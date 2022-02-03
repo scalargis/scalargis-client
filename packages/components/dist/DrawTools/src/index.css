@@ -1,0 +1,36 @@
+#drawtools .p-button.tool {
+  font-weight: 500;
+  width: 32px !important;
+  margin-right: 1px;
+  margin-bottom: 1px;
+}
+
+#drawtools .toolbar {
+  padding: 1em;
+}
+
+#drawtools .p-button {
+  border-radius: unset;
+}
+
+#drawtools .p-button.format-tool {
+  font-weight: 500;
+  margin-right: 1px;
+  margin-bottom: 1px;
+}
+
+#drawtools .drawtools-text-input {
+  width: 100%;
+  margin-top: 1em;
+}
+
+#drawtools .p-paginator .p-dropdown {
+  margin-left: 0.5rem;
+  height: 2.3rem;
+}
+
+#drawtools .p-button.tool.active:active,
+#drawtools .p-button.tool.active:focus,
+#drawtools .p-button.tool.active:enabled {
+  background: #673AB7 !important;
+}

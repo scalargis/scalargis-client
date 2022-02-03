@@ -1,0 +1,12 @@
+{
+  "id": "coordinates",
+  "type": "Coordinates", 
+  "target": "mainmenu", 
+  "order": 6,
+  "config_json": {
+    "map_control": "Coordinates",
+    "crs_list": [3763, 4326],
+    "export_crs": 3763
+   },
+  "children": []
+}

@@ -1,0 +1,61 @@
+.sb-show-main h1 {
+  display: block;
+}
+
+.sb-show-main .p-field-checkbox,
+.sb-show-main .p-field-radiobutton {
+  margin-bottom: 1rem;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.p-dialog-content {
+  overflow-y: none;
+}
+
+.p-dialog-myfooter {
+  border-top: 1px solid #c8c8c8;
+  background: #ffffff;
+  color: #333333;
+  padding: 0.571rem 1rem;
+  text-align: right;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+#layer-switcher .activate {
+  width: 64px !important;
+}
+
+.p-checkbox .p-checkbox-box {
+  position: relative;
+  top: -6px;
+}
+
+#layer-switcher td:nth-child(2) {
+  padding-top: .6rem;
+}
+
+.theme-tools {
+  display: flex;
+  flex-direction: row;
+  margin-left: -2.5em;
+}
+
+.hidden {
+  display: none;
+}
+
+#layer-switcher .label-grp {
+  font-weight: bold;
+}
+
+.p-button.p-button-sm {
+  padding: 0.33rem 0.25rem;
+}
+
+.p-checkbox {
+  margin-left: 4px;
+}

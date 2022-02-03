@@ -2,6 +2,7 @@ import React from 'react'
 import { extend, omit } from 'underscore'
 import thunk from 'redux-thunk'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
+import * as cmps from '@scalargis/components'
 import * as actions from './core/actions'
 import * as utils from './core/utils'
 
@@ -133,6 +134,40 @@ Core.prototype.setConfig = function(config) {
 
 // Add components
 Core.prototype.addComponent = function(core, component, done) {
+
+  //Add local component
+  if (cmps[component.type]) {
+    const c = cmps[component.type];
+
+    // Add component actions
+    if (c.actions && typeof c.actions === 'object') {
+      core.actions = extend(core.actions, omit(c.actions, this.__secureProps ));
+    }
+
+    // Add component reducers
+    if (c.reducers && typeof c.reducers === 'object') {
+      Object.entries(c.reducers).forEach(function([key, reducer]) {
+        core.store.reducerManager.add(key, reducer);
+     });
+    }    
+
+    // Registry Pattern: register react component in components registry
+    if (!!c.default && !this.__components[component.type]) {   
+      const ReactComponent = c.default;
+      this.__components[component.type] = ReactComponent;
+    }
+
+    // Main menu registry
+    if (!!c.MainMenu && !this.__mainmenu[component.type]) {
+      const MainMenu = c.MainMenu;
+      this.__mainmenu[component.type] = MainMenu;
+    }
+
+    //It's a local component, do not load from plugin components
+    return;
+  }
+
+  // Add plugin components
   import('./components/' + component.type + '/src/Main.js').then(c => {
 
     // Add component actions

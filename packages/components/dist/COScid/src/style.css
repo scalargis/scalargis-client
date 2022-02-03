@@ -1,0 +1,170 @@
+.map-region-top-right {
+  z-index: 2 !important;
+}
+
+.coscid-control .coscid-control-content {
+  position: fixed;
+  top: 50px;
+  padding: 0;
+  right: 32em;
+  right: 0;
+  display: block;
+  width: 32em;
+  z-index: 998;
+  height: calc(100% - 85px);
+  max-width: 100%;
+  transform: translate3d(32em, 0px, 0px);
+  transition: transform 0.2s;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  box-shadow: 0 2px 10px 0 rgb(0 0 0 / 24%);
+  color: #333333;
+  background-color: #ffffff;
+  overflow-y: auto;
+}
+
+.coscid-control .coscid-control-content.coscid-control-content-opened {
+  transform: translate3d(0px, 0px, 0px);
+}
+
+.coscid-control .coscid-control-close {
+  /*position: unset !important;*/
+  /*
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  right: 20px;
+  top: 10px;
+  */
+  position: absolute;
+  z-index: 1000;
+  background-color: #e54a51;
+  transition: background-color 0.2s;
+  /*border-radius: 50%;*/
+  top: -11px;
+  right: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.coscid-control .coscid-control-close i {
+  color: #ffffff;
+  line-height: inherit;
+  font-size: 12px;
+}
+
+.coscid-control .coscid-main-control {
+  position: absolute;
+  right: 0px; 
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 0.5em;
+  border-radius: 4px;
+}
+
+.coscid-control .coscid-main-control-menu {
+  width: unset;
+  background-color: rgba(255,255, 255, 0.7);
+}
+
+.coscid-control .coscid-main-control-menu:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.coscid-control .p-menuitem.coscid-menu-selected {
+  background-color: rgb(255, 255, 255);
+}
+
+.coscid-control .p-menuitem.coscid-menu-selected .p-menuitem-link .p-menuitem-text,
+.coscid-control .p-menuitem.coscid-menu-selected .p-menuitem-link .p-menuitem-icon {
+  color: rgb(84, 165, 105);
+}
+
+.coscid-control .p-speeddial>button,
+.coscid-control .p-speeddial>button.p-button.p-button-icon-only.p-button-rounded {
+  height: 5rem;
+  width: 5rem;
+}
+
+.coscid-control .p-speeddial>ul {
+  --item-diff-x: .5px !important;
+  --item-diff-y: .5px !important;
+}
+
+.coscid-control .p-speeddial-action {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #495057;
+  color: #fff;
+}
+
+.coscid-control .p-speeddial-action.p-speeddial-action-active {
+  background-color: #FBC02D;
+}
+
+.coscid-control .p-button.coscid-menu-selected {
+  line-height: 1.27em;
+}
+
+.coscid-control .coscid-control-content .p-grid {
+  margin-right: unset;
+}
+
+
+.coscid-control .coscid-control-content .p-divider.p-divider-horizontal {
+  margin: 1.25rem 0;
+  padding: 0 1.25rem;
+  color: #d3d3d3;
+}
+
+.coscid-control .coscid-control-content .p-divider-dashed.p-divider-horizontal:before {
+  border-width: thin;
+}
+
+.coscid-control .coscid-control-content .p-tag {
+  font-size: 1rem;
+}
+
+.coscid-control .coscid-control-content .p-divider.p-component {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.coscid-control .coscid-control-content .coscid-stats-groups .p-dropdown.p-component {  
+  width: -webkit-fill-available !important;
+  margin-left: 0px !important;
+  margin-bottom: 5px;
+}
+
+.coscid-control .coscid-control-content .p-button.btn-zoom-admin-unit {
+  background-color: rgb(131, 131, 131);
+}
+
+.coscid-control .coscid-control-content .p-button.btn-zoom-admin-unit:enabled:hover {
+  background: rgb(84, 165, 105);
+}
+
+.coscid-stats-serie {
+  cursor: pointer;
+}
+
+.coscid-stats-serie-selected {
+  /*background: linear-gradient(0deg, #9fc222c4 0%, rgba(255,255,255,1) 100%);*/
+  background: #f5f5f5;
+}
+
+.coscid-control .coscid-control-content .coscid-legend-checkbox {
+  margin-bottom: 1px;
+}
+
+.coscid-control .coscid-control-content .coscid-legend-class {
+  margin-left: 4px;
+  line-height: 19px;
+  width: 30px;
+  min-width: 30px;
+}
+
+.coscid-control .coscid-control-content .coscid-legend-buttons {
+  margin-top: 5px;
+  text-align: center;
+}

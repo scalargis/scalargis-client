@@ -3,6 +3,7 @@ module.exports = {
     "../src/stories/*.stories.mdx",
     "../src/stories/*.stories.@(js|jsx|ts|tsx)",
     "../packages/frontend/src/components/*/src/stories/*.stories.@(js|jsx|ts|tsx)",
+    "../packages/components/src/*/src/stories/*.stories.@(js|jsx|ts|tsx)",
     "../packages/primereact-renderers/src/stories/*.stories.@(js|jsx|ts|tsx)"
   ],
   "addons": [

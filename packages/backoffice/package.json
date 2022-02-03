@@ -8,6 +8,7 @@
     "src/components/*"
   ],  
   "dependencies": {
+    "@scalargis/components": "^0.1.0",
     "@fortawesome/fontawesome-free": "^5.15.2",
     "@fullcalendar/core": "4.4.2",
     "@fullcalendar/daygrid": "4.4.2",

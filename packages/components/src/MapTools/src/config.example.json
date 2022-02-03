@@ -1,0 +1,9 @@
+{
+  "id": "maptools",
+  "type": "MapTools", 
+  "target": "mainmenu",
+  "title": "Ferramentas de Medição",
+  "order": 3,
+  "config_json": { "header": "Ferramentas de Medição", "crs": 3763 },
+  "children": []
+}

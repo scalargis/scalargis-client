@@ -1,0 +1,26 @@
+{
+  "id": "streetview",
+  "type": "StreetView",
+  "title": "StreetView",
+  "config_json": {
+      "header": "Google Street View",
+      "show_options": true, 
+      "tracking": "extent",
+      "style": {
+          "fill": {
+              "color": "rgba(0, 0, 255, 0.2)"
+          },
+          "image": {
+              "icon": {
+                  "src": "assets/images/location-heading.svg",
+                  "imgSize": [27, 55]
+              }
+          }
+      }
+  },
+  "config_version": "1.0",
+  "regions": [],
+  "target": "other_tools",
+  "children": [
+  ]
+}

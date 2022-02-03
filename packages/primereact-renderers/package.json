@@ -11,7 +11,6 @@
     "copy": "copyfiles -u 1 \"./src/**/*.{css,html}\" \"./dist/\""
   },
   "dependencies": {
-    "@craco/craco": "^6.4.3"
   },  
   "devDependencies": {
     "@jsonforms/core": "^2.5.2",

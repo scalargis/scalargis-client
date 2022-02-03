@@ -1,0 +1,263 @@
+{
+    "id": "searchlayers1",
+    "type": "SearchLayers",
+    "title": "Pesquisa de tema 1 ",
+    "icon": "pi pi-briefcase",
+    "config_json": {
+        "header": "Pesquisa Temas 1",
+        "show_icon": true,
+        "exclusive_layer": false,
+        "layers": [
+            {
+                "id": "search-cadastro",
+                "title": "Cadastro",
+                "subtitle": "sfsfsdfsf",
+                "icon": "pi pi-th-large",
+                "tooltip": "Pesquisar Cadastro",
+                "description": "czxcvxcv csdsdf sdfasdf sdf",
+                "layer_id": "",
+                "source_type": "wfs",                        
+                "source_url": "http://srvcoscid.wkt.pt/geoserver/cos/ows",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "seccao": {
+                            "type": "string",
+                            "enum": ["A", "B", "C", "D"]
+                        },                                 
+                        "predio": {
+                            "type": "string"
+                        },
+                        "proprietario": {
+                            "type": "string"
+                        }                                
+                    },
+                    "required": ["seccaoj"]
+                },
+                "uischema": {
+                    "type": "HorizontalLayout",
+                    "elements": [
+                        {
+                            "type": "Control",
+                            "label": "Secção",
+                            "scope": "#/properties/seccao"
+                        },
+                        {
+                            "type": "Control",
+                            "label": "Prédio",
+                            "scope": "#/properties/predio"
+                        },
+                        {
+                            "type": "Control",
+                            "label": "Proprietário",
+                            "scope": "#/properties/proprietario"
+                        }                                
+                    ]
+                }
+            },
+            {
+                "id": "search-lugares",
+                "title": "Lugares",
+                "icon": "pi pi-table",
+                "description": "",
+                "layer_id": "",
+                "source_type": "wfs",
+                "source_url": "https://www.wkt.pt/geoserver/wktapp-tests/ows",
+                "feature_namespace": "http://wktapp-tests.pt",
+                "feature_prefix": "wktapp-tests",
+                "feature_type": "v_lugar",
+                "pagination": false 
+            },                    
+            {
+                "id": "search-caop",
+                "title": "CAOP",
+                "icon": "pi pi-table",
+                "description": "",
+                "layer_id": "",
+                "source_type": "wfs",
+                "source_url": "https://www.wkt.pt/geoserver/caop/ows",
+                "feature_namespace": "caop.maps.wkt.pt",
+                "feature_prefix": "caop",
+                "feature_type": "conc" 
+            },
+            {
+                "id": "search-caop-wkt",
+                "title": "CAOP WKT",
+                "icon": "pi pi-table",
+                "description": "",
+                "layer_id": "",
+                "source_type": "wfs",
+                "source_url": "https://www.wkt.pt/geoserver/caop/ows",
+                "feature_namespace": "caop.maps.wkt.pt",
+                "feature_prefix": "caop",
+                "feature_type": "conc",
+                "fields_list": {
+                    "distrito": {
+                        "label": "Distrito"
+                    },
+                    "concelho": {
+                        "label": "Concelho"
+                    }
+                },
+                "fields_sort": ["concelho", "distrito"] 
+            }                    
+        ]
+    },
+    "config_version": "1.0",
+    "regions": [],
+    "target": "mainmenu",
+    "order": 10,
+    "children": []
+  },
+  {
+    "id": "searchlayers2",
+    "type": "SearchLayers",
+    "title": "Pesquisa de tema 2",
+    "config_json": {
+        "header": "Pesquisa Temas 2",
+        "show_icon": true,
+        "exclusive_layer": true,
+        "style": {
+            "fill": {
+                "color": "rgba(0, 255, 0, 1)"
+            },
+            "stroke": {
+                "color": "rgba(126, 211, 33, 1)",
+                "width": 4,
+                "lineCap": "square",
+                "lineJoin": "miter",
+                "lineDash": [10, 5, 10],
+                "lineDashOffset": 3,
+                "miterLimit": 2
+            },
+            "image": {
+                "radius": 20,
+                "fill": {
+                    "color": "rgba(0, 255, 0, 0.8)"
+                },
+                "stroke": { 
+                    "color": "rgba(126, 211, 33, 1)",
+                    "width": 2 
+                }
+            }           
+        },                
+        "layers": [
+            {
+                "id": "search-lugares",
+                "title": "Lugares",
+                "icon": "pi pi-table",
+                "description": "",
+                "layer_id": "",
+                "source_type": "wfs",
+                "source_url": "https://www.wkt.pt/geoserver/wktapp-tests/ows",
+                "feature_namespace": "http://wktapp-tests.pt",
+                "feature_prefix": "wktapp-tests",
+                "feature_type": "v_lugar",
+                "pagination": false,
+                "all_geometries": true                         
+            },                    
+            {
+                "id": "search-caop",
+                "title": "CAOP",
+                "icon": "pi pi-table",
+                "description": "",
+                "layer_id": "",
+                "source_type": "wfs",
+                "source_url": "https://www.wkt.pt/geoserver/caop/ows",
+                "feature_namespace": "caop.maps.wkt.pt",
+                "feature_prefix": "caop",
+                "feature_type": "conc" 
+            },
+            {
+                "id": "search-caop-wkt",
+                "title": "CAOP WKT",
+                "icon": "pi pi-table",
+                "description": "",
+                "layer_id": "",
+                "source_type": "wfs",
+                "source_url": "https://www.wkt.pt/geoserver/caop/ows",
+                "feature_namespace": "caop.maps.wkt.pt",
+                "feature_prefix": "caop",
+                "feature_type": "conc",
+                "fields_form": {
+                    "distrito": {
+                        "expression": "*{value}*"
+                    },
+                    "concelho": {
+                        "expression": "{concelho}"
+                    }
+                },
+                "fields_list": {
+                    "distrito": {
+                        "label": "Distrito"
+                    },
+                    "concelho": {
+                        "label": "Concelho"
+                    }
+                },
+                "fields_sort": ["concelho", "distrito"]                        
+            }                    
+        ]
+    },
+    "config_version": "1.0",
+    "regions": [],
+    "target": "mainmenu",
+    "order": 10,
+    "children": []
+  },
+  {
+    "id": "searchlayers3",
+    "type": "SearchLayers",
+    "title": "Pesquisa de Cadastro",
+    "icon": "pi pi-id-card",
+    "config_json": {
+        "header": "Cadastro",
+        "show_icon": true,
+        "show_main": false,
+        "exclusive_layer": true,
+        "style": {
+            "fill": {
+                "color": "rgba(255, 0, 0, 0.5)"
+            },
+            "stroke": {
+                "color": "rgba(126, 211, 33, 1)",
+                "width": 4,
+                "lineCap": "square",
+                "lineJoin": "miter",
+                "lineDash": [10, 5, 10],
+                "lineDashOffset": 3,
+                "miterLimit": 2
+            },
+            "image2": {
+                "radius": 10,
+                "fill": {
+                    "color": "rgba(255, 0, 0, 0)"
+                },
+                "stroke": { 
+                    "color": "rgba(126, 211, 33, 1)",
+                    "width": 2 
+                }
+            }           
+        },
+        "layers": [                   
+            {
+                "id": "search-caop",
+                "title": "Cadastro de Albergaria dos Doze",
+                "icon": "pi pi-table",
+                "description": "",
+                "layer_id": "",
+                "source_type": "wfs",
+                "source_url": "https://www.wkt.pt/geoserver/caop/ows",
+                "feature_namespace": "caop.maps.wkt.pt",
+                "feature_prefix": "caop",
+                "feature_type": "conc",
+                "all_geometries": true
+            }                   
+        ]
+    },
+    "config_version": "1.0",
+    "regions": [],
+    "target": "mainmenu",
+    "order": 10,
+    "children": []
+  }

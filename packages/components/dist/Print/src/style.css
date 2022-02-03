@@ -1,0 +1,45 @@
+/* ----- */
+#content .print h4 {
+  border-bottom: #9e9d9e;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  padding-bottom: 10px;
+  margin-bottom: 5px;
+}
+
+#content .print p {
+  margin-top: 10px;
+}
+
+#content .print .print-panel1 button { 
+  position: absolute;
+  right: 15px;
+  margin-top: -8px;
+}
+
+#content .print .print-panel2 button.tool.p-button-sm,
+#content .print .print-panel-item button.tool.p-button-sm  { 
+  padding: 0.49rem 0.49rem !important
+}
+
+#content .print .print-panel2 button.tool.active,
+#content .print .print-panel-item button.tool.active { 
+  background-color: red;
+}
+
+#content .print .print-panel3 ul {
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+#content .print .print-panel3 ul li {
+  line-height: 1.8rem;
+}
+
+#content .print .print-panel4 i.print-error {
+  color: red;
+}
+
+#content .print .print-panel4 i.print-success {
+  color: green;
+}

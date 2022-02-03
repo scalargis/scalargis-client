@@ -1,0 +1,15 @@
+{
+  "id": "placessearch",
+  "type": "PlacesSearch", 
+  "target": "topbar_right", 
+  "order": 1,
+  "config_json": {
+    "url": "https://snig.dgterritorio.pt/geographical_names/search?_min_similarity=0.5&_maxrows=10&_filter={filter}",
+    "sources": [
+      { "id": "DGT", "title": "DGT", "active": true, "buffer": 1000},
+      { "id": "INE", "title": "INE", "active": true, "buffer": 500}
+    ],
+    "buffer": 1000
+  },
+  "children": []
+}

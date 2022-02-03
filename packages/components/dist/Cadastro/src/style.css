@@ -1,0 +1,20 @@
+div.cadastro div.p-dropdown.p-component .p-dropdown-panel.p-component li.p-dropdown-item label {
+  white-space: pre-wrap;  
+}
+
+div.cadastro .p-inputgroup button.p-all-rounded {
+  border-top-right-radius: 50% !important;
+  border-bottom-right-radius: 50% !important;
+}
+
+.p-chip.custom-chip-pts-cadastro-P {
+  background: White;
+  color: Black;
+  font-size: 12px;
+}
+
+.p-chip.custom-chip-pts-cadastro-M {
+  background: rgba(255, 99, 71, 0.5);
+  color: Black;
+  font-size: 12px;
+}

@@ -1,0 +1,66 @@
+
+.node rect {
+    fill-opacity: .9;
+    shape-rendering: crispEdges;
+  }
+  
+  .node text {
+    pointer-events: none;
+    text-shadow: 0 1px 0 #fff;
+  }
+  
+  .link {
+    fill: none;
+    /* stroke: #666666; */
+    stroke-opacity: .5;
+  }
+  
+  .link:hover {
+    /* stroke-opacity: .5; */
+    /* stroke: #008aff; */
+    stroke-opacity: 1;
+  
+  }
+  
+  .sankey_header{
+    background-color: #ff9a1e;
+    padding-left: 40px;
+    cursor: default;
+    height: 28.5px;
+    justify-content: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .panel_title{
+    color: whitesmoke;
+    font-size: 18px;
+  }
+  
+  .sankey_diagram{
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #ff9a1e;
+    border-radius: 10px;
+  
+  }
+  
+  .sakey_background{
+    background-color: #ffffff;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+  }
+
+  
+  .year{
+    color: rgba(78, 65, 65, 0.911);
+  }
+  .year:hover, .year.active:hover{
+    cursor: pointer;
+    font-size: 105%;
+  }
+  
+  .year.active{
+    color: #000;
+  }

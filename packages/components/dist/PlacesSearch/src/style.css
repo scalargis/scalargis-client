@@ -1,0 +1,13 @@
+.layout-topbar .layout-topbar-icons .layout-topbar-search {
+  top: -2px;
+}
+
+.layout-topbar .layout-topbar-icons .layout-topbar-search input {
+  font-size: 1.1rem;
+  width: 155px;
+  padding: 1px 34px 1px 1px;
+}
+
+.layout-topbar .layout-topbar-icons .layout-topbar-search .layout-topbar-search-icon {
+  top: 2px;
+}

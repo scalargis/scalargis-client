@@ -1,0 +1,29 @@
+.dialog-demo .p-button {
+    margin: 0 0rem 0 0;
+    min-width: 10rem;
+}
+
+.dialog-demo p {
+    margin: 0;
+    line-height: 1.5;
+    height: 550px;
+}
+
+.dialog-demo .p-dialog .p-button {
+    min-width: 6rem;
+}
+
+.p-dialog-header {
+    height: 50px;
+}
+
+/*
+.p-dialog-content{
+    display: grid;
+    place-items: center;
+}
+*/
+
+.p-dialog-header-icons {
+    height: 7px;
+}

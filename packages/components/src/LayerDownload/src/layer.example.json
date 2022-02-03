@@ -1,0 +1,21 @@
+{
+  "exclude_export_formats": ["gml"],
+  "download": {
+    "link": {
+      "url": "http://snic.dgterritorio.gov.pt/geoserver/cp/wfs?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&typeNames=cp:mv_0812_publicar&srsName=EPSG:3763&outputFormat=SHAPE-ZIP&propertyName=the_geom,declaracao",
+      "label": "Shapefile"
+    },
+    "external": {
+      "url": "https://snig.dgterritorio.gov.pt/rndg",
+      "label": "Externo"
+    },
+    "datasource": {
+      "type": "WFS",
+      "url": "http://snic.dgterritorio.gov.pt/geoserver/cp/wfs?",
+      "typeNames": "cp:mv_0812_publicar",
+      "geomName": "the_geom",
+      "crs": "EPSG:3763",
+      "propertyName": "the_geom,declaracao"
+    }
+  }
+}

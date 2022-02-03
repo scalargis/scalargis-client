@@ -1,0 +1,71 @@
+/* style */
+
+.p-panel-content div.coordinates h4 {
+  margin-bottom: 10px;
+}
+
+.p-panel-content div.coordinates .p-paginator.p-paginator-bottom {
+  justify-content: center;
+}
+
+.p-dataview-list div.coordinates-item {
+  padding-top: 5px;
+}
+
+.coordinates-item table {
+  width: 100%;
+  border: none;
+  border-collapse: collapse; 
+  font-size: .9rem; 
+}
+
+.coordinates-item table td {
+  padding: 5px;
+}
+
+.coordinates-item table>tr>td {
+  text-align: left;
+  border: solid #e4e4e4;
+  border-width: 0 1px 1px;
+}
+
+.coordinates-item td.coordinates-item-title {
+  background-color: #424242;
+  color: white;
+  border: solid #424242;
+  border-width: 1px;
+}
+
+.coordinates-item .coordinates-item-tools {
+  background: #2196f3;
+}
+
+.coordinates-item .coordinates-item-tools .p-button {
+  border-radius: 0;
+}
+
+.coordinates-item .coordinates-item-tools .p-menu.p-menu-overlay {
+  width: 7rem;
+  left: -30px !important;
+}
+
+.coordinates-item .coordinates-item-tools .p-splitbutton-defaultbutton {
+  display: none
+}
+
+.coordinates-item .coordinates-item-tools .p-splitbutton-menubutton span.pi:before {
+  content: "\e956";
+}
+
+
+.coordinates .p-formgroup-inline.flex-no-wrap {
+  flex-wrap: nowrap;
+}
+
+.coordinates .p-inputtext.p-inputnumber-input {
+  font-size: 1rem;
+}
+
+.coordinates .p-inputmask {
+  padding: 0.65rem 0.5rem;
+}
