@@ -1,0 +1,45 @@
+{
+  "name": "scalargis",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "packages/frontend/src/components/*",
+    "packages/frontend/src/themes/*",
+    "packages/backoffice/src/components/*"  
+  ],
+  "scripts": {
+    "start": "cd ./packages/frontend && yarn start",
+    "build": "cd ./packages/frontend && yarn build",
+    "test": "cd ./packages/frontend && yarn test",    
+    "story": "lerna run storybook --stream",
+    "lerna:prepublish": "lerna bootstrap && lerna run build --include-dependencies --stream",
+    "lerna:publish": "yarn install && yarn run lerna:prepublish && lerna publish from-package --ignore-scripts --ignore-prepublish",
+    "_build:all": "lerna run build --parallel",
+    "build:all": "lerna run build  --concurrency 1",
+    "install:all": "lerna bootstrap && lerna link",
+    "start:all": "lerna run start --parallel",
+    "storybook": "start-storybook -p 9009",
+    "build-storybook": "build-storybook"    
+  },
+  "devDependencies": {
+    "lerna": "^4.0.0",
+    "@storybook/addon-actions": "^6.1.17",
+    "@storybook/addon-essentials": "^6.1.17",
+    "@storybook/addon-links": "^6.1.17",
+    "@storybook/node-logger": "^6.1.17",
+    "@storybook/preset-create-react-app": "^3.1.5",
+    "@storybook/react": "^6.1.17",  
+    "@babel/core": "^7.16.7",
+    "babel-loader": "^8.1.0"       
+  },
+  "dependencies": {
+    "primeflex": "2.0.0",
+    "primeicons": "^4.1.0",
+    "primereact": "^6.6.0"     
+  },
+  "resolutions": {
+    "babel-loader": "8.1.0",
+    "webpack": "4.44.2"
+  }   
+}

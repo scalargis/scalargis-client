@@ -1,0 +1,1 @@
+export { PrimereactIntegerCell } from './PrimereactIntegerCell';

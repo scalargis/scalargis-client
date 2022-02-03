@@ -1,0 +1,12 @@
+#https://stackoverflow.com/questions/64625050/error-node-sass-version-5-0-0-is-incompatible-with-4-0-0
+yarn remove node-sass
+yarn add node-sass@4.14.1
+
+#https://forum.primefaces.org/viewtopic.php?t=64958
+yarn add @fullcalendar/core@4.4.2
+yarn add @fullcalendar/daygrid@4.4.2
+yarn add @fullcalendar/interaction@4.4.2
+yarn add @fullcalendar/timegrid@4.4.2
+
+#https://github.com/primefaces/primereact/issues/913
+yarn add chart.js

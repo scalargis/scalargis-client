@@ -1,0 +1,1053 @@
+{
+  "id": 1,
+  "name": "cadastro",
+  "title": "Aplica\u00e7\u00e3o para consulta do cadastro da propriedade",
+  "description": null,
+  "keywords": null,
+  "author": null,
+  "lang": null,
+  "slug": "cadastro",
+  "bbox": null,
+  "maxbbox": null,
+  "config_version": null,
+  "config_json": {
+      "id": "toc",
+      "title": "TOC",
+      "state": "TOC_DEFAULT",
+      "activeIndex": 0,
+      "displayConfig": {
+          "map": {
+              "srid": 3857
+          }
+      },
+      "selected_menu": "cadastro",
+      "help_url": "https://snic.dgterritorio.gov.pt/snic_help",
+      "display_crs": 3763,
+      "export_crs": 3763,
+      "crs_list": [
+          {
+              "srid": 3763,
+              "code": "EPSG:3763",
+              "title": "PT-TM06/ETRS89",
+              "label": "PT-TM06/ETRS89 (EPSG:3763)",
+              "defs": "+proj=tmerc +lat_0=39.66825833333333 +lon_0=-8.133108333333334 +k=1 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+              "extent": "-9.5000 36.9000 -6.1900 42.1500",
+              "description": "PT-TM06/ETRS89",
+              "precision": 1000
+          },
+          {
+              "srid": 3857,
+              "code": "EPSG:3857",
+              "title": "Pseudo-Mercator/WGS84",
+              "label": "Pseudo-Mercator/WGS84 (EPSG:3857)",
+              "extent": "-180 -90 180 90",
+              "description": "Pseudo-Mercator/WGS84",
+              "precision": 1000
+          },
+          {
+              "srid": 4326,
+              "code": "EPSG:4326",
+              "title": "WGS84",
+              "label": "WGS84 (EPSG:4326)",
+              "extent": "-180 -90 180 90",
+              "description": "WGS84",
+              "precision": 1000000
+          }
+      ],
+      "center": [
+          -874202,
+          4808946
+      ],
+      "extent": [
+          -1059430,
+          4400000,
+          -688974,
+          5200000
+      ],
+      "full_extent": [
+          -1600000,
+          4400000,
+          -100000,
+          5200000
+      ],
+      "constrained_extent": [
+          -1600000,
+          4400000,
+          -100000,
+          5200000
+      ],
+      "max_zoom": 18,
+      "max_zoom_authenticated": 20,
+      "proxy_http_image_requests": true,
+      "exclude_export_formats": [
+          "gml",
+          "kml",
+          "shape"
+      ],
+      "opened": [
+          "overlays"
+      ],
+      "checked": [
+          "overlays",
+          "basemaps",
+          "main",
+          "osm1",
+          "AerialDGTWorld",
+          "AerialDGTOrtos2018",
+          "userlayer"
+      ],
+      "drawings": [],
+      "components": [
+          {
+              "id": "popupinfo",
+              "type": "PopupInfo",
+              "title": "PopupInfo",
+              "config_json": {
+                  "header": "Bem-vindo ao",
+                  "html": "<div><h3 style='text-align: center'>VISUALIZADOR DO SISTEMA NACIONAL DE INFORMA\u00c7\u00c3O CADASTRAL</h3><div>Para mais informa\u00e7\u00e3o, consulte a <a href='https://www.dgterritorio.gov.pt/cadastro' target='_blank'>p\u00e1gina oficial da DGT</a> ou contacte pelo formul\u00e1rio <a href='https://www.dgterritorio.gov.pt/formulario-contacto' target='_blank'>https://www.dgterritorio.gov.pt/formulario-contacto</a>.<p></p><strong>A impress\u00e3o dos dados disponibilizados n\u00e3o tem valor de certid\u00e3o.</strong></div></div>",
+                  "hideOption": false,
+                  "cookieName": "popup2",
+                  "maxAge": 86400
+              },
+              "config_version": "1.0",
+              "regions": [],
+              "target": "popup",
+              "children": []
+          },
+          {
+              "id": "placessearch",
+              "type": "PlacesSearch",
+              "target": "topbar_right",
+              "order": 1,
+              "config_json": {
+                  "url": "https://snic.dgterritorio.gov.pt/geographical_names/search?_min_similarity=0.5&_maxrows=10&_filter={filter}",
+                  "sources": [
+                      {
+                          "id": "DGT",
+                          "title": "DGT",
+                          "active": true,
+                          "buffer": 1000
+                      },
+                      {
+                          "id": "INE",
+                          "title": "INE",
+                          "active": true,
+                          "buffer": 500
+                      }
+                  ],
+                  "buffer": 1000
+              },
+              "children": []
+          },
+          {
+              "id": "cadastro",
+              "type": "Cadastro",
+              "title": "Cadastro",
+              "config_json": {
+                  "header": "Pesquisa Cadastro"
+              },
+              "config_version": "1.0",
+              "regions": [],
+              "target": "mainmenu",
+              "children": []
+          },
+          {
+              "id": "7",
+              "type": "LayerAttributesTable",
+              "title": "Tabela de Atributos",
+              "config_json": {},
+              "config_version": "1.0",
+              "regions": [],
+              "target": "layer_tools",
+              "children": []
+          },
+          {
+              "id": "6",
+              "type": "LayerDownload",
+              "title": "Descarregar Tema",
+              "config_json": {},
+              "config_version": "1.0",
+              "regions": [],
+              "target": "theme_info_tools",
+              "children": []
+          },
+          {
+              "id": "5",
+              "type": "LayerEdit",
+              "title": "Personalizar Tema",
+              "config_json": {},
+              "config_version": "1.0",
+              "regions": [],
+              "target": "layer_tools",
+              "children": []
+          },
+          {
+              "id": "4",
+              "type": "LayerRemove",
+              "title": "Remover",
+              "config_json": {},
+              "config_version": "1.0",
+              "regions": [],
+              "target": "layer_tools",
+              "children": []
+          },
+          {
+              "id": "3",
+              "type": "LayerMetadata",
+              "title": "Metadados",
+              "config_json": {},
+              "config_version": "1.0",
+              "regions": [],
+              "target": "layer_tools",
+              "children": [
+                  "6"
+              ]
+          },
+          {
+              "id": "2",
+              "type": "LayerOpacity",
+              "title": "Opacidade",
+              "config_json": {
+                  "name": "Opacidade",
+                  "except": [
+                      "2"
+                  ]
+              },
+              "config_version": "1.0",
+              "regions": [],
+              "target": "layer_tools",
+              "children": []
+          },
+          {
+              "id": "toc",
+              "type": "TOC",
+              "target": "mainmenu",
+              "order": 1,
+              "config_json": {
+                  "content": 1
+              },
+              "children": [
+                  "3",
+                  "4",
+                  "5",
+                  "7",
+                  "2",
+                  "exportfeat"
+              ]
+          },
+          {
+              "id": "themewizard",
+              "type": "ThemeWizard",
+              "target": "mainmenu",
+              "order": 2,
+              "config_json": {
+                  "data": {
+                      "type": "",
+                      "url": "",
+                      "wmsIgnoreServiceUrl": true,
+                      "wmsVersion": "1.3.0",
+                      "wmsTiled": true,
+                      "wmtsIgnoreServiceUrl": true,
+                      "wmtsVersion": "1.0.0",
+                      "crs": "4326",
+                      "dataitems": [],
+                      "items": [],
+                      "get_map_format": "image/png",
+                      "get_feature_info_format": "text/plain"
+                  },
+                  "layer_visible": true,
+                  "layer_group_opened": true
+              },
+              "children": []
+          },
+          {
+              "id": "maptools",
+              "type": "MapTools",
+              "target": "mainmenu",
+              "order": 3,
+              "config_json": {
+                  "crs": 3763
+              },
+              "children": []
+          },
+          {
+              "id": "drawtools",
+              "type": "DrawTools",
+              "target": "mainmenu",
+              "order": 20,
+              "config_json": {
+                  "content": 1
+              },
+              "children": []
+          },
+          {
+              "id": "featureinfo",
+              "type": "FeatureInfo",
+              "target": "mainmenu",
+              "order": 8,
+              "config_json": {
+                  "map_control": "FeatureInfo",
+                  "header": "Identificar elementos"
+              },
+              "title": "Identificar elementos",
+              "children": []
+          },
+          {
+              "id": "mapscaleline",
+              "type": "MapScaleLine",
+              "target": "footer_right",
+              "order": 1,
+              "config_json": {
+                  "content": 1
+              },
+              "children": []
+          },
+          {
+              "id": "mapscaleinput",
+              "type": "MapScaleInput",
+              "target": "footer_right",
+              "order": 2,
+              "config_json": {
+                  "content": 1
+              },
+              "children": []
+          },
+          {
+              "id": "crsselect",
+              "type": "CRSSelect",
+              "target": "footer_right",
+              "order": 3,
+              "config_json": {
+                  "content": 1
+              },
+              "children": []
+          },
+          {
+              "id": "mapcontrols",
+              "type": "MapControls",
+              "target": "map_controls_left",
+              "order": 4,
+              "config_json": {
+                  "content": 1
+              },
+              "children": []
+          },
+          {
+              "id": "coordinates",
+              "type": "Coordinates",
+              "target": "mainmenu",
+              "order": 6,
+              "config_json": {
+                  "map_control": "Coordinates"
+              },
+              "children": []
+          },
+          {
+              "id": "geolocation",
+              "type": "GeoLocation",
+              "target": "mainmenu",
+              "order": 6,
+              "config_json": {
+                  "map_control": "GeoLocation"
+              },
+              "children": []
+          },
+          {
+              "id": "basemaps",
+              "type": "Basemaps",
+              "target": "map_controls_top_left",
+              "order": 5,
+              "config_json": {
+                  "auto_close": true
+              },
+              "children": []
+          },
+          {
+              "id": "print",
+              "type": "Print",
+              "target": "mainmenu",
+              "order": 12,
+              "title": "Imprimir",
+              "config_json": {
+                  "header": "Imprimir",
+                  "closeLabel": "Fechar"
+              },
+              "children": []
+          }
+      ],
+      "map_controls": [
+          {
+              "id": "Attribution",
+              "type": "Attribution",
+              "collapsible": true,
+              "collapsed": false
+          },
+          {
+              "id": "FeatureInfo",
+              "type": "FeatureInfo",
+              "show_button": false,
+              "exclusive": true,
+              "active": false
+          },
+          {
+              "id": "Coordinates",
+              "type": "Coordinates",
+              "show_button": false,
+              "exclusive": true,
+              "active": false
+          },
+          {
+              "id": "GeoLocation",
+              "type": "GeoLocation",
+              "show_button": false,
+              "active": false,
+              "zoom_init": true,
+              "zoom": true
+          }
+      ],
+      "layers": [
+          {
+              "active": true,
+              "id": "userlayer",
+              "opacity": 1,
+              "open": true,
+              "system": true,
+              "title": "Camada do Utilizador",
+              "type": "VECTOR",
+              "selectable": false
+          },
+          {
+              "active": true,
+              "children": [
+                  "userlayer"
+              ],
+              "id": "overlays",
+              "opacity": 1,
+              "open": true,
+              "system": true,
+              "title": "Camadas do utilizador",
+              "type": "GROUP",
+              "selectable": false
+          },
+          {
+              "type": "GROUP",
+              "active": true,
+              "id": "main",
+              "title": "TOC",
+              "opacity": 1,
+              "system": true,
+              "open": true,
+              "children": [
+                  "caop",
+                  "ran",
+                  "crus",
+                  "ren",
+                  "cos",
+                  "areas_edificadas",
+                  "interface_urbano_rural"
+              ],
+              "selectable": false
+          },
+          {
+              "active": true,
+              "id": "osm1",
+              "opacity": 1,
+              "open": true,
+              "system": true,
+              "title": "OSM",
+              "type": "OSM",
+              "selectable": false
+          },
+          {
+              "id": "ArcGISTerrain",
+              "title": "ArcGIS Terrain",
+              "type": "XYZ",
+              "active": false,
+              "opacity": 1,
+              "system": true,
+              "open": false,
+              "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+              "thumbnail": "assets/images/basemaps/TERRAIN.jpg",
+              "attributions": "Tiles &copy; <a href='http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer'>ArcGIS</a>"
+          },
+          {
+              "id": "ArcGISAerial",
+              "title": "ArcGIS Aerial",
+              "description": "",
+              "type": "XYZ",
+              "active": false,
+              "opacity": 1,
+              "system": true,
+              "open": false,
+              "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+              "thumbnail": "assets/images/basemaps/AERIAL.jpg",
+              "attributions": "Tiles &copy; <a href='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'>ArcGIS</a>"
+          },
+          {
+              "id": "AerialDGTSentinel2",
+              "title": "Sentinel-2",
+              "description": "",
+              "type": "WMS",
+              "active": false,
+              "opacity": 1,
+              "system": true,
+              "open": false,
+              "format": "image/jpeg",
+              "tiled": true,
+              "url": "https://ortos.dgterritorio.gov.pt/wms/IPSentinel2PT",
+              "version": "1.3.0",
+              "layers": "2020-jul-set-RGB",
+              "get_map_format": "image/jpeg",
+              "wms_style": "",
+              "thumbnail": "assets/images/basemaps/AERIAL.jpg",
+              "attributions": "<a href='https://ipsentinel.pt' target='_blank'>Sentinel-2</a> (julho a setembro de 2020) / &copy; <a href='http://www.dgterritorio.pt' target='_blank'>DGT - Dire\u00e7\u00e3o-Geral do Territ\u00f3rio</a>"
+          },
+          {
+              "id": "AerialDGTOrtos2018",
+              "title": "XYZ 2018",
+              "description": "",
+              "type": "WMTSXYZ",
+              "active": false,
+              "opacity": 1,
+              "system": true,
+              "open": false,
+              "url": "https://cartografia.dgterritorio.gov.pt/ortos2018-wm/service?layer=Ortos2018-RGB_WMercator&style=default&tilematrixset=webmercator&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}",
+              "thumbnail": "assets/images/basemaps/AERIAL.jpg",
+              "attributions": "&copy; Ortos 2018 <a href='http://www.dgterritorio.pt' target='_blank'>DGT - Dire\u00e7\u00e3o-Geral do Territ\u00f3rio</a>",
+              "print": [
+                  {
+                      "type": "wms",
+                      "url": "https://cartografia.dgterritorio.gov.pt/wms/ortos2018",
+                      "layers": "Ortos2018-RGB",
+                      "minScale": 50000
+                  },
+                  {
+                      "type": "wms",
+                      "url": "https://ortos.dgterritorio.gov.pt/wms/IPSentinel2PT",
+                      "layers": "2018-dez-2019-jan-RGB",
+                      "maxScale": 50001
+                  }
+              ]
+          },
+          {
+              "id": "AerialDGTWorld",
+              "title": "XYZ 2018",
+              "description": "",
+              "type": "WMTSXYZ",
+              "active": false,
+              "opacity": 1,
+              "system": true,
+              "open": false,
+              "url": "https://cartografia.dgterritorio.gov.pt/bluemarble-wm/service?layer=NASA-B1C1-WGS84_WMercator&style=default&tilematrixset=webmercator&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}",
+              "thumbnail": "assets/images/basemaps/AERIAL.jpg",
+              "attributions": [
+                  "Blue Marble <a href='http://earthobservatory.nasa.gov/' target='_blank'>NASA Earth Observatory</a>",
+                  " / "
+              ]
+          },
+          {
+              "active": false,
+              "children": [
+                  "AerialDGTOrtos2018",
+                  "AerialDGTWorld"
+              ],
+              "id": "OrtosDGTBasemap",
+              "opacity": 1,
+              "open": false,
+              "system": true,
+              "title": "Ortos 2018",
+              "type": "GROUP",
+              "thumbnail": "assets/images/basemaps/AERIAL.jpg"
+          },
+          {
+              "active": true,
+              "children": [
+                  "osm1",
+                  "AerialDGTSentinel2",
+                  "OrtosDGTBasemap"
+              ],
+              "id": "basemaps",
+              "opacity": 1,
+              "open": true,
+              "system": true,
+              "title": "Basemaps layers",
+              "type": "GROUP",
+              "selectable": false
+          },
+          {
+              "id": "caop",
+              "title": "Carta Administrativa de Portugal (CAOP)",
+              "description": "AreaAdministrativa-2020-Continente. Carta Administrativa Oficial de Portugal (CAOP) - Vers\u00e3o 2020. Corresponde \u00e0 AreaAdministrativa-2020. Para mais informa\u00e7\u00f5es consultar https://www.dgterritorio.pt",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/198497815bf647ecaa990c34c42e932e"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 1,
+              "type": "WMS",
+              "url": "https://geo2.dgterritorio.gov.pt/geoserver/caop_continente/wms",
+              "layers": "AdministrativeUnit",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,CRS:84,EPSG:4326,EPSG:4258,EPSG:27492,EPSG:27493,EPSG:20790,EPSG:20791,EPSG:5018,EPSG:3857,EPSG:900913",
+              "get_map_formats": "image/png,application/atom+xml,application/json;type=geojson,application/json;type=topojson,application/json;type=utfgrid,application/pdf,application/rss+xml,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kml+xml;mode=networklink,application/vnd.google-earth.kmz,application/vnd.mapbox-vector-tile,image/geotiff,image/geotiff8,image/gif,image/jpeg,image/png; mode=8bit,image/svg+xml,image/tiff,image/tiff8,image/vnd.jpeg-png,image/vnd.jpeg-png8,text/html; subtype=openlayers,text/html; subtype=openlayers2,text/html; subtype=openlayers3",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "text/plain,application/vnd.ogc.gml,text/xml,application/vnd.ogc.gml/3.1.1,text/xml; subtype=gml/3.1.1,text/html,text/javascript,application/json",
+              "get_feature_info_format": "application/json",
+              "wms_styles": "CAOP_AAD",
+              "wms_style": "CAOP_AAD",
+              "legend_url": "http://geo2.dgterritorio.gov.pt/geoserver/caop_continente/ows?service=WMS&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=AdministrativeUnit",
+              "bbox": "-9.575004869539608 36.94801888440093 -6.17203661378838 42.1540358696008",
+              "source_min_scale": null,
+              "source_max_scale": null,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          },
+          {
+              "id": "ran",
+              "title": "Reserva Agr\u00edcola Nacional (RAN)",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/528a3b46-555a-4472-85d3-d06c18c34be5"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 0.7,
+              "type": "WMS",
+              "url": "https://servicos.dgterritorio.pt/SDISNITWMSSRUP_RAN_PT1/WMService.aspx",
+              "layers": "Reserva_Agr\u00edcola_Nacional",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:3785,EPSG:3857,EPSG:4258,EPSG:4326",
+              "get_map_formats": "image/png,image/jpeg,image/svg+xml",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "text/xml,text/html,application/gml+xml; version=3.1",
+              "get_feature_info_format": "text/html",
+              "wms_styles": "Default",
+              "wms_style": "Default",
+              "legend_url": "https://servicos.dgterritorio.pt/SDISNITWMSSRUP_RAN_PT1/service.svc/get?VERSION=1.3.0&REQUEST=getlegendgraphic&SERVICE=WMS&format=image/png&layer=Reserva_Agr\u00edcola_Nacional&style=Default",
+              "bbox": "-14.9874510398635 36.6957836748151 -0.768590468635611 42.0683333617993",
+              "source_min_scale": null,
+              "source_max_scale": null,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ],
+              "description": "A Reserva Agr\u00edcola Nacional (RAN) \u00e9 uma restri\u00e7\u00e3o de utilidade p\u00fablica. A informa\u00e7\u00e3o geogr\u00e1fica fornecida atrav\u00e9s do presente servi\u00e7o WMS foi produzida pela DGT e por outras entidades oficiais, a partir de informa\u00e7\u00e3o legalmente depositada no SNIT relativa \u00e0 delimita\u00e7\u00e3o da RAN, sendo que a RAN \u00e9 o conjunto das \u00e1reas que em termos agro-clim\u00e1ticos, geomorfol\u00f3gicos e pedol\u00f3gicos apresentam maior aptid\u00e3o para a atividade agr\u00edcola. Informa\u00e7\u00e3o no sistema de refer\u00eancia EPSG: 3763 (PT-TM06/ETRS89)."
+          },
+          {
+              "id": "crus",
+              "title": "Carta do Regime do Uso do Solo (CRUS)",
+              "description": "Servi\u00e7o WMS - Carta do Regime de Uso do Solo - Portugal Continental - Classe Solo",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/517c5023-04cc-47a4-99f7-bb32814dd62f"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 1,
+              "type": "GROUP",
+              "url": "https://servicos.dgterritorio.pt/SDISNITWMSCRUS_S/WMService.aspx",
+              "children": [
+                  "crus_nao_classificado",
+                  "crus_rustico",
+                  "crus_urbano"
+              ],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:3785,EPSG:3857,EPSG:4258,EPSG:4326",
+              "get_map_formats": "image/png,image/jpeg,image/svg+xml",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "text/xml,text/html,application/gml+xml; version=3.1",
+              "get_feature_info_format": "text/xml",
+              "wms_styles": "",
+              "wms_style": "",
+              "legend_url": "",
+              "bbox": "-15.5021097726088 36.571176446123 -0.245545168532115 42.0769285259479",
+              "source_min_scale": null,
+              "source_max_scale": null,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          },
+          {
+              "id": "crus_nao_classificado",
+              "title": "Solo N\u00e3o Classificado",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/517c5023-04cc-47a4-99f7-bb32814dd62f"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 0.8,
+              "type": "WMS",
+              "url": "https://servicos.dgterritorio.pt/SDISNITWMSCRUS_S/WMService.aspx",
+              "layers": "Solo_Nao_Classificado",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:3785,EPSG:3857,EPSG:4258,EPSG:4326",
+              "get_map_formats": "image/png,image/jpeg,image/svg+xml",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "text/xml,text/html,application/gml+xml; version=3.1",
+              "get_feature_info_format": "text/xml",
+              "wms_styles": "Default",
+              "wms_style": "Default",
+              "legend_url": "https://servicos.dgterritorio.pt/SDISNITWMSCRUS_S/service.svc/get?VERSION=1.3.0&REQUEST=getlegendgraphic&SERVICE=WMS&format=image/png&layer=Solo_Nao_Classificado&style=Default",
+              "bbox": "-15.5021097726088 36.571176446123 -0.245545168532115 42.0769285259479",
+              "source_min_scale": null,
+              "source_max_scale": null,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          },
+          {
+              "id": "crus_rustico",
+              "title": "Solo R\u00fastico",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/517c5023-04cc-47a4-99f7-bb32814dd62f"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 0.8,
+              "type": "WMS",
+              "url": "https://servicos.dgterritorio.pt/SDISNITWMSCRUS_S/WMService.aspx",
+              "layers": "Solo_Rustico",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:3785,EPSG:3857,EPSG:4258,EPSG:4326",
+              "get_map_formats": "image/png,image/jpeg,image/svg+xml",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "text/xml,text/html,application/gml+xml; version=3.1",
+              "get_feature_info_format": "text/xml",
+              "wms_styles": "Default",
+              "wms_style": "Default",
+              "legend_url": "https://servicos.dgterritorio.pt/SDISNITWMSCRUS_S/service.svc/get?VERSION=1.3.0&REQUEST=getlegendgraphic&SERVICE=WMS&format=image/png&layer=Solo_Rustico&style=Default",
+              "bbox": "-15.5021097726088 36.571176446123 -0.245545168532115 42.0769285259479",
+              "source_min_scale": null,
+              "source_max_scale": null,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          },
+          {
+              "id": "crus_urbano",
+              "title": "Solo Urbano",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/517c5023-04cc-47a4-99f7-bb32814dd62f"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 0.8,
+              "type": "WMS",
+              "url": "https://servicos.dgterritorio.pt/SDISNITWMSCRUS_S/WMService.aspx",
+              "layers": "Solo_Urbano",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:3785,EPSG:3857,EPSG:4258,EPSG:4326",
+              "get_map_formats": "image/png,image/jpeg,image/svg+xml",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "text/xml,text/html,application/gml+xml; version=3.1",
+              "get_feature_info_format": "text/xml",
+              "wms_styles": "Default",
+              "wms_style": "Default",
+              "legend_url": "https://servicos.dgterritorio.pt/SDISNITWMSCRUS_S/service.svc/get?VERSION=1.3.0&REQUEST=getlegendgraphic&SERVICE=WMS&format=image/png&layer=Solo_Urbano&style=Default",
+              "bbox": "-15.5021097726088 36.571176446123 -0.245545168532115 42.0769285259479",
+              "source_min_scale": null,
+              "source_max_scale": null,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          },
+          {
+              "id": "ren",
+              "title": "Reserva Ecol\u00f3gica Nacional (REN)",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/ad95b02a-fbd2-4b8e-89b6-f699a9ff3c0d"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 1,
+              "type": "WMS",
+              "url": "https://servicos.dgterritorio.pt/SDISNITWMSREN_S/WMService.aspx",
+              "layers": "REN",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:3785,EPSG:3857,EPSG:4258,EPSG:4326",
+              "get_map_formats": "image/png,image/jpeg,image/svg+xml",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "text/xml,text/html,application/gml+xml; version=3.1",
+              "get_feature_info_format": "text/xml",
+              "wms_styles": "Default",
+              "wms_style": "Default",
+              "legend_url": "https://servicos.dgterritorio.pt/SDISNITWMSREN_S/service.svc/get?VERSION=1.3.0&REQUEST=getlegendgraphic&SERVICE=WMS&format=image/png&layer=REN&style=Default",
+              "bbox": "-15.2467477713602 36.6502696798438 -0.682727925017436 42.0914837655935",
+              "source_min_scale": null,
+              "source_max_scale": null,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ],
+              "description": "\u00c1reas da REN - A Reserva Ecol\u00f3gica Nacional (REN) \u00e9 uma restri\u00e7\u00e3o de utilidade p\u00fablica. A informa\u00e7\u00e3o geogr\u00e1fica fornecida atrav\u00e9s do presente servi\u00e7o WMS foi produzida pela DGT, a partir de informa\u00e7\u00e3o legalmente depositada no SNIT relativa \u00e0 delimita\u00e7\u00e3o da REN, sendo que a REN \u00e9 uma estrutura biof\u00edsica que integra as \u00e1reas que s\u00e3o objeto de prote\u00e7\u00e3o especial por causa do seu valor e sensibilidade ecol\u00f3gicos ou pela sua susceptibilidade a riscos naturais. Informa\u00e7\u00e3o no sistema de refer\u00eancia EPSG: 3763 (PT-TM06/ETRS89)."
+          },
+          {
+              "id": "cos",
+              "title": "Carta de Uso e Ocupa\u00e7\u00e3o do Solo (COS)",
+              "description": "Servi\u00e7o de Visualiza\u00e7\u00e3o da Carta de Uso e Ocupa\u00e7\u00e3o do Solo de Portugal Continental para 2018 (COS2018v1.0). A COS2018 \u00e9 uma cartografia tem\u00e1tica de ocupa\u00e7\u00e3o e uso do solo para Portugal Continental para o ano de 2018, sendo a Dire\u00e7\u00e3o-Geral do Territ\u00f3rio a entidade respons\u00e1vel pela sua produ\u00e7\u00e3o. A informa\u00e7\u00e3o cartogr\u00e1fica da COS2018v1.0 encontra-se em formato vetorial e divide o espa\u00e7o em unidades de paisagem (pol\u00edgonos) que partilham os conceitos de uso e ocupa\u00e7\u00e3o do solo, n\u00e3o contemplando quaisquer elementos lineares ou pontuais. A COS2018v1.0 tem uma unidade m\u00ednima cartogr\u00e1fica (UMC) de 1 ha, uma dist\u00e2ncia m\u00ednima entre linhas de 20m e a escala equivalente \u00e9 1:25 000. Cada pol\u00edgono da COS2018v1.0 \u00e9 classificado apenas com um c\u00f3digo de ocupa\u00e7\u00e3o/uso do solo, selecionado do quinto n\u00edvel hier\u00e1rquico da nomenclatura. Os limites da COS2018v1.0 na fronteira com Espanha s\u00e3o os da Carta Administrativa Oficial de Portugal (CAOP) vers\u00e3o 2018 e no lado do mar s\u00e3o definidos por fotointerpreta\u00e7\u00e3o.",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/b498e89c-1093-4793-ad22-63516062891b"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 0.7,
+              "type": "WMS",
+              "url": "http://mapas.dgterritorio.pt/wms-inspire/cos2018v1",
+              "layers": "COS2018v1.0",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:4326,EPSG:4258,EPSG:3857",
+              "get_map_formats": "image/png,image/jpeg,image/gif,image/png; mode=8bit,application/x-pdf,image/svg+xml,image/tiff,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "application/vnd.ogc.gml,text/plain",
+              "get_feature_info_format": "application/vnd.ogc.gml",
+              "wms_styles": "default,inspire_common:DEFAULT",
+              "wms_style": "default",
+              "legend_url": "http://mapas.dgterritorio.pt/wms-inspire/cos2018v1?language=por&version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=COS2018v1.0&format=image/png&STYLE=default",
+              "bbox": "-10.1905 36.7643 -5.71298 42.1896",
+              "source_min_scale": 1000,
+              "source_max_scale": 100000,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          },
+          {
+              "id": "areas_edificadas",
+              "title": "\u00c1reas Edificadas",
+              "description": "Servi\u00e7o de Visualiza\u00e7\u00e3o da Carta de \u00c1reas Edificadas 2018.",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/4cb8ce5d-3231-4d42-bbac-b2447e936104"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 1,
+              "type": "WMS",
+              "url": "https://geo2.dgterritorio.gov.pt/wms/areas_edificadas2018",
+              "layers": "AreasEdificadas_2018",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:4326,EPSG:4258,EPSG:3857",
+              "get_map_formats": "image/png,image/jpeg,image/gif,image/png; mode=8bit,application/x-pdf,image/svg+xml,image/tiff,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "application/vnd.ogc.gml,text/plain",
+              "get_feature_info_format": "application/vnd.ogc.gml",
+              "wms_styles": "default",
+              "wms_style": "default",
+              "legend_url": "https://geo2.dgterritorio.gov.pt/wms/areas_edificadas2018?version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=AreasEdificadas_2018&format=image/png&STYLE=default",
+              "bbox": "-10.1905 36.7643 -5.71298 42.1896",
+              "source_min_scale": 1000,
+              "source_max_scale": 75000,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          },
+          {
+              "id": "interface_urbano_rural",
+              "title": "Interface Urbano-Rural",
+              "description": "Servi\u00e7o de Visualiza\u00e7\u00e3o da Interface Urbano-Rural 2018.",
+              "metadata": {
+                  "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/c1eae781-0812-43f0-96a5-ed67df9ca739"
+              },
+              "active": false,
+              "open": false,
+              "opacity": 1,
+              "type": "WMS",
+              "url": "https://geo2.dgterritorio.gov.pt/wms/interface_ur2018",
+              "layers": "Tipo_Interface",
+              "children": [],
+              "servertype": "mapserver",
+              "crs": 4326,
+              "tiled": true,
+              "version": "1.3.0",
+              "crs_options": "EPSG:3763,EPSG:4326,EPSG:4258,EPSG:3857",
+              "get_map_formats": "image/png,image/jpeg,image/gif,image/png; mode=8bit,application/x-pdf,image/svg+xml,image/tiff,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz",
+              "get_map_format": "image/png",
+              "get_feature_info_formats": "application/vnd.ogc.gml,text/plain",
+              "get_feature_info_format": "application/vnd.ogc.gml",
+              "wms_styles": "default",
+              "wms_style": "default",
+              "legend_url": "https://geo2.dgterritorio.gov.pt/wms/interface_ur2018?version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=Tipo_Interface&format=image/png&STYLE=default",
+              "bbox": "-10.1905 36.7643 -5.71298 42.1896",
+              "source_min_scale": 1000,
+              "source_max_scale": 75000,
+              "max_scale": 75000,
+              "filtered": false,
+              "selectable": true,
+              "exclude_components": [
+                  "LayerAttributesTable",
+                  "LayerRemove",
+                  "LayerEdit"
+              ]
+          }
+      ]
+  },
+  "is_active": true,
+  "allow_add_layers": true,
+  "allow_user_session": null,
+  "default_component": null,
+  "show_help": null,
+  "show_credits": null,
+  "show_contact": null,
+  "on_homepage": null,
+  "img_homepage": null,
+  "img_logo": null,
+  "send_email_notifications_admin": null,
+  "email_notifications_admin": null,
+  "template": null,
+  "components": [
+      {
+          "id": 1,
+          "name": "toc",
+          "title": "Tabela de Conte\u00fados",
+          "description": null,
+          "type": "TOC",
+          "plugin": null,
+          "target": "mainmenu",
+          "scripts": null,
+          "is_active": true,
+          "config_version": "1.0",
+          "config_json": {
+              "name": "Component 1"
+          },
+          "action": null,
+          "template": null,
+          "html_content": null,
+          "icon_css_class": null,
+          "viewer_id": 1,
+          "order": 1,
+          "roles": []
+      }
+  ],
+  "is_session": false,
+  "printing": {
+      "prints": [
+          {
+              "id": 11,
+              "code": "cadastro_livre",
+              "name": "Planta Livre",
+              "title": "Planta Livre",
+              "description": "Emiss\u00e3o de planta livre",
+              "is_active": true,
+              "scale": null,
+              "srid": 3763,
+              "format": "A4",
+              "orientation": "Retrato",
+              "identification": null,
+              "identification_fields": null,
+              "form_fields": {
+                  "fields": {
+                      "title": {
+                          "title": "Titulo",
+                          "active": true,
+                          "required": false,
+                          "header": "T\u00edtulo"
+                      }
+                  }
+              },
+              "location_marking": false,
+              "draw_location": true,
+              "free_printing": true,
+              "show_author": false,
+              "payment_reference": "False",
+              "print_purpose": false,
+              "restrict_scales": true,
+              "restrict_scales_list": "1000,2000,5000,10000,20000,25000,50000",
+              "free_scale": true,
+              "map_scale": true,
+              "multi_geom": false,
+              "config_json": null,
+              "layouts": [
+                  {
+                      "id": 14,
+                      "orientation": "Retrato",
+                      "format": "A4"
+                  },
+                  {
+                      "id": 15,
+                      "orientation": "Paisagem",
+                      "format": "A4"
+                  }
+              ],
+              "order": 1
+          }
+      ],
+      "groups": []
+  },
+  "is_owner": false,
+  "allow_anonymous": true,
+  "upload_maxfilesize": 5120
+}
