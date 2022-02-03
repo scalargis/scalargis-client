@@ -5,8 +5,8 @@ node_modules/
 **/build/
 
 # sources
-packages/frontend/src/components/
-packages/backoffice/src/components/
+packages/frontend/src/components/*/
+packages/backoffice/src/components/*/
 
 npm-debug.log*
 yarn-debug.log*
