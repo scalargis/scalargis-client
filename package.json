@@ -5,8 +5,7 @@
   "workspaces": [
     "packages/*",
     "packages/frontend/src/components/*",
-    "packages/frontend/src/themes/*",
-    "packages/backoffice/src/components/*"  
+	  "packages/frontend/src/themes/*"    
   ],
   "scripts": {
     "start": "cd ./packages/frontend && yarn start",

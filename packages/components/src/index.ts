@@ -1,6 +1,7 @@
 import * as AttributesTable from './AttributesTable/src/Main'
 import * as Basemaps from './Basemaps/src/Main'
 import * as ContactForm from './ContactForm/src/Main'
+import * as Coordinates from './Coordinates/src/Main'
 import * as CRSSelect from './CRSSelect/src/Main'
 import * as DrawTools from './DrawTools/src/Main'
 import * as ExportMapFeatures from './ExportMapFeatures/src/Main'
@@ -36,6 +37,7 @@ export {
   Basemaps,
   ContactForm,
   CRSSelect,
+  Coordinates,
   DrawTools,
   ExportMapFeatures,
   FeatureInfo,

@@ -1340,9 +1340,9 @@
     strip-json-comments "^3.1.1"
 
 "@fontsource/saira@^4.5.1":
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/@fontsource/saira/-/saira-4.5.2.tgz#2c00b83008efd8549790ee81e5ff3b5481cf7312"
-  integrity sha512-u4qaIYRCiCdiZFJtWxgMltMcOVTf6G/ttKxSFYvg3++Roq9Oc31pIo5hkYH9KOWYDhJ+KVvDr568BgWTqGZs7Q==
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/@fontsource/saira/-/saira-4.5.3.tgz#3478a1db735f533c066d2439cdf3896a844bd8e4"
+  integrity sha512-bWp9uMVIsE0DKp5cpdJ//VJlpzf7+F2EdpeYCR7yMInpOAdxMXx0tDzXq+U59Hh2rpcDQcUUmuGNtTS0GgcPDA==
 
 "@fortawesome/fontawesome-free@^5.15.2":
   version "5.15.4"

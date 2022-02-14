@@ -5,8 +5,9 @@
   "proxy": "http://localhost:5000",
   "homepage": "static/frontend",
   "workspaces": [
-    "src/components/*"
-  ],  
+    "src/components/*",
+    "src/themes/*"
+  ],
   "dependencies": {
     "@scalargis/primereact-renderers": "^0.1.0",
     "@scalargis/components": "^0.1.0", 
