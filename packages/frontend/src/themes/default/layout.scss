@@ -7,6 +7,10 @@ html {
   font-size: 14px;
 }
 
+body {
+  overflow: hidden;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -137,18 +141,31 @@ body .p-dropdown {
 
 .layout-footer .footer-text {
   display: inline-block;
+  margin-right: 10px;
+  margin-top: 3px;
   @media screen and (max-width: 667px) {
       display: none;
   }    
 }
 
-.footer-right {
+.footer-left {
+  float: left;
+}
+.footer-left > div {
   float: right;
+}
+.footer-left button.p-link {
+  font-size: 1.4em;
+  color: white;
+}
+
+.footer-right {
+  position: absolute;
   display: flex;
+  right: 3px;
   animation-duration: .5s;
-  /*width: 420px;*/
   margin-top: -3px;
-  text-align: right;
+  max-width: 660px;
 }
 
 .footer-right .p-button {
@@ -219,7 +236,7 @@ body .p-multiselect {
 }
 
 .viewer-mouse-position {
-  min-width: 250px;
+  min-width: 190px;
   padding: 0.5em;
 }
 

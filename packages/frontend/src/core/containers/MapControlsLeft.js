@@ -1,23 +1,14 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import AppContext from '../../AppContext'
 import MapControlsLeftComponent from '../components/MapControlsLeft'
+import { mapStateToProps } from '../utils'
 
 function MapControlsLeft(props) {
 
   const { core, mainMap } = useContext(AppContext);
   const dispatch = useDispatch();
-  const [ componentsOrdered, setComponentsOrdered ] = useState([]);
-  const { viewer, components } = props;
-
-  useEffect(() => {
-    let pitems = Object.keys(components)
-      .filter(k => components[k].target === 'map_controls_left' || components[k].links=== 'map_controls_left')
-      .sort((a, b) => components[a].order > components[b].order ? 1 : -1 )
-      .map(id => components[id]);
-      setComponentsOrdered(pitems);
-  }, [components]);
-
+  const { viewer } = props;
   
   return (
     <div className="map-region-left">
@@ -25,14 +16,17 @@ function MapControlsLeft(props) {
         core={core}
         mainMap={mainMap}
         dispatch={dispatch}
-        components={componentsOrdered}
         viewer={viewer}
       />
     </div>
   )
 }
 
-export default connect(state => ({
-  viewer: state.root.viewer,
-  components: state.root.components
-}))(MapControlsLeft);
+export default connect(state => {
+  const gstate = mapStateToProps(state);
+  return ({
+    viewer: gstate.viewer,
+    components: gstate.components,
+    auth: gstate.auth
+  });
+})(MapControlsLeft);

@@ -1,5 +1,6 @@
 .layout-topbar .layout-topbar-icons .layout-topbar-search {
   top: -2px;
+  margin-left: 20px;
 }
 
 .layout-topbar .layout-topbar-icons .layout-topbar-search input {

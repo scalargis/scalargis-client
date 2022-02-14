@@ -1,10 +1,7 @@
-import React, { useContext, useRef, useState, useEffect } from 'react'
+import React, {  useRef, useState, useEffect } from 'react'
 import { Dialog } from 'primereact/dialog'
 import Cookies from 'universal-cookie'
 import { Menu } from 'primereact/menu'
-import { getWindowSize } from '../utils'
-import { connect, useDispatch } from 'react-redux'
-import AppContext from '../../AppContext'
 import LoginWidget from './LoginWidget'
 
 const cookies = new Cookies();
@@ -12,16 +9,16 @@ const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
 const appEntityNameAbrev = process.env.REACT_APP_ENTITY_NAME_ABREV || 'DGT';
 //let popupMenu;
 
-function TopButtonAuth(props) {
+export default function Main({ region, as, config, actions, record }) {
+  const { viewer, mainMap, dispatch, Models } = config;
+  const { getWindowSize, showOnPortal } = Models.Utils
+
   const [showLoginButton, setShowLoginButton] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const popupMenu = useRef();
 
-  // Enable redux actions
-  const dispatch = useDispatch();
-  const { core } = useContext(AppContext);
-  const { logout } = core.actions;
+  const { logout } = actions;
 
   const cookieData = cookies.get(cookieAuthName);
   const wsize = getWindowSize();
@@ -30,10 +27,10 @@ function TopButtonAuth(props) {
 
   useEffect(() => {
     //Hide login button if viewer only has anonymous access
-    if (core.config && core.config.roles && core.config.roles.length === 1 && core.config.roles[0].name === 'Anonymous') {
+    if (config && config.roles && config.roles.length === 1 && config.roles[0].name === 'Anonymous') {
       setShowLoginButton(false);
     }
-  }, [props.config]);
+  }, [config]);
 
   // Render user
   if (cookieData) {
@@ -79,7 +76,10 @@ function TopButtonAuth(props) {
         style={{width: wsize[0] < 768 ? '90%' : '35vw' }} 
         modal 
         onHide={e => setShowLogin(false)}>
-          <LoginWidget />
+          <LoginWidget 
+            dispatch={dispatch}
+            actions={actions} 
+            />
       </Dialog>
     )
   }
@@ -96,5 +96,3 @@ function TopButtonAuth(props) {
     return null;
   }
 }
-
-export default connect(state => ({ auth: state.root.auth, config: state.root.config }))(TopButtonAuth)

@@ -1,10 +1,13 @@
 import * as AttributesTable from './AttributesTable/src/Main'
 import * as Basemaps from './Basemaps/src/Main'
+import * as ContactForm from './ContactForm/src/Main'
 import * as CRSSelect from './CRSSelect/src/Main'
 import * as DrawTools from './DrawTools/src/Main'
 import * as ExportMapFeatures from './ExportMapFeatures/src/Main'
 import * as FeatureInfo from './FeatureInfo/src/Main'
 import * as GeoLocation from './GeoLocation/src/Main'
+import * as HelpButton from './HelpButton/src/Main'
+import * as HtmlContent from './HtmlContent'
 import * as LayerAttributesTable from './LayerAttributesTable/src/Main'
 import * as LayerDownload from './LayerDownload/src/Main'
 import * as LayerEdit from './LayerEdit/src/Main'
@@ -23,15 +26,22 @@ import * as SearchLayers from './SearchLayers/src/Main'
 import * as StreetView from './StreetView/src/Main'
 import * as ThemeWizard from './ThemeWizard/src/Main'
 import * as TOC from './TOC/src/Main'
+import * as UserLogin from './UserLogin/src/Main'
+//Simple components - only for use in Right Topbar
+import * as ShareViewer from './ShareViewer'
+import * as SaveViewer from './SaveViewer'
 
 export {
   AttributesTable,
   Basemaps,
+  ContactForm,
   CRSSelect,
   DrawTools,
   ExportMapFeatures,
   FeatureInfo,
   GeoLocation,
+  HelpButton,
+  HtmlContent,
   LayerAttributesTable,
   LayerDownload,
   LayerEdit,
@@ -49,5 +59,8 @@ export {
   SearchLayers,
   StreetView,
   ThemeWizard,
-  TOC
+  TOC,
+  UserLogin,
+  ShareViewer,
+  SaveViewer
 };

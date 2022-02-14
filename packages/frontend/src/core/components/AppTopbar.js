@@ -1,10 +1,5 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import TopButtonAuth from './TopButtonAuth';
-import TopButtonHelp from './TopButtonHelp';
-import TopButtonContact from './TopButtonContact';
-import SaveViewerWidget from './SaveViewerWidget';
-import ShareViewerWidget from './ShareViewerWidget';
 
 export class AppTopbar extends Component {
 
@@ -27,11 +22,6 @@ export class AppTopbar extends Component {
                 {this.props.logo}
                 <div className="layout-topbar-icons topbar-right">
                     {this.props.regionComponents}
-                    <ShareViewerWidget />
-                    <SaveViewerWidget />
-                    <TopButtonAuth />
-                    <TopButtonContact />
-                    <TopButtonHelp />
                 </div>
             </div>
         );

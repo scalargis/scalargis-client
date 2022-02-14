@@ -152,7 +152,7 @@ Core.prototype.addComponent = function(core, component, done) {
     }    
 
     // Registry Pattern: register react component in components registry
-    if (!!c.default && !this.__components[component.type]) {   
+    if (!!c.default && !this.__components[component.type]) {
       const ReactComponent = c.default;
       this.__components[component.type] = ReactComponent;
     }
@@ -214,10 +214,12 @@ Core.prototype.renderMainMenu = function({ selected_menu, props }) {
 
   // From all components
   let { components } = this.config.config_json;
-  //let { components } = props;
+
+  // Filter by region
+  const mainmenuComponents = components.filter(c => c.target === 'mainmenu')  
   
   // Render components
-  return components.map(c => {
+  return mainmenuComponents.map(c => {
     let PluginComponent = this.__mainmenu[c.type];
 
     // Validate dynamic import is loaded
@@ -242,7 +244,7 @@ Core.prototype.renderMainMenu = function({ selected_menu, props }) {
   })
 }
 
-Core.prototype.renderComponentById = function({ id, as = '', props, }) {
+Core.prototype.renderComponentById = function({ id, region, as = '', props, }) {
 
   // Validate id
   if (!id) return null;
@@ -268,6 +270,7 @@ Core.prototype.renderComponentById = function({ id, as = '', props, }) {
       config={{ ...props, ...c.config_json }}
       core={this}
       actions={this.actions}
+      region={region}
       as={as}
       utils={utils}
     />
@@ -288,7 +291,7 @@ Core.prototype.renderComponents = function({ region, as = '', props, parent, sep
 
   // Filter by region
   const regionComponents = components.filter(c => c.target === region);
-
+  
   // Render components
   return regionComponents.map(c => {
     let PluginComponent = this.__components[c.type];
@@ -302,7 +305,8 @@ Core.prototype.renderComponents = function({ region, as = '', props, parent, sep
           config={{ ...props, ...c.config_json }}
           core={this}
           actions={this.actions}
-          as={as}
+          region={region}
+          as={c.as || as}
           utils={utils}
         />
         { separator }

@@ -20,6 +20,7 @@ function Layout(props) {
     onToggleMenu
   } = props;
 
+  const copyrightYear = new Date().getFullYear();
   const entityName = process.env.REACT_APP_ENTITY_NAME || 'Direção-Geral do Território';
 
   const wrapperClass = classNames('layout-wrapper', {
@@ -89,10 +90,15 @@ function Layout(props) {
         </div>
 
         <div className="layout-footer">
-            <div className="footer-right">
-                { props.footerRight }
+          <div className="footer-left">
+            <span className="footer-text">&copy; {copyrightYear} {entityName}</span>
+            <div>
+              { props.footerLeft }
             </div>
-            <span className="footer-text" style={{'marginRight': '5px'}}>&copy; 2021 {entityName}</span>
+          </div>
+          <div className="footer-right">
+              { props.footerRight }
+          </div>
         </div>
 
         <div className="layout-mask"></div>

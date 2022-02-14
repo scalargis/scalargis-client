@@ -1,17 +1,17 @@
 import React, { useContext } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import AppContext from '../../AppContext'
-import TopbarRightComponent from '../components/TopbarRight'
+import FooterLeftComponent from '../components/FooterLeft'
 import { mapStateToProps } from '../utils'
 
-function TopbarRight(props) {
+function FooterLeft(props) {
 
   const { core, mainMap } = useContext(AppContext);
   const dispatch = useDispatch();
   const { viewer } = props;
   
   return (
-    <TopbarRightComponent
+    <FooterLeftComponent
       core={core}
       mainMap={mainMap}
       dispatch={dispatch}
@@ -27,4 +27,4 @@ export default connect(state => {
     components: gstate.components,
     auth: gstate.auth
   });
-})(TopbarRight);
+})(FooterLeft);

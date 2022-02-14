@@ -1,60 +1,73 @@
 import React, { useContext, useState } from 'react'
 import Cookies from 'universal-cookie'
 import { InputText } from 'primereact/inputtext'
-import { InputTextarea } from 'primereact/inputtextarea';
+import { InputTextarea } from 'primereact/inputtextarea'
 import { Button } from 'primereact/button'
-import { connect, useDispatch } from 'react-redux'
-import AppContext from '../../AppContext'
 import { Message } from 'primereact/message'
 import { InputSwitch } from 'primereact/inputswitch'
 import { Dialog } from 'primereact/dialog'
+/*
 import { getWindowSize, showOnPortal } from '../utils'
 import { getViewerSessionConfig } from '../model/MapModel'
+*/
 
 const cookies = new Cookies();
 const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
 
-function SaveViewerWidget({ viewer }) {
+export default function ShareViewer({region, as, config, actions, record, utils}) {
+  const { viewer, dispatch, Models } = config;
+  //const { type, region, as, config, actions, record, utils } = props;
+
+  const { getViewerSessionConfig } = Models.MapModel;
+  const {getWindowSize, showOnPortal } = utils;
+
+  const { viewer_save_record, viewer_save_response } = actions;
 
   const [showForm, setShowForm] = useState(false);
   const [id, setId] = useState(null);
   const [name, setName] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [is_active, setIsActive] = useState(true);
+  const [slug, setSlug] = useState('');
   const [allow_add_layers, setAllowAddLayers] = useState(true);
   const [allow_user_session, setAllowUserSession] = useState(false);
   const [allow_anonymous, setAllowAnonymous] = useState(true);
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
-  
-  // Enable redux actions
-  const dispatch = useDispatch();
-  const { core } = useContext(AppContext);
-  const { viewer_save_record } = core.actions;
 
   const cookieData = cookies.get(cookieAuthName);
 
+  let allow_sharing = true;
+  if (viewer?.allow_sharing === false) {
+    allow_sharing = false;
+  };
+  if (viewer?.config_json?.allow_sharing === false) {
+    allow_sharing = false;
+  } else if (viewer?.config_json?.allow_sharing === true) {
+    allow_sharing = true;
+  }
+
   function openForm() {
-    setId(viewer.id);
-    setName(viewer.name);
+    dispatch(viewer_save_response(null));
+    setId(null);
+    setName(null);
     setTitle(viewer.title);
     setDescription(viewer.description);
-    setIsActive(viewer.is_active === null ? true : viewer.is_active);
-    setAllowAddLayers(viewer.allow_add_layers);
-    setAllowUserSession(viewer.allow_user_session == null ? false : viewer.allow_user_session);
-    setAllowAnonymous(viewer.allow_anonymous == null ? true : viewer.allow_anonymous);
+    setSlug(null);   
+    setAllowAddLayers(viewer.allow_add_layers == null ? false : viewer.allow_add_layers);
+    if (cookieData) {
+      setAllowAnonymous(viewer.allow_anonymous == null ? true : viewer.allow_anonymous);
+    } else {
+      setAllowAnonymous(true);
+    }
     setShowForm(true);
   }
-  
-  // Render user
-  if (!cookieData || !viewer.is_owner) return null;
 
   function submit(e) {
     e.preventDefault();
 
-    if (!name || name.length==0 || !title || title.length==0) {
+    if (!title || title.length===0) {
       return false;
     }
 
@@ -66,7 +79,7 @@ function SaveViewerWidget({ viewer }) {
       name,
       title,
       description,
-      is_active,
+      slug,
       allow_add_layers,
       allow_user_session,
       allow_anonymous,
@@ -75,50 +88,51 @@ function SaveViewerWidget({ viewer }) {
     dispatch(viewer_save_record(record, null, null))
   }
 
-  // Render save button
+  function getPublicUrl(uuid) {
+    const appUrl = new URL(window.location.href);  
+    return appUrl.origin + (process.env.REACT_APP_BASE_URL || '/') + uuid;
+  }
+
+  const copyToClipboard = str => {
+    const el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    return false;
+  };  
+
   return (
-    <React.Fragment>
-      <button className="p-link" onClick={e => openForm()}>
-        <span className="layout-topbar-item-text">Guardar</span>
-        <span className="layout-topbar-icon pi pi-save"/>
+    allow_sharing ? <React.Fragment>
+      <button className="p-link" onClick={e => openForm()} title="Partilhar mapa">
+        <span className="layout-topbar-item-text">Partilhar</span>
+        <span className="layout-topbar-icon pi pi-share-alt"/>
       </button>
 
       {showOnPortal(<Dialog
-        header="Guardar Visualizador"
+        header="Partilhar Mapa"
         visible={showForm}
         style={{width: isMobile ? '90%' : '35vw' }} 
         modal 
         onHide={e => setShowForm(false)}>
 
           <form onSubmit={e => submit()}>
-
             <div className="p-fluid">
-
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Nome</label>
-                <div className="p-col-12 p-md-8">
-                  <InputText
-                    className={(!name || name.length == 0 ? 'p-invalid' : '')}
-                    value={name}
-                    placeholder="Nome do Visualizador"
-                    onChange={e => setName(e.target.value)}
-                  />
-                  { (!name || name.length == 0) &&
-                  <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }                  
-                </div>
-              </div>
-
               <div className="p-field p-grid">
                 <label className="p-col-12 p-md-4">Título</label>
                 <div className="p-col-12 p-md-8">
                   <InputText
-                    className={(!title || title.length == 0 ? 'p-invalid' : '')}
+                    className={(!title || title.length === 0 ? 'p-invalid' : '')}
                     value={title}
                     placeholder="Título"
                     onChange={e => setTitle(e.target.value)}
                   />
                   { (!title || title.length == 0) &&
-                  <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }                  
+                  <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }
                 </div>
               </div>
 
@@ -131,19 +145,9 @@ function SaveViewerWidget({ viewer }) {
                     onChange={e => setDescription(e.target.value)}
                   />
                 </div>
-              </div>              
-
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Está ativo?</label>
-                <div className="p-col-12 p-md-8">
-                  <InputSwitch
-                    checked={is_active}
-                    onChange={(e) => setIsActive(!is_active)}
-                  />
-                </div>
               </div>
 
-              {/*
+              { (viewer.allow_add_layers == null || viewer.allow_add_layers) &&
               <div className="p-field p-grid">
                 <label className="p-col-12 p-md-4">Permitir adicionar temas ao mapa?</label>
                 <div className="p-col-12 p-md-8">
@@ -152,10 +156,9 @@ function SaveViewerWidget({ viewer }) {
                     onChange={(e) => setAllowAddLayers(!allow_add_layers)}
                   />
                 </div>
-              </div>
-              */}
+              </div> }
 
-              <div className="p-field p-grid">
+              { cookieData && <div className="p-field p-grid">
                 <label className="p-col-12 p-md-4">Permitir gravar sessão?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
@@ -163,9 +166,9 @@ function SaveViewerWidget({ viewer }) {
                     onChange={(e) => setAllowUserSession(!allow_user_session)}
                   />
                 </div>
-              </div>
+              </div> }
 
-              <div className="p-field p-grid">
+              { cookieData && <div className="p-field p-grid">
                 <label className="p-col-12 p-md-4">Permitir acesso anónimo?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
@@ -173,15 +176,33 @@ function SaveViewerWidget({ viewer }) {
                     onChange={(e) => setAllowAnonymous(!allow_anonymous)}
                   />
                 </div>
-              </div>              
-
+              </div> }
             </div>
+
+            { viewer.save_response &&  
+            <div className="p-grid">
+                <label className="p-col-12"><strong>Url</strong></label>
+                <div className="p-col-12 p-md-10">
+                    <a style={{wordBreak: "break-all"}} href={getPublicUrl(viewer.save_response.uuid)} 
+                      target="_blank">{getPublicUrl(viewer.save_response.uuid)}</a>             
+                </div>
+                <div className="p-col-12 p-md-2">
+                    <Button
+                        style={{marginLeft:"0px", color: "#2196F"}} 
+                        icon="pi pi-copy"
+                        className="p-button p-component p-button-rounded p-button-outlined p-button-help p-button-icon-only"
+                        onClick={(e) => { e.preventDefault(); e.currentTarget.blur(); copyToClipboard(getPublicUrl(viewer.save_response.uuid)) }}
+                        tooltip="Copiar Url" tooltipOptions={{position: 'top'}}
+                    />
+                </div>
+            </div>
+            }            
 
             <div className="p-dialog-myfooter">
               <Button 
                 color='green'
                 icon={ viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                label="Guardar" 
+                label="Obter Link" 
                 onClick={submit}
                 disabled={(viewer.save_loading)}
               />
@@ -192,14 +213,11 @@ function SaveViewerWidget({ viewer }) {
             }
 
             { viewer.save_response && !!viewer.save_response.message && 
-              <Message style={{ width: '100%' }} severity="error" text="Chave de URL inválida"></Message>
-            }
-
+              <Message style={{ width: '100%' }} severity="error" text="Ocorreu um erro"></Message>
+            }           
           </form>
       </Dialog>)}
 
-    </React.Fragment>
+    </React.Fragment> : null
   )
 }
-
-export default connect(state => ({ viewer: state.root.viewer }))(SaveViewerWidget)

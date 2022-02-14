@@ -14,11 +14,12 @@ function MainMenu(props) {
   useEffect(() => {
     let pitems = Object.keys(components)
       .filter(k => components[k].target === 'mainmenu')
-      .sort((a, b) => components[a].order > components[b].order ? 1 : -1 )
+      //.sort((a, b) => components[a].order > components[b].order ? 1 : -1 )
       .map(id => components[id]);
-      setComponentsOrdered(pitems);
-  }, [components]);
+    
+    setComponentsOrdered(pitems);
 
+  }, [components]);
   
   return (
     <MainMenuComponent

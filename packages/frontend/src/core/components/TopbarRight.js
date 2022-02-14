@@ -12,7 +12,8 @@ export default function TopbarRight(props) {
 
       { core.renderComponents({
         region: 'topbar_right',
-        props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } }
+        props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } },
+        as: 'popup'
       })}
       
     </React.Fragment>

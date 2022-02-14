@@ -7,6 +7,7 @@ import MainMap from '../components/MainMap'
 import MainMenu from './MainMenu'
 import Layers from '../components/Layers'
 import MorphLayer from '../components/Layers/MorphLayer'
+import FooterLeft from './FooterLeft'
 import FooterRight from './FooterRight'
 import TopbarRight from './TopbarRight'
 import MapControlsTopLeft from './MapControlsTopLeft'
@@ -84,6 +85,7 @@ function Viewer(props) {
       layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
       mainMenu={<MainMenu history={history} onMenuClick={isDesktop => dispatch(layout_show_menu(isDesktop))} />}
       topbarRight={<TopbarRight />}
+      footerLeft={<FooterLeft />}
       footerRight={<FooterRight />}
       mainOlMap={mainMap}
     >

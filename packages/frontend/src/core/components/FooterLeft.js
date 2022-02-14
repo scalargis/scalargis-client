@@ -3,7 +3,7 @@ import MapModel from '../model/MapModel';
 import OWSModel from '../model/OWSModel';
 import * as Utils from '../utils';
 
-export default function FooterRight(props) {
+export default function FooterLeft(props) {
 
   const { core, viewer, dispatch, mainMap } = props;
 
@@ -11,7 +11,7 @@ export default function FooterRight(props) {
     <React.Fragment>
 
       { core.renderComponents({
-        region: 'footer_right',
+        region: 'footer_left',
         props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } },
         as: "popup"
       })}
