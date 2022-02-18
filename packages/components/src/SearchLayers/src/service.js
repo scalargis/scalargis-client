@@ -11,7 +11,9 @@ export const getDescribeFeatureType = (options) => {
   const { cfg, viewer, auth } = options;
 
   const featureType = `${cfg.feature_prefix}:${cfg.feature_type}`;
-  let url = `${cfg.source_url}?service=WFS&version=2.0.0&request=DescribeFeatureType&typeName=${featureType}&outputFormat=application/json`
+  //let url = `${cfg.source_url}?service=WFS&version=2.0.0&request=DescribeFeatureType&typeName=${featureType}&outputFormat=application/json`
+  let url = cfg.source_url + (cfg.source_url.indexOf('?') > -1 ? '' : '?');
+  url = `${url}&service=WFS&version=2.0.0&request=DescribeFeatureType&typeName=${featureType}&outputFormat=application/json`
 
   //Add user authentication token
   if (isUrlAppHostname(url) && viewer.integrated_authentication) {
