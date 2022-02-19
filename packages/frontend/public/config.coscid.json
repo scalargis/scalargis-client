@@ -454,10 +454,10 @@
           "children": []
           },
           {
-          "id": "searchlayers2",
-          "type": "SearchLayers",
-          "title": "Pesquisa de tema 2",
-          "config_json": {
+            "id": "searchlayers2",
+            "type": "SearchLayers",
+            "title": "Pesquisa de tema 2",
+            "config_json": {
               "header": "Pesquisa Temas 2",
               "show_icon": true,
               "exclusive_layer": true,
@@ -542,11 +542,11 @@
                       "fields_sort": ["concelho", "distrito"]                        
                   }                    
               ]
-          },
-          "config_version": "1.0",
-          "regions": [],
-          "target": "mainmenu",
-          "children": []
+            },
+            "config_version": "1.0",
+            "regions": [],
+            "target": "mainmenu",
+            "children": []
           },
           {
           "id": "searchlayers3",
@@ -607,7 +607,9 @@
               "id": "layerattributestable",
               "type": "LayerAttributesTable",
               "title": "Tabela de Atributos",
-              "config_json": {},
+              "config_json": {
+                  "target": "searchlayerstoc"
+              },
               "config_version": "1.0",
               "regions": [],
               "target": "layer_tools",
