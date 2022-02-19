@@ -11,7 +11,6 @@ export const getDescribeFeatureType = (options) => {
   const { cfg, viewer, auth } = options;
 
   const featureType = `${cfg.feature_prefix}:${cfg.feature_type}`;
-  //let url = `${cfg.source_url}?service=WFS&version=2.0.0&request=DescribeFeatureType&typeName=${featureType}&outputFormat=application/json`
   let url = cfg.source_url + (cfg.source_url.indexOf('?') > -1 ? '' : '?');
   url = `${url}&service=WFS&version=2.0.0&request=DescribeFeatureType&typeName=${featureType}&outputFormat=application/json`
 
@@ -51,12 +50,12 @@ export const getFeatures = (options) => {
 
   const {cfg, schema, startIndex, maxFeatures, filter, sort, viewer, auth} = options;
 
-  let url = cfg.source_url;
+  let url = cfg.source_url + (cfg.source_url.indexOf('?') > -1 ? '' : '?');
 
   //Add user authentication token
   if (isUrlAppHostname(url) && viewer.integrated_authentication) {
     if (auth && auth.data && auth.data.auth_token) {
-      const authkey = viewer?.integrated_authentication_key || 'authkey';
+      const authkey = viewer?.integrated_authentication_key || 'authkey';      
       url = url + '&' + authkey + '=' + auth.data.auth_token;
     }
   }
