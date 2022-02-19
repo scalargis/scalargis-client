@@ -55,7 +55,7 @@ export const getFeatures = (options) => {
   //Add user authentication token
   if (isUrlAppHostname(url) && viewer.integrated_authentication) {
     if (auth && auth.data && auth.data.auth_token) {
-      const authkey = viewer?.integrated_authentication_key || 'authkey';      
+      const authkey = viewer?.integrated_authentication_key || 'authkey';
       url = url + '&' + authkey + '=' + auth.data.auth_token;
     }
   }

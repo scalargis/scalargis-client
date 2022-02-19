@@ -7,6 +7,20 @@ import * as OlExtent from 'ol/extent';
 import { generateRGBA, removeUrlParam } from '../utils';
 import FileSaver from 'file-saver';
 
+
+const getCRSCode = (val) => {
+
+  let retVal = /:(\d+)$/g.exec(val) ? parseInt(/:(\d+)$/g.exec(val)[1], 10) : null;
+
+  if (!retVal) {
+    if (val.indexOf('www.opengis.net/def/crs/EPSG') !== -1) {
+      retVal = val.substr(val.lastIndexOf('/') + 1);
+    }
+  }
+
+  return retVal;
+}
+
 // Get loaded coordinate systems from server
 export const projOptions = (coordsyss) => {
   const options = coordsyss.map(i => ({
@@ -111,6 +125,8 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
   // Get feature types
   types = wfs[wfsns+'WFS_Capabilities'][ns+'FeatureTypeList'][0][ns+'FeatureType'];
 
+
+
   // Loop through feature types
   types.map((l, i) => {
 
@@ -133,14 +149,14 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
     if (['1.0.0', '1.1.0'].indexOf(version) > -1) {
 
       // Update CRS
-      if (l.SRS) crs = parseInt(/EPSG:(\d+)/g.exec(l.SRS[0])[1], 10);
+      if (l.SRS) crs = getCRSCode(l.SRS[0]) ? parseInt(getCRSCode(l.SRS[0]), 10) : crs; //parseInt(/EPSG:(\d+)/g.exec(l.SRS[0])[1], 10);
       else if (l.DefaultSRS) {
-        crs = parseInt(/EPSG::(\d+)/g.exec(l.DefaultSRS[0])[1], 10);
+        crs = getCRSCode(l.DefaultSRS[0]) ? parseInt(getCRSCode(l.DefaultSRS[0]), 10): crs; //parseInt(/EPSG::(\d+)/g.exec(l.DefaultSRS[0])[1], 10);
       }
 
       // Use CRS from DefaultCRS
       if (l[wfsns+'DefaultCRS']) {
-        crs = parseInt(/EPSG::(\d+)/g.exec(l[wfsns+'DefaultCRS'][0])[1], 10);
+        crs = getCRSCode(l[wfsns+'DefaultCRS'][0]) ? parseInt(getCRSCode(l[wfsns+'DefaultCRS'][0]), 10) : crs; //parseInt(/EPSG::(\d+)/g.exec(l[wfsns+'DefaultCRS'][0])[1], 10);
       }
 
       // Find lat/lon bounding box
@@ -178,7 +194,11 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
 
       // Get CRS from DefaultCRS
       if (l[wfsns+'DefaultCRS']) {
-        crs = parseInt(/:(\d+)$/g.exec(l[wfsns+'DefaultCRS'][0])[1], 10);
+        //crs = /:(\d+)$/g.exec(l[wfsns+'DefaultCRS'][0]) ? parseInt(/:(\d+)$/g.exec(l[wfsns+'DefaultCRS'][0])[1], 10) : crs;
+        crs = getCRSCode(l[wfsns+'DefaultCRS'][0]) ? parseInt(getCRSCode(l[wfsns+'DefaultCRS'][0]), 10) : crs;
+      } else if (l['DefaultCRS']) {
+        //crs = /:(\d+)$/g.exec(l['DefaultCRS'][0]) ? parseInt(/:(\d+)$/g.exec(l['DefaultCRS'][0])[1], 10) : crs;
+        crs =  getCRSCode(l['DefaultCRS'][0]) ? parseInt(getCRSCode(l['DefaultCRS'][0]), 10) : crs;
       }
 
       // Get bounding box from WGS84 bounding box
@@ -220,6 +240,23 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
       style_stroke_color: generateRGBA(),
       style_stroke_width: 1
     };
+
+    if (l['$']) {
+      const featurerns = Object.entries(l['$']).find(([key]) => key.includes('xmlns:' + ns));
+      const featureprefix = l[ns+'Name'][0].split(':').length > 1 ? l[ns+'Name'][0].split(':')[0] : '';
+      const faturetype = l[ns+'Name'][0].split(':').length > 1 ? l[ns+'Name'][0].split(':')[1] : l[ns+'Name'][0];
+      if (featurerns) {
+        theme['datatable'] = {
+          "source_type": "wfs",
+          "source_url": url,
+          "feature_namespace": featurerns[1],
+          "feature_prefix": featureprefix,
+          "feature_type": faturetype,
+          "all_geometries": true
+        }
+      }
+    }
+
     result.push(theme)
     return l;
   });

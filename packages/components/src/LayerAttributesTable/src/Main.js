@@ -27,11 +27,13 @@ export default function Main(props) {
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
+  const target = layer?.datatable?.target || props?.config?.target;
+
   // Use layers.exclude_components prop to exclude component
   if (layer && layer.exclude_components && layer.exclude_components.includes('LayerAttributesTable')) return null;
 
   // If doesn't have datable reference info
-  if (!layer || !layer.datatable || !layer.datatable.target) return null;
+  if (!layer || !layer.datatable || !target) return null;
 
   if (!hasAttributes(layer)) return null;
   return (
@@ -44,8 +46,8 @@ export default function Main(props) {
         color="blue"
         className="p-button-sm p-button-rounded p-button-text tool"
         onClick={e => {
-          dispatch(actions.searchlayers_set_layer(layer.datatable.target, layer));
-          dispatch(actions.viewer_set_selectedmenu(layer.datatable.target));
+          dispatch(actions.searchlayers_set_layer(target, layer));
+          dispatch(actions.viewer_set_selectedmenu(target));
           //setModalThemeAttributesOpen(layer)
         }}
       />
