@@ -1,0 +1,12 @@
+{
+  "id": "layerattributestable",
+  "type": "LayerAttributesTable",
+  "title": "Tabela de Atributos",
+  "config_json": {
+      "target": "searchlayerstoc"
+  },
+  "config_version": "1.0",
+  "regions": [],
+  "target": "layer_tools",
+  "children": []
+}
