@@ -11,6 +11,7 @@
     "copy": "copyfiles -u 1 \"./src/**/*.{css,html}\" \"./dist/\""
   },
   "dependencies": {
+    "mathjs": "^10.1.1"
   },
   "devDependencies": {
   } 

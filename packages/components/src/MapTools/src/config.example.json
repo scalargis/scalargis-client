@@ -1,9 +1,35 @@
 {
   "id": "maptools",
-  "type": "MapTools", 
+  "type": "MapTools",
   "target": "mainmenu",
-  "title": "Ferramentas de Medição",
-  "order": 3,
-  "config_json": { "header": "Ferramentas de Medição", "crs": 3763 },
+  "links": "map_controls_left",
+  "config_json": {
+    "header": "Ferramentas de Medição",
+    "crs": 3763,
+    "length": {
+        "format": {
+            "locale": "en-US",
+            "options": {
+                "useGrouping": true,
+                "minimumFractionDigits": 0,
+                "maximumFractionDigits": 1
+            },
+            "unit": "m",
+            "expression": "{value} m"
+        }
+    },
+    "area": {
+        "format": {
+            "locale": "en-US",
+            "options": {
+                "useGrouping": true,
+                "minimumFractionDigits": 0,
+                "maximumFractionDigits": 2
+            },
+            "unit": "hectare",
+            "expression": "{value} ha"
+        }
+    }
+  },
   "children": []
 }

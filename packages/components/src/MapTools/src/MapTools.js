@@ -13,6 +13,7 @@ import OlStyle from 'ol/style/Style';
 import OlCircle from 'ol/style/Circle';
 import OlFill from 'ol/style/Fill';
 import OlStroke from 'ol/style/Stroke';
+import { unit } from 'mathjs';
 import './style.css';
 
 // TODO: create namespace in Store and pass actions through props
@@ -157,12 +158,29 @@ class Main extends React.Component {
           }
         }
       }
+
       let output;
-      if (length > 10000) {
-          output = (Math.round(length / 1000 * 1000) / 1000) + ' km';
+      if (this.props.record?.config_json?.length?.format) {
+        const format = this.props.record.config_json.length.format;
+
+        output = unit(length, 'm').toNumeric(format.unit || 'm');
+        if (format.options) {
+          output = output.toLocaleString(format.locale || 'en-US', format.options);
+          if (format.options.useGrouping !== false) {
+            output = output.replace(/,/g," ");
+          }
+        }
+        if (format.expression) {
+          output = format.expression.replace('{value}', output);
+        }
       } else {
-          output = (Math.round(length * 1000) / 1000) + ' m';
+        if (length > 10000) {
+          output = (Math.round(length / 1000 * 1000) / 1000) + ' km';
+        } else {
+            output = (Math.round(length * 1000) / 1000) + ' m';
+        }
       }
+
       return output;
     };
 
@@ -182,12 +200,27 @@ class Main extends React.Component {
           }
         }
       }      
+      
       let output;
-      if (area > 100000) {
+      if (this.props.record?.config_json?.area?.format) {
+        const format = this.props.record.config_json.area.format;
+
+        output = unit(area, 'm2').toNumeric(format.unit || 'm2');
+        if (format.options) {
+          output = output.toLocaleString(format.locale || 'en-US', format.options);
+          if (format.options.useGrouping !== false) {
+            output = output.replace(/,/g," ");
+          }
+        }
+        if (format.expression) {
+          output = format.expression.replace('{value}', output);
+        }
+      } else if (area > 100000) {
         output = (Math.round(area / 1000000 * 1000) / 1000) + ' km2';
       } else {
         output = (Math.round(area * 1000) / 1000) + ' m2';
       }
+
       return output;
     };
 
