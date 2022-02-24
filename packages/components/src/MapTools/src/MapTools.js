@@ -159,11 +159,13 @@ class Main extends React.Component {
         }
       }
 
-      let output;
+      let output = length;
       if (this.props.record?.config_json?.length?.format) {
         const format = this.props.record.config_json.length.format;
 
-        output = unit(length, 'm').toNumeric(format.unit || 'm');
+        if (format.source_unit && format.output_unit) {
+          output = unit(length, format.source_unit).toNumeric(format.output_unit);
+        }
         if (format.options) {
           output = output.toLocaleString(format.locale || 'en-US', format.options);
           if (format.options.useGrouping !== false) {
@@ -201,11 +203,13 @@ class Main extends React.Component {
         }
       }      
       
-      let output;
+      let output = area;
       if (this.props.record?.config_json?.area?.format) {
         const format = this.props.record.config_json.area.format;
 
-        output = unit(area, 'm2').toNumeric(format.unit || 'm2');
+        if (format.source_unit && format.output_unit) {
+          output = unit(area, format.source_unit).toNumeric(format.output_unit);
+        }
         if (format.options) {
           output = output.toLocaleString(format.locale || 'en-US', format.options);
           if (format.options.useGrouping !== false) {
