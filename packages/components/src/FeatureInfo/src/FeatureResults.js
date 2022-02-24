@@ -8,6 +8,7 @@ import OlFormatGeoJSON from "ol/format/GeoJSON"
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { Message } from 'primereact/message'
 import { Button } from 'primereact/button'
+import { unit } from 'mathjs'
 
 export default function FeatureResults({ config, features, layers, actions, dispatch, mainMap, record }) {
 
@@ -255,7 +256,7 @@ function getFeatureRows(feat, layer) {
         feature_tpl.fields.forEach((field, i) => {
           let key = field.name;
           if (typeof feat.get(key) != 'object') {
-            rows.push({ key, name: field.title, value: feat.get(field.name) });
+            rows.push({ key, name: field.title, value: formatValue(feat.get(field.name), field.format) });
           }
         })
       } else {
@@ -271,7 +272,7 @@ function getFeatureRows(feat, layer) {
         feature_tpl.fields.forEach((field, i) => {
           let key = field.name;
           if (typeof feat.get(key) != 'object') {
-            rows.push({ key, name: field.title, value: feat.data[field.name] });
+            rows.push({ key, name: field.title, value: formatValue(feat.data[field.name],field.format) });
           }
         })
       } else {
@@ -388,4 +389,25 @@ function download(filename, text) {
   document.body.appendChild(element);
   element.click();
   document.body.removeChild(element);
+}
+
+function formatValue(value, format) {
+  let new_value = value;
+  if (format) {
+    let val = value;
+    if (format.source_unit && format.output_unit) {
+      val = unit(val, format.source_unit).toNumeric(format.output_unit);
+    }
+    if (format.options) {
+      val =  val.toLocaleString(format.locale || 'en-US', format.options);
+      if (format.options.useGrouping !== false) {
+        val = val.replace(/,/g," ");
+      }
+    }
+    if (format.expression) {
+      val = format.expression.replace('{value}', val);
+    }
+    new_value = val;
+  }
+  return new_value;
 }
