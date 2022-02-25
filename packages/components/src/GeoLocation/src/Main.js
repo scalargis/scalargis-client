@@ -20,7 +20,7 @@ export function MainMenu({ className, config, actions, record }) {
   )
 }
 
-export default function Main({ as, config, actions }) {
+export default function Main({ as, config, actions, record }) {
 
   const { viewer, dispatch } = config;
 
@@ -33,6 +33,7 @@ export default function Main({ as, config, actions }) {
           config={config}
           actions={actions}
           dispatch={dispatch}
+          record={record}
         />
         
       </div>

@@ -8,20 +8,22 @@ import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
 import { Message } from 'primereact/message'
 
-export default function GeoLocation({ config, actions, dispatch }) {
+export default function GeoLocation({ config, actions, dispatch, record }) {
 
   const { viewer, mainMap, Models } = config;
   const { getProjectionSrid } = Models.MapModel;
   const { geolocation }  = viewer;
 
+  const component_cfg = record.config_json;
+
   const geo_location_control = viewer.config_json.map_controls.find(c => c.id === 'GeoLocation');
   const geoLocationActive = geo_location_control ? geo_location_control.active : false;
   const geoLocationTracking = geo_location_control ? geo_location_control.tracking : false;
-  const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol } = actions;  
+  const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol } = actions;
 
   const [results, setResults] = useState([]);
 
-  function getErrorMessage(error) {
+  function getErrorMessage(error, messages) {
     let message = error.message;
 
     switch(error.code) {
@@ -35,10 +37,14 @@ export default function GeoLocation({ config, actions, dispatch }) {
         break;
       case 3:
         //The time allowed to acquire the geolocation, defined by PositionOptions.timeout information that was reached before the information was obtained.
-        message = 'Ocorreu um timeout antes de ter sido possível obter a localização.'
+        message = 'Ocorreu um timeout antes de ter sido possível obter a localização.';
         break;
       default:
-        message = 'Não foi possível obter a localização.'
+        message = messages?.error?.text ? messages.error.text : 'Não foi possível obter a localização.';
+    }
+
+    if (error.code && messages && messages['error' + error.code] && messages['error' + error.code].text) {
+      message = messages['error' + error.code].text;
     }
 
     return message;
@@ -110,7 +116,7 @@ export default function GeoLocation({ config, actions, dispatch }) {
   if (geolocation && geolocation.error) return (
     <Message
       severity="warn"
-      text={getErrorMessage(geolocation.error)} 
+      text={getErrorMessage(geolocation.error, component_cfg?.messages)}
     />
   )
 
@@ -118,7 +124,7 @@ export default function GeoLocation({ config, actions, dispatch }) {
     <div>
       <Message
         severity="info"
-        text={"Selecione a opção 'Ver Posição' para ativar a visualização da sua posição."} 
+        text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : "Selecione a opção 'Ver Posição' para ativar a visualização da sua posição."}
       />
 
       <div className="p-mt-3 p-pt-3 p-pr-2 p-pl-2" style={{"border": "1px solid rgb(111 57 57 / 12%)"}}>
