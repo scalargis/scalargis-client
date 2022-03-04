@@ -37,7 +37,7 @@ export function MainMenu({ className, config, actions, record }) {
         {showOnPortal(<Dialog
           header={header}
           visible={showPopup}
-          style={{width: isMobile ? '90%' : '35vw' }} 
+          style={{width: isMobile ? '90%' : '45vw' }} 
           modal
           footer={(
             <div className="p-grid">
@@ -51,6 +51,7 @@ export function MainMenu({ className, config, actions, record }) {
           <ContactForm
             viewer={viewer}
             dispatch={dispatch}
+            config={component_cfg}
             Utils={Models.Utils}
           />
 
@@ -92,6 +93,7 @@ export default function Main({ region, as, config, actions, record }) {
       <ContactForm
         viewer={viewer}
         dispatch={dispatch}
+        config={component_cfg}
         Utils={Models.Utils}
       />
     )
@@ -114,7 +116,7 @@ export default function Main({ region, as, config, actions, record }) {
           {showOnPortal(<Dialog
             header="Formulário de Contacto"
             visible={showForm}
-            style={{width: isMobile ? '90%' : '35vw' }} 
+            style={{width: isMobile ? '90%' : '45vw' }} 
             modal
             footer={(
               <div className="p-grid">
@@ -127,6 +129,7 @@ export default function Main({ region, as, config, actions, record }) {
               <ContactForm
                 viewer={viewer}
                 dispatch={dispatch}
+                config={component_cfg}
                 Utils={Models.Utils}
               />
           </Dialog>)}

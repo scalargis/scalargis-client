@@ -1,0 +1,23 @@
+{
+  "id": "contactform",
+  "type": "ContactForm",
+  "title": "",
+  "config_json": {
+      "requiredFieldMessage": "Campo de preenchimento obrigatório",
+      "upload": {
+          "enabled": true,
+          "minFiles": 0,
+          "maxFiles": 3,          
+          "maxFileSize": 3000000,
+          "accept": "",
+          "invalidFileSizeMessageSummary": "",
+          "invalidFileSizeMessageDetail": "",
+          "chooseLabel": "",
+          "cancelLabel": "",
+          "emptyMessage": "Arraste para aqui o ficheiros a enviar."
+      }
+  },
+  "regions": [],
+  "target": "mainmenu",
+  "children": []
+} 
