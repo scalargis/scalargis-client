@@ -301,6 +301,7 @@ class Main extends React.Component {
     } = this.props;
 
     const olmap = config.mainMap;
+    const component_cfg = record.config_json || {};
 
     /*
     const { filter, opened, dragging } = this.state;
@@ -375,20 +376,24 @@ class Main extends React.Component {
           }
 
           { !!tree.length ? (
-            <div className="p-inputgroup">
-              <InputText 
-                placeholder='Filtro...'
-                className="p-inputtext-sm p-mb-2"
-                value={filter}
-                onChange={this.changeFilter.bind(this)}
-              />
-              <Button
-                icon="pi pi-times"
-                label="Limpar"
-                className="p-button-sm p-mb-2"
-                onClick={this.clearFilter.bind(this)}
-              />
-            </div>
+            <>
+            { component_cfg.show_filter !== false ? (
+              <div className="p-inputgroup">
+                <InputText 
+                  placeholder='Filtro...'
+                  className="p-inputtext-sm p-mb-2"
+                  value={filter}
+                  onChange={this.changeFilter.bind(this)}
+                />
+                <Button
+                  icon="pi pi-times"
+                  label="Limpar"
+                  className="p-button-sm p-mb-2"
+                  onClick={this.clearFilter.bind(this)}
+                />
+              </div>
+            ) : null }
+            </>
           ) : (
             <Message
               severity="info"

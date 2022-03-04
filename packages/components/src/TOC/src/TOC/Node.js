@@ -122,13 +122,15 @@ class Node extends React.Component {
                   )}
                 </td>
                 <td className="buttons">
+                  { data.show_details !== false ?
                   <Button
                     className={"p-button-sm" + (detailsOpen ? "" : " p-button-text") } 
                     title="Mostrar/esconder detalhes"
                     size="mini"
                     icon={this.isOpen() ? "pi pi-cog" : "pi pi-cog" }
                     onClick={e => this.setState({ ...this.state, detailsOpen: !detailsOpen })}
-                  />{' '}
+                  /> : null }
+                  {' '}
                   { data.bbox ? (
                     <Button
                       className="p-button-sm p-button-text"
