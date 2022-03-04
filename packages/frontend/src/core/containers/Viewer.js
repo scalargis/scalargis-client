@@ -75,7 +75,12 @@ function Viewer(props) {
   // TODO: improve loading UI
   if (loading) return null;
 
-  const rootLayers = layers.filter(c => ['overlays', 'main', 'basemaps'].includes(c.id)).reverse();
+  let rlayers = ['overlays', 'main', 'basemaps'];
+  if (viewer.config_json && viewer.config_json.root_layers && viewer.config_json.root_layers.length > 0) {
+    rlayers = viewer.config_json.root_layers;
+  }
+
+  const rootLayers = layers.filter(c => rlayers.includes(c.id)).reverse();
   return (
     <Layout
       history={history}
