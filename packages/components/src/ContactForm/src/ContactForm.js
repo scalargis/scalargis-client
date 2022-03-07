@@ -6,6 +6,7 @@ import { InputTextarea } from 'primereact/inputtextarea'
 import { Button } from 'primereact/button'
 import { Message } from 'primereact/message'
 import { Tag } from 'primereact/tag'
+import { Captcha } from 'primereact/captcha';
 import './style.css'
 
 const cookies = new Cookies();
@@ -58,12 +59,16 @@ export default function ContactFrom(props) {
 
   const upload_cfg = config.upload || {};
 
+  const showCaptcha = (!viewer?.user_info?.name && viewer.captcha_key) ? true : false;
+
   //const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState(viewer?.user_info?.name ? viewer.user_info.name : null);
   const [email, setEmail] = useState(viewer?.user_info?.email  ? viewer.user_info.email : null);
+  const [captchaResponse, setCaptchaResponse] = useState(null);
   const [files, setFiles] = useState([]);
   const [description, setDescription] = useState(null);
   const [infoMessage, setInfoMessage] = useState(null);
+  const [enableSubmit, setEnableSubmit] = useState(showCaptcha ? false: true);
   const [isProcessingFiles, setIsProcessingFiles] =  useState(false);
   const [sending, setSending] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -96,6 +101,16 @@ export default function ContactFrom(props) {
     setFiles([]);
     setInfoMessage(null);
   }
+
+  const onCaptchaResponse = (e) => {
+    setCaptchaResponse(e.response);
+    if (e.response) setEnableSubmit(true);
+  }
+
+  const onCaptchaExpire = () => {
+    setCaptchaResponse(null);
+    setEnableSubmit(false);
+  }  
 
   function submit(e) {
     e.preventDefault();
@@ -138,9 +153,12 @@ export default function ContactFrom(props) {
       description
     }
 
-
     if (files && files.length) {
       record['files'] = files.filter(f=>final_files.includes(f.filename));
+    }
+
+    if (showCaptcha) {
+      record['captcha'] = captchaResponse;
     }
 
     // Save request
@@ -318,7 +336,15 @@ export default function ContactFrom(props) {
                 invalidFileSizeMessageDetail={ upload_cfg.invalidFileSizeMessageDetail || "Ficheiro com dimensão superior ao permitido ({0})." }
                 emptyTemplate={<p className="m-0">{ upload_cfg.emptyMessage || "Arraste para aqui o ficheiros a enviar." }</p>} />          
           </div> }
-
+          
+          { showCaptcha ?
+          <div className="p-field">
+            <Captcha siteKey={viewer.captcha_key}
+              language='pt'
+              onResponse={onCaptchaResponse} 
+              onExpire={onCaptchaExpire}
+              />
+          </div> : null }
         </div>
         
         { viewer.contact_info && 
@@ -337,7 +363,7 @@ export default function ContactFrom(props) {
             icon={ sending ? "pi pi-spin pi-spinner": "pi pi-check" }
             label="Enviar" 
             onClick={submit}
-            disabled={sending}
+            disabled={!enableSubmit || sending}
           />
         </div>         
       </form>
