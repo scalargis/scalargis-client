@@ -7,7 +7,7 @@ import { Button } from 'primereact/button'
 import { Message } from 'primereact/message'
 
 const cookies = new Cookies();
-const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
 
 function LoginWidget({ auth, history, redirect, dispatch, actions }) {
 

@@ -8,7 +8,7 @@ import AppContext from '../../AppContext'
 import { Message } from 'primereact/message'
 
 const cookies = new Cookies();
-const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
 //let popupMenu;
 
 function LoginWidget({ auth, history, redirect }) {

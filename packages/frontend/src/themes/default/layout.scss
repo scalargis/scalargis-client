@@ -352,3 +352,33 @@ body .p-multiselect {
   text-align: center;
   margin-bottom: 1em;
 }
+
+.splashscreen {
+  height: 100%;
+}
+
+.splashscreen > div {
+  background-color: white;
+  padding: 6rem;
+}
+
+.splashscreen a {
+  text-decoration: underline;
+}
+
+/* Cookie Consent */
+.CookieConsent {
+  text-align: center;
+}
+.CookieConsent #rcc-confirm-button {
+  background: rgb(255, 212, 45);
+  border: 0px;
+  border-radius: 0px;
+  box-shadow: none;
+  color: rgb(78, 80, 59);
+  cursor: pointer;
+  flex: 0 0 auto;
+  padding: 10px 15px;
+  margin: 15px;
+  font-size: 14px;
+}

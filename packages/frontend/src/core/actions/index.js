@@ -51,7 +51,7 @@ export const LAYOUT_TOGGLE_MOBILEMENU   = 'LAYOUT_TOGGLE_MOBILEMENU'
 const CONFIG_URL = process.env.REACT_APP_CONFIG_URL || './config.example.json';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const MAP_PROXY = process.env.REACT_APP_MAP_PROXY || '';
-const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
 
 export function viewer_save_record(record, history, redirect) {
   return function (dispatch, getState) {

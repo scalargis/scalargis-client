@@ -1,26 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { connect } from 'react-redux';
+import ThemeSelector from '../components/ThemeSelector'
 import LayoutComponent from '../components/Layout'
 import { mapStateToProps } from '../utils'
-
-const ThemeSelector = ({ theme, children }) => {
-  let Theme = null;
-
-  if (!theme || theme === 'default') {
-    Theme = React.lazy(() => import('../../themes/default/main'));
-  } else {
-    Theme = React.lazy(() => import('../../themes/' + theme + '/src/main'));
-  }
-
-  return (
-    <>
-      <React.Suspense fallback={<></>}>
-        <Theme />
-      </React.Suspense>
-      {children}
-    </>
-  )
-}
 
 function Layout(props) {
 
@@ -87,13 +69,10 @@ function Layout(props) {
     }
     //Set document icons
     if (config.img_icon) {
-      //document.querySelector("link[rel*='icon']").href = "favicon.ico"
       let elem = document.querySelector("link[rel='shortcut icon']");
-      //if (elem) elem.href = CLIENT_URL + '/assets/images/dgt/logo32.png';
       if (elem) elem.href = CLIENT_URL + config.img_icon;
 
       elem = document.querySelector("link[rel='apple-touch-icon']");
-      //if (elem) elem.href = CLIENT_URL + '/assets/images/dgt/logo32.png';
       if (elem) elem.href = CLIENT_URL + config.img_icon;
     }
   }, [config]);   

@@ -59,7 +59,7 @@ const initialBackoffice = {
 }
 
 const cookies = new Cookies();
-const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
 
 //export default (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, config: null, viewer: initialViewer, components: {} }, action) => {
 //export default (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, config: null, components: {} }, action) => {

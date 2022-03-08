@@ -16,7 +16,7 @@ import { getViewerSessionConfig } from '../model/MapModel'
 */
 
 const cookies = new Cookies();
-const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
 
 export default function SaveViewer({region, as, config, actions, record, utils}) {
   const { viewer, dispatch, Models } = config;

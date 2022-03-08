@@ -29,7 +29,7 @@ export default function FeatureResults({ config, features, layers, actions, disp
 
   //Set Export permissions
   useEffect(() => {
-    const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+    const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
     const cookies = new Cookies();
     const logged = cookies.get(cookieAuthName);
   

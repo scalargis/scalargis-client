@@ -42,7 +42,7 @@ export const createHeadersFromOptions = (options) => {
         requestHeaders.set('X-API-KEY', options.user.token);
     } else {
       const cookies = new Cookies();
-      const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+      const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
       const logged = cookies.get(cookieAuthName);
       if (logged && logged.token) {
         requestHeaders.set('X-API-KEY', logged.token);

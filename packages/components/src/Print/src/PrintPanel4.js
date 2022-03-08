@@ -24,7 +24,7 @@ export default function PrintPanel4(props) {
 
   const toast = useRef(null);
 
-  const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+  const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   function goPanelPrintPrev() {

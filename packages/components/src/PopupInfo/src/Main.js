@@ -5,7 +5,7 @@ import { InputSwitch } from 'primereact/inputswitch'
 import { Button } from 'primereact/button'
 import './index.css'
 
-const cookiePopupName = process.env.REACT_APP_COOKIE_POPUP_NAME || 'websig_dgt_popup';
+const cookiePopupName = process.env.REACT_APP_COOKIE_POPUP_NAME || 'scalargis_popup';
 
 export default function Main({ config, actions, utils }) {
 

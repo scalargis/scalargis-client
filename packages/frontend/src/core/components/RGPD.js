@@ -3,8 +3,9 @@ import SplashScreen from './SplashScreen';
 import { withCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
+import ThemeSelector from './ThemeSelector'
 
-const cookieName = process.env.REACT_APP_COOKIE_NAME || 'websig_dgt_rgpd';
+const cookieName = process.env.REACT_APP_COOKIE_NAME || 'scalargis_rgpd';
 const cookieValue = process.env.REACT_APP_COOKIE_VALUE || '2';
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || '/';
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);
@@ -12,6 +13,8 @@ const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || 
 function RGPD({ cookies, children }) {
 
   const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
+
+  let theme = process.env.REACT_APP_DEFAULT_THEME || 'default';
 
   function accept() {
     setCookiergpd(cookieValue);
@@ -27,28 +30,30 @@ function RGPD({ cookies, children }) {
   }
 
   return (
-    <React.Fragment>
-
-      { cookiergpd !== cookieValue && (
-        <CookieConsent
-          location="bottom"
-          buttonText="Aceito"
-          cookieName={cookieName}
-          cookieValue={cookieValue}
-          style={{ background: "#2B373B" }}
-          buttonStyle={{ color: "#4e503b", fontSize: "13px" }}
-          expires={cookieExpiresDays}
-          onAccept={accept}
-          extraCookieOptions={{ path: cookiePath }}
-          debug={true}
-          cookieSecurity={false}
-        >
-          Este website usa cookies para melhorar a experiência do utilizador
-        </CookieConsent>
-      ) }
-      
-      { cookiergpd ? children : <SplashScreen /> }
-    </React.Fragment> 
+    <ThemeSelector theme={theme}>
+      <React.Fragment>
+        { cookiergpd !== cookieValue && (
+          <SplashScreen>
+            <CookieConsent
+              location="bottom"
+              buttonText="Aceito"
+              cookieName={cookieName}
+              cookieValue={cookieValue}
+              expires={cookieExpiresDays}
+              onAccept={accept}
+              extraCookieOptions={{ path: cookiePath }}
+              debug={true}
+              cookieSecurity={false}
+              disableStyles={true}
+            >
+            </CookieConsent>
+          </SplashScreen>
+        ) }
+        
+        {/* cookiergpd ? children : <SplashScreen /> */}
+        { cookiergpd ? children : <></> }
+      </React.Fragment>
+    </ThemeSelector> 
   );
 } 
 

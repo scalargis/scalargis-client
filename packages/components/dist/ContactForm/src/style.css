@@ -1,0 +1,16 @@
+.contact-form-upload-file.p-fileupload .p-fileupload-content {
+  padding: 1rem 1rem;   
+}
+
+.contact-form-upload-file.p-fileupload .p-progressbar.p-component {
+  display: none
+}
+
+.contact-form-upload-file.p-fileupload .p-fileupload-row > div {
+  padding: 0.25rem 0.25rem;
+}
+
+
+.contact-form-upload-file.p-fileupload .p-tag.p-component {
+  background-color: #57636e;
+}

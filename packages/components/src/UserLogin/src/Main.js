@@ -5,8 +5,8 @@ import { Menu } from 'primereact/menu'
 import LoginWidget from './LoginWidget'
 
 const cookies = new Cookies();
-const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
-const appEntityNameAbrev = process.env.REACT_APP_ENTITY_NAME_ABREV || 'DGT';
+const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
+const appEntityNameAbrev = process.env.REACT_APP_ENTITY_NAME_ABREV || 'WKT-SI';
 //let popupMenu;
 
 export default function Main({ region, as, config, actions, record }) {
@@ -71,7 +71,7 @@ export default function Main({ region, as, config, actions, record }) {
   if (showLogin) {
     return (
       <Dialog
-        header={"Entrar - " + (appEntityNameAbrev || 'DGT')}
+        header={"Entrar - " + (appEntityNameAbrev || 'WKT-SI')}
         visible={showLogin}
         style={{width: wsize[0] < 768 ? '90%' : '35vw' }} 
         modal 

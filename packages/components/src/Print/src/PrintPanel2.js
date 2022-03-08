@@ -20,7 +20,7 @@ export default function PrintPanel2(props) {
   const { showOnPortal } = Models.Utils;
   const { exclusive_mapcontrol } = viewer;
 
-  const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+  const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   const [drawTool, setDrawTool] = useState(null);

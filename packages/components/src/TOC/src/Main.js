@@ -42,7 +42,7 @@ class Main extends React.Component {
     
     const { opened } = props.config.viewer.config_json;
 
-    const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+    const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
     this.state = {
@@ -318,7 +318,7 @@ class Main extends React.Component {
 
     //User authentication
     const cookies = new Cookies();
-    const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'websig_dgt';
+    const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis';
     const cookieData = cookies.get(cookieAuthName);
     
     // Filter themes
