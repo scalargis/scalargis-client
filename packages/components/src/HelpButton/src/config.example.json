@@ -1,0 +1,14 @@
+{
+  "id": "helpbutton",
+  "type": "HelpButton",
+  "title": "",
+  "config_json": {
+      "header": "Ajuda",
+      "closeLabel": "Fechar",
+      "_url": "/static/client/help.html",      
+      "html": "<div>teste1</div><div>teste3</div>"
+  },
+  "target": "mainmenu",
+  "as": "popup",
+  "children": []
+} 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from 'primereact/button'
 import { Panel } from 'primereact/panel'
 import { Dialog } from 'primereact/dialog'
@@ -14,9 +14,13 @@ export function MainMenu({ className, config, actions, record }) {
   const { getWindowSize, showOnPortal } = Models.Utils;
 
   const [showPopup, setShowPopup] = useState(false);
+  const [size, setSize] = useState(null);
+  const [maximized, setMaximized] = useState(false);
+
+  const dialog = useRef();
 
   const component_cfg = record.config_json || {};
-  const title = record.title || '';
+  const title = record.title || 'Ajuda';
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
@@ -36,9 +40,12 @@ export function MainMenu({ className, config, actions, record }) {
         />
 
         {showOnPortal(<Dialog
+          ref={dialog}        
           header={header}
           visible={showPopup}
-          style={{width: isMobile ? '90%' : '35vw' }} 
+          style={{width: isMobile ? '90%' : '50vw', height: '80%' }}
+          maximizable
+          maximized={maximized} 
           modal
           footer={(
             <div className="p-grid">
@@ -46,12 +53,30 @@ export function MainMenu({ className, config, actions, record }) {
                 <Button label={closeLabel} onClick={e => setShowPopup(false)} />
               </div>
             </div>
-          )}          
+          )}
+          onShow={() => {
+            const elem = dialog.current.contentEl;
+            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
+          }}
+          onResize={e => {
+            const elem = dialog.current.contentEl;
+            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
+          }}
+          onMaximize={e => {
+            setMaximized(e.maximized);
+            const elem = dialog.current.contentEl;
+            setTimeout(() => {setSize({x: elem.clientWidth, y: elem.clientHeight - 25 }, 200)});
+          }}
           onHide={e => setShowPopup(false)}>
-
-          <HelpHtmlContent
-            config={component_cfg}
-          />
+          
+          { component_cfg.iframe === true ?
+            <iframe title={title} src={component_cfg.url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
+            :
+            <HelpHtmlContent
+              config={component_cfg}
+              size={size}
+            />
+          }
 
         </Dialog>)}
 
@@ -63,7 +88,7 @@ export function MainMenu({ className, config, actions, record }) {
     if (!help_url) return null;
     return (
       <Button
-        title={title || 'Ajuda'}
+        title={title}
         className={className}
         icon="far fa-question-circle"
         style={{ margin: '0.5em 1em' }}
@@ -87,10 +112,14 @@ export default function Main({ as, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
-  const [showPopup, setShowPopup] = useState(false);  
+  const [showPopup, setShowPopup] = useState(false);
+  const [size, setSize] = useState(null);
+  const [maximized, setMaximized] = useState(false);
+
+  const dialog = useRef();    
 
   const component_cfg = record.config_json || {};
-  const title = record.title || '';
+  const title = record.title || 'Ajuda';
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
@@ -117,28 +146,51 @@ export default function Main({ as, config, actions, record }) {
 
   if (openAs === 'popup') return (
     <React.Fragment>
-      <button className="p-link" onClick={e => setShowPopup(true)} title="Ajuda">
+      <button className="p-link" onClick={e => setShowPopup(true)} title={title}>
         <span className="layout-topbar-item-text"></span>
         <span className="layout-topbar-icon far far fa-question-circle" />
       </button>
 
       {showOnPortal(<Dialog
-        header="Ajuda"
-        visible={showPopup}
-        style={{width: isMobile ? '90%' : '35vw' }} 
-        modal
-        footer={(
-          <div className="p-grid">
-            <div className="p-col" style={{ textAlign: 'right'}}>
-              <Button label={closeLabel} onClick={e => setShowPopup(false)} />
+          ref={dialog}        
+          header={header}
+          visible={showPopup}
+          style={{width: isMobile ? '90%' : '50vw', height: '80%' }}
+          maximizable
+          maximized={maximized} 
+          modal
+          footer={(
+            <div className="p-grid">
+              <div className="p-col" style={{ textAlign: 'right'}}>
+                <Button label={closeLabel} onClick={e => setShowPopup(false)} />
+              </div>
             </div>
-          </div>
-        )}             
-        onHide={e => setShowPopup(false)}>
-        <HelpHtmlContent
-          config={component_cfg}
-        />
-      </Dialog>)}
+          )}
+          onShow={() => {
+            const elem = dialog.current.contentEl;
+            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
+          }}
+          onResize={e => {
+            const elem = dialog.current.contentEl;
+            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
+          }}
+          onMaximize={e => {
+            setMaximized(e.maximized);
+            const elem = dialog.current.contentEl;
+            setTimeout(() => {setSize({x: elem.clientWidth, y: elem.clientHeight - 25 }, 200)});
+          }}
+          onHide={e => setShowPopup(false)}>
+          
+          { component_cfg.iframe === true ?
+            <iframe title={title} src={component_cfg.url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
+            :
+            <HelpHtmlContent
+              config={component_cfg}
+              size={size}
+            />
+          }
+
+        </Dialog>)}
 
     </React.Fragment>
   )
@@ -150,9 +202,9 @@ export default function Main({ as, config, actions, record }) {
 
     // Render help button
     return (
-      <button className="p-link" title="Ajuda" onClick={e => { return; }}>
+      <button className="p-link" title={title} onClick={e => { return; }}>
         <a href={help_url} target="_blank" style={{"color": "#ffffff"}}>
-          <span className="layout-topbar-item-text">Ajuda</span>
+          <span className="layout-topbar-item-text">{title}</span>
           <span className="layout-topbar-icon pi pi-question-circle"/>
         </a>
       </button>
