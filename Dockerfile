@@ -1,5 +1,5 @@
 # Build phase
-FROM node:14.17.1 as build
+FROM node:latest as build
 
 # Instal base packages
 WORKDIR /var/scalargis

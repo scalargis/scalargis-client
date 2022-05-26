@@ -2,8 +2,11 @@ version: '3.5'
 
 services:
   scalargis:
-    image: registry.wkt.pt:5000/wkt/scalargis-client:latest    
+    build:
+      context: .
+    image: registry.wkt.pt:5000/wkt/scalargis-client:latest
     container_name: wkt-scalargis-client
     hostname: wkt-scalargis-client
     command: ["yarn start"]
     restart: always
+    dns: 8.8.8.8
