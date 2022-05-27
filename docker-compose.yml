@@ -7,6 +7,7 @@ services:
     image: registry.wkt.pt:5000/wkt/scalargis-client:latest
     container_name: wkt-scalargis-client
     hostname: wkt-scalargis-client
-    command: ["yarn start"]
     restart: always
     dns: 8.8.8.8
+    ports:
+      - "8081:80"
