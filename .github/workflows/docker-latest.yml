@@ -23,7 +23,7 @@ jobs:
       with:
         registry: ${{ secrets.DOCKER_REGISTRY }}
         username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_PASSW }      
+        password: ${{ secrets.REGISTRY_PASSW }}    
 
     - name: Push to WKT registry
       id: push_image
