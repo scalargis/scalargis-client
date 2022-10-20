@@ -1,8 +1,0 @@
-{
-  "name": "@scalargis/coscid-theme",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@fontsource/saira": "^4.5.1"
-  }
-}
