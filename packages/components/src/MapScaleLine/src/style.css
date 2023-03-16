@@ -1,0 +1,14 @@
+/* -- */
+.footer-right .mapscale-line .ol-scale-line,
+.footer-right .mapscale-line .ol-scale-bar {
+  position: static;
+}
+
+.footer-right .mapscale-line .ol-scale-line {
+  background: rgba(0,60,136,0.0);
+}
+
+.footer-right .mapscale-line .ol-scale-line .ol-scale-line-inner {
+  height: 25px;
+  padding-top: 5px;
+}

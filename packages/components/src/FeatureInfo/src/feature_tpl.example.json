@@ -1,0 +1,53 @@
+{
+  "feature_tpl": {
+    "fields": [
+        {
+            "name": "id",
+            "title": "Id"
+        },
+        {
+          "name": "observacoes",
+          "title": "Observaçõess"
+        },
+        {
+          "name": "intervencao_id",
+          "title": "Intervenção"
+        },
+        {
+          "name": "teste_intervencao_id",
+          "title": "Intervenção",
+          "value": "{intervencao_id}"
+        },        
+        {
+          "name": "teste_html1",
+          "type": "html",
+          "value": "{intervencao_id}"
+        },
+        {
+          "name": "teste_html2",
+          "type": "html",
+          "value": "{intervencao_id} - {observacoes}"
+        },                   
+        {                
+          "name": "teste_action",
+          "title": "Ação",
+          "type": "action",
+          "action": {
+            "type": "FeatureInfo/DoAction",
+            "label": "Editar",
+            "icon": "pi pi-search",
+            "tooltip": "Editar",
+            "className": "p-button-text",
+            "show_null": true,
+            "data": {
+              "id": "{id}",
+              "intervencao_id": "{intervencao_id}",
+              "result_id": "{id} - {resultId}",
+              "descricao": "Texto de descrição"
+            }
+          },
+          "value": "{intervencao_id}"
+        }                    
+    ]
+  }
+}

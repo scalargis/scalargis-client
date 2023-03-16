@@ -1,0 +1,30 @@
+{
+  "id": "placessearch",
+  "type": "PlacesSearch", 
+  "target": "topbar_right", 
+  "order": 1,
+  "config_json": {
+    "placeholder": "Localizar...",
+    "url": "https://snig.dgterritorio.pt/geographical_names/search?_min_similarity=0.5&_maxrows=10&_filter={filter}",
+    "sources": [
+      { "id": "DGT", "title": "DGT", "active": true, "buffer": 1000},
+      { "id": "INE", "title": "INE", "active": true, "buffer": 500}
+    ],
+    "types": {
+      "field": "type",
+      "templates": [
+        {
+          "id": "populatedPlace",
+          "iconClass": "pi-chevron-right",
+          "html": "<div><i class='pi pi-chevron-right p-mr-2'></i> <span>{name} ({admin_level3})</span></div>"
+        }
+      ],
+      "default": {
+        "iconClass": "pi-circle-on",
+        "html": "<div><i class='pi pi-circle-on p-mr-2'></i> <span>{name} ({admin_level3})</span></div>"
+      }
+    },    
+    "buffer": 1000
+  },
+  "children": []
+}

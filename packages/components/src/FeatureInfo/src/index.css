@@ -1,0 +1,65 @@
+.feature-info {
+  /* background-color: #f9f9f9; */
+}
+
+.feature-info table {
+  font-size: 0.8em;
+  width: 100%;
+}
+
+.feature-info table td:nth-child(2) {
+  text-align: right;
+}
+
+.feature-info table th {
+  padding-bottom: 1em;
+}
+
+.feature-info .p-panel {
+  margin-bottom: 1em;
+}
+
+.feature-info .p-datatable {
+  margin-bottom: 1em;
+  border-bottom: 1px dashed #f0f0f0;
+  border-top: 1px dashed #f0f0f0;
+  background-color: #fafafa;
+}
+
+.feature-info .p-datatable .p-datatable-thead > tr > th,
+.feature-info .p-datatable .p-datatable-tbody > tr
+{
+  background: transparent;
+}
+
+.feature-info .p-datatable .p-datatable-thead > tr > th {
+  background-color: #2196f3;
+  color: #ffffff;
+}
+
+.feature-info .fi-result-feat {
+  position: relative;
+}
+
+.feature-info .fi-result-feat .fi-result-tools {
+  position: absolute;
+  top: 1px;
+  z-index: 1;
+  right: 0;
+}
+
+.feature-info .fi-result-feat .fi-result-tools .p-button {
+  border-radius: 0;
+}
+
+.feature-info .p-inline-message {
+  display: block;
+  width: 100%;
+}
+
+.feature-info .remove-all,
+.feature-info .export-all
+{
+  display: block;
+  width: 100%;
+}

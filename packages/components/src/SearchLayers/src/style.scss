@@ -1,0 +1,104 @@
+.search-layers {
+  .p-card .p-card-header {
+    text-align: center;
+  }
+
+  .p-card .p-card-title, .p-card .p-card-subtitle {
+    text-align: center;  
+  }
+
+  .p-datatable .p-datatable-thead > tr > th {
+    padding: 0.75rem 0.25rem;
+  }
+
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 0.25rem;
+  }
+
+  .p-datatable .p-sortable-column .p-sortable-column-icon {
+    margin-left: 0.25rem;
+  }
+
+  .p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last {
+    min-width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .p-paginator {
+    justify-content: center;
+  }
+
+  .p-paginator.p-paginator-bottom.p-jc-end {
+    justify-content: center;
+  }
+
+  .p-paginator .p-paginator-pages .p-paginator-page {
+    min-width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .p-paginator .p-dropdown {
+    height: 2rem;
+  }
+
+  .p-paginator .p-dropdown .p-dropdown-label {
+    padding: 0.3em;
+    padding-left: 0.5rem;
+  }
+
+  @keyframes p-progress-spinner-color {
+    100%,
+    0% {
+        stroke: #2196f3;
+    }
+    40% {
+        stroke: #2196f3;
+    }
+    66% {
+        stroke: #2196f3;
+    }
+    80%,
+    90% {
+        stroke: #2196f3;
+    }
+  }
+
+  .p-field .control label {
+    display: inline-block;
+    margin-bottom: .5rem;
+  }
+  
+  .p-field .control select, .p-field .control .input {
+    width: 100%;
+  }
+  
+  .p-field .control .input, .p-field .control .select {
+    padding: 0.33rem 0.49rem !important;
+  }
+
+}
+
+.p-progress-spinner-circle {
+  stroke-width: 3;
+}
+
+//Primerect BlockUI CSS - Remove Block-UI css after update primereact
+.p-blockui-container {
+  position: relative;
+}
+
+.p-blockui, .p-blockui.p-component-overlay {
+  position: absolute;
+}
+
+.p-blockui {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+//End Primerect BlockUI CSS

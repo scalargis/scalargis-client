@@ -1,0 +1,21 @@
+{
+  "id": "popupinfo",
+  "type": "PopupInfo",
+  "title": "PopupInfo",
+  "config_json": {
+    "header": "Bem-vindo ao",
+    "html": "<div><h3 style='text-align: center'>Título</h3><div>Dscrição</div></div>",
+    "closeLabel": "Fechar",
+    "hideOption": true,
+    "hideAuthenticated": false,
+    "cookieName": "cosvgi_popup",
+    "maxAge": 86400,    
+    "actions": {
+      "hide": "UserLogin/Show"
+    }
+  },
+  "config_version": "1.0",
+  "regions": [],
+  "target": "popup",
+  "children": []
+}

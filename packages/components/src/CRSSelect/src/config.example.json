@@ -1,0 +1,8 @@
+{
+  "id": "crsselect",
+  "type": "CRSSelect", 
+  "target": "footer_right", 
+  "order": 3,
+  "config_json": { "crs_list": [3763, 4326] },
+  "children": []
+}

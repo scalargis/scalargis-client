@@ -1,0 +1,19 @@
+{
+  "id": "userlogin",
+  "type": "UserLogin",
+  "title": "Utilizador",
+  "regions": [],
+  "target": "topbar_right",
+  "config_json": {
+    "header": "Entrar - COSvgi",
+    "closable": false,
+    "reset_password": true,
+    "user_registration": true,
+    "actions": {
+      "login": "COSvgi/Login",
+      "registration": "COSvgi/Registration",
+      "reset_password": "COSvgi/ResetPassword"
+    }
+  },
+  "children": []
+}

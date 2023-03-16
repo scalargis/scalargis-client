@@ -1,0 +1,300 @@
+import React from 'react';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { ColorPicker } from 'primereact/colorpicker';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { Dropdown } from 'primereact/dropdown';
+import { InputSwitch } from 'primereact/inputswitch';
+//import './style.css';
+
+class EditNode extends React.Component {
+
+  constructor(props) {
+    super(props);    
+    this.state = {
+      edit: props.edit,
+      showAdvanceOptions: false
+    };
+    //Default value of 'selectable' property is true
+    if (props.edit.selectable == null) {
+      this.editField('selectable', true );
+    }
+  }
+
+  editField(field, value) {
+    let { edit } = this.state;
+    edit[field] = value;
+    this.setState({ ...this.state, edit });
+  }
+
+  convertToRGBAString(str) {
+    const fill = str.split(',');
+    return `rgba(${ fill[0] }, ${ fill[1] }, ${ fill[2] }, ${ fill[3] })`;
+  }
+
+  convertToRGBA(str) {
+    const fill = str.split(',');
+    return { r: fill[0], g: fill[1], b: fill[2], a: fill[3] };
+  }
+
+  convertToRGB(str) {
+    const fill = str.split(',');
+    return { r: fill[0], g: fill[1], b: fill[2] };
+  }
+
+  convertToRGBString(rgb) {
+    return [rgb.r, rgb.g, rgb.b, 1].join(',');
+  }
+
+  render() {
+    const { edit, showAdvanceOptions } = this.state;
+    if (!edit) return null;
+
+    let wmsFormatOptions = [];
+    let wmsFeatureFormatOptions = [];
+    let wmsStyleOptions = [{ key: 999, value: '', label: 'Não Especificado'}];
+
+    let wmtsFormatOptions = [];
+    let wmtsFeatureFormatOptions = [];
+    let wmtsStyleOptions = [{ key: 999, value: '', label: 'Não Especificado'}]; 
+
+    if (edit.type === 'WMS') {
+      let map_formats = edit.get_map_formats || '';
+      let finfo_formats = edit.get_feature_info_formats || '';
+      let wstyles = edit.wms_styles || '';
+      wmsFormatOptions = map_formats.split(',').map((i, j) => {
+        return { key: j, value: i, label: i};
+      });
+      wmsFeatureFormatOptions = finfo_formats.split(',').map((i, j) => {
+        return { key: j, value: i, label: i};
+      });
+      wstyles.split(',').forEach((i, j) => {
+        wmsStyleOptions.push({ key: j, value: i, label: i})
+        return i;
+      });
+    }
+
+    if (['WMTS', 'WMTSXYZ'].includes(edit.type)) {
+      let tile_formats = edit.wmts_formats || '';
+      let wmts_finfo_formats = edit.get_feature_info_formats || '';
+      let wstyles = edit.wmts_styles || '';
+      wmtsFormatOptions = tile_formats.split(',')
+      .filter(v => v && v.toLowerCase().indexOf('image/') !== -1)
+      .map((i, j) => {
+        return { key: j, value: i, label: i};
+      });
+      wmtsFeatureFormatOptions = wmts_finfo_formats.split(',').map((i, j) => {
+        return { key: j, value: i, label: i};
+      });        
+      wstyles.split(',').forEach((i, j) => {
+        wmtsStyleOptions.push({ key: j, value: i, label: i})
+        return i;
+      });      
+    }
+
+    return (
+      <div>
+        <div className="p-fluid">
+
+          <div className="p-field p-grid">
+            <label className="p-col-12 p-md-4">Título</label>
+            <div className="p-col-12 p-md-8">
+              <InputText
+                value={edit.title}
+                placeholder="Título"
+                onChange={e => this.editField('title', e.target.value)}
+                onClick={e => e.target.select()}
+              />
+            </div>
+          </div>
+
+          <div className="p-field p-grid">
+            <label className="p-col-12 p-md-4">Descrição</label>
+            <div className="p-col-12 p-md-8">
+              <InputTextarea 
+                value={edit.description} 
+                placeholder="Descrição"
+                style={{width: '100%', padding: '.67857143em 1em', border: '1px solid rgba(34,36,38,.15)'}}
+                rows="5"
+                onChange={e => this.editField('description', e.target.value)}
+                onClick={e => e.target.select()}
+              />
+            </div>
+          </div>
+
+          { ['GeoJSON', 'KML', 'WMS', 'WFS', 'ArcGISMap'].includes(edit.type) ? (
+            <div className="p-field p-grid">
+              <label className="p-col-12 p-md-4">Selecionar Elementos</label>
+              <div className="p-col-12 p-md-8">
+                <InputSwitch
+                  checked={edit.selectable}
+                  onChange={(e) => this.editField('selectable', !edit.selectable)}
+                />
+              </div>
+            </div>
+          ) : null }
+
+        { (['WMTS', 'WMTSXYZ'].includes(edit.type) && edit.get_feature_info_formats) ? (
+            <div className="p-field p-grid">
+              <label className="p-col-12 p-md-4">Selecionar Elementos</label>
+              <div className="p-col-12 p-md-8">
+                <InputSwitch
+                  checked={edit.selectable}
+                  onChange={(e) => this.editField('selectable', !edit.selectable)}
+                />
+              </div>
+            </div>
+          ) : null }          
+
+          { edit.type === 'WMS' ? (
+            <React.Fragment>
+              <div>
+                <p style={{textAlign: 'right'}}>
+                  <a style={{cursor: 'pointer'}}
+                    onClick={e => this.setState({...this.state, showAdvanceOptions: !showAdvanceOptions})}>
+                    Opções Avançadas{' '}
+                    <i className={showAdvanceOptions ? 'pi pi-angle-up' : 'pi pi-angle-down'}></i>
+                  </a>
+                </p>
+                { showAdvanceOptions && (
+                <div className="p-pb-2">
+                  <div className="p-pt-2">
+                    <label>Formato de GetMap</label>
+                    <Dropdown placeholder='Escolha o Formato de GetMap'
+                      options={wmsFormatOptions}
+                      value={edit.get_map_format || ''}
+                      onChange={({ value }) => this.editField('get_map_format', value)}
+                    />
+                  </div>
+                  <div className="p-pt-2">
+                    <label>Formato de GetFeatureInfo</label>
+                    <Dropdown placeholder='Escolha o formato de GetFeatureInfo'
+                      options={wmsFeatureFormatOptions}
+                      value={edit.get_feature_info_format || ''}
+                      onChange={({ value }) => this.editField('get_feature_info_format', value)}
+                    />
+                  </div>
+                  <div className="p-pt-2">
+                    <label>Estilo</label>
+                    <Dropdown placeholder='Escolha o estilo'
+                      options={wmsStyleOptions}
+                      value={edit.wms_style || ''}
+                      onChange={({ value }) => this.editField('wms_style', value)}
+                    />
+                  </div>
+                </div>
+                )}
+              </div>
+            </React.Fragment>
+          ) : null }
+
+          { ['WMTS', 'WMTSXYZ'].includes(edit.type) ? (
+            <React.Fragment>
+              <div>
+                <p style={{textAlign: 'right'}}>
+                  <a style={{cursor: 'pointer'}}
+                    onClick={e => this.setState({...this.state, showAdvanceOptions: !showAdvanceOptions})}>
+                    Opções Avançadas{' '}
+                    <i className={showAdvanceOptions ? 'pi pi-angle-up' : 'pi pi-angle-down'}></i>
+                  </a>
+                </p>
+                { showAdvanceOptions && (
+                <div className="p-pb-2">
+                  <div className="p-pt-2">
+                    <label>Formato de GetTile</label>
+                    <Dropdown placeholder='Escolha o Formato de GetTile'
+                      options={wmtsFormatOptions}
+                      value={edit.wmts_format || ''}
+                      onChange={({ value }) => this.editField('wmts_format', value)}
+                    />
+                  </div>
+                  <div className="p-pt-2">
+                    <label>Formato de GetFeatureInfo</label>
+                    <Dropdown placeholder='Escolha o formato de GetFeatureInfo'
+                      options={wmtsFeatureFormatOptions}
+                      value={edit.get_feature_info_format || ''}
+                      onChange={({ value }) => this.editField('get_feature_info_format', value)}
+                    />
+                  </div>
+                  <div className="p-pt-2">
+                    <label>Estilo</label>
+                    <Dropdown placeholder='Escolha o estilo'
+                      options={wmtsStyleOptions}
+                      value={edit.wmts_style || ''}
+                      onChange={({ value }) => this.editField('wmts_style', value)}
+                    />
+                  </div>
+                </div>
+                )}
+              </div>
+            </React.Fragment>
+          ) : null }          
+
+          { ['GeoJSON', 'WFS', 'KML'].includes(edit.type) ? (
+            <React.Fragment>
+              <div className="p-field p-grid">
+                <label className="p-col-12 p-md-4">Côr de Preenchimento</label>
+                <div className="p-col-12 p-md-4">
+                  <ColorPicker
+                    format="rgb"
+                    value={ edit.style_color ? this.convertToRGB(edit.style_color) : null }
+                    onChange={({value}) => this.editField('style_color', this.convertToRGBString(value)) }
+                  />
+                </div>
+                <div className="p-col-12 p-md-4">
+                  <InputText
+                    placeholder='Côr de preenchimento'
+                    value={edit.style_color ? this.convertToRGBAString(edit.style_color) : null }
+                  />
+                </div>
+              </div>
+              <div className="p-field p-grid">
+                <label className="p-col-12 p-md-4">Côr de Rebordo</label>
+                <div className="p-col-12 p-md-4">
+                  <ColorPicker
+                    format="rgb"
+                    value={ edit.style_stroke_color ? this.convertToRGB(edit.style_stroke_color) : null }
+                    onChange={({value}) => this.editField('style_stroke_color', this.convertToRGBString(value)) }
+                  />
+                </div>
+                <div className="p-col-12 p-md-4">
+                  <InputText
+                    placeholder='Côr de Rebordo'
+                    value={ edit.style_stroke_color ? this.convertToRGBAString(edit.style_stroke_color) : null }
+                  />
+                </div>
+              </div>
+              <div className="p-field p-grid">
+                <label className="p-col-12 p-md-4">Espessura do Rebordo</label>
+                <div className="p-col-12 p-md-8">
+                  <InputText
+                    type="number"
+                    min="0"
+                    value={edit.style_stroke_width}
+                    placeholder="Espessura do Rebordo"
+                    onChange={e => this.editField('style_stroke_width', e.target.value)}
+                  />
+                </div>
+              </div>
+            </React.Fragment>
+            
+          ) : null }
+
+        </div>
+
+        <div className="p-dialog-myfooter">
+          <Button 
+            color='green'
+            icon="pi pi-check"
+            label="Aplicar" 
+            onClick={e => this.props.onSave(e, edit)}
+          />
+        </div>
+
+      </div>
+    );
+  }
+
+}
+
+export default EditNode;

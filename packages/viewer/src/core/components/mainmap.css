@@ -1,0 +1,93 @@
+.ol-control {
+    position: absolute;
+    background-color: transparent;
+    border-radius: 0;
+    padding: 0;
+}
+
+.ol-control:hover {
+    background-color: inherit;
+}
+
+.ol-control button {
+    color: #ffffff;
+    background: #2196f3;
+    border: 0 none;
+    padding: 0.571rem 0.49rem;
+    font-size: 1rem;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, background-size 0.2s cubic-bezier(0.64, 0.09, 0.08, 1);
+    border-radius: 0;
+    margin: 0;
+    width: 2.25em;
+    height: 2.25em;
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+
+.ol-zoom {
+    top: 5em;
+    left: .5em;
+}
+
+.ol-zoom .ol-zoom-in,
+.ol-zoom .ol-zoom-out {
+    border-radius: 50%;
+}
+
+.ol-full-screen {
+    right: inherit;
+    left: .5em;
+    top: 10.15em;
+}
+
+.ol-rotate {
+    top: 12.7em;
+    right: inherit;
+    left: .5em;
+    transition: opacity .25s linear, visibility 0s linear;
+}
+
+.ol-rotate.ol-hidden {
+    opacity: inherit;
+    visibility: inherit;
+    transition: opacity .25s linear, visibility 0s linear .25s;
+}
+
+.ol-control button:hover, .ol-control button:focus {
+    text-decoration: none;
+    background: rgba(103, 58, 183, 0.76);
+    outline: 0;
+}
+
+.ol-touch .ol-control button {
+    font-size: 1rem;
+}
+
+.ol-touch .ol-zoom-extent {
+    top: 16em;
+}
+
+.ol-attribution.ol-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    background-color: rgba(255,255,255,0.6);
+    border-radius: 15px;
+    font-size: .9rem;
+    bottom: 1em;
+}
+.ol-attribution.ol-control:hover {
+    background-color: rgba(255,255,255,0.8);
+}
+.ol-attribution button {
+    font-size: .9rem;
+    width: 2.2em;
+    height: 2.2em;
+    padding-top: .4rem;
+    padding-bottom: .4rem;
+}
+.ol-attribution.ol-collapsed button {
+    padding-bottom: .2rem;
+}

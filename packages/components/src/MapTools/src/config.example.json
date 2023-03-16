@@ -1,0 +1,37 @@
+{
+    "id": "maptools",
+    "type": "MapTools",
+    "target": "mainmenu",
+    "links": "map_controls_left",
+    "config_json": {
+        "header": "Ferramentas de Medição",        
+        "crs": 3763,
+        "length": {
+            "format": {
+                "locale": "en-US",
+                "options": {
+                    "useGrouping": true,
+                    "minimumFractionDigits": 0,
+                    "maximumFractionDigits": 1
+                },
+                "source_unit": "m",
+                "output_unit": "m",
+                "expression": "{value} m"
+            }
+        },
+        "area": {
+            "format": {
+                "locale": "en-US",
+                "options": {
+                    "useGrouping": true,
+                    "minimumFractionDigits": 0,
+                    "maximumFractionDigits": 2
+                },
+                "source_unit": "m2",
+                "output_unit": "hectare",
+                "expression": "{value} ha"
+            }
+        }
+    },
+    "children": []
+}

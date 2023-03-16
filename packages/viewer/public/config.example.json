@@ -1,0 +1,538 @@
+{
+  "id": 1,
+  "config_json": {
+    "id": "toc",
+    "title": "TOC",
+    "state": "TOC_DEFAULT",
+    "activeIndex": 0,
+    "displayConfig": {
+      "map": {
+        "srid": 3857
+      }
+    },
+    "selected_menu": "toc",
+    "display_crs": 3857,
+    "crs_list": [
+        {
+          "srid": 3763,
+          "code": "EPSG:3763",
+          "title": "PT-TM06/ETRS89",
+          "defs": "+proj=tmerc +lat_0=39.66825833333333 +lon_0=-8.133108333333334 +k=1 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+          "extent": "-9.5000 36.9000 -6.1900 42.1500",
+          "description": "PT-TM06/ETRS89",
+          "precision": 10000
+        },
+        {
+          "srid": 27493,
+          "code": "EPSG:27493",
+          "title": "dt73",
+          "defs":"+proj=tmerc +lat_0=39.66666666666666 +lon_0=-8.131906111111112 +k=1 +x_0=180.598 +y_0=-86.98999999999999 +ellps=intl +towgs84=-223.237,110.193,36.649,0,0,0,0 +units=m +no_defs",
+          "extent": "-9.56 36.95 -6.19 42.16",
+          "description": "PT-TM06/ETRS89",
+          "precision": 1      
+        },
+        { 
+          "srid": 3857,
+          "code": "EPSG:3857",
+          "title": "Google Mercator",
+          "extent": "-180 -90 180 90",
+          "description": "Google Mercator",
+          "precision": 10000 
+        },
+        { 
+          "srid": 4326,
+          "code": "EPSG:4326",
+          "title": "WGS84",
+          "extent": "-180 -90 180 90",
+          "description": "WGS84",
+          "precision": 1000000 
+        }
+    ],
+    "components": [
+      {
+        "id": "popupinfo",
+        "type": "PopupInfo",
+        "title": "PopupInfo",
+        "config_json": { "header": "Hello World", "html": "<div>Hello World</div>", "hideOption": true, "cookieName": "popup2", "maxAge": 86400 },
+        "config_version": "1.0",
+        "regions": [],
+        "target": "popup",
+        "children": []
+      },
+      {
+        "id": "placessearch",
+        "type": "PlacesSearch", 
+        "target": "topbar_right", 
+        "order": 1,
+        "config_json": {
+          "url": "https://snig.dgterritorio.pt/geographical_names/search?_min_similarity=0.5&_maxrows=10&_filter={filter}",
+          "sources": [
+            { "id": "DGT", "title": "DGT", "active": true, "buffer": 1000},
+            { "id": "INE", "title": "INE", "active": true, "buffer": 500}
+          ],
+          "buffer": 1000
+        },
+        "children": []
+      },
+      {
+        "id": "shareviewer",
+        "type": "ShareViewer",
+        "title": "Partilhar",
+        "regions": [],
+        "target": "topbar_right",
+        "config_json": {
+          "show_allow_add_layers": false,
+          "allow_add_layers": true,
+          "show_allow_anonymous": false,
+          "allow_anonymous": true,
+          "show_allow_user_session": false,
+          "allow_user_session": false
+        },
+        "children": []
+      },      
+      {
+        "id": "cadastro",
+        "type": "Cadastro",
+        "title": "Cadastro",
+        "config_json": { "options": ["Option1", "Option2"] },
+        "config_version": "1.0",
+        "regions": [],
+        "target": "mainmenu",
+        "children": []
+      },
+      {
+        "id": "7",
+        "type": "LayerAttributesTable",
+        "title": "Tabela de Atributos",
+        "config_json": {},
+        "config_version": "1.0",
+        "regions": [],
+        "target": "layer_tools",
+        "children": []
+      },
+      {
+        "id": "6",
+        "type": "LayerDownload",
+        "title": "Descarregar Tema",
+        "config_json": {},
+        "config_version": "1.0",
+        "regions": [],
+        "target": "theme_info_tools",
+        "children": []
+      },
+      {
+        "id": "5",
+        "type": "LayerEdit",
+        "title": "Personalizar Tema",
+        "config_json": {},
+        "config_version": "1.0",
+        "regions": [],
+        "target": "layer_tools",
+        "children": []
+      },
+      {
+        "id": "4",
+        "type": "LayerRemove",
+        "title": "Remover",
+        "config_json": {},
+        "config_version": "1.0",
+        "regions": [],
+        "target": "layer_tools",
+        "children": []
+      },
+      {
+        "id": "3",
+        "type": "LayerMetadata",
+        "title": "Metadados",
+        "config_json": {},
+        "config_version": "1.0",
+        "regions": [],
+        "target": "layer_tools",
+        "children": ["6"]
+      },
+      {
+        "id": "2",
+        "type": "LayerOpacity",
+        "title": "Opacidade",
+        "config_json": { "name": "Opacidade", "except": ["2"] },
+        "config_version": "1.0",
+        "regions": [],
+        "target": "layer_tools",
+        "children": []
+      },
+      {
+        "id": "themewizard",
+        "type": "ThemeWizard", 
+        "target": "mainmenu", 
+        "order": 1,
+        "config_json": {
+          "data": {
+            "type": "",
+            "url": "",
+            "wmsIgnoreServiceUrl": true,
+            "wmsVersion": "1.3.0",
+            "wmsTiled": true,
+            "wmtsIgnoreServiceUrl": true,
+            "wmtsVersion": "1.0.0",
+            "crs": "4326",
+            "dataitems": [],
+            "items": [],
+            "get_map_format": "image/png",
+            "get_feature_info_format": "text/plain"
+          }
+        },
+        "children": []
+      },
+      {
+        "id": "toc",
+        "type": "TOC", 
+        "target": "mainmenu", 
+        "order": 2,
+        "config_json": { "content": 1 },
+        "children": ["3", "4", "5", "7", "2", "exportfeat"]
+      },
+      {
+        "id": "maptools",
+        "type": "MapTools", 
+        "target": "mainmenu", 
+        "order": 3,
+        "config_json": { "content": 1 },
+        "children": []
+      },
+      {
+        "id": "drawtools",
+        "type": "DrawTools", 
+        "target": "mainmenu", 
+        "order": 4,
+        "config_json": { "content": 1 },
+        "children": []
+      },
+      {
+        "id": "featureinfo",
+        "type": "FeatureInfo", 
+        "target": "mainmenu", 
+        "order": 8,
+        "config_json": {
+          "map_control": "FeatureInfo",
+          "content": 1 
+        },
+        "children": []
+      },
+      {
+        "id": "crsselect",
+        "type": "CRSSelect", 
+        "target": "footer_right", 
+        "order": 4,
+        "config_json": { "content": 1 },
+        "children": []
+      },
+      {
+        "id": "mapcontrols",
+        "type": "MapControls", 
+        "target": "map_controls_left", 
+        "order": 4,
+        "config_json": { "content": 1 },
+        "children": []
+      },
+      {
+        "id": "coordinates",
+        "type": "Coordinates", 
+        "target": "mainmenu", 
+        "order": 6,
+        "config_json": {
+          "map_control": "Coordinates"
+         },
+        "children": []
+      },      
+      {
+        "id": "geolocation",
+        "type": "GeoLocation", 
+        "target": "mainmenu", 
+        "order": 7,
+        "config_json": {
+          "map_control": "GeoLocation"
+         },
+        "children": []
+      },
+      {
+        "id": "panelhtml",
+        "type": "PanelHTML", 
+        "target": "mainmenu",
+        "as": "popup",
+        "order": 11,
+        "title": "Ajuda",
+        "config_json": { "header": "Ajuda", "closeLabel": "Fechar", 
+          "url": "/static/viewer/help.html",
+          "html": "<div>Hello World</div>" },
+        "children": []
+      },            
+      {
+        "id": "basemaps",
+        "type": "Basemaps", 
+        "target": "map_controls_top_left", 
+        "order": 5,
+        "config_json": { "auto_close": true },
+        "children": []
+      }      
+    ],
+    "center": [-874202, 4808946],
+    "extent": [-1059430, 4000000, -688974, 5200000],
+    "full_extent": [-1600000, 4000000, -100000, 5200000],
+    "constrained_extent": [-1600000, 4000000, -100000, 5200000],
+    "opened": ["overlays"],
+    "checked": ["overlays", "basemaps", "main", "osm1", "userlayer","cont_conc"],
+    "drawings": [],
+    "map_controls": [
+      {
+        "id": "FeatureInfo",
+        "type": "FeatureInfo",
+        "exclusive": true,
+        "active": false
+      },
+      {
+        "id": "Coordinates",
+        "type": "Coordinates",
+        "exclusive": true,
+        "active": false
+      },      
+      {
+        "id": "GeoLocation",
+        "type": "GeoLocation",
+        "active": false,
+        "zoom_init": true,
+        "zoom": true
+      }      
+    ],
+    "layers": [
+      {
+        "active": false,
+        "bbox": "-10.1905 36.7643 -5.71298 42.1896",
+        "crs": 4326,
+        "description": "",
+        "id": "caop",
+        "layers": "AU.AdministrativeBoundary",
+        "opacity": 1,
+        "open": false,
+        "servertype": "geoserver",
+        "format": "image/png",
+        "tiled": true,
+        "title": "Portugal (CAOP)",
+        "type": "WMS",
+        "url": "http://mapas.dgterritorio.pt/wms-inspire/caop/continente?",
+        "version": "1.3.0",
+        "selectable": true,
+        "get_feature_info_format": "text/plain",
+        "get_map_format": "image/png",
+        "wms_style": "",
+        "get_feature_info_formats": "text/plain,text/xml,application/vnd.ogc.gml",
+        "get_map_formats": "image/jpeg,image/png",
+        "wms_styles": ""
+      },
+      {
+        "active": false,
+        "bbox": "-7.96473098804965 37.12241260042936 -7.785474235025013 37.26897871218591",
+        "crs": 4326,
+        "description": "",
+        "format": "image/png",
+        "id": "3",
+        "layers": "cp:mv_0812_publicar",
+        "opacity": 0.5,
+        "open": false,
+        "servertype": "geoserver",
+        "tiled": true,
+        "title": "São Brás de Alportel",
+        "type": "WMS",
+        "url": "https://dgt.wkt.pt/geoserver/cp/wms?",
+        "version": "1.3.0",
+        "legend_type": "wms",
+        "selectable": true,
+        "get_feature_info_format": "application/json",
+        "get_map_format": "image/png",
+        "wms_style": "",
+        "get_feature_info_formats": "application/json,text/html",
+        "get_map_formats": "image/jpeg,image/png",
+        "datasource": {
+          "type": "WFS",
+          "url": "https://dgt.wkt.pt/geoserver/cp/wfs?",
+          "typeNames": "cp:mv_0812_publicar",
+          "geomName": "the_geom",
+          "crs": "EPSG:3763"
+        },
+        "feature_tpl": {
+          "fields": [
+            {
+              "name": "titular",
+              "field": "titular",
+              "title": "Titular"
+            },
+            {
+              "name": "concelho",
+              "field": "concelho",
+              "title": "Concelho"
+            },
+            {
+              "name": "area_m2",
+              "field": "area_m2",
+              "title": "Área (m2)"
+            }
+          ]
+        }
+      },
+      {
+        "active": false,
+        "bbox": "-180 -89.99892578124998 180.00000000000003 83.59960937500006",
+        "crs": 4326,
+        "description": "",
+        "id": "9",
+        "layers": "caop:cont_conc",
+        "opacity": 1,
+        "open": false,
+        "servertype": "mapserver",
+        "style_color": "34,141,144,1",
+        "tiled": true,
+        "title": "Ortos2018",
+        "type": "WMS",
+        "url": "http://193.137.94.102/geoserver/caop/wms?",
+        "version": "1.1.0",
+        "selectable": false,
+        "legend_type": "link",
+        "legend_url": "https://www.google.com",
+        "legend_label": "Legenda Ortofotomapas"
+      },
+      {
+        "active": false,
+        "bbox": "-180 -89.99892578124998 180.00000000000003 83.59960937500006",
+        "crs": 4326,
+        "description": "O Lorem Ipsum é um texto modelo da indústria tipográfica e de impressão. O Lorem Ipsum tem vindo a ser o texto padrão usado por estas indústrias desde o ano de 1500, quando uma misturou os caracteres de um texto para criar um espécime de livro. Este texto não só sobreviveu 5 séculos, mas também o salto para a tipografia electrónica, mantendo-se essencialmente inalterada. Foi popularizada nos anos 60 com a disponibilização das folhas de Letraset, que continham passagens com Lorem Ipsum, e mais recentemente com os programas de publicação como o Aldus PageMaker que incluem versões do Lorem Ipsum.",
+        "id": "5",
+        "layers": "opengeo:countries",
+        "opacity": 1,
+        "open": false,
+        "servertype": "mapserver",
+        "style_color": "",
+        "tiled": true,
+        "title": "grupo2",
+        "type": "GROUP",
+        "url": "https://ahocevar.com/geoserver/wfs?",
+        "version": "2.0.0",
+        "selectable": false,
+        "legend_url": "https://via.placeholder.com/150x300",
+        "children": ["9"]
+      },
+      {
+        "active": false,
+        "bbox": "-180 -89.99892578124998 180.00000000000003 83.59960937500006",
+        "crs": 4326,
+        "description": "",
+        "id": "2",
+        "layers": "opengeo:countries",
+        "opacity": 1,
+        "open": false,
+        "servertype": "mapserver",
+        "style_color": "34,141,144,1",
+        "tiled": true,
+        "title": "tema2",
+        "type": "WFS",
+        "url": "https://ahocevar.com/geoserver/wfs?",
+        "version": "2.0.0",
+        "selectable": true
+      },
+      {
+        "active": false,
+        "bbox": "-180 -89.99892578124998 180.00000000000003 83.59960937500006",
+        "crs": 4326,
+        "description": "O Lorem Ipsum é um texto modelo da indústria tipográfica e de impressão. O Lorem Ipsum tem vindo a ser o texto padrão usado por estas indústrias desde o ano de 1500, quando uma misturou os caracteres de um texto para criar um espécime de livro. Este texto não só sobreviveu 5 séculos, mas também o salto para a tipografia electrónica, mantendo-se essencialmente inalterada. Foi popularizada nos anos 60 com a disponibilização das folhas de Letraset, que continham passagens com Lorem Ipsum, e mais recentemente com os programas de publicação como o Aldus PageMaker que incluem versões do Lorem Ipsum.",
+        "id": "1",
+        "layers": "opengeo:countries",
+        "opacity": 1,
+        "open": false,
+        "servertype": "mapserver",
+        "style_color": "",
+        "tiled": true,
+        "title": "grupo1",
+        "type": "GROUP",
+        "url": "https://ahocevar.com/geoserver/wfs?",
+        "version": "2.0.0",
+        "selectable": false,
+        "legend_url": "https://via.placeholder.com/150x300",
+        "children": ["2", "9", "caop"]
+      },
+      {
+        "active": true,
+        "id": "userlayer",
+        "opacity": 1,
+        "open": true,
+        "system": true,
+        "title": "Camada do Utilizador",
+        "type": "VECTOR",
+        "selectable": false
+      },
+      {
+        "active": true,
+        "children": ["userlayer"],
+        "id": "overlays",
+        "opacity": 1,
+        "open": true,
+        "system": true,
+        "title": "Camadas do utilizador",
+        "type": "GROUP",
+        "selectable": false
+      },
+      {
+        "type": "GROUP",
+        "active": true,
+        "id": "main",
+        "title": "TOC",
+        "opacity": 1,
+        "system": true,
+        "open": true,
+        "children": ["1", "3","cont_conc"],
+        "selectable": false
+      },
+      {
+        "active": true,
+        "id": "osm1",
+        "opacity": 1,
+        "open": true,
+        "system": true,
+        "title": "OSM",
+        "type": "OSM",
+        "selectable": false
+      },
+      {
+        "id": "ArcGISTerrain",
+        "title": "ArcGIS Terrain",
+        "type": "XYZ",
+        "active": false,
+        "opacity": 1,
+        "system": true,
+        "open": false,
+        "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        "thumbnail" : "assets/images/basemaps/TERRAIN.jpg"
+      },      
+      {
+        "id": "ArcGISAerial",
+        "title": "Aerial",
+        "description": "",
+        "type": "XYZ",
+        "active": false,
+        "opacity": 1,
+        "system": true,
+        "open": false,
+        "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        "thumbnail" : "assets/images/basemaps/AERIAL.jpg"
+      },    
+      {
+        "active": true,
+        "children": ["osm1", "ArcGISTerrain", "ArcGISAerial"],
+        "id": "basemaps",
+        "opacity": 1,
+        "open": true,
+        "system": true,
+        "title": "Basemaps layers",
+        "type": "GROUP",
+        "selectable": false
+      }
+    ]
+  }
+}

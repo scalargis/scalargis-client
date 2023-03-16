@@ -1,0 +1,18 @@
+{
+  "id": "featureinfo",
+  "type": "FeatureInfo", 
+  "target": "mainmenu", 
+  "order": 8,
+  "config_json": {
+    "map_control": "FeatureInfo",
+    "expand_menu": true,
+    "expand_menu_mobile": false, 
+    "header": "Identificar elementos",
+    "export_crs": 3763,
+    "export_all": true,
+    "export_record": true,
+    "export_roles": ["DGT_Cadastro", "Admin"]    
+  },
+  "title": "Identificar elementos",
+  "children": []
+}

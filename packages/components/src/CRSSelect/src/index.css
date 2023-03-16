@@ -1,0 +1,23 @@
+.footer-right .crsselect {
+  display: inline-flex;
+}
+
+@media screen and (max-width: 768px) {
+  .footer-right .crsselect { display: none !important; }
+}
+
+.footer-right .crsselect .p-dropdown.p-component  {
+  height: 30px;
+}
+
+.footer-right .crsselect .p-dropdown.p-component .p-dropdown-label.p-inputtext {
+  max-width: 200px;
+}
+
+.footer-right .viewer-mouse-position {
+  width: 200px;
+  padding: 0.5em;
+  background: rgb(198 204 212 / 10%);
+  height: 30px;
+  white-space: nowrap;
+}
