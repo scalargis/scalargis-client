@@ -225,6 +225,7 @@ function ViewerForm(props) {
       on_homepage: formData.on_homepage,
       img_icon: formData.img_icon ? formData.img_icon : null,
       img_logo: formData.img_logo ? formData.img_logo : null,
+      img_logo_alt: formData.img_logo_alt ? formData.img_logo_alt : null,
       manifest_json: manifest_json,
       custom_style: customStyle ? customStyle : null,
       config_json: config_json,
@@ -457,14 +458,19 @@ function ViewerForm(props) {
             <div className="card">            
               <div className="p-fluid p-formgrid p-grid">
 
-                <div className="p-field p-col-6">
+                <div className="p-field p-col-4">
                   <label htmlFor="img_icon">Icon</label>
                   <InputText id="img_icon" name="img_icon" {...register('img_icon')} />
                 </div>
 
-                <div className="p-field p-col-6">
+                <div className="p-field p-col-4">
                   <label htmlFor="img_logo">Logo</label>
                   <InputText id="img_logo" name="img_logo" {...register('img_logo')} />
+                </div>
+
+                <div className="p-field p-col-4">
+                  <label htmlFor="img_logo_alt">Logo Alternativo</label>
+                  <InputText id="img_logo_alt" name="img_logo_alt" {...register('img_logo_alt')} />
                 </div>
 
                 <div className="p-field p-col-12" id="manifest-editor-parent">
