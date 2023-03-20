@@ -4,7 +4,7 @@ import {AppTopbar} from './AppTopbar'
 import 'primereact/resources/primereact.min.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
-import { getWindowSize } from '../utils'
+import { getWindowSize, buildRelativeUrlPath } from '../utils'
 import Script, {ScriptHtml} from './Script'
 import Style, {StyleHtml} from './Style'
 import LoadingScreen from './LoadingScreen'
@@ -60,16 +60,20 @@ function Layout(props) {
   }
 
   if (config && config.img_logo) {
-    logo = CLIENT_URL + config.img_logo;
+    logo = buildRelativeUrlPath(config.img_logo);
+  }
+
+  if (config && config.img_logo_alt &&  viewer.staticMenuInactive && viewer.layoutMode === 'static') {
+    logo = buildRelativeUrlPath(config.img_logo_alt);
   }
 
   let title_logo = null;
 
   if (config && config.title_logo) {
-    title_logo = config.title_logo;
+    title_logo = buildRelativeUrlPath(config.title_logo);
   }
   if (config && config.config_json && config.config_json.title_logo)  {
-    title_logo = config.config_json.title_logo;
+    title_logo = buildRelativeUrlPath(config.config_json.title_logo);
   }
 
   const logoComponent = size[0] > 768 ? <div className="layout-logo">

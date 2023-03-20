@@ -101,6 +101,8 @@ export const isMobile = () => {
   return isMobile;
 }
 
+export const isRelativePath = (path) => !/^([a-z]+:)?[\\/]/i.test(path);
+
 export const isUrlAppOrigin = (url) => {
   //Considers it is same origin if is relative path
   if (url.indexOf('http') !== 0) return true;
@@ -208,6 +210,18 @@ export const getViewerPublicUrl = (uuid) => {
       }
     }
     return appUrl.origin + getAppBaseUrl() + viewerPath + uuid;
+}
+
+export const buildRelativeUrlPath = (path) => {
+  if (!/^([a-z]+:)?[\\/]/i.test(path)) {
+    return getAppClientUrl() + path;
+  }
+
+  if (/^\/[^/]/i.test(path)) {
+    return getAppRootPath() + path;
+  }
+
+  return path;
 }
 
 export const getCookieAuthName = () => {
