@@ -2,7 +2,9 @@ ame: Build and push to WKT registry ScalarGIS core image (latest)
 
 on:
   push:
-    branch: [ main, new-actions ]
+    branches: 
+      - main
+      - new-actions
 
 jobs:
 
