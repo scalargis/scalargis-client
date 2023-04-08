@@ -9,6 +9,7 @@ import OlStyleFill from "ol/style/Fill";
 import OlStyleCircle from "ol/style/Circle";
 import OlStyleText from 'ol/style/Text';
 import {all as allStrategy, bbox as bboxStrategy} from 'ol/loadingstrategy';
+
 import AppContext from "../../../AppContext";
 import { isUrlAppOrigin, isUrlAppHostname } from '../../utils';
 import { transformExtent, getProjectionSrid, getResolutionForScale } from '../../model/MapModel';
@@ -24,8 +25,6 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
 
   // Default style
   function defaultStyle(config) {
-    console.log(config.style_stroke_color);
-    
     let style_color = config.style_color === null ? null : (config.style_color ? `rgba(${config.style_color})` : 'black');
     
     let style_stroke_color = config.style_stroke_color === null ? null : (config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'black');
@@ -102,15 +101,18 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
       loader: (extent, resolution, projection, success, failure) => {
         let bbox = config.bbox ? config.bbox.split(' ') : null;
         let bbox_crs = config?.bbox_crs || config?.crs;
-        let url = config.url
+        let url = (config.url || '');
+        const params = new URL(url.toLowerCase()).searchParams;
+
         url = url.replace(/&$/ig, '')
-        url = url + (url.indexOf('?') > -1 ? '' : '?')
-          + '&service=WFS&'
-          + 'version=' + config.version
-          + '&request=GetFeature'
-          + '&typename=' + encodeURIComponent(config.layers)
-          + '&outputFormat=' + formatOutput
-          + '&srsname=' + srsname
+
+        url = url + (url.indexOf('?') > -1 ? '' : '?');
+        if (!params.get('service')) url += '&service=WFS';
+        if (!params.get('version')) url += '&version=' + config.version;
+        url += '&request=GetFeature';
+        url += '&typename=' + encodeURIComponent(config.layers);
+        url += '&outputFormat=' + formatOutput;
+        url += '&srsname=' + srsname;
 
         if (config.strategy === 'bbox') {
           if (parseInt(config.crs) !== parseInt(getProjectionSrid(crs))) {
