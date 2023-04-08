@@ -220,15 +220,19 @@ export function backoffice_load(core, history) {
       })
 
     }).catch(error => {
-
       // Redirect to login or error pages
-      if (error.message === 'Unauthorized') {
+      if (error.message === 'Not found') {
+        //TODO: Bad API endpoint, redirect to page with more info to user
+        const redirect = '/login?redirect=/';
+        history.push(redirect);
+      } else if (error.message === 'Unauthorized') {
         if (!logged) {
-          //const redirect = 'login?redirect=' + (id || '/');
           const redirect = '/login?redirect=/';
           history.push(redirect);
         } else dispatch(backoffice_not_authorized(history));
-      } else dispatch(logout());  //dispatch(backoffice_not_authorized(history));
+      } else {
+        dispatch(logout());
+      }
     })
   }
 }
