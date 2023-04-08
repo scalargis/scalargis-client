@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Button } from 'primereact/button';
+import { Panel } from 'primereact/panel';
+import { v4 as uuidV4 } from 'uuid';
+
 import {Steps} from 'primereact/steps';
 import WizardStepType from './wizard/stepType';
 import WizardStepData from './wizard/stepData';
 import WizardStepConfirm from './wizard/stepConfirm';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import componentMessages from './messages';
 import './index.css'
-import { useEffect } from 'react';
+
 
 const items = [
   { label: 'Tipo' },
@@ -62,6 +65,7 @@ export function MainMenu({ className, config, actions, record }) {
 }
 
 export default function Main(props) {
+  const { core } = props;
   const component_cfg = props.record.config_json;
   const title = props.record.title || 'Adicionar Temas';
   const header = component_cfg.header || title;
@@ -72,6 +76,16 @@ export default function Main(props) {
   const [wizardData, setWizardData] = useState(props.config.data);
   const [loading, setLoading] = useState(false);
   const [types, setTypes] = useState(source_types);
+  
+  useEffect(() => {
+    if (!core?.pubsub?.subscribe) return;
+
+    const unsubscribe = core.pubsub.subscribe(componentMessages.THEMEWIZARD_ADD_SERVICE, data => {
+      externalLoad(data);
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     if (component_cfg && component_cfg.exclude_types && component_cfg.exclude_types.length) {
@@ -80,6 +94,19 @@ export default function Main(props) {
     }
   }, []);
 
+
+  function externalLoad(data) {
+    setActiveIndex(1);
+    setWizardData({
+      ...wizardData,
+      key: String(uuidV4()),
+      type: data.type ? data.type.toLowerCase() : '',
+      url: data.url || '',
+      dataType: data.type ? data.type.toLowerCase() : ''
+    });
+    props.config.dispatch(props.actions.viewer_set_selectedmenu(props.record.id));
+    if (data.callback) data.callback();
+  }
 
   function reset() {
     setWizardData(initialData);
