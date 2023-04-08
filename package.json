@@ -18,7 +18,7 @@
     "start:all": "lerna run start --parallel",
     "deploy:viewer": "cd ./packages/viewer && yarn build:deploy",
     "deploy:backoffice": "cd ./packages/backoffice && yarn build:deploy",
-    "deploy:all": "lerna run build:deploy --concurrency 1"
+    "deploy:all": "lerna run build:deploy --concurrency 2"
   },
   "devDependencies": {
     "lerna": "^4.0.0",
