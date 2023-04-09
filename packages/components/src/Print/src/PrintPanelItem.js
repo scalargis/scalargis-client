@@ -427,7 +427,6 @@ export default function PrintPanelItem(props) {
   // draw paper box 
   function drawPaperBox() {
     if (!paperBoxLayer.current.getSource()) { return null }
-    if (!selectedScaleMode) { return null }
 
     paperBoxLayer.current.getSource().clear();
 
@@ -444,6 +443,8 @@ export default function PrintPanelItem(props) {
       scale = freeScale
     } else if (selectedScaleMode === 'restricted') {
       scale = restrictedScale
+    } else if (printItem.scale) {
+      scale = printItem.scale;
     } else {
       // ?
       return null
@@ -475,8 +476,10 @@ export default function PrintPanelItem(props) {
 
     const layout_conf_json = JSON.parse(layout_conf?.config)[0]
 
-    const img_w = layout_conf_json.map.width;
-    const img_h = layout_conf_json.map.height;
+    const img_w = layout_conf_json?.map?.width;
+    const img_h = layout_conf_json?.map?.height;
+
+    if (!img_w || !img_h) return null;
 
     const magic = 22;
     const res = 1 / ((1 / scale) * inch_per_units * magic);
