@@ -16,8 +16,9 @@
     "test:backoffice": "cd ./packages/backoffice && yarn test",
     "build:all": "lerna run build --concurrency 1",
     "start:all": "lerna run start --parallel",
-    "deploy:viewer": "cd ./packages/viewer && yarn build:deploy",
-    "deploy:backoffice": "cd ./packages/backoffice && yarn build:deploy",
+    "deploy-server:viewer": "cd ./packages/viewer && yarn build:deploy-server",
+    "deploy-server:backoffice": "cd ./packages/backoffice && yarn build:deploy-server",
+    "deploy-server:all": "lerna run build:deploy-server --concurrency 2",
     "deploy:all": "lerna run build:deploy --concurrency 2"
   },
   "devDependencies": {
@@ -25,7 +26,8 @@
     "@babel/core": "^7.16.7",
     "babel-loader": "^8.1.0",
     "copyfiles": "2.4.1",
-    "env-cmd": "^10.1.0"
+    "env-cmd": "^10.1.0",
+    "cross-env": "^7.0.3"
   },
   "dependencies": {
     "primeflex": "2.0.0",

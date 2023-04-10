@@ -64,7 +64,8 @@
     "test": "craco test",    
     "serve": "serve -s build",
     "eject": "react-scripts eject",
-    "build:deploy": "env-cmd -f ./.deploy.env craco build"
+    "build:deploy": "env-cmd -f ./.deploy.env craco build",
+    "build:deploy-server": "cross-env BUILD_PATH=\"../../../scalargis-server/scalargis/app/static/backoffice\" env-cmd -f ./.deploy.env --no-override craco build"
   },
   "eslintConfig": {
     "extends": [
@@ -88,6 +89,7 @@
   "devDependencies": {
     "@craco/craco": "^6.2.0",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
-    "env-cmd": "^10.1.0"
+    "env-cmd": "^10.1.0",
+    "cross-env": "^7.0.3"
   }
 }
