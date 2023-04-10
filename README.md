@@ -18,20 +18,20 @@ yarn build:viewer
 # run viewer
 yarn start:viewer
 
-# build and deploy viewer
-yarn deploy:viewer
-
 # build backoffice
 yarn build:backoffice
 
 # run backoffice
 yarn start:backoffice
 
-# build and deploy backoffice
-yarn deploy:backoffice
+# build viewer and copy to server directory
+yarn deploy-server:viewer
 
-# build and deploy all
-yarn deploy:all
+# build backoffice and copy to server directory
+yarn deploy-server:backoffice
+
+# build all and copy to server directory
+yarn deploy-server:all
 ```
 
 
