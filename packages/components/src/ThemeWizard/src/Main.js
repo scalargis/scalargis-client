@@ -123,6 +123,10 @@ export default function Main(props) {
       const allIds = [];
       const parentIds = [];
 
+      // Add Themes no Top
+      let addThemesTop = viewer?.config_json?.addThemesTop != null ? viewer?.config_json?.addThemesTop : true;
+      if (component_cfg?.addThemesTop != null) addThemesTop = component_cfg?.addThemesTop;
+
       const getSimpleLayers = function (items) {
         items.forEach(item => {
           if (item.children && item.children.length) {
@@ -147,9 +151,9 @@ export default function Main(props) {
           }
 
           if (!parent) {
-            dispatch(viewer_add_themes('main', [item]));
+            dispatch(viewer_add_themes('main', [item], addThemesTop));
           } else {
-            dispatch(viewer_add_themes(parent.id, [item]));            
+            dispatch(viewer_add_themes(parent.id, [item], addThemesTop));
           }
 
           if (children && children.length) {
