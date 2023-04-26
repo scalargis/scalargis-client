@@ -497,7 +497,8 @@
         "system": true,
         "title": "OSM",
         "type": "OSM",
-        "selectable": false
+        "selectable": false,
+        "thumbnail" : "assets/images/basemaps/terrain.jpg"
       },
       {
         "id": "ArcGISTerrain",
@@ -508,7 +509,7 @@
         "system": true,
         "open": false,
         "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-        "thumbnail" : "assets/images/basemaps/TERRAIN.jpg"
+        "thumbnail" : "assets/images/basemaps/terrain.jpg"
       },      
       {
         "id": "ArcGISAerial",
@@ -520,7 +521,7 @@
         "system": true,
         "open": false,
         "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        "thumbnail" : "assets/images/basemaps/AERIAL.jpg"
+        "thumbnail" : "assets/images/basemaps/aerial.jpg"
       },    
       {
         "active": true,
