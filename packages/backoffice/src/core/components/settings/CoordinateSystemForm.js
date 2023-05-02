@@ -47,6 +47,7 @@ function CoordinateSystemForm(props) {
 
   const onSubmit = (formData) => {
     const new_data = {
+      srid: formData?.srid ? parseInt(formData?.srid) : null,
       code: formData.code,
       name: formData.name,
       description: formData.description,

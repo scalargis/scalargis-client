@@ -45,8 +45,13 @@ function CoordinateSystemEdit(props) {
 
     provider.getOne('coordinate_systems', params).then(d => {
       const data = {
-        id: d.data?.id, code: d.data?.code, name: d.data?.name,  description: d.data?.description, 
-        srid: d.data?.config_json?.srid, label: d.data?.config_json?.label, defs: d.data?.config_json?.defs,
+        id: d.data?.id,
+        code: d.data?.code,
+        name: d.data?.name,
+        description: d.data?.description,
+        srid: d.data?.config_json?.srid,
+        label: d.data?.config_json?.label,
+        defs: d.data?.config_json?.defs,
         minx: d.data?.config_json?.extent ? d.data?.config_json?.extent.split(' ')[0] : null,
         miny: d.data?.config_json?.extent ? d.data?.config_json?.extent.split(' ')[1] : null,
         maxx: d.data?.config_json?.extent ? d.data?.config_json?.extent.split(' ')[2] : null,
