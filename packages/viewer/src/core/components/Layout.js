@@ -70,10 +70,10 @@ function Layout(props) {
   let title_logo = null;
 
   if (config && config.title_logo) {
-    title_logo = buildRelativeUrlPath(config.title_logo);
+    title_logo = config.title_logo;
   }
   if (config && config.config_json && config.config_json.title_logo)  {
-    title_logo = buildRelativeUrlPath(config.config_json.title_logo);
+    title_logo = config.config_json.title_logo;
   }
 
   const logoComponent = size[0] > 768 ? <div className="layout-logo">
