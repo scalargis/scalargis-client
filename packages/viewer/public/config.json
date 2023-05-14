@@ -73,6 +73,14 @@
           "buffer": 1000
         },
         "children": []
+      },{
+        "id": "saveviewer",
+        "type": "SaveViewer",
+        "title": "Gravar",
+        "regions": [],
+        "target": "topbar_right",
+        "config_json": {},
+        "children": []
       },
       {
         "id": "shareviewer",
