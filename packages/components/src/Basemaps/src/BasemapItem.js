@@ -10,7 +10,7 @@ export default function BasemapItem({ core, viewer, mainMap, layer, selected, se
     const title = layer.title || '';
     const subtitle = layer.description || '';
 
-    const img = CLIENT_URL + (layer.thumbnail || 'assets/images/basemaps/TERRAIN.jpg');
+    const img = CLIENT_URL + (layer.thumbnail || 'assets/images/basemaps/terrain.jpg');
 
     const header = <img alt="Card" src={img} className={ !selected ? 'disabled' : ''}
                         title={(selected ? 'Clicar para desligar' : 'Clicar para ligar' )}
