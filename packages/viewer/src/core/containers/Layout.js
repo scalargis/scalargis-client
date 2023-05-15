@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import { connect } from 'react-redux';
 import ThemeSelector from '../components/ThemeSelector'
 import LayoutComponent from '../components/Layout'
-import { mapStateToProps, isDesktop } from '../utils'
+import { mapStateToProps, isDesktop, buildRelativeUrlPath } from '../utils'
 
 function Layout(props) {
 
@@ -88,7 +88,7 @@ function Layout(props) {
     //Set document icons
     let icon_url = CLIENT_URL + 'assets/images/logo32.png';
     if (config.img_icon) {
-      icon_url = CLIENT_URL + config.img_icon;
+      icon_url = buildRelativeUrlPath(config.img_icon);
     }
     elem = document.querySelector("link[rel='shortcut icon']");
     if (!elem) elem = document.querySelector("link[rel='icon']");
