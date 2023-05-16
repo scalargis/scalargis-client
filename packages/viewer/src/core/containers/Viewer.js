@@ -119,6 +119,7 @@ function Viewer(props) {
         <MapControlsBottomRight />
 
         { !!map_controls && map_controls.map(ctrl => {
+          console.log(ctrl);
           const OlControl = OlControls[ctrl.type];
           return (
             <OlControl

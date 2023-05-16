@@ -11,6 +11,13 @@ body {
   overflow: hidden;
 }
 
+/* Firefox */
+div {
+  scrollbar-color: #999 #999;
+  scrollbar-width: thin;
+}
+
+/* For Chrome and other browsers except Firefox */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -112,14 +119,28 @@ body .p-dropdown {
 }
 
 .layout-sidebar #mainmenu {
-  width: 55px;
+  width: 55px;  
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+
+.layout-sidebar #mainmenu::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+
+.layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #mainmenu,
+.layout-wrapper.layout-static.layout-mobile-sidebar-active .layout-sidebar #mainmenu {
+  margin-bottom: 35px;
+}
+
 
 .layout-sidebar #content {
   position: relative;
   background-color: white;
   color: #303030;
-  overflow-y: auto;
+  /*overflow-y: auto;*/
   flex: 1;
   width: 100%;
   padding: 5px;
@@ -127,6 +148,11 @@ body .p-dropdown {
   @media screen and (max-width: 1024px) {
       height: calc(100% - 35px);
   } 
+}
+
+.layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #content {
+  padding: unset;
+  display: none !important;
 }
 
 .layout-sidebar #content-bottom {
@@ -305,7 +331,7 @@ body .p-multiselect {
 }
 
 .map-region-left {
-  top: 18.58em;
+  top: 5em;
   left: 0.5em;
 }
 

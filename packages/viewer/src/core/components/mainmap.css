@@ -1,5 +1,5 @@
 .ol-control {
-    position: absolute;
+    position: unset;
     background-color: transparent;
     border-radius: 0;
     padding: 0;
@@ -27,8 +27,7 @@
 
 
 .ol-zoom {
-    top: 5em;
-    left: .5em;
+    padding-bottom: 10px;
 }
 
 .ol-zoom .ol-zoom-in,
@@ -36,16 +35,7 @@
     border-radius: 50%;
 }
 
-.ol-full-screen {
-    right: inherit;
-    left: .5em;
-    top: 10.15em;
-}
-
 .ol-rotate {
-    top: 12.7em;
-    right: inherit;
-    left: .5em;
     transition: opacity .25s linear, visibility 0s linear;
 }
 
@@ -65,11 +55,8 @@
     font-size: 1rem;
 }
 
-.ol-touch .ol-zoom-extent {
-    top: 16em;
-}
-
 .ol-attribution.ol-control {
+    position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;    
