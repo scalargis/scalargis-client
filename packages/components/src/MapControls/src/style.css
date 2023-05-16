@@ -1,5 +1,6 @@
 .map-controls {
   width: 2.5em;
+  padding-bottom: 10px;
 }
 
 .ol-control button:focus {

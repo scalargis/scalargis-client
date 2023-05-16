@@ -66,7 +66,10 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
     } else {
       mapControls = defaultControls(options).extend([new FullScreen(), zoomToExtentControl]);
     }
-    mapControls.forEach(c => mainMap.addControl(c));
+    mapControls.forEach(c => {
+      c.setTarget(document.getElementById('map-controls'));
+      mainMap.addControl(c);
+    });
 
     dragBoxInteraction = new DragBox();
     //mapInteractions = defaultInteractions({altShiftDragRotate:false, pinchRotate: false});
