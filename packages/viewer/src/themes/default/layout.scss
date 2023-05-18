@@ -144,6 +144,7 @@ body .p-dropdown {
   flex: 1;
   width: 100%;
   padding: 5px;
+  word-break: break-all;
 
   @media screen and (max-width: 1024px) {
       height: calc(100% - 35px);
