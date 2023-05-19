@@ -14,6 +14,8 @@ module.exports = {
       // Resolve the path aliases.
       config.resolve.plugins.push(new TsconfigPathsPlugin());
 
+      config.resolve.symlinks = false;
+
       // Let Babel compile outside of src/.
       const oneOfRule = config.module.rules.find((rule) => rule.oneOf);
       const tsRule = oneOfRule.oneOf.find((rule) =>
