@@ -3,7 +3,6 @@ import { InputText } from 'primereact/inputtext';
 import { ListBox } from 'primereact/listbox';
 import { transform } from 'ol/proj';
 import './style.css'
-import { config } from 'react-transition-group';
 import useOutsideClick from './useOutsideClick';
 
 
@@ -13,6 +12,7 @@ export default function Main({ core, config, actions, record }) {
 
   const [filter, setFilter] = useState("");
   const [activeSources, setActiveSources] = useState([]);
+  const [showPlaces, setShowPlaces]= useState(false);
   const [places, setPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
 
@@ -23,7 +23,7 @@ export default function Main({ core, config, actions, record }) {
   const component_cfg = record.config_json || {};
 
   useOutsideClick(ref, () => {
-    setPlaces([]);
+    setShowPlaces(false);
   });  
 
   function changeFilterFunc(e) {
@@ -92,7 +92,7 @@ export default function Main({ core, config, actions, record }) {
     let elem = null;
   
     if (iconClass) {
-      elem = <div><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.designacao} ({option.concelho})</span></div>;
+      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.designacao} ({option.concelho})</span></div>;
       if (option.designacao === option.concelho) {
         elem = <div>{option.concelho}</div>
       }
@@ -112,7 +112,7 @@ export default function Main({ core, config, actions, record }) {
     const admin_level = option.admin_level4 || option.admin_level3 || option.admin_level2 || option.admin_level1 || '';
   
     if (iconClass) {      
-      elem = <div><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.name} {admin_level ? `(${admin_level})` : ''}</span></div>;
+      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.name} {admin_level ? `(${admin_level})` : ''}</span></div>;
       if (option.name === admin_level) {
         elem = <div>{admin_level}</div>
       }
@@ -131,14 +131,14 @@ export default function Main({ core, config, actions, record }) {
     let elem = null;
 
     if (types) {
-      elem = buildDefaultItem(option, types?.defaultTemplate?.iconClass);
+      elem = buildDefaultItem(option, types?.default?.iconClass);
     } else {
       elem = buildLegacyDefaultItem(option, null);
     }
 
-    if (types?.defaultTemplate) {
-      if (types?.defaultTemplate?.html) {
-        let html = types?.defaultTemplate?.html;
+    if (types?.default) {
+      if (types?.default?.html) {
+        let html = types?.default?.html;
         const rf = (html && html.match) ? html.match(/[^{}]+(?=})/g) : null;
         if (rf) {
           rf.forEach(fld => {
@@ -183,16 +183,17 @@ export default function Main({ core, config, actions, record }) {
   }, []);   
 
   return (
-    <div ref={ref} style={{ textAlign: "right" }}>
+    <div ref={ref} className="layout-topbar-search-container">
       <span className="layout-topbar-search">
           <InputText type="text"
             placeholder={config.placeholder || 'Pesquisar...'}
             value={filter}
+            onFocus={(e) => setShowPlaces(true)}
             onChange={(e) => changeFilterFunc(e)} />
           <span className={ isLoading ? 'layout-topbar-search-icon pi pi-spin pi-spinner' : 'layout-topbar-search-icon pi pi-search' }/>
       </span>
-      {(places && places.length > 0 ?
-        <div style={{marginTop: "5px", position: "absolute", zIndex: "10"}}>
+      {(showPlaces && places && places.length > 0 ?
+        <div className="layout-topbar-search-results">
           <ListBox
               optionLabel="Lugar"
               value={selectedPlace}
