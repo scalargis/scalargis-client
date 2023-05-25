@@ -28,9 +28,9 @@ export default function PrintPanel2(props) {
   const [modify, setModify] = useState(null);
 
   const [selectedFeatures, setSelectedFeatures] = useState([]);
-
+    
   const [isLoading, setIsLoading] = useState(false);
-  const [showErrors, setShowErrors] = useState(false);
+  const [geometryError, setGeometryError] = useState(false);  
 
   const toastDialog = useRef(null);
 
@@ -89,7 +89,8 @@ export default function PrintPanel2(props) {
           features.forEach((f) => {
             printLayer.current.getSource().removeFeature(f);
           });
-          mainMap.render();
+
+          mainMap.render();          
         },
         reject: () =>  { }      
     });
@@ -166,9 +167,14 @@ export default function PrintPanel2(props) {
       });
     }
 
-    if (printGroup.location_marking && !isFormInvalid) {
+    if (printGroup.location_marking) {
       const ft = printLayer.current.getSource().getFeatures();
-      if (ft.length == 0) isFormInvalid = true;
+      if (ft.length == 0) {
+        isFormInvalid = true;
+        setGeometryError(true);
+      } else {
+        setGeometryError(false);
+      }
     }
 
     //Abort if form is not valid
@@ -246,9 +252,26 @@ export default function PrintPanel2(props) {
       });   
   }
 
-  useEffect(() => {
-    setShowErrors(false);
-  }, [fields]);
+
+  useEffect(()=> {
+    let fn_change = printLayer.current.getSource().on('change', () => {      
+      if (printGroup.location_marking) {
+        const ft = printLayer.current.getSource().getFeatures();
+        if (ft.length == 0) {
+          setGeometryError(true);
+        } else {
+          setGeometryError(false);
+        }
+      } 
+    });
+
+    return () => {
+      if (fn_change && printLayer.current) {        
+        printLayer.current.getSource().un('change', fn_change.listener);
+      }
+    }
+  }, []);
+
 
   useEffect(() => {
     if (drawTool) {
@@ -345,7 +368,7 @@ export default function PrintPanel2(props) {
           <Toolbar left={toolbarLeftContents} right={toolbarRightContents} />
         </div>
         { printGroup.location_marking && 
-          <Message severity="info" text="Deverá marcar no mapa a localização pretendida" />
+          <Message severity={ geometryError === true ? "error" : "info" } text="Deverá marcar no mapa a localização pretendida" />
         }
       </div>}
 

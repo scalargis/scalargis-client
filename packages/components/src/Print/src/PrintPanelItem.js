@@ -57,7 +57,7 @@ export default function PrintPanelItem(props) {
   const [freeScale, setFreeScale] = useState(null);
 
   const [isPrinting, setIsPrinting] = useState(false);
-  const [showErrors, setShowErrors] = useState(false);
+  const [geometryError, setGeometryError] = useState(false);  
 
   const [printFile, setPrintFile] = useState(null);
 
@@ -100,7 +100,6 @@ export default function PrintPanelItem(props) {
         if (paperBox) {
           drawPaperBox()
         }
-
       });
       setDraw(di);
     } else if (type === 'Select') {
@@ -202,10 +201,15 @@ export default function PrintPanelItem(props) {
       });
     }
 
-    if (printItem.location_marking && !isFormInvalid) {
+    if (printItem.location_marking) {
       const ft = printLayer.current.getSource().getFeatures();
-      if (ft.length === 0) isFormInvalid = true;
-    }
+      if (ft.length == 0) {
+        isFormInvalid = true;
+        setGeometryError(true);
+      } else {
+        setGeometryError(false);
+      }
+    }    
 
     //Abort if form is not valid
     if (isFormInvalid) return;
@@ -340,7 +344,6 @@ export default function PrintPanelItem(props) {
   }
 
 
-
   useEffect(() => {
     const frmts = {};
     printItem.layouts.forEach((p) => {
@@ -386,14 +389,7 @@ export default function PrintPanelItem(props) {
         setSelectedScaleMode(scale_types[0]);
       }
     }
-
-
-
   }, []);
-
-  useEffect(() => {
-    setShowErrors(false);
-  }, [fields]);
 
   function onScaleTabChange(e) {
     setScaleTabIndex(e.index);
@@ -421,6 +417,31 @@ export default function PrintPanelItem(props) {
 
     mainMap.addLayer(paperBoxLayer.current)
 
+    return () => {
+      if (mainMap && paperBoxLayer.current) {
+        mainMap.removeLayer(paperBoxLayer.current);
+      }
+    } 
+
+  }, []);
+
+  useEffect(()=> {
+    let fn_change = printLayer.current.getSource().on('change', () => {      
+      if (printItem.location_marking) {
+        const ft = printLayer.current.getSource().getFeatures();
+        if (ft.length == 0) {
+          setGeometryError(true);
+        } else {
+          setGeometryError(false);
+        }
+      } 
+    });
+
+    return () => {
+      if (fn_change && printLayer.current) {        
+        printLayer.current.getSource().un('change', fn_change.listener);
+      }
+    }
   }, []);
 
 
@@ -622,7 +643,7 @@ export default function PrintPanelItem(props) {
           <Toolbar left={toolbarLeftContents} right={toolbarRightContents} />
         </div>
         {printItem.location_marking &&
-          <Message severity="info" text="Deverá marcar no mapa a localização pretendida" />
+          <Message severity={ geometryError === true ? "error" : "info" } text="Deverá marcar no mapa a localização pretendida" />
         }
       </div>}
 
