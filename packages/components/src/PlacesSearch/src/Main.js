@@ -27,13 +27,14 @@ export default function Main({ core, config, actions, record }) {
   });  
 
   function changeFilterFunc(e) {
-    setFilter(e.target.value)
+    setFilter(e.target.value);
     if (e.target.value.length < 3) {
         setPlaces([]);
         return;
     }
 
     setIsLoading(true);
+    setShowPlaces(true);
 
     // Fetch filter
     let url = core.API_URL + '/geographical_names/search?_min_similarity=0.5&_maxrows=10&_filter={filter}';
