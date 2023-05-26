@@ -5,7 +5,7 @@
   "workspaces": [
     "packages/*",
     "packages/viewer/src/components/*",
-	  "packages/viewer/src/themes/*"    
+    "packages/viewer/src/themes/*"
   ],
   "scripts": {
     "start:viewer": "cd ./packages/viewer && yarn start",
@@ -22,12 +22,13 @@
     "deploy:all": "lerna run build:deploy --concurrency 2"
   },
   "devDependencies": {
-    "lerna": "^4.0.0",
     "@babel/core": "^7.16.7",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "babel-loader": "^8.1.0",
     "copyfiles": "2.4.1",
+    "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
-    "cross-env": "^7.0.3"
+    "lerna": "^4.0.0"
   },
   "dependencies": {
     "primeflex": "2.0.0",
@@ -38,5 +39,5 @@
     "babel-loader": "8.1.0",
     "webpack": "4.44.2",
     "@types/react": "17.0.0"
-  }   
+  }
 }
