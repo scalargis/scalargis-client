@@ -100,7 +100,7 @@ function PrintForm(props) {
     defaultValues: {
       id: data.id,
       code: data.code,
-      config_json: data.config_json,
+      config_json: typeof (data.config_json || '') === "object" ? JSON.stringify(data.config_json) : data?.config_json || '',
       description: data.description,
       allow_drawing: data.allow_drawing,
       draw_location: data.draw_location,
