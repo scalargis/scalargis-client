@@ -130,6 +130,14 @@ body .p-dropdown {
 }
 
 
+.layout-sidebar #mainmenu .main-menu-btn-image {
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position-x: center !important;
+  background-position-y: center !important;
+}
+
+
 .layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #mainmenu,
 .layout-wrapper.layout-static.layout-mobile-sidebar-active .layout-sidebar #mainmenu {
   margin-bottom: 35px;

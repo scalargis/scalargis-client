@@ -26,14 +26,21 @@ export function MainMenu({ className, config, actions, record }) {
     const closeLabel = component_cfg.closeLabel || "Fechar";    
     return (
       <React.Fragment>
-
-        <Button
-          title={title}
-          className={className}
-          icon="far fa-question-circle"
-          style={{ margin: '0.5em 1em' }}
-          onClick={e => setShowPopup(true)}
-        />
+        { component_cfg?.btn_image ? 
+            <Button
+              title={title}
+              className={className ? className + ' main-menu-btn-image' : null}
+              icon="pi"
+              style={{ margin: '0.5em 1em', backgroundImage: `url("${component_cfg.btn_image}")` }}
+              onClick={e => setShowPopup(true)}
+            /> :
+            <Button
+              title={title}
+              className={className}
+              icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
+              style={{ margin: '0.5em 1em' }}
+              onClick={e => setShowPopup(true)}
+            /> }
 
         {showOnPortal(<Dialog
           header={header}
@@ -58,14 +65,26 @@ export function MainMenu({ className, config, actions, record }) {
       </React.Fragment>
     )
   }  else {
+    if (component_cfg?.btn_image) {
+      return (
+        <Button
+          title={title}
+          className={className ? className + ' main-menu-btn-image' : null}
+          icon="pi"
+          style={{ margin: '0.5em 1em', backgroundImage: `url("${component_cfg.btn_image}")` }}
+          onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+        />
+      )
+    }
+
     return (
-      <Button
+        <Button
         title={title}
         className={className}
-        icon="far fa-question-circle"
+        icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
         style={{ margin: '0.5em 1em' }}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
-      />
+      /> 
     )
   }
 }
