@@ -8,6 +8,11 @@
   margin-bottom: 5px;
 }
 
+#content .print h4.print-link {
+  cursor: pointer; 
+  cursor: hand;
+}
+
 #content .print p {
   margin-top: 10px;
 }

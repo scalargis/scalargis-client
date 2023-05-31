@@ -33,7 +33,7 @@ export default function PrintPanel1(props) {
               icon="pi pi-chevron-right" 
               className="p-button-rounded p-button-text"
               onClick={e => { goPanelPrintGroup(group) }} />
-            <h4>{group.title}</h4>
+            <h4 className="print-link" onClick={e => { goPanelPrintGroup(group) }}>{group.title}</h4>
             <p>{group.description}</p>
           </div>
         )
@@ -44,7 +44,7 @@ export default function PrintPanel1(props) {
             <Button label="" icon="pi pi-chevron-right" 
               className="p-button-rounded p-button-text"
               onClick={e => { goPanelPrintItem(print) }} />
-            <h4>{print.title}</h4>
+            <h4 className="print-link" onClick={e => { goPanelPrintItem(print) }}>{print.title}</h4>
             <p>{print.description}</p>
           </div>
         )
