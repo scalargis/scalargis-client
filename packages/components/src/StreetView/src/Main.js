@@ -8,8 +8,7 @@ import StreetView from './StreetView';
  */
 export function MainMenu({ className, config, actions, record }) {
   return (React.Fragment)
-  {/*
-  const title = record.title || 'Google Street View';
+  {/*const title = record.title || 'Google Street View';
 
   return (
     <Button
@@ -25,9 +24,9 @@ export function MainMenu({ className, config, actions, record }) {
 
 export default function Main(props) {
 
-  const { as, core, config, utils, record } = props;
+  const { as, core, config, utils, actions, record } = props;
 
-  const { actions, mainMap, viewer, dispatch } = config;
+  const { mainMap, viewer, dispatch } = config;
 
   const component_cfg = record.config_json || {};
   const title = record.title || 'Google StreetView';
