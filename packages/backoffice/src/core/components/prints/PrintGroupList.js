@@ -211,7 +211,7 @@ function PrintGroupList(props) {
 
     return (
       <div className='p-text-center'>
-        <ViewersList id={rowData.id} elementType="groups" header={`Planta - [${rowData.code}] ${rowData.title}`} />
+        <ViewersList id={rowData.id} elementType="groups" header={`Grupo - [${rowData.code}] ${rowData.title}`} />
       </div>
     );    
 

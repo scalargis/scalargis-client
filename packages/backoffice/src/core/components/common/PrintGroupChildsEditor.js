@@ -54,6 +54,7 @@ function RecordSelector(props) {
             itemTemplate={itemTemplate}
             filter filterBy="code,title" filterValue={filterValue} 
             onFilterValueChange={(e) => setFilterValue(e.value)}
+            emptyFilterMessage="Não foram encontrados registos"
             onChange={(e) => setSelectedRecords(e.value)} placeholder="Selecionar" />
         </div>              
         <div className="p-grid">
