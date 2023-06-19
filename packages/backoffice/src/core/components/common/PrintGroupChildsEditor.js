@@ -34,7 +34,15 @@ function RecordSelector(props) {
     props.onChange(new_records);
 
     setSelectedRecords(null);
-  } 
+  }
+  
+  const itemTemplate = (option) => {
+    return (
+      <div>
+        <div>{`[${option.code}] ${option.title}`}</div>
+      </div>
+    );
+  }
 
   return (
     <React.Fragment>
@@ -42,8 +50,9 @@ function RecordSelector(props) {
         <div className="p-field p-col-12 p-pl-0">
           <MultiSelect value={selectedRecords || []} 
             options={(availableRecords || []).filter(p => !(records || []).map(f=>f.id).includes(p.id))} 
-            optionLabel="title" optionValue="id" display="chip" showClear 
-            filter filterValue={filterValue} 
+            optionLabel="title" optionValue="id" display="chip" showClear
+            itemTemplate={itemTemplate}
+            filter filterBy="code,title" filterValue={filterValue} 
             onFilterValueChange={(e) => setFilterValue(e.value)}
             onChange={(e) => setSelectedRecords(e.value)} placeholder="Selecionar" />
         </div>              

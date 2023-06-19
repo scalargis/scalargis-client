@@ -12,6 +12,7 @@ import { Toast } from 'primereact/toast';
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
 import { isAdminOrManager } from '../../utils';
+import ViewersList from './ViewersList';
 
 
 const initialSearchParams = {
@@ -155,7 +156,7 @@ function PrintList(props) {
 
     const params = {
       pagination: { page: searchParams.page + 1, perPage: searchParams.rows},
-      sort: { field: searchParams.sortField, order: searchParams.sortOrder == -1 ? 'Desc' : 'Asc' },
+      sort: { field: searchParams.sortField, order: searchParams.sortOrder === -1 ? 'Desc' : 'Asc' },
       filter: _filter
     }
 
@@ -167,7 +168,8 @@ function PrintList(props) {
       setLoading(false);
     }).catch(e => {
       setLoading(false);
-      toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Plantas', detail: 'Ocorreu um erro na pesquisa'});
+      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Plantas', detail: 'Ocorreu um erro na pesquisa'});
+      toast.current && toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Plantas', detail: 'Ocorreu um erro na pesquisa'});
     });
   }
 
@@ -184,6 +186,7 @@ function PrintList(props) {
   const onFilter = (event) => {
     let _searchParams = { ...searchParams, ...event };
     _searchParams['first'] = 0;
+    _searchParams['page'] = 0;
     setSearchParams(_searchParams);    
   }
 
@@ -200,12 +203,30 @@ function PrintList(props) {
   }
 
   const viewersTemplate = (rowData) => {
+    if (!rowData?.viewers?.length) return null;
+
+    return (
+      <div className='p-text-center'>
+        <ViewersList id={rowData.id} elementType="prints" header={`Planta - [${rowData.code}] ${rowData.title}`} />
+      </div>
+    );
+    
+    /*
+    if (rowData.viewers.length > 5) {
+      return (
+        <div className='p-text-center'>
+          <ViewersList id={rowData.id} elementType="prints" header={`Planta - [${rowData.code}] ${rowData.title}`} />
+        </div>
+      )
+    }
+
     return (
         <React.Fragment>
-          { rowData.viewers && rowData.viewers.map( (item) => <Chip key={item.id} label={item.name} className="p-mr-2 p-mb-2" /> ) }
+          { rowData.viewers && rowData.viewers.map( (item) => <Chip key={item.id} label={item.name} style={{"maxWidth": "100px"}} className="p-mr-2 p-mb-2 cut-text" /> ) }
         </React.Fragment>
     );
-  } 
+    */
+  }
 
   const ownerTemplate = (rowData) => {
     let elem = <Chip label="Anónimo" icon="far fa-user" className="p-mr-2 p-mb-2" />;
@@ -269,9 +290,9 @@ function PrintList(props) {
               <Column field="code" header="Código" sortable filter filterPlaceholder="Código" style={{"wordBreak": "break-all"}} />
               <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" style={{"wordBreak": "break-all"}} />
               <Column field="title" header="Título" sortable filter filterPlaceholder="Título" style={{"wordBreak": "break-all"}} /> 
-              <Column field="groups" header="Grupos" body={groupsTemplate} />
-              <Column field="viewers" header="Visualizadores" body={viewersTemplate} />
-              { adminOrManager && <Column field="owner" header="Dono" body={ownerTemplate} /> }
+              <Column field="groups" header="Grupos" body={groupsTemplate} filter filterPlaceholder="Grupo" style={{"wordBreak": "break-all"}} />
+              <Column field="viewers" header="Visualizadores" body={viewersTemplate} filter filterPlaceholder="Visualizador" style={{"wordBreak": "break-all"}} />
+              { adminOrManager && <Column field="owner" header="Dono" body={ownerTemplate} style={{"wordBreak": "break-all"}} /> }
               <Column body={actionBodyTemplate} />
           </DataTable>
         </div>

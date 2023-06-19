@@ -789,3 +789,14 @@ pre[class*="language-"] {
 .p-blockui .p-blockui-loading-icon {
     font-size: 2rem;
 }
+
+.p-chip.cut-text span.p-chip-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    /*max-width: 100px;*/
+    white-space: nowrap;
+}
+
+.data-table-filter-sized .p-column-filter {
+    width: -webkit-fill-available;
+}
