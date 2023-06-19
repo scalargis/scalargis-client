@@ -30,7 +30,6 @@ function RecordSelector(props) {
 
     let new_records = availableRecords.filter(v => selectedRecords.includes(v.id));
     new_records = [...new_records, ...props.data];
-    console.log(new_records);
     props.onChange(new_records);
 
     setSelectedRecords(null);
