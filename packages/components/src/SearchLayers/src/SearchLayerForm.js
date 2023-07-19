@@ -48,7 +48,18 @@ export default function SearchLayerForm(props) {
 
     getDescribeFeatureType({cfg: searchConfig, core, viewer, auth}).then(data => {
       try {
-        updateLayerSchema(id, data);
+        if (searchConfig?.uischema) {
+          updateLayerSchema(id, {
+            ...data,
+            uischema: {
+              type: 'VerticalLayout',
+              elements: [...data?.uischema?.elements],
+              ...searchConfig?.uischema
+            }
+          });
+        } else {
+          updateLayerSchema(id, data);
+        }
       } catch (err) {
         return Promise.reject(err);
       }

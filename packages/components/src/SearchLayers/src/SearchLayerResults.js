@@ -240,18 +240,20 @@ export default function SearchLayerResults(props) {
     return cols.map((f, i) => {
       const sortable = cfg.fields_sort && cfg.fields_sort.length > 0 && cfg.fields_sort.includes(f[0]);
 
-      const field_cfg = cfg.fields_list[f[0]];
+      if (cfg?.fields_list) {
+        const field_cfg = cfg.fields_list[f[0]];
 
-      if (field_cfg) {
-        if (field_cfg.type === 'html') {
-          return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable} 
-            body={(rowData) => htmlTemplate(rowData, {...field_cfg, 'name': f[0]})} />
-        } else if (field_cfg.type === 'action') {
-          return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable} 
-            body={(rowData) => actionTemplate(rowData, {...field_cfg, 'name': f[0]})} />
-        } else {
-          return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable} 
-            body={(rowData) => valueTemplate(rowData, {...field_cfg, 'name': f[0]})} />
+        if (field_cfg) {
+          if (field_cfg.type === 'html') {
+            return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
+              body={(rowData) => htmlTemplate(rowData, {...field_cfg, 'name': f[0]})} />
+          } else if (field_cfg.type === 'action') {
+            return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
+              body={(rowData) => actionTemplate(rowData, {...field_cfg, 'name': f[0]})} />
+          } else {
+            return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
+              body={(rowData) => valueTemplate(rowData, {...field_cfg, 'name': f[0]})} />
+          }
         }
       }
 
