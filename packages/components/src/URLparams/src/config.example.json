@@ -1,0 +1,10 @@
+{
+    "id": "url_params",
+    "type": "URLparams",
+    "title": "URLparams",
+    "config_json": {},
+    "config_version": "1.0",
+    "regions": [],
+    "target": "mainmenu",
+    "children": []
+  }

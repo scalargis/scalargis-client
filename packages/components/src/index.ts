@@ -28,6 +28,7 @@ import * as StreetView from './StreetView/src/Main'
 import * as ThemeWizard from './ThemeWizard/src/Main'
 import * as TOC from './TOC/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
+import * as URLparams from './URLparams/src/Main'
 
 
 export {
@@ -60,5 +61,6 @@ export {
   StreetView,
   ThemeWizard,
   TOC,
-  UserLogin
+  UserLogin,
+  URLparams
 };
