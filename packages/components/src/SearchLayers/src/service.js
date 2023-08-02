@@ -108,6 +108,8 @@ export const getFeatures = (options) => {
         if (schema && schema.properties && schema.properties[key]) {
           if (schema.properties[key].type === 'integer') {
             conditions.push(equalToFilter(key, value));
+          } else if (schema.properties[key].type === 'number') {
+            conditions.push(equalToFilter(key, value));
           } else {
             conditions.push(likeFilter(key, value, '*', '.','!', false));
           }
