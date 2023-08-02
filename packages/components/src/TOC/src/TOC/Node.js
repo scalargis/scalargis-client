@@ -59,10 +59,14 @@ class Node extends React.Component {
       .map(id => layers.find(l => l.id === id))
       .filter(i => !!i);
 
+    // Check if is hidden
+    const isHidden = data.hidden === true;
+
     // Render theme node
     return (
       <React.Fragment>
         <DraggableItem i={i}
+          hidden={isHidden}
           parent={parent}
           action={actions.moveTheme}
           models={config.Models}

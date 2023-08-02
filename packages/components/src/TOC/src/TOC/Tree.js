@@ -49,11 +49,11 @@ class Tree extends React.Component {
                 actions={actions}
                 onDragStart={this.props.onDragStart}
               />
-              <DragSlot i={i+1}
+              {!child.hidden && <DragSlot i={i+1}
                 parent={id}
                 action={actions.moveTheme}
                 deep={deep}
-              />
+              />}
             </React.Fragment>
           ))}
         </ul>
