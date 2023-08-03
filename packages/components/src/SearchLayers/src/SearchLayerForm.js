@@ -212,7 +212,15 @@ export default function SearchLayerForm(props) {
               
               //Combine values of form and virtual fields
               const data = getFormData(schema, formData[id], searchConfig.fields_form);
-              doSearch(0, null, data);
+
+              //Set default sor field
+              let sort;
+              if (searchConfig?.fields_sort?.length) {
+                sort = {}
+                sort[searchConfig.fields_sort[0]] = 'ASC';
+              }
+
+              doSearch(0, null, data, sort);
 
           }} color='primary'>
             Pesquisar
