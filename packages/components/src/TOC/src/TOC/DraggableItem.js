@@ -10,10 +10,10 @@ class DraggableItem extends React.Component {
   };
 
   render() {
-    if (this.props.draggable === false) {
-      const { id } = this.props;
+    if (this.props.draggable === false || this.props.hidden === true) {
+      const { id, hidden } = this.props;
       return (
-        <li data-id={id}>
+        <li data-id={id} style={hidden === true ? {display: "none"} : {}}>
           {this.props.children}
         </li>
       );
