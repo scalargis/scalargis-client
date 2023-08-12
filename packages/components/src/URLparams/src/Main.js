@@ -11,16 +11,11 @@ export default function Main({ config, actions }) {
     useEffect(() => {
 
         const mapCRS = mainMap.getView().getProjection().getCode()
-        console.log(mapCRS)
-
         const isURLparams = new URLSearchParams(url_parameters).get('urlparams');
 
         if (isURLparams !== "true") { // need urlparams=true to parse
             return null
-        } else {
-            console.log("Using url params: " || url_parameters)
         }
-
 
         const urlExtent = new URLSearchParams(url_parameters).get('extent');
         const urlExtentSRID = new URLSearchParams(url_parameters).get('extent_srid');
