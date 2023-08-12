@@ -5,7 +5,7 @@ import { Message } from 'primereact/message';
 import { JsonForms } from '@jsonforms/react';
 import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers';
 
-import { primereactLayouts, primereactRenderers } from '@scalargis/primereact-renderers';
+import { primereactLayouts, primereactRenderers } from '@scalargis/jsonforms-primereact-renderers';
 
 import { getDescribeFeatureType, getFeatures } from './service';
 import SearchLayerResults from './SearchLayerResults';

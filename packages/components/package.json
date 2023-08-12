@@ -11,7 +11,7 @@
     "copy": "copyfiles -u 1 \"./src/**/*.{css,html}\" \"./dist/\""
   },
   "dependencies": {
-    "@scalargis/primereact-renderers": "^0.1.0",
+    "@scalargis/jsonforms-primereact-renderers": "^0.1.0",
     "mathjs": "^10.1.1"
   },
   "devDependencies": {    

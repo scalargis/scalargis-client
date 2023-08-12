@@ -8,7 +8,7 @@
     "src/themes/*"
   ],
   "dependencies": {
-    "@scalargis/primereact-renderers": "^0.1.0",
+    "@scalargis/jsonforms-primereact-renderers": "^0.1.0",
     "@scalargis/components": "^0.1.0",
     "@fortawesome/fontawesome-free": "^5.15.2",
     "@jsonforms/core": "^2.5.2",
