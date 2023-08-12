@@ -13,4 +13,3 @@ export default {
   SEARCHLAYERS_SET_LAYER,  
   searchlayers_set_layer
 }
-

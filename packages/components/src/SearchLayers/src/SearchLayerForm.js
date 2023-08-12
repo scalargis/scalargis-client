@@ -5,20 +5,27 @@ import { Message } from 'primereact/message';
 import { JsonForms } from '@jsonforms/react';
 import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers';
 
-import PrimereactVerticalLayoutRenderer, { primereactVerticalLayoutTester } from './renderes/layouts/PrimereactVerticalLayoutRenderer';
-import PrimereactHorizontalLayoutRenderer, { primereactHorizontalLayoutTester } from './renderes/layouts/PrimereactHorizontalLayoutRenderer';
+import { primereactLayouts, primereactRenderers } from '@scalargis/primereact-renderers';
 
 import { getDescribeFeatureType, getFeatures } from './service';
 import SearchLayerResults from './SearchLayerResults';
 
-let toastEl = null;
+
+const { 
+  primereactVerticalLayoutTester, PrimereactVerticalLayout,
+  primereactHorizontalLayoutTester, PrimereactHorizontalLayout 
+} = primereactLayouts;
 
 const renderers = [
   ...vanillaRenderers,
   //register custom renderers
-  { tester: primereactVerticalLayoutTester, renderer: PrimereactVerticalLayoutRenderer },
-  { tester: primereactHorizontalLayoutTester, renderer: PrimereactHorizontalLayoutRenderer }
+  ...primereactRenderers,
+  { tester: primereactVerticalLayoutTester, renderer: PrimereactVerticalLayout },
+  { tester: primereactHorizontalLayoutTester, renderer: PrimereactHorizontalLayout },
 ];
+
+let toastEl = null;
+
 
 export default function SearchLayerForm(props) {
   const {core, viewer, auth, actions, pubsub, dispatch, mainMap, Models, layers, layer, 
