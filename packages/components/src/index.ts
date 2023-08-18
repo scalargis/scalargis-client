@@ -30,7 +30,6 @@ import * as TOC from './TOC/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
 import * as URLparams from './URLparams/src/Main'
 
-
 export {
   AttributesTable,
   Basemaps,
@@ -64,3 +63,5 @@ export {
   UserLogin,
   URLparams
 };
+
+export * from './JsonForm';
