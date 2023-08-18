@@ -5,7 +5,9 @@
     "target": "esnext",
     "baseUrl": ".",
     "jsx": "preserve",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true    
   },
   "include": ["packages/"],
   "exclude": ["**/node_modules", "**/dist"]

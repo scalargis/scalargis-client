@@ -4,11 +4,31 @@ import {
 } from '@jsonforms/core';
 
 import {
+  /*
+  materialAllOfControlTester,
+  MaterialAllOfRenderer,
+  materialAnyOfControlTester,
+  MaterialAnyOfRenderer,
+  MaterialArrayControlRenderer,
+  materialArrayControlTester,
+  materialObjectControlTester,
+  MaterialObjectRenderer,
+  materialOneOfControlTester,
+  MaterialOneOfRenderer,
+  */
   PrimereactEnumArrayRenderer,
   primereactEnumArrayRendererTester,
   PrimereactEnumArraySelectRenderer,
   primereactEnumArraySelectRendererTester  
 } from './complex';
+
+
+import {
+  PrimereactLabelRenderer,
+  primereactLabelRendererTester,
+  //MaterialListWithDetailRenderer,
+  //materialListWithDetailTester,
+} from './additional';
 
 import {
   PrimereactBooleanControl,
@@ -19,19 +39,35 @@ import {
   primereactDateControlTester,
   PrimereactDateTimeControl,
   primereactDateTimeControlTester,
+  PrimereactEnumControl,
+  primereactEnumControlTester,
   PrimereactIntegerControl,
   primereactIntegerControlTester,
   PrimereactNumberControl,
-  primereactNumberControlTester,    
-  PrimereactTextControl,
-  primereactTextControlTester,  
+  primereactNumberControlTester,
   PrimereactOneOfEnumControl,
   primereactOneOfEnumControlTester,
+  PrimereactOneOfRadioGroupControl,
+  primereactOneOfRadioGroupControlTester,  
   PrimereactRadioGroupControl,
-  primereactRadioGroupControlTester
+  primereactRadioGroupControlTester,
+  PrimereactSliderControl,
+  primereactSliderControlTester,
+  PrimereactTextControl,
+  primereactTextControlTester,
+  PrimereactTimeControl,
+  primereactTimeControlTester,  
 } from './controls';
 
 import {
+  /*
+  MaterialArrayLayout,
+  materialArrayLayoutTester,
+  */
+  PrimereactCategorizationLayout,
+  primereactCategorizationTester,
+  PrimereactGroupLayout,
+  primereactGroupTester,
   PrimereactHorizontalLayout,
   primereactHorizontalLayoutTester,
   PrimereactVerticalLayout,
@@ -41,17 +77,40 @@ import {
 //TODO
 /*
 import {
+  MaterialBooleanCell,
+  materialBooleanCellTester,
+  MaterialBooleanToggleCell,
+  materialBooleanToggleCellTester,
+  MaterialDateCell,
+  materialDateCellTester,
+  MaterialEnumCell,
+  materialEnumCellTester,
+  MaterialIntegerCell,
+  materialIntegerCellTester,
+  MaterialNumberCell,
+  materialNumberCellTester,
+  MaterialNumberFormatCell,
+  materialNumberFormatCellTester,
+  MaterialOneOfEnumCell,
+  materialOneOfEnumCellTester,
+  MaterialTextCell,
+  materialTextCellTester,
+  MaterialTimeCell,
+  materialTimeCellTester,
 } from './cells';
 */
 
+import PrimereactCategorizationStepperLayout, {
+  primereactCategorizationStepperTester,
+} from './layouts/PrimereactCategorizationStepperLayout';
 
+export * from './additional';
+//export * from './cells';
 export * from './complex';
 export * from './controls';
 export * from './layouts';
-//export * from './cells';
 export * from './primereact-controls';
 export * from './util';
-
 
 export const primereactRenderers: JsonFormsRendererRegistryEntry[] = [
   // controls
@@ -59,15 +118,42 @@ export const primereactRenderers: JsonFormsRendererRegistryEntry[] = [
   { tester: primereactBooleanToggleControlTester, renderer: PrimereactBooleanToggleControl },
   { tester: primereactDateControlTester, renderer: PrimereactDateControl },
   { tester: primereactDateTimeControlTester, renderer: PrimereactDateTimeControl },
+  { tester: primereactEnumControlTester, renderer: PrimereactEnumControl },
+  { tester: primereactTimeControlTester, renderer: PrimereactTimeControl },
   { tester: primereactIntegerControlTester, renderer: PrimereactIntegerControl },
   { tester: primereactNumberControlTester, renderer: PrimereactNumberControl },
-  { tester: primereactTextControlTester, renderer: PrimereactTextControl },
+  { tester: primereactSliderControlTester, renderer: PrimereactSliderControl },
   { tester: primereactOneOfEnumControlTester, renderer: PrimereactOneOfEnumControl },
+  { tester: primereactOneOfRadioGroupControlTester, renderer: PrimereactOneOfRadioGroupControl },
   { tester: primereactRadioGroupControlTester, renderer: PrimereactRadioGroupControl },
+  { tester: primereactTextControlTester, renderer: PrimereactTextControl },
   // layouts
+  { tester: primereactGroupTester, renderer: PrimereactGroupLayout },
   { tester: primereactHorizontalLayoutTester, renderer: PrimereactHorizontalLayout },
   { tester: primereactVerticalLayoutTester, renderer: PrimereactVerticalLayout },
+  {
+    tester: primereactCategorizationTester,
+    renderer: PrimereactCategorizationLayout,
+  },
+  {
+    tester: primereactCategorizationStepperTester,
+    renderer: PrimereactCategorizationStepperLayout,
+  },
+  /*
+  { tester: materialArrayLayoutTester, renderer: MaterialArrayLayout },
+  */
   // additional
+  { tester: primereactLabelRendererTester, renderer: PrimereactLabelRenderer },
+  /*
+  {
+    tester: materialListWithDetailTester,
+    renderer: MaterialListWithDetailRenderer,
+  },
+  {
+    tester: materialAnyOfStringOrEnumControlTester,
+    renderer: MaterialAnyOfStringOrEnumControl,
+  },
+  */
   {
     tester: primereactEnumArrayRendererTester,
     renderer: PrimereactEnumArrayRenderer
@@ -79,11 +165,39 @@ export const primereactRenderers: JsonFormsRendererRegistryEntry[] = [
 ];
 
 export const primereactCells: JsonFormsCellRendererRegistryEntry[] = [
+  /*
+  { tester: materialBooleanCellTester, cell: MaterialBooleanCell },
+  { tester: materialBooleanToggleCellTester, cell: MaterialBooleanToggleCell },
+  { tester: materialDateCellTester, cell: MaterialDateCell },
+  { tester: materialEnumCellTester, cell: MaterialEnumCell },
+  { tester: materialIntegerCellTester, cell: MaterialIntegerCell },
+  { tester: materialNumberCellTester, cell: MaterialNumberCell },
+  { tester: materialNumberFormatCellTester, cell: MaterialNumberFormatCell },
+  { tester: materialOneOfEnumCellTester, cell: MaterialOneOfEnumCell },
+  { tester: materialTextCellTester, cell: MaterialTextCell },
+  { tester: materialTimeCellTester, cell: MaterialTimeCell },
+  */
 ];
 
 export const primereactLayouts = {
+  PrimereactGroupLayout,
+  primereactGroupTester,
+  PrimereactCategorizationLayout,
+  primereactCategorizationTester,
   PrimereactHorizontalLayout,
   primereactHorizontalLayoutTester,
   PrimereactVerticalLayout,
   primereactVerticalLayoutTester
+};
+
+import { UnwrappedAdditional } from './additional/unwrapped';
+import { UnwrappedComplex } from './complex/unwrapped';
+import { UnwrappedControls } from './controls/unwrapped';
+import { UnwrappedLayouts } from './layouts/unwrapped';
+
+export const Unwrapped = {
+  ...UnwrappedAdditional,
+  ...UnwrappedComplex,
+  ...UnwrappedControls,
+  ...UnwrappedLayouts,
 };

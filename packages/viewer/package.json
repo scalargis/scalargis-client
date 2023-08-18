@@ -8,12 +8,9 @@
     "src/themes/*"
   ],
   "dependencies": {
-    "@scalargis/jsonforms-primereact-renderers": "^0.1.0",
+    "@scalargis/jsonforms-primereact-renderers": "^3.1.0",
     "@scalargis/components": "^0.1.0",
     "@fortawesome/fontawesome-free": "^5.15.2",
-    "@jsonforms/core": "^2.5.2",
-    "@jsonforms/react": "^2.5.2",
-    "@jsonforms/vanilla-renderers": "^2.5.2",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
