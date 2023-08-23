@@ -9,8 +9,10 @@ import {
   MaterialAllOfRenderer,
   materialAnyOfControlTester,
   MaterialAnyOfRenderer,
-  MaterialArrayControlRenderer,
-  materialArrayControlTester,
+  */
+  PrimereactArrayControlRenderer,
+  primereactArrayControlTester,
+  /*
   materialObjectControlTester,
   MaterialObjectRenderer,
   materialOneOfControlTester,
@@ -28,6 +30,9 @@ import {
   primereactLabelRendererTester,
   //MaterialListWithDetailRenderer,
   //materialListWithDetailTester,
+  
+  PrimereactDividerRenderer,
+  primereactDividerRendererTester,  
 } from './additional';
 
 import {
@@ -60,10 +65,8 @@ import {
 } from './controls';
 
 import {
-  /*
-  MaterialArrayLayout,
-  materialArrayLayoutTester,
-  */
+  PrimereactArrayLayout,
+  primereactArrayLayoutTester,
   PrimereactCategorizationLayout,
   primereactCategorizationTester,
   PrimereactGroupLayout,
@@ -114,6 +117,7 @@ export * from './util';
 
 export const primereactRenderers: JsonFormsRendererRegistryEntry[] = [
   // controls
+  //{ tester: primereactArrayControlTester, renderer: PrimereactArrayControlRenderer },  
   { tester: primereactBooleanControlTester, renderer: PrimereactBooleanControl },
   { tester: primereactBooleanToggleControlTester, renderer: PrimereactBooleanToggleControl },
   { tester: primereactDateControlTester, renderer: PrimereactDateControl },
@@ -139,9 +143,7 @@ export const primereactRenderers: JsonFormsRendererRegistryEntry[] = [
     tester: primereactCategorizationStepperTester,
     renderer: PrimereactCategorizationStepperLayout,
   },
-  /*
-  { tester: materialArrayLayoutTester, renderer: MaterialArrayLayout },
-  */
+  { tester: primereactArrayLayoutTester, renderer: PrimereactArrayLayout },
   // additional
   { tester: primereactLabelRendererTester, renderer: PrimereactLabelRenderer },
   /*
@@ -149,6 +151,9 @@ export const primereactRenderers: JsonFormsRendererRegistryEntry[] = [
     tester: materialListWithDetailTester,
     renderer: MaterialListWithDetailRenderer,
   },
+  */
+  { tester: primereactDividerRendererTester, renderer: PrimereactDividerRenderer },
+  /*
   {
     tester: materialAnyOfStringOrEnumControlTester,
     renderer: MaterialAnyOfStringOrEnumControl,
@@ -187,7 +192,9 @@ export const primereactLayouts = {
   PrimereactHorizontalLayout,
   primereactHorizontalLayoutTester,
   PrimereactVerticalLayout,
-  primereactVerticalLayoutTester
+  primereactVerticalLayoutTester,
+  PrimereactArrayLayout,
+  primereactArrayLayoutTester,
 };
 
 import { UnwrappedAdditional } from './additional/unwrapped';

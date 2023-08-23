@@ -5,10 +5,10 @@ import MaterialAllOfRenderer, {
 import MaterialAnyOfRenderer, {
   materialAnyOfControlTester,
 } from './MaterialAnyOfRenderer';
-import MaterialArrayControlRenderer, {
-  materialArrayControlTester,
-} from './MaterialArrayControlRenderer';
 */
+import PrimereactArrayControlRenderer, {
+  primereactArrayControlTester,
+} from './PrimereactArrayControlRenderer';
 import PrimereactEnumArrayRenderer, {
   primereactEnumArrayRendererTester,
 } from './PrimereactEnumArrayRenderer';
@@ -30,9 +30,9 @@ export {
   MaterialAllOfRenderer,
   materialAnyOfControlTester,
   MaterialAnyOfRenderer,
-  materialArrayControlTester,
-  MaterialArrayControlRenderer,
   */
+  primereactArrayControlTester,
+  PrimereactArrayControlRenderer,
   primereactEnumArrayRendererTester,
   PrimereactEnumArrayRenderer,
   primereactEnumArraySelectRendererTester,
@@ -45,15 +45,11 @@ export {
   */
 };
 
-/*
 export * from './CombinatorProperties';
 export * from './DeleteDialog';
-export * from './MaterialTableControl';
+export * from './PrimereactTableControl';
 export * from './TableToolbar';
-*/
 export * from './ValidationIcon';
 
-/*
 import NoBorderTableCell from './NoBorderTableCell';
 export { NoBorderTableCell };
-*/

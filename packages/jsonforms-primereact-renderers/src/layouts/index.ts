@@ -17,11 +17,9 @@ import PrimereactVerticalLayout, {
 import PrimereactCategorizationLayout, {
   primereactCategorizationTester,
 } from './PrimereactCategorizationLayout';
-/*
-import MaterialArrayLayout, {
-  materialArrayLayoutTester,
-} from './MaterialArrayLayoutRenderer';
-*/
+import PrimereactArrayLayout, {
+  primereactArrayLayoutTester,
+} from './PrimereactArrayLayoutRenderer';
 
 export {
   /*
@@ -29,9 +27,9 @@ export {
   ctxDispatchToExpandPanelProps,
   withContextToExpandPanelProps,
   withJsonFormsExpandPanelProps,
-  MaterialArrayLayout,
-  materialArrayLayoutTester,
   */
+  PrimereactArrayLayout,
+  primereactArrayLayoutTester,
   PrimereactCategorizationLayout,
   primereactCategorizationTester,
   PrimereactGroupLayout,
