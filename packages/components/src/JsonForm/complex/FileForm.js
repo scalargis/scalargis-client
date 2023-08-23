@@ -7,7 +7,7 @@ import { JsonForm, JsonFormDefaultRenderers } from '@scalargis/components';
 
 //import './../style.css';
 
-export default function PhotoForm(props) {
+export default function FileForm(props) {
 
   const { getWindowSize, showOnPortal } = props.utils;  
 
@@ -66,9 +66,9 @@ export default function PhotoForm(props) {
 
   return (
     <Dialog
-      header={ "Fotografia" }
+      header={ "Ficheiro" }
       visible={!!props.showForm}
-      className="jsonform-photo-form-editor"
+      className="jsonform-file-form-editor"
       style={{ width: isMobile ? '90%' : '50vw' }}
       position="top"
       modal

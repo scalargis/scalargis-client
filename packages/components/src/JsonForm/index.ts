@@ -3,15 +3,18 @@ import { primereactLayouts, primereactRenderers } from '@scalargis/jsonforms-pri
 import JsonForm from './JsonForm';
 import { JsonFormContext } from './JsonFormContext';
 
-
 import {
   ArrayPhotoControlRenderer,
-  arrayPhotoControlTester
+  arrayPhotoControlTester,
+  ArrayFileControlRenderer,
+  arrayFileControlTester,  
 } from './complex';
 
 import {
   PhotoControl,
-  photoControlTester
+  photoControlTester,
+  FileControl,
+  fileControlTester  
 } from './controls';
 
 const {  
@@ -31,7 +34,9 @@ const defaultRenderers = [
   { tester: primereactArrayLayoutTester, renderer: PrimereactArrayLayout },
   // Scalargis custom renderers
   { tester: photoControlTester, renderer: PhotoControl },
-  { tester: arrayPhotoControlTester, renderer: ArrayPhotoControlRenderer }
+  { tester: fileControlTester, renderer: FileControl },
+  { tester: arrayPhotoControlTester, renderer: ArrayPhotoControlRenderer },
+  { tester: arrayFileControlTester, renderer: ArrayFileControlRenderer }
 ];
 
 export {

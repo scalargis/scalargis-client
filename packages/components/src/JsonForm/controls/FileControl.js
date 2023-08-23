@@ -8,7 +8,6 @@ import { withJsonFormsControlProps } from '@jsonforms/react';
 import { Toast } from 'primereact/toast';
 import { Chip } from 'primereact/chip';
 import { FileUpload } from 'primereact/fileupload';
-import Resizer from "react-image-file-resizer";
 
 import { JsonFormContext } from './../JsonFormContext';
 
@@ -18,39 +17,7 @@ const fileDefaultValues = {
   filename: null
 };
 
-const resizeFile = (file) =>
-new Promise((resolve) => {
-  Resizer.imageFileResizer(
-    file,
-    2400,
-    1600,
-    "JPEG",
-    90,
-    0,
-    (uri) => {
-      resolve(uri);
-    },
-    "base64"
-  );
-});
-
-const resizeThumbFile = (file) =>
-new Promise((resolve) => {
-  Resizer.imageFileResizer(
-    file,
-    165,
-    165,
-    "JPEG",
-    90,
-    0,
-    (uri) => {
-      resolve(uri);
-    },
-    "base64"
-  );
-});
-
-export const PhotoControl = (props) => {
+export const FileControl = (props) => {
 
   const ctx = useContext(JsonFormContext);
   
@@ -71,25 +38,16 @@ export const PhotoControl = (props) => {
     if (file_upload.current && file_upload.current.files && file_upload.current.files.length) {
       const reader = new FileReader();
       reader.onload = async function() {
-        let data = reader.result;
+        let file_data = reader.result;
 
         try {
-          const image = await resizeFile(file_upload.current.files[0]);
-          const imageThumb = await resizeThumbFile(file_upload.current.files[0]);
-
-          const stringLength = image.length - 'data:image/jpg;base64,'.length;
-          const sizeInBytes = 4 * Math.ceil((stringLength / 3))*0.5624896334383812;
-          const sizeInKb = sizeInBytes/1000;
-          
           const data = {
             ...file,
             file_url: null,
-            thumb_url: null,
             original_filename: file_upload.current.files[0].name,
             filename: file_upload.current.files[0].name,            
-            file_size: sizeInBytes,
-            data: image,
-            data_thumb: imageThumb
+            file_size: file_upload.current.files[0].size,
+            data: file_data
           };
           props.handleChange(props.path, data);
 
@@ -98,12 +56,10 @@ export const PhotoControl = (props) => {
           const data = {
             ...file,
             file_url: null,
-            thumb_url: null,
             original_filename: file_upload.current.files[0].name,            
             filename: file_upload.current.files[0].name,
-            size: file_upload.current.files[0].size, 
-            data: data,
-            data_thumb: null
+            size: file_upload.current.files[0].size,            
+            data: file_data
           };
           props.handleChange(props.path, data);
         }
@@ -111,8 +67,7 @@ export const PhotoControl = (props) => {
         file_upload.current.clear();
         file_upload.current.files = []; 
       };
-      reader.readAsDataURL(file_upload.current.files[0]);    
-
+      reader.readAsDataURL(file_upload.current.files[0]);
     }
   }
 
@@ -165,22 +120,17 @@ export const PhotoControl = (props) => {
             : null }
           </div>
           <div className="p-field p-col-12">
-            { (file?.data || file?.file_url) ?
-            <div className="p-field p-col-6">
-              <img src={file.data || `${file.file_url}`} alt={file.original_filename} style={{"maxWidth": "300px"}} />
-            </div> :
-            getFormErrorMessage('filename') }
+            { (!file?.data && !file?.file_url) && getFormErrorMessage('filename') }
           </div>
         </div>
       </form>
     </>
-
   );
 };
 
-export const photoControlTester = rankWith(
+export const fileControlTester = rankWith(
   3,
-  optionIs('format', 'photo')
+  optionIs('format', 'file')
 );
 
-export default withJsonFormsControlProps(PhotoControl);
+export default withJsonFormsControlProps(FileControl);
