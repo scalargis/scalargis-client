@@ -30,6 +30,14 @@ import * as TOC from './TOC/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
 import * as URLparams from './URLparams/src/Main'
 
+import { 
+  JsonForm, 
+  JsonFormContext,
+  JsonFormDefaultRenderers,
+  //ScalargisArrayPhotoControl,
+  //scalargisArrayPhotoControlTester
+} from './JsonForm'
+
 export {
   AttributesTable,
   Basemaps,
@@ -61,7 +69,13 @@ export {
   ThemeWizard,
   TOC,
   UserLogin,
-  URLparams
+  URLparams,
+
+  JsonForm,
+  JsonFormContext,
+  JsonFormDefaultRenderers,
+  //ScalargisArrayPhotoControl,
+  //scalargisArrayPhotoControlTester
 };
 
-export * from './JsonForm';
+//export * from './JsonForm';

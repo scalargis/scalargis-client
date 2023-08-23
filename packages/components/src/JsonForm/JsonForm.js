@@ -1,26 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { JsonForms } from '@jsonforms/react';
 import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers';
 import { get } from 'lodash';
 
-import { primereactLayouts, primereactRenderers } from '@scalargis/jsonforms-primereact-renderers';
 
-import { i18nDefaults as translations } from './utils/i18nDefaults';
 
-const {
-  primereactGroupTester, PrimereactGroupLayout,
-  primereactVerticalLayoutTester, PrimereactVerticalLayout,
-  primereactHorizontalLayoutTester, PrimereactHorizontalLayout 
-} = primereactLayouts;
+import { i18nDefaults as translations } from './../utils/i18nDefaults';
 
-const defaultRenderers = [
-  //...vanillaRenderers,
-  //register custom renderers
-  ...primereactRenderers,
-  { tester: primereactGroupTester, renderer: PrimereactGroupLayout },
-  { tester: primereactVerticalLayoutTester, renderer: PrimereactVerticalLayout },
-  { tester: primereactHorizontalLayoutTester, renderer: PrimereactHorizontalLayout }
-];
+
+
 
 const createTranslator = (locale) => (key, defaultMessage) => {
   //console.log(get(translations, `${locale}.${key}`, get(translations, `${key}`, defaultMessage)));
@@ -29,10 +17,12 @@ const createTranslator = (locale) => (key, defaultMessage) => {
     ? msg = get(translations, `${locale}.${key}`, get(translations, `${key}`, defaultMessage))
     : mgs = get(translations, `${key}`, defaultMessage);
 
+  /*
   console.log({
     key:`${locale}.${key}`,
     message: msg
-  })
+  });
+  */
 
   return msg;
 };
@@ -51,6 +41,12 @@ export const JsonForm = (props) => {
 
   const translation = useMemo(() => createTranslator(locale), [props.locale, props.i18n]);
 
+  useEffect(() => {
+    console.log('Entrei');
+  }, []);
+
+  //const LayerContext = createContext();
+
   return (
     <JsonForms
       data={data}
@@ -64,8 +60,6 @@ export const JsonForm = (props) => {
     />
   );
 }
-
-export const JsonFormDefaultRenderers = defaultRenderers;
 
 export default JsonForm;
 
