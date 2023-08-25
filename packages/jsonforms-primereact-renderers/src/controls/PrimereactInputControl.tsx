@@ -54,17 +54,6 @@ export const PrimereactInputControl = (props: ControlProps & WithInput) => {
 
   const labelClassName = `${!isValid ? 'p-invalid' : ''}`;
 
-  /*
-  console.log({
-    config,
-    focused,
-    path,
-    description,
-    showDescription,
-    firstFormHelperText,
-    secondFormHelperText
-  });
-  */
   return (
     <div
       hidden={!visible}

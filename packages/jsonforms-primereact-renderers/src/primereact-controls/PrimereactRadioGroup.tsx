@@ -33,7 +33,6 @@ export const PrimereactRadioGroup = React.memo(function PrimereactRadioGroup(
                 inputId={`${id}-${option.value}`}
                 name={id}
                 onChange={(e) => {
-                  console.log('asdada');
                   handleChange(path, e.value)
                 }}
                 checked={data === (option.value)}

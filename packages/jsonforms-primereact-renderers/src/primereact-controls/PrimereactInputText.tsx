@@ -98,8 +98,6 @@ export const PrimereactInputText = React.memo(function PrimereactInputText(
   };
   */
 
-  //console.log({...inputProps});
-
   if (appliedUiSchemaOptions.format === 'password') {
     return (
       <Password

@@ -10,8 +10,6 @@ import {
 //import { MaterialArrayLayout } from './MaterialArrayLayout';
 import { withJsonFormsArrayLayoutProps } from '@jsonforms/react';
 
-console.log('asdasdadadssa');
-
 export const PrimereactArrayLayoutRenderer = ({
   visible,
   addItem,
@@ -22,8 +20,6 @@ export const PrimereactArrayLayoutRenderer = ({
     (p: string, value: any) => addItem(p, value),
     [addItem]
   );
-
-    console.log(data);
 
   //TODO
   return (

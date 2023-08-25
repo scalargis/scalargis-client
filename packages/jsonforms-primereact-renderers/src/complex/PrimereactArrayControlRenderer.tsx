@@ -17,8 +17,6 @@ export const PrimereactArrayControlRenderer = (props: ArrayLayoutProps) => {
   const [rowData, setRowData] = useState(undefined);
   const { removeItems, visible } = props;
 
-  console.log(props);
-
   const openDeleteDialog = useCallback(
     //(p: string, rowIndex: number) => {
     (p: any, rowIndex: any) => {

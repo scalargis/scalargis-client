@@ -23,10 +23,7 @@ export const PrimereactSlider = React.memo(function PrimereactSlider(
   const inputPropsMerged = merge({}, inputProps, {
     autoFocus: !!appliedUiSchemaOptions.focus,
   });
-  */
-
-  //console.log(props);
-
+  */ 
   const sliderProps = {
     min: schema.minimum,
     max: schema.maximum,

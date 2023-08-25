@@ -5,6 +5,10 @@
   padding: 0.5em;
 }
 
+.p-jsonform .p-steps ul {
+  overflow-x: auto;
+}
+
 .p-jsonform .p-steps .p-steps-item:before {
   margin-top: -0.85rem;
 }
@@ -18,4 +22,11 @@
   white-space: break-spaces;
   word-break: keep-all;
   max-height: 1.2rem;
+}
+
+.p-jsonform .p-tabview .p-tabview-nav {
+  overflow-x: auto;
+}
+::-webkit-scrollbar {
+  height: 0px !important;
 }
