@@ -1,9 +1,12 @@
-import React, { useRef, useContext } from 'react';
+import React, { useRef, useContext, useMemo } from 'react';
 import {
   optionIs,
   rankWith,
 } from '@jsonforms/core';
-import { withJsonFormsControlProps } from '@jsonforms/react';
+import {
+  withTranslateProps,
+  withJsonFormsControlProps
+} from '@jsonforms/react';
 
 import { Toast } from 'primereact/toast';
 import { Chip } from 'primereact/chip';
@@ -11,6 +14,7 @@ import { FileUpload } from 'primereact/fileupload';
 import Resizer from "react-image-file-resizer";
 
 import { JsonFormContext } from './../JsonFormContext';
+import { translateMsg } from './../util/i18n';
 
 const fileDefaultValues = {
   file_url: null,
@@ -54,7 +58,9 @@ export const PhotoControl = (props) => {
 
   const ctx = useContext(JsonFormContext);
   
-  const { showOnPortal } = ctx.utils;  
+  const { showOnPortal } = ctx.utils;
+
+  const { schema, uischema, path, label, t, locale } = props;
  
   const file_upload = useRef();
 
@@ -121,9 +127,24 @@ export const PhotoControl = (props) => {
   }
 
   const getFormErrorMessage = (name) => {
-    //TODO
-    return "TODO: Erro"
-  };  
+    // TODO
+    return "TODO: Error"
+  };
+
+  const labels = useMemo(() => {
+    const prefix = "PhotoControl";
+    const elem = `${locale}.${prefix}`;
+    const fallbackElem = `${locale}.controls`;
+    return {
+      file: translateMsg(`${elem}.file`, `${fallbackElem}.file`, 'File', {t, schema, uischema, path}),
+      size: translateMsg(`${elem}.size`, `${fallbackElem}.size`, 'Size', {t, schema, uischema, path}),
+      newfile: translateMsg(`${elem}.newfile`, `${fallbackElem}.newfile`, 'New file', {t, schema, uischema, path}),
+      choose: translateMsg(`${elem}.choose`, `${fallbackElem}.choose`, 'Choose', {t, schema, uischema, path}),
+      upload: translateMsg(`${elem}.upload`, `${fallbackElem}.upload`, 'Upload', {t, schema, uischema, path}),
+      cancel: translateMsg(`${elem}.cancel`, `${fallbackElem}.cancel`, 'Cancel', {t, schema, uischema, path}),
+      maxFileSize: translateMsg(`${elem}.maxFileSize`, `${fallbackElem}.maxFileSize`, 'Max file size', {t, schema, uischema, path}),
+    }
+  }, [locale, schema, uischema, path]);
 
   return (
     <>
@@ -133,13 +154,13 @@ export const PhotoControl = (props) => {
           <div className="p-field">
             { (file && file.data && file.original_filename) ?
             <div>
-              <div><strong>Ficheiro: </strong>{file.original_filename} <Chip label=" Novo ficheiro" icon="pi pi-info-circle" className="p-ml-2" /></div>
-              <div><strong>Dimensão: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
+              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" /></div>
+              <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             :
             <div>
-              <div><strong>Ficheiro: </strong><a href={`${file.file_url}`} target="_blank">{file.original_filename}</a></div>
-              <div><strong>Dimensão: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
+              <div><strong>{labels.file}: </strong><a href={`${file.file_url}`} target="_blank">{file.original_filename}</a></div>
+              <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             }
           </div>
@@ -154,14 +175,14 @@ export const PhotoControl = (props) => {
               onValidationFail={fileValidationFail}
               disabled={false}
               url="./upload"
-              chooseLabel="Escolher"
-              uploadLabel="Carregar"
-              cancelLabel="Cancelar"
+              chooseLabel={labels.choose}
+              uploadLabel={labels.upload}
+              cancelLabel={labels.cancel}
               invalidFileSizeMessageDetail=""
               invalidFileSizeMessageSummary=""
             />
             { (maxFileSize > 0) ?
-            <small id="upload-help" className="p-warn">Dimensão máxima do ficheiro: {Math.round((maxFileSize/1024) * 100) / 100} MB</small>
+            <small id="upload-help" className="p-warn">{labels.maxFileSize}: {Math.round((maxFileSize/1024) * 100) / 100} MB</small>
             : null }
           </div>
           <div className="p-field p-col-12">
@@ -183,4 +204,4 @@ export const photoControlTester = rankWith(
   optionIs('format', 'photo')
 );
 
-export default withJsonFormsControlProps(PhotoControl);
+export default withTranslateProps(withJsonFormsControlProps(PhotoControl));

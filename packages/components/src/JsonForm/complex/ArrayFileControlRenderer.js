@@ -14,7 +14,10 @@ import {
   or,
   rankWith,
 } from '@jsonforms/core';
-import { withJsonFormsArrayControlProps } from '@jsonforms/react';
+import {
+  withTranslateProps,
+  withJsonFormsArrayControlProps
+} from '@jsonforms/react';
 
 import { JsonFormContext } from './../JsonFormContext';
 import FileForm from './FileForm';
@@ -25,25 +28,21 @@ export const ArrayFileControlRenderer = (props) => {
     data,
     schema,
     uischema,
-    options
+    path,
+    label,
+    t,
+    locale
   }= props;
   
   const ctx = useContext(JsonFormContext);
 
-  const { getWindowSize, showOnPortal } = ctx.utils; 
+  const { showOnPortal } = ctx.utils; 
 
   const { removeItems } = props;
  
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
   const [showFileForm, setShowFileForm] = useState(false);  
-
-  useEffect(() => {
-    //console.log('Enter ArrayFileControlRenderer');
-    return () => {
-      //console.log('Clear ArrayFileControlRenderer');
-    };
-  }, []);
   
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
@@ -55,13 +54,17 @@ export const ArrayFileControlRenderer = (props) => {
         <FileForm
           schema={schema}
           uischema={uischema}
+          path={path}
+          label={label}
+          t={t}
+          locale={locale}
           data={rowData}
           index={rowIndex}
           utils={ctx.utils}
           showForm={showFileForm}
           setShowForm={setShowFileForm}
           onChange={(data) => {
-            console.log(data);
+            // TODO
           }}
           onSave={(data) => {
             const newData = [...props.data];
@@ -98,8 +101,6 @@ export const ArrayFileControlRenderer = (props) => {
                           <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2" tooltip="Editar ficheiro"
                             onClick={(e) => {
                               e.preventDefault();
-                              //setFileData(f);
-                              //setShowFileForm(true);
                               setShowFileForm(true);
                               setRowIndex(index);
                               setRowData(item);                              
@@ -116,12 +117,6 @@ export const ArrayFileControlRenderer = (props) => {
                                 rejectLabel: 'Não',
                                 accept: () => {
                                   deleteConfirm(index);
-                                  /*
-                                  setFormData({
-                                    ...formData,
-                                    files: (formData.files || []).filter((_, idx) => idx !== index)
-                                  });
-                                  */
                                 },
                                 reject: () =>  { }      
                               });
@@ -130,41 +125,6 @@ export const ArrayFileControlRenderer = (props) => {
                         </td>
                     </tr>                      
                     )
-                    /*
-                    return (
-                      <tr key={index}>  
-                        <td className="" style={{"wordBreak": "break-all", "textAlign": "center"}}>
-                          <Image src={f.data || `${f.file_url}`} alt={f.filename} width={100} preview />
-                        </td>
-                        <td className="p-col-9" style={{"wordBreak": "break-all", "textAlign": "center"}}>{(f?.original_filename || f?.filename)}</td>
-                        <td className="p-col-1" style={{"verticalAlign": "top", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2" tooltip="Editar ficheiro"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setShowFileForm(true);
-                              setRowIndex(index);
-                              setRowData(item);                   
-                            }} />                                                                            
-                          <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger" tooltip="Eliminar ficheiro" 
-                            onClick={(e) => { 
-                              e.preventDefault();
-
-                              confirmDialog({
-                                message: `Deseja remover o ficheiro "${f.original_filename || f.filename}"?`,
-                                header: 'Confirmação',
-                                icon: 'pi pi-exclamation-triangle p-mr-1',
-                                acceptLabel: 'Sim',
-                                rejectLabel: 'Não',
-                                accept: () => {
-                                  deleteConfirm(index);
-                                },
-                                reject: () =>  { }      
-                              });
-
-                          } } />                    
-                        </td>
-                    </tr>)
-                    */
                   })
                 }
               </tbody>
@@ -199,4 +159,4 @@ export const arrayFileControlTester = rankWith(
   )
 );
 
-export default withJsonFormsArrayControlProps(ArrayFileControlRenderer);
+export default withTranslateProps(withJsonFormsArrayControlProps(ArrayFileControlRenderer));

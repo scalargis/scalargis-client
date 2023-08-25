@@ -14,7 +14,10 @@ import {
   or,
   rankWith,
 } from '@jsonforms/core';
-import { withJsonFormsArrayControlProps } from '@jsonforms/react';
+import { 
+  withTranslateProps,
+  withJsonFormsArrayControlProps
+} from '@jsonforms/react';
 
 import { JsonFormContext } from './../JsonFormContext';
 import PhotoForm from './PhotoForm';
@@ -25,25 +28,21 @@ export const ArrayPhotoControlRenderer = (props) => {
     data,
     schema,
     uischema,
-    options
-  }= props;
+    path,
+    label,
+    t,
+    locale
+  } = props;
   
   const ctx = useContext(JsonFormContext);
 
-  const { getWindowSize, showOnPortal } = ctx.utils; 
+  const { showOnPortal } = ctx.utils; 
 
   const { removeItems } = props;
  
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
   const [showPhotoForm, setShowPhotoForm] = useState(false);  
-
-  useEffect(() => {
-    //console.log('Enter ArrayPhotoControlRenderer');
-    return () => {
-      //console.log('Clear ArrayPhotoControlRenderer');
-    };
-  }, []);
   
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
@@ -55,13 +54,17 @@ export const ArrayPhotoControlRenderer = (props) => {
         <PhotoForm
           schema={schema}
           uischema={uischema}
+          path={path}
+          label={label}
+          t={t}
+          locale={locale}
           data={rowData}
           index={rowIndex}
           utils={ctx.utils}
           showForm={showPhotoForm}
           setShowForm={setShowPhotoForm}
           onChange={(data) => {
-            console.log(data);
+            // TODO
           }}
           onSave={(data) => {
             const newData = [...props.data];
@@ -155,4 +158,4 @@ export const arrayPhotoControlTester = rankWith(
   )
 );
 
-export default withJsonFormsArrayControlProps(ArrayPhotoControlRenderer);
+export default withTranslateProps(withJsonFormsArrayControlProps(ArrayPhotoControlRenderer));
