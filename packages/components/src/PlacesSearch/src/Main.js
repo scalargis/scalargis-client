@@ -80,7 +80,7 @@ export default function Main({ core, config, actions, record }) {
       }
 
       const geom_ext = geom.getExtent();
-      const extent = [geom_ext[0] - buffer, geom_ext[1] - buffer, geom_ext[0] + buffer, geom_ext[1] + buffer];
+      const extent = [geom_ext[0] - buffer, geom_ext[1] - buffer, geom_ext[2] + buffer, geom_ext[3] + buffer];
 
       dispatch(actions.map_set_extent([extent[2] - extent[0], extent[3] - extent[1]], extent));
 
