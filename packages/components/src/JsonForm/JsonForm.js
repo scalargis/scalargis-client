@@ -7,6 +7,8 @@ import { JsonFormContext } from './JsonFormContext';
 
 import { i18nDefaults } from './../utils/i18nDefaults';
 
+//import { useTranslation } from 'react-i18next';
+
 export const JsonForm = (props) => {
   const {
     data,
@@ -18,6 +20,12 @@ export const JsonForm = (props) => {
     locale,
     i18n,
   } = props;
+
+  /*
+  const { t } = useTranslation();
+  const s = t('welcome');
+  console.log(`Teste : ${s}`);
+  */
 
   const ctx = useContext(JsonFormContext);
 

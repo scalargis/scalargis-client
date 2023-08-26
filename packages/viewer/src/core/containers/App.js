@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Viewer from './Viewer'
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import { Provider } from 'react-redux'
@@ -12,9 +12,17 @@ import PagePassword from '../components/PagePassword'
 import RGPD from '../components/RGPD'
 import { getAppBaseUrl } from '../utils'
 
+//import { useTranslation } from 'react-i18next';
+
 const App = () => {
 
   const base_url = getAppBaseUrl();
+
+  /*
+  const { t } = useTranslation();
+  const s = t('welcome');
+  console.log(s);
+  */
 
   return (
     <React.StrictMode>

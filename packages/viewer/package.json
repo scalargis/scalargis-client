@@ -7,7 +7,7 @@
     "src/components/*",
     "src/themes/*"
   ],
-  "dependencies": {
+  "dependencies": {    
     "@scalargis/jsonforms-primereact-renderers": "^3.1.0",
     "@scalargis/components": "^0.1.0",
     "@fortawesome/fontawesome-free": "^5.15.2",
@@ -23,6 +23,8 @@
     "chart.js": "^3.5.0",
     "classnames": "^2.3.1",
     "file-saver": "^2.0.5",
+    "i18next": "^23.4.6",
+    "i18next-browser-languagedetector": "^7.1.0",    
     "ol": "^6.10.0",
     "primeflex": "2.0.0",
     "primeicons": "^4.1.0",
@@ -38,6 +40,7 @@
     "react-dom": "^17.0.2",
     "react-ga": "^3.3.0",
     "react-hook-form": "7.8.3",
+    "react-i18next": "^13.2.0",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",

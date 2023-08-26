@@ -33,6 +33,7 @@ export const VIEWER_NOT_AUTHORIZED      = 'VIEWER_NOT_AUTHORIZED'
 export const VIEWER_LOAD_COMPONENTS     = 'VIEWER_LOAD_COMPONENTS'
 export const VIEWER_UNLOAD_COMPONENTS   = 'VIEWER_UNLOAD_COMPONENTS'
 export const VIEWER_SET_SELECTEDMENU    = 'VIEWER_SET_SELECTEDMENU'
+export const VIEWER_SET_LOCALE          = 'VIEWER_SET_LOCALE'
 export const VIEWER_SET_FEATUREINFO     = 'VIEWER_SET_FEATUREINFO'
 export const VIEWER_SET_GEOLOCATION     = 'VIEWER_SET_GEOLOCATION'
 export const VIEWER_SET_DRAWINGS        = 'VIEWER_SET_DRAWINGS'
@@ -454,6 +455,14 @@ export function registration_http_error(res) {
   const action = {
     type: REGISTRATION_HTTP_ERROR,
     res
+  }
+  return action;
+}
+
+export function viewer_set_locale(data) {
+  const action = {
+    type: VIEWER_SET_LOCALE,
+    data
   }
   return action;
 }

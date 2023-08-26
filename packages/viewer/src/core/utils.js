@@ -27,6 +27,14 @@ const _getAppBaseUrl = () => {
   }
 }
 
+const _getAppDefaultLocale = () => {
+  if (window?.SCALARGIS_DEFAULT_LOCALE !== '__SCALARGIS_DEFAULT_LOCALE__') {
+    return window?.SCALARGIS_DEFAULT_LOCALE || process.env.REACT_APP_DEFAULT_LOCALE || '';
+  } else {
+    return process.env.REACT_APP_DEFAULT_LOCALE || '';
+  }
+}
+
 export const mapStateToProps = state => {
   if (!state) return;
   const props = Object.entries(state).map(([k,v])=>v);
@@ -194,6 +202,10 @@ export const getAppUploadUrl = () => {
     url =  window.location.origin + url;
   }
   return url;
+}
+
+export const getAppDefaultLocale = () => {
+  return _getAppDefaultLocale();
 }
 
 export const getViewerPublicUrl = (uuid) => {

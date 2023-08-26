@@ -15,6 +15,7 @@ import * as LayerEdit from './LayerEdit/src/Main'
 import * as LayerMetadata from './LayerMetadata/src/Main'
 import * as LayerOpacity from './LayerOpacity/src/Main'
 import * as LayerRemove from './LayerRemove/src/Main'
+import * as LocaleSelector from './LocaleSelector/src/Main'
 import * as MapControls from './MapControls/src/Main'
 import * as MapScaleInput from './MapScaleInput/src/Main'
 import * as MapScaleLine from './MapScaleLine/src/Main'
@@ -38,6 +39,8 @@ import {
   //scalargisArrayPhotoControlTester
 } from './JsonForm'
 
+import * as i18n from './utils/i18n';
+
 export {
   AttributesTable,
   Basemaps,
@@ -56,6 +59,7 @@ export {
   LayerMetadata,
   LayerOpacity,
   LayerRemove,
+  LocaleSelector,
   MapControls,
   MapScaleInput,
   MapScaleLine,
@@ -74,8 +78,8 @@ export {
   JsonForm,
   JsonFormContext,
   JsonFormDefaultRenderers,
-  //ScalargisArrayPhotoControl,
-  //scalargisArrayPhotoControlTester
+
+  i18n
 };
 
 //export * from './JsonForm';
