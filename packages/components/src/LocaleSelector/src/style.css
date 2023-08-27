@@ -3,5 +3,67 @@
 }
 
 .locale-selector.p-dropdown.p-dropdown-label {
-  padding: 0.3em;
+  padding: 0.3em 0.1em;
+}
+
+.locale-selector.p-dropdown {
+  background: transparent;
+  margin-left: 10px;
+  /*border-color: white;*/
+}
+
+.locale-selector.p-dropdown .p-dropdown-label {
+  padding: 0.5em;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.locale-selector.p-dropdown .p-hidden-accessible.p-dropdown-hidden-select,
+.locale-selector.p-dropdown .p-dropdown.p-dropdown-label,
+.locale-selector.p-dropdown .p-dropdown-label.p-inputtext,
+.locale-selector.p-dropdown .p-dropdown-trigger {
+  color: white;
+}
+
+.locale-selector.p-dropdown:not(.p-disabled):hover,
+.locale-selector.p-dropdown:not(.p-disabled):focus,
+.locale-selector.p-dropdown:not(.p-disabled).p-focus
+{
+  /*border-color: white;*/
+  border-color: transparent;
+  box-shadow: unset;
+}
+
+.locale-selector.p-dropdown .p-dropdown-trigger {
+  width: 1.7rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-left: 1px solid white;
+  /*
+  width: 1.5rem;
+  padding-left: 0px;
+  padding-right: 0.5rem;
+  */
+}
+
+.locale-selector button:not(:last-child):after {
+  content: '|';
+  width: 20px;
+  display: inline-block;  
+}
+
+.locale-selector button.locale-selected {
+  font-weight: bold;
+}
+
+.locale-selector button.p-button-link,
+.locale-selector button.p-button-text {
+  padding: 0px !important;
+}
+
+.locale-selector button.p-button-link > span.p-button-label {
+  color: white
+}
+.locale-selector button.p-button-link.locale-selected > span.p-button-label {
+  text-decoration: underline;
 }
