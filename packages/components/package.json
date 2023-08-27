@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@scalargis/jsonforms-primereact-renderers": "^3.1.0",
-    "mathjs": "^10.1.1"
+    "mathjs": "^10.1.1",
+    "react-image-file-resizer": "^0.4.8"
   },
   "devDependencies": {
   } 
