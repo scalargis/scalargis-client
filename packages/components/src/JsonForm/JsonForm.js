@@ -31,7 +31,7 @@ export const JsonForm = (props) => {
 
   const translation = useMemo(() => {
     let translations = i18nDefaults;
-    if (ctx.translations) {
+    if (ctx?.translations) {
       translations = {
         ...i18nDefaults,
         ...ctx.translations
@@ -61,7 +61,7 @@ export const JsonForm = (props) => {
       uischema={uischema}
       renderers={renderers || defaultRenderers}
       cells={cells || vanillaCells}
-      i18n={i18n || ctx.i18n || {locale: locale, translate: translation}}
+      i18n={i18n || ctx?.i18n || {locale: locale, translate: translation}}
     />
   );
 }
