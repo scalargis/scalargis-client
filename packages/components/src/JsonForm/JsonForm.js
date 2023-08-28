@@ -1,4 +1,5 @@
-import React, { useMemo, useContext } from "react";
+import React, { useMemo, useContext, useEffect } from "react";
+import i18nLib from "i18next";
 import { JsonForms } from '@jsonforms/react';
 import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers';
 import { get } from 'lodash';
@@ -6,8 +7,6 @@ import { get } from 'lodash';
 import { JsonFormContext } from './JsonFormContext';
 
 import { i18nDefaults } from './../utils/i18nDefaults';
-
-//import { useTranslation } from 'react-i18next';
 
 export const JsonForm = (props) => {
   const {
@@ -17,7 +16,6 @@ export const JsonForm = (props) => {
     uischema,
     renderers,
     cells,
-    locale,
     i18n,
   } = props;
 
@@ -28,6 +26,10 @@ export const JsonForm = (props) => {
   */
 
   const ctx = useContext(JsonFormContext);
+  
+  const locale = useMemo(()=> {
+    return props.locale || i18nLib.language;
+  }, [i18nLib.language]);
 
   const translation = useMemo(() => {
     let translations = i18nDefaults;
@@ -51,7 +53,7 @@ export const JsonForm = (props) => {
       return msg;
     };
     return createTranslator(locale);
-  },  [props.locale, props.translations, props.i18n]);
+  },  [props.locale, props.translations, props.i18n, i18nLib.language]);
 
   return (
     <JsonForms
