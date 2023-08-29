@@ -52,7 +52,7 @@ export const PrimereactEnumArraySelectRenderer = (
   } = props;
 
   const isValid = errors.length === 0;
-  const appliedUiSchemaOptions = merge({}, config, uischema.options);  
+  const appliedUiSchemaOptions = merge({}, config, uischema.options);
   
   const divClassNames = ['validate']
     .concat(isValid ? 'input-description' : 'validation_error')

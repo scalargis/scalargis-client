@@ -27,7 +27,7 @@ export const PrimereactRadioGroup = React.memo(function PrimereactRadioGroup(
     {
       (options || []).map((option) => {
         return (
-            <div key={option.value}>
+            <div key={option.value} className="p-mb-1">
               <RadioButton                
                 value={option.value}
                 inputId={`${id}-${option.value}`}
@@ -37,6 +37,7 @@ export const PrimereactRadioGroup = React.memo(function PrimereactRadioGroup(
                 }}
                 checked={data === (option.value)}
                 disabled={!enabled}
+                className="p-mr-1"
               />
               <label htmlFor={`${id}-${option.value}`}>{option.label}</label>
             </div>

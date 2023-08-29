@@ -1,3 +1,4 @@
+import react, { useEffect } from 'react';
 import {
   and,
   showAsRequired,
@@ -54,6 +55,15 @@ export const PrimereactEnumArrayRenderer = ({
 
   ...otherProps
 }: ControlProps & OwnPropsOfEnum & DispatchPropsOfMultiEnumControl) => {
+
+  // Clear value if control is changed to not visible
+  // TODO: try to implement a more elegant solution
+  useEffect(() => {
+    if (!visible) {
+      _handleChange(path, undefined);
+    }
+  }, [visible]);
+
   const [focused, onFocus, onBlur] = useFocus();
 
   const isValid = errors.length === 0;
@@ -132,7 +142,8 @@ export const PrimereactEnumArrayRenderer = ({
                 schema={schema}
                 uischema={uischema}
                 visible={visible}
-                enabled={enabled}                
+                enabled={enabled}
+                className="p-mr-1"
                 {...otherProps}
               />
               <label htmlFor={`${id}-${option.value}-input`}>{option.label}</label>
