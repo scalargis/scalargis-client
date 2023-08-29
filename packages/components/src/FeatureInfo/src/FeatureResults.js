@@ -8,7 +8,7 @@ import OlFormatGeoJSON from "ol/format/GeoJSON"
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { Message } from 'primereact/message'
 import { Button } from 'primereact/button'
-//import { unit } from 'mathjs'
+import convert from 'convert'
 
 import componentMessages from './messages'
 
@@ -498,7 +498,7 @@ function formatValue(value, format) {
   if (format) {
     let val = value;
     if (format.source_unit && format.output_unit) {
-      //val = unit(val, format.source_unit).toNumeric(format.output_unit);
+      val = convert(val, format.source_unit).to(format.output_unit);
     }
     if (format.options) {
       val =  val.toLocaleString(format.locale || 'en-US', format.options);

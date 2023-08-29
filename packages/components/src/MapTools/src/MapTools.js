@@ -13,7 +13,7 @@ import OlStyle from 'ol/style/Style';
 import OlCircle from 'ol/style/Circle';
 import OlFill from 'ol/style/Fill';
 import OlStroke from 'ol/style/Stroke';
-//import { unit } from 'mathjs';
+import convert from 'convert';
 import './style.css';
 
 // TODO: create namespace in Store and pass actions through props
@@ -164,7 +164,7 @@ class Main extends React.Component {
         const format = this.props.record.config_json.length.format;
 
         if (format.source_unit && format.output_unit) {
-          //output = unit(length, format.source_unit).toNumeric(format.output_unit);
+          output = convert(length, format.source_unit).to(format.output_unit);
         }
         if (format.options) {
           output = output.toLocaleString(format.locale || 'en-US', format.options);
@@ -208,7 +208,7 @@ class Main extends React.Component {
         const format = this.props.record.config_json.area.format;
 
         if (format.source_unit && format.output_unit) {
-          //output = unit(area, format.source_unit).toNumeric(format.output_unit);
+          output = convert(area, format.source_unit).to(format.output_unit);
         }        
         if (format.options) {
           output = output.toLocaleString(format.locale || 'en-US', format.options);
