@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   showAsRequired,
   ControlProps,
@@ -25,10 +25,19 @@ export const PrimereactInputControl = (props: ControlProps & WithInput) => {
     visible,
     required,
     config,
+    handleChange,
     input,
   } = props;
   const isValid = errors.length === 0;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
+
+  // Clear value if control is changed to not visible
+  // TODO: try to implement a more elegant solution  
+  useEffect(() => {
+    if (!visible) {
+      handleChange(path, undefined);
+    }
+  }, [visible]);
 
   const showDescription = !isDescriptionHidden(
     visible,
