@@ -1,12 +1,12 @@
 import React, { useMemo, useContext, useEffect } from "react";
-import i18nLib from "i18next";
+import i18next from "i18next";
 import { JsonForms } from '@jsonforms/react';
 import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers';
-import { get } from 'lodash';
+import { get, merge } from 'lodash';
 
 import { JsonFormContext } from './JsonFormContext';
-
-import { i18nDefaults } from './../utils/i18nDefaults';
+import { i18nDefaults } from './util/i18nDefaults';
+import { getTranslations } from './../utils/i18n';
 
 export const JsonForm = (props) => {
   const {
@@ -19,32 +19,21 @@ export const JsonForm = (props) => {
     i18n,
   } = props;
 
-  /*
-  const { t } = useTranslation();
-  const s = t('welcome');
-  console.log(`Teste : ${s}`);
-  */
-
   const ctx = useContext(JsonFormContext);
   
   const locale = useMemo(()=> {
-    return props.locale || i18nLib.language;
-  }, [i18nLib.language]);
+    return props.locale || i18next.language;
+  }, [i18next.language]);
 
   const translation = useMemo(() => {
-    let translations = i18nDefaults;
+    let translations = merge(i18nDefaults, getTranslations());    
     if (ctx?.translations) {
-      translations = {
-        ...i18nDefaults,
-        ...ctx.translations
-      }
+      translations = merge(translations, ctx.translations);
     }
     if (props.translations) {
-      translations = {
-        ...i18nDefaults,
-        ...props.translations
-      }
+      translations = merge(translations, props.translations);
     }
+
     const createTranslator = (locale) => (key, defaultMessage) => {
       let msg;
       locale
@@ -53,7 +42,7 @@ export const JsonForm = (props) => {
       return msg;
     };
     return createTranslator(locale);
-  },  [props.locale, props.translations, props.i18n, i18nLib.language]);
+  },  [props.locale, props.translations, props.i18n, i18next.language]);
 
   return (
     <JsonForms

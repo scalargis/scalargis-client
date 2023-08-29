@@ -2,6 +2,8 @@ import { transformExtent } from "../model/MapModel"
 import Cookies from 'universal-cookie'
 import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from '../utils'
 import { isThemeOnScale as isThemeOnScaleMapModel } from '../model/MapModel'
+import { loadTranslations } from "../i18n"
+
 
 export const AUTH_HTTP_LOADING          = 'AUTH_HTTP_LOADING'
 export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
@@ -66,6 +68,7 @@ const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || ''; 
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);
+
 
 export function viewer_save_record(record, history, redirect) {
   return function (dispatch, getState) {
@@ -648,6 +651,9 @@ export function viewer_load(core, id, history) {
             // Finally, load into redux store
             dispatch(viewer_load_components(pitems));
             dispatch(viewer_load_done());
+
+            // Load viewer specific translations
+            loadTranslations(config.id);
           }
         })
       })
