@@ -42,7 +42,11 @@ export const ArrayFileControlRenderer = (props) => {
  
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
-  const [showFileForm, setShowFileForm] = useState(false);  
+  const [showFileForm, setShowFileForm] = useState(false);
+
+  const buttonAddStyle = {
+    width: 'auto'
+  };
   
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
@@ -67,7 +71,7 @@ export const ArrayFileControlRenderer = (props) => {
             // TODO
           }}
           onSave={(data) => {
-            const newData = [...props.data];
+            const newData = [...(props?.data || [])];
             if (rowIndex === null) {
               newData.push({...data});
             } else {              
@@ -137,13 +141,14 @@ export const ArrayFileControlRenderer = (props) => {
         }              
       </div>
 
-      <div className="p-col-12 p-text-right">
-        <Button label="Adicionar Ficheiro" className="p-button-text" onClick={(e) => {
-          e.preventDefault();
-          setShowFileForm(true);
-          setRowIndex(null);
-          setRowData(null);
-        }} />
+      <div className="p-col-12 p-text-center">
+        <Button label="Adicionar Ficheiro" className="p-button-text" style={buttonAddStyle} 
+          onClick={(e) => {
+            e.preventDefault();
+            setShowFileForm(true);
+            setRowIndex(null);
+            setRowData(null);
+          }} />
       </div>
     </div>
 

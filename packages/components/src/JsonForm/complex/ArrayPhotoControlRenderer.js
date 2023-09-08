@@ -42,7 +42,11 @@ export const ArrayPhotoControlRenderer = (props) => {
  
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
-  const [showPhotoForm, setShowPhotoForm] = useState(false);  
+  const [showPhotoForm, setShowPhotoForm] = useState(false);
+
+  const buttonAddStyle = {
+    width: 'auto'
+  };
   
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
@@ -67,7 +71,7 @@ export const ArrayPhotoControlRenderer = (props) => {
             // TODO
           }}
           onSave={(data) => {
-            const newData = [...props.data];
+            const newData = [...(props?.data || [])];
             if (rowIndex === null) {
               newData.push({...data});
             } else {              
@@ -136,13 +140,14 @@ export const ArrayPhotoControlRenderer = (props) => {
         }              
       </div>
 
-      <div className="p-col-12 p-text-right">
-        <Button label="Adicionar Fotografia" className="p-button-text" onClick={(e) => {
-          e.preventDefault();
-          setShowPhotoForm(true);
-          setRowIndex(null);
-          setRowData(null);
-        }} />
+      <div className="p-col-12 p-text-center">
+        <Button label="Adicionar Fotografia" className="p-button-text" style={buttonAddStyle}
+          onClick={(e) => {
+            e.preventDefault();
+            setShowPhotoForm(true);
+            setRowIndex(null);
+            setRowData(null);
+          }} />
       </div>
     </div>
 

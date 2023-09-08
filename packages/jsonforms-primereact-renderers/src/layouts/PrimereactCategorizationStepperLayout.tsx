@@ -78,6 +78,7 @@ export const PrimereactCategorizationStepperLayoutRenderer = (
     t,
     locale,
   } = props;
+
   const categorization = uischema as Categorization;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
   const buttonWrapperStyle = {
@@ -87,9 +88,11 @@ export const PrimereactCategorizationStepperLayoutRenderer = (
   };
   const buttonNextStyle = {
     float: 'right' as const,
+    width: 'auto' as const
   };
   const buttonStyle = {
     marginRight: '1em',
+    width: 'auto' as const
   };
   const categories = useMemo(
     () =>
@@ -136,7 +139,7 @@ export const PrimereactCategorizationStepperLayoutRenderer = (
   const items = tabLabels.map(l => {return { label: l}});
 
   return (
-    <div className="p-jsonform">
+    <div hidden={!visible} className="p-jsonform">
       <Steps
         model={items} 
         activeIndex={activeCategory}
@@ -146,24 +149,26 @@ export const PrimereactCategorizationStepperLayoutRenderer = (
       <PrimereactLayoutRenderer {...childProps} key={safeCategory} />
       {appliedUiSchemaOptions.showNavButtons ? (
         <div style={buttonWrapperStyle}>
-          <Button
-            style={buttonNextStyle}
-            //variant='contained'
-            color='primary'
-            disabled={activeCategory >= categories.length - 1}
-            onClick={() => handleStep(activeCategory + 1)}
-          >
-            {nextButtonLabel || "Next"}
-          </Button>
-          <Button
-            style={buttonStyle}
-            color='secondary'
-            //variant='contained'
-            disabled={activeCategory <= 0}
-            onClick={() => handleStep(activeCategory - 1)}
-          >
-            {previousButtonLabel || "Previous"}
-          </Button>
+          <div>
+            <Button
+              style={buttonNextStyle}
+              //variant='contained'
+              color='primary'
+              disabled={activeCategory >= categories.length - 1}
+              onClick={() => handleStep(activeCategory + 1)}
+            >
+              {nextButtonLabel || "Next"}
+            </Button>
+            <Button
+              style={buttonStyle}
+              color='secondary'
+              //variant='contained'
+              disabled={activeCategory <= 0}
+              onClick={() => handleStep(activeCategory - 1)}
+            >
+              {previousButtonLabel || "Previous"}
+            </Button>
+          </div>
         </div>
       ) : (
         <></>

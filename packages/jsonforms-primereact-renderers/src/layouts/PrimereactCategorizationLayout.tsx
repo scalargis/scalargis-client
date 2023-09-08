@@ -135,7 +135,7 @@ export const PrimereactCategorizationLayoutRenderer = (
   }, [categories, t]);
 
   return (    
-    <div className="p-jsonform">
+    <div hidden={!visible} className="p-jsonform">
       <TabView activeIndex={activeCategory} onTabChange={(e) => onTabChange(e, e.index)}>
         {categories.map((_, idx: number) => (
           <TabPanel key={idx} header={tabLabels[idx]}>
