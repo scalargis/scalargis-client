@@ -150,7 +150,6 @@ export default function SearchLayerResults(props) {
     }
   }
 
-  /*
   const htmlTemplate = (rowData, field) => {
     let new_value = field.value ? field.value : rowData[field.name];
     const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
@@ -266,7 +265,6 @@ export default function SearchLayerResults(props) {
 
     });
   }
-  */
 
   return (
     <>
