@@ -33,6 +33,7 @@ import {
   REGISTRATION_HTTP_ERROR,
   REGISTRATION_HTTP_LOADING,
   REGISTRATION_RESPONSE,
+  VIEWER_SET_LOCALE,
   VIEWER_SET_FEATUREINFO,
   VIEWER_SET_GEOLOCATION,
   VIEWER_UPDATE_MAPCONTROL,
@@ -288,6 +289,15 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
         viewer: {
           ...state.viewer,
           exclusive_mapcontrol: action.exclusive_mapcontrol
+        }
+      }
+
+    case VIEWER_SET_LOCALE:
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          locale: action.data
         }
       }
 

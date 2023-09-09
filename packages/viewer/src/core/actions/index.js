@@ -2,6 +2,8 @@ import { transformExtent } from "../model/MapModel"
 import Cookies from 'universal-cookie'
 import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from '../utils'
 import { isThemeOnScale as isThemeOnScaleMapModel } from '../model/MapModel'
+import { loadTranslations } from "../i18n"
+
 
 export const AUTH_HTTP_LOADING          = 'AUTH_HTTP_LOADING'
 export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
@@ -33,6 +35,7 @@ export const VIEWER_NOT_AUTHORIZED      = 'VIEWER_NOT_AUTHORIZED'
 export const VIEWER_LOAD_COMPONENTS     = 'VIEWER_LOAD_COMPONENTS'
 export const VIEWER_UNLOAD_COMPONENTS   = 'VIEWER_UNLOAD_COMPONENTS'
 export const VIEWER_SET_SELECTEDMENU    = 'VIEWER_SET_SELECTEDMENU'
+export const VIEWER_SET_LOCALE          = 'VIEWER_SET_LOCALE'
 export const VIEWER_SET_FEATUREINFO     = 'VIEWER_SET_FEATUREINFO'
 export const VIEWER_SET_GEOLOCATION     = 'VIEWER_SET_GEOLOCATION'
 export const VIEWER_SET_DRAWINGS        = 'VIEWER_SET_DRAWINGS'
@@ -65,6 +68,7 @@ const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || ''; 
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);
+
 
 export function viewer_save_record(record, history, redirect) {
   return function (dispatch, getState) {
@@ -458,6 +462,14 @@ export function registration_http_error(res) {
   return action;
 }
 
+export function viewer_set_locale(data) {
+  const action = {
+    type: VIEWER_SET_LOCALE,
+    data
+  }
+  return action;
+}
+
 export function viewer_set_drawings(data) {
   const action = {
     type: VIEWER_SET_DRAWINGS,
@@ -639,6 +651,9 @@ export function viewer_load(core, id, history) {
             // Finally, load into redux store
             dispatch(viewer_load_components(pitems));
             dispatch(viewer_load_done());
+
+            // Load viewer specific translations
+            loadTranslations(config.id);
           }
         })
       })

@@ -11,8 +11,10 @@
     "copy": "copyfiles -u 1 \"./src/**/*.{css,html}\" \"./dist/\""
   },
   "dependencies": {
-    "mathjs": "^10.1.1"
+    "@scalargis/jsonforms-primereact-renderers": "^3.1.0",
+    "convert": "^4.13.1",
+    "react-image-file-resizer": "^0.4.8"
   },
-  "devDependencies": {    
+  "devDependencies": {
   } 
 }

@@ -1,24 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Message } from 'primereact/message';
-import { JsonForms } from '@jsonforms/react';
-import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers';
 
-import PrimereactVerticalLayoutRenderer, { primereactVerticalLayoutTester } from './renderes/layouts/PrimereactVerticalLayoutRenderer';
-import PrimereactHorizontalLayoutRenderer, { primereactHorizontalLayoutTester } from './renderes/layouts/PrimereactHorizontalLayoutRenderer';
+import {   
+  JsonForm,
+  JsonFormContext, 
+  JsonFormDefaultRenderers
+} from './../../JsonForm';
 
 import { getDescribeFeatureType, getFeatures } from './service';
 import SearchLayerResults from './SearchLayerResults';
 
 let toastEl = null;
-
-const renderers = [
-  ...vanillaRenderers,
-  //register custom renderers
-  { tester: primereactVerticalLayoutTester, renderer: PrimereactVerticalLayoutRenderer },
-  { tester: primereactHorizontalLayoutTester, renderer: PrimereactHorizontalLayoutRenderer }
-];
 
 export default function SearchLayerForm(props) {
   const {core, viewer, auth, actions, pubsub, dispatch, mainMap, Models, layers, layer, 
@@ -137,18 +131,23 @@ export default function SearchLayerForm(props) {
 
       { loaded && <React.Fragment>
         <div className="p-mt-3">
-          <JsonForms
-            schema={schema}
-            uischema={uischema}
-            data={formData[id]}
-            renderers={renderers}
-            cells={vanillaCells}
-            onChange={({ data, _errors }) => {
-              const new_formdata = {...formData};
-              new_formdata[id] = data;
-              setFormData(new_formdata);
-            }}
-          />       
+          <JsonFormContext.Provider value={{utils: Models.Utils}}>
+            <JsonForm
+              schema={schema}
+              uischema={uischema}
+              data={formData[id]}
+              renderers={JsonFormDefaultRenderers}
+              //cells={vanillaCells}
+              onChange={({ data, _errors }) => {
+                const new_formdata = {...formData};
+                new_formdata[id] = data;
+                setFormData(new_formdata);
+              }}                            
+              //locale={locale}
+              //translations={translations}
+              //i18n={{locale: locale, translate: translation}}
+            />
+          </JsonFormContext.Provider>
         </div>
 
         <div className="p-text-center">

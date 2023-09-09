@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import Layout from './Layout'
 import { withRouter } from 'react-router-dom'
 import AppContext from '../../AppContext'
@@ -33,6 +34,9 @@ function Viewer(props) {
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
   
+  //Localization
+  const { i18n } = useTranslation();
+
   // Main map
   let mainMapEl = useRef(null);
   
@@ -41,7 +45,7 @@ function Viewer(props) {
   const { core, mainMap } = useContext(AppContext);
   const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu, viewer_update_mapcontrol } = core.actions;
 
-  const gaTrackingId = process.env.REACT_APP_GA_TRACKING_ID;
+  const gaTrackingId = process.env.REACT_APP_GA_TRACKING_ID;  
 
   // Get config
   React.useEffect(() => {
@@ -56,6 +60,10 @@ function Viewer(props) {
       dispatch(viewer_load(core, id, history, true));
     }
   }, [id]);
+
+  useEffect(() => {
+    i18n.changeLanguage(viewer.locale);
+  }, [viewer?.locale]);
 
   useEffect(() => {
     if (!viewer.config_json) return;

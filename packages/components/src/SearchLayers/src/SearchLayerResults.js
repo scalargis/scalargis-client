@@ -150,6 +150,7 @@ export default function SearchLayerResults(props) {
     }
   }
 
+  /*
   const htmlTemplate = (rowData, field) => {
     let new_value = field.value ? field.value : rowData[field.name];
     const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
@@ -160,6 +161,7 @@ export default function SearchLayerResults(props) {
     }    
     return <div dangerouslySetInnerHTML={{__html: new_value}} />;
   }
+
 
   const actionTemplate = (rowData, field) => {
     const action = {...field.action};
@@ -246,12 +248,15 @@ export default function SearchLayerResults(props) {
         if (field_cfg) {
           if (field_cfg.type === 'html') {
             return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
+              style={field_cfg.style}
               body={(rowData) => htmlTemplate(rowData, {...field_cfg, 'name': f[0]})} />
           } else if (field_cfg.type === 'action') {
             return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
+              style={field_cfg.style}
               body={(rowData) => actionTemplate(rowData, {...field_cfg, 'name': f[0]})} />
           } else {
             return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
+              style={field_cfg.style}
               body={(rowData) => valueTemplate(rowData, {...field_cfg, 'name': f[0]})} />
           }
         }
@@ -261,6 +266,7 @@ export default function SearchLayerResults(props) {
 
     });
   }
+  */
 
   return (
     <>

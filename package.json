@@ -38,6 +38,7 @@
   "resolutions": {
     "babel-loader": "8.1.0",
     "webpack": "4.44.2",
-    "@types/react": "17.0.0"
+    "@types/react": "17.0.0",
+    "ajv-keywords": "^3.5.2"
   }
 }

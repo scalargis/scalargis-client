@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import ThemeAttributes from './ThemeAttributes';
 
 function hasAttributes(theme) {
-  return !['GROUP'].includes(theme.type);
+  return !['GROUP'].includes(theme.type) || theme.datatable;
 }
 
 /**

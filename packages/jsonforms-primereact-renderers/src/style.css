@@ -1,0 +1,32 @@
+.p-jsonform input[type=date],
+.p-jsonform input[type=datetime],
+.p-jsonform input[type=datetime-local],
+.p-jsonform input[type=time] {
+  padding: 0.5em;
+}
+
+.p-jsonform .p-steps ul {
+  overflow-x: auto;
+}
+
+.p-jsonform .p-steps .p-steps-item:before {
+  margin-top: -0.85rem;
+}
+
+.p-jsonform .p-steps .p-steps-item .p-menuitem-link {
+  flex-direction: column;
+}
+
+.p-jsonform .p-steps .p-steps-item .p-menuitem-link .p-steps-title {
+  margin-top: 0.5rem;
+  white-space: break-spaces;
+  word-break: keep-all;
+  max-height: 1.2rem;
+}
+
+.p-jsonform .p-tabview .p-tabview-nav {
+  overflow-x: auto;
+}
+::-webkit-scrollbar {
+  height: 0px !important;
+}

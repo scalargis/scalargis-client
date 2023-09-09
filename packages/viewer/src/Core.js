@@ -8,6 +8,11 @@ import * as actions from './core/actions'
 import * as utils from './core/utils'
 import * as pubsub from './core/pubsub'
 
+import { initTranslations } from './core/i18n';
+
+// Init translations
+initTranslations();
+
 export function createReducerManager(initialReducers) {
   // Create an object which maps keys to reducers
   const reducers = { ...initialReducers }
