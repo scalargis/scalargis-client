@@ -4,8 +4,9 @@ FROM node:16.10.0 as build
 # Instal base packages
 WORKDIR /var/scalargis
 COPY package.json .
-COPY ./packages/backoffice/package.json packages/backoffice/package.json
+COPY ./packages/jsonforms-primereact-renderers/package.json packages/jsonforms-primereact-renderers/package.json
 COPY ./packages/components/package.json packages/components/package.json
+COPY ./packages/backoffice/package.json packages/backoffice/package.json
 COPY ./packages/viewer/package.json packages/viewer/package.json
 RUN yarn install
 
