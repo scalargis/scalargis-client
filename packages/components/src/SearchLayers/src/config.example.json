@@ -91,6 +91,7 @@
                 "feature_namespace": "caop.maps.wkt.pt",
                 "feature_prefix": "caop",
                 "feature_type": "conc",
+                "fields_exclude_query": ["nut2"],
                 "fields_list": {
                     "distrito": {
                         "label": "Distrito"
@@ -204,6 +205,7 @@
                 "feature_namespace": "caop.maps.wkt.pt",
                 "feature_prefix": "caop",
                 "feature_type": "conc",
+                "fields_exclude_query": ["nut2"],
                 "fields_form": {
                     "distrito": {
                         "expression": "*{value}*"

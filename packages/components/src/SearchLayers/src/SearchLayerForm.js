@@ -165,12 +165,26 @@ export default function SearchLayerForm(props) {
             Limpar
           </Button>
           <Button onClick={(e) => {
-              const getFormData = (schema, formData, template) => {
-                if (!formData || ! template) return formData;
+              const getFormData = (schema, formData, config) => {
+                let finalFormData = {...formData};
+                
+                if (config?.fields_exclude_query?.length) {
+                  const tmpFields = {};
+                  Object.keys(finalFormData).forEach(k => {
+                    if (!config.fields_exclude_query.includes(k)) {
+                      tmpFields[k] = finalFormData[k];
+                    }
+                  });
+                  finalFormData = {...tmpFields}
+                }
+
+                const template = config?.fields_form;
+
+                if (!finalFormData || !template) return finalFormData;
 
                 //Get filled form fields
                 const formvalues = {};
-                Object.entries(formData).forEach(([k, v]) => {
+                Object.entries(finalFormData).forEach(([k, v]) => {
                   const val = (typeof v == 'number' && Number.isNaN(v)) ? null : v + '';
                   if (val !== null && val !== '') {
                     formvalues[k] = v;
@@ -194,7 +208,7 @@ export default function SearchLayerForm(props) {
                 //Apply expression to virtual form fields
                 const virtualdata = Object.entries(template).filter(([k, v]) => {
                   //Exclude form fields
-                  return !(k in (formData || {})) && !(k in (schema?.properties || {}));
+                  return !(k in (finalFormData || {})) && !(k in (schema?.properties || {}));
                 }).map(([k, v]) => {
                   let final_value = v.expression;
                   Object.entries(formvalues).forEach(([f, z]) => {
@@ -210,7 +224,8 @@ export default function SearchLayerForm(props) {
               }
               
               //Combine values of form and virtual fields
-              const data = getFormData(schema, formData[id], searchConfig.fields_form);
+              //const data = getFormData(schema, formData[id], searchConfig.fields_form);
+              const data = getFormData(schema, formData[id], searchConfig);
 
               //Set default sort field
               let sort;
