@@ -224,7 +224,6 @@ export default function SearchLayerForm(props) {
               }
               
               //Combine values of form and virtual fields
-              //const data = getFormData(schema, formData[id], searchConfig.fields_form);
               const data = getFormData(schema, formData[id], searchConfig);
 
               //Set default sort field
