@@ -242,19 +242,31 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
       style_stroke_width: 1
     };
 
+    const featureprefix = l[ns+'Name'][0].split(':').length > 1 ? l[ns+'Name'][0].split(':')[0] : '';
+    const faturetype = l[ns+'Name'][0].split(':').length > 1 ? l[ns+'Name'][0].split(':')[1] : l[ns+'Name'][0];
+
+    let featurerns = null;
+
     if (l['$']) {
-      const featurerns = Object.entries(l['$']).find(([key]) => key.includes('xmlns:' + ns));
-      const featureprefix = l[ns+'Name'][0].split(':').length > 1 ? l[ns+'Name'][0].split(':')[0] : '';
-      const faturetype = l[ns+'Name'][0].split(':').length > 1 ? l[ns+'Name'][0].split(':')[1] : l[ns+'Name'][0];
-      if (featurerns) {
-        theme['datatable'] = {
-          "source_type": "wfs",
-          "source_url": url,
-          "feature_namespace": featurerns[1],
-          "feature_prefix": featureprefix,
-          "feature_type": faturetype,
-          "all_geometries": true
-        }
+      featurerns = Object.entries(l['$']).find(([key]) => key.includes('xmlns:' + ns));
+    }
+
+    if (!featurerns && wfs[wfsns+'WFS_Capabilities'][ns+'FeatureTypeList']['$']) {
+      featurerns = Object.entries(wfs[wfsns+'WFS_Capabilities'][ns+'FeatureTypeList']['$']).find(([key]) => key.includes('xmlns:' + featureprefix));
+    }
+
+    if (!featurerns && wfs[wfsns+'WFS_Capabilities']['$']) {
+      featurerns = Object.entries(wfs[wfsns+'WFS_Capabilities']['$']).find(([key]) => key.includes('xmlns:' + featureprefix));
+    }
+
+    if (featurerns) {
+      theme['datatable'] = {
+        "source_type": "wfs",
+        "source_url": url,
+        "feature_namespace": featurerns[1],
+        "feature_prefix": featureprefix,
+        "feature_type": faturetype,
+        "all_geometries": true
       }
     }
 
@@ -280,7 +292,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
     'image/png24',
     'image/png32',
     'image/gif',
-    'image/jpeg',    
+    'image/jpeg',
     'image/bmp',
     'image/tiff',
     'image/svg+xml'
@@ -292,7 +304,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
       if (get_map_format) return;
       if (tmformats.includes(gmf)) get_map_format = gmf;
     });
-  }  
+  }
 
   // Get formats for GetFeatureInfo request
   let get_feature_info_formats = wms.Capability.Request.GetFeatureInfo.Format.join(',');
@@ -474,7 +486,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
  */
 export const convertWMTS2Themes = (wmts, originUrl, options) => {
   let result = [];
-  
+
   // Set default CRS
   let crs = 4326, bbox, inspire_service_metadata;
 
@@ -485,7 +497,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
     'image/png24',
     'image/png32',
     'image/gif',
-    'image/jpeg',    
+    'image/jpeg',
     'image/bmp',
     'image/tiff',
     'image/svg-+xml'
@@ -524,7 +536,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
 
 
   //// Get formats for GetFeatureInfo request
-  //let get_feature_info_formats = wmts.Capability.Request.GetFeatureInfo.Format.join(',');  
+  //let get_feature_info_formats = wmts.Capability.Request.GetFeatureInfo.Format.join(',');
 
   //// Get bbox from extent options
   //if (options.extent) bbox = parseBBOX(options.extent)
@@ -560,7 +572,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
         if (wmts_format) return;
         if (wmts_formats.includes(gtf)) wmts_format = gtf;
       });
-    }    
+    }
 
     // Get legend URL
     let wmts_styles = [];
@@ -580,7 +592,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
     //Get FeatureInfo Url
     let get_feature_info_url = finalUrl;
 
-    //Get FeatureInfo formats    
+    //Get FeatureInfo formats
     let get_feature_info_format = '';
     let get_feature_info_formats = [];
     if (l.ResourceURL && l.ResourceURL.length > 0) {
@@ -592,7 +604,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
         if (get_feature_info_format) return;
         if (get_feature_info_formats.includes(gfif)) get_feature_info_format = gfif;
       });
-    }    
+    }
 
     // Create theme object
       // Build theme object
@@ -613,18 +625,18 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
         wmts_capabilities: wmts,
         wmts_tilematrixsets: wmts_tilematrixsets.join(','),
         wmts_tilematrixset: l.tilematrixset || 'EPSG:900913',
-        wmts_format: wmts_format || 'image/png',        
-        wmts_formats: wmts_formats.join(','),                
+        wmts_format: wmts_format || 'image/png',
+        wmts_formats: wmts_formats.join(','),
         wmts_styles: wmts_styles.join(','),
         wmts_style: '',
         get_feature_info_url: get_feature_info_formats.length > 0 ? get_feature_info_url : null,
         get_feature_info_format: get_feature_info_format || 'text/plain',
         get_feature_info_formats: get_feature_info_formats.join(','),
-        legend_url: legend_url      
+        legend_url: legend_url
       }
 
     result.push(theme)
-    return l;    
+    return l;
   });
 
   return result;
@@ -715,7 +727,7 @@ export const convertKML2Themes = (kml, url, raw, crs) => {
         style_color: generateRGBA(),
         style_stroke_color: generateRGBA(),
         style_stroke_width: 1
-      })      
+      })
     }
   }
   return items;
@@ -891,7 +903,7 @@ export const downloadTheme = (theme, format) => {
     'PNG',
     'JPG',
     'DIB',
-    'TIFF',    
+    'TIFF',
     'EMF',
     'PS',
     'PDF',
@@ -907,7 +919,7 @@ export const downloadTheme = (theme, format) => {
       if (get_map_format) return;
       if (tmformats.includes(gmf)) get_map_format = gmf;
     });
-  }  
+  }
 
   // Set default CRS
   let crs = 4326, bbox;
@@ -917,7 +929,7 @@ export const downloadTheme = (theme, format) => {
     const extent = service.fullExtent;
     if (extent && extent.xmin && extent.ymin && extent.xmax && extent.ymax) {
       console.log(OlProj.get(`EPSG:${extent.spatialReference.wkid}`));
-      if (extent.spatialReference.wkid && OlProj.get(`EPSG:${extent.spatialReference.wkid}`)) {        
+      if (extent.spatialReference.wkid && OlProj.get(`EPSG:${extent.spatialReference.wkid}`)) {
         bbox = parseBBOX([extent.xmin, extent.ymin, extent.xmax, extent.ymax], `EPSG:${extent.spatialReference.wkid}`, `EPSG:${crs}`);
       } else if (extent.spatialReference.wkt) {
         const min = proj4(extent.spatialReference.wkt,'EPSG:4326', [extent.xmin, extent.ymin]);
@@ -945,7 +957,7 @@ export const downloadTheme = (theme, format) => {
       let finalUrl = originUrl;
 
       let layer_crs = crs;
-      let layer_bbox = bbox;      
+      let layer_bbox = bbox;
 
       try {
         const extent = layer.extent;
@@ -960,7 +972,7 @@ export const downloadTheme = (theme, format) => {
         }
       } catch (e) {
         console.log(e);
-      }      
+      }
 
       // Parse min/max scale
       const source_min_scale = layer.maxScale != null ? layer.maxScale : null;
@@ -1019,7 +1031,7 @@ export default {
   convertWFS2Themes,
   convertWMS2Themes,
   convertWMTS2Themes,
-  convertArcGISMap2Themes,  
+  convertArcGISMap2Themes,
   convertKML2Themes,
   convertGeoJSON2Themes,
   convertGML2Themes,
