@@ -2,6 +2,7 @@ import { vanillaRenderers } from '@jsonforms/vanilla-renderers';
 import { primereactLayouts, primereactRenderers } from '@scalargis/jsonforms-primereact-renderers';
 import JsonForm from './JsonForm';
 import { JsonFormContext } from './JsonFormContext';
+import FormErrors from './FormErrors';
 
 import {
   ArrayPhotoControlRenderer,
@@ -42,5 +43,6 @@ const defaultRenderers = [
 export {
   JsonForm,
   JsonFormContext,
-  defaultRenderers as JsonFormDefaultRenderers
+  defaultRenderers as JsonFormDefaultRenderers,
+  FormErrors
 }

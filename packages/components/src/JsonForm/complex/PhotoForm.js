@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 
-import { JsonForm, JsonFormDefaultRenderers } from '@scalargis/components';
+import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '@scalargis/components';
 
 import { translateMsg } from './../util/i18n';
 
@@ -15,7 +15,10 @@ export default function PhotoForm(props) {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const [formData, setFormData] = useState();
+  const [formErrors, setFormErrors] = useState();
+  const [formData, setFormData] = useState({...(props?.data || {})});
+
+  const [showFormErrors, setShowFormErrors] = useState(false);
 
   const toast = useRef(null);  
 
@@ -24,15 +27,22 @@ export default function PhotoForm(props) {
 
   const uischema = props.uischema.elements[0];
 
-  useEffect(() => {
-    setFormData(props?.data);
-  }, []);
- 
   function close() {
     props.setShowForm(false);
   } 
 
   const onSave = (e) => {
+    if (!formData?.file?.data || !formData?.file?.filename) {
+      setFormErrors([{message: "É necessário adicionar um ficheiro."}]);
+      setShowFormErrors(true);
+      return;
+    }
+
+    if (formErrors?.length > 0) {
+      setShowFormErrors(true);
+      return;
+    }
+
     props.onSave({...formData});   
   };
 
@@ -80,21 +90,22 @@ export default function PhotoForm(props) {
       >
         <div>
           {showOnPortal(<Toast ref={toast} baseZIndex={2000} />)}
-          <form onSubmit={(e)=>{ e.preventDefault(); }}>
-            <div>
-              <JsonForm
-                data={props.data}
-                onChange={({errors, data}) => {
-                  setFormData({...data});
-                }}
-                schema={schema}
-                uischema={uischema}
-                renderers={JsonFormDefaultRenderers}
-                locale={locale}
-              />              
-            </div>
-        </form>
-      </div>
+          <div>
+            <JsonForm
+              data={formData}
+              onChange={({errors, data}) => {
+                setFormErrors(errors);
+                setFormData(data);
+                setShowFormErrors(false);
+              }}
+              schema={schema}
+              uischema={uischema}
+              renderers={JsonFormDefaultRenderers}
+              locale={locale}
+            />
+            <FormErrors errors={formErrors} data={formData} show={showFormErrors} displayMode="static" />
+          </div>
+        </div>
     </Dialog>
   )
 }

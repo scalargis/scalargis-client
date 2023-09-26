@@ -35,8 +35,7 @@ import {
   JsonForm, 
   JsonFormContext,
   JsonFormDefaultRenderers,
-  //ScalargisArrayPhotoControl,
-  //scalargisArrayPhotoControlTester
+  FormErrors
 } from './JsonForm'
 
 import * as i18n from './utils/i18n';
@@ -78,6 +77,7 @@ export {
   JsonForm,
   JsonFormContext,
   JsonFormDefaultRenderers,
+  FormErrors,
 
   i18n
 };

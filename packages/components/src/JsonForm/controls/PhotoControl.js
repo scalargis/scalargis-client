@@ -100,7 +100,6 @@ export const PhotoControl = (props) => {
           props.handleChange(props.path, data);
 
         } catch (err) {
-          //console.log(err);          
           const data = {
             ...file,
             file_url: null,
@@ -126,11 +125,6 @@ export const PhotoControl = (props) => {
     toast.current.show({life: 5000, severity: 'warn', summary: 'Selecionar Ficheiro', detail: 'Não foi possível selecionar o ficheiro. Por favor, verifique se o ficheiro selecionado ultrapassa a dimensão máxima permitida.'});
   }
 
-  const getFormErrorMessage = (name) => {
-    // TODO
-    return "TODO: Error"
-  };
-
   const labels = useMemo(() => {
     const prefix = "PhotoControl";
     const elem = `${locale}.${prefix}`;
@@ -154,7 +148,7 @@ export const PhotoControl = (props) => {
           <div className="p-field">
             { (file && file.data && file.original_filename) ?
             <div>
-              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" /></div>
+              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" style={{color:"var(--primary-color)"}} /></div>
               <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             :
@@ -186,11 +180,10 @@ export const PhotoControl = (props) => {
             : null }
           </div>
           <div className="p-field p-col-12">
-            { (file?.data || file?.file_url) ?
+            { (file?.data || file?.file_url) &&
             <div className="p-field p-col-6">
               <img src={file.data || `${file.file_url}`} alt={file.original_filename} style={{"maxWidth": "300px"}} />
-            </div> :
-            getFormErrorMessage('filename') }
+            </div> }
           </div>
         </div>
       </form>

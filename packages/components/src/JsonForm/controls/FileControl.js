@@ -80,11 +80,6 @@ export const FileControl = (props) => {
     toast.current.show({life: 5000, severity: 'warn', summary: 'Selecionar Ficheiro', detail: 'Não foi possível selecionar o ficheiro. Por favor, verifique se o ficheiro selecionado ultrapassa a dimensão máxima permitida.'});
   }
 
-  const getFormErrorMessage = (name) => {
-    // TODO
-    return "TODO: Error"
-  };
-
   const labels = useMemo(() => {
     const prefix = "FileControl";
     const elem = `${locale}.${prefix}`;
@@ -108,7 +103,7 @@ export const FileControl = (props) => {
           <div className="p-field">
             { (file && file.data && file.original_filename) ?
             <div>
-              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" /></div>
+              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" style={{color:"var(--primary-color)"}} /></div>
               <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             :
@@ -138,9 +133,6 @@ export const FileControl = (props) => {
             { (maxFileSize > 0) ?
             <small id="upload-help" className="p-warn">{labels.maxFileSize}: {Math.round((maxFileSize/1024) * 100) / 100} MB</small>
             : null }
-          </div>
-          <div className="p-field p-col-12">
-            { (!file?.data && !file?.file_url) && getFormErrorMessage('filename') }
           </div>
         </div>
       </form>
