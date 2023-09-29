@@ -30,9 +30,18 @@ import {register as proj4register } from 'ol/proj/proj4'
 import Proj4 from 'proj4';
 import OlProjection from 'ol/proj/Projection';
 import {applyTransform} from 'ol/extent';
-import xml2js from 'xml2js';
-import { removeUrlParam } from '../utils';
+import OlPoint from 'ol/geom/Point';
+import OlLineString from 'ol/geom/LineString';
+import OlPolygon from 'ol/geom/Polygon';
+import OlMultiPoint from 'ol/geom/MultiPoint';
+import OlMultiLineString from 'ol/geom/MultiLineString';
+import OlMultiPolygon from 'ol/geom/MultiPolygon';
+import OlGeometryCollection from 'ol/geom/GeometryCollection';
 import { listen } from "ol/events";
+import xml2js from 'xml2js';
+
+import { removeUrlParam } from '../utils';
+
 
 let loading = 0;
 // TODO: cache layer styles
@@ -1262,6 +1271,87 @@ export const getArcGISVisibleLayers = function (map, scale) {
   return vlayers;    
 };
 
+export const buildMultiGeom = function (geoms) {
+  let outGeom;
+  const type = geoms[0].getType().toUpperCase();
+  switch (type) {
+    case 'POINT':
+      outGeom = new OlMultiPoint([]);
+      geoms.forEach(g => outGeom.appendPoint(g.clone()));
+      break;
+    case 'LINESTRING':
+      outGeom = new OlMultiLineString([]);
+      geoms.forEach(g => outGeom.appendLineString(g.clone()));
+      break;
+    case 'POLYGON':
+      outGeom = new OlMultiPolygon([]);
+      geoms.forEach(g => outGeom.appendPolygon(g.clone()));
+      break;
+    default:
+      return;
+  }
+  return outGeom;
+}
+
+export const buildGeomFromGeometries = function (geoms, outputGeometryType) {
+  const geomTypes = new Set();
+  geoms.forEach(g => {
+    const type = g.getType();
+    geomTypes.add(type);
+  });
+
+  if (geoms.length > 1) {
+    if ([geomTypes].length > 1) {
+      return new OlGeometryCollection(geoms.map(g=>g.clone()));
+    }
+    switch (outputGeometryType.toUpperCase()) {
+      case 'GEOMETRYCOLLECTION':
+        return new OlGeometryCollection(geoms.map(g=>g.clone()));
+      default:
+        return buildMultiGeom(geoms);
+    }
+  }
+
+  if (geoms.length === 1) {
+    switch (outputGeometryType.toUpperCase()) {
+      case 'MULTIPOINT':
+      case 'MULTILINESTRING':
+      case 'MULTIPOLYGON':
+        return buildMultiGeom(geoms);
+      case 'GEOMETRYCOLLECTION':
+        return new OlGeometryCollection(geoms.map(g=>g.clone()));
+      default:
+        return geoms[0].clone();
+    }
+  }
+}
+
+export const splitGeom = function (geom) {
+  if (!geom) return;
+
+  const type = geom.getType();
+  let geoms = [];
+
+  switch (type.toUpperCase()) {
+    case 'MULTIPOINT':
+      geoms = geom.getPoints();
+      break;
+    case 'MULTILINESTRING':
+      geoms = geom.getLineStrings();
+      break;
+    case 'MULTIPOLYGON':
+      geoms = geom.getPolygons();
+      break;
+    case 'GEOMETRYCOLLECTION':
+      geoms = geom.getGeometries();
+      break;
+    default:
+      geoms.push(geom);
+  }
+
+  return geoms;
+}
+
 export default {
   processVisibility,
   traverseTree,
@@ -1293,6 +1383,9 @@ export default {
   deserializeFeatures,
   getProjectionSrid,
   getPolygonFromExtent,
+  buildMultiGeom,
+  buildGeomFromGeometries,
+  splitGeom,
   getWKTFromGeometry,
   getGeometryFromWKT,
   getWMSVisibleLayers,
