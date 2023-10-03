@@ -21,6 +21,7 @@ import * as MapScaleInput from './MapScaleInput/src/Main'
 import * as MapScaleLine from './MapScaleLine/src/Main'
 import * as MapTools from './MapTools/src/Main'
 import * as PanelHTML from './PanelHTML/src/Main'
+import * as PanelJSON from './PanelJSON/src/Main'
 import * as PlacesSearch from './PlacesSearch/src/Main'
 import * as PopupInfo from './PopupInfo/src/Main'
 import * as Print from './Print/src/Main'
@@ -64,6 +65,7 @@ export {
   MapScaleLine,
   MapTools,
   PanelHTML,
+  PanelJSON,
   PlacesSearch,
   PopupInfo,
   Print,
