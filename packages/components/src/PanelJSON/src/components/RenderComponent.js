@@ -16,7 +16,8 @@ function renderer(config) {
     config.component ? {
       ...config.props,
       className: config.className ? config.className : null,
-      style: config.style ? config.style : null
+      style: config.style ? config.style : null,
+      options: config.options ? config.options : null
     } : {},
     config.children &&
       (typeof config.children === "string"
