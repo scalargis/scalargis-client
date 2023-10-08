@@ -7,6 +7,7 @@
     "src/components/*"
   ],  
   "dependencies": {
+    "@scalargis/jsonforms-primereact-renderers": "^3.1.0",
     "@scalargis/components": "^0.1.0",
     "@fortawesome/fontawesome-free": "^5.15.2",
     "@fullcalendar/core": "4.4.2",
@@ -25,6 +26,8 @@
     "axios": "^0.21.1",
     "chart.js": "^3.3.2",
     "classnames": "^2.3.1",
+    "i18next": "^23.4.6",
+    "i18next-browser-languagedetector": "^7.1.0",
     "jsts": "^2.7.1",
     "ol": "^6.5.0",
     "primeflex": "2.0.0",
@@ -44,6 +47,7 @@
     "react-cookie-consent": "^6.2.3",
     "react-dom": "^17.0.2",
     "react-hook-form": "7.8.3",
+    "react-i18next": "^13.2.0",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
@@ -83,7 +87,8 @@
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 safari version",
+      "ie 11"
     ]
   },
   "devDependencies": {

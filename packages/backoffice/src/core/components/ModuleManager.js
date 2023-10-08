@@ -1,17 +1,21 @@
-import React from 'react'
+import React from 'react';
+
 //import MapModel from '../model/MapModel';
 //import OWSModel from '../model/OWSModel';
 import * as Utils from '../utils';
 import dataProvider from '../../service/DataProvider';
 
+
 export default function ModuleManager(props) {
 
-  const { history, core, backoffice, dispatch, module } = props;
+  const { history, core, backoffice, dispatch, module, submodule, action } = props;
 
   return (
     <div>
       { core.renderComponentManager({
-        id: module || 'cadastro',
+        id: module,
+        submodule: submodule,
+        action: action,
         props: { history, backoffice, dispatch, Models: { Utils }, dataProvider },
         dataProvider: { dataProvider },
         //props: { history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } },

@@ -14,6 +14,14 @@ const _getAppBaseUrl = () => {
   }
 }
 
+const _getAppDefaultLocale = () => {
+  if (window?.SCALARGIS_DEFAULT_LOCALE !== '__SCALARGIS_DEFAULT_LOCALE__') {
+    return window?.SCALARGIS_DEFAULT_LOCALE || process.env.REACT_APP_DEFAULT_LOCALE || '';
+  } else {
+    return process.env.REACT_APP_DEFAULT_LOCALE || '';
+  }
+}
+
 export function rememberUrl(cookies, type, url) {
   const prefix = process.env.REACT_APP_COOKIE_PREFIX || 'sniguserurl';
   const cookieName = prefix + type;
@@ -162,6 +170,10 @@ export const getAppUploadUrl = () => {
     url =  window.location.origin + url;
   }
   return url;
+}
+
+export const getAppDefaultLocale = () => {
+  return _getAppDefaultLocale();
 }
 
 export const getCookieAuthName = () => {

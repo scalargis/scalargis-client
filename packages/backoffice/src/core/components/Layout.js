@@ -15,7 +15,7 @@ import Dashboard from './Dashboard';
 
 import AccountEdit from './account/AccountEdit';
 
-import ModuleManager from './ModuleManager';
+import ModuleManager, {ModuleManagerRoutes} from './ModuleManager';
 
 import NotificationEdit from './notifications/NotificationEdit';
 import NotificationList from './notifications/NotificationList';
@@ -212,9 +212,17 @@ function Layout(props) {
                 <PrintElementList {...props} />
             )} />                      
 
-            <Route path="/modules/:id" render={(props) => { return (
-                <ModuleManager {...props} core={core} module={props.match.params.id} />
-            )}} />          
+            <Route path="/modules/:id/:sub?/:action?" render={(props) => {
+                return (
+                    <ModuleManager {...props}
+                    core={core}
+                    module={props.match.params.id}
+                    submodule={props.match.params.sub}
+                    action={props.match.params.action} />
+                )
+            }} />
+
+            {}          
 
             <Route path="/security/users/create" component={UserEdit}  />
             <Route path="/security/users/edit/:id" component={UserEdit} />             

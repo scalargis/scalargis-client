@@ -5,6 +5,13 @@ import { createStore, applyMiddleware } from 'redux'
 import * as actions from './core/actions'
 import * as utils from './core/utils'
 
+
+import { initTranslations } from './core/i18n';
+
+// Init translations
+initTranslations();
+
+
 function Core(config, rootReducer) {
 
   /**
@@ -204,7 +211,7 @@ Core.prototype.renderComponents = function({ region, as = '', props, parent, sep
   })
 }
 
-Core.prototype.renderComponentManager = function({ id, as = '', props }) {
+Core.prototype.renderComponentManager = function({ id, submodule, action, as = '', props }) {
 
   // Validate id
   if (!id) return null;
@@ -226,6 +233,8 @@ Core.prototype.renderComponentManager = function({ id, as = '', props }) {
   if (!PluginComponent) return null;
   return (
     <PluginComponent
+      submodule={submodule}
+      action={action}
       record={c}
       config={{ ...props, ...c.config_json }}
       core={this}
