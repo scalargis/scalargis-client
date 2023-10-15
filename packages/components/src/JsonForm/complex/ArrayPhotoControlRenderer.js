@@ -21,6 +21,7 @@ import {
 
 import { JsonFormContext } from './../JsonFormContext';
 import PhotoForm from './PhotoForm';
+import { translateMsg } from './../util/i18n';
 
 export const ArrayPhotoControlRenderer = (props) => {
 
@@ -33,6 +34,8 @@ export const ArrayPhotoControlRenderer = (props) => {
     t,
     locale
   } = props;
+
+  const i18Props = {t, schema, uischema, path};
   
   const ctx = useContext(JsonFormContext);
 
@@ -88,7 +91,9 @@ export const ArrayPhotoControlRenderer = (props) => {
           <div className="p-col-12">
             <div className="card p-text-center  p-mb-1 p-p-0">
               <Tag severity="info" rounded style={{width:'80%'}} 
-                value={props.data.length + " " + (props.data.length > 1 ? "fotografias" : "fotografia")}></Tag>
+                value={props.data.length + " " + (props.data.length > 1 ? 
+                  translateMsg("common.photos", "photos", "Fotografias", i18Props) : 
+                  translateMsg("common.photo", "photo", "Fotografia", i18Props))}></Tag>
             </div>
             <table style={{"width": "100%"}}>
               <tbody>
@@ -102,23 +107,25 @@ export const ArrayPhotoControlRenderer = (props) => {
                         </td>
                         <td className="p-col-9" style={{"wordBreak": "break-all", "textAlign": "center"}}>{(f?.original_filename || f?.filename)}</td>
                         <td className="p-col-1" style={{"verticalAlign": "top", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2" tooltip="Editar fotografia"
+                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2" 
+                            tooltip={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
                               setShowPhotoForm(true);
                               setRowIndex(index);
                               setRowData(item);                   
                             }} />                                                                            
-                          <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger" tooltip="Eliminar fotografia" 
+                          <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger" 
+                            tooltip={translateMsg("common.deletePhoto", "deletePhoto", "Eliminar fotografia", i18Props)}
                             onClick={(e) => { 
                               e.preventDefault();
 
                               confirmDialog({
-                                message: `Deseja remover o ficheiro "${f.original_filename || f.filename}"?`,
-                                header: 'Confirmação',
+                                message: `${translateMsg("common.deleteFileConfirmation", "deleteFileConfirmation", "Deseja remover a ficheiro", i18Props)} "${f.original_filename || f.filename}"?`,
+                                header:  translateMsg("common.confirmation", "confirmation", "Confirmação", i18Props),
                                 icon: 'pi pi-exclamation-triangle p-mr-1',
-                                acceptLabel: 'Sim',
-                                rejectLabel: 'Não',
+                                acceptLabel: translateMsg("yes", null, "Sim", i18Props),
+                                rejectLabel: translateMsg("no", null, "Não", i18Props),
                                 accept: () => {
                                   deleteConfirm(index);
                                 },
@@ -135,13 +142,13 @@ export const ArrayPhotoControlRenderer = (props) => {
           </div> : 
           <Message
             severity="info"
-            text={"Não existem fotografias. Pode adicioná-las através do botão 'Adicionar fotografia'."} 
+            text={translateMsg("noPhotosInfo", null, "Não existem fotografias. Pode adicioná-las através do botão 'Adicionar fotografia'.", i18Props)} 
           />
         }              
       </div>
 
       <div className="p-col-12 p-text-center">
-        <Button label="Adicionar Fotografia" className="p-button-text" style={buttonAddStyle}
+        <Button label={translateMsg("addPhoto", null, "Adicionar Fotografia", i18Props)} className="p-button-text" style={buttonAddStyle}
           onClick={(e) => {
             e.preventDefault();
             setShowPhotoForm(true);

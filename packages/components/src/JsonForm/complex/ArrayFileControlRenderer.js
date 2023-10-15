@@ -21,6 +21,7 @@ import {
 
 import { JsonFormContext } from './../JsonFormContext';
 import FileForm from './FileForm';
+import { translateMsg } from './../util/i18n';
 
 export const ArrayFileControlRenderer = (props) => {
 
@@ -33,6 +34,8 @@ export const ArrayFileControlRenderer = (props) => {
     t,
     locale
   }= props;
+
+  const i18Props = {t, schema, uischema, path};
   
   const ctx = useContext(JsonFormContext);
 
@@ -88,7 +91,9 @@ export const ArrayFileControlRenderer = (props) => {
           <div className="p-col-12">
             <div className="card p-text-center  p-mb-1 p-p-0">
               <Tag severity="info" rounded style={{width:'80%'}} 
-                value={props.data.length + " " + (props.data.length > 1 ? "ficheiros" : "ficheiro")}></Tag>
+                value={props.data.length + " " + (props.data.length > 1 ? 
+                  translateMsg("common.files", "files", "Ficheiros", i18Props) : 
+                  translateMsg("common.file", "file", "Ficheiro", i18Props))}></Tag>
             </div>
             <table style={{"width": "100%"}}>
               <tbody>
@@ -102,20 +107,22 @@ export const ArrayFileControlRenderer = (props) => {
                           <div className="file-description" style={{"fontSize": "0.9rem","color": "#b7bdbb"}}>{(item?.description)}</div>
                         </td>
                         <td className="p-col-1" style={{"verticalAlign": "middle", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2" tooltip="Editar ficheiro"
+                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2"
+                            tooltip={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
                               setShowFileForm(true);
                               setRowIndex(index);
                               setRowData(item);                              
                             }} />                                                                            
-                          <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger" tooltip="Eliminar ficheiro" 
+                          <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger"
+                            tooltip={translateMsg("common.deleteFile", "deleteFile", "Eliminar ficheiro", i18Props)}
                             onClick={(e) => { 
                               e.preventDefault();
 
                               confirmDialog({
-                                message: `Deseja remover o ficheiro "${f.original_filename || f.filemame}"?`,
-                                header: 'Confirmação',
+                                message: `${translateMsg("common.deleteFileConfirmation", "deleteFileConfirmation", "Deseja remover a ficheiro", i18Props)} "${f.original_filename || f.filename}"?`,
+                                header:  translateMsg("common.confirmation", "confirmation", "Confirmação", i18Props),
                                 icon: 'pi pi-exclamation-triangle p-mr-1',
                                 acceptLabel: 'Sim',
                                 rejectLabel: 'Não',
@@ -136,13 +143,13 @@ export const ArrayFileControlRenderer = (props) => {
           </div> : 
           <Message
             severity="info"
-            text={"Não existem ficheiros. Pode adicioná-las através do botão 'Adicionar ficheiro'."} 
+            text={translateMsg("noFilesInfo", null, "Não existem ficheiros. Pode adicioná-las através do botão 'Adicionar ficheiro'.", i18Props)} 
           />
         }              
       </div>
 
       <div className="p-col-12 p-text-center">
-        <Button label="Adicionar Ficheiro" className="p-button-text" style={buttonAddStyle} 
+        <Button label={translateMsg("addFile", null, "Adicionar Ficheiro", i18Props)} className="p-button-text" style={buttonAddStyle} 
           onClick={(e) => {
             e.preventDefault();
             setShowFileForm(true);

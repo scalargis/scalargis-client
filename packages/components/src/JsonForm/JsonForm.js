@@ -26,7 +26,10 @@ export const JsonForm = (props) => {
   }, [i18next.language]);
 
   const translation = useMemo(() => {
-    let translations = merge(i18nDefaults, getTranslations());    
+    let translations = merge(i18nDefaults, getTranslations());  
+    
+    //console.log(ctx?.translations);
+
     if (ctx?.translations) {
       translations = merge(translations, ctx.translations);
     }
@@ -35,6 +38,9 @@ export const JsonForm = (props) => {
     }
 
     const createTranslator = (locale) => (key, defaultMessage) => {
+
+      //console.log({ key, defaultMessage});
+
       let msg;
       locale
         ? msg = get(translations, `${locale}.${key}`, get(translations, `${key}`, defaultMessage))

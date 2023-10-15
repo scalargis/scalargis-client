@@ -9,7 +9,7 @@ const displayModes = {
 }
 
 function FormErrors(props) {
-  const { errors, data, show, displayMode } = props;
+  const { errors, data, show, displayMode, t } = props;
   
   const [showErrors, setShowErrors] = useState(false);
 
@@ -31,14 +31,14 @@ function FormErrors(props) {
     );
   }
 
-  let lblErrorsBtn = "Ver erros";
+  let lblErrorsBtn = t("showErrors", "Ver erros");
   if (showErrors && props?.displayMode !== displayModes.DIALOG) {
-    lblErrorsBtn = "Ocultar erros";
+    lblErrorsBtn = t("hideErrors", "Ocultar erros");
   }  
 
   const footer = (
     <div>
-        <Button label="Fechar" onClick={()=>setShowErrors(false)} />
+        <Button label={t("close", "Fechar")} onClick={()=>setShowErrors(false)} />
     </div>
   );  
 

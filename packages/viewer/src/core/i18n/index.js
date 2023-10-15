@@ -36,6 +36,7 @@ export const loadTranslations = (id) => {
   const API_URL = getAppApiUrl();
   const url = `${API_URL}/app/viewer/${id}/translations`;
   i18n.loadBackendTranslations(url, true, true, (data, error) => {
+    //console.log(data);
     //console.log(i18n.getTranslations());
   });
 }
