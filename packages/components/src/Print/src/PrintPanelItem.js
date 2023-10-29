@@ -667,7 +667,7 @@ export default function PrintPanelItem(props) {
       </div>
 
       {(printItem.form_fields && printItem.form_fields.groups) &&
-        <React.Fragment>
+        <div class="p-mt-2">
           {Object.entries(printItem.form_fields.groups).map(([groupKey, group]) => {
             if (group.active) {
               return <div key={groupKey} className="p-fluid">
@@ -688,11 +688,11 @@ export default function PrintPanelItem(props) {
               </div>
             }
           })}
-        </React.Fragment>
+        </div>
       }
 
       {(printItem.form_fields && printItem.form_fields.fields) &&
-        <React.Fragment>
+        <div class="p-mt-2">
           {Object.entries(printItem.form_fields.fields).map(([fieldKey, field]) => {
             const field_key = fieldKey;
             if (field.active) {
@@ -710,7 +710,7 @@ export default function PrintPanelItem(props) {
               </React.Fragment>
             }
           })}
-        </React.Fragment>
+        </div>
       }
 
       {isPrinting ?
