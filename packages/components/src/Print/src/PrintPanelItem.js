@@ -492,7 +492,7 @@ export default function PrintPanelItem(props) {
     const inch_per_units = 39.37
 
     // find layout serv conf
-    const layout_conf = printItem.layouts.find(e => e.orientation === fields.layout.orientation && fields.layout.format === printItem.format)
+    const layout_conf = printItem.layouts.find(e => e.orientation === (fields?.layout?.orientation || printItem.orientation) && e.format === (fields?.layout?.format || printItem.format))
     if (!layout_conf || !layout_conf.config) return null; // TODO need clean up !??
 
     const layout_conf_json = JSON.parse(layout_conf?.config)[0]
