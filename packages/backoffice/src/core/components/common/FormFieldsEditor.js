@@ -83,17 +83,31 @@ const FieldFormEditor = props => {
             {getFormErrorMessage(errors, 'title')}
           </div>
           <div className="p-field p-col-12">
-            <Controller name="required" control={control}
-              render={({ field }) => {                      
-                return <Checkbox id="required" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
-              }}                    
-            />          
-            <label htmlFor="required" className="p-checkbox-label" style={{display: "inline"}}>Preenchimento obrigatório</label>
+            <label htmlFor="header">Cabeçalho</label>
+            <InputText  id="header" type="text" {...register("header")} />
+          </div>
+          <div className="p-fluid p-formgrid p-grid p-col-12">
+            <div className="p-field p-col-6">
+              <Controller name="required" control={control}
+                render={({ field }) => {                      
+                  return <Checkbox id="required" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                }}
+              />
+              <label htmlFor="required" className="p-checkbox-label" style={{display: "inline"}}>Preenchimento obrigatório</label>
+            </div>
+            <div className="p-field p-col-6">
+              <Controller name="showLabel" control={control}
+                render={({ field }) => {                      
+                  return <Checkbox id="showLabel" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                }}
+              />
+              <label htmlFor="showLabel" className="p-checkbox-label" style={{display: "inline"}}>Mostrar título</label>
+            </div>            
           </div>
           
           <div className="p-field p-col-12"><hr /></div>
           
-          <div className="p-field p-col-12">
+          <div className="p-field p-col-6">
             <Controller name="active" control={control}
               render={({ field }) => {                      
                 return <Checkbox id="active" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
@@ -214,7 +228,7 @@ const GroupFields = props => {
 
     let new_fields = {...group.data.fields};
     if (new_fields[fieldEdition.key]) delete new_fields[fieldEdition.key];
-    new_fields = {[key]: (({ active, title, header, required }) => ({ active, title, header, required }))(field), ...new_fields};
+    new_fields = {[key]: (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field), ...new_fields};
 
     props.onChange(group.id, new_fields);
 
@@ -328,14 +342,20 @@ const GroupFields = props => {
                               </div>                       
                             </div>
                           </div>
-                          <div className="p-field p-grid">
-                            <div class="p-col-12">
+                          <div className="p-field p-grid p-col-12">
+                            <div class="p-col-7">
                               <div className="p-field-checkbox">
                                   <Checkbox checked={field.required} disabled/>
                                   <label>Preenchimento obrigatório</label>
                               </div>
                             </div>
-                          </div>                                        
+                            <div class="p-col-5">
+                              <div className="p-field-checkbox">
+                                  <Checkbox checked={field.showLabel} disabled/>
+                                  <label>Mostrar título</label>
+                              </div>
+                            </div>
+                          </div>                     
                         </div>
 
                     </div>
@@ -370,7 +390,7 @@ const Fields = props => {
 
     let new_fields = {...fields};
     if (fieldEdition.key !== key) delete new_fields[fieldEdition.key];
-    new_fields[key] =  (({ active, title, header, required }) => ({ active, title, header, required }))(field);
+    new_fields[key] =  (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field);
 
     props.onChange(new_fields);
 
@@ -379,136 +399,140 @@ const Fields = props => {
 
   return (
 
-
-  <DragDropContext
-    onDragEnd={props.onDragEnd}
-    //onDragUpdate={this.onDragUpdate}
-  >
-    <Droppable droppableId="droppable" type="FIELDS">
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          style={getFieldListStyle(snapshot.isDraggingOver)}
-        >
-          {Object.keys(fields || {}).length === 0 &&
-            <div className="p-fluid">
-              <div className="p-col-12">
-                  <Message severity="info" text="Clique em 'Novo Campo' para adicionar um campo" />
+    <DragDropContext
+      onDragEnd={props.onDragEnd}
+      //onDragUpdate={this.onDragUpdate}
+    >
+      <Droppable droppableId="droppable" type="FIELDS">
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            style={getFieldListStyle(snapshot.isDraggingOver)}
+          >
+            {Object.keys(fields || {}).length === 0 &&
+              <div className="p-fluid">
+                <div className="p-col-12">
+                    <Message severity="info" text="Clique em 'Novo Campo' para adicionar um campo" />
+                </div>
               </div>
-            </div>
-          }
+            }
 
-          {Object.entries(fields).map((f,i) => {
-            return {id: f[0], data: f[1]}
-          }).map((field, index) => (
-            <Draggable
-              key={field.id}
-              draggableId={field.id}
-              index={index}
-              style={{ "border": "solid 1px lightgray", marginTop: 3 }}                  
-            >
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  style={getItemStyle(
-                    snapshot.isDragging,
-                    provided.draggableProps.style
-                  )}
-                  className="p-shadow-1"
-                >
-                <div style={{marginBottom: 5 }}>
-                  <div style={{ float: "left", paddingTop: 6 }}>
-                    <span style={{paddingLeft: "15px"}}>{field.id}</span>
-                    <span {...provided.dragHandleProps}>
-                      <i className="fas fa-arrows-alt" style={{ float: "left", "paddingTop": 3 }}></i>
-                    </span>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <Button type="text" icon="pi pi-trash" 
-                      className="p-button-rounded p-button-text p-button-danger"
-                      tooltip="Eliminar campo"
-                      tooltipOptions={{position: 'bottom'}}                            
-                      onClick={ (e) => {
-                        e.preventDefault();
-                        confirmPopup({
-                            target: e.currentTarget,
-                            message: 'Tem a certeza que pretende eliminar?',
-                            icon: 'pi pi-exclamation-triangle',
-                            acceptLabel: 'Sim',
-                            rejectLabel: 'Não',
-                            accept: () => {                                      
-                              const new_fields = {...fields};
-                              delete new_fields[field.id];
-                              props.onChange(new_fields);
-                            }
-                        });
-                      }} />
-                      <Button type="text" icon="pi pi-pencil" 
-                        className="p-button-rounded p-button-text p-button-warning"
-                        tooltip="Editar campo"
-                        tooltipOptions={{position: 'bottom'}}                              
+            {Object.entries(fields).map((f,i) => {
+              return {id: f[0], data: f[1]}
+            }).map((field, index) => (
+              <Draggable
+                key={field.id}
+                draggableId={field.id}
+                index={index}
+                style={{ "border": "solid 1px lightgray", marginTop: 3 }}                  
+              >
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    style={getItemStyle(
+                      snapshot.isDragging,
+                      provided.draggableProps.style
+                    )}
+                    className="p-shadow-1"
+                  >
+                  <div style={{marginBottom: 5 }}>
+                    <div style={{ float: "left", paddingTop: 6 }}>
+                      <span style={{paddingLeft: "15px"}}>{field.id}</span>
+                      <span {...provided.dragHandleProps}>
+                        <i className="fas fa-arrows-alt" style={{ float: "left", "paddingTop": 3 }}></i>
+                      </span>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <Button type="text" icon="pi pi-trash" 
+                        className="p-button-rounded p-button-text p-button-danger"
+                        tooltip="Eliminar campo"
+                        tooltipOptions={{position: 'bottom'}}                            
                         onClick={ (e) => {
                           e.preventDefault();
-                          setFieldEdition({...field.data, key: field.id});
-                          setShowFieldForm(true);                                     
-                        }} />                                
+                          confirmPopup({
+                              target: e.currentTarget,
+                              message: 'Tem a certeza que pretende eliminar?',
+                              icon: 'pi pi-exclamation-triangle',
+                              acceptLabel: 'Sim',
+                              rejectLabel: 'Não',
+                              accept: () => {                                      
+                                const new_fields = {...fields};
+                                delete new_fields[field.id];
+                                props.onChange(new_fields);
+                              }
+                          });
+                        }} />
+                        <Button type="text" icon="pi pi-pencil" 
+                          className="p-button-rounded p-button-text p-button-warning"
+                          tooltip="Editar campo"
+                          tooltipOptions={{position: 'bottom'}}                              
+                          onClick={ (e) => {
+                            e.preventDefault();
+                            setFieldEdition({...field.data, key: field.id});
+                            setShowFieldForm(true);                                     
+                          }} />                                
+                      </div>
                     </div>
-                  </div>
 
-                  { showFieldForm && 
-                    <FieldFormEditor data={fieldEdition} show={showFieldForm} onHide={onFieldFormHide} onSave={onFieldFormSave} />
-                  }
+                    { showFieldForm && 
+                      <FieldFormEditor data={fieldEdition} show={showFieldForm} onHide={onFieldFormHide} onSave={onFieldFormSave} />
+                    }
 
-                  <div className="p-fluid p-pt-2">
-                    <div className="p-field p-grid p-mb-0">
-                      <div class="p-col-10">
-                        <div className="p-grid">
-                          <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
-                          <div className="p-col-12 p-md-10">
-                              <span>{field.data.title}</span>
+                    <div className="p-fluid p-pt-2">
+                      <div className="p-field p-grid p-mb-0">
+                        <div class="p-col-10">
+                          <div className="p-grid">
+                            <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
+                            <div className="p-col-12 p-md-10">
+                                <span>{field.data.title}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="p-col-2">
+                          <div className="p-grid">
+                            <div className="p-field-checkbox">
+                                <Checkbox checked={field.data.active} disabled/>
+                                <label>Ativo</label>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="p-col-2">
-                        <div className="p-grid">
+                      <div className="p-field p-grid">
+                        <div class="p-col-12">
+                          <div className="p-grid">
+                            <label className="p-col-12 p-md-2"><strong>Cabeçalho: </strong></label>
+                            <div className="p-col-12 p-md-10">
+                                <span>{field.data.header}</span>
+                            </div>
+                          </div>                     
+                        </div>
+                      </div>
+                      <div className="p-field p-grid">
+                        <div class="p-col-6">
                           <div className="p-field-checkbox">
-                              <Checkbox checked={field.data.active} disabled/>
-                              <label>Ativo</label>
+                              <Checkbox checked={field.data.required} disabled/>
+                              <label>Preenchimento obrigatório</label>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="p-field p-grid">
-                      <div class="p-col-12">
-                        <div className="p-grid">
-                          <label className="p-col-12 p-md-2"><strong>Cabeçalho: </strong></label>
-                          <div className="p-col-12 p-md-10">
-                              <span>{field.data.header}</span>
+                        <div class="p-col-6">
+                          <div className="p-field-checkbox">
+                              <Checkbox checked={field.data.showLabel} disabled/>
+                              <label>Mostrar título</label>
                           </div>
-                        </div>                       
-                      </div>
+                        </div>                        
+                      </div>                                                              
                     </div>
-                    <div className="p-field p-grid">
-                      <div class="p-col-12">
-                        <div className="p-field-checkbox">
-                            <Checkbox checked={field.data.required} disabled/>
-                            <label>Preenchimento obrigatório</label>
-                        </div>
-                      </div>
-                    </div>                                        
+
                   </div>
-
-                </div>
-              )}
-            </Draggable>
-          ))}
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
-  </DragDropContext>
-
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
 
   );
 };
@@ -640,7 +664,7 @@ class FormFieldsEditor extends Component {
 
       let new_data = {...this.state.data.groups};
       if (new_data[groupId].fields[key]) delete new_data[groupId].fields[key];
-      new_data[groupId].fields = {[key]: (({ active, title, header, required }) => ({ active, title, header, required }))(field), ...new_data[groupId].fields};
+      new_data[groupId].fields = {[key]: (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field), ...new_data[groupId].fields};
 
       this.setState({
         ...this.state,
@@ -654,7 +678,7 @@ class FormFieldsEditor extends Component {
 
       let new_data = {...this.state.data.fields};
       if (new_data[key]) delete new_data[key];
-      new_data = {[key]: (({ active, title, header, required }) => ({ active, title, header, required }))(field), ...new_data};
+      new_data = {[key]: (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field), ...new_data};
 
       this.setState({
         ...this.state,
@@ -691,7 +715,7 @@ class FormFieldsEditor extends Component {
                       icon="pi pi-list" 
                       className="p-button-outlined"
                       onClick={()=> {
-                        this.fieldEdition = { key: null, active: true, title: null, header: null};
+                        this.fieldEdition = { key: null, active: true, title: null, header: null, showLabel: false};
                         this.setState({
                           ...this.state,              
                           showFieldForm: true
@@ -790,7 +814,7 @@ class FormFieldsEditor extends Component {
                                   tooltipOptions={{position: 'bottom'}}
                                   onClick={ (e) => {
                                     e.preventDefault();
-                                    this.fieldEdition = { groupId: group.id, key: null, active: true, title: null, header: null, required: false};
+                                    this.fieldEdition = { groupId: group.id, key: null, active: true, title: null, header: null, showLabel: false, required: false};
                                     this.setState({
                                       ...this.state,              
                                       showFieldForm: true
