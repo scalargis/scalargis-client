@@ -384,7 +384,7 @@ export default function PrintPanel2(props) {
                     return <div className="p-field">
                       { field.header && <h4>{field.header}</h4> }
                       { field.showLabel && <label>{field.title}</label> }
-                      <InputText key={field_key} id={field_key} className="p-inputtext-sm p-d-block" 
+                      <InputText key={field_key} id={field_key} className="p-inputtext p-d-block" 
                         placeholder={field.title} tooltip={field.title}
                         value={fields[field_key]} onChange={handleFieldChange} />
                         { (field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">Campo de preenchimento obrigatório.</small> }
@@ -407,7 +407,7 @@ export default function PrintPanel2(props) {
                   { field.header && <h4>{field.header}</h4> }
                   <div className="p-field">
                     { field.showLabel && <label>{field.title}</label> }
-                    <InputText id={field_key} className="p-inputtext-sm p-d-block" 
+                    <InputText id={field_key} className="p-inputtext p-d-block" 
                       placeholder={field.title} tooltip={field.title}
                       value={fields[field_key]} onChange={handleFieldChange} />
                       { (field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">Campo de preenchimento obrigatório.</small> }
