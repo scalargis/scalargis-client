@@ -22,7 +22,7 @@ export const ReorderFields = (list, startIndex, endIndex) => {
 
   const fields = {}
   result.forEach((r) => {
-    fields[r.id] = {active: r.active, required: r.required, title: r.title};
+    fields[r.id] = {active: r.active, required: r.required, title: r.title, header: r.header, showLabel: r.showLabel};
   });
 
   return fields;

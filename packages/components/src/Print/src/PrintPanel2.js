@@ -383,7 +383,7 @@ export default function PrintPanel2(props) {
                   if (field.active) {                    
                     return <div className="p-field">
                       { field.header && <h4>{field.header}</h4> }
-                      { field.label && <label>{field.label}</label> }
+                      { field.showLabel && <label>{field.title}</label> }
                       <InputText key={field_key} id={field_key} className="p-inputtext-sm p-d-block" 
                         placeholder={field.title} tooltip={field.title}
                         value={fields[field_key]} onChange={handleFieldChange} />
@@ -406,7 +406,7 @@ export default function PrintPanel2(props) {
                 <div key={field_key} className="p-fluid">
                   { field.header && <h4>{field.header}</h4> }
                   <div className="p-field">
-                    { field.label && <label>{field.label}</label> }
+                    { field.showLabel && <label>{field.title}</label> }
                     <InputText id={field_key} className="p-inputtext-sm p-d-block" 
                       placeholder={field.title} tooltip={field.title}
                       value={fields[field_key]} onChange={handleFieldChange} />
