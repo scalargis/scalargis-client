@@ -373,7 +373,7 @@ export default function PrintPanel2(props) {
       </div>}
 
       { (printGroup.form_fields && printGroup.form_fields.groups) &&
-        <React.Fragment>
+        <div class="p-mt-2">
           { Object.entries(printGroup.form_fields.groups).map(([groupKey, group]) => {
             if (group.active) {
               return <div key={groupKey} className="p-fluid">
@@ -394,11 +394,11 @@ export default function PrintPanel2(props) {
               </div>
             }
           }) }
-        </React.Fragment>
+        </div>
       }
 
       { (printGroup.form_fields && printGroup.form_fields.fields) &&
-        <React.Fragment>
+        <div class="p-mt-2">
           { Object.entries(printGroup.form_fields.fields).map(([fieldKey, field]) => {
             const field_key = fieldKey;
             if (field.active) {
@@ -416,7 +416,7 @@ export default function PrintPanel2(props) {
                 </React.Fragment>
               }
           }) }
-        </React.Fragment>
+        </div>
       }
 
       <div className="card">
