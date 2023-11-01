@@ -226,9 +226,14 @@ const GroupFields = props => {
     //Check key already exists
     if (fieldEdition.key !== key && group.data.fields[key]) return;
 
-    let new_fields = {...group.data.fields};
-    if (new_fields[fieldEdition.key]) delete new_fields[fieldEdition.key];
-    new_fields = {[key]: (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field), ...new_fields};
+    const new_fields = {};
+    Object.keys(group.data.fields).forEach((k) => {
+      if (fieldEdition.key === k) {
+        new_fields[field.key] = (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field);
+      } else {
+        new_fields[k] = (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(group.data.fields[k]);
+      }
+    });
 
     props.onChange(group.id, new_fields);
 
@@ -248,7 +253,7 @@ const GroupFields = props => {
                   <Message severity="info" text="Clique em '+' para adicionar um campo" />
               </div>
             </div>
-          }          
+          }
 
           {Object.entries(group.data.fields).map((g,i) => {
               return {id: g[0], ...g[1]}
@@ -388,9 +393,14 @@ const Fields = props => {
     //Check key already exists
     if (fieldEdition.key !== key && fields[key]) return;
 
-    let new_fields = {...fields};
-    if (fieldEdition.key !== key) delete new_fields[fieldEdition.key];
-    new_fields[key] =  (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field);
+    const new_fields = {};
+    Object.keys(fields).forEach((k) => {
+      if (fieldEdition.key === k) {
+        new_fields[field.key] = (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field);
+      } else {
+        new_fields[k] = (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(fields[k]);
+      }
+    });    
 
     props.onChange(new_fields);
 

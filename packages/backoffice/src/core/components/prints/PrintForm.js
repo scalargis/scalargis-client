@@ -622,7 +622,6 @@ function PrintForm(props) {
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
                 onChange={(data) => {
                   //console.log(JSON.stringify(data));
-                  console.log(data);
                   setLayouts(data);
                 }}
               />
