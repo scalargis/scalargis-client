@@ -108,8 +108,6 @@ function PrintForm(props) {
       format: data.format,
       free_printing: data.free_printing,
       free_scale: data.free_scale,
-      identification: data.identification,
-      identification_fields: data.identification_fields,
       is_active: data.is_active,
       //layouts: data.layouts,
       location_marking: data.location_marking,
@@ -483,14 +481,6 @@ function PrintForm(props) {
               <div className="p-field p-col-12 p-md-6">
                 <Panel header="Opções de impressão" className="p-pb-1">
                   <div className="p-grid">
-                    <div className="p-col p-field p-mt-2">
-                      <Controller name="identification" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="identification" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
-                        }}                    
-                      />                       
-                      <label htmlFor="identification" className="p-checkbox-label" style={{display: "inline"}}>Identificação obrigatória</label>
-                    </div>
                     <div className="p-col p-field p-mt-2">
                       <Controller name="add_title" control={control}
                         render={({ field }) => {                      

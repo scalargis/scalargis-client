@@ -103,8 +103,6 @@ function PrintGroupForm(props) {
       description: data.description,
       //form_fields: data.form_fields,
       free_scale: data.free_scale,
-      identification: data.identification,
-      identification_fields: data.identification_fields,
       is_active: data.is_active,
       //layouts: data.layouts,
       allow_drawing: data.allow_drawing,
@@ -402,19 +400,6 @@ function PrintGroupForm(props) {
                       </div>                           
                     </div>
                     )}                                       
-                  </div>
-                </Panel>
-
-                <Panel header="Opções de impressão" className="p-mt-2">
-                  <div className="p-grid">
-                    <div className="p-col p-field p-mt-2">
-                      <Controller name="identification" control={control}
-                        render={({ field }) => {
-                          return <Checkbox id="identification" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
-                        }}
-                      />
-                      <label htmlFor="identification" className="p-checkbox-label" style={{display: "inline"}}>Identificação obrigatória</label>
-                    </div>                                        
                   </div>
                 </Panel>
 
