@@ -115,7 +115,6 @@ function PrintGroupForm(props) {
       print_purpose: data.print_purpose,
       restrict_scales: data.restrict_scales,
       restrict_scales_list: data.restrict_scales_list,
-      add_title: data.add_title,
       show_author: data.show_author,
       select_prints: data.select_prints,
       group_prints:data.group_prints,
