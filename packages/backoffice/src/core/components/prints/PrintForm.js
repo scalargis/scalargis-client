@@ -121,7 +121,6 @@ function PrintForm(props) {
       restrict_scales: data.restrict_scales,
       restrict_scales_list: data.restrict_scales_list,
       scale: data.scale,
-      add_title: data.add_title,
       show_author: data.show_author,
       srid: data.srid,
       title: data.title
@@ -481,14 +480,6 @@ function PrintForm(props) {
               <div className="p-field p-col-12 p-md-6">
                 <Panel header="Opções de impressão" className="p-pb-1">
                   <div className="p-grid">
-                    <div className="p-col p-field p-mt-2">
-                      <Controller name="add_title" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="add_title" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
-                        }}                    
-                      />                       
-                      <label htmlFor="add_title" className="p-checkbox-label" style={{display: "inline"}}>Adicionar título</label>
-                    </div>
                     <div className="p-col p-field p-mt-2">
                       <Controller name="free_printing" control={control}
                         render={({ field }) => {
