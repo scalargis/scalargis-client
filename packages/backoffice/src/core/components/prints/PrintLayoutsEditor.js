@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef, Component } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { confirmPopup } from 'primereact/confirmpopup';
 import { Toast } from 'primereact/toast';
@@ -154,6 +153,10 @@ const PrintLayoutsEditor = props => {
           key += chars.charAt(Math.floor(Math.random() * chars.length));
       }
       return key;
+  }
+
+  const onRowReorder = (e) => {
+    props.onChange(e.value.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
   }  
   
   const editRecord = (record) => {
@@ -170,7 +173,6 @@ const PrintLayoutsEditor = props => {
       rejectLabel: 'Não',
       accept: () => {
         const _records = records.filter(val => val.key !== record.key);
-        console.log(_records);
         props.onChange(_records.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
         setSelectedRecords([]);
       }
@@ -186,9 +188,7 @@ const PrintLayoutsEditor = props => {
       rejectLabel: 'Não',
       accept: () => {
         const _keys = selectedRecords.map((r) => r.key);
-        //console.log(_keys);
         const _records = records.filter(r => !_keys.includes(r.key));
-        //console.log(_records);
         props.onChange(_records.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
         setSelectedRecords([]);
       }
@@ -202,8 +202,6 @@ const PrintLayoutsEditor = props => {
   }
 
   const onLayoutFormSave = (data) => {
-    console.log(data);
-
     const _records = [...records];
     const _record = {...data}
 
@@ -215,7 +213,6 @@ const PrintLayoutsEditor = props => {
       _records.push(_record);
     }
 
-    //console.log(_records.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
     props.onChange(_records.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
     setSelectedRecords([]);
     setShowLayoutForm(false);
@@ -273,15 +270,16 @@ const PrintLayoutsEditor = props => {
         <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
         <DataTable ref={dt} value={records ? records : []}
-            selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
-            emptyMessage="Não foram encontrados registos." >
+          selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
+          reorderableColumns onRowReorder={onRowReorder}
+          emptyMessage="Não foram encontrados registos." >
+            <Column rowReorder rowReorderIcon="fas fa-arrows-alt" style={{width: '3em'}} />
             <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-            <Column field="id" header="Id" sortable filterPlaceholder="Id" headerStyle={{ width: '6rem' }} />
-            <Column field="format" header="Formato" sortable filterPlaceholder="Format" />
-            <Column field="orientation" header="Orientação" sortable filterPlaceholder="Orientação" />
+            <Column field="format" header="Formato" filterPlaceholder="Format" />
+            <Column field="orientation" header="Orientação" filterPlaceholder="Orientação" />
             <Column body={actionBodyTemplate} />
         </DataTable>
-      </div>      
+      </div>
     </div>
   )
 
