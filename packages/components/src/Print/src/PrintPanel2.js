@@ -385,7 +385,6 @@ export default function PrintPanel2(props) {
                       { field.header && <h4>{field.header}</h4> }
                       { field.showLabel && <label>{field.title}</label> }
                       <InputText key={field_key} id={field_key} className="p-inputtext p-d-block" 
-                        //placeholder={field.title} tooltip={field.title}
                         placeholder={!field.header && !field.showLabel ? field.title : ''}
                         tooltip={!field.header && !field.showLabel ? field.title : ''}
                         value={fields[field_key]} onChange={handleFieldChange} />
@@ -410,7 +409,6 @@ export default function PrintPanel2(props) {
                   <div className="p-field">
                     { field.showLabel && <label>{field.title}</label> }
                     <InputText id={field_key} className="p-inputtext p-d-block" 
-                      //placeholder={field.title} tooltip={field.title}
                       placeholder={!field.header && !field.showLabel ? field.title : ''}
                       tooltip={!field.header && !field.showLabel ? field.title : ''}                      
                       value={fields[field_key]} onChange={handleFieldChange} />
