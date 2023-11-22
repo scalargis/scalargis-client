@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from "react-i18next";
 import { InputText } from 'primereact/inputtext';
 import { ListBox } from 'primereact/listbox';
 import { transform } from 'ol/proj';
@@ -9,6 +10,8 @@ import useOutsideClick from './useOutsideClick';
 export default function Main({ core, config, actions, record }) {
   const { viewer, mainMap, dispatch, Models } = config;
   const { MapModel } = Models;
+
+  const { t } = useTranslation(["common", "custom"]);
 
   const [filter, setFilter] = useState("");
   const [activeSources, setActiveSources] = useState([]);
@@ -181,13 +184,14 @@ export default function Main({ core, config, actions, record }) {
       });
     }
     setActiveSources([...sources_ids]);
-  }, []);   
+  }, []);
+
 
   return (
     <div ref={ref} className="layout-topbar-search-container">
       <span className="layout-topbar-search">
           <InputText type="text"
-            placeholder={config.placeholder || 'Pesquisar...'}
+            placeholder={ config.placeholder ? t(config.placeholder, config.placeholder, {"ns": "custom"}) : `${t("search", "Pesquisar")}...`}
             value={filter}
             onFocus={(e) => setShowPlaces(true)}
             onChange={(e) => changeFilterFunc(e)} />
@@ -196,7 +200,7 @@ export default function Main({ core, config, actions, record }) {
       {(showPlaces && places && places.length > 0 ?
         <div className="layout-topbar-search-results">
           <ListBox
-              optionLabel="Lugar"
+              optionLabel={t("place", "Lugar")}
               value={selectedPlace}
               options={places}
               itemTemplate={itemTemplate}
