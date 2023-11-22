@@ -1,9 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { Button } from 'primereact/button'
-import { Panel } from 'primereact/panel'
-import { Dialog } from 'primereact/dialog'
-import HelpHtmlContent from './HelpHmtlContent'
-import './style.css'
+import { useTranslation } from "react-i18next";
+import { Button } from 'primereact/button';
+import { Panel } from 'primereact/panel';
+import { Dialog } from 'primereact/dialog';
+
+import HelpHtmlContent from './HelpHmtlContent';
+
+import './style.css';
 
 /**
  * Main menu component
@@ -13,6 +16,8 @@ export function MainMenu({ className, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
+  const { i18n, t } = useTranslation(["common", "custom"]);
+
   const [showPopup, setShowPopup] = useState(false);
   const [size, setSize] = useState(null);
   const [maximized, setMaximized] = useState(false);
@@ -20,14 +25,19 @@ export function MainMenu({ className, config, actions, record }) {
   const dialog = useRef();
 
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Ajuda';
-  const header = component_cfg.header || title;
+  const title = record.title ? t(record.title, record.title, {"ns": "custom"}) : t("help", "Ajuda");
+  const header = component_cfg.header ? t(component_cfg.header, component_cfg.header, {"ns": "custom"}) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
   if (record.as === 'popup') {    
-    const closeLabel = component_cfg.closeLabel || "Fechar";    
+    const closeLabel = component_cfg.closeLabel ? t(component_cfg.closeLabel, component_cfg.closeLabel, {"ns": "custom"}) : t("close", "Fechar");
+
+    let url = i18n.language ? 
+      component_cfg.url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+      : component_cfg.url;
+
     return (
       <React.Fragment>
 
@@ -70,7 +80,7 @@ export function MainMenu({ className, config, actions, record }) {
           onHide={e => setShowPopup(false)}>
           
           { component_cfg.iframe === true ?
-            <iframe title={title} src={component_cfg.url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
+            <iframe title={title} src={url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
             :
             <HelpHtmlContent
               config={component_cfg}
@@ -83,9 +93,14 @@ export function MainMenu({ className, config, actions, record }) {
       </React.Fragment>
     )
   } else if (record.as === 'external') { 
-    const help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url ;
+    let help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url ;
 
     if (!help_url) return null;
+
+    help_url = i18n.language ? 
+      help_url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+      : help_url;
+
     return (
       <Button
         title={title}
@@ -112,6 +127,8 @@ export default function Main({ as, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
+  const { i18n, t } = useTranslation(["common", "custom"]);
+
   const [showPopup, setShowPopup] = useState(false);
   const [size, setSize] = useState(null);
   const [maximized, setMaximized] = useState(false);
@@ -119,15 +136,15 @@ export default function Main({ as, config, actions, record }) {
   const dialog = useRef();    
 
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Ajuda';
-  const header = component_cfg.header || title;
+  const title = record.title ? t(record.title, record.title, {"ns": "custom"}) : t("help", "Ajuda");
+  const header = component_cfg.header ? t(component_cfg.header, component_cfg.header, {"ns": "custom"}) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  const closeLabel = component_cfg.closeLabel || "Fechar";
+  const closeLabel = component_cfg.closeLabel ? t(component_cfg.closeLabel, component_cfg.closeLabel, {"ns": "custom"}) : t("close", "Fechar");
   
-  const openAs = record?.as || as;
+  const openAs = record?.as || as; 
 
   // Render content
   function renderContent() {
@@ -144,14 +161,20 @@ export default function Main({ as, config, actions, record }) {
     </Panel>
   )
 
-  if (openAs === 'popup') return (
-    <React.Fragment>
-      <button className="p-link" onClick={e => setShowPopup(true)} title={title}>
-        <span className="layout-topbar-item-text"></span>
-        <span className="layout-topbar-icon far far fa-question-circle" />
-      </button>
+  if (openAs === 'popup') {
+    
+    let url = i18n.language ? 
+      component_cfg.url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+      : component_cfg.url;
 
-      {showOnPortal(<Dialog
+    return (
+      <React.Fragment>
+        <button className="p-link" onClick={e => setShowPopup(true)} title={title}>
+          <span className="layout-topbar-item-text"></span>
+          <span className="layout-topbar-icon far far fa-question-circle" />
+        </button>
+
+        {showOnPortal(<Dialog
           ref={dialog}        
           header={header}
           visible={showPopup}
@@ -182,7 +205,7 @@ export default function Main({ as, config, actions, record }) {
           onHide={e => setShowPopup(false)}>
           
           { component_cfg.iframe === true ?
-            <iframe title={title} src={component_cfg.url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
+            <iframe title={title} src={url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
             :
             <HelpHtmlContent
               config={component_cfg}
@@ -192,13 +215,18 @@ export default function Main({ as, config, actions, record }) {
 
         </Dialog>)}
 
-    </React.Fragment>
-  )
+      </React.Fragment>
+    );
+  }
 
   if (openAs === 'external') {    
-    const help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url ;
+    let help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url;
 
     if (!help_url) return null;
+
+    help_url = i18n.language ? 
+      help_url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+      : help_url;
 
     // Render help button
     return (
