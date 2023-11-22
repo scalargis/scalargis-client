@@ -1,3 +1,7 @@
 {
-  "welcome": "Welcome"
+  "welcome": "Welcome",
+  "search": "Search",
+  "place": "Place",
+  "close": "Close",
+  "help": "Ajuda"
 }
