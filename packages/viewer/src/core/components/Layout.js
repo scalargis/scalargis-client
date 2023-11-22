@@ -1,4 +1,5 @@
 import React,  {useState, useEffect} from 'react'
+import { useTranslation } from "react-i18next"
 import classNames from 'classnames'
 import {AppTopbar} from './AppTopbar'
 import 'primereact/resources/primereact.min.css'
@@ -21,6 +22,8 @@ function Layout(props) {
     onSidebarClick,
     onToggleMenu
   } = props;
+
+  const { t } = useTranslation(["common", "custom"]);
 	
   const { CLIENT_URL } = core;
 
@@ -74,6 +77,11 @@ function Layout(props) {
   }
   if (config && config.config_json && config.config_json.title_logo)  {
     title_logo = config.config_json.title_logo;
+  }
+
+  //Translate title
+  if (title_logo) {
+    title_logo = t(title_logo, title_logo, {"ns": "custom"});
   }
 
   const logoComponent = size[0] > 768 ? <div className="layout-logo">
