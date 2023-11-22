@@ -1,23 +1,37 @@
 import React, { Fragment, useState, useEffect } from 'react'
+import i18next from 'i18next'
+import { useTranslation } from "react-i18next"
 import { Dialog } from 'primereact/dialog'
 import Cookies from 'universal-cookie'
 import { InputSwitch } from 'primereact/inputswitch'
 import { Button } from 'primereact/button'
+
+import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
+
 import './index.css'
+
 
 const cookiePopupName = process.env.REACT_APP_COOKIE_POPUP_NAME || 'scalargis_popup';
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || '';
+
 
 export default function Main({ config, as, core, actions, utils, record }) {
 
   const { mainMap, auth } = config;
   const { showOnPortal } = utils;
 
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
+
   const [showPopup, setShowPopup] = useState(false);
   const [permanent, setPermanent] = useState(false);
 
   const wsize = utils.getWindowSize();
   const isMobile = wsize[0] <= 768;
+
+  useEffect(()=>{
+    loadTranslations();
+  }, []);
+
 
   function getInitialState() {
 
@@ -67,13 +81,30 @@ export default function Main({ config, as, core, actions, utils, record }) {
       }, 500);
     }
   }, []);
-  
+
   // Render content
-  const closeLabel = config.closeLabel || "Fechar";
+  let header;  
+  if (typeof config?.header === 'object') {
+    header = config.header["default"] ? config.header["default"] : "";
+    header = config.header[i18n.language] ? config.header[i18n.language] : html;
+  } else {
+    header = config?.header ? t(config.header, config.header) : "";
+  }
+
+  const closeLabel = config.closeLabel ? t(config.closeLabel, config.closeLabel) : t("close", "Fechar")
+
+  let html;
+  if (typeof config?.html === 'object') {
+    html = config.html["default"] ? config.html["default"] : "";
+    html = config.html[i18n.language] ? config.html[i18n.language] : html;
+  } else {
+    html = config?.html;
+  }
+
   return (
     <Fragment>
       {showOnPortal(<Dialog
-        header={config.header}
+        header={header}
         visible={showPopup}
         style={{width: isMobile ? '90%' : '35vw' }}
         modal
@@ -88,7 +119,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
               />
               {' '}
               <label htmlFor="permanentSwitch">
-                <span>Não mostrar novamente</span>
+                <span>{t("doNotShowAgain", "Não mostrar novamente")}</span>
               </label>
             </div>)}
             <div className="p-col" style={{ textAlign: 'right'}}>
@@ -97,7 +128,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
           </div>
         )}
         onHide={e => hidePopup()}>
-          <div dangerouslySetInnerHTML={{ __html: config.html }}></div>
+          <div dangerouslySetInnerHTML={{ __html: html }}></div>
       </Dialog>)}
     </Fragment>
   )
