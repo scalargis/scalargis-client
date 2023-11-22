@@ -1,12 +1,19 @@
+import React, { useState } from 'react';
+import { useTranslation} from "react-i18next";
+
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import React, { useState } from 'react';
+
 import ThemeInfo from './ThemeInfo';
+
 
 export default function Main({ core, config }) {
 
   const { layer, viewer, mainMap, actions, models } = config;
   const { getWindowSize, showOnPortal } = models.Utils;  
+
+  const { t } = useTranslation(["common", "custom"]);
+
   const [modalThemeInfoOpen, setModalThemeInfoOpen] = useState(false);
 
   const wsize = getWindowSize();
@@ -19,14 +26,14 @@ export default function Main({ core, config }) {
     <React.Fragment>
 
       <Button icon="pi pi-info-circle"
-        title="Informação de Metadados"
+        title={t("metadataInfo", "Informação de Metadados")}
         color="blue"
         className="p-button-sm p-button-rounded p-button-text tool"
         onClick={e => setModalThemeInfoOpen(layer)}
       />
 
       {showOnPortal(<Dialog 
-        header="Informação do Tema"
+        header={t("themeInfo", "Informação do Tema")}
         visible={!!modalThemeInfoOpen}
         style={{width: isMobile ? '90%' : '50vw' }}  
         modal 

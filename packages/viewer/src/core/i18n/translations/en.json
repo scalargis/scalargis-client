@@ -3,5 +3,15 @@
   "search": "Search",
   "place": "Place",
   "close": "Close",
-  "help": "Ajuda"
+  "help": "Ajuda",
+  "metadataInfo": "Metadata information",
+  "themeInfo": "Theme info",
+  "title": "Title",
+  "metadata": "Metadata",
+  "description": "Description",
+  "type": "Type",
+  "coordinateSystem": "Coordinate System",
+  "getMapFormats": "GetMap Formats",
+  "getFeatureInfoFormats": "GetFeatureInfo Formats",
+  "openMetadataDetails": "Open Details"
 }
