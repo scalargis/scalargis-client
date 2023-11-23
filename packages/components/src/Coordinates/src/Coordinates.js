@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation} from "react-i18next"
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { TabView,TabPanel } from 'primereact/tabview';
 import { transform } from 'ol/proj'
@@ -23,6 +24,8 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const { viewer, mainMap, Models } = config;  
   const { getProjectionSrid } = Models.MapModel;  
   const { coordinates }  = viewer;
+
+  const { t } = useTranslation();
 
   const [listCRS, setListCRS] = useState([]);
   const [CRS, setCRS] = useState(null);
@@ -373,13 +376,13 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       <div className="p-col-12 coordinates-item">
         <div className="coordinates-item-tools p-text-right">
           <Button
-            title="Aproximar ao elemento"
+            title={t("zoomToElement", "Aproximar ao elemento")}
             icon="pi pi-search"
             onClick={e => zoomItem(data)}
           />
           <SplitButton label="" icon="pi pi-download" model={buildSaveBtnItems(data)} />
           <Button
-            title="Remover elemento"
+            title={t("removeElement","Remover elemento")}
             icon="pi pi-times"
             onClick={e => removeItem(data)}
           />
@@ -512,7 +515,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
           <div className="p-mt-2 p-mb-3">
             <Message
               severity="info"
-              text="Clique no mapa para obter as coordenadas ou indique os seus valores através seguinte formulário." 
+              text={t("searchByCoordinateInfo", "Clique no mapa para obter as coordenadas ou indique os seus valores através seguinte formulário.")}
             />
           </div> : null 
       ) }
@@ -521,18 +524,18 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       <React.Fragment>
         <div className="p-fluid p-formgrid p-grid p-mt-2">
           <div className="p-field p-col-12">
-            <label htmlFor="coordsys">Sistema de Coordenadas</label>
-            <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder="Selecione um CRS"/>
+            <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
+            <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")}/>
           </div>
           <div className="p-field p-col-12">
             <div className="p-formgroup-inline flex-no-wrap">
                 <div className="p-field-checkbox">
                     <RadioButton value="dd" onChange={(e) => setUnits(e.value)} checked={units === 'dd'}  />
-                    <label>Graus decimais</label>
+                    <label>{t("decimalDegrees", "Graus decimais")}</label>
                 </div>
                 <div className="p-field-checkbox">
                     <RadioButton value="dms" onChange={(e) => setUnits(e.value)} checked={units === 'dms'}  />
-                    <label>Graus / Minutos / Segundos</label>
+                    <label>{`${t("degrees", "Graus")} / ${t("minutes", "Minutos")} / ${t("seconds", "Segundos")}`}</label>
                 </div>
             </div>
           </div>
@@ -540,11 +543,11 @@ export default function Coordinates({ core, config, actions, dispatch, record })
           { units === 'dd' &&
             <div className="p-fluid p-formgrid p-grid">
               <div className="p-field p-col">
-                <label>Longitude</label>
+                <label>{t("longitude", "Longitude")}</label>
                 <InputNumber value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm" />
               </div>
               <div className="p-field p-col">
-                <label>Latitude</label>              
+                <label>{t("latitude", "Latitude")}</label>
                 <InputNumber value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm" />
               </div>
             </div>          
@@ -552,7 +555,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
           { units === 'dms' &&
             <div className="p-fluid p-formgrid p-grid">
               <div className="p-field p-col">
-                <label>Longitude</label>
+                <label>{t("longitude", "Longitude")}</label>
                 <div className="p-inputgroup">
                   <select value={optLongitude} onChange={e => setOptLongitude(e.target.value)}>
                     <option value="E">E</option>
@@ -562,7 +565,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                 </div>
               </div>
               <div className="p-field p-col">
-                <label>Latitude</label>
+                <label>{t("latitude", "Latitude")}</label>
                 <div className="p-inputgroup">
                 <select value={optLatitude} onChange={e => setOptLatitude(e.target.value)}>
                     <option value="N">N</option>
@@ -581,8 +584,8 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       <React.Fragment>
         <div className="p-fluid p-formgrid p-grid p-mt-2">
             <div className="p-field p-col-12">
-              <label htmlFor="coordsys">Sistema de Coordenadas</label>
-              <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder="Selecione um CRS"/>
+              <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
+              <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")}/>
             </div>
             <div className="p-field p-col">
                 <label htmlFor="coordX">X</label>
@@ -596,8 +599,8 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       </React.Fragment>)}
       <div className="card p-text-center">
         <Button
-            label="Localizar"
-            icon="pi pi-pi-search"
+            label={t("locate","Localizar")}
+            icon="pi pi-search"
             className="p-button-md"
             onClick={e => { transformCoordinatesByApi(); }}
         />
@@ -609,21 +612,21 @@ export default function Coordinates({ core, config, actions, dispatch, record })
 
           <div style={ {padding: "1rem 0", textAlign: "right"} }>
             <Button
-              title="Limpar resultados"
-              label="Limpar"
+              title={t("clearResults", "Limpar resultados")}
+              label={t("clear", "Limpar")}
               icon="pi pi-times"
               className="p-button-outlined p-button-sm"
               onClick={e => removeAll()}
             />
             <Button
-              title="Exportar resultados"
+              title={t("exportResults", "Exportar resultados")}
               label="CSV"
               icon="pi pi-download"
               className="p-button-outlined p-button-sm p-ml-2"
               onClick={e => exportAll('csv')}
             />
             <Button
-              title="Exportar resultados"
+              title={t("exportResults", "Exportar resultados")}
               label="GeoJSON"
               icon="pi pi-download"
               className="p-button-outlined p-button-sm p-ml-2"
@@ -636,7 +639,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       ) }
 
       { ( coordinates.length > 1 ?
-        <React.Fragment><h4>Resultados anteriores</h4>
+        <React.Fragment><h4>{t("previousResults", "Resultados anteriores")}</h4>
           <DataView value={coordinates.slice(1)} layout="list"
             itemTemplate={itemTemplate} paginator alwaysShowPaginator={false} pageLinkSize={2} rows={9} style={{fontSize: ".8rem"}} />
         </React.Fragment> : null)

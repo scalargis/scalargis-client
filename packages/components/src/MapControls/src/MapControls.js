@@ -149,7 +149,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
     if (type === 'Coordinates') {
       return (!!coordinates_control && !!coordinates_control.show_button) ?
         <Button key={type}
-          title={coordinates_control.title || 'Obter coordenadas'}
+          title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
           icon="fas fa-bullseye"
           className={exclusive_mapcontrol === 'Coordinates' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}

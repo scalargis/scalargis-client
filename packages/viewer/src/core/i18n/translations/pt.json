@@ -31,5 +31,19 @@
   "altitudeAccuracy": "Precisão da altitude",
   "heading": "Direção",
   "speed": "Velocidade",
-  "showTotalExtent": "Ver extensão total"
+  "showTotalExtent": "Ver extensão total",
+  "getCoordinates":"Obter coordenadas",
+  "searchByCoordinates": "Pesquisa por Coordenadas",
+  "searchByCoordinateInfo": "Clique no mapa para obter as coordenadas ou indique os seus valores através seguinte formulário.",
+  "zoomToElement": "Aproximar ao elemento",
+  "removeElement":"Remover elemento",
+  "exportResults": "Exportar resultados",
+  "clearResults": "Limpar resultados",
+  "clear": "Limpar",
+  "selectCRS": "Selecione um CRS",
+  "previousResults": "Resultados anteriores",
+  "decimalDegrees": "Graus decimais",
+  "degrees": "Graus",
+  "minutes": "Minutos",
+  "seconds": "Segundos"
 }

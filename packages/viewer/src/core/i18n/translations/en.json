@@ -31,5 +31,19 @@
   "altitudeAccuracy": "Altitude accuracy",
   "heading": "Direção",
   "speed": "Speed",
-  "showTotalExtent": "Show full extent"
+  "showTotalExtent": "Show full extent",
+  "getCoordinates":"Get coordinates",
+  "searchByCoordinates": "Search by Coordinates",
+  "searchByCoordinateInfo": "Click on the map to obtain the coordinates or enter their values ​​using the following form.",
+  "zoomToElement": "Zoom to element",
+  "removeElement":"Remove element",
+  "exportResults": "Export results",
+  "clearResults": "Clear results",
+  "clear": "Clear",
+  "selectCRS": "Select a CRS",
+  "previousResults": "Previous resultados",
+  "decimalDegrees": "Decimal degrees",
+  "degrees": "Degrees",
+  "minutes": "Minutes",
+  "seconds": "Seconds"
 }
