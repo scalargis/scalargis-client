@@ -38,6 +38,7 @@
   "zoomToElement": "Zoom to element",
   "removeElement":"Remove element",
   "exportResults": "Export results",
+  "export": "Exportar",
   "clearResults": "Clear results",
   "clear": "Clear",
   "selectCRS": "Select a CRS",
@@ -45,5 +46,9 @@
   "decimalDegrees": "Decimal degrees",
   "degrees": "Degrees",
   "minutes": "Minutes",
-  "seconds": "Seconds"
+  "seconds": "Seconds",
+  "noResultsFound": "No results found",
+  "identifyElements": "Identify Elements",
+  "identifyNoResults": "No results. Click on the map to identify.",
+  "exportElement": "Export element"
 }

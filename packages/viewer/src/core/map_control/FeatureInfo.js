@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { useTranslation} from "react-i18next"
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
 import OlVectorTileLayer from "ol/layer/VectorTile";
@@ -48,6 +49,8 @@ export default function FeatureInfo({ core, config, actions }) {
   const feature_info_component = viewer.config_json.components.find(c => c.config_json && 
                 c.config_json.map_control === 'FeatureInfo');
   const layers = viewer.config_json.layers;
+
+  const { t } = useTranslation();
 
   const [search, setSearch] = useState(null);
 
@@ -298,14 +301,13 @@ export default function FeatureInfo({ core, config, actions }) {
       }
     });    
 
-
     // No layers found, disable GetFeatureInfo
     //if (features.length === 0 && lrs.length === 0) {
       if (features.length === 0 && fvt_remote.length === 0) {
       let emptyResults = [{
         id: uuidV4(),
         type: 'text',
-        data: '<p>Não foram encontrados resultados</p>'
+        data: `<p>${t("noResultsFound", "Não foram encontrados resultados")}</p>`
       }];
       dispatch(actions.viewer_set_featureinfo(emptyResults));
     }

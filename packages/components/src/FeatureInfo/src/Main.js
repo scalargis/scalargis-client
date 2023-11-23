@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useTranslation} from "react-i18next"
 import { Button } from 'primereact/button'
 import OLGroupLayer from "ol/layer/Group"
 import { Panel } from 'primereact/panel'
@@ -20,8 +21,10 @@ export function traverseOlLayers(collection, cb) {
  */
 export function MainMenu({ className, config, actions, record }) {
 
+  const { t } = useTranslation();
+
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Identificar Elementos';
+  const title = record.title || t("identifyElements", "Identificar elementos");
 
   return (
     <Button
@@ -43,7 +46,10 @@ export default function Main({ as, core, config, actions, record }) {
   const { selected_menu, layers } = viewer.config_json;
 
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Identificar Elementos';
+
+  const { t } = useTranslation();
+
+  const title = record.title || t("identifyElements", "Identificar elementos");
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();

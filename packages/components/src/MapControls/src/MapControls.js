@@ -157,7 +157,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
     } else if (type === 'FeatureInfo') {
       return (!!feature_info_control && !!feature_info_control.show_button) ?
         <Button key={type}
-          title={feature_info_control.title || 'Identificar elementos'}
+          title={feature_info_control.title || t("identifyElements", "Identificar elementos")}
           icon="pi pi-info-circle"
           className={exclusive_mapcontrol === 'FeatureInfo' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleFeatureInfoControl() }}
