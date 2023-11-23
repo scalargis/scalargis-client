@@ -50,5 +50,16 @@
   "noResultsFound": "No results found",
   "identifyElements": "Identify Elements",
   "identifyNoResults": "No results. Click on the map to identify.",
-  "exportElement": "Export element"
+  "exportElement": "Export element",
+  "mapTools": "Map Tools",
+  "measurementTools": "Measurement Tools",
+  "measureDistance": "Measure Distance",
+  "measureArea": "Measure Area",
+  "measureInfoDistance": "1. to start measuring, click on the map at the initial location<br />2. to measure a route click on the intermediate locations<br />3. to finish, double-click",
+  "measureInfoArea": "1. to start measuring, click on the map at a starting location<br />2. continue clicking on the locations that define the area<br />3. to finish, double-click",
+  "measureMsgStartDrawing": "Click to start drawing",
+  "measureMsgContinuePolygon": "Click to continue drawing the polygon",
+  "measureMsgContinueLine": "Click to continue drawing the line",
+  "length": "Length",
+  "area": "Area"
 }

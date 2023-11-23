@@ -50,5 +50,16 @@
   "noResultsFound": "Não foram encontrados resultados",
   "identifyElements": "Identificar Elementos",
   "identifyNoResults": "Sem resultados. Clique no mapa para identificar.",
-  "exportElement": "Exportar elemento"
+  "exportElement": "Exportar elemento",
+  "mapTools": "Ferramentas do Mapa",
+  "measurementTools": "Ferramentas de Medição",
+  "measureDistance": "Medir Distância",
+  "measureArea": "Medir Área",
+  "measureInfoDistance": "1. para começar a medição clique no mapa na localização inicial<br />2. para medir um trajeto clique nas localizações intermédias<br />3. para terminar faça duplo-clique",
+  "measureInfoArea": "1. para começar a medição clique no mapa numa localização inicial<br />2. continue clicando nas localizações que definem a área<br />3. para terminar faça duplo-clique",
+  "measureMsgStartDrawing": "Clique para começar a desenhar",
+  "measureMsgContinuePolygon": "Clique para continuar a desenhar o polígono",
+  "measureMsgContinueLine": "Clique para continuar a desenhar a linha",
+  "length": "Comprimento",
+  "area": "Área"
 }

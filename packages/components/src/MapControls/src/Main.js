@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import MapControls from './MapControls'
@@ -25,9 +26,11 @@ export default function Main({ core, as, config, record }) {
 
   const { actions, mainMap, viewer, dispatch } = config;
 
+  const { t } = useTranslation();
+
   function renderContent() {
     return (
-      <div title="Ferramentas do Mapa">
+      <div title={t("mapTools", "Ferramentas do Mapa")}>
         <MapControls
           core={core}
           viewer={viewer}
@@ -41,7 +44,7 @@ export default function Main({ core, as, config, record }) {
   }
 
   if (as === 'panel') return (
-    <Panel header="Ferramentas do Mapa">
+    <Panel header={t("mapTools", "Ferramentas do Mapa")}>
       { renderContent() }
     </Panel>
   )

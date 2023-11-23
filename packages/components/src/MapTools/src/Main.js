@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { useTranslation} from "react-i18next"
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import componentActions from './actions';
@@ -23,8 +24,10 @@ const maptoolsReducer = (state = {}, action) => {
  */
 export function MainMenu({ className, config, actions, record }) {
 
+  const { t } = useTranslation();
+
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Ferramentas de Medição';
+  const title = record.title || t("measurementTools", "Ferramentas de Medição");
 
   return (
     <Button
@@ -47,10 +50,12 @@ export function MainMenu({ className, config, actions, record }) {
 
   const { dispatch, viewer, mainMap } = config;
   const { selected_menu, layers } = viewer.config_json;
-  const { getWindowSize } = Models ? Models.Utils : utils;    
+  const { getWindowSize } = Models ? Models.Utils : utils;
+
+  const { t } = useTranslation();
 
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Ferramentas de Medição';
+  const title = record.title || t("measurementTools", "Ferramentas de Medição");
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
