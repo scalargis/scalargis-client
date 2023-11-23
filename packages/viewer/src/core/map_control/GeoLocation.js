@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { useTranslation} from "react-i18next"
 import { transform } from 'ol/proj'
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
@@ -31,6 +32,9 @@ export default function GeoLocation({ config, actions }) {
     const geo_location_control = viewer.config_json.map_controls.find(c => c.id === 'GeoLocation');
     const geo_location_component = viewer.config_json.components.find(c => c.config_json && 
                 c.config_json.map_control === 'GeoLocation');
+
+    const { t } = useTranslation();
+
     const [loaded, setLoaded] = useState(false);
     const [olgeolocation, setOlgeolocation] = useState(null);
 
@@ -64,7 +68,7 @@ export default function GeoLocation({ config, actions }) {
                     saveGeoLocation(pos);
                     if (cb) cb(pos);
                 } else {
-                    saveGeoLocation({ error: { code: 0, message: 'Não foi possível obter localização.'} });
+                    saveGeoLocation({ error: { code: 0, message: t("myLocationNoInformation", "Não foi possível obter localização.")} });
                 }
             }, (error) => {
                 const pos = { 

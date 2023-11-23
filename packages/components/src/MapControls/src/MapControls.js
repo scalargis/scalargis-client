@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import ZoomToExtent from 'ol/control/ZoomToExtent';
 import DragBox from 'ol/interaction/DragBox';
@@ -27,6 +28,9 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
   const geo_location_component = viewer.config_json.components.find(c => c.config_json &&
     c.config_json.map_control === 'GeoLocation');
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, viewer_set_exclusive_mapcontrol } = actions;
+
+  const { t } = useTranslation();
+
   const [dragBox, setDragBox] = useState(false);
 
   const [geoLocationSettings, setGeoLocationSettings] = useState(false);
@@ -37,7 +41,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
     const zoom_opts = {
       label: elem_zoom,
-      tipLabel: "Ver extensão total"
+      tipLabel: t("showTotalExtent", "Ver extensão total")
     }
 
     if (viewer && viewer.config_json && viewer.config_json.full_extent) {
@@ -164,7 +168,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
           onMouseOver={e => { setGeoLocationSettings(true); }}
           onMouseLeave={e => { setGeoLocationSettings(false); }}>
           <Button 
-            title={geo_location_control.title || 'A minha localização'}
+            title={geo_location_control.title || t("myLocation", "A minha localização")}
             icon="pi pi-globe"
             className={geoLocationActive ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
             onClick={e => { e.currentTarget.blur(); toggleGeoLocationControl() }}
@@ -173,7 +177,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
             onMouseLeave={e => { setGeoLocationSettings(false); }}
           >
             <input type="checkbox" onClick={e => { toggleGeoLocationTracking(e.currentTarget.checked); }} checked={geoLocationTracking} />
-            <label> Atualizar posição</label>
+            <label> {t("myLocationUpdatePosition", "Atualizar posição")}</label>
           </div>
         </div> : null;
     } else {
