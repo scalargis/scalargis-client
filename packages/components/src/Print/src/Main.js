@@ -1,8 +1,10 @@
 import React, { useState,useEffect } from 'react';
+import { useTranslation} from "react-i18next"
 import { Button } from 'primereact/button'
 import { Panel } from 'primereact/panel'
 import { Dialog } from 'primereact/dialog'
 import Print from './Print'
+
 import './style.css'
 
 /**
@@ -13,17 +15,19 @@ export function MainMenu({ className, core, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
+  const { t } = useTranslation();
+
   const [showPopup, setShowPopup] = useState(false);
 
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Imprimir';
+  const title = record.title || t("print", "Imprimir");
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
   if (record.as === 'popup') {    
-    const closeLabel = component_cfg.closeLabel || "Fechar";    
+    const closeLabel = component_cfg.closeLabel || t("close", "Fechar");
     return (
       <React.Fragment>
 
@@ -78,10 +82,13 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   const { viewer, dispatch, Models } = config;
   const { selected_menu } = viewer.config_json;
-  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;
+  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;  
 
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Imprimir';
+
+  const { t } = useTranslation();
+
+  const title = record.title || t("print", "Imprimir");
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
