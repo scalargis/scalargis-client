@@ -135,5 +135,8 @@
   "map": "Mapa",
   "printMapScaleOptionMsg": "A planta será emitida em função da escala de visualização do mapa",
   "contactForm": "Formulário de Contacto",
-  "contact": "Contacto"
+  "contact": "Contacto",
+  "themes": "Temas",
+  "showHideChildThemes": "Mostrar/esconder subtemas",
+  "showHideDetails": "Mostrar/esconder detalhes"
 }

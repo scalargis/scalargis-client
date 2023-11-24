@@ -135,5 +135,8 @@
   "map": "Map",
   "printMapScaleOptionMsg": "Print based on the map  active scale",
   "contactForm": "Contact Form",
-  "contact": "Contact"  
+  "contact": "Contact",
+  "themes": "Themes",
+  "showHideChildThemes": "Show/Hide child themes",
+  "showHideDetails": "Show/Hide details"
 }

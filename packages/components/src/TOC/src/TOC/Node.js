@@ -1,4 +1,5 @@
 import React from "react";
+import { withTranslation } from "react-i18next";
 import Tree from "./Tree";
 import {Checkbox} from 'primereact/checkbox';
 import { RadioButton } from 'primereact/radiobutton';
@@ -81,7 +82,7 @@ class Node extends React.Component {
                   { isGroup && (
                     <Button
                       className="p-button-sm p-button-text" 
-                      title="Mostrar/esconder subtemas"
+                      title={this.props.t("showHideChildThemes", "Mostrar/esconder subtemas")}
                       icon={this.isOpen() ? "pi pi-chevron-down" : "pi pi-chevron-right" }
                       onClick={e => actions.open(e, data.id)}
                     />
@@ -128,7 +129,7 @@ class Node extends React.Component {
                   { data.show_details !== false ?
                   <Button
                     className={"p-button-sm" + (detailsOpen ? "" : " p-button-text") } 
-                    title="Mostrar/esconder detalhes"
+                    title={this.props.t("showHideDetails", "Mostrar/esconder detalhes")}
                     icon={this.isOpen() ? "pi pi-cog" : "pi pi-cog" }
                     onClick={e => this.setState({ ...this.state, detailsOpen: !detailsOpen })}
                   /> : null }
@@ -200,4 +201,4 @@ class Node extends React.Component {
   }
 }
 
-export default Node;
+export default withTranslation()(Node);

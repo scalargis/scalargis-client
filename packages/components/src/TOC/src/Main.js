@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import Cookies from 'universal-cookie'
+import { withTranslation, useTranslation} from "react-i18next";
+import Cookies from 'universal-cookie';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import Tree from './TOC/Tree';
@@ -24,9 +25,16 @@ export const actions = {
  * Main menu component
  */
 export function MainMenu({ className, config, actions, record }) {
+
+  const { t } = useTranslation();
+
+  const component_cfg = record.config_json || {};
+  const title = record.title || t("themes", "Temas");
+  const header = component_cfg.header || title;
+
   return (
     <Button
-      title="Temas"
+      title={title}
       className={className}
       icon="pi pi-list"
       style={{ margin: '0.5em 1em' }}
@@ -383,7 +391,7 @@ class Main extends React.Component {
 
         <div id="layer-switcher" className={"plugin-main" + (dragging ? " dragging" : "")}>
 
-          { !!withHeading && <h3>Temas</h3> }
+          { !!withHeading && <h3>{this.props.t("themes","Temas")}</h3> }
 
           { (!!cookieData && !!config.viewer.allow_user_session) && 
             <Toolbar className="p-mb-2"
@@ -457,7 +465,7 @@ class Main extends React.Component {
     const { as } = this.props;
     
     if (as === 'panel') return (
-      <Panel header="Temas">        
+      <Panel header={this.props.t("themes","Temas")}>
         { this.renderContent() }
       </Panel>
     )
@@ -472,4 +480,4 @@ class Main extends React.Component {
 
 }
 
-export default Main;
+export default withTranslation()(Main);
