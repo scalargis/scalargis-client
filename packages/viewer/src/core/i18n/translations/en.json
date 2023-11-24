@@ -133,5 +133,7 @@
   "predefined": "Predefined",
   "free": "Free",
   "map": "Map",
-  "printMapScaleOptionMsg": "Print based on the map  active scale"
+  "printMapScaleOptionMsg": "Print based on the map  active scale",
+  "contactForm": "Contact Form",
+  "contact": "Contact"  
 }
