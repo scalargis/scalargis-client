@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useTranslation} from "react-i18next"
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import DrawTools from './DrawTools'
@@ -8,8 +9,10 @@ import DrawTools from './DrawTools'
  */
 export function MainMenu({ className, config, actions, record }) {
 
+  const { t } = useTranslation();
+
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Ferramentas de Desenho';
+  const title = record.title || t("drawingTools", "Ferramentas de Desenho");
   const header = component_cfg.header || title;
 
   return (
@@ -30,7 +33,10 @@ export default function Main({ type, region, as, config, actions, record, utils 
   const { getWindowSize } = Models ? Models.Utils : utils;  
 
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Ferramentas de Desenho';
+
+  const { t } = useTranslation();
+
+  const title = record.title || t("drawingTools", "Ferramentas de Desenho");
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
