@@ -138,5 +138,15 @@
   "contact": "Contact",
   "themes": "Themes",
   "showHideChildThemes": "Show/Hide child themes",
-  "showHideDetails": "Show/Hide details"
+  "showHideDetails": "Show/Hide details",
+  
+  "accept": "Accept",
+
+  "defaultRGPDmsg": "This website uses cookies to improve your browsing experience. By pressing 'I Accept' you are agreeing to its use.",
+  "moreInformation": "More information",
+
+  "pageNotFound": "Page not found",
+  "viewerNotFound": "The viewer does not exists.",
+  "goHomeMsg": "Click to got to homepage",
+  "homepage": "Homepage"
 }

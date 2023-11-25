@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation} from "react-i18next";
 import SplashScreen from './SplashScreen';
 import { withCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
@@ -11,6 +12,8 @@ const cookiePath = process.env.REACT_APP_COOKIE_PATH || '';
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
 function RGPD({ cookies, children }) {
+
+  const { t } = useTranslation();
 
   const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
 
@@ -36,7 +39,7 @@ function RGPD({ cookies, children }) {
           <SplashScreen>
             <CookieConsent
               location="bottom"
-              buttonText="Aceito"
+              buttonText={t("accept", "Aceito")}
               cookieName={cookieName}
               cookieValue={cookieValue}
               expires={cookieExpiresDays}

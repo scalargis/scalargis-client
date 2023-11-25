@@ -138,5 +138,15 @@
   "contact": "Contacto",
   "themes": "Temas",
   "showHideChildThemes": "Mostrar/esconder subtemas",
-  "showHideDetails": "Mostrar/esconder detalhes"
+  "showHideDetails": "Mostrar/esconder detalhes",
+  
+  "accept": "Aceito",
+
+  "defaultRGPDmsg": "Este website usa cookies para melhorar a sua experiência de navegação. Ao pressionar 'Aceito' está a concordar com a sua utilização.",
+  "moreInformation": "Mais informação",
+
+  "pageNotFound": "Página não encontrada",
+  "viewerNotFound": "O visualizador solicitado não existe.",
+  "goHomeMsg": "Clique para ir para a página inicial",
+  "homepage": "Página Inicial"
 }
