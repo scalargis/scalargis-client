@@ -59,18 +59,17 @@ export default function Main({ as, config, actions, record }) {
   if (mode === 'inline') {
     return (
       <div style={{marginLeft: '20px'}} className='locale-selector'>
-        {localesList.map((item) => {
+        {localesList.map((item, index) => {
           return (
-            <Button
-              key={item.value} 
-              label={item.label} 
-              style={{
-                marginLeft: 'unset',
-                minWidth: 'unset',
-              }}
-              className={`p-button-text ${ i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
-              onClick={(e)=>dispatch(viewer_set_locale(item.value))}
-            />
+            <React.Fragment>
+              <Button
+                key={item.value} 
+                label={item.label}
+                className={`p-button-text ${ i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                onClick={(e)=>dispatch(viewer_set_locale(item.value))}
+              />
+              {(index < localesList.length-1) && <span>|</span>}
+            </React.Fragment>
           );
         })}
       </div>
