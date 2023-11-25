@@ -450,7 +450,7 @@ export default function PrintPanelItem(props) {
   useEffect(() => {
     if (!formats?.length) return;
     setFormats(formats.map((f) => { return {...f, label: f.format + ' - ' + t(f.orientation, f.orientation)}}))
-  }, [i18n.language])
+  }, [i18n.resolvedLanguage]);
 
 
   // draw paper box 

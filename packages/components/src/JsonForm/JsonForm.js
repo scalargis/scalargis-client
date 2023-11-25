@@ -22,8 +22,8 @@ export const JsonForm = (props) => {
   const ctx = useContext(JsonFormContext);
   
   const locale = useMemo(()=> {
-    return props.locale || i18next.language;
-  }, [i18next.language]);
+    return props.locale || i18next.resolvedLanguage;
+  }, [i18next.resolvedLanguage]);
 
   const translation = useMemo(() => {
     let translations = merge(i18nDefaults, getTranslations());  
@@ -48,7 +48,7 @@ export const JsonForm = (props) => {
       return msg;
     };
     return createTranslator(locale);
-  },  [props.locale, props.translations, props.i18n, i18next.language]);
+  },  [props.locale, props.translations, props.i18n, i18next.resolvedLanguage]);
 
   return (
     <JsonForms

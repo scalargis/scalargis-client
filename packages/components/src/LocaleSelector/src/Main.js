@@ -21,7 +21,7 @@ export default function Main({ as, config, actions, record }) {
   const { i18n } = useTranslation();
 
   const locale = useMemo(()=> {
-    return viewer.locale ? viewer.locale : i18n.language;
+    return viewer.locale ? viewer.locale : i18n.resolvedLanguage;
   }, [viewer.locale]);
   
   const localesList = useMemo(() => {
@@ -34,7 +34,7 @@ export default function Main({ as, config, actions, record }) {
       }
     } else {
       locales = [
-        { label: i18n.language.toUpperCase(), value: i18n.language}
+        { label: i18n.resolvedLanguage.toUpperCase(), value: i18n.resolvedLanguage}
       ]
     }
     return locales;
@@ -68,7 +68,7 @@ export default function Main({ as, config, actions, record }) {
                 marginLeft: 'unset',
                 minWidth: 'unset',
               }}
-              className={`p-button-text ${ i18n.language === item.value ? 'locale-selected' : ''}`}
+              className={`p-button-text ${ i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
               onClick={(e)=>dispatch(viewer_set_locale(item.value))}
             />
           );

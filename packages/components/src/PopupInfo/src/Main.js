@@ -86,7 +86,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
   let header;  
   if (typeof config?.header === 'object') {
     header = config.header["default"] ? config.header["default"] : "";
-    header = config.header[i18n.language] ? config.header[i18n.language] : html;
+    header = config.header[i18n.resolvedLanguage] ? config.header[i18n.resolvedLanguage] : html;
   } else {
     header = config?.header ? t(config.header, config.header) : "";
   }
@@ -96,7 +96,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
   let html;
   if (typeof config?.html === 'object') {
     html = config.html["default"] ? config.html["default"] : "";
-    html = config.html[i18n.language] ? config.html[i18n.language] : html;
+    html = config.html[i18n.resolvedLanguage] ? config.html[i18n.resolvedLanguage] : html;
   } else {
     html = config?.html;
   }

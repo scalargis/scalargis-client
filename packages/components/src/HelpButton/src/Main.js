@@ -34,8 +34,8 @@ export function MainMenu({ className, config, actions, record }) {
   if (record.as === 'popup') {    
     const closeLabel = component_cfg.closeLabel ? t(component_cfg.closeLabel, component_cfg.closeLabel, {"ns": "custom"}) : t("close", "Fechar");
 
-    let url = i18n.language ? 
-      component_cfg.url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+    let url = i18n.resolvedLanguage ? 
+      component_cfg.url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
       : component_cfg.url;
 
     return (
@@ -97,8 +97,8 @@ export function MainMenu({ className, config, actions, record }) {
 
     if (!help_url) return null;
 
-    help_url = i18n.language ? 
-      help_url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+    help_url = i18n.resolvedLanguage ? 
+      help_url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
       : help_url;
 
     return (
@@ -163,8 +163,8 @@ export default function Main({ as, config, actions, record }) {
 
   if (openAs === 'popup') {
     
-    let url = i18n.language ? 
-      component_cfg.url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+    let url = i18n.resolvedLanguage ? 
+      component_cfg.url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
       : component_cfg.url;
 
     return (
@@ -224,8 +224,8 @@ export default function Main({ as, config, actions, record }) {
 
     if (!help_url) return null;
 
-    help_url = i18n.language ? 
-      help_url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+    help_url = i18n.resolvedLanguage ? 
+      help_url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
       : help_url;
 
     // Render help button

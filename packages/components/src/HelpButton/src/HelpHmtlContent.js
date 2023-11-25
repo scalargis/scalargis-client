@@ -13,15 +13,15 @@ export default function HelpHtmlContent({ config }) {
   let html;
   if (typeof config?.html === "object") {
     html = config.html["default"] ? config.html["default"] : "";
-    html = config.html[i18n.language] ? config.html[i18n.language] : html;
+    html = config.html[i18n.resolvedLanguage] ? config.html[i18n.resolvedLanguage] : html;
   } else {
     html = config?.html || "";
   }
 
   useEffect(() => {    
     if (config.url) {
-      const url = i18n.language ? 
-        config.url.replace("{lang}", i18n.language).replace("{language}", i18n.language)
+      const url = i18n.resolvedLanguage ? 
+        config.url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
         : config.url;
       fetch(url).then(res => {
           return res.text();
