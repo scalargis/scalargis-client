@@ -35,6 +35,10 @@
     border-radius: 50%;
 }
 
+.ol-zoom-extent {
+    padding-bottom: 10px;
+}
+
 .ol-rotate {
     transition: opacity .25s linear, visibility 0s linear;
 }
