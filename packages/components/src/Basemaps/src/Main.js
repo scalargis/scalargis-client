@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import Basemaps from './Basemaps'
@@ -7,11 +8,16 @@ import Basemaps from './Basemaps'
  * Main menu component
  */
 export function MainMenu({ className, config, actions, record }) {
+
+  const { t } = useTranslation();
+
+  const component_cfg = record.config_json || {};
+  const title = record.title || t("basemaps", "Maps de Base");
   
   if (record && record.target === 'mainmenu') {
       return (
           <Button
-            title="Mapas de Base"
+            title={title}
             className={className}
             icon="pi pi-image"
             style={{ margin: '0.5em 1em' }}
@@ -26,6 +32,13 @@ export function MainMenu({ className, config, actions, record }) {
 export default function Main({as, core, config, actions, record, utils}) {
   
   const { viewer, mainMap } = config;
+
+  const component_cfg = record.config_json || {};
+
+  const { t } = useTranslation();
+
+  const title = record.title || t("basemaps", "Mapas de Base");
+  const header = component_cfg.header ? t(component_cfg.header, component_cfg.header) : title;  
 
   let layers = [];
   let selectedLayer = null;
@@ -60,7 +73,7 @@ export default function Main({as, core, config, actions, record, utils}) {
 
   function renderContent() {
     return (
-      <div title="Mapas de Base">
+      <div title={title}>
         <Basemaps
           core={core}
           config={config}
@@ -76,7 +89,7 @@ export default function Main({as, core, config, actions, record, utils}) {
   }
 
   if (as === 'panel') return (    
-    <Panel header="Mapas de Base">
+    <Panel header={header}>
       { renderContent() }
     </Panel>
   )  

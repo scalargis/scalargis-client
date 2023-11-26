@@ -148,5 +148,9 @@
   "pageNotFound": "Página não encontrada",
   "viewerNotFound": "O visualizador solicitado não existe.",
   "goHomeMsg": "Clique para ir para a página inicial",
-  "homepage": "Página Inicial"
+  "homepage": "Página Inicial",
+
+  "basemaps": "Maps de Base",
+  "clickTurnOn": "Clicar para ligar",
+  "clickTurnOff": "Clicar para desligar"
 }

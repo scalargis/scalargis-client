@@ -148,5 +148,9 @@
   "pageNotFound": "Page not found",
   "viewerNotFound": "The viewer does not exists.",
   "goHomeMsg": "Click to got to homepage",
-  "homepage": "Homepage"
+  "homepage": "Homepage",
+
+  "basemaps": "Basemaps",
+  "clickTurnOn": "Click to turn on",
+  "clickTurnOff": "Click turn off"
 }
