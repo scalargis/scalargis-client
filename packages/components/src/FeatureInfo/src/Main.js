@@ -50,7 +50,7 @@ export default function Main({ as, core, config, actions, record }) {
   const { t } = useTranslation();
 
   const title = record.title || t("identifyElements", "Identificar elementos");
-  const header = component_cfg.header || title;
+  const header = component_cfg.header ? t(component_cfg.header, component_cfg.header) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;  
