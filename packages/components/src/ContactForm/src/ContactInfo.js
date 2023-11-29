@@ -15,10 +15,10 @@ export default function ContactInfo(props) {
   }
 
   let html_contacto_info = contact_info || '';
-  if (typeof variable === "object") {
+  if (typeof contact_info === "object") {
     html_contacto_info = contact_info['default'] || '';
     if (html_contacto_info[i18n.resolvedLanguage]) {
-      html_contacto_info = contact_info[i18n];
+      html_contacto_info = contact_info[i18n.resolvedLanguage];
     }
   }
   

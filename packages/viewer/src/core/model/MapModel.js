@@ -1294,6 +1294,9 @@ export const buildMultiGeom = function (geoms) {
 }
 
 export const buildGeomFromGeometries = function (geoms, outputGeometryType) {
+
+  const  _outputGeometryType = outputGeometryType || '';
+
   const geomTypes = new Set();
   geoms.forEach(g => {
     const type = g.getType();
@@ -1304,7 +1307,7 @@ export const buildGeomFromGeometries = function (geoms, outputGeometryType) {
     if ([geomTypes].length > 1) {
       return new OlGeometryCollection(geoms.map(g=>g.clone()));
     }
-    switch (outputGeometryType.toUpperCase()) {
+    switch (_outputGeometryType.toUpperCase()) {
       case 'GEOMETRYCOLLECTION':
         return new OlGeometryCollection(geoms.map(g=>g.clone()));
       default:
@@ -1313,7 +1316,7 @@ export const buildGeomFromGeometries = function (geoms, outputGeometryType) {
   }
 
   if (geoms.length === 1) {
-    switch (outputGeometryType.toUpperCase()) {
+    switch (_outputGeometryType.toUpperCase()) {
       case 'MULTIPOINT':
       case 'MULTILINESTRING':
       case 'MULTIPOLYGON':
