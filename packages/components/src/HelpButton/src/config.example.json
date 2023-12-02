@@ -5,10 +5,10 @@
   "config_json": {
       "header": "Ajuda",
       "closeLabel": "Fechar",
-      "url": "/static/viewer/help.html",      
+      "url": "/static/viewer/{language}/help.html",      
       "html": "<h1>Cabeçalho</h1><div>Texto</div>"
   },
   "target": "mainmenu",
-  "as": "popup",
+  "as": "popup|external|panel",
   "children": []
 }  

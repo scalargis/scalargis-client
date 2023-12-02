@@ -1,7 +1,12 @@
 import React from 'react';
+import i18next from 'i18next';
 
 
 const formatMetadataValue = (element) => {
+
+    console.log(element.url);
+    console.log(element.html);
+
     if (element.type === 'html') {
         return <div dangerouslySetInnerHTML={{__html: element.value}} />
     } else if (element.type === 'hyperlink') {
@@ -36,18 +41,18 @@ class ThemeInfo extends React.Component {
     return (
       <div>
         <div className="p-grid">
-            <div className="p-col-4">Título</div>
+            <div className="p-col-4">{i18next.t("title", "Título")}</div>
             <div className="p-col-8">{theme.title}</div>
         </div>
         { theme.description ?
         <div className="p-grid">
-            <div className="p-col-4">Descrição</div>
+            <div className="p-col-4">{i18next.t("description", "Descrição")}</div>
             <div className="p-col-8">{theme.description}</div>
         </div> : null }
         { (theme.metadata && theme.metadata.url) ?
         <div className="p-grid">
-            <div className="p-col-4">Metadados</div>
-            <div className="p-col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><i className="pi pi-external-link p-mr-2"></i>Abrir Ficha</a></div>
+            <div className="p-col-4">{i18next.t("metadata", "Metadados")}</div>
+            <div className="p-col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><i className="pi pi-external-link p-mr-2"></i>{i18next.t("openMetadataDetails","Abrir Ficha")}</a></div>
         </div> : null }
         { (theme.metadata && theme.metadata.data) ?
             theme.metadata.data.map(d => {
@@ -61,7 +66,7 @@ class ThemeInfo extends React.Component {
         { (theme.exclude_service_metadata !== true) ?
         (<>               
             <div className="p-grid">
-                <div className="p-col-4">Tipo</div>
+                <div className="p-col-4">{i18next.t("type", "Tipo")}</div>
                 <div className="p-col-8">{this.getTypeDescription(theme.type)}</div>
             </div>
             { !['GROUP'].includes(theme.type) ? (
@@ -72,7 +77,7 @@ class ThemeInfo extends React.Component {
             ) : null }
             { !['GROUP', 'ArcGISMap'].includes(theme.type) ? (
             <div className="p-grid">
-                <div className="p-col-4">Sistema de Coordenadas</div>
+                <div className="p-col-4">{i18next.t("coordinateSystem", "Sistema de Coordenadas")}</div>
                 <div className="p-col-8">
                     { theme.crs_options ? (
                         <ul>
@@ -88,7 +93,7 @@ class ThemeInfo extends React.Component {
             ) : null }
             { ['WMS'].includes(theme.type) ? (
             <div className="p-grid">
-                <div className="p-col-4">Formatos de GetMap</div>
+                <div className="p-col-4">{i18next.t("getMapFormats", "Formatos de GetMap")}</div>
                 <div className="p-col-8">
                     { theme.get_map_formats ? (
                         <ul>
@@ -102,7 +107,7 @@ class ThemeInfo extends React.Component {
             ) : null }
             { ['WMS'].includes(theme.type) ? (
             <div className="p-grid">
-                <div className="p-col-4">Formatos de GetFeatureInfo</div>
+                <div className="p-col-4">{i18next.t("getFeatureInfoFormats", "Formatos de GetFeatureInfo")}</div>
                 <div className="p-col-8">
                     { theme.get_feature_info_formats ? (
                         <ul>

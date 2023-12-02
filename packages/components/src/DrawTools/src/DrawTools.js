@@ -1,4 +1,5 @@
 import React from 'react';
+import i18next from "i18next";
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
@@ -19,26 +20,26 @@ import FileSaver from 'file-saver';
 import './index.css';
 
 const drawElementsOptions = [
-  { value: "symbol", title: "Adicionar símbolo", icon: "pi pi-star-o" },
-  { value: "text", title: "Adicionar texto", icon: "pi pi-info-circle" },
-  { value: "point", title: "Adicionar ponto", icon: "pi pi-circle-on" },
-  { value: "line", title: "Adicionar linha", icon: "pi pi-minus" },
-  { value: "polygon", title: "Adicionar polígono", icon: "pi pi-th-large" }  
+  { value: "symbol", title: "drawingAddSymbol", defaultTitle: "Adicionar símbolo", icon: "pi pi-star-o" },
+  { value: "text", title: "drawingAddText", defaultTitle: "Adicionar texto", icon: "pi pi-info-circle" },
+  { value: "point", title: "drawingAddPoint", defaultTitle: "Adicionar ponto", icon: "pi pi-circle-on" },
+  { value: "line", title: "drawingAddLine", defaultTitle: "Adicionar linha", icon: "pi pi-minus" },
+  { value: "polygon", title: "drawingAddPoligon", defaultTitle: "Adicionar polígono", icon: "pi pi-th-large" }
 ];
 
 const selectTools = [
-  { value: "select", title: "Selecionar", icon: "pi pi-pencil" }
+  { value: "select", title: "select", defaultTitle: "Selecionar", icon: "pi pi-pencil" }
 ]
 
 const historyTools = [
-  { value: "undo", title: "Desfazer", icon: "pi pi-replay" },
-  { value: "redo", title: "Refazer", icon: "pi pi-refresh" },
-  { value: "clear", title: "Limpar Tudo", icon: "pi pi-trash" }
+  { value: "undo", title: "undo", defaultTitle: "Desfazer", icon: "pi pi-replay" },
+  { value: "redo", title: "redo", defaultTitle: "Refazer" , icon: "pi pi-refresh" },
+  { value: "clear", title: "clearAll", defaultTitle:"Limpar tudo", icon: "pi pi-trash" }
 ];
 
 const colorTools = [
-  { value: "fill", title: "Côr de preenchimento", icon: "pi pi-palette" },
-  { value: "stroke", title: "Côr de rebordo", icon: "pi pi-palette" }
+  { value: "fill", title: "fillColor", defaultTitle: "Côr de preenchimento", icon: "pi pi-palette" },
+  { value: "stroke", title: "outlineColor", defaultTitle: "Côr de rebordo", icon: "pi pi-palette" }
 ];
 
 const defaultExportFormats = [
@@ -49,11 +50,11 @@ const defaultExportFormats = [
 ];
 
 const typeLabels = {
-  "Symbol": "símbolo",
-  "Text": "texto",
-  "Point": "ponto",
-  "LineString": "trajeto",
-  "Polygon": "polígono"
+  "Symbol": "symbol",
+  "Text": "text",
+  "Point": "point",
+  "LineString": "linestring",
+  "Polygon": "polygon"
 };
 
 class DrawTools extends React.Component {
@@ -88,7 +89,7 @@ class DrawTools extends React.Component {
       text_style: 'normal',
       text_size: '20px',
       text_font: 'Arial, Helvetica, sans-serif',
-      text_value: 'Introduza o texto...',
+      text_value: i18next.t('drawingSampleText', 'Exemplo de texto'),
       displayFillPicker: false,
       displayStrokePicker: false,
       editing: null,
@@ -107,12 +108,12 @@ class DrawTools extends React.Component {
     ];
 
     this.symbolOptions = [
-      { key: '1', label: 'circulo', value: 'circle' },
-      { key: '2', label: 'quadrado', value: 'square' },
-      { key: '3', label: 'triângulo', value: 'triangle' },
-      { key: '4', label: 'estrela', value: 'star' },
-      { key: '5', label: 'cruz', value: 'cross' },
-      { key: '10', label: 'xis', value: 'x' }
+      { key: '1', label: 'circle', labelDefault: "círculo", value: 'circle' },
+      { key: '2', label: 'square', labelDefault: "quadrado", value: 'square' },
+      { key: '3', label: 'triangle', labelDefault: "triângulo", value: 'triangle' },
+      { key: '4', label: 'square', labelDefault: "estrela", value: 'star' },
+      { key: '5', label: 'cross', labelDefault: "cruz", value: 'cross' },
+      { key: '10', label: 'x', labelDefault: "x", value: 'x' }
     ];
 
     this.textStyleOptions = [
@@ -902,7 +903,7 @@ class DrawTools extends React.Component {
               key={opt.value}
               icon={opt.icon}
               label={ opt.label ? opt.label : ''}
-              tooltip={opt.title}
+              tooltip={i18next.t(opt.title, opt.defaultTitle)}
               className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "") }
               onClick={(e) => this.startDraw(e, opt.value) }
             />
@@ -914,7 +915,7 @@ class DrawTools extends React.Component {
             <Button
               key={opt.value}
               icon={opt.icon}
-              tooltip={opt.title}
+              tooltip={i18next.t(opt.title, opt.defaultTitle)}
               className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "") }
               onClick={(e) => this.startDraw(e, opt.value) }
             />
@@ -926,7 +927,7 @@ class DrawTools extends React.Component {
             <Button
               key={opt.value}
               icon={opt.icon}
-              tooltip={opt.title}
+              tooltip={i18next.t(opt.title, opt.defaultTitle)}
               className={"p-button-secondary tool " + (opt.value === selectedTool ? "p-highlight" : "") }
               style={this.getButtonStyle(opt)}
               onClick={(e) => {
@@ -951,7 +952,7 @@ class DrawTools extends React.Component {
 
           <Dropdown 
             text={size}
-            tooltip="Tamanho da linha/símbolo"
+            tooltip={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
             value={size}
             options={this.sizeOptions}
             onChange={opt => this.changeSize(opt)}
@@ -964,7 +965,7 @@ class DrawTools extends React.Component {
             <Button
               key={opt.value}
               icon={opt.icon}
-              tooltip={opt.title}
+              tooltip={i18next.t(opt.title, opt.defaultTitle)}
               className={opt.value !== "clear" ? "p-button-info tool" : "p-button-danger tool" }
               onClick={(e) => {
                 switch(opt.value) {
@@ -981,7 +982,7 @@ class DrawTools extends React.Component {
 
         { editing ? (
           <React.Fragment>
-            <h5>A editar { typeLabels[editing.type] }</h5>
+            <h5>{` ${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</h5>
             <div>
               <Button
                 onClick={e => this.finishEditing()}
@@ -1001,12 +1002,12 @@ class DrawTools extends React.Component {
 
         { draw_symbol ? (
           <div>
-            <h5>Opções de Simbologia</h5>
+            <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
             <Dropdown
               text={symbol_type}
-              tooltip="Escolha o Símbolo"
+              tooltip={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
               value={symbol_type}
-              options={this.symbolOptions}
+              options={this.symbolOptions.map(o => { return {...o, "label": i18next.t(o.label, o.labelDefault)} })}
               onChange={this.changeSymbol.bind(this)}
               style={{ minWidth: '120px' }}
             />
@@ -1015,23 +1016,23 @@ class DrawTools extends React.Component {
 
         { draw_text ? (
           <div>
-            <h5>Opções de Texto</h5>
+            <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
             <Dropdown text={text_style}
-              tooltip="Estilo do Texto"
+              tooltip={i18next.t("textStyle", "Estilo do Texto")}
               value={text_style}
               options={this.textStyleOptions}
               onChange={this.changeTextStyle.bind(this)}
             />
 
             <Dropdown text={text_size}
-              tooltip="Tamanho do Texto"
+              tooltip={i18next.t("textSize", "Tamanho do Texto")}
               value={text_size}
               options={this.textSizeOptions}
               onChange={this.changeTextSize.bind(this)}
             />
 
             <Dropdown text={text_font}
-              tooltip="Tipo de Letra"
+              tooltip={i18next.t("fontType", "Tipo de Letra")}
               value={text_font}
               options={this.textFontOptions}
               onChange={this.changeTextFont.bind(this)}
@@ -1041,7 +1042,8 @@ class DrawTools extends React.Component {
               className="drawtools-text-input"
               value={text_value}
               onChange={this.changeTextValue.bind(this)}
-              tooltip="Texto para a etiqueta"
+              tooltip={i18next.t("textLabel", "Texto para a etiqueta")}
+              placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
               onClick={e => e.target.select()}
             />
         </div>
@@ -1066,9 +1068,9 @@ class DrawTools extends React.Component {
 
         <hr />
 
-        <h5>Desenhos</h5>
+        <h5>{i18next.t("drawings", "Desenhos")}</h5>
         { viewer.config_json.drawings.length === 0 ? (
-          <p>Não existem desenhos</p>
+          <p>{i18next.t("noDrawings", "Não existem desenhos")}</p>
         ) : (
           <DataTable 
             value={viewer.config_json.drawings}
@@ -1077,7 +1079,7 @@ class DrawTools extends React.Component {
             rows={10}
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Mostrando {first} até {last} de {totalRecords} items"
+            currentPageReportTemplate={i18next.t("drawingElementsPageInfo", "Mostrando {first} a {last} de {totalRecords} items")}
             >
             <Column 
               field="properties.id" 
@@ -1086,8 +1088,8 @@ class DrawTools extends React.Component {
             />
             <Column 
               field="properties.type" 
-              header="Tipo"
-              body={row => typeLabels[row.properties.type]}
+              header={i18next.t("type", "Tipo")}
+              body={row => i18next.t(typeLabels[row.properties.type], row.properties.type)}
             />
             <Column 
               body={row => (
@@ -1096,13 +1098,13 @@ class DrawTools extends React.Component {
                     icon="pi pi-search" 
                     className="p-mr-2" 
                     onClick={() => this.zoom(row)}
-                    tooltip="Centrar"
+                    tooltip={i18next.t("locate", "Localizar")}
                   />
                   <Button 
                     icon="pi pi-trash" 
                     className="p-button-danger" 
                     onClick={() => this.deleteItem(row)}
-                    tooltip="Apagar"
+                    tooltip={i18next.t("delete", "Eliminar")}
                   />
                 </React.Fragment>
               )}

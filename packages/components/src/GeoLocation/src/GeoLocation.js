@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation} from "react-i18next"
 import { transform } from 'ol/proj'
 import { Button } from 'primereact/button'
 import { InputSwitch } from 'primereact/inputswitch'
@@ -21,6 +22,8 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
   const geoLocationTracking = geo_location_control ? geo_location_control.tracking : false;
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol } = actions;
 
+  const { t } = useTranslation();
+
   const [results, setResults] = useState([]);
 
   function getErrorMessage(error, messages) {
@@ -29,18 +32,18 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
     switch(error.code) {
       case 1:
         //The acquisition of the geolocation information failed because the page did not have the permission to do it.
-        message = 'Não foi autorizada a obtenção da localização.';
+        message = t("locationNotAuthorized", "Não foi autorizada a obtenção da localização.");
         break;
       case 2:
         //The acquisition of the geolocation failed because one or several internal sources of position returned an internal error.
-        message = 'Ocorreu um erro interno ao obter-se a localização.';
+        message = t("myLocationError", "Ocorreu um erro interno ao obter-se a localização.");
         break;
       case 3:
         //The time allowed to acquire the geolocation, defined by PositionOptions.timeout information that was reached before the information was obtained.
-        message = 'Ocorreu um timeout antes de ter sido possível obter a localização.';
+        message = t("myLocationTimeout", "Ocorreu um timeout antes de ter sido possível obter a localização.");
         break;
       default:
-        message = messages?.error?.text ? messages.error.text : 'Não foi possível obter a localização.';
+        message = messages?.error?.text ? messages.error.text : t("myLocationNoInformation", "Não foi possível obter a localização.");
     }
 
     if (error.code && messages && messages['error' + error.code] && messages['error' + error.code].text) {
@@ -56,8 +59,8 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
     const precision = 10000;
 
     if (geolocation && geolocation.coordinates) {
-      results.push({ field: 'Longitude (dd)', value: (Math.round(geolocation.coordinates[0] * precision) / precision) });
-      results.push({ field: 'Latitude (dd)', value: (Math.round(geolocation.coordinates[1] * precision) / precision) });
+      results.push({ field: `${t("longitude", "Longitude")} (dd)`, value: (Math.round(geolocation.coordinates[0] * precision) / precision) });
+      results.push({ field: `${t("latitude", "Latitude")} (dd)`, value: (Math.round(geolocation.coordinates[1] * precision) / precision) });
 
       if (viewer.config_json.display_crs && viewer.config_json.display_crs != 4326) {
         const display_coords = transform(geolocation.coordinates, 'EPSG:4326', 'EPSG:' + viewer.config_json.display_crs);
@@ -65,11 +68,11 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
         results.push({ field: 'Y [EPSG:' + viewer.config_json.display_crs + ']', value: (Math.round(display_coords[1] * 100) / 100) });
       }
 
-      geolocation.accuracy && results.push({ field: 'Precisão', value: ((Math.round(geolocation.accuracy * 100) / 100) + ' m')});
-      geolocation.altitude && results.push({ field: 'Altitude', value: ((Math.round(geolocation.altitude * 100) / 100) + ' m')});
-      geolocation.altitudeAccuracy && results.push({ field: 'Precisão da Altitude', value: ((Math.round(geolocation.altitudeAccuracy * 100) /100) + ' m')});
-      geolocation.heading && results.push({ field: 'Direção', value: ((Math.round(geolocation.heading * 100) / 100) + ' rad')});
-      geolocation.speed && results.push({ field: 'Velocidade', value: ((Math.round(geolocation.speed  * 100) / 100) + ' m/s')});
+      geolocation.accuracy && results.push({ field: t("accuracy", "Precisão"), value: ((Math.round(geolocation.accuracy * 100) / 100) + ' m')});
+      geolocation.altitude && results.push({ field: t("altitude", "Altitude"), value: ((Math.round(geolocation.altitude * 100) / 100) + ' m')});
+      geolocation.altitudeAccuracy && results.push({ field: t("altitudeAccuracy", "Precisão da altitude"), value: ((Math.round(geolocation.altitudeAccuracy * 100) /100) + ' m')});
+      geolocation.heading && results.push({ field: t("heading", "Direção"), value: ((Math.round(geolocation.heading * 100) / 100) + ' rad')});
+      geolocation.speed && results.push({ field: t("speed", "Velocidade"), value: ((Math.round(geolocation.speed  * 100) / 100) + ' m/s')});
     }
     setResults(results);
   }
@@ -124,7 +127,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
     <div>
       <Message
         severity="info"
-        text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : "Selecione a opção 'Ver Posição' para ativar a visualização da sua posição."}
+        text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : t("myLocationSelectOption","Selecione a opção 'Ver Posição' para ativar a visualização da sua posição.")}
       />
 
       <div className="p-mt-3 p-pt-3 p-pr-2 p-pl-2" style={{"border": "1px solid rgb(111 57 57 / 12%)"}}>
@@ -138,7 +141,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
             />
             {' '}
             <label htmlFor="geolocationSwitch">
-              <span className="p-text-bold">Ver Posição</span>
+              <span className="p-text-bold">{t("myLocationViewPosition", "Ver Posição")}</span>
             </label>
           </div>
         </div>
@@ -146,12 +149,12 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
           <div className="p-col" style={{ textAlign: 'left'}}>
             <div className="p-field-checkbox p-mb-1">
             <Checkbox onChange={e => trackingGeoLocationControl(e.checked)} checked={geoLocationTracking} disabled={!geoLocationActive}></Checkbox>
-            <label className={"p-checkbox-label" + (!geoLocationActive ? " p-disabled" : "")}>Atualizar</label>
+            <label className={"p-checkbox-label" + (!geoLocationActive ? " p-disabled" : "")}>{t("myLocationUpdate", "Atualizar")}</label>
             </div>
           </div>
           <div className="p-col" style={{ textAlign: 'right'}}>
             <Button
-              label="Localizar"
+              label={t("locate", "Localizar")}
               icon="pi pi-search"
               className="p-button-sm"
               onClick={e => { zoomGeoLocation(geolocation); }}

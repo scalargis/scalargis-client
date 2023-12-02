@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation} from "react-i18next"
 import Cookies from 'universal-cookie'
 import { Button } from 'primereact/button'
 import { Dropdown } from 'primereact/dropdown';
@@ -36,6 +37,8 @@ export default function PrintPanelItem(props) {
 
   const { selected_menu } = viewer.config_json
 
+  const { i18n, t } = useTranslation();
+
   const toast = useRef(null);
   const toastDialog = useRef(null);
 
@@ -62,11 +65,11 @@ export default function PrintPanelItem(props) {
   const [printFile, setPrintFile] = useState(null);
 
   const drawTools = [
-    { value: "Point", title: "Adicionar ponto", icon: "fas fa-circle" },
-    { value: "LineString", title: "Adicionar linha", icon: "pi pi-minus" },
-    { value: "Polygon", title: "Adicionar polígono", icon: "fas fa-draw-polygon" },
-    { value: "Select", title: "Selecionar elemento", icon: "fas fa-mouse-pointer" },
-    { value: "Modify", title: "Editar elemento", icon: "pi pi-pencil" }
+    { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
+    { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
+    { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
+    { value: "Select", title: "selectElement", "defaultTitle": "Selecionar elemento", icon: "fas fa-mouse-pointer" },
+    { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: "pi pi-pencil" }     
   ];
 
   function selectDrawTool(e, tool) {
@@ -112,11 +115,11 @@ export default function PrintPanelItem(props) {
 
   const confirmDeleteAll = (features) => {
     confirmDialog({
-      message: ' Deseja eliminar todos os elementos?',
-      header: 'Confirmação',
+      message: ` ${t("deleteAllElments", "Deseja eliminar todos os elementos?")}`,
+      header: t("confirmation", "Confirmação"),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
+      acceptLabel: t("yes", "Sim"),
+      rejectLabel: t("no", "Não"),
       accept: () => {
         features.forEach((f) => {
           printLayer.current.getSource().removeFeature(f);
@@ -308,7 +311,7 @@ export default function PrintPanelItem(props) {
         setIsPrinting(false);
         toast.current.show({
           severity: 'warn', summary: printItem.title || 'Emissão de plantas',
-          detail: 'Não foi possível gerar a planta', life: 3000
+          detail: t("printError", "Não foi possível gerar a planta"), life: 3000
         });
       });
   }
@@ -316,7 +319,7 @@ export default function PrintPanelItem(props) {
   function getScalesTabs() {
     const tabs = [];
     if (printItem.restrict_scales) {
-      tabs.push(<TabPanel key={'predefined'} header="Predefinida">
+      tabs.push(<TabPanel key={'predefined'} header={t("predefined", "Predefinida")}>
         <Dropdown
           className="p-inputgroup"
           options={restrictScales}
@@ -328,15 +331,15 @@ export default function PrintPanelItem(props) {
       </TabPanel>)
     }
     if (printItem.free_scale) {
-      tabs.push(<TabPanel key={'freescale'} header="Livre">
+      tabs.push(<TabPanel key={'freescale'} header={t("free", "Livre")}>
         <InputNumber value={freeScale} onChange={(e) => setFreeScale(e.value)} prefix="1:" />
       </TabPanel>)
     }
     if (printItem.map_scale) {
-      tabs.push(<TabPanel key={'map'} header="Mapa">
+      tabs.push(<TabPanel key={'map'} header={t("map", "Mapa")}>
         <Message
           severity="info"
-          text={"A planta será emitida em função da escala de visualização do mapa"}
+          text={t("printMapScaleOptionMsg", "A planta será emitida em função da escala de visualização do mapa")}
         />
       </TabPanel>)
     }
@@ -349,7 +352,7 @@ export default function PrintPanelItem(props) {
     printItem.layouts.forEach((p) => {
       const { format, orientation } = p;
       const key = format + '-' + orientation;
-      if (!frmts[key]) frmts[key] = { format, orientation, label: format + ' - ' + orientation }
+      if (!frmts[key]) frmts[key] = { format, orientation, label: format + ' - ' + t(orientation, orientation) }
     });
     const ff = [];
     Object.keys(frmts).forEach(function (k) {
@@ -443,6 +446,11 @@ export default function PrintPanelItem(props) {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!formats?.length) return;
+    setFormats(formats.map((f) => { return {...f, label: f.format + ' - ' + t(f.orientation, f.orientation)}}))
+  }, [i18n.resolvedLanguage]);
 
 
   // draw paper box 
@@ -605,7 +613,7 @@ export default function PrintPanelItem(props) {
           key={opt.value}
           icon={opt.icon}
           label={opt.label ? opt.label : ''}
-          tooltip={opt.title}
+          tooltip={t(opt.title, opt.defaultTitle)}
           className={"p-button-sm p-mr-2 tool" + (opt.value === drawTool ? " active" : "")}
           onClick={(e) => selectDrawTool(e, opt.value)}
         />
@@ -617,13 +625,13 @@ export default function PrintPanelItem(props) {
     <React.Fragment>
       <Button
         icon="pi pi-trash"
-        tooltip="Eliminar elemento(s)"
+        tooltip={t("deleteElement(s)", "Eliminar elemento(s)")}
         className="p-button-sm p-mr-2 tool"
         onClick={(e) => deletedSelectedFeature()}
       />
       <Button
         icon="fas fa-search-plus"
-        tooltip="Ver todos os elementos"
+        tooltip={t("viewAllElements", "Ver todos os elementos")}
         className="p-button-sm p-mr-2 tool"
         onClick={(e) => zoomFeaturesExtent()}
       />
@@ -638,32 +646,32 @@ export default function PrintPanelItem(props) {
       <h3>{props.printItem.title}</h3>
 
       {(printItem.allow_drawing !== false) && <div className="p-fluid">
-        <h4>Marcação do Local</h4>
+        <h4>{t("locationMarking", "Marcação do Local")}</h4>
         <div>
           <Toolbar left={toolbarLeftContents} right={toolbarRightContents} />
         </div>
         {printItem.location_marking &&
-          <Message severity={ geometryError === true ? "error" : "info" } text="Deverá marcar no mapa a localização pretendida" />
+          <Message severity={ geometryError === true ? "error" : "info" } text={t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")} />
         }
       </div>}
 
       {(printItem.restrict_scales || printItem.free_scale || printItem.map_scale) &&
         <div className="p-fluid">
-          <h4>Escala de Saída</h4>
+          <h4>{t("outputScale", "Escala de Saída")}</h4>
           <TabView activeIndex={scaleTabIndex} onTabChange={(e) => onScaleTabChange(e)}>
             {getScalesTabs().map(tab => tab)}
           </TabView>
         </div>}
 
       <div className="p-fluid">
-        <h4>Formato</h4>
+        <h4>{t("format", "Formato")}</h4>
         <Dropdown
           id="layout"
           optionLabel="label"
           value={fields.layout}
           options={formats}
           onChange={handleFieldChange}
-          placeholder="Selecione um Formato" />
+          placeholder={t("selectFormat", "Selecione um formato")} />
       </div>
 
       {(printItem.form_fields && printItem.form_fields.groups) &&
@@ -717,13 +725,13 @@ export default function PrintPanelItem(props) {
 
       {isPrinting ?
         <div className="card p-text-center p-mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
-          <div><i className="pi pi-spin pi-spinner"></i> A gerar a planta ...</div>
+          <div><i className="pi pi-spin pi-spinner p-mr-1"></i>{t("generatingPrint", "A gerar a planta...")}</div>
         </div> : null
       }
       {!isPrinting && printFile ?
         <div className="card p-text-center p-mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
           <a href={printFile.url} target="_blank">
-            <i className="pi pi-external-link p-pl-2"></i> Abrir PDF da planta
+            <i className="pi pi-external-link p-pl-2 p-mr-1"></i>{t("openPrintPdf", "Abrir PDF da planta")}
           </a>
         </div> : null
       }
@@ -741,7 +749,7 @@ export default function PrintPanelItem(props) {
           </div>
           <div className="p-col p-text-right">
             <Button
-              label="Imprimir"
+              label={t("print", "Imprimir")}
               icon="pi pi-print"
               className="p-button-sm"
               onClick={e => { doPrint(); }}
@@ -754,7 +762,7 @@ export default function PrintPanelItem(props) {
         <div className="field-checkbox">
           <Checkbox inputId="binary" checked={paperBox}
             onChange={e => setPaperBox(e.checked)} />
-          <label htmlFor="binary"> Visualizar área de impressão</label>
+          <label htmlFor="binary" className="p-pl-2">{t("showPrintArea", "Visualizar área de impressão")}</label>
         </div>
       </div> : null}
     </div>

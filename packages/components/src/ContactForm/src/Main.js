@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { Dialog } from 'primereact/dialog';
+
 import ContactForm from './ContactForm';
 import ContactInfo from './ContactInfo';
 
@@ -13,17 +15,19 @@ export function MainMenu({ className, core, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
+  const { t } = useTranslation();
+
   const [showPopup, setShowPopup] = useState(false);
 
   const component_cfg = record.config_json || {};
   const title = record.title || '';
-  const header = component_cfg.header || title || "Formulário de Contacto";
+  const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
   if (record.as === 'popup') {    
-    const closeLabel = component_cfg.closeLabel || "Fechar";    
+    const closeLabel = component_cfg.closeLabel || t("close", "Fechar");    
     return (
       <React.Fragment>
 
@@ -89,16 +93,18 @@ export default function Main({ region, as, core, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
+  const { t } = useTranslation();
+
   const [showForm, setShowForm] = useState(false);
 
   const component_cfg = record.config_json || {};
   const title = record.title || '';
-  const header = component_cfg.header || title || "Formulário de Contacto";
+  const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768; 
 
-  const closeLabel = component_cfg.closeLabel || "Fechar";
+  const closeLabel = component_cfg.closeLabel || t("close", "Fechar");
 
   function renderContent() {
     return  (
@@ -130,7 +136,7 @@ export default function Main({ region, as, core, config, actions, record }) {
    } else {
       return (
         <React.Fragment>
-          <button className="p-link" onClick={e => setShowForm(true)} title="Contacto">
+          <button className="p-link" onClick={e => setShowForm(true)} title={t("contact", "Contacto")}>
             <span className="layout-topbar-item-text"></span>
             <span className="layout-topbar-icon far fa-envelope" />
           </button>

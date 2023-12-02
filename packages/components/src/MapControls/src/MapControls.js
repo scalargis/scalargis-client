@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import ZoomToExtent from 'ol/control/ZoomToExtent';
 import DragBox from 'ol/interaction/DragBox';
@@ -27,17 +28,24 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
   const geo_location_component = viewer.config_json.components.find(c => c.config_json &&
     c.config_json.map_control === 'GeoLocation');
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, viewer_set_exclusive_mapcontrol } = actions;
+
+  const { t } = useTranslation();
+
+  const [loaded, setLoaded] = useState(loaded, false);
+
   const [dragBox, setDragBox] = useState(false);
 
   const [geoLocationSettings, setGeoLocationSettings] = useState(false);
 
   useEffect(() => {
+    setLoaded(true);
+
     const elem_zoom = document.createElement('span');
     elem_zoom.classList.add("pi", "pi-window-maximize", "p-c");
 
     const zoom_opts = {
       label: elem_zoom,
-      tipLabel: "Ver extensão total"
+      tipLabel: t("showTotalExtent", "Ver extensão total")
     }
 
     if (viewer && viewer.config_json && viewer.config_json.full_extent) {
@@ -145,7 +153,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
     if (type === 'Coordinates') {
       return (!!coordinates_control && !!coordinates_control.show_button) ?
         <Button key={type}
-          title={coordinates_control.title || 'Obter coordenadas'}
+          title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
           icon="fas fa-bullseye"
           className={exclusive_mapcontrol === 'Coordinates' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}
@@ -153,7 +161,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
     } else if (type === 'FeatureInfo') {
       return (!!feature_info_control && !!feature_info_control.show_button) ?
         <Button key={type}
-          title={feature_info_control.title || 'Identificar elementos'}
+          title={feature_info_control.title || t("identifyElements", "Identificar elementos")}
           icon="pi pi-info-circle"
           className={exclusive_mapcontrol === 'FeatureInfo' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleFeatureInfoControl() }}
@@ -164,7 +172,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
           onMouseOver={e => { setGeoLocationSettings(true); }}
           onMouseLeave={e => { setGeoLocationSettings(false); }}>
           <Button 
-            title={geo_location_control.title || 'A minha localização'}
+            title={geo_location_control.title || t("myLocation", "A minha localização")}
             icon="pi pi-globe"
             className={geoLocationActive ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
             onClick={e => { e.currentTarget.blur(); toggleGeoLocationControl() }}
@@ -173,7 +181,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
             onMouseLeave={e => { setGeoLocationSettings(false); }}
           >
             <input type="checkbox" onClick={e => { toggleGeoLocationTracking(e.currentTarget.checked); }} checked={geoLocationTracking} />
-            <label> Atualizar posição</label>
+            <label> {t("myLocationUpdatePosition", "Atualizar posição")}</label>
           </div>
         </div> : null;
     } else {
@@ -183,6 +191,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
   // Apply state
   if (dragBoxInteraction) dragBoxInteraction.setActive(dragBox);
+
+  /*
   return (
     <div id="map-controls" className="map-controls">
 
@@ -190,11 +200,16 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         return getComponentMapButton(c.type);
       })}
 
-      {core.renderComponents({
-        region: 'map_tools',
-        props: { core, actions, viewer, dispatch, mainMap: mainMap },
-        separator: " ",
-        parent: record
+
+
+    </div>
+  )
+  */
+  return (
+    <div id="map-controls" className="map-controls">
+      
+      {loaded && viewer.config_json.map_controls.map(c => {
+        return getComponentMapButton(c.type);
       })}
 
     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation} from "react-i18next"
 import Cookies from 'universal-cookie';
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
@@ -15,7 +16,9 @@ import componentMessages from './messages'
 export default function FeatureResults({ core, config, features, layers, actions, pubsub, dispatch, mainMap, record }) {
 
   const { viewer } = config;
-  const { publish, subscribe } = pubsub ? pubsub : {}
+  const { publish, subscribe } = pubsub ? pubsub : {};
+
+  const { t } = useTranslation();
 
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -156,7 +159,7 @@ export default function FeatureResults({ core, config, features, layers, actions
   if (Object.keys(grouped).length === 0) return (
     <Message
       severity="info"
-      text="Sem resultados. Clique no mapa para identificar." 
+      text={t("identifyNoResults", "Sem resultados. Clique no mapa para identificar.")} 
     />
   ) 
 
@@ -164,16 +167,16 @@ export default function FeatureResults({ core, config, features, layers, actions
     <div>
       <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
         <Button
-          title="Limpar resultados"
-          label="Limpar"
+          title={t("clearResults", "Limpar resultados")}
+          label={t("clear", "Limpar")}
           icon="pi pi-times"
           className="p-button-outlined p-button-sm"
           onClick={e => removeAll()}
         />
         { (showExport && showExportAll && showExportAllFeatures) ?
         <Button
-          title="Exportar resultados"
-          label="Exportar"
+          title={t("exportResults", "Exportar resultados")}
+          label={t("export", "Exportar")}
           icon="pi pi-download"
           className="p-button-outlined p-button-sm p-ml-2"
           onClick={e => exportAll()}
@@ -219,18 +222,18 @@ export default function FeatureResults({ core, config, features, layers, actions
                       <div className="fi-result-tools">
                         {hasGeometry &&
                         <Button
-                          title="Aproximar ao elemento"
+                          title={t("zoomToElement", "Aproximar ao elemento")}
                           icon="pi pi-search"
                           onClick={e => zoomFeature(feat)}
                         />}
                         {(!isText && showExport && showExportRecord && layerRecordExport) &&
                         <Button
-                          title="Exportar elemento"
+                          title={t("exportElement", "Exportar elemento")}
                           icon="pi pi-download"
                           onClick={e => exportItem(feat)}
                         />}
                         <Button
-                          title="Remover elemento"
+                          title={t("removeElement", "Remover elemento")}
                           icon="pi pi-times"
                           onClick={e => removeItem(feat)}
                         />

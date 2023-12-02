@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation} from "react-i18next"
 import Cookies from 'universal-cookie'
 import { Button } from 'primereact/button'
 import { Toolbar } from 'primereact/toolbar';
@@ -11,6 +12,7 @@ import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
 import { shiftKeyOnly, singleClick } from "ol/events/condition";
 import { v4 as uuidV4 } from 'uuid'
+
 import './style.css'
 
 export default function PrintPanel2(props) {
@@ -19,6 +21,8 @@ export default function PrintPanel2(props) {
   const { viewer, mainMap, dispatch, Models } = config;
   const { showOnPortal } = Models.Utils;
   const { exclusive_mapcontrol } = viewer;
+
+  const { t } = useTranslation();
 
   const API_URL = core.API_URL;
 
@@ -35,11 +39,11 @@ export default function PrintPanel2(props) {
   const toastDialog = useRef(null);
 
   const drawTools = [
-    { value: "Point", title: "Adicionar ponto", icon: "fas fa-circle" },
-    { value: "LineString", title: "Adicionar linha", icon: "pi pi-minus" },
-    { value: "Polygon", title: "Adicionar polígono", icon: "fas fa-draw-polygon" },
-    { value: "Select", title: "Selecionar elemento", icon: "fas fa-mouse-pointer" },
-    { value: "Modify", title: "Editar elemento", icon: "pi pi-pencil" }     
+    { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
+    { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
+    { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
+    { value: "Select", title: "selectElement", "defaultTitle": "Selecionar elemento", icon: "fas fa-mouse-pointer" },
+    { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: "pi pi-pencil" }     
   ];
 
   function selectDrawTool(e, tool) {
@@ -80,11 +84,11 @@ export default function PrintPanel2(props) {
 
   const confirmDeleteAll = (features) => {
     confirmDialog({
-        message: ' Deseja eliminar todos os elementos?',
-        header: 'Confirmação',
+        message: ` ${t("deleteAllElments", "Deseja eliminar todos os elementos?")}`,
+        header: t("confirmation", "Confirmação"),
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Sim',
-        rejectLabel: 'Não',
+        acceptLabel: t("yes", "Sim"),
+        rejectLabel: t("no", "Não"),
         accept: () => {
           features.forEach((f) => {
             printLayer.current.getSource().removeFeature(f);
@@ -331,7 +335,7 @@ export default function PrintPanel2(props) {
           key={opt.value}
           icon={opt.icon}
           label={ opt.label ? opt.label : ''}
-          tooltip={opt.title}
+          tooltip={t(opt.title, opt.defaultTitle)}
           className={"p-button-sm p-mr-2 tool" + (opt.value === drawTool ? " active" : "") }
           onClick={(e) => selectDrawTool(e, opt.value) }
         />
@@ -343,13 +347,13 @@ export default function PrintPanel2(props) {
     <React.Fragment>
         <Button 
           icon="pi pi-trash"
-          tooltip="Eliminar elemento selecionado"
+          tooltip={t("deleteSelectedElment", "Eliminar elemento selecionado")}
           className="p-button-sm p-mr-2 tool"
           onClick={(e) => deletedSelectedFeature() }
         />
         <Button 
           icon="fas fa-search-plus"
-          tooltip="Ver todos os elementos"
+          tooltip={t("viewAllElements", "Ver todos os elementos")}
           className="p-button-sm p-mr-2 tool"
           onClick={(e) => zoomFeaturesExtent() }
         />        
@@ -363,12 +367,12 @@ export default function PrintPanel2(props) {
       <h3>{props.printGroup.title}</h3>
 
       {(printGroup.allow_drawing !== false) && <div className="p-fluid">
-        <h4>Marcação do Local</h4>
+        <h4>{t("locationMarking", "Marcação do Local")}</h4>
         <div>
           <Toolbar left={toolbarLeftContents} right={toolbarRightContents} />
         </div>
         { printGroup.location_marking && 
-          <Message severity={ geometryError === true ? "error" : "info" } text="Deverá marcar no mapa a localização pretendida" />
+          <Message severity={ geometryError === true ? "error" : "info" } text={t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")} />
         }
       </div>}
 

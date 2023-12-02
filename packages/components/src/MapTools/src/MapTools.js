@@ -1,4 +1,5 @@
 import React from 'react';
+import i18next from 'i18next';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
@@ -97,6 +98,11 @@ class Main extends React.Component {
      */
     this.measureTooltip = null;
 
+    /**
+     * Message to show before user start drawing.
+     * @type {string}
+     */
+    const startDrawingMsg = 'Clique para começar a desenhar';
 
     /**
      * Message to show when the user is drawing a polygon.
@@ -121,14 +127,14 @@ class Main extends React.Component {
             return;
         }
         /** @type {string} */
-        let helpMsg = 'Clique para começar a desenhar';
+        let helpMsg = i18next.t('measureMsgStartDrawing', startDrawingMsg)
 
         if (this.sketch) {
             const geom = (this.sketch.getGeometry());
             if (geom instanceof Polygon) {
-            helpMsg = continuePolygonMsg;
+            helpMsg = i18next.t('measureMsgContinuePolygon', continuePolygonMsg);
             } else if (geom instanceof LineString) {
-            helpMsg = continueLineMsg;
+            helpMsg = i18next.t('measureMsgContinueLine', continueLineMsg);
             }
         }
 
@@ -460,8 +466,8 @@ class Main extends React.Component {
   render() {
     const { control, helpModal } = this.state;
     const controlOptions = [
-      { key: 'length', label: "Medir Distância", icon: "pi pi-minus" },
-      { key: 'area', label: "Medir Área", icon: "fas fa-draw-polygon" },
+      { key: 'length', label: i18next.t("measureDistance", "Medir Distância"), icon: "pi pi-minus" },
+      { key: 'area', label: i18next.t("measureArea", "Medir Área"), icon: "fas fa-draw-polygon" },
     ];
 
     return (
@@ -486,17 +492,17 @@ class Main extends React.Component {
 
             { control === 'length' ? (
               <InputText fluid
-                label='Comprimento'
+                label={i18next.t("length", "Comprimento")}
                 value={this.state.length || ''}
-                placeholder="Comprimento"
+                placeholder={i18next.t("length", "Comprimento")}
               />
             ) : null }
 
             { control === 'area' ? (
               <InputText fluid
-                label='Área'
+                label={i18next.t("area", "Área")}
                 value={this.state.area || ''}
-                placeholder="Área"
+                placeholder={i18next.t("area", "Área")}
               />
             ) : null }
 
@@ -505,7 +511,7 @@ class Main extends React.Component {
         </div>
 
         <Dialog 
-          header={control === 'length' ? 'Medir Distância' : 'Medir Área'}
+          header={control === 'length' ? i18next.t("measureDistance", "Medir Distância") : i18next.t("measureArea", "Medir Área")}
           visible={helpModal}
           style={{width: '50vw'}} 
           modal
@@ -520,16 +526,12 @@ class Main extends React.Component {
           onHide={e => this.closeHelp()}>
           <div>
             { control === 'length' ? <div>
-              <p>1. para começar a medição clique no mapa na localização inicial<br />
-              2. para medir um trajeto clique nas localizações intermédias<br />
-              3. para terminar faça duplo-clique
-              </p>
+              <p dangerouslySetInnerHTML={{__html: i18next.t("measureInfoDistance", "1. para começar a medição clique no mapa na localização inicial<br /> 2. para medir um trajeto clique nas localizações intermédias<br /> 3. para terminar faça duplo-clique")}}
+              />
             </div> : null}
             { control === 'area' ? <div>
-              <p>1. para começar a medição clique no mapa numa localização inicial<br />
-              2. continue clicando nas localizações que definem a área<br />
-              3. para terminar faça duplo-clique
-              </p>
+              <p dangerouslySetInnerHTML={{__html: i18next.t("measureInfoArea", "1. para começar a medição clique no mapa numa localização inicial<br />2. continue clicando nas localizações que definem a área<br />3. para terminar faça duplo-clique")}}
+              />
             </div> : null}
           </div>
         </Dialog>
