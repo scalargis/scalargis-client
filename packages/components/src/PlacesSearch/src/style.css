@@ -21,6 +21,10 @@
   top: 2px;
 }
 
+.layout-topbar .layout-topbar-icons .layout-topbar-search .layout-topbar-search-icon.mouse-pointer {
+  cursor: pointer;
+}
+
 .layout-topbar .layout-topbar-icons .layout-topbar-search-results {
   position: absolute;
   margin-top: 5px; 

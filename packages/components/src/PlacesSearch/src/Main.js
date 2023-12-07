@@ -2,15 +2,43 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import { InputText } from 'primereact/inputtext';
 import { ListBox } from 'primereact/listbox';
-import { transform } from 'ol/proj';
+import 'ol/ol.css';
+import VectorLayer from 'ol/layer/Vector'
+import { Vector } from 'ol/source';
+import Feature from 'ol/Feature';
+import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
+
 import './style.css'
 import useOutsideClick from './useOutsideClick';
 
 
-export default function Main({ core, config, actions, record }) {
+const featureStyle = new Style({
+  fill: new Fill({
+    color: 'rgba(255, 255, 255, 0.2)',
+  }),
+  stroke: new Stroke({
+    color: 'rgba(255, 0, 0, 0.5)',
+    width: 4,
+  }),
+  image: new CircleStyle({
+    radius: 6,
+    fill: new Fill({
+      color: 'rgba(255, 0, 0, 0.5)',
+    }),
+    stroke: new Stroke({
+      //color: '#fff',
+      color: 'rgba(255, 255, 255, 0.5)',
+      width: 2,
+    })
+  })    
+});
+
+export default function Main({ core, config, actions, utils, record }) {
   const { viewer, mainMap, dispatch, Models } = config;
   const { MapModel } = Models;
-
+  const { getGeometryFromWKT } = MapModel;
+  const { findOlLayer } = utils;
+  
   const { t } = useTranslation(["common", "custom"]);
 
   const [filter, setFilter] = useState("");
@@ -23,13 +51,16 @@ export default function Main({ core, config, actions, record }) {
 
   const ref = useRef();
 
+  const featuresLayer = useRef();
+
   const component_cfg = record.config_json || {};
 
-  useOutsideClick(ref, () => {
+  useOutsideClick(ref, () => {    
     setShowPlaces(false);
   });  
 
   function changeFilterFunc(e) {
+    setSelectedPlace(null);
     setFilter(e.target.value);
     if (e.target.value.length < 3) {
         setPlaces([]);
@@ -65,13 +96,16 @@ export default function Main({ core, config, actions, record }) {
         //console.log('error', error);
         setIsLoading(false);
     })
-  }
+  }  
 
   function selectPlace(e) {
-    let item = e.value;
-    if (item && item.geom_wkt) {
-      let geom = MapModel.getGeometryFromWKT(item.geom_wkt);
-      geom.transform('EPSG:4326', mainMap.getView().getProjection());
+    let item = e.value || selectedPlace;
+
+    if (item?.geom_wkt) {
+      const geom = MapModel.getGeometryFromWKT(item.geom_wkt);
+      const srid = component_cfg?.geometrySRID || item?.geom_srid || 4326;
+
+      geom.transform(`EPSG:${srid}`, mainMap.getView().getProjection());
 
       let buffer = config.buffer || 1000;
       if (config?.sources?.length) {
@@ -87,8 +121,15 @@ export default function Main({ core, config, actions, record }) {
 
       dispatch(actions.map_set_extent([extent[2] - extent[0], extent[3] - extent[1]], extent));
 
-      setFilter(item.designacao);
+      //setFilter(item.name || filter);
+      setSelectedPlace(item);
     }
+  }
+
+  function clearFilter() {
+    setFilter("");
+    setPlaces([]);
+    setSelectedPlace(null);
   }
 
   // Legacy code. To be removed
@@ -186,6 +227,92 @@ export default function Main({ core, config, actions, record }) {
     setActiveSources([...sources_ids]);
   }, []);
 
+  useEffect(() => {
+    if (!mainMap) return;
+
+    const layerId = 'places-search';
+
+    const savedLayer = utils.findOlLayer(mainMap, layerId);
+    if (savedLayer) {
+      featuresLayer.current = userLayer; 
+      return;      
+    }
+    
+    /*
+    const userLayer = utils.findOlLayer(mainMap, 'userlayer');
+    if (userLayer) {
+      featuresLayer.current = userLayer; 
+      return;
+    }
+    */
+
+    featuresLayer.current = new VectorLayer({
+      id: layerId,
+      renderMode: 'vector',
+      source: new Vector({}),
+      style: featureStyle,
+      selectable: false
+    });
+
+    const parentLayer = utils.findOlLayer(mainMap, 'overlays');
+
+    if (parentLayer) {      
+      parentLayer.getLayers().getArray().push(featuresLayer.current);
+    } else {
+      mainMap.addLayer(featuresLayer.current);
+    }
+  }, [mainMap]);
+
+  useEffect(() => {
+    if (selectedPlace && component_cfg.unselectOnHide === true) {
+      setSelectedPlace(null);
+    }
+  },[showPlaces]);
+
+  useEffect(() => {
+    if (!featuresLayer.current) return;
+
+    featuresLayer.current.getSource().clear();
+
+    if (!selectedPlace) return;
+
+    let drawGeometry = true;
+
+    if (component_cfg.drawGeometry=== false) return;
+
+    const types = component_cfg?.types || {};    
+    if (types.templates?.length) {
+      let template;
+      if (selectedPlace.type) {
+        template = types.templates.find(t => t.id === selectedPlace.type);
+      }
+      if (!template && types?.default) {
+        template = types?.default;
+      }
+
+      if (template?.drawGeometry != null) {
+        drawGeometry = template.drawGeometry;
+      }
+    }
+
+    if (!drawGeometry) return;
+
+    if (!selectedPlace?.geom_wkt && !selectedPlace?.geom_ext) return;
+
+    if (selectedPlace?.geom_wkt) {      
+      const geom = getGeometryFromWKT(selectedPlace.geom_wkt);
+      const srid = component_cfg?.geometrySRID || selectedPlace?.geom_srid || 4326;
+
+      geom.transform(`EPSG:${srid}`, mainMap.getView().getProjection());
+
+      const feature = new Feature();
+      feature.setGeometry(geom);
+      feature.setStyle(featureStyle);
+      featuresLayer.current.getSource().addFeatures([feature]);
+    }  
+  }, [selectedPlace]);
+
+
 
   return (
     <div ref={ref} className="layout-topbar-search-container">
@@ -195,7 +322,14 @@ export default function Main({ core, config, actions, record }) {
             value={filter}
             onFocus={(e) => setShowPlaces(true)}
             onChange={(e) => changeFilterFunc(e)} />
-          <span className={ isLoading ? 'layout-topbar-search-icon pi pi-spin pi-spinner' : 'layout-topbar-search-icon pi pi-search' }/>
+          { isLoading ?
+            <span className='layout-topbar-search-icon pi pi-spin pi-spinner' />
+            : filter ? <span className='layout-topbar-search-icon pi pi-times mouse-pointer'
+              aria-label={t('clear', 'Limpar')}
+              title={t('clear', 'Limpar')}
+              onClick={e=>clearFilter()} />
+            : <span className='layout-topbar-search-icon pi pi-search' />
+          }          
       </span>
       {(showPlaces && places && places.length > 0 ?
         <div className="layout-topbar-search-results">
@@ -204,7 +338,7 @@ export default function Main({ core, config, actions, record }) {
               value={selectedPlace}
               options={places}
               itemTemplate={itemTemplate}
-              onChange={(e) => selectPlace(e)}              
+              onChange={(e) => selectPlace(e)}
           />
         </div> : null
       )}

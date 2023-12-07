@@ -1,14 +1,23 @@
 {
   "id": "placessearch",
-  "type": "PlacesSearch", 
-  "target": "topbar_right", 
+  "type": "PlacesSearch",
+  "target": "topbar_right",
   "order": 1,
   "config_json": {
-    "placeholder": "Localizar...",
-    "url": "https://snig.dgterritorio.pt/geographical_names/search?_min_similarity=0.5&_maxrows=10&_filter={filter}",
+    "url": "/geonames/api/v1/search?_min_similarity=0.5&_maxrows=10&_filter={filter}",
     "sources": [
-      { "id": "DGT", "title": "DGT", "active": true, "buffer": 1000},
-      { "id": "INE", "title": "INE", "active": true, "buffer": 500}
+      {
+        "id": "DGT",
+        "title": "DGT",
+        "active": false,
+        "buffer": 1000
+      },
+      {
+        "id": "INE",
+        "title": "INE",
+        "active": false,
+        "buffer": 500
+      }
     ],
     "types": {
       "field": "type",
@@ -16,15 +25,26 @@
         {
           "id": "populatedPlace",
           "iconClass": "pi-chevron-right",
-          "html": "<div><i class='pi pi-chevron-right p-mr-2'></i> <span>{name} ({admin_level3})</span></div>"
-        }
+          "html": "<div class='p-text-left'><i class='pi pi-chevron-right p-mr-2'></i> <span>{name} ({admin_level4})</span></div>",
+          "drawGeometry": false
+        },
+        {
+          "id": "streets",
+          "iconClass": "pi-chevron-right",
+          "html": "<div class='p-text-left'><i class='pi pi-chevron-right p-mr-2'></i> <span>{name} ({admin_level4})</span></div>",
+          "drawGeometry": true
+        }            
       ],
       "default": {
         "iconClass": "pi-circle-on",
-        "html": "<div><i class='pi pi-circle-on p-mr-2'></i> <span>{name} ({admin_level3})</span></div>"
+        "html": "<div class='p-text-left'><i class='pi pi-circle-on p-mr-2'></i> <span>{name} ({admin_level4})</span></div>",
+        "drawGeometry": true
       }
-    },    
-    "buffer": 1000
+    },
+    "buffer": 500,
+    "drawGeometry": true,
+    "geometrySRID": 4326,
+    "unselectOnHide": false
   },
   "children": []
 }
