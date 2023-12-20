@@ -358,7 +358,6 @@ class DrawTools extends React.Component {
       this.enableTools()
     };
 
-
     if (this.state.selectedTool && viewer.config_json.selected_menu != 'drawtools') {
       this.select.setActive(false);
       this.setState({
@@ -856,18 +855,6 @@ class DrawTools extends React.Component {
       dispatch(actions.viewer_set_drawings(drawings));
     });
   }
-
-
-  // componentDidUpdate(nextProps) {
-  //   const { viewer} = this.props;
-  //   if (this.state.enabled && (viewer.config_json.selected_menu !== 'drawtools')) {
-  //     this.disableTools()
-  //   }
-  //   if (!this.state.enabled && (viewer.config_json.selected_menu === 'drawtools')) {
-  //     this.enableTools()
-  //   };
-  // }
-
 
 
   render() {
