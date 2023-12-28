@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import i18next from "i18next";
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -33,8 +33,8 @@ const selectTools = [
 
 const historyTools = [
   { value: "undo", title: "undo", defaultTitle: "Desfazer", icon: "pi pi-replay" },
-  { value: "redo", title: "redo", defaultTitle: "Refazer" , icon: "pi pi-refresh" },
-  { value: "clear", title: "clearAll", defaultTitle:"Limpar tudo", icon: "pi pi-trash" }
+  { value: "redo", title: "redo", defaultTitle: "Refazer", icon: "pi pi-refresh" },
+  { value: "clear", title: "clearAll", defaultTitle: "Limpar tudo", icon: "pi pi-trash" }
 ];
 
 const colorTools = [
@@ -58,7 +58,7 @@ const typeLabels = {
 };
 
 class DrawTools extends React.Component {
-  
+
   constructor(props) {
     super(props);
 
@@ -66,10 +66,10 @@ class DrawTools extends React.Component {
 
     const component_cfg = props.record.config_json;
 
-    if  (component_cfg && component_cfg.exclude_export_formats && component_cfg.exclude_export_formats.length) {
+    if (component_cfg && component_cfg.exclude_export_formats && component_cfg.exclude_export_formats.length) {
       this.exportFormats = defaultExportFormats.filter(t => !component_cfg.exclude_export_formats.includes(t.value));
     } else if (props.viewer && props.viewer.config_json && props.viewer.config_json.exclude_export_formats) {
-      this.exportFormats = defaultExportFormats.filter(t => !props.viewer.config_json.exclude_export_formats.includes(t.value));    
+      this.exportFormats = defaultExportFormats.filter(t => !props.viewer.config_json.exclude_export_formats.includes(t.value));
     } else {
       this.exportFormats = [...defaultExportFormats];
     }
@@ -95,7 +95,7 @@ class DrawTools extends React.Component {
       editing: null,
       selectedTool: null
     }
-    
+
     this.sizeOptions = [
       { key: '1', label: '1', value: '1' },
       { key: '2', label: '2', value: '2' },
@@ -139,7 +139,7 @@ class DrawTools extends React.Component {
     this.drawingsLayer = props.utils.findOlLayer(olmap, 'userlayer');
     this.vectorSource = this.drawingsLayer.getSource();
     this.features = this.vectorSource.getFeaturesCollection();
-    
+
     this.modify = null;
 
     this.select = new OlInteractionSelect({
@@ -166,7 +166,7 @@ class DrawTools extends React.Component {
         selected.forEach((feature) => {
           if (feature.get('state')) {
             oldSelect.push(feature);
-            const style = this.createStyle(feature, {r: 255, g: 0, b: 0, a: 1});
+            const style = this.createStyle(feature, { r: 255, g: 0, b: 0, a: 1 });
             feature.setStyle(style);
           }
         });
@@ -207,64 +207,64 @@ class DrawTools extends React.Component {
         this.editFeature(selected[0]);
       }
     });
-    
+
     this.draw = null;
     this.format = new OlFormatWKT();
   }
 
   changeSize = ({ value }) => {
-    this.setState({...this.state, size: value }, () => {
+    this.setState({ ...this.state, size: value }, () => {
       const selected = this.select.getFeatures();
       if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
-  
+
   changeFill = (color) => {
-    this.setState({...this.state, fill: color.rgb }, () => {
+    this.setState({ ...this.state, fill: color.rgb }, () => {
       const selected = this.select.getFeatures();
       if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
-  
+
   changeStroke = (color) => {
-    this.setState({...this.state, stroke: color.rgb }, () => {
+    this.setState({ ...this.state, stroke: color.rgb }, () => {
       const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));  
+      if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
   changeSymbol = ({ value }) => {
-    this.setState({...this.state, symbol_type: value }, () => {
+    this.setState({ ...this.state, symbol_type: value }, () => {
       const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));  
+      if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
   changeTextStyle = ({ value }) => {
-    this.setState({...this.state, text_style: value }, () => {
+    this.setState({ ...this.state, text_style: value }, () => {
       const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));  
+      if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
   changeTextSize = ({ value }) => {
-    this.setState({...this.state, text_size: value }, () => {
+    this.setState({ ...this.state, text_size: value }, () => {
       const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));  
+      if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
   changeTextFont = ({ value }) => {
-    this.setState({...this.state, text_font: value }, () => {
+    this.setState({ ...this.state, text_font: value }, () => {
       const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));  
+      if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
   changeTextValue = (e) => {
-    this.setState({...this.state, text_value: e.target.value }, () => {
+    this.setState({ ...this.state, text_value: e.target.value }, () => {
       const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));  
+      if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
@@ -290,10 +290,10 @@ class DrawTools extends React.Component {
     const { symbol_type, size, fill, text_style, text_size, text_font, text_value } = props.state;
     let style = utils.createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke);
     if (props.type === 'Symbol') {
-        style = utils.createDrawingSymbol(symbol_type, size, fill, stroke);
+      style = utils.createDrawingSymbol(symbol_type, size, fill, stroke);
     }
     if (props.type === 'Text') {
-        style = utils.createDrawingText(feature, size, fill, stroke, text_style, text_size, text_font, text_value);
+      style = utils.createDrawingText(feature, size, fill, stroke, text_style, text_size, text_font, text_value);
     }
     return style;
   }
@@ -301,8 +301,8 @@ class DrawTools extends React.Component {
   updateStyle(feature) {
     const { viewer, actions, dispatch, utils } = this.props;
     const map = this.props.mainMap;
-    const crs = map.getView().getProjection().getCode();    
-    const style = utils.createStyle(feature, this.state, {r: 255, g: 0, b: 0, a: 1});
+    const crs = map.getView().getProjection().getCode();
+    const style = utils.createStyle(feature, this.state, { r: 255, g: 0, b: 0, a: 1 });
     feature.setStyle(style);
     const geojson = utils.serializeDrawing(feature, this.state, crs);
     const drawings = viewer.config_json.drawings.map(d => {
@@ -330,7 +330,7 @@ class DrawTools extends React.Component {
       features.push(feature);
       this.modify = new OlInteractionModify({
         features,
-        deleteCondition: function(event) {
+        deleteCondition: function (event) {
           return shiftKeyOnly(event) && singleClick(event);
         }
       });
@@ -350,15 +350,22 @@ class DrawTools extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    //TODO: may need more work
-      if (this.state.selectedTool && this.props.viewer.config_json.selected_menu != 'drawtools') {
+    const { viewer } = this.props;
+    if (this.state.enabled && (viewer.config_json.selected_menu !== 'drawtools')) {
+      this.disableTools()
+    }
+    if (!this.state.enabled && (viewer.config_json.selected_menu === 'drawtools')) {
+      this.enableTools()
+    };
+
+    if (this.state.selectedTool && viewer.config_json.selected_menu != 'drawtools') {
       this.select.setActive(false);
       this.setState({
         ...this.state,
-        selectedTool: ''
+        selectedTool: null
       });
     }
-  }   
+  }
 
   addInteraction(type, cb) {
     const { hist, history_now } = this.state;
@@ -366,18 +373,18 @@ class DrawTools extends React.Component {
     const map = this.props.mainMap;
     const crs = map.getView().getProjection().getCode();
     this.draw = new OlInteractionDraw({
-        features: new OlCollection(),
-        type: type
+      features: new OlCollection(),
+      type: type
     });
     this.findInteraction(OlInteractionDragPan).setActive(false);
     this.findInteraction(OlInteractionDoubleClickZoom).setActive(false);
     this.findInteraction(OlInteractionPinchZoom).setActive(false);
 
     dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
-    
+
     map.addInteraction(this.draw);
     this.draw.on('drawend', (e) => {
-        
+
       // Add drawing
       const geojson = utils.serializeDrawing(e.feature, this.state, crs);
       const drawings_update = [...viewer.config_json.drawings, geojson];
@@ -385,14 +392,14 @@ class DrawTools extends React.Component {
 
       setTimeout(() => {
         let history_item = [];
-        drawings_update.forEach(function(item) {
+        drawings_update.forEach(function (item) {
           history_item.push(Object.assign({}, item));
         });
         hist.push(history_item);
         this.setState({
           ...this.state,
           hist,
-          history_now: history_now+1,
+          history_now: history_now + 1,
           selectedTool: null,
           draw_geom: false,
           draw_symbol: false,
@@ -414,7 +421,7 @@ class DrawTools extends React.Component {
   findInteraction(classname) {
     let result = false;
     const { mainMap } = this.props;
-    mainMap.getInteractions().forEach(function(item) {
+    mainMap.getInteractions().forEach(function (item) {
       if (item instanceof classname) result = item;
     });
     return result;
@@ -444,8 +451,8 @@ class DrawTools extends React.Component {
         this.findInteraction(OlInteractionDragPan).setActive(true);
         this.findInteraction(OlInteractionDoubleClickZoom).setActive(true);
         this.findInteraction(OlInteractionPinchZoom).setActive(true);
-      }      
-      
+      }
+
       return this.setState({
         ...this.state,
         selectedTool: null,
@@ -454,31 +461,33 @@ class DrawTools extends React.Component {
         draw_text: false
       }, () => {
         dispatch(actions.viewer_set_exclusive_mapcontrol(null));
-      });      
+      });
     }
 
-    if (type === 'select') {     
+    if (type === 'select') {
       // Enable interaction
-      this.setState({ ...this.state, 
+      this.setState({
+        ...this.state,
         selectedTool: type,
         draw_geom: false,
         draw_symbol: false,
-        draw_text: false }, () => {
-          this.select.setActive(true);
+        draw_text: false
+      }, () => {
+        this.select.setActive(true);
 
-          const { mainMap, actions, dispatch } = this.props;
-          if (this.draw) mainMap.removeInteraction(this.draw);
+        const { mainMap, actions, dispatch } = this.props;
+        if (this.draw) mainMap.removeInteraction(this.draw);
 
-          dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+        dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
         //this.addInteraction(type);
         //this.findInteraction(OlInteractionDragPan).setActive(false);
-        }
+      }
       );
     } else {
       // Enable interaction
       this.setState({ ...this.state, selectedTool: type }, () => {
         this.select.setActive(false);
-        switch(type) {
+        switch (type) {
           case 'symbol': this.clickDrawSymbol(); break;
           case 'text': this.clickDrawText(); break;
           case 'point': this.clickDrawPoint(); break;
@@ -512,7 +521,7 @@ class DrawTools extends React.Component {
       draw_text: false,
       editing: null
     });
- }
+  }
 
   // Enable draw polygon
   clickDrawPolygon() {
@@ -578,9 +587,9 @@ class DrawTools extends React.Component {
           drawings.push(item);
         });
         this.setState({
-            ...this.state,
-            hist,
-            history_now: history_now
+          ...this.state,
+          hist,
+          history_now: history_now
         }, () => {
           dispatch(actions.viewer_set_drawings(drawings));
         });
@@ -753,20 +762,20 @@ class DrawTools extends React.Component {
       decimals: 6
     }
     const json = serializer.writeFeaturesObject(this.features.getArray(), serializeOptions);
-    
+
     // Hack: OL does not serialize with CRS attribute
     //json.crs = { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::4326" } }
     const crsinfo = {
       "type": "name",
       "properties": {
-          "name": "urn:ogc:def:crs:EPSG::" + crs
+        "name": "urn:ogc:def:crs:EPSG::" + crs
       }
     };
-    json.crs = crsinfo;    
+    json.crs = crsinfo;
     const data = JSON.stringify(json)
 
     // Build file
-    const file = new Blob([data], {type: 'application/json'});
+    const file = new Blob([data], { type: 'application/json' });
     FileSaver.saveAs(file, 'geojson');
 
     // TODO: upload and convert
@@ -801,9 +810,9 @@ class DrawTools extends React.Component {
 
   getButtonStyle(opt) {
     const { fill, stroke } = this.state;
-    const fillStr = `rgba(${ fill.r }, ${ fill.g }, ${ fill.b }, ${ fill.a })`;
-    const strokeStr = `rgba(${ stroke.r }, ${ stroke.g }, ${ stroke.b }, ${ stroke.a })`;
-    switch(opt.value) {
+    const fillStr = `rgba(${fill.r}, ${fill.g}, ${fill.b}, ${fill.a})`;
+    const strokeStr = `rgba(${stroke.r}, ${stroke.g}, ${stroke.b}, ${stroke.a})`;
+    switch (opt.value) {
       case 'fill':
         return {
           backgroundColor: fillStr,
@@ -814,7 +823,7 @@ class DrawTools extends React.Component {
           backgroundColor: strokeStr,
           color: 'white'
         }
-      default:;
+      default: ;
     }
   }
 
@@ -846,6 +855,7 @@ class DrawTools extends React.Component {
       dispatch(actions.viewer_set_drawings(drawings));
     });
   }
+
 
   render() {
     const {
@@ -889,68 +899,70 @@ class DrawTools extends React.Component {
       }
     }
 
-    // Enable/disable tools
-    if (enabled && (viewer.config_json.selected_menu !== 'drawtools')) this.disableTools();
-    if (!enabled && (viewer.config_json.selected_menu === 'drawtools')) this.enableTools();
+
+
+
+
+
 
     return (
       <div id="drawtools">
 
         <div className="p-shadow-5 toolbar">
-        
-          { drawElementsOptions.map(opt =>
+
+          {drawElementsOptions.map(opt =>
             <Button
               key={opt.value}
               icon={opt.icon}
-              label={ opt.label ? opt.label : ''}
+              label={opt.label ? opt.label : ''}
               tooltip={i18next.t(opt.title, opt.defaultTitle)}
-              className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "") }
-              onClick={(e) => this.startDraw(e, opt.value) }
+              className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "")}
+              onClick={(e) => this.startDraw(e, opt.value)}
             />
           )}
 
           {' '}
 
-          { selectTools.map(opt =>
+          {selectTools.map(opt =>
             <Button
               key={opt.value}
               icon={opt.icon}
               tooltip={i18next.t(opt.title, opt.defaultTitle)}
-              className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "") }
-              onClick={(e) => this.startDraw(e, opt.value) }
+              className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "")}
+              onClick={(e) => this.startDraw(e, opt.value)}
             />
           )}
 
           <br />
 
-          { colorTools.map(opt =>
+          {colorTools.map(opt =>
             <Button
               key={opt.value}
               icon={opt.icon}
               tooltip={i18next.t(opt.title, opt.defaultTitle)}
-              className={"p-button-secondary tool " + (opt.value === selectedTool ? "p-highlight" : "") }
+              className={"p-button-secondary tool " + (opt.value === selectedTool ? "p-highlight" : "")}
               style={this.getButtonStyle(opt)}
               onClick={(e) => {
-                switch(opt.value) {
+                switch (opt.value) {
                   case 'fill': this.toggleFillPicker(e); break;
                   case 'stroke': this.toggleStrokePicker(e); break;
-                  default:;
+                  default: ;
                 }
               }}
             />
           )}
 
-          { this.state.displayFillPicker ? <div style={ styles().popover }>
-            <div style={ styles().cover } onClick={ this.closeFillPicker.bind(this) }/>
-            <CompactPicker color={ fill } onChange={ this.changeFill.bind(this) } />
-          </div> : null }
+          {this.state.displayFillPicker ? <div style={styles().popover}>
+            <div style={styles().cover} onClick={this.closeFillPicker.bind(this)} />
+            <CompactPicker color={fill} onChange={this.changeFill.bind(this)} />
+          </div> : null}
 
-          { this.state.displayStrokePicker ? <div style={ styles().popover }>
-            <div style={ styles().cover } onClick={ this.closeStrokePicker.bind(this) }/>
-            <CompactPicker color={ stroke } onChange={ this.changeStroke.bind(this) } />
-          </div> : null }
+          {this.state.displayStrokePicker ? <div style={styles().popover}>
+            <div style={styles().cover} onClick={this.closeStrokePicker.bind(this)} />
+            <CompactPicker color={stroke} onChange={this.changeStroke.bind(this)} />
+          </div> : null}
 
-          <Dropdown 
+          <Dropdown
             text={size}
             tooltip={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
             value={size}
@@ -961,26 +973,26 @@ class DrawTools extends React.Component {
 
           <br /><br />
 
-          { historyTools.map(opt =>
+          {historyTools.map(opt =>
             <Button
               key={opt.value}
               icon={opt.icon}
               tooltip={i18next.t(opt.title, opt.defaultTitle)}
-              className={opt.value !== "clear" ? "p-button-info tool" : "p-button-danger tool" }
+              className={opt.value !== "clear" ? "p-button-info tool" : "p-button-danger tool"}
               onClick={(e) => {
-                switch(opt.value) {
+                switch (opt.value) {
                   case 'undo': this.clickUndo(e); break;
                   case 'redo': this.clickRedo(e); break;
                   case 'clear': this.clickDelete(e); break;
-                  default:;
+                  default: ;
                 }
               }}
             />
-          )}          
+          )}
 
         </div>
 
-        { editing ? (
+        {editing ? (
           <React.Fragment>
             <h5>{` ${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</h5>
             <div>
@@ -998,23 +1010,23 @@ class DrawTools extends React.Component {
               />
             </div>
           </React.Fragment>
-        ) : null }
+        ) : null}
 
-        { draw_symbol ? (
+        {draw_symbol ? (
           <div>
             <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
             <Dropdown
               text={symbol_type}
               tooltip={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
               value={symbol_type}
-              options={this.symbolOptions.map(o => { return {...o, "label": i18next.t(o.label, o.labelDefault)} })}
+              options={this.symbolOptions.map(o => { return { ...o, "label": i18next.t(o.label, o.labelDefault) } })}
               onChange={this.changeSymbol.bind(this)}
               style={{ minWidth: '120px' }}
             />
           </div>
-        ) : null }
+        ) : null}
 
-        { draw_text ? (
+        {draw_text ? (
           <div>
             <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
             <Dropdown text={text_style}
@@ -1038,7 +1050,7 @@ class DrawTools extends React.Component {
               onChange={this.changeTextFont.bind(this)}
             />
             <br />
-            <InputText 
+            <InputText
               className="drawtools-text-input"
               value={text_value}
               onChange={this.changeTextValue.bind(this)}
@@ -1046,13 +1058,13 @@ class DrawTools extends React.Component {
               placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
               onClick={e => e.target.select()}
             />
-        </div>
-        ) : null }
+          </div>
+        ) : null}
 
         <hr />
 
         <div>
-          { viewer.config_json.drawings.length > 0 &&
+          {viewer.config_json.drawings.length > 0 &&
             this.exportFormats.map(opt =>
               <Button
                 key={opt.value}
@@ -1061,7 +1073,7 @@ class DrawTools extends React.Component {
                 tooltip={opt.tooltip}
                 className="p-button-outlined p-button-sm p-button-info format-tool"
                 onClick={(e) => this.download(opt.value)}
-              /> 
+              />
             )
           }
         </div>
@@ -1069,10 +1081,10 @@ class DrawTools extends React.Component {
         <hr />
 
         <h5>{i18next.t("drawings", "Desenhos")}</h5>
-        { viewer.config_json.drawings.length === 0 ? (
+        {viewer.config_json.drawings.length === 0 ? (
           <p>{i18next.t("noDrawings", "Não existem desenhos")}</p>
         ) : (
-          <DataTable 
+          <DataTable
             value={viewer.config_json.drawings}
             dataKey="id"
             paginator
@@ -1080,29 +1092,29 @@ class DrawTools extends React.Component {
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate={i18next.t("drawingElementsPageInfo", "Mostrando {first} a {last} de {totalRecords} items")}
-            >
-            <Column 
-              field="properties.id" 
+          >
+            <Column
+              field="properties.id"
               header="ID"
               body={(row, table) => table.value.indexOf(row) + 1}
             />
-            <Column 
-              field="properties.type" 
+            <Column
+              field="properties.type"
               header={i18next.t("type", "Tipo")}
               body={row => i18next.t(typeLabels[row.properties.type], row.properties.type)}
             />
-            <Column 
+            <Column
               body={row => (
                 <React.Fragment>
-                  <Button 
-                    icon="pi pi-search" 
-                    className="p-mr-2" 
+                  <Button
+                    icon="pi pi-search"
+                    className="p-mr-2"
                     onClick={() => this.zoom(row)}
                     tooltip={i18next.t("locate", "Localizar")}
                   />
-                  <Button 
-                    icon="pi pi-trash" 
-                    className="p-button-danger" 
+                  <Button
+                    icon="pi pi-trash"
+                    className="p-button-danger"
                     onClick={() => this.deleteItem(row)}
                     tooltip={i18next.t("delete", "Eliminar")}
                   />
