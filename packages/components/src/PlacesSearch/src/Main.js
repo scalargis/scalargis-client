@@ -234,17 +234,10 @@ export default function Main({ core, config, actions, utils, record }) {
 
     const savedLayer = utils.findOlLayer(mainMap, layerId);
     if (savedLayer) {
-      featuresLayer.current = userLayer; 
-      return;      
-    }
-    
-    /*
-    const userLayer = utils.findOlLayer(mainMap, 'userlayer');
-    if (userLayer) {
-      featuresLayer.current = userLayer; 
+      featuresLayer.current = savedLayer;
       return;
     }
-    */
+
 
     featuresLayer.current = new VectorLayer({
       id: layerId,

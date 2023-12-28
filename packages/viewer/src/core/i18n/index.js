@@ -14,7 +14,7 @@ export const initTranslations = () => {
     //resources,
     resources: {},
     defaultNS: 'common',
-    fallbackLng: defaultLocale || 'en',
+    fallbackLng: defaultLocale || 'pt',
     //keySeparator: "false", // we do not use keys in form key.text
     interpolation: {
       escapeValue: false // react already safes from xss
