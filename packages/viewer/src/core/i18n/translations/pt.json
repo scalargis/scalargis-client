@@ -83,6 +83,7 @@
   "clearAll": "Limpar tudo",
   "fillColor": "Côr de preenchimento",
   "outlineColor": "Côr de rebordo",
+  "outlineWitdh": "Espessura de rebordo",
   "drawings": "Desenhos",
   "noDrawings": "Não existem desenhos",
   "delete": "Eliminar",
@@ -150,7 +151,27 @@
   "goHomeMsg": "Clique para ir para a página inicial",
   "homepage": "Página Inicial",
 
-  "basemaps": "Maps de Base",
+  "basemaps": "Mapas de Base",
   "clickTurnOn": "Clicar para ligar",
-  "clickTurnOff": "Clicar para desligar"
+  "clickTurnOff": "Clicar para desligar",
+
+  "removeTheme": "Remover Tema",
+  "confirmAction": "Tem a certeza?",
+
+  "personalizarTema": "Personalizar Tema",
+
+  "selectElements": "Selecionar elementos",
+  "advancedOptions": "Opções Avançadas",
+  "apply": "Aplicar",
+  "getMapFormat": "Formato de GetMap",
+  "getTileFormat": "Formato de GetTile",
+  "getFeatureInfoFormat": "Formato de GetFeatureInfo",
+  "style": "Estilo",
+  "selectGetMapFormat": "Escolha o Formato de GetMap",
+  "selectGetFeatureInfoFormat": "Escolha o formato de GetFeatureInfo",
+  "selectGetTileFormat": "Escolha o Formato de GetTile",
+  "selectStyle": "Escolha o Estilo",
+  "notDefined": "Não Especificado",
+
+  "setTransparency": "Definir Transparência"
 }

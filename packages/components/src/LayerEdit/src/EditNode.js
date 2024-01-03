@@ -1,4 +1,5 @@
 import React from 'react';
+import { withTranslation } from "react-i18next";
 import { InputTextarea } from 'primereact/inputtextarea';
 import { ColorPicker } from 'primereact/colorpicker';
 import { Button } from 'primereact/button';
@@ -52,11 +53,11 @@ class EditNode extends React.Component {
 
     let wmsFormatOptions = [];
     let wmsFeatureFormatOptions = [];
-    let wmsStyleOptions = [{ key: 999, value: '', label: 'Não Especificado'}];
+    let wmsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }];
 
     let wmtsFormatOptions = [];
     let wmtsFeatureFormatOptions = [];
-    let wmtsStyleOptions = [{ key: 999, value: '', label: 'Não Especificado'}]; 
+    let wmtsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }]; 
 
     if (edit.type === 'WMS') {
       let map_formats = edit.get_map_formats || '';
@@ -97,11 +98,11 @@ class EditNode extends React.Component {
         <div className="p-fluid">
 
           <div className="p-field p-grid">
-            <label className="p-col-12 p-md-4">Título</label>
+            <label className="p-col-12 p-md-4">{this.props.t("title", "Título")}</label>
             <div className="p-col-12 p-md-8">
               <InputText
                 value={edit.title}
-                placeholder="Título"
+                placeholder={this.props.t("title", "Título")}
                 onChange={e => this.editField('title', e.target.value)}
                 onClick={e => e.target.select()}
               />
@@ -109,11 +110,11 @@ class EditNode extends React.Component {
           </div>
 
           <div className="p-field p-grid">
-            <label className="p-col-12 p-md-4">Descrição</label>
+            <label className="p-col-12 p-md-4">{this.props.t("description", "Descrição")}</label>
             <div className="p-col-12 p-md-8">
               <InputTextarea 
                 value={edit.description} 
-                placeholder="Descrição"
+                placeholder={this.props.t("description", "Descrição")}
                 style={{width: '100%', padding: '.67857143em 1em', border: '1px solid rgba(34,36,38,.15)'}}
                 rows="5"
                 onChange={e => this.editField('description', e.target.value)}
@@ -124,7 +125,7 @@ class EditNode extends React.Component {
 
           { ['GeoJSON', 'KML', 'WMS', 'WFS', 'ArcGISMap'].includes(edit.type) ? (
             <div className="p-field p-grid">
-              <label className="p-col-12 p-md-4">Selecionar Elementos</label>
+              <label className="p-col-12 p-md-4">{this.props.t("selectElements", "Selecionar Elementos")}</label>
               <div className="p-col-12 p-md-8">
                 <InputSwitch
                   checked={edit.selectable}
@@ -136,7 +137,7 @@ class EditNode extends React.Component {
 
         { (['WMTS', 'WMTSXYZ'].includes(edit.type) && edit.get_feature_info_formats) ? (
             <div className="p-field p-grid">
-              <label className="p-col-12 p-md-4">Selecionar Elementos</label>
+              <label className="p-col-12 p-md-4">{this.props.t("selectElements", "Selecionar Elementos")}</label>
               <div className="p-col-12 p-md-8">
                 <InputSwitch
                   checked={edit.selectable}
@@ -152,31 +153,31 @@ class EditNode extends React.Component {
                 <p style={{textAlign: 'right'}}>
                   <a style={{cursor: 'pointer'}}
                     onClick={e => this.setState({...this.state, showAdvanceOptions: !showAdvanceOptions})}>
-                    Opções Avançadas{' '}
+                    {this.props.t("advancedOptions", "Opções Avançadas")}{' '}
                     <i className={showAdvanceOptions ? 'pi pi-angle-up' : 'pi pi-angle-down'}></i>
                   </a>
                 </p>
                 { showAdvanceOptions && (
                 <div className="p-pb-2">
                   <div className="p-pt-2">
-                    <label>Formato de GetMap</label>
-                    <Dropdown placeholder='Escolha o Formato de GetMap'
+                    <label>{this.props.t("getMapFormat", "Formato de GetMap")}</label>
+                    <Dropdown placeholder={this.props.t("selectGetMapFormat", "Escolha o Formato de GetMap")}
                       options={wmsFormatOptions}
                       value={edit.get_map_format || ''}
                       onChange={({ value }) => this.editField('get_map_format', value)}
                     />
                   </div>
                   <div className="p-pt-2">
-                    <label>Formato de GetFeatureInfo</label>
-                    <Dropdown placeholder='Escolha o formato de GetFeatureInfo'
+                    <label>{this.props.t("getFeatureInfoFormat", "Formato de GetFeatureInfo")}</label>
+                    <Dropdown placeholder={this.props.t("selectGeFeatureInfoFormat", "Escolha o formato de GetFeatureInfo")}
                       options={wmsFeatureFormatOptions}
                       value={edit.get_feature_info_format || ''}
                       onChange={({ value }) => this.editField('get_feature_info_format', value)}
                     />
                   </div>
                   <div className="p-pt-2">
-                    <label>Estilo</label>
-                    <Dropdown placeholder='Escolha o estilo'
+                    <label>{this.props.t("style", "Estilo")}</label>
+                    <Dropdown placeholder={this.props.t("selectStyle", "Escolha o Estilo")}
                       options={wmsStyleOptions}
                       value={edit.wms_style || ''}
                       onChange={({ value }) => this.editField('wms_style', value)}
@@ -194,31 +195,31 @@ class EditNode extends React.Component {
                 <p style={{textAlign: 'right'}}>
                   <a style={{cursor: 'pointer'}}
                     onClick={e => this.setState({...this.state, showAdvanceOptions: !showAdvanceOptions})}>
-                    Opções Avançadas{' '}
+                    {this.props.t("advancedOptions", "Opções Avançadas")}{' '}
                     <i className={showAdvanceOptions ? 'pi pi-angle-up' : 'pi pi-angle-down'}></i>
                   </a>
                 </p>
                 { showAdvanceOptions && (
                 <div className="p-pb-2">
                   <div className="p-pt-2">
-                    <label>Formato de GetTile</label>
-                    <Dropdown placeholder='Escolha o Formato de GetTile'
+                    <label>{this.props.t("getTileFormat", "Formato de GetTile")}</label>
+                    <Dropdown placeholder={this.props.t("selectGetTileFormat", "Escolha o formato de GetTile")}
                       options={wmtsFormatOptions}
                       value={edit.wmts_format || ''}
                       onChange={({ value }) => this.editField('wmts_format', value)}
                     />
                   </div>
                   <div className="p-pt-2">
-                    <label>Formato de GetFeatureInfo</label>
-                    <Dropdown placeholder='Escolha o formato de GetFeatureInfo'
+                    <label>{this.props.t("getFeatureInfoFormat", "Formato de GetFeatureInfo")}</label>
+                    <Dropdown placeholder={this.props.t("selectGeFeatureInfoFormat", "Escolha o formato de GetFeatureInfo")}
                       options={wmtsFeatureFormatOptions}
                       value={edit.get_feature_info_format || ''}
                       onChange={({ value }) => this.editField('get_feature_info_format', value)}
                     />
                   </div>
                   <div className="p-pt-2">
-                    <label>Estilo</label>
-                    <Dropdown placeholder='Escolha o estilo'
+                    <label>{this.props.t("style", "Estilo")}</label>
+                    <Dropdown placeholder={this.props.t("selectStyle", "Escolha o Estilo")}
                       options={wmtsStyleOptions}
                       value={edit.wmts_style || ''}
                       onChange={({ value }) => this.editField('wmts_style', value)}
@@ -233,7 +234,7 @@ class EditNode extends React.Component {
           { ['GeoJSON', 'WFS', 'KML'].includes(edit.type) ? (
             <React.Fragment>
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Côr de Preenchimento</label>
+                <label className="p-col-12 p-md-4">{this.props.t("fillColor", "Côr de Preenchimento")}</label>
                 <div className="p-col-12 p-md-4">
                   <ColorPicker
                     format="rgb"
@@ -243,13 +244,13 @@ class EditNode extends React.Component {
                 </div>
                 <div className="p-col-12 p-md-4">
                   <InputText
-                    placeholder='Côr de preenchimento'
+                    placeholder={this.props.t("fillColor", "Côr de Preenchimento")}
                     value={edit.style_color ? this.convertToRGBAString(edit.style_color) : null }
                   />
                 </div>
               </div>
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Côr de Rebordo</label>
+                <label className="p-col-12 p-md-4">{this.props.t("outlineColor", "Côr de Rebordo")}</label>
                 <div className="p-col-12 p-md-4">
                   <ColorPicker
                     format="rgb"
@@ -259,19 +260,19 @@ class EditNode extends React.Component {
                 </div>
                 <div className="p-col-12 p-md-4">
                   <InputText
-                    placeholder='Côr de Rebordo'
+                    placeholder={this.props.t("outlineColor", "Côr de Rebordo")}
                     value={ edit.style_stroke_color ? this.convertToRGBAString(edit.style_stroke_color) : null }
                   />
                 </div>
               </div>
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Espessura do Rebordo</label>
+                <label className="p-col-12 p-md-4">{this.props.t("outlineWitdh", "Espessura de Rebordo")}</label>
                 <div className="p-col-12 p-md-8">
                   <InputText
                     type="number"
                     min="0"
                     value={edit.style_stroke_width}
-                    placeholder="Espessura do Rebordo"
+                    placeholder={this.props.t("outlineWitdh", "Espessura de Rebordo")}
                     onChange={e => this.editField('style_stroke_width', e.target.value)}
                   />
                 </div>
@@ -286,7 +287,7 @@ class EditNode extends React.Component {
           <Button 
             color='green'
             icon="pi pi-check"
-            label="Aplicar" 
+            label={this.props.t("apply", "Aplicar")} 
             onClick={e => this.props.onSave(e, edit)}
           />
         </div>
@@ -297,4 +298,4 @@ class EditNode extends React.Component {
 
 }
 
-export default EditNode;
+export default withTranslation()(EditNode);

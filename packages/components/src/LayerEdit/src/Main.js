@@ -1,6 +1,7 @@
+import React, { useState } from 'react';
+import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import React, { useState } from 'react';
 import EditNode from './EditNode';
 
 export default function Main({ config }) {
@@ -8,6 +9,8 @@ export default function Main({ config }) {
   const { layer, actions, models } = config;
   const { getWindowSize, showOnPortal } = models.Utils;
   const [modalEditOpen, setModalEditOpen] = useState(false);
+
+  const { t } = useTranslation();  
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
@@ -19,14 +22,14 @@ export default function Main({ config }) {
     <React.Fragment>
 
       <Button icon="pi pi-pencil"
-        title="Personalizar Tema"
+        title={t("personalizarTema", "Personalizar Tema")}
         color="green"
         className="p-button-sm p-button-rounded p-button-text tool"
         onClick={e => setModalEditOpen(layer)}
       />
 
       {showOnPortal(<Dialog 
-        header="Personalizar Tema"
+        header={t("personalizarTema", "Personalizar Tema")}
         visible={!!modalEditOpen} 
         style={{width: isMobile ? '90%' : '50vw' }} 
         modal 

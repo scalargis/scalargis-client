@@ -83,6 +83,7 @@
   "clearAll": "Clear all",
   "fillColor": "Fill color",
   "outlineColor": "Outline color",
+  "outlineWidth": "Outline size",
   "drawings": "Drawings",
   "noDrawings": "No drawinngs",
   "delete": "Delete",
@@ -152,5 +153,25 @@
 
   "basemaps": "Basemaps",
   "clickTurnOn": "Click to turn on",
-  "clickTurnOff": "Click turn off"
+  "clickTurnOff": "Click turn off",
+
+  "removeTheme": "Remove Theme",
+  "confirmAction": "Are you sure?",
+
+  "personalizarTema": "Customise Theme",
+
+  "selectElements": "Select elements",
+  "advancedOptions": "Advanced Options",
+  "apply": "Apply",
+  "getMapFormat": "GetMap Format",
+  "getTileFormat": "GetTile Format",
+  "getFeatureInfoFormat": "GetFeatureInfo Format",
+  "style": "Style",
+  "selectGetMapFormat": "Select GetMap Format",
+  "selectGetFeatureInfoFormat": "Select GetFeatureInfo Format",
+  "selectGetTileFormat": "Select GetTile Format",
+  "selectStyle": "Select Style",
+  "notDefined": "Not Defined",
+
+  "setTransparency": "Set Transparency"
 }
