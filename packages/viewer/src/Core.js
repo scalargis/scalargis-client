@@ -228,7 +228,7 @@ Core.prototype.unloadComponents = function() {
   this.__components = {}
 }
 
-Core.prototype.renderMainMenu = function({ selected_menu, props }) {
+Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
   
   // Validate not empty components registry
   const keys = Object.keys(this.__mainmenu);
@@ -237,8 +237,13 @@ Core.prototype.renderMainMenu = function({ selected_menu, props }) {
   // From all components
   let { components } = this.config.config_json;
 
-  // Filter by region
-  const mainmenuComponents = components.filter(c => c.target === 'mainmenu');  
+  // Filter by mainmenu components (main section)
+  let mainmenuComponents = components.filter(c => c.target === 'mainmenu' && !c.section);
+
+  // Filter by section
+  if (section) {
+    mainmenuComponents = components.filter(c => c.target === 'mainmenu' && c.section === section);
+  }
   
   // Render components
   return mainmenuComponents.map(c => {

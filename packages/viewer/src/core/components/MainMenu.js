@@ -15,13 +15,22 @@ export default function MainMenu(props) {
   return (
     <div className="layout-sidebar-panel">
       <div id="mainmenu"
+        className="p-d-flex p-flex-column"
         onClick={onMenuClick}
         >
-        
-        { core.renderMainMenu({
-          selected_menu,
-          props: { components, history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils }, auth }
-        })}
+        <div>
+          { core.renderMainMenu({
+            selected_menu,
+            props: { components, history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils }, auth }
+          })}
+        </div>
+        <div class="p-mt-auto">
+          { core.renderMainMenu({
+            selected_menu,
+            section: 'bottom',
+            props: { components, history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils }, auth }
+          })}
+        </div>
 
       </div>
 
