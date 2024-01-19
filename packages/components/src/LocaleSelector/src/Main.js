@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 
@@ -20,32 +20,32 @@ export default function Main({ as, config, actions, record }) {
 
   const { i18n } = useTranslation();
 
-  const locale = useMemo(()=> {
+  const locale = useMemo(() => {
     return viewer.locale ? viewer.locale : i18n.resolvedLanguage;
   }, [viewer.locale]);
-  
+
   const localesList = useMemo(() => {
     let locales = [];
     if (record?.config_json?.locales?.length) {
       if (typeof record.config_json.locales[0] === 'object') {
-        locales = record.config_json.locales.map(l => { return { label: l, value: l.values }});
+        locales = record.config_json.locales.map(l => { return { label: l, value: l.values } });
       } else {
-        locales = record.config_json.locales.map(l => {return {label: l, value: l.toLowerCase()}});
+        locales = record.config_json.locales.map(l => { return { label: l, value: l.toLowerCase() } });
       }
     } else {
       locales = [
-        { label: i18n.resolvedLanguage.toUpperCase(), value: i18n.resolvedLanguage}
+        { label: i18n.resolvedLanguage.toUpperCase(), value: i18n.resolvedLanguage }
       ]
     }
     return locales;
-  }, [record?.config_json, locale]);  
+  }, [record?.config_json, locale]);
 
   const mode = useMemo(() => {
     if (!record?.config_json?.mode && localesList?.length <= 3) {
       return 'inline';
     }
     return (record?.config_json?.mode || defaultMode).toLowerCase();
-  });  
+  });
 
   const handleChange = (event) => {
     dispatch(viewer_set_locale(event.value));
@@ -54,21 +54,21 @@ export default function Main({ as, config, actions, record }) {
 
   if (localesList.length < 2 && !(record?.config_json?.show_always === true)) {
     return null;
-  } 
-  
+  }
+
   if (mode === 'inline') {
     return (
-      <div style={{marginLeft: '20px'}} className='locale-selector'>
+      <div style={{ marginLeft: '20px' }} className='locale-selector'>
         {localesList.map((item, index) => {
           return (
-            <React.Fragment>
+            <React.Fragment key={item.value} >
               <Button
-                key={item.value} 
+                key={item.value}
                 label={item.label}
-                className={`p-button-text ${ i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
-                onClick={(e)=>dispatch(viewer_set_locale(item.value))}
+                className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                onClick={(e) => dispatch(viewer_set_locale(item.value))}
               />
-              {(index < localesList.length-1) && <span>|</span>}
+              {(index < localesList.length - 1) && <span>|</span>}
             </React.Fragment>
           );
         })}
@@ -78,6 +78,6 @@ export default function Main({ as, config, actions, record }) {
 
   return (
     <Dropdown value={locale.toLowerCase()} options={localesList} onChange={handleChange} className='locale-selector' />
-  );  
-  
+  );
+
 }
