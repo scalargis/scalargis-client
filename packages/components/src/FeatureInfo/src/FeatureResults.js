@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useTranslation} from "react-i18next"
+import { useTranslation } from "react-i18next"
 import Cookies from 'universal-cookie';
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
@@ -11,6 +11,8 @@ import { Message } from 'primereact/message'
 import { Button } from 'primereact/button'
 import convert from 'convert'
 
+import { i18n } from '@scalargis/components';
+
 import componentMessages from './messages'
 
 export default function FeatureResults({ core, config, features, layers, actions, pubsub, dispatch, mainMap, record }) {
@@ -21,7 +23,7 @@ export default function FeatureResults({ core, config, features, layers, actions
   const { t } = useTranslation();
 
   const [activeIndex, setActiveIndex] = useState(null);
-
+  
   //Export permissions
   const [userRoles, setUserRoles] = useState([]);
   const [showExport, setShowExport] = useState(true);  
@@ -63,8 +65,7 @@ export default function FeatureResults({ core, config, features, layers, actions
 
   // Update accordion active items
   useEffect(() => {
-    let active = Object.keys(grouped).map((title, i) => i);
-
+    let active = Object.keys(grouped).map((layerId, i) => i);
     if (active && active.length) {
       setActiveIndex(active);
     } else {
@@ -125,9 +126,11 @@ export default function FeatureResults({ core, config, features, layers, actions
     }
 
     let results = [];
-    Object.keys(grouped).map(title => {
-      if (allowExportFeatures(title, layers, userRoles)) {
-        results = results.concat(grouped[title]);
+    Object.keys(grouped).map(layerId => {
+      if (allowExportFeatures(layerId, layers, userRoles)) {
+        if (grouped[layerId]?.features?.length) {
+          results = results.concat(grouped[layerId].features);
+        }
       }
     });
     let text = serializeFeatures(results, mainMap, viewer, outCRS);
@@ -140,9 +143,9 @@ export default function FeatureResults({ core, config, features, layers, actions
       const action = rowData.action || {};
 
       if (action.show_null === true || rowData.value != null) {
-        val = <Button label={action.label} icon={action.icon}
+        val = <Button label={i18n.translateValue(action.label)} icon={action.icon}
             className={action.classname || action.className}
-            title={action.tooltip}
+            title={i18n.translateValue(action.tooltip)}
             onClick={(e) => publish(action.type, action.data)}
           />
       } else {
@@ -188,11 +191,10 @@ export default function FeatureResults({ core, config, features, layers, actions
         multiple
         activeIndex={activeIndex} 
         onTabChange={(e) => setActiveIndex(e.index)}>
-          { Object.keys(grouped).map(title => {
-
+          { Object.keys(grouped).map(layerId => {
             // Validate layer
-            const layer = layers.find(l => l.title === title);
-            //if (!layer) return null;
+            const layer = layers.find(l => l.id === layerId);
+            if (!layer) return null;
 
             //Get export permissions from layer config
             let layerRecordExport = true;
@@ -204,8 +206,8 @@ export default function FeatureResults({ core, config, features, layers, actions
             }
             
             return (
-              <AccordionTab header={title}>
-                { grouped[title].map((feat, i) => {
+              <AccordionTab key={layerId} header={i18n.translateValue(grouped[layerId].layerName)}>
+                { grouped[layerId].features.map((feat, i) => {
                     
                   let key;                  
                   if (feat.getId) key = feat.getId();
@@ -329,7 +331,7 @@ function getFeatureRows(feat, layer) {
               }
               rows.push({ 
                 key, 
-                name: field.title,
+                name: i18n.translateValue(field.title),
                 action,
                 value: new_value,
                 type: field.type
@@ -337,7 +339,7 @@ function getFeatureRows(feat, layer) {
             } else {
               rows.push({ 
                 key,
-                name: field.title,
+                name: i18n.translateValue(field.title),
                 value: formatValue(new_value, field.format),
                 type: field.type
               });
@@ -371,11 +373,10 @@ function getFeatureRows(feat, layer) {
               });                 
             }
 
-            //rows.push({ key, name: field.title, value: formatValue(feat.data[field.name],field.format), type: field.type });
             rows.push({ 
               key, 
               name: field.title, 
-              value: formatValue(new_value,field.format), 
+              value: formatValue(new_value, field.format), 
               type: field.type 
             });
           }
@@ -397,27 +398,29 @@ function groupResults(features, map) {
   const grouped = {};
   features.forEach(feat => {
     if (feat.layer && feat.data) {
-      if (!grouped[feat.layer]) grouped[feat.layer] = [];
+      const layerId = feat.layerId
+      const layerName = i18n.translateValue(feat.layer);
+
+      if (!grouped[layerId]) grouped[layerId] = {layerId, layerName, features: []};
       if (feat.type === 'ol') {
         let items = parseOlFeatures(feat.data, map);
         items.forEach(f => {
           f.set('resultId', feat.id)
           f.set('feature_tpl', {...feat.feature_tpl});
         });
-        grouped[feat.layer] = grouped[feat.layer].concat(items);
-      }
-      else {
-        grouped[feat.layer].push(feat);
+        grouped[layerId].features = grouped[layerId].features.concat(items);
+      } else {
+        grouped[layerId].features.push(feat);
       }
     }
   });
   return grouped;
 }
 
-function allowExportFeatures(layerKey, layers, userRoles) {
+function allowExportFeatures(layerId, layers, userRoles) {
   let allowExport = false;
 
-  const layer = layers.find(l => l.title === layerKey);
+  const layer = layers.find(l => l.id === layerId);
   if (layer) {
     //Get export permissions from layer config
     if (layer && layer.featureinfo_export_roles && layer.featureinfo_export_roles.length) {

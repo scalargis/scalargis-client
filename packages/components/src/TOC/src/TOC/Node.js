@@ -7,6 +7,8 @@ import { Button } from 'primereact/button';
 import DraggableItem from './DraggableItem';
 import Legend from "./Legend";
 
+import { i18n } from '@scalargis/components';
+
 class Node extends React.Component {
 
   state = { detailsOpen: false }
@@ -110,7 +112,7 @@ class Node extends React.Component {
                 <td className={(onScale ? "title" : "title outofscale") + (isGroup ? " title-grp" : "")}>
                   { data.style_color ? <i className='pi pi-square' style={{color: `rgba(${data.style_color})` }} /> : null }
                   <label htmlFor={data.id} className={"label" + (isGroup ? " label-grp" : "") }>
-                    {data.title}
+                    {i18n.translateValue(data.title)}
                   </label>
                   { !data.system && (
                     <div className={"theme-tools" + (detailsOpen ? "" : " hidden") }>

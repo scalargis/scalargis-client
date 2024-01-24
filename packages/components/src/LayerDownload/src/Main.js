@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { useTranslation } from "react-i18next"
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast'
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
@@ -14,17 +15,6 @@ export const actions = {
 }
 */
 
-const defaultExportFormats = [
-  { value: "geojson", title: "GeoJSON", icon: "pi pi-file", tooltip: "Exportar para ficheiro GeoJSON",
-    outputFormat: "application/json" },
-  { value: "gml", title: "GML", icon: "pi pi-file", tooltip: "Exportar para ficheiro GML",
-    outputFormat: "text/xml; subtype=gml/2.1.2" },
-  { value: "shape", title: "ShapeFile", icon: "pi pi-file", tooltip: "Exportar para ficheiro ShapeFile",
-    outputFormat: "SHAPE-ZIP" },
-  { value: "kml", title: "KML", icon: "pi pi-file", tooltip: "Exportar para ficheiro KML",
-    outputFormat: "application/vnd.google-earth.kml+xml" }
-];
-
 export default function Main({ core, config, record }) {
 
   const { viewer, layer, actions, mainMap, models } = config;
@@ -34,6 +24,21 @@ export default function Main({ core, config, record }) {
   const [downloadFormat, setDownloadFormat] = useState(null);
 
   const toast = useRef(null)
+
+  const { t } = useTranslation();
+
+  const defaultExportFormats = [
+    { value: "geojson", title: "GeoJSON", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "GeoJSON"}),
+      outputFormat: "application/json" },
+    { value: "gml", title: "GML", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "GML"}),
+      outputFormat: "text/xml; subtype=gml/2.1.2" },
+    { value: "shape", title: "ShapeFile", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "Shapefile"}),
+      outputFormat: "SHAPE-ZIP" },
+    { value: "kml", title: "KML", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "KML"}),
+      outputFormat: "application/vnd.google-earth.kml+xml" }
+  ];
+
+  console.log(defaultExportFormats);
 
   const component_cfg = record.config_json;
 
@@ -257,13 +262,13 @@ export default function Main({ core, config, record }) {
       {showOnPortal(<Toast ref={toast} position="top-right" />)}
       { showDownloadBtn && (
         <div className="p-grid">
-            <div className="p-col-4">Descarregar</div>
+            <div className="p-col-4">{t("download", "Descarregar")}</div>
             <div className="p-col-8">
               { linkDownload &&
                 <Button
                   className="p-button-sm p-mr-2 p-mb-2"
                   icon={(isDownloading && downloadFormat=='link') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"} 
-                  label={linkDownload.label || "Abrir"}
+                  label={linkDownload.label || t("open", "Abrir")}
                   onClick={e => downloadLink(linkDownload.filename, linkDownload.url)}
                   disabled={isDownloading}
                 />
@@ -272,7 +277,7 @@ export default function Main({ core, config, record }) {
                 <Button
                   className="p-button-sm p-mr-2 p-mb-2"
                   icon={(isDownloading && downloadFormat=='external') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"} 
-                  label={externalDownload.label || "Abrir"}
+                  label={externalDownload.label || t("open", "Abrir")}
                   onClick={e => window.open(externalDownload.url, "_blank")}
                   disabled={isDownloading}
                 />

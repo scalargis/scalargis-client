@@ -31,3 +31,14 @@ export const loadBackendTranslations = (url, deep=true, overwrite=true, callback
 export const getTranslations = () => {
   return i18next.options.resources;
 }
+
+export const translateValue = (value, defaultString=null, lang=i18next.resolvedLanguage, t=i18next?.t, namespaces=i18next?.options?.ns) => {
+  let translatedValue = defaultString;
+  if (typeof value === 'object') {
+    translatedValue = value["default"] ? value["default"] : "";
+    translatedValue = value[lang] ? value[lang] : translatedValue;
+  } else {
+    translatedValue = value ? (namespaces ? t(value, defaultString, { ns: namespaces }) : t(value, defaultString)) : "";
+  }
+  return translatedValue;
+}

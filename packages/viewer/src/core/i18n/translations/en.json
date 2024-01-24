@@ -38,7 +38,7 @@
   "zoomToElement": "Zoom to element",
   "removeElement":"Remove element",
   "exportResults": "Export results",
-  "export": "Exportar",
+  "export": "Export",
   "clearResults": "Clear results",
   "clear": "Clear",
   "selectCRS": "Select a CRS",
@@ -83,7 +83,7 @@
   "clearAll": "Clear all",
   "fillColor": "Fill color",
   "outlineColor": "Outline color",
-  "outlineWidth": "Outline size",
+  "outlineWidth": "Outline width",
   "drawings": "Drawings",
   "noDrawings": "No drawinngs",
   "delete": "Delete",
@@ -173,5 +173,21 @@
   "selectStyle": "Select Style",
   "notDefined": "Not Defined",
 
-  "setTransparency": "Set Transparency"
+  "setTransparency": "Set Transparency",
+
+  "download": "Download",
+  "exportToFileFormat": "Export to {{format}} file",
+  "open": "Open",
+
+  "filter": "Filter",
+
+  "noTocThemesMsg": "There are no themes. Click on the + menu to add them.",
+
+  "session": "Session",
+  "saveSession": "Save session",
+  "saveSessionSuccessMsg": "The session was recorded successfully.",
+  "unexpectedError": "An unexpected error has occurred",
+  "saveSessionErrorMsg": "It was not possible to record the session.",
+  "sessionSaveInfo": "Saved in {{info}}",
+  "loadSession": "Open session"
 }

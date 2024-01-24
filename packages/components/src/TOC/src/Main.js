@@ -10,6 +10,8 @@ import { Panel } from 'primereact/panel';
 import { Message } from 'primereact/message';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { translateValue } from '../../utils/i18n';
+
 
 const diffArray = (arr1, arr2) => arr1.concat(arr2)
     .filter(val => !(arr1.includes(val) && arr2.includes(val)));
@@ -236,8 +238,11 @@ class Main extends React.Component {
     let filterRegEx = new RegExp(filter, "i");
     themes.forEach(n => {
       if (filterDone.includes(n.id)) return;
-      if (!filter) n.filtered = false;
-      else n.filtered = filterRegEx.test(n.title) || filterRegEx.test(n.description) ? false : true;
+      if (!filter) {
+        n.filtered = false
+      } else {
+        n.filtered = filterRegEx.test(translateValue(n.title)) || filterRegEx.test(translateValue(n.description)) ? false : true;
+      }
       filterDone.push(n.id);
       if (!n.filtered) {
         let parents = findAllParents(themes, n.id);
@@ -305,19 +310,19 @@ class Main extends React.Component {
         if (res.success) {
           toastEl.show({
             severity: 'success',
-            summary: 'Gravar Sessão',
-            detail: "A sessão foi gravada com sucesso.",
+            summary: this.props.t("saveSession", "Gravar sessão"),
+            detail: this.props.t("saveSessionSuccessMsg", "A sessão foi gravada com sucesso."),
             sticky: false
           });
           this.props.config.dispatch(this.props.actions.viewer_session_saved(res.session));       
         } else {
-          throw new Error('Não foi possível gravar a sessão.');        
+          throw new Error(this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão."));        
         }
       }).catch(error => {
         toastEl.show({
           severity: 'error',
-          summary: 'Ocorreu um erro inesperado',
-          detail: "Não foi possível gravar a sessão.",
+          summary: this.props.t("unexpectedError", "Ocorreu um erro inesperado"),
+          detail: this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão."),
           sticky: false
         });
         this.props.config.dispatch(this.props.actions.viewer_save_http_error());
@@ -396,17 +401,17 @@ class Main extends React.Component {
           { (!!cookieData && !!config.viewer.allow_user_session) && 
             <Toolbar className="p-mb-2"
               left={(config.viewer.is_session && 
-                <Button label="Sessão" className="p-button-sm p-button-rounded p-button-info" 
-                  icon="pi pi-check" tooltip={"Gravada em " + config.viewer.session.date}  />)} 
+                <Button label={this.props.t("session", "Sessão")} className="p-button-sm p-button-rounded p-button-info" 
+                  icon="pi pi-check" tooltip={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}  />)} 
               right={ 
               <React.Fragment>
-                {(config.viewer.session && !config.viewer.is_session) && <Button label="Abrir Sessão" 
+                {(config.viewer.session && !config.viewer.is_session) && <Button label={this.props.t("loadSession","Abrir sessão")} 
                   icon="pi pi-folder-open" 
                   className="p-button-text p-button-sm"
                   onClick={e => this.loadSession()}
                   disabled={(config.viewer.save_loading)}
-                  tooltip={"Gravada em " + config.viewer.session.date} />}
-                <Button label="Gravar Sessão"
+                  tooltip={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )} />}
+                <Button label={this.props.t("saveSession", "Gravar sessão")}
                   icon={config.viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-save"}
                   className="p-button-text p-button-sm"
                   onClick={e => this.saveSession(toastEl)} 
@@ -419,14 +424,14 @@ class Main extends React.Component {
             { component_cfg.show_filter !== false ? (
               <div className="p-inputgroup">
                 <InputText 
-                  placeholder='Filtro...'
+                  placeholder={`${this.props.t('filter', "Filtro")}...`}
                   className="p-inputtext-sm p-mb-2"
                   value={filter}
                   onChange={this.changeFilter.bind(this)}
                 />
                 <Button
                   icon="pi pi-times"
-                  label="Limpar"
+                  label={this.props.t('clear', "Limpar")}
                   className="p-button-sm p-mb-2"
                   onClick={this.clearFilter.bind(this)}
                 />
@@ -436,7 +441,7 @@ class Main extends React.Component {
           ) : (
             <Message
               severity="info"
-              text="Não existem temas. Clique no menu + para adicionar." 
+              text={this.props.t("noTocThemesMsg", "Não existem temas. Clique no menu + para adicionar.")}
             />
           ) }
 

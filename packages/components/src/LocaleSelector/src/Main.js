@@ -61,7 +61,7 @@ export default function Main({ as, config, actions, record }) {
       <div style={{marginLeft: '20px'}} className='locale-selector'>
         {localesList.map((item, index) => {
           return (
-            <React.Fragment>
+            <React.Fragment key={index}>
               <Button
                 key={item.value} 
                 label={item.label}

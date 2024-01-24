@@ -86,7 +86,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
   let header;  
   if (typeof config?.header === 'object') {
     header = config.header["default"] ? config.header["default"] : "";
-    header = config.header[i18n.resolvedLanguage] ? config.header[i18n.resolvedLanguage] : html;
+    header = config.header[i18n.resolvedLanguage] ? config.header[i18n.resolvedLanguage] : header;
   } else {
     header = config?.header ? t(config.header, config.header) : "";
   }

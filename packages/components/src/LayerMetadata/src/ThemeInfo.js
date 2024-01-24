@@ -1,12 +1,10 @@
 import React from 'react';
 import i18next from 'i18next';
 
+import { i18n } from '@scalargis/components';
+
 
 const formatMetadataValue = (element) => {
-
-    console.log(element.url);
-    console.log(element.html);
-
     if (element.type === 'html') {
         return <div dangerouslySetInnerHTML={{__html: element.value}} />
     } else if (element.type === 'hyperlink') {
@@ -42,7 +40,7 @@ class ThemeInfo extends React.Component {
       <div>
         <div className="p-grid">
             <div className="p-col-4">{i18next.t("title", "Título")}</div>
-            <div className="p-col-8">{theme.title}</div>
+            <div className="p-col-8">{i18n.translateValue(theme.title)}</div>
         </div>
         { theme.description ?
         <div className="p-grid">
