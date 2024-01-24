@@ -6,7 +6,8 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
-//import './style.css';
+
+import { i18n } from '@scalargis/components';
 
 class EditNode extends React.Component {
 
@@ -101,7 +102,7 @@ class EditNode extends React.Component {
             <label className="p-col-12 p-md-4">{this.props.t("title", "Título")}</label>
             <div className="p-col-12 p-md-8">
               <InputText
-                value={edit.title}
+                value={i18n.translateValue(edit.title)}
                 placeholder={this.props.t("title", "Título")}
                 onChange={e => this.editField('title', e.target.value)}
                 onClick={e => e.target.select()}
@@ -266,13 +267,13 @@ class EditNode extends React.Component {
                 </div>
               </div>
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{this.props.t("outlineWitdh", "Espessura de Rebordo")}</label>
+                <label className="p-col-12 p-md-4">{this.props.t("outlineWidth", "Espessura de Rebordo")}</label>
                 <div className="p-col-12 p-md-8">
                   <InputText
                     type="number"
                     min="0"
                     value={edit.style_stroke_width}
-                    placeholder={this.props.t("outlineWitdh", "Espessura de Rebordo")}
+                    placeholder={this.props.t("outlineWidth", "Espessura de Rebordo")}
                     onChange={e => this.editField('style_stroke_width', e.target.value)}
                   />
                 </div>

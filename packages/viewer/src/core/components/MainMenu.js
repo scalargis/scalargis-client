@@ -24,7 +24,7 @@ export default function MainMenu(props) {
             props: { components, history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils }, auth }
           })}
         </div>
-        <div class="p-mt-auto">
+        <div className="p-mt-auto">
           { core.renderMainMenu({
             selected_menu,
             section: 'bottom',

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useTranslation} from "react-i18next"
+import { useTranslation } from "react-i18next"
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
 import OlVectorTileLayer from "ol/layer/VectorTile";
@@ -77,6 +77,7 @@ export default function FeatureInfo({ core, config, actions }) {
             type: 'ol',
             data: serializeFeatures([feature]),
             layer: l ? l.get('title') : '',
+            layerId: l ? l.get('id') : null, 
             feature_tpl: l.get('feature_tpl') ? l.get('feature_tpl') : null
           };
         } else {
@@ -84,7 +85,7 @@ export default function FeatureInfo({ core, config, actions }) {
           Object.keys(feature)
             .filter(k => typeof feature[k] !== 'object')
             .forEach(k => data[k] = feature[k]);
-          return { id: uuidV4(), type: 'object', data, layer: l ? l.get('title') : '' };
+          return { id: uuidV4(), type: 'object', data, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null };
         }
       }
     }
@@ -233,7 +234,7 @@ export default function FeatureInfo({ core, config, actions }) {
               acc.push(displayFeature(result, l));
             }          
           } else {
-           acc.push({id: uuidV4(), type: 'text', data: result, layer: l.get('title') || 'teste'});
+           acc.push({id: uuidV4(), type: 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
           }
           dispatch(actions.viewer_set_featureinfo(acc));
         });
@@ -294,7 +295,7 @@ export default function FeatureInfo({ core, config, actions }) {
               acc.push(displayFeature(result, l));
             }          
           } else {
-           acc.push({id: uuidV4(), type: 'text', data: result, layer: l.get('title') || 'teste'});
+           acc.push({id: uuidV4(), type: 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
           }
           dispatch(actions.viewer_set_featureinfo(acc));
         });

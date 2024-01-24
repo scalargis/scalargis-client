@@ -83,7 +83,7 @@
   "clearAll": "Borrar todos",
   "fillColor": "Color de relleno",
   "outlineColor": "Color del borde",
-  "outlineWitdh": "Ancho del borde",
+  "outlineWidth": "Ancho del borde",
   "drawings": "Dibujos",
   "noDrawings": "No hay dibujos",
   "delete": "Borrar",
@@ -173,5 +173,21 @@
   "selectStyle": "Escolha o Estilo",
   "notDefined": "No Definido",
 
-  "setTransparency": "Definir Transparencia"  
+  "setTransparency": "Definir Transparencia",
+
+  "download": "Descargar",
+  "exportToFileFormat": "exportar a archivo {{format}}",
+  "open": "Abrir",
+
+  "filter": "Filtro",
+
+  "noTocThemesMsg": "No hay capas. Haz clic en el menú + para añadirlos.",
+
+  "session": "Sesión",
+  "saveSession": "Grabar sesión",
+  "saveSessionSuccessMsg": "La sesión ha sido grabada correctamente.",
+  "unexpectedError": "Se ha producido un error inesperado",
+  "saveSessionErrorMsg": "No ha sido posible grabar la sesión.",
+  "sessionSaveInfo": "Grabada en {{info}}",
+  "loadSession": "Cargar sesión"
 }
