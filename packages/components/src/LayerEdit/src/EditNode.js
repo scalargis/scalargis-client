@@ -52,6 +52,12 @@ class EditNode extends React.Component {
     const { edit, showAdvanceOptions } = this.state;
     if (!edit) return null;
 
+    let wmsServerTypeOtions = [
+      { key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") },
+      { key: "geoserver", value: "geoserver", label: "Geoserver"},
+      { key: "mapserver", value: "mapserver", label: "Mapserver"},
+      { key: "qgis", value: "qgis", label: "QGIS"}
+    ];
     let wmsFormatOptions = [];
     let wmsFeatureFormatOptions = [];
     let wmsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }];
@@ -160,6 +166,14 @@ class EditNode extends React.Component {
                 </p>
                 { showAdvanceOptions && (
                 <div className="p-pb-2">
+                  <div className="p-pt-2">
+                    <label>{this.props.t("serverType", "Tipo de Servidor")}</label>
+                    <Dropdown placeholder={this.props.t("selectServerType", "Escolha o Tipo de Servidor")}
+                      options={wmsServerTypeOtions}
+                      value={edit.servertype || ''}
+                      onChange={({ value }) => this.editField('servertype', value || undefined)}
+                    />
+                  </div>                  
                   <div className="p-pt-2">
                     <label>{this.props.t("getMapFormat", "Formato de GetMap")}</label>
                     <Dropdown placeholder={this.props.t("selectGetMapFormat", "Escolha o Formato de GetMap")}

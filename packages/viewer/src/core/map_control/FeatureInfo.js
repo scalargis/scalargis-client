@@ -817,13 +817,20 @@ class FeatureInfoUtils  {
     return result;
   }
   
-  buildFeatureInfoWMSUrl(map, layer, viewResolution, coordinate, crs, format) {  
+  buildFeatureInfoWMSUrl(map, layer, viewResolution, coordinate, crs, format) {
+    //TODO: Add option to set FEATURE_COUNT by config
+    const params = { 'INFO_FORMAT': format, 'FEATURE_COUNT': 10 }
+
+    // Add vendor parameters
+    if (layer.get('servertype') === 'qgis') {
+      params["WITH_GEOMETRY"] = true;
+    }
+
     let url = layer.getSource().getFeatureInfoUrl(
       coordinate,
       viewResolution,
       crs,
-      //TODO: Add option to set FEATURE_COUNT by config
-      { 'INFO_FORMAT': format, 'FEATURE_COUNT': 10 }
+      params
     );
     if (!isUrlAppOrigin(url)) {
       url = this.core.MAP_PROXY_URL + encodeURIComponent(url);

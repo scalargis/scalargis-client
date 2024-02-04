@@ -189,5 +189,8 @@
   "unexpectedError": "Ocorreu um erro inesperado",
   "saveSessionErrorMsg": "Não foi possível gravar a sessão.",
   "sessionSaveInfo": "Gravada em {{info}}",
-  "loadSession": "Abrir sessão"
+  "loadSession": "Abrir sessão",
+
+  "serverType": "Tipo de servidor",
+  "selectServerType": "Escolha o tipo de servidor"
 }

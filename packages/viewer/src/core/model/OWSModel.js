@@ -438,7 +438,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
         url: finalUrl,
         layers: layer.Name,
         children: [],
-        servertype: 'mapserver',
+        servertype: options.servertype || undefined,
         crs: crs,
         tiled: typeof options.tiled === 'undefined' ? true : options.tiled,
         version: wms.version,
@@ -928,7 +928,7 @@ export const downloadTheme = (theme, format) => {
     // Get bbox from extent options
     const extent = service.fullExtent;
     if (extent && extent.xmin && extent.ymin && extent.xmax && extent.ymax) {
-      console.log(OlProj.get(`EPSG:${extent.spatialReference.wkid}`));
+      //console.log(OlProj.get(`EPSG:${extent.spatialReference.wkid}`));
       if (extent.spatialReference.wkid && OlProj.get(`EPSG:${extent.spatialReference.wkid}`)) {
         bbox = parseBBOX([extent.xmin, extent.ymin, extent.xmax, extent.ymax], `EPSG:${extent.spatialReference.wkid}`, `EPSG:${crs}`);
       } else if (extent.spatialReference.wkt) {

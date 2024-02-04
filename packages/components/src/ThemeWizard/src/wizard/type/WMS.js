@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { withTranslation } from "react-i18next";
 import { WMSCapabilities } from 'ol/format';
 //import WMSCapabilities from '../../../model/WMSCapabilities';
 import { Button } from 'primereact/button';
@@ -6,6 +7,9 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import {InputSwitch} from 'primereact/inputswitch';
 import { Accordion, AccordionTab } from 'primereact/accordion';
+
+import { i18n } from '@scalargis/components';
+
 
 const versions = [
   { key: 'default', value: 'default', label: 'Especificada pela Serviço' },
@@ -37,6 +41,7 @@ class WMS extends Component {
     let options = {
       srid: srid,
       bbox: bbox,
+      servertype: data.wmsServerType,
       ignore_url: data.wmsIgnoreServiceUrl,
       version: data.wmsVersion,
       tiled: data.wmsTiled
@@ -107,8 +112,16 @@ class WMS extends Component {
    */
   render() {
     const { loading, data, editField, getUrlHistory, winSize } = this.props;
-    const { wmsIgnoreServiceUrl, wmsVersion, wmsTiled } = data;
+    const { wmsServerType, wmsIgnoreServiceUrl, wmsVersion, wmsTiled } = data;
     const { showAdvanceOptions } = this.state;
+
+    let wmsServerTypeOtions = [
+      { key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") },
+      { key: "geoserver", value: "geoserver", label: "Geoserver"},
+      { key: "mapserver", value: "mapserver", label: "Mapserver"},
+      { key: "qgis", value: "qgis", label: "QGIS"}
+    ];
+
     return (
       <React.Fragment>
         <div className="p-inputgroup">
@@ -137,8 +150,19 @@ class WMS extends Component {
             <div className="p-fluid">
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">Versão</label>
-                <div className="p-col-12 p-md-5">
+                <label className="p-col-12 p-md-4">{this.props.t("serverType", "Tipo de servidor")}</label>
+                <div className="p-col-12 p-md-8">
+                  <Dropdown placeholder={this.props.t("selectServerType", "Escolha o tipo de servidor")}
+                    options={wmsServerTypeOtions}
+                    value={wmsServerType || ''}
+                    onChange={({ value }) => editField('wmsServerType', value)}
+                  />
+                </div>
+              </div> 
+
+              <div className="p-field p-grid">
+                <label className="p-col-12 p-md-4">Versão</label>
+                <div className="p-col-12 p-md-8">
                   <Dropdown
                     options={versions}
                     value={wmsVersion}
@@ -178,4 +202,4 @@ class WMS extends Component {
   }
 }
 
-export default WMS;
+export default withTranslation()(WMS);

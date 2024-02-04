@@ -189,5 +189,8 @@
   "unexpectedError": "An unexpected error has occurred",
   "saveSessionErrorMsg": "It was not possible to record the session.",
   "sessionSaveInfo": "Saved in {{info}}",
-  "loadSession": "Open session"
+  "loadSession": "Open session",
+
+  "serverType": "Server type",
+  "selectServerType": "Select server type"
 }

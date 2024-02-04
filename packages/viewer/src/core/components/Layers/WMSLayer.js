@@ -164,6 +164,7 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
       'STYLES': config.wms_style || config.styles
     }
     layer.current.getSource().updateParams(params);
+    layer.current.set('servertype', config.servertype);
     layer.current.set('selectable', config.selectable);
     layer.current.set('get_feature_info_format', config.get_feature_info_format)
     layer.current.setOpacity(config.opacity);
