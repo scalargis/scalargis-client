@@ -9,7 +9,7 @@ export default function MainMenu(props) {
   const { selected_menu } = viewer.config_json;
 
   function getStyle(c) {
-    return { display: c.id !== selected_menu ? 'none' : 'block', height: 'calc(100%)', overflowY: 'scroll' }
+    return { display: c.id !== selected_menu ? 'none' : 'block', height: 'calc(100%)' }
   }
 
   return (

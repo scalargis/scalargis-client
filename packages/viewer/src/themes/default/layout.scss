@@ -11,12 +11,6 @@ body {
   overflow: hidden;
 }
 
-/* Firefox */
-div {
-  scrollbar-color: #999 #999;
-  scrollbar-width: thin;
-}
-
 /* For Chrome and other browsers except Firefox */
 ::-webkit-scrollbar {
   width: 8px;
@@ -36,6 +30,11 @@ div {
   border-radius: 5px;
   -webkit-border-radius: 5px;
 }
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
 
 /* -- previously in components/index.css --
 body {
@@ -118,6 +117,7 @@ body .p-dropdown {
   height: calc(100% - 50px);
 }
 
+
 .layout-sidebar #mainmenu {
   width: 55px;  
   overflow-y: auto;
@@ -125,8 +125,8 @@ body .p-dropdown {
 }
 
 .layout-sidebar #mainmenu::-webkit-scrollbar {
-  width: 3px;
-  height: 3px;
+  width: 5px;
+  height: 5px;
 }
 
 
