@@ -23,14 +23,12 @@ function SplashScreen(props) {
 
   const message = t("defaultRGPDmsg", "Este website usa cookies para melhorar a sua experiência de navegação. Ao pressionar 'Aceito' está a concordar com a sua utilização.");
 
-  console.log(message);
-
   return (
     <div className="splashscreen p-d-flex p-jc-center">
       <div className="p-as-center">
 
         <div className="login-logo p-text-center">
-          <img onError={addDefaultSrc} className="img-responsive" src={viewerLogo} alt="Logo" />  
+          <img onError={addDefaultSrc} className="img-responsive" src={viewerLogo} alt="Logo" style={{maxWidth: "100%"}} />  
         </div>
 
         <h3>{`${t("welcome", "Bem-vindo")}!`}</h3>
