@@ -65,6 +65,9 @@ class Node extends React.Component {
     // Check if is hidden
     const isHidden = data.hidden === true;
 
+    // Check if has visible childrens
+    const isChildrenVisible = isGroup && (!nodeChildren.length || nodeChildren.filter(child => !child.hidden).length > 0);
+
     // Render theme node
     return (
       <React.Fragment>
@@ -83,7 +86,8 @@ class Node extends React.Component {
 
                   { isGroup && (
                     <Button
-                      className="p-button-sm p-button-text" 
+                      className="p-button-sm p-button-text"
+                      style={!isChildrenVisible ? {visibility: "hidden"} : null}
                       title={this.props.t("showHideChildThemes", "Mostrar/esconder subtemas")}
                       icon={this.isOpen() ? "pi pi-chevron-down" : "pi pi-chevron-right" }
                       onClick={e => actions.open(e, data.id)}
