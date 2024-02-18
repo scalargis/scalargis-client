@@ -27,6 +27,3 @@
 .p-jsonform .p-tabview .p-tabview-nav {
   overflow-x: auto;
 }
-::-webkit-scrollbar {
-  height: 0px !important;
-}
