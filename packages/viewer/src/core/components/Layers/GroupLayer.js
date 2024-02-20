@@ -31,10 +31,18 @@ const GroupLayer = ({ layers, config, group, checked, viewer }) => {
     };
   }, [mainMap]);
 
+
   // Toggle layer visibility
   useEffect(() => {
     layer.current.setVisible(checked.includes(config.id));
   }, [checked]);
+
+  // TODO: Remove this useEffect, change layer opacity when updating theme state
+  // Update layer opacity
+  useEffect(() => {
+    if (config.opacity == null) return;
+    if (layer?.current?.setOpacity) layer.current.setOpacity(config.opacity);
+  }, [config.opacity]);
 
   // Validate children prop
   if (!config.children) return null;
