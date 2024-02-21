@@ -57,7 +57,7 @@ function ViewerEdit(props) {
   return (
     <React.Fragment>
       <BlockUI blocked={isLoading}
-        template={<i class="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
+        template={<i className="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
         { record ? <ViewerForm data={record} /> : <div /> }
       </BlockUI>
     </React.Fragment>

@@ -153,7 +153,7 @@ const ListChilds = props => {
     
                       <div className="p-fluid p-pt-2">
                         <div className="p-field p-grid p-mb-0">
-                          <div class="p-col-12">
+                          <div className="p-col-12">
                             <div className="p-grid">
                               <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
                               <div className="p-col-12 p-md-10">
@@ -222,7 +222,7 @@ class PrintGroupChildsEditor extends Component {
 
         <div className="p-field p-col-12 p-md-6">
           <Panel header="Plantas">
-            <div class="p-col-12">
+            <div className="p-col-12">
               <div className="p-grid p-mb-4">
                 <div className="p-col-12">
                   <RecordSelector 
@@ -253,7 +253,7 @@ class PrintGroupChildsEditor extends Component {
 
         <div className="p-field p-col-12 p-md-6">
           <Panel header="Grupos">
-            <div class="p-col-12">
+            <div className="p-col-12">
               <div className="p-grid p-mb-4">
                 <div className="p-col-12">
                   <RecordSelector 

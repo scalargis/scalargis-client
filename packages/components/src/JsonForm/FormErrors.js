@@ -25,7 +25,7 @@ function FormErrors(props) {
 
   if (!displayMode || displayMode === displayModes.STATIC && show) {
     return (
-      <div aria-live="polite" class="dataform-inline-message p-component dataform-inline-message-error p-mt-2 p-mb-2" role="alert">
+      <div aria-live="polite" className="dataform-inline-message p-component dataform-inline-message-error p-mt-2 p-mb-2" role="alert">
         {buildErrorsList()}
       </div>
     );
@@ -50,12 +50,12 @@ function FormErrors(props) {
        />
       </div>}
         { props?.displayMode === displayModes.DIALOG ? <Dialog header={props?.title || "Erros do formulário"} footer={footer} visible={showErrors} style={{ width: '50vw' }}  onHide={() => setShowErrors(false)}>
-            <div aria-live="polite" class="dataform-inline-message p-component dataform-inline-message-error p-mt-2 p-mb-2" role="alert">
+            <div aria-live="polite" className="dataform-inline-message p-component dataform-inline-message-error p-mt-2 p-mb-2" role="alert">
               {buildErrorsList()}
             </div>
           </Dialog> :
           showErrors &&
-            <div aria-live="polite" class="dataform-inline-message p-component dataform-inline-message-error p-mt-2 p-mb-2" role="alert">
+            <div aria-live="polite" className="dataform-inline-message p-component dataform-inline-message-error p-mt-2 p-mb-2" role="alert">
               {buildErrorsList()}
             </div>
           }

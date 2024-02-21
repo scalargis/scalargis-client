@@ -158,8 +158,8 @@ function NotificationForm(props) {
         </div>
         <div className="p-col p-md-3">
           <div className="p-m-2 p-text-center">
-            {file.size != null && <span class="p-tag p-component p-px-1 p-py-1">
-              <span class="p-tag-value">{(file.size / 1024).toFixed(2) + " KB"}</span>
+            {file.size != null && <span className="p-tag p-component p-px-1 p-py-1">
+              <span className="p-tag-value">{(file.size / 1024).toFixed(2) + " KB"}</span>
             </span>}
           </div>
         </div>
