@@ -17,8 +17,8 @@ function FormErrors(props) {
 
   const buildErrorsList = ()=> {
     return <ul>
-      {(errors || []).map(err => {
-        return <li>{err.message}</li>
+      {(errors || []).map((err, k) => {
+        return <li key={k}>{err.message}</li>
       })}
     </ul>;
   }
