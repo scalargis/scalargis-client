@@ -320,7 +320,7 @@ const GroupFields = props => {
 
                         <div className="p-fluid p-pt-2">
                           <div className="p-field p-grid p-mb-0">
-                            <div class="p-col-10">
+                            <div className="p-col-10">
                               <div className="p-grid">
                                 <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
                                 <div className="p-col-12 p-md-10">
@@ -328,7 +328,7 @@ const GroupFields = props => {
                                 </div>
                               </div>
                             </div>
-                            <div class="p-col-2">
+                            <div className="p-col-2">
                               <div className="p-grid">
                                 <div className="p-field-checkbox">
                                     <Checkbox checked={field.active} disabled/>
@@ -338,7 +338,7 @@ const GroupFields = props => {
                             </div>
                           </div>
                           <div className="p-field p-grid">
-                            <div class="p-col-12">
+                            <div className="p-col-12">
                               <div className="p-grid">
                                 <label className="p-col-12 p-md-2"><strong>Cabeçalho: </strong></label>
                                 <div className="p-col-12 p-md-10">
@@ -348,13 +348,13 @@ const GroupFields = props => {
                             </div>
                           </div>
                           <div className="p-field p-grid p-col-12">
-                            <div class="p-col-7">
+                            <div className="p-col-7">
                               <div className="p-field-checkbox">
                                   <Checkbox checked={field.required} disabled/>
                                   <label>Preenchimento obrigatório</label>
                               </div>
                             </div>
-                            <div class="p-col-5">
+                            <div className="p-col-5">
                               <div className="p-field-checkbox">
                                   <Checkbox checked={field.showLabel} disabled/>
                                   <label>Mostrar título</label>
@@ -491,7 +491,7 @@ const Fields = props => {
 
                     <div className="p-fluid p-pt-2">
                       <div className="p-field p-grid p-mb-0">
-                        <div class="p-col-10">
+                        <div className="p-col-10">
                           <div className="p-grid">
                             <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
                             <div className="p-col-12 p-md-10">
@@ -499,7 +499,7 @@ const Fields = props => {
                             </div>
                           </div>
                         </div>
-                        <div class="p-col-2">
+                        <div className="p-col-2">
                           <div className="p-grid">
                             <div className="p-field-checkbox">
                                 <Checkbox checked={field.data.active} disabled/>
@@ -509,7 +509,7 @@ const Fields = props => {
                         </div>
                       </div>
                       <div className="p-field p-grid">
-                        <div class="p-col-12">
+                        <div className="p-col-12">
                           <div className="p-grid">
                             <label className="p-col-12 p-md-2"><strong>Cabeçalho: </strong></label>
                             <div className="p-col-12 p-md-10">
@@ -519,13 +519,13 @@ const Fields = props => {
                         </div>
                       </div>
                       <div className="p-field p-grid">
-                        <div class="p-col-6">
+                        <div className="p-col-6">
                           <div className="p-field-checkbox">
                               <Checkbox checked={field.data.required} disabled/>
                               <label>Preenchimento obrigatório</label>
                           </div>
                         </div>
-                        <div class="p-col-6">
+                        <div className="p-col-6">
                           <div className="p-field-checkbox">
                               <Checkbox checked={field.data.showLabel} disabled/>
                               <label>Mostrar título</label>
@@ -712,7 +712,7 @@ class FormFieldsEditor extends Component {
         <div className="p-field p-col-12 p-md-6">
           <Panel header="Campos">
 
-            <div class="p-col-12">
+            <div className="p-col-12">
 
               <div>
                 <div className="p-grid">
@@ -746,7 +746,7 @@ class FormFieldsEditor extends Component {
         <div className="p-field p-col-12 p-md-6">
           <Panel header="Grupos">
 
-          <div class="p-col-12">
+          <div className="p-col-12">
 
             <div>
               { this.state.showGroupForm && 
@@ -869,7 +869,7 @@ class FormFieldsEditor extends Component {
 
                             <div className="p-fluid">
                               <div className="p-grid">
-                                <div class="p-col-10">
+                                <div className="p-col-10">
                                   <div className="p-grid">
                                     <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
                                     <div className="p-col-12 p-md-10">
@@ -877,7 +877,7 @@ class FormFieldsEditor extends Component {
                                     </div>
                                   </div>
                                 </div>
-                                <div class="p-col-2">
+                                <div className="p-col-2">
                                   <div className="p-grid">
                                     <div className="p-field-checkbox">
                                         <Checkbox checked={true} disabled/>
