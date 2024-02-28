@@ -5,6 +5,7 @@ import WFSLayer from "./WFSLayer";
 import OSM from "ol/source/OSM";
 import OlSourceXYZ from "ol/source/XYZ";
 import OlSourceTileJSON from "ol/source/TileJSON";
+//import OlSourceGeoTIFF from 'ol/source/GeoTIFF.js';
 import OLGroupLayer from "ol/layer/Group";
 import WMTSLayer from "./WMTSLayer";
 import VectorTileLayer from "./VectorTileLayer";
@@ -12,6 +13,7 @@ import VectorLayer from "./VectorLayer";
 import GeoJSONLayer from "./GeoJSONLayer";
 import KMLLayer from "./KMLLayer";
 import ArcGISMapLayer from "./ArcGISMapLayer";
+import COGLayer from "./COGLayer";
 import GroupLayer from './GroupLayer';
 import { removeUrlParam, addUrlParam} from '../../utils';
 
@@ -136,7 +138,66 @@ const MorphLayer = ({ layers, config, group, checked, viewer }) => {
 
     case 'ArcGISMap': 
       LayerComponent = ArcGISMapLayer;
-      break;     
+      break; 
+      
+    case 'COG':
+      /*
+      let sources = [];
+      const { nodata, min, max, bands } = config?.options || {};
+
+      if (Array.isArray(config.url)) {
+        sources = config.url.map(s => {
+          let src = {
+            url: s.url,
+            ...{ nodata, min, max, bands }
+          }
+
+          // Remove undefined properties
+          src = Object.keys(src).reduce((acc, key) => {
+            if (src[key] !== undefined) {
+              acc[key] = src[key];
+            }
+            return acc;
+          }, {});
+
+          return src;
+        });
+      } else {
+        let src = {
+          url: config.url,
+          ...{ nodata, min, max, bands }
+        }
+
+        // Remove undefined properties
+        src = Object.keys(src).reduce((acc, key) => {
+          if (src[key] !== undefined) {
+            acc[key] = src[key];
+          }
+          return acc;
+        }, {});
+
+        sources.push(src);
+      }
+
+      const { convertToRGB, normalize, opaque, projection, transition, wrapX, interpolate } = config?.options || {};
+      let source_options = { 
+        sources,
+        ...{ convertToRGB, normalize, opaque, projection, transition, wrapX, interpolate }
+      }
+
+      // Remove undefined properties
+      source_options = Object.keys(source_options).reduce((acc, key) => {
+        if (source_options[key] !== undefined) {
+          acc[key] = source_options[key];
+        }
+        return acc;
+      }, {});
+      
+      source = new OlSourceGeoTIFF({ ...source_options });
+      */
+      
+      LayerComponent = COGLayer;
+      break;
       
     case 'GROUP':
       LayerComponent = GroupLayer;

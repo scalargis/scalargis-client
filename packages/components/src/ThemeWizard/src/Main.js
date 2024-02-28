@@ -27,6 +27,7 @@ const source_types = [
   { value: 'gml', label: 'GML - Geographic Markup Language' },
   { value: 'geojson', label: 'GeoJSON' },
   { value: 'dxf', label: 'DXF (v2000)' },
+  { value: 'cog', label: 'COG (GeoTiff)' },
   { value: 'group', label: 'Grupo de Temas' },
 ];
 

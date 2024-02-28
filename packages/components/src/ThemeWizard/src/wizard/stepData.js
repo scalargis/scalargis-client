@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from 'primereact/button';
 import WMS from './type/WMS';
 import WMTS from './type/WMTS';
+import COG from './type/COG';
 import WFS from './type/WFS';
 import ArcGISMap from './type/ArcGISMap';
 import Shapefile from './type/Shapefile';
@@ -85,6 +86,7 @@ export default function WizardStepData(props) {
     case 'kml': TypeComponent = KML; break;
     case 'gml': TypeComponent = GML; break;
     case 'dxf': TypeComponent = DXF; break;
+    case 'cog': TypeComponent= COG; break;
     case 'group': TypeComponent = Group; break;
     default: TypeComponent = null;
   }
