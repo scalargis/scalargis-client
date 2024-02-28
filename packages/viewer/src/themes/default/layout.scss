@@ -159,6 +159,11 @@ body .p-dropdown {
   } 
 }
 
+.layout-sidebar #content .content-root {
+  overflow-y: auto;
+  height: calc(100%)
+}
+
 .layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #content {
   padding: unset;
   display: none !important;

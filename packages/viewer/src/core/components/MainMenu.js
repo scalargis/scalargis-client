@@ -9,7 +9,7 @@ export default function MainMenu(props) {
   const { selected_menu } = viewer.config_json;
 
   function getStyle(c) {
-    return { display: c.id !== selected_menu ? 'none' : 'block', height: 'calc(100%)' }
+    return { display: c.id !== selected_menu ? 'none' : 'block' }
   }
 
   return (
@@ -41,6 +41,7 @@ export default function MainMenu(props) {
           region: 'mainmenu',
           props: { history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils }, auth },
           as: 'panel',
+          className: 'content-root',
           style: getStyle
         })}
 
