@@ -7,6 +7,8 @@
     "html": "<div><h3 style='text-align: center'>Título</h3><div>Dscrição</div></div>",
     "closeLabel": "Fechar",
     "hideOption": true,
+    "dialogWidth": "40vw",
+    "modileDialogWidth": "95%",
     "hideAuthenticated": false,
     "cookieName": "cosvgi_popup",
     "maxAge": 86400,    

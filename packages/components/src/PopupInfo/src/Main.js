@@ -106,7 +106,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
       {showOnPortal(<Dialog
         header={header}
         visible={showPopup}
-        style={{width: isMobile ? '90%' : '35vw' }}
+        style={{width: isMobile ? config?.modileDialogWidth ||'90%' : config?.dialogWidth || '35vw' }}
         modal
         footer={(
           <div className="p-grid">
