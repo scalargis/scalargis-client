@@ -193,6 +193,8 @@ export default function Main(props) {
 
   // Validate change step
   function changeStep(previous, next) {
+    console.log(wizardData);
+
     if (next > 0 && !wizardData.type) setActiveIndex(previous);
     else if (next > 1 && !wizardData.items.length > 0) setActiveIndex(previous);
     else setActiveIndex(next);
@@ -224,6 +226,9 @@ export default function Main(props) {
             viewer={props.config.viewer}
             loading={loading}
             setLoading={setLoading}
+            onChange={stepdata => {
+              setWizardData(stepdata);
+            }}
             onSave={stepdata => {
               setWizardData(stepdata);
               setActiveIndex(activeIndex+1);
@@ -241,11 +246,15 @@ export default function Main(props) {
             record={props.record}
             types={types}
             initialData={initialData}
-            wizardData={wizardData} 
+            wizardData={wizardData}
+            onChange={type => setWizardData({...initialData, type })}
+            /*
             onSave={stepdata => {
               setWizardData(stepdata);
               setActiveIndex(activeIndex+1);
             }}
+            */
+            onSave={() => setActiveIndex(activeIndex+1)}
             onCancel={null}
           />
     }

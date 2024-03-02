@@ -8,6 +8,8 @@ import AppContext from "../../../AppContext";
 
 const COGLayer = ({ config, source, group, checked }) => {
 
+  //console.log({ config, source, group, checked });
+
   const { core, mainMap } = useContext(AppContext);
   const layer = useRef();
 

@@ -18,7 +18,9 @@ const types = [
 
 export default function WizardStepType(props) {
   const { types } = props;
-  let [type, setType ] = useState(props.wizardData.type);
+
+  const type = props?.wizardData?.type;
+
   return (
     <div>
       
@@ -29,7 +31,7 @@ export default function WizardStepType(props) {
               id={'wizard_type' + t.value}
               value={t.value}
               name="type"
-              onChange={(e) => setType(e.value)}
+              onChange={(e) => props.onChange(e.value)}
               checked={type === t.value}
             />
             <label htmlFor={'wizard_type' + t.value}>{ t.label }</label>
@@ -41,15 +43,22 @@ export default function WizardStepType(props) {
         <Button           
           disabled={!type}
           onClick={e => {
-            let stepdata = props.initialData;
+            /*
+            //let stepdata = props.initialData;
+            let stepdata = props.wizardData || {};
             let previousType = stepdata.type;
-            stepdata.type = type;
-            if (previousType !== type) { 
+            
+            if (previousType != type){
+              stepdata = props.initialData;
+              stepdata.type = type;
+             
               stepdata.items = [];
               stepdata.dataitems = [];
               stepdata.url = '';
             }
-            props.onSave(stepdata)
+            props.onSave(stepdata);
+            */
+            props.onSave();
           }}
           label="Seguinte" />
       </div>

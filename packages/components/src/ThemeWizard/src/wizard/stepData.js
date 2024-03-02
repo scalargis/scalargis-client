@@ -22,7 +22,7 @@ let toastEl = null;
 export default function WizardStepData(props) {
 
   const { Models, fastFetch } = props;
-  let [data, setData] = useState(props.wizardData);
+  //let [data, setData] = useState(props.wizardData);
   const [filter, setFilter] = useState('');
   const [selected, setSelected] = useState({});
   const { getWindowSize, showOnPortal } = Models.Utils;
@@ -38,8 +38,16 @@ export default function WizardStepData(props) {
     maxFileSize = props.record.config_json.upload_maxfilesize;
   }
 
+  const data = props.wizardData;
+
+  function updateData(d) {
+    props.onChange(d);
+  }
+
   function editField(field, value) {
-    setData({ ...data, [field]: value });
+    console.log({ ...data, [field]: value });
+    //setData({ ...data, [field]: value });
+    props.onChange({ ...data, [field]: value });
   }
 
   function getUrlHistory() {
@@ -106,7 +114,8 @@ export default function WizardStepData(props) {
         loading={props.loading}
         setLoading={props.setLoading}
         setError={setError}
-        setData={setData}
+        //setData={setData}
+        setData={updateData}
         setSelected={setSelected}
         getUrlHistory={getUrlHistory}
         editField={editField}
@@ -132,7 +141,8 @@ export default function WizardStepData(props) {
           filter={filter}
           setSelected={setSelected}
           data={data}
-          setData={setData}
+          //setData={setData}
+          setData={updateData}
         />
       }[props.wizardData.type] || <ThemesSelector
           core={props.core}

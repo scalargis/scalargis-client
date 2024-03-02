@@ -22,7 +22,7 @@ class WMS extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { showAdvanceOptions: false };
+    this.state = {};
   }
 
   /**
@@ -113,7 +113,6 @@ class WMS extends Component {
   render() {
     const { loading, data, editField, getUrlHistory, winSize } = this.props;
     const { wmsServerType, wmsIgnoreServiceUrl, wmsVersion, wmsTiled } = data;
-    const { showAdvanceOptions } = this.state;
 
     let wmsServerTypeOtions = [
       { key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") },
@@ -144,7 +143,14 @@ class WMS extends Component {
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 
-        <Accordion activeIndex={showAdvanceOptions ? 0 : -1} className="p-pt-2">
+        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="p-pt-2"
+          onTabChange={(e) => {
+            const new_options = {
+              ...data?.options,
+              showAdvancedOptions: e.index === 0 ? true : false
+            }
+            editField("options", new_options);
+          }}>
           <AccordionTab header="Opções Avançadas">
 
             <div className="p-fluid">

@@ -1,197 +1,324 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect, useMemo } from 'react';
+import { useTranslation } from "react-i18next";
+
+import * as GeoTIFFLib from "geotiff";
+import Proj4 from 'proj4';
+
 import { Dropdown } from 'primereact/dropdown';
-import { FileUpload } from 'primereact/fileupload';
-import { TabView, TabPanel } from 'primereact/tabview';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import {InputSwitch} from 'primereact/inputswitch';
+import { InputNumber } from 'primereact/inputnumber';
+import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Fieldset } from 'primereact/fieldset';
 
 
-class COG extends Component {
+export default function COG(props) {
+
+  const { core, auth, mainMap, viewer, data, loading, setLoading, setData, setError, editField, cookies, Models } = props;
+  const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
+  const { addProjections } = Models.MapModel;
+  const { getCOGImageProjCode } = Models.OWSModel;
+
+  const { t } = useTranslation(); 
+
+
+  let bandOptions = useMemo(() => {
+    if (!data?.options?.available_bands?.length) {
+      return [1, 2, 3];
+    }
+    return bandOptions = data.options.available_bands;
+  }, [data?.options?.available_bands]);
 
   /**
-   * Event handler for load file
-   * 
-   * @param {Object} e 
+   * Event handler for load WMS capabilities
+   *
+   * @param {Object} e The click handler
    */
-  loadGeoJSONFile(e) {
-    const { core, mainMap, viewer, data, setLoading, setData, setError, Models, fastFetch } = this.props;
-    const { isUrlAppOrigin } = Models.Utils;
-    const endpoint = viewer.upload_url || core.UPLOAD_URL;
-    const name = e.files[0].name;
+  const loadCOGMetadata = () => {
 
-    const file = e.files[0];
-    const upload = new FormData();
-    upload.append('files', file);
-    upload.append('ext', 'json');
+    if (!data.url) return;
+
+    let url = data.url;
+
+    //Add user authentication token
+    if (isUrlAppHostname(url) && viewer.integrated_authentication) {
+      if (auth && auth.data && auth.data.auth_token) {
+        const authkey = viewer?.integrated_authentication_key || 'authkey';
+        url = url + '&' + authkey + '=' + auth.data.auth_token;
+      }
+    }
+
+    /*
+    if (!isUrlAppOrigin(url)) {
+      url = core.MAP_PROXY_URL + encodeURIComponent(url);
+    }
+    */
 
     setLoading(true);
-    const options = { method: 'POST', body: upload };
-    fastFetch(endpoint, options, 8000)
-      .then(res => {
-        if (!res || !res.ok) {
-          throw new Error('Não foi possível obter uma resposta válida.');
-        } else {
-          return res.json();
-        }        
-      })
-      .then(res => {
-        // Validate response
-        if (!res.Success) {
-          setError('Ocorreu um erro ao processar o ficheiro GeoJSON!');
-          return setLoading(false);
+
+    GeoTIFFLib.fromUrl(url)
+    .then(tiff => {
+      return tiff.getImage(); 
+    }).then(async image => {
+      /*
+      const width = image.getWidth();
+      const height = image.getHeight();
+      const tileWidth = image.getTileWidth();
+      const tileHeight = image.getTileHeight();
+      const samplesPerPixel = image.getSamplesPerPixel();
+      
+      // when we are actually dealing with geo-data the following methods return
+      // meaningful results:
+      const origin = image.getOrigin();
+      const resolution = image.getResolution();
+      const bbox = image.getBoundingBox();
+  
+      console.log({
+        width,
+        height,
+        tileWidth,
+        tileHeight,
+        samplesPerPixel,
+        origin,
+        resolution,
+        bbox
+      });
+      */
+
+      const code = getCOGImageProjCode(image);
+      const epsg = `EPSG:${code}`;
+
+      if (!Proj4.defs(epsg)) {
+        const response = await fetch(`https://epsg.io/${code}.proj4`);
+        const projText = await response.text();
+
+        Proj4.defs(epsg, projText);
+
+        const newProj = {
+          "srid": code,
+          "code": epsg,
+          "title": image?.geoKeys?.GTCitationGeoKey || epsg,
+          "defs": projText,
+          "extent": "-180 -90 180 90",
+          "description": image?.geoKeys?.GTCitationGeoKey || `Dinamically loaded by COG image (${epsg})`
         }
+        addProjections([newProj]);
+      }
 
-        let orginal_url = core.API_URL + res.Data.url;
-        let url = orginal_url;
-        if (!isUrlAppOrigin(url)) {
-          url = core.MAP_PROXY_URL + encodeURIComponent(url);
-        };        
-        fetch(url)
-          .then(res => res.json())
-          .then(res => {
-            data.dataitems = Models.OWSModel.convertGeoJSON2Themes(res, orginal_url, name, data.crs);
-            setData(Object.assign({}, data));
-            setLoading(false);
-        })
+      const available_bands = [...Array(bands).keys().map(i => i+1)];
+      const bands = image.getSamplesPerPixel();
+      const options = {
+        available_bands,
+        bands: bands >= 3 ? [1, 2, 3] : [...available_bands],
+        showAdvancedOptions: !!data?.options?.showAdvancedOptions
+      }
 
-        // Catch download error
-        .catch(error => {
-          setLoading(false);
-          setError(''+error);
-        });
-    })
+      // Extract filename from url path
+      const baseUrl = url.indexOf('?') === -1 ? url : url.slice(0, url.indexOf('?'));
+      const [...parts] = baseUrl.split('/');
+      const filename = parts.pop();
 
-    // Catch upload error
-    .catch(error => {
+      let dataitems = Models.OWSModel.convertCOG2Themes(image, data.url, filename, options);
+      setData({ ...data, options, dataitems });
+    }).catch((error) => {
+      setData({ ...data, dataitems: [] });
       setLoading(false);
-      setError(''+error);
+      setError('' + error);
+    }).finally(()=>{
+      setLoading(false);
     });
   }
 
-  changeURL(value) {
-    let { data, setData } = this.props;
-    data.url = value.trim();
-    setData(Object.assign({}, data));
-  }
+  const onChangeBand = (index, value) => {
+    const bands = [...selectedBands];
+    bands[index] = value;
 
-  loadFromUserURL() {
-    let { core, data, setData, setSelected, setError, cookies, setLoading, Models } = this.props;
-    let { isUrlAppOrigin } = Models.Utils;
-    let name = 'GeoJSON';
-    let url = data.url || '';
+    const new_options = {
+      ...data?.options,
+      bands: bands
+    }
+    editField("options", new_options);
 
-    if (!url.trim()) return;
+    if (data?.dataitems?.length) {
+      let item = data.dataitems[0];
+      item = {
+        ...item,
+        options: {
+          ...item.options,
+          bands: bands
+        }
+      }
 
-    if (!isUrlAppOrigin(url)) {
-      url = core.MAP_PROXY_URL + encodeURIComponent(url);
-    };
-    setLoading(true);
-    fetch(url)
-      .then(res => {     
-        if (!res.ok) {
-          throw new Error('Não foi possível obter uma resposta válida.');
-        } else {
-          return res.json();
-        }                   
-      })
-      .then(res => {
-        try {
-          data.dataitems = Models.OWSModel.convertGeoJSON2Themes(res, data.url, name, data.crs);
-          if (data.dataitems && data.dataitems.length > 0) {
-            setLoading(false);
-            setData(Object.assign({}, data));
-            // Add to cookies history
-            //if (cookies) rememberUrl(cookies, 'geojson', data.url);
-          } else {
-            throw Error('Não foi possível obter uma resposta válida.');
-          }
-        } catch (e) {
-          setLoading(false);
-          setError(''+e);
-        }          
-      })
-      // Catch download error
-      .catch(error => {
-        setData({ ...data, dataitems: [] });
-        setSelected({});
-        setLoading(false);
-        setError(''+error);
+      setData({
+        ...data,
+        dataitems: [item]
       });
+    }
   }
+
+  const onChangeConvertToRGB = (value) => {
+    const new_options = {
+      ...data?.options,
+      convertToRGB: value
+    }
+    editField("options", new_options);
+
+    if (data?.dataitems?.length) {
+      let item = data.dataitems[0];
+      item = {
+        ...item,
+        options: {
+          ...item.options,
+          convertToRGB: value
+        }
+      }
+      setData({
+        ...data,
+        dataitems: [item]
+      });
+    }
+  }
+
+  const onChangeNoData = (value) => {
+    const new_options = {
+      ...data?.options,
+      nodata: value
+    }
+    editField("options", new_options);
+
+    if (data?.dataitems?.length) {
+      let item = data.dataitems[0];
+      item = {
+        ...item,
+        options: {
+          ...item.options,
+          nodata: value
+        }
+      }
+      setData({
+        ...data,
+        dataitems: [item]
+      });
+    }
+  }
+
+  let selectedBands = [1, 2, 3];
+  let convertToRGB;
+  let nodata;
+  if (data?.dataitems?.length) {
+    if (data?.dataitems[0].options?.bands?.length) {
+      selectedBands = data.dataitems[0].options.bands;
+    } else if (data?.options?.bands?.length) {
+      selectedBands = data.options.bands;
+    }
+    convertToRGB = data.dataitems[0]?.options?.convertToRGB != null ? data.dataitems[0].options.convertToRGB : false;
+    nodata = data.dataitems[0]?.options?.nodata != null ? data.dataitems[0].options?.nodata : undefined;
+  }
+
 
   /**
-   * Render GeoJSON wizard
+   * Render COG wizard
    */
-  render() {
-    const { viewer, loading, data, editField, winSize } = this.props;
+  const render = () => {
+
     return (
       <React.Fragment>
-        <div className="p-fluid">
-
-          <div className="p-field">
-            <label>Sistema de Coordenadas</label>
-            <Dropdown 
-              placeholder='Escolha o sistema de coordenadas'
-              options={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
-              value={data.crs || '4326'}
-              onChange={(e) => editField('crs', e.value)}
-            />
-          </div>
-
-          <TabView>
-            <TabPanel header="Ficheiro">
-              <div className="p-field">
-                <label>Ficheiro GeoJSON</label>
-                <FileUpload 
-                  name="upload"
-                  accept="application/json,.geojson"
-                  maxFileSize={this.props.maxFileSize * 1024}
-                  customUpload 
-                  uploadHandler={this.loadGeoJSONFile.bind(this)}
-                  disabled={loading}
-                  url="./upload"
-                  chooseLabel="Escolher"
-                  uploadLabel="Carregar"
-                  cancelLabel="Cancelar"
-                  invalidFileSizeMessageDetail=""
-                  invalidFileSizeMessageSummary={"O ficheiro não poderá ter mais de " + (Math.round((this.props.maxFileSize/1024) * 100) / 100) + " MB"}
-                />
-                { (this.props.maxFileSize && this.props.maxFileSize > 0) ?
-                <small id="upload-help" className="p-warn">Dimensão máxima do ficheiro: {Math.round((this.props.maxFileSize/1024) * 100) / 100} MB</small>
-                : null }
-              </div>
-            </TabPanel>
-            <TabPanel header="URL">
-              <div className="p-field">
-                <label>URL</label>
-                <div className="p-inputgroup">
-                  <InputText placeholder='URL...'
-                    value={data.url}
-                    onChange={e => this.changeURL(e.target.value)}
-                    style={{ width: '100%' }}
-                  />
-                  <Button
-                    icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-                    tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
-                    disabled={loading}
-                    onClick={e => {
-                      e.preventDefault();
-                      this.loadFromUserURL()
-                    }}
-                  />
-                </div>
-                
-              </div>
-            </TabPanel>
-
-          </TabView>
-
-          
+        <div className="p-inputgroup">
+          <InputText placeholder='https://...'
+            value={data.url}
+            list='urlhistory'
+            onChange={e => editField('url', e.target.value.trim())}
+          />
+          <Button
+            icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
+            tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
+            disabled={loading}
+            onClick={e => {
+              e.preventDefault();
+              loadCOGMetadata()
+            }}
+          />
         </div>
+        {/*
+        <datalist id='urlhistory'>
+          { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
+        </datalist>
+          */}
+
+        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="p-pt-2" 
+          onTabChange={(e) => {
+            const new_options = {
+              ...data?.options,
+              showAdvancedOptions: e.index === 0 ? true : false
+            }
+            editField("options", new_options);
+          }}>
+          <AccordionTab header="Opções Avançadas">
+
+            <div className="p-fluid">
+              <div className="p-field p-grid">
+                <Fieldset legend={t("bands", `Bandas` )} className="p-col-12">
+                  <div className="p-field p-grid">
+                    <label className="p-col-12 p-md-4">{t("red", "Vermelho")}</label>
+                    <div className="p-col-12 p-md-8">
+                      <Dropdown placeholder={t("selectBands", "Selecione a banda")}
+                        options={bandOptions}
+                        value={selectedBands[0]}
+                        onChange={({ value }) => {
+                          onChangeBand(0, value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="p-field p-grid">
+                    <label className="p-col-12 p-md-4">{t("green", "Verde")}</label>
+                    <div className="p-col-12 p-md-8">
+                      <Dropdown placeholder={t("selectBands", "Selecione a banda")}
+                        options={bandOptions}
+                        value={selectedBands[1]}
+                        onChange={({ value }) => {
+                          onChangeBand(1, value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="p-field p-grid">
+                    <label className="p-col-12 p-md-4">{t("azul", "Azul")}</label>
+                    <div className="p-col-12 p-md-8">
+                      <Dropdown placeholder={t("selectBands", "Selecione a banda")}
+                        options={bandOptions}
+                        value={selectedBands[2]}
+                        onChange={({ value }) => {
+                          onChangeBand(2, value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Fieldset>
+              </div>
+              <div className="p-field p-grid">
+                <label className="p-col-12 p-md-6">{t("convertToRGB", "Converter para RGB")}</label>
+                <InputSwitch checked={convertToRGB} onChange={(e) => {
+                  onChangeConvertToRGB(e.value);
+                }} />
+              </div> 
+
+              <div className="p-field p-grid">
+                <label className="p-col-12 p-md-4">{t("nodataValue", "Valor NoData")}</label>
+                <div className="p-col-12 p-md-8">
+                  <InputNumber value={nodata} mode="decimal" onValueChange={(e) => {
+                    onChangeNoData(e.value);
+                  }} />
+                </div>
+              </div>
+            </div>
+          </AccordionTab>
+        </Accordion>
 
       </React.Fragment>
     )
   }
-}
 
-export default COG;
+  return render();
+}
