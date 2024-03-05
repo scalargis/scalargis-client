@@ -3,6 +3,7 @@ import { Tree } from 'primereact/tree';
 import layerNode from './layerNode';
 
 const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide }) => {
+  const [loaded, setLoaded] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState({});
   const [isSelectAll, setIsSelectAll] = useState(false);
   const nodes = themes.map(l => layerNode(l));
@@ -29,6 +30,10 @@ const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide }) => {
 
   // Select/deselect all
   useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+      return;
+    }
     if (!setSelected) return;
     selectAll(isSelectAll, nodes, {});
   }, [isSelectAll]);

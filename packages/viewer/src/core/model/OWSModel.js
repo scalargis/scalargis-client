@@ -39,6 +39,25 @@ export const projOptions = (coordsyss) => {
   return options;
 }
 
+// Get proj code from COG Image
+export const getCOGImageProjCode = (image) => {
+  const geoKeys = image.getGeoKeys();
+  const {
+    ProjectedCSTypeGeoKey
+  } = geoKeys;
+  // check if projected
+  if (typeof ProjectedCSTypeGeoKey === "number" && ProjectedCSTypeGeoKey !== 32767 && ProjectedCSTypeGeoKey <= 32760) {
+    return ProjectedCSTypeGeoKey;
+  }
+  const {
+    GeographicTypeGeoKey
+  } = geoKeys;
+  // check if geographic
+  if (typeof GeographicTypeGeoKey === "number" && typeof ProjectedCSTypeGeoKey !== "number") {
+    return GeographicTypeGeoKey;
+  }
+}
+
 /**
  * Create group
  */
@@ -1026,8 +1045,44 @@ export const downloadTheme = (theme, format) => {
 }
 
 
+/**
+ * Parse COG to Theme
+ */
+export const convertCOG2Themes = (image, url, name, options) => {
+  let result = [];
+
+  const bbox = image.getBoundingBox();
+  const bands = image.getSamplesPerPixel();
+  const nodata = undefined;
+  const crs = getCOGImageProjCode(image);
+  const projection = `EPSG:${crs}`;
+
+  // Create theme object
+  // Build theme object
+  const theme = {
+    id: uuidv4(),
+    title: name,
+    description: '',
+    active: false,
+    open: false,
+    opacity: 1,
+    type: "COG",
+    url: url,
+    crs: parseInt(crs, 10),
+    crs_options: projection,
+    bbox: bbox.join(' '),
+    options
+  }
+
+  result.push(theme);
+
+  return result;
+}
+
+
 export default {
   projOptions,
+  getCOGImageProjCode,
   convertWFS2Themes,
   convertWMS2Themes,
   convertWMTS2Themes,
@@ -1035,5 +1090,6 @@ export default {
   convertKML2Themes,
   convertGeoJSON2Themes,
   convertGML2Themes,
+  convertCOG2Themes,
   createGroup
 }

@@ -27,6 +27,7 @@ const source_types = [
   { value: 'gml', label: 'GML - Geographic Markup Language' },
   { value: 'geojson', label: 'GeoJSON' },
   { value: 'dxf', label: 'DXF (v2000)' },
+  { value: 'cog', label: 'COG (GeoTiff)' },
   { value: 'group', label: 'Grupo de Temas' },
 ];
 
@@ -74,9 +75,10 @@ export default function Main(props) {
     props.config.data.type ? (props.config.data.items.length ? 2 : 1) : 0
   );
   const [wizardData, setWizardData] = useState(props.config.data);
+  const [selected, setSelected] = useState({});
   const [loading, setLoading] = useState(false);
   const [types, setTypes] = useState(source_types);
-  
+
   useEffect(() => {
     if (!core?.pubsub?.subscribe) return;
 
@@ -97,6 +99,7 @@ export default function Main(props) {
 
   function externalLoad(data) {
     setActiveIndex(1);
+    setSelected({});
     setWizardData({
       ...wizardData,
       key: String(uuidV4()),
@@ -109,7 +112,8 @@ export default function Main(props) {
   }
 
   function reset() {
-    setWizardData(initialData);
+    setSelected({});
+    setWizardData({...initialData, dataitems: [], items:[]});
   }
 
   function onComplete(wizardData) {
@@ -192,7 +196,8 @@ export default function Main(props) {
 
   // Validate change step
   function changeStep(previous, next) {
-    if (next > 0 && !wizardData.type) setActiveIndex(previous);
+    if (next > previous) setActiveIndex(previous);
+    else if (next > 0 && !wizardData.type) setActiveIndex(previous);
     else if (next > 1 && !wizardData.items.length > 0) setActiveIndex(previous);
     else setActiveIndex(next);
   }
@@ -223,6 +228,11 @@ export default function Main(props) {
             viewer={props.config.viewer}
             loading={loading}
             setLoading={setLoading}
+            selected={selected}
+            setSelected={setSelected}
+            onChange={stepdata => {
+              setWizardData(stepdata);
+            }}
             onSave={stepdata => {
               setWizardData(stepdata);
               setActiveIndex(activeIndex+1);
@@ -239,12 +249,13 @@ export default function Main(props) {
             auth={props.config.auth}
             record={props.record}
             types={types}
-            initialData={initialData}
-            wizardData={wizardData} 
-            onSave={stepdata => {
-              setWizardData(stepdata);
-              setActiveIndex(activeIndex+1);
+            initialData={{...initialData, dataitems: [], items:[]}}
+            wizardData={wizardData}
+            onChange={type => {
+              setSelected({});
+              setWizardData({...initialData, dataitems: [], items:[], type})
             }}
+            onSave={() => setActiveIndex(activeIndex+1)}
             onCancel={null}
           />
     }

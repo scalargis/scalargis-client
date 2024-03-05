@@ -3,6 +3,7 @@ import { Tree } from 'primereact/tree';
 import layerNode from './layerNode';
 
 const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllGroups }) => {
+  const [loaded, setLoaded] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState({});
   const [isSelectAll, setIsSelectAll] = useState(false);
   const nodes = themes.map(l => layerNode(l));
@@ -29,18 +30,14 @@ const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllG
 
   // Select/deselect all
   useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+      return;
+    }
     if (!setSelected) return;
     selectAll(isSelectAll, nodes, {});
   }, [isSelectAll]);
-
-  // Expand all on
-  /*
-  useEffect(() => {
-    for (let node of nodes) {
-      expandNode(node);
-    }
-  }, []);
-  */  
+ 
   // Expand all on
   useEffect(() => {
     if (expandAllGroups) {
@@ -86,8 +83,7 @@ const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllG
         filterMode={readOnly ? null :  "lenient"}
         selectionMode={readOnly ? null : "checkbox"}
         selectionKeys={readOnly ? null : selected}
-        onSelectionChange={e => { 
-          /*console.log(e.value);*/
+        onSelectionChange={e => {
           const sel = {};
           Object.keys(e.value).forEach(key => {
             const selItem = e.value[key];
@@ -95,7 +91,7 @@ const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllG
           });
           setSelected(sel);
         }}
-        onToggle={e => { /*console.log(e.value);*/ setExpandedKeys(e.value);}} 
+        onToggle={e => {setExpandedKeys(e.value);}} 
       />
 
     </React.Fragment>

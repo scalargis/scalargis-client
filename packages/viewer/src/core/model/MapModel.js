@@ -1356,6 +1356,7 @@ export const splitGeom = function (geom) {
 }
 
 export default {
+  addProjections,
   processVisibility,
   traverseTree,
   processOpacity,

@@ -12,6 +12,7 @@ import VectorLayer from "./VectorLayer";
 import GeoJSONLayer from "./GeoJSONLayer";
 import KMLLayer from "./KMLLayer";
 import ArcGISMapLayer from "./ArcGISMapLayer";
+import COGLayer from "./COGLayer";
 import GroupLayer from './GroupLayer';
 import { removeUrlParam, addUrlParam} from '../../utils';
 
@@ -136,7 +137,11 @@ const MorphLayer = ({ layers, config, group, checked, viewer }) => {
 
     case 'ArcGISMap': 
       LayerComponent = ArcGISMapLayer;
-      break;     
+      break; 
+      
+    case 'COG':      
+      LayerComponent = COGLayer;
+      break;
       
     case 'GROUP':
       LayerComponent = GroupLayer;

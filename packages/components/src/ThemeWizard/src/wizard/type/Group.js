@@ -12,7 +12,7 @@ class Group extends Component {
       "type": "GROUP",
       "active": true,
       "id": String(uuidV4()),
-      "title": "Grupo",
+      "_title": "Grupo",
       "opacity": 1,
       "open": true,
       "children": [],
@@ -23,21 +23,14 @@ class Group extends Component {
     if (data.dataitems.length === 0) data.dataitems.push(theme);
     else if (data.dataitems[0].type !== 'GROUP') data.dataitems = [theme];
     else theme = data.dataitems[0];
-    setData(data);
 
-    // Create selection
-    // TODO: fix without timeout
-    setTimeout(() => {
-      let selection = {};
-      selection[theme.id] = { checked: true, partialChecked: false };
-      setSelected(selection);
-    }, 0);
+    setData(data);
   }
 
   changeName(value) {
     let { data, editField, setSelected } = this.props;
-    let title =  value.trim();
-    if (title) {
+    if (value.trim()) {
+      const title = value;
       let theme = data.dataitems[0];
       if (theme) {
         theme.title = title;

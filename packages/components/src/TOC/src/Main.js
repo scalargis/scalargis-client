@@ -176,7 +176,8 @@ class Main extends React.Component {
 
   applyThemeChanges(theme) {
     let { layers } = this.props.config.viewer.config_json;
-    const index = layers.indexOf(theme);
+    //const index = layers.indexOf(theme);
+    const index = layers.findIndex(i => i.id === theme.id);
     const update = Object.assign({}, theme);
     layers.splice(index, 1, update);
     this.setState({ ...this.state, layers });
