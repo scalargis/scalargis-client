@@ -1,15 +1,27 @@
-import React, {Component} from 'react';
+import React, { useEffect } from 'react';
+import { useTranslation } from "react-i18next";
+
 import xml2js from 'xml2js';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 
-class WFS extends Component {
+
+export default function WFS(props) {
+
+  const { t } = useTranslation(); 
+
+  useEffect(() => {
+    if (props?.data?.dataType === 'wfs' && props?.data?.url) {
+      loadWFSCapabilities();
+    }
+  }, [props?.data?.dataType]);
+
 
   /**
    * Event handler for load WFS Capabilities
    */
-  loadWFSCapabilities() {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = this.props;
+  const loadWFSCapabilities = () => {
+    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl } = Models.Utils;
     if (!data.url) return;
 
@@ -55,8 +67,10 @@ class WFS extends Component {
           setLoading(false);
           return;
         }
-        data.dataitems = Models.OWSModel.convertWFS2Themes(capabilities, data.url, options);
-        setData(data);
+        //data.dataitems = Models.OWSModel.convertWFS2Themes(capabilities, data.url, options);
+        let dataitems = Models.OWSModel.convertWFS2Themes(capabilities, data.url, options);
+        //setData(data);
+        setData({ ...data, dataType: undefined, dataitems });
 
         // Add to cookies history
         if (cookies) rememberUrl(cookies, 'wfs', data.url);
@@ -64,27 +78,17 @@ class WFS extends Component {
 
       });
     }).catch((error) => {
-      setData({ ...data, dataitems: [] });
+      setData({ ...data, dataType: undefined, dataitems: [] });
       setError(''+error);
       setLoading(false);
     });
   }
 
   /**
-   * On component did mount
-   */
-  componentDidMount() {
-    const { data } = this.props;
-    if (data.dataType === 'wfs' && data.url) {
-      this.loadWFSCapabilities();
-    }
-  }
-
-  /**
    * Render WFS wizard
    */
-  render() {
-    const { loading, data, editField, getUrlHistory, winSize } = this.props;
+  const render = () => {
+    const { loading, data, editField, getUrlHistory, winSize } = props;
     return (
       <React.Fragment>
         <div className="p-inputgroup">
@@ -99,7 +103,7 @@ class WFS extends Component {
             disabled={loading}
             onClick={e => {
               e.preventDefault();
-              this.loadWFSCapabilities()
+              loadWFSCapabilities()
             }}
           />
         </div>
@@ -109,6 +113,7 @@ class WFS extends Component {
       </React.Fragment>
     )
   }
-}
 
-export default WFS;
+  return render();
+
+}

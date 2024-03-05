@@ -1,14 +1,12 @@
-import React, {Component} from 'react';
-import { withTranslation } from "react-i18next";
+import React, { useEffect } from 'react';
+import { useTranslation } from "react-i18next";
+
 import { WMSCapabilities } from 'ol/format';
-//import WMSCapabilities from '../../../model/WMSCapabilities';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import {InputSwitch} from 'primereact/inputswitch';
 import { Accordion, AccordionTab } from 'primereact/accordion';
-
-import { i18n } from '@scalargis/components';
 
 
 const versions = [
@@ -18,20 +16,25 @@ const versions = [
   { key: '1.3.0', value: '1.3.0', label: '1.3.0' }
 ];
 
-class WMS extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+export default function WMS(props) {
+
+  const { t } = useTranslation(); 
+
+  useEffect(() => {
+    if (props?.data?.dataType === 'wms' && props?.data?.url) {
+      loadWMSCapabilities();
+    }
+  }, [props?.data?.dataType]);
+
 
   /**
    * Event handler for load WMS capabilities
    *
    * @param {Object} e The click handler
    */
-  loadWMSCapabilities() {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = this.props;
+  const loadWMSCapabilities = () => {
+    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -80,7 +83,7 @@ class WMS extends Component {
         const parser = new WMSCapabilities();
         const wms = parser.read(r);
         let dataitems = Models.OWSModel.convertWMS2Themes(wms, data.url, options);
-        setData({ ...data, dataitems });
+        setData({ ...data, dataType: undefined, dataitems });
 
         // Add to cookies history
         if (cookies) rememberUrl(cookies, 'wms', data.url);
@@ -91,31 +94,22 @@ class WMS extends Component {
         setError(''+e);
       }
     }).catch((error) => {
-      setData({ ...data, dataitems: [] });
+      setData({ ...data, dataType: undefined, dataitems: [] });
       setLoading(false);
       setError(''+error);
     });
   }
 
-  /**
-   * On component did mount
-   */
-  componentDidMount() {
-    const { data } = this.props;
-    if (data.dataType === 'wms' && data.url) {
-      this.loadWMSCapabilities();
-    }
-  }
 
   /**
    * Render WMS wizard
    */
-  render() {
-    const { loading, data, editField, getUrlHistory, winSize } = this.props;
+  const render = () => {
+    const { loading, data, editField, getUrlHistory, winSize } = props;
     const { wmsServerType, wmsIgnoreServiceUrl, wmsVersion, wmsTiled } = data;
 
     let wmsServerTypeOtions = [
-      { key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") },
+      { key: 999, value: '', label: t("notDefined", "Não Especificado") },
       { key: "geoserver", value: "geoserver", label: "Geoserver"},
       { key: "mapserver", value: "mapserver", label: "Mapserver"},
       { key: "qgis", value: "qgis", label: "QGIS"}
@@ -135,7 +129,7 @@ class WMS extends Component {
             disabled={loading}
             onClick={e => {
               e.preventDefault();
-              this.loadWMSCapabilities()
+              loadWMSCapabilities()
             }}
           />
         </div>
@@ -156,9 +150,9 @@ class WMS extends Component {
             <div className="p-fluid">
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{this.props.t("serverType", "Tipo de servidor")}</label>
+                <label className="p-col-12 p-md-4">{t("serverType", "Tipo de servidor")}</label>
                 <div className="p-col-12 p-md-8">
-                  <Dropdown placeholder={this.props.t("selectServerType", "Escolha o tipo de servidor")}
+                  <Dropdown placeholder={t("selectServerType", "Escolha o tipo de servidor")}
                     options={wmsServerTypeOtions}
                     value={wmsServerType || ''}
                     onChange={({ value }) => editField('wmsServerType', value)}
@@ -206,6 +200,9 @@ class WMS extends Component {
       </React.Fragment>
     )
   }
+
+  return render();
+
 }
 
-export default withTranslation()(WMS);
+

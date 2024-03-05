@@ -1,31 +1,38 @@
-import React, {Component} from 'react';
+import React, { useEffect } from 'react';
+import { useTranslation } from "react-i18next";
+
 import { WMTSCapabilities } from 'ol/format';
-//import WMSCapabilities from '../../../model/WMSCapabilities';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import {InputSwitch} from 'primereact/inputswitch';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
+
 const versions = [
   { key: 'default', value: 'default', label: 'Especificada pelo Serviço' },
   { key: '1.0.0', value: '1.0.0', label: '1.0.0' }
 ];
 
-class WMTS extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = { showAdvanceOptions: false };
-  }
+export default function WMTS(props) {
+
+  const { t } = useTranslation(); 
+
+  useEffect(() => {
+    if (props?.data?.dataType === 'wmts' && props?.data?.url) {
+      loadWMTSCapabilities();
+    }
+  }, [props?.data?.dataType]);
+
 
   /**
    * Event handler for load WMTS capabilities
    *
    * @param {Object} e The click handler
    */
-  loadWMTSCapabilities() {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = this.props;
+  const loadWMTSCapabilities = () => {
+    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -71,12 +78,12 @@ class WMTS extends Component {
       try {
         const parser = new WMTSCapabilities();
         const wmts = parser.read(r);
-        data.dataitems = Models.OWSModel.convertWMTS2Themes(wmts, data.url, options);
+        let dataitems = Models.OWSModel.convertWMTS2Themes(wmts, data.url, options);
         data.wmtsTileMatrixSet = [];
         if (wmts.Contents && wmts.Contents.TileMatrixSet) {
           data.wmtsTileMatrixSet = wmts.Contents.TileMatrixSet.map(m => ({ Identifier: m.Identifier, SupportedCRS: m.SupportedCRS }));
         }
-        setData(data);
+        setData({ ...data, dataType: undefined, dataitems });
 
         // Add to cookies history
         if (cookies) rememberUrl(cookies, 'wmts', data.url);
@@ -87,29 +94,19 @@ class WMTS extends Component {
         setLoading(false);
       }
     }).catch((error) => {
-      setData({ ...data, dataitems: [] });
+      setData({ ...data, dataType: undefined, dataitems: [] });
       setError(''+error);
       setLoading(false);
     });
   }
 
-  /**
-   * On component did mount
-   */
-  componentDidMount() {
-    const { data } = this.props;
-    if (data.dataType === 'wmts' && data.url) {
-      this.loadWMTSCapabilities();
-    }
-  }
 
   /**
    * Render WMTS wizard
    */
-  render() {
-    const { loading, data, editField, getUrlHistory, winSize } = this.props;
+  const render = () => {
+    const { loading, data, editField, getUrlHistory, winSize } = props;
     const { wmtsIgnoreServiceUrl, wmtsVersion } = data;
-    const { showAdvanceOptions } = this.state;
     
     return (
       <React.Fragment>
@@ -125,7 +122,7 @@ class WMTS extends Component {
             disabled={loading}
             onClick={e => {
               e.preventDefault();
-              this.loadWMTSCapabilities()
+              loadWMTSCapabilities()
             }}
           />
         </div>
@@ -133,7 +130,14 @@ class WMTS extends Component {
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 
-        <Accordion activeIndex={showAdvanceOptions ? 0 : -1} className="p-pt-2">
+        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="p-pt-2"
+          onTabChange={(e) => {
+            const new_options = {
+              ...data?.options,
+              showAdvancedOptions: e.index === 0 ? true : false
+            }
+            editField("options", new_options);
+          }}>
           <AccordionTab header="Opções Avançadas">
 
             <div className="p-fluid">
@@ -144,7 +148,7 @@ class WMTS extends Component {
                   <Dropdown
                     options={versions}
                     value={wmtsVersion}
-                    onChange={(e, { value }) => editField('wmtsVersion', value)}
+                    onChange={(e) => editField('wmtsVersion', e.value)}
                   />
                 </div>
               </div>
@@ -168,6 +172,9 @@ class WMTS extends Component {
       </React.Fragment>
     )
   }
+
+  return render();
+
 }
 
-export default WMTS;
+
