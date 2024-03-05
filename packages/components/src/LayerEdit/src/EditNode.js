@@ -9,6 +9,9 @@ import { InputSwitch } from 'primereact/inputswitch';
 
 import { i18n } from '@scalargis/components';
 
+import COG from './type/COG';
+
+
 class EditNode extends React.Component {
 
   constructor(props) {
@@ -21,6 +24,12 @@ class EditNode extends React.Component {
     if (props.edit.selectable == null) {
       this.editField('selectable', true );
     }
+
+    switch(props?.edit?.type) {
+      case 'COG': this.typeComponent = COG; break;
+      default: this.typeComponent = null;
+    }
+
   }
 
   editField(field, value) {
@@ -51,6 +60,8 @@ class EditNode extends React.Component {
   render() {
     const { edit, showAdvanceOptions } = this.state;
     if (!edit) return null;
+
+    const TypeComponent = this.typeComponent;
 
     let wmsServerTypeOtions = [
       { key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") },
@@ -294,6 +305,13 @@ class EditNode extends React.Component {
               </div>
             </React.Fragment>
             
+          ) : null }
+
+          { ['COG'].includes(edit.type) ? (
+              <TypeComponent
+                data={edit}
+                editField={(field, value) => this.editField(field, value)}
+              />
           ) : null }
 
         </div>

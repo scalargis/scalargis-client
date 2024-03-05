@@ -1,0 +1,97 @@
+{
+    "id": "cog1",
+    "title": "COG Image",
+    "active": false,
+    "open": false,
+    "opacity": 1,
+    "type": "COG",
+    "url": "http://localhost/0181_3_1rgbi_21.tif",
+    "advancedOptions": true,
+    "options": {
+      "image_bands": 4,
+      "bands": [
+        1,
+        2,
+        3
+      ],
+      "projection": "EPSG:3763",
+      "nodata": 0,
+      "convertToRGB": false,
+      "style": {
+        "color": [
+          "case",
+          [
+            "all",
+            ["<", ["band", 1], 0.03],
+            ["<", ["band", 2], 0.04],
+            [
+              "<",
+              [
+                "band",
+                3
+              ],
+              0.04
+            ]
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "all",
+            [
+              "==",
+              [
+                "band",
+                1
+              ],
+              0
+            ],
+            [
+              ">",
+              [
+                "band",
+                2
+              ],
+              0
+            ],
+            [
+              "==",
+              [
+                "band",
+                3
+              ],
+              0
+            ]
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "array",
+            [
+              "band",
+              1
+            ],
+            [
+              "band",
+              2
+            ],
+            [
+              "band",
+              3
+            ],
+            [
+              "band",
+              4
+            ]
+          ]
+        ]
+      }
+    }
+  }

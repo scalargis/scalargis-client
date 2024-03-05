@@ -1057,10 +1057,6 @@ export const convertCOG2Themes = (image, url, name, options) => {
   const crs = getCOGImageProjCode(image);
   const projection = `EPSG:${crs}`;
 
-  console.log(crs);
-  console.log(projection);
-  console.log(bbox);
-
   // Create theme object
   // Build theme object
   const theme = {
@@ -1075,7 +1071,6 @@ export const convertCOG2Themes = (image, url, name, options) => {
     crs: parseInt(crs, 10),
     crs_options: projection,
     bbox: bbox.join(' '),
-    cog_bands: bands,
     options
   }
 

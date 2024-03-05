@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo } from 'react';
+import React, {useState, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 
 import * as GeoTIFFLib from "geotiff";
@@ -22,16 +22,18 @@ export default function COG(props) {
 
   const { t } = useTranslation(); 
 
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
-  let bandOptions = useMemo(() => {
-    if (!data?.options?.available_bands?.length) {
+
+  const bandOptions = useMemo(() => {
+    if (!data?.options?.image_bands) {
       return [1, 2, 3];
     }
-    return bandOptions = data.options.available_bands;
-  }, [data?.options?.available_bands]);
+    return [...Array(data.options.image_bands).keys().map(i => i+1)];
+  }, [data?.options?.image_bands]);
 
   /**
-   * Event handler for load WMS capabilities
+   * Event handler for load COG
    *
    * @param {Object} e The click handler
    */
@@ -61,57 +63,37 @@ export default function COG(props) {
     .then(tiff => {
       return tiff.getImage(); 
     }).then(async image => {
-      /*
-      const width = image.getWidth();
-      const height = image.getHeight();
-      const tileWidth = image.getTileWidth();
-      const tileHeight = image.getTileHeight();
-      const samplesPerPixel = image.getSamplesPerPixel();
-      
-      // when we are actually dealing with geo-data the following methods return
-      // meaningful results:
-      const origin = image.getOrigin();
-      const resolution = image.getResolution();
-      const bbox = image.getBoundingBox();
-  
-      console.log({
-        width,
-        height,
-        tileWidth,
-        tileHeight,
-        samplesPerPixel,
-        origin,
-        resolution,
-        bbox
-      });
-      */
-
       const code = getCOGImageProjCode(image);
       const epsg = `EPSG:${code}`;
 
       if (!Proj4.defs(epsg)) {
-        const response = await fetch(`https://epsg.io/${code}.proj4`);
-        const projText = await response.text();
+        //throw new Error(`Unsupported coordinate reference system (EPSG:${code})`);
+        try {
+          const response = await fetch(`https://epsg.io/${code}.proj4`);
+          const projText = await response.text();
 
-        Proj4.defs(epsg, projText);
+          Proj4.defs(epsg, projText);
 
-        const newProj = {
-          "srid": code,
-          "code": epsg,
-          "title": image?.geoKeys?.GTCitationGeoKey || epsg,
-          "defs": projText,
-          "extent": "-180 -90 180 90",
-          "description": image?.geoKeys?.GTCitationGeoKey || `Dinamically loaded by COG image (${epsg})`
+          const newProj = {
+            "srid": code,
+            "code": epsg,
+            "title": image?.geoKeys?.GTCitationGeoKey || epsg,
+            "defs": projText,
+            "extent": "-180 -90 180 90",
+            "description": image?.geoKeys?.GTCitationGeoKey || `Dinamically loaded by COG image (${epsg})`
+          }
+          addProjections([newProj]);
+        } catch (error) {
+          throw new Error(`Could not load unsupported coordinate reference system (EPSG:${code})`);
         }
-        addProjections([newProj]);
       }
-
-      const available_bands = [...Array(bands).keys().map(i => i+1)];
-      const bands = image.getSamplesPerPixel();
+      return image;
+    }).then(image => {
+      const number_bands = image.getSamplesPerPixel();
+      const available_bands = [...Array(number_bands).keys().map(i => i+1)];
       const options = {
-        available_bands,
-        bands: bands >= 3 ? [1, 2, 3] : [...available_bands],
-        showAdvancedOptions: !!data?.options?.showAdvancedOptions
+        image_bands: number_bands,
+        bands: number_bands >= 3 ? [1, 2, 3] : [...available_bands]
       }
 
       // Extract filename from url path
@@ -246,14 +228,7 @@ export default function COG(props) {
         </datalist>
           */}
 
-        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="p-pt-2" 
-          onTabChange={(e) => {
-            const new_options = {
-              ...data?.options,
-              showAdvancedOptions: e.index === 0 ? true : false
-            }
-            editField("options", new_options);
-          }}>
+        <Accordion activeIndex={showAdvancedOptions ? 0 : -1} className="p-pt-2">
           <AccordionTab header="Opções Avançadas">
 
             <div className="p-fluid">

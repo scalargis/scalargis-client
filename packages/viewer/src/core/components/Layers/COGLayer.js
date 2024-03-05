@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import OlSourceGeoTIFF from 'ol/source/GeoTIFF.js';
 import OLTileLayerWebGL from 'ol/layer/WebGLTile.js';
@@ -8,14 +8,15 @@ import AppContext from "../../../AppContext";
 
 const COGLayer = ({ config, source, group, checked }) => {
 
-  //console.log({ config, source, group, checked });
+  const [loaded, setLoaded] = useState(false);
 
   const { core, mainMap } = useContext(AppContext);
   const layer = useRef();
 
   const MAP_PROXY = core.MAP_PROXY_URL;
 
-  function createLayer(config) {
+
+  function createLayerSource(config) {
     let sources = [];
     const { nodata, min, max, bands } = config?.options || {};
 
@@ -66,22 +67,20 @@ const COGLayer = ({ config, source, group, checked }) => {
       }
       return acc;
     }, {});
-    
+
     const layer_source = new OlSourceGeoTIFF({ ...source_options });
 
-    /*
-    const options = {}
-    if (Array.isArray(source)) {
-        options["sources"] = [source];
-    } else {
-        options["source"] = source;
-    }
-    */
+    return layer_source;
+  }
+
+
+  function createLayer(config) {
+    const layer_source = createLayerSource(config);
 
     const layer =  new OLTileLayerWebGL({
         ...config,
-        //...options
-        sources: [layer_source]
+        source: layer_source,
+        style: config.options.style || undefined 
       });
 
     return layer;
@@ -105,13 +104,30 @@ const COGLayer = ({ config, source, group, checked }) => {
 
   // Toggle layer visibility
   useEffect(() => {
+    if (!layer.current) return;
+
     layer.current.setVisible(checked.includes(config.id))
   }, [checked]);
 
-  // Changed config
+  // Changed opacity
   useEffect(() => {
+    if (!layer.current) return;
+
     layer.current.setOpacity(config.opacity);
-  }, [config]);  
+  }, [config]);
+
+  // Changed other config options
+  useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+      return;
+    }
+
+    if (!layer.current) return;
+
+    const layer_source = createLayerSource(config);
+    layer.current.setSource(layer_source);
+  }, [config?.options]);  
 
   return null;
 };

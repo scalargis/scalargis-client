@@ -4,6 +4,7 @@ import { Dropdown } from 'primereact/dropdown';
 import layerNode from './layerNode';
 
 const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, setSelected, readOnly }) => {
+  const [loaded, setLoaded] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState({});
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [tilematrixset, setTilematrixset] =useState();
@@ -38,6 +39,10 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
 
   // Select/deselect all
   useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+      return;
+    }
     if (!setSelected) return;
     selectAll(isSelectAll, nodes, {});
   }, [isSelectAll]);
@@ -76,7 +81,6 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
         selectionMode={readOnly ? null : "checkbox"}
         selectionKeys={readOnly ? null : selected}
         onSelectionChange={e => {
-          /*console.log(e.value);*/
           const sel = {};
           Object.keys(e.value).forEach(key => {
             const selItem = e.value[key];

@@ -12,7 +12,6 @@ import GML from './type/GML';
 import DXF from './type/DXF';
 import Group from './type/Group';
 import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
 import WMSThemesSelector from './WMSThemesSelector';
 import WMTSThemesSelector from './WMTSThemesSelector';
 import ThemesSelector from './ThemesSelector';
@@ -22,9 +21,8 @@ let toastEl = null;
 export default function WizardStepData(props) {
 
   const { Models, fastFetch } = props;
-  //let [data, setData] = useState(props.wizardData);
+  const { selected, setSelected } = props;
   const [filter, setFilter] = useState('');
-  const [selected, setSelected] = useState({});
   const { getWindowSize, showOnPortal } = Models.Utils;
   const winSize = getWindowSize();
 
@@ -45,8 +43,6 @@ export default function WizardStepData(props) {
   }
 
   function editField(field, value) {
-    console.log({ ...data, [field]: value });
-    //setData({ ...data, [field]: value });
     props.onChange({ ...data, [field]: value });
   }
 
@@ -79,7 +75,7 @@ export default function WizardStepData(props) {
     let clone = JSON.parse(JSON.stringify(data.dataitems));
     clone = filterSelectedLayerItems(clone);
     data.items = clone;
-     
+
     props.onSave(data);
   }
 
@@ -114,7 +110,6 @@ export default function WizardStepData(props) {
         loading={props.loading}
         setLoading={props.setLoading}
         setError={setError}
-        //setData={setData}
         setData={updateData}
         setSelected={setSelected}
         getUrlHistory={getUrlHistory}
@@ -129,8 +124,8 @@ export default function WizardStepData(props) {
           record={props.record}
           themes={data.dataitems}
           selected={selected}
-          filter={filter}
           setSelected={setSelected}
+          filter={filter}
         />,
         wmts: <WMTSThemesSelector
           core={props.core}
@@ -138,10 +133,9 @@ export default function WizardStepData(props) {
           themes={data.dataitems}
           tileMatrixSet={data.wmtsTileMatrixSet || []}
           selected={selected}
-          filter={filter}
           setSelected={setSelected}
+          filter={filter}
           data={data}
-          //setData={setData}
           setData={updateData}
         />
       }[props.wizardData.type] || <ThemesSelector
@@ -150,8 +144,8 @@ export default function WizardStepData(props) {
           hide={data.type === 'group'}
           themes={data.dataitems}
           selected={selected}
-          filter={filter}
           setSelected={setSelected}
+          filter={filter}
         />
       }
 
