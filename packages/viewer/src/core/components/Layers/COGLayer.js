@@ -13,8 +13,11 @@ const COGLayer = ({ config, source, group, checked }) => {
   const { core, mainMap } = useContext(AppContext);
   const layer = useRef();
 
-  const MAP_PROXY = core.MAP_PROXY_URL;
+  let proxy_requests = false;
 
+  if (config && config.proxy_requests != null) {
+    proxy_requests = config.proxy_requests;
+  }
 
   function createLayerSource(config) {
     let sources = [];
@@ -22,8 +25,14 @@ const COGLayer = ({ config, source, group, checked }) => {
 
     if (Array.isArray(config.url)) {
       sources = config.url.map(s => {
+        let url = s.url;
+
+        if (proxy_requests) {
+          url = core.MAP_PROXY_URL + encodeURIComponent(url);
+        }
+
         let src = {
-          url: s.url,
+          url: url,
           ...{ nodata, min, max, bands }
         }
 
@@ -38,8 +47,14 @@ const COGLayer = ({ config, source, group, checked }) => {
         return src;
       });
     } else {
+      let url = config.url;
+
+      if (proxy_requests) {
+        url = core.MAP_PROXY_URL + encodeURIComponent(url);
+      }
+
       let src = {
-        url: config.url,
+        url: url,
         ...{ nodata, min, max, bands }
       }
 

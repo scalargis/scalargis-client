@@ -6,6 +6,7 @@
     "opacity": 1,
     "type": "COG",
     "url": "http://localhost/0181_3_1rgbi_21.tif",
+    "proxy_requests": false,
     "advancedOptions": true,
     "options": {
       "image_bands": 4,

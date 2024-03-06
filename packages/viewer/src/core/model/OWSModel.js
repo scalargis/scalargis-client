@@ -1048,7 +1048,7 @@ export const downloadTheme = (theme, format) => {
 /**
  * Parse COG to Theme
  */
-export const convertCOG2Themes = (image, url, name, options) => {
+export const convertCOG2Themes = (image, url, name, proxyRequests, options) => {
   let result = [];
 
   const bbox = image.getBoundingBox();
@@ -1071,6 +1071,7 @@ export const convertCOG2Themes = (image, url, name, options) => {
     crs: parseInt(crs, 10),
     crs_options: projection,
     bbox: bbox.join(' '),
+    proxy_requests: proxyRequests,
     options
   }
 

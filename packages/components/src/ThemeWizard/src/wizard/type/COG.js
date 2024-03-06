@@ -50,18 +50,23 @@ export default function COG(props) {
       }
     }
 
-    /*
-    if (!isUrlAppOrigin(url)) {
-      url = core.MAP_PROXY_URL + encodeURIComponent(url);
-    }
-    */
-
     setLoading(true);
 
+    let proxyRequests = false;
+
     GeoTIFFLib.fromUrl(url)
+    .catch(error => {
+      if (isUrlAppOrigin(url)) throw new error;
+
+      proxyRequests = true;
+
+      const surl = core.MAP_PROXY_URL + encodeURIComponent(url);
+      return GeoTIFFLib.fromUrl(surl);
+    })
     .then(tiff => {
-      return tiff.getImage(); 
-    }).then(async image => {
+      return tiff.getImage();
+    })
+    .then(async image => {
       const code = getCOGImageProjCode(image);
       const epsg = `EPSG:${code}`;
 
@@ -94,13 +99,14 @@ export default function COG(props) {
       }
 
       // Extract filename from url path
-      const baseUrl = url.indexOf('?') === -1 ? url : url.slice(0, url.indexOf('?'));
+      const baseUrl = data.url.indexOf('?') === -1 ? data.url : data.url.slice(0, data.url.indexOf('?'));
       const [...parts] = baseUrl.split('/');
       const filename = parts.pop();
 
-      let dataitems = Models.OWSModel.convertCOG2Themes(image, data.url, filename, options);
+      let dataitems = Models.OWSModel.convertCOG2Themes(image, data.url, filename, proxyRequests, options);
       setData({ ...data, options, dataitems });
     }).catch((error) => {
+      console.log(error);
       setData({ ...data, dataitems: [] });
       setLoading(false);
       setError('' + error);
