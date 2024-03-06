@@ -19,7 +19,7 @@ export default function COG(props) {
         if (!data?.options?.image_bands) {
           return [1, 2, 3];
         }
-        return [...Array(data.options.image_bands).keys().map(i => i+1)];
+        return Array.from({length: data.options.image_bands}, (_, index) => (index + 1));
       }, [data?.options?.image_bands]);
 
     const onChangeBand = (index, value) => {

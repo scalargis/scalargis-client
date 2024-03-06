@@ -46,6 +46,12 @@ import { removeUrlParam } from '../utils';
 let loading = 0;
 // TODO: cache layer styles
 
+
+export const hasProjection = (proj) => {
+  if (!OlProj.get(proj)) return false;
+  else return true;
+}
+
 // Add projections
 export const addProjections = (projections) => {
   projections.map(i => {
@@ -1356,6 +1362,7 @@ export const splitGeom = function (geom) {
 }
 
 export default {
+  hasProjection,
   addProjections,
   processVisibility,
   traverseTree,

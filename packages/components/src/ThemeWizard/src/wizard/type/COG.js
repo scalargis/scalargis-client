@@ -2,7 +2,6 @@ import React, {useState, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 
 import * as GeoTIFFLib from "geotiff";
-import Proj4 from 'proj4';
 
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
@@ -17,7 +16,7 @@ export default function COG(props) {
 
   const { core, auth, mainMap, viewer, data, loading, setLoading, setData, setError, editField, cookies, Models } = props;
   const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
-  const { addProjections } = Models.MapModel;
+  const { hasProjection, addProjections } = Models.MapModel;
   const { getCOGImageProjCode } = Models.OWSModel;
 
   const { t } = useTranslation(); 
@@ -29,7 +28,7 @@ export default function COG(props) {
     if (!data?.options?.image_bands) {
       return [1, 2, 3];
     }
-    return [...Array(data.options.image_bands).keys().map(i => i+1)];
+    return Array.from({length: data.options.image_bands}, (_, index) => (index + 1));
   }, [data?.options?.image_bands]);
 
   /**
@@ -66,13 +65,11 @@ export default function COG(props) {
       const code = getCOGImageProjCode(image);
       const epsg = `EPSG:${code}`;
 
-      if (!Proj4.defs(epsg)) {
+      if (!hasProjection(epsg)) {
         //throw new Error(`Unsupported coordinate reference system (EPSG:${code})`);
         try {
           const response = await fetch(`https://epsg.io/${code}.proj4`);
           const projText = await response.text();
-
-          Proj4.defs(epsg, projText);
 
           const newProj = {
             "srid": code,
@@ -90,10 +87,10 @@ export default function COG(props) {
       return image;
     }).then(image => {
       const number_bands = image.getSamplesPerPixel();
-      const available_bands = [...Array(number_bands).keys().map(i => i+1)];
+      const available_bands = Array.from({length: number_bands}, (_, index) => (index + 1));
       const options = {
         image_bands: number_bands,
-        bands: number_bands >= 3 ? [1, 2, 3] : [...available_bands]
+        bands: number_bands >= 3 ? [1, 2, 3] : available_bands
       }
 
       // Extract filename from url path
