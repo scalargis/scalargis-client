@@ -29,7 +29,7 @@ function Viewer(props) {
   // Get router props
   const { url } = props.match;
   const { id } = props.match.params;
-  const { history, loading, viewer, config } = props;
+  const { history, loading, viewer, config, notifications } = props;
   const { exclusive_mapcontrol } = viewer;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
@@ -90,6 +90,7 @@ function Viewer(props) {
       history={history}
       core={core}
       viewer={viewer}
+      notifications={notifications}
       layout_wrapper_click={e => dispatch(layout_wrapper_click())}
       layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
       mainMenu={<MainMenu history={history} onMenuClick={isDesktop => dispatch(layout_show_menu(isDesktop))} />}
@@ -98,6 +99,7 @@ function Viewer(props) {
       footerRight={<FooterRight />}
       mainOlMap={mainMap}
     >
+
       <MainMap 
         olMap={mainMap}
         config={config}
@@ -146,5 +148,5 @@ function Viewer(props) {
 
 export default connect(state => {
   const gstate = mapStateToProps(state);
-  return ({ viewer: gstate.viewer });
+  return ({ viewer: gstate.viewer, notifications: gstate.notifications });
 })(withRouter(Viewer));

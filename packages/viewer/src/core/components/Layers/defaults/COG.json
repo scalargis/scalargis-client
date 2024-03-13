@@ -1,0 +1,12 @@
+{
+    "opacity": 1,
+    "type": "COG",
+    "proxy_requests": true,
+    "options": {
+        "image_bands": 3,
+        "bands": [1, 2, 3],
+        "convertToRGB": true,
+        "nodata": 0
+    },
+    "selectable": false
+}
