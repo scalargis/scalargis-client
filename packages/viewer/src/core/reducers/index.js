@@ -44,7 +44,10 @@ import {
   VIEWER_SESSION_SAVED,
 
   VIEWER_SET_DRAWINGS,
-  VIEWER_SET_COORDINATES
+  VIEWER_SET_COORDINATES,
+
+  VIEWER_ADD_NOTIFICATION,
+  VIEWER_CLEAR_NOTIFICATIONS
 } from '../actions';
 import { traverseLayersTree, getCookieAuthName } from '../utils';
 
@@ -66,7 +69,7 @@ const cookies = new Cookies();
 const cookieAuthName = getCookieAuthName();
 
 //export default (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, config: null, viewer: initialViewer, components: {} }, action) => {
-const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, registration: {}, password: {}, config: null, viewer: initialViewer, components: {} }, action) => {
+const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, registration: {}, password: {}, config: null, viewer: initialViewer, components: {}, notifications: [] }, action) => {
 
   //console.log('action', action);
   
@@ -490,17 +493,46 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
       }
 
     // Remove themes from ids
-    // DEPRECATED
     case VIEWER_REMOVE_THEMES:
-      let { removed } = state.viewer;
-      removed = removed.concat(action.ids);
-      return {
-        ...state,
-        viewer: {
-          ...state.viewer,
-          removed
+      return (function () {
+        const allIds = Object.assign([], action.ids);//[...action.ids];
+        action.ids.forEach(id => {
+          const layer = state.viewer.config_json.layers.find( l => l.id === id);
+          if (layer.type === "GROUP") {
+              traverseLayersTree(state.viewer.config_json.layers, id, (l, i) => {
+                  if (!allIds.includes(l.id)) allIds.push(l.id);
+              });
+          }
+        });
+        let updated = Object.assign([], state.viewer.config_json.layers);
+
+        // Remove as child layers
+        traverseLayersTree(updated, null, (l, i) => {
+          if (l.children) l.children = l.children.filter(cid => allIds.includes(cid) === false);
+        });
+        // Remove layers
+        updated = updated.filter(l => !allIds.includes(l.id));
+
+        //Update opened list
+        let opened = Object.assign([], state.viewer.config_json.opened);
+        opened = opened.filter(id => !allIds.includes(id));
+        //Update checked list
+        let checked =  Object.assign([], state.viewer.config_json.checked);
+        checked = checked.filter(id => !allIds.includes(id));
+
+        return {
+          ...state,
+          viewer: {
+            ...state.viewer,
+            config_json: {
+              ...state.viewer.config_json,
+              layers: updated,
+              opened: opened,
+              checked: checked
+            }
+          }
         }
-      }
+      }());
 
     // Update map control
     case VIEWER_UPDATE_MAPCONTROL:
@@ -581,6 +613,20 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
           ...state.viewer,
           mobileMenuActive: !state.viewer.mobileMenuActive
         }
+      }
+
+    // Add notification
+    case VIEWER_ADD_NOTIFICATION:
+      return {
+        ...state,
+        notifications: [...state.notifications.splice(-5), action.notification]
+      }
+
+    // Clear notifications
+    case VIEWER_CLEAR_NOTIFICATIONS:
+      return {
+        ...state,
+        notifications: []
       }
 
     // Not state change
