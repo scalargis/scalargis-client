@@ -156,7 +156,7 @@
   "clickTurnOff": "Clicar para desligar",
 
   "removeTheme": "Remover Tema",
-  "confirmAction": "Tem a certeza?",
+  "confirmAction": "Tem a certeza que deseja continuar?",
 
   "personalizarTema": "Personalizar Tema",
 
@@ -192,5 +192,11 @@
   "loadSession": "Abrir sessão",
 
   "serverType": "Tipo de servidor",
-  "selectServerType": "Escolha o tipo de servidor"
+  "selectServerType": "Escolha o tipo de servidor",
+
+  "addTheme": "Adicionar Tema",
+  "warnThemeExists": "O tema já foi adicionado ao mapa.",
+  "warnThemeNotFound": "Não foi possível encontrar o tema na lista de temas do mapa",
+
+  "successActionMsg": "Operação realizada com sucesso"
 }
