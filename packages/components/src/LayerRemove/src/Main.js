@@ -23,7 +23,7 @@ export default function Main({ config }) {
       />
 
       <Dialog
-        header={t("confirmation", "Confirmação")}
+        header={t("removeTheme", "Remover Tema")}
         visible={!!confirmDeleteTheme} 
         modal 
         style={{ width: '350px' }} 
