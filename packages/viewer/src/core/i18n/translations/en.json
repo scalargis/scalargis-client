@@ -156,7 +156,7 @@
   "clickTurnOff": "Click turn off",
 
   "removeTheme": "Remove Theme",
-  "confirmAction": "Are you sure?",
+  "confirmAction": "Are you sure you want to continue?",
 
   "personalizarTema": "Customise Theme",
 
@@ -192,5 +192,11 @@
   "loadSession": "Open session",
 
   "serverType": "Server type",
-  "selectServerType": "Select server type"
+  "selectServerType": "Select server type",
+
+  "addTheme": "Add Theme",
+  "warnThemeExists": "The theme has already been added to the map",
+  "warnThemeNotFound": "Couldn't find theme in map themes list",
+
+  "successActionMsg": "Operação realizada com sucesso"
 }

@@ -156,7 +156,7 @@
   "clickTurnOff": "Pulse para ocultar",
 
   "removeTheme": "Eliminar Capa",
-  "confirmAction": "¿Está seguro?",
+  "confirmAction": "¿Seguro que quiere continuar?",
 
   "personalizarTema": "Personalizar Capa",
 
@@ -192,5 +192,11 @@
   "loadSession": "Cargar sesión",
 
   "serverType": "Tipo de servidor",
-  "selectServerType": "Elige el tipo de servidor"
+  "selectServerType": "Elige el tipo de servidor",
+
+  "addTheme": "Añadir Capa",
+  "warnThemeExists": "La capa ya ha sido añadido al mapa",
+  "warnThemeNotFound": "No se ha podido encontrar la capa en la lista de capas del mapa",
+
+  "successActionMsg": "Operação realizada com sucesso"
 }

@@ -61,6 +61,10 @@ export const LAYOUT_TOGGLE_OVERLAYMENU  = 'LAYOUT_TOGGLE_OVERLAYMENU'
 export const LAYOUT_TOGGLE_STATICMENU   = 'LAYOUT_TOGGLE_STATICMENU'
 export const LAYOUT_TOGGLE_MOBILEMENU   = 'LAYOUT_TOGGLE_MOBILEMENU'
 
+export const VIEWER_ADD_NOTIFICATION    = 'VIEWER_ADD_NOTIFICATION'
+export const VIEWER_CLEAR_NOTIFICATIONS = 'VIEWER_CLEAR_NOTIFICATIONS'
+
+
 // Get config URL
 const CONFIG_URL = process.env.REACT_APP_CONFIG_URL;
 const API_URL = getAppApiUrl();
@@ -870,6 +874,22 @@ export function layout_show_menu(isDesktop) {
     }
   }
 }
+
+export function viewer_add_notification(notification) {
+  let action = {
+    type: VIEWER_ADD_NOTIFICATION,
+    notification
+  }
+  return action;
+}
+
+export function viewer_clear_notifications() {
+  let action = {
+    type: VIEWER_CLEAR_NOTIFICATIONS
+  }
+  return action;
+}
+
 
 export function getThemeLegendUrl(config) {
   let url = config.legend_url;

@@ -9,7 +9,8 @@ import { getWindowSize, buildRelativeUrlPath } from '../utils'
 import Script, {ScriptHtml} from './Script'
 import Style, {StyleHtml} from './Style'
 import LoadingScreen from './LoadingScreen'
-
+import EventManager from '../events/EventManager'
+import AppNotification from './AppNotification'
 
 function Layout(props) {
 
@@ -18,6 +19,7 @@ function Layout(props) {
     config,
     viewer,
     sidebar,
+    notifications,
     onWrapperClick,
     onSidebarClick,
     onToggleMenu
@@ -28,6 +30,7 @@ function Layout(props) {
   const { CLIENT_URL } = core;
 
   const [loaded, setLoaded] = useState(false);
+
 
   useEffect(() => {
     if (!config) return;
@@ -93,6 +96,19 @@ function Layout(props) {
 
   return (
     <div className={wrapperClass} onClick={onWrapperClick}>
+
+        <EventManager
+          mainMap={props.mainOlMap}
+          viewer={props.viewer}
+          core={props.core}
+          dispatch={props.dispatch}
+        />
+
+        <AppNotification
+          notifications={props.notifications}
+          filterGroups={[]}
+        />
+
         { loaded && <AppTopbar onToggleMenu={onToggleMenu} logo={logoComponent} regionComponents={props.topbarRight} /> }
 
         <div ref={(el) => sidebar.current = el} 

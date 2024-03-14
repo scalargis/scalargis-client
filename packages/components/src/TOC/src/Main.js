@@ -162,21 +162,13 @@ class Main extends React.Component {
 
   removeThemes(themes) {
     this.setState({ ...this.state, confirmDeleteTheme: false });
-    //const { opened } = this.state;
-    const { opened } = this.props.config.viewer.config_json;
-    const { checked } = this.props.config.viewer.config_json;
-    themes.forEach(id => {
-      if (opened.includes(id)) this.openTheme(null, id);
-      if (checked.includes(id)) this.toggle(id);
-    });
-    if (this.props.actions.layers_remove_items && this.props.config.dispatch) {
-      this.props.config.dispatch(this.props.actions.layers_remove_items(themes));
+    if (this.props.actions.viewer_remove_themes && this.props.config.dispatch) {
+      this.props.config.dispatch(this.props.actions.viewer_remove_themes(themes));
     }
   }
 
   applyThemeChanges(theme) {
     let { layers } = this.props.config.viewer.config_json;
-    //const index = layers.indexOf(theme);
     const index = layers.findIndex(i => i.id === theme.id);
     const update = Object.assign({}, theme);
     layers.splice(index, 1, update);
