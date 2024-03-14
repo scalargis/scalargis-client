@@ -307,28 +307,12 @@ function getFeatureRows(feat, layer) {
 
               if (field.action.data) {
                 const new_data = {}
-                Object.entries(field.action.data).forEach(([key, value]) => {                                    
-                  let new_value = value;
-                  //Apply field template
-                  const rf = (value && value.match) ? value.match(/[^{}]+(?=})/g) : null;
-                  if (rf) {
-                    const fld = rf[0];
-                    if (rf.length === 1 && value === `{${fld}}` ) {
-                      if (rf[0] in action.data) {
-                        new_value = action.data[rf[0]];
-                      }
-                    } else {
-                      rf.forEach(fld => {
-                        if (fld in action.data) {
-                          new_value = new_value.replace(`{${fld}}`, action.data[fld]);
-                        }                      
-                      });
-                    }                    
-                  }
-                  new_data[key] = new_value;
+                Object.entries(field.action.data).forEach(([key, value]) => {
+                  new_data[key] = formatTemplateValue(feat.getProperties(), value);
                 });
                 action.data = new_data;
               }
+
               rows.push({ 
                 key, 
                 name: i18n.translateValue(field.title),
@@ -523,19 +507,44 @@ function formatValue(value, format) {
 const formatTemplateValue = (rowData, value) => {
   let new_value = value;
 
-  const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
-  if (rf) {
-    if (rf.length === 1) {
-      const fld = rf[0];
-      if (fld in rowData) {
-        new_value = rowData[fld];
+  const _isPureObject = (input) => {
+    return null !== input && 
+      typeof input === 'object' &&
+      Object.getPrototypeOf(input).isPrototypeOf(Object);
+  }
+
+  const _formatValue = (data, value) => {
+    let _new_value = value;
+
+    const rf = (_new_value && _new_value.match) ? _new_value.match(/[^{}]+(?=})/g) : null;
+    if (rf) {
+      if (rf.length === 1) {
+        const fld = rf[0];
+        if (fld in data) {
+          _new_value = _new_value.replace(`{${fld}}`, data[fld] || '');
+        }
+      } else {
+        rf.forEach(fld => {
+          _new_value = _new_value.replace(`{${fld}}`, data[fld] || '');
+        });
       }
-    } else {
-      rf.forEach(fld => {
-        new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');      
+    }
+    return _new_value;
+  }
+
+  if (_isPureObject(value)) {
+    function iter(o) {
+      Object.keys(o).forEach(function (k) {
+          if (o[k] !== null && typeof o[k] === 'object') {
+              iter(o[k]);
+              return;
+          }
+          o[k] = _formatValue(rowData, o[k]);
       });
     }
+    iter(new_value);
+  } else {
+    new_value = _formatValue(rowData, value);
   }
- 
   return new_value;
 }
