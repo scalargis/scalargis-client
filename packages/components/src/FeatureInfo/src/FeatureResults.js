@@ -16,7 +16,6 @@ import { i18n } from '@scalargis/components';
 import componentMessages from './messages'
 
 export default function FeatureResults({ core, config, features, layers, actions, pubsub, dispatch, mainMap, record }) {
-
   const { viewer } = config;
   const { publish, subscribe } = pubsub ? pubsub : {};
 
@@ -146,7 +145,9 @@ export default function FeatureResults({ core, config, features, layers, actions
         val = <Button label={i18n.translateValue(action.label)} icon={action.icon}
             className={action.classname || action.className}
             title={i18n.translateValue(action.tooltip)}
-            onClick={(e) => publish(action.type, action.data)}
+            onClick={(e) => {
+              publish(action.type, action.data)
+            }}
           />
       } else {
         val = null;
@@ -164,7 +165,7 @@ export default function FeatureResults({ core, config, features, layers, actions
       severity="info"
       text={t("identifyNoResults", "Sem resultados. Clique no mapa para identificar.")} 
     />
-  ) 
+  )
 
   return (
     <div>
@@ -193,7 +194,7 @@ export default function FeatureResults({ core, config, features, layers, actions
         onTabChange={(e) => setActiveIndex(e.index)}>
           { Object.keys(grouped).map(layerId => {
             // Validate layer
-            const layer = layers.find(l => l.id === layerId);
+            let layer = layers.find(l => l.id === layerId);
             if (!layer) return null;
 
             //Get export permissions from layer config
@@ -276,40 +277,41 @@ function getFeatureRows(feat, layer) {
     rows.push({ name: 'name', value: feat.data, type: 'text' });
   } else {
     let feature_tpl = null;
-    if (layer && layer.feature_tpl && layer.feature_tpl.fields && layer.feature_tpl.fields.length) {
+    if (layer && layer?.feature_tpl?.fields?.length) {
       feature_tpl = layer.feature_tpl;
-    } else if (feat.get('feature_tpl') && feat.get('feature_tpl').fields && feat.get('feature_tpl').fields.length) {
+    } else if (feat.get('feature_tpl') && feat.get('feature_tpl')?.fields?.length) {
       feature_tpl = feat.get('feature_tpl');
     }
 
+    // Make copy of feature template (deep clone) 
+    feature_tpl = JSON.parse(JSON.stringify(feature_tpl));
+
     if (feat instanceof OlFeature) {
+      const feat_properties = JSON.parse(JSON.stringify(feat.getProperties()));
       if (feature_tpl) {
         feature_tpl.fields.forEach((field, i) => {
           let key = field.name;
-          if (typeof feat.get(key) != 'object') {
+            if (typeof feat_properties[key] != 'object') {
 
-            let new_value = feat.get(field.name);
+            //let new_value = feat.get(field.name);
+            let new_value = feat_properties[field.name];
 
             //Apply field template
             if (field.value) {
               new_value = field.value;
             }
-            const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
-            if (rf) {
-              rf.forEach(fld => {
-                new_value = new_value.replace(`{${fld}}`, feat.get(fld) || '');      
-              });                 
-            }
+            new_value = formatTemplateValue(feat_properties, new_value);
 
             if (field.action) {              
-              const action = {...field.action, data: {...feat.getProperties()}};
+              let action = {...field.action, data: feat_properties};
               delete action.data.feature_tpl;
 
               if (field.action.data) {
                 const new_data = {}
                 Object.entries(field.action.data).forEach(([key, value]) => {
-                  new_data[key] = formatTemplateValue(feat.getProperties(), value);
+                  new_data[key] = formatTemplateValue(feat_properties, value);
                 });
+
                 action.data = new_data;
               }
 
@@ -371,7 +373,6 @@ function getFeatureRows(feat, layer) {
             rows.push({ name: k, value: feat.data[k] })
           }
         });
-        //rows.push({ name: 'name', value: JSON.stringify(feat.data) });
       }
     }
   }
@@ -389,8 +390,7 @@ function groupResults(features, map) {
       if (feat.type === 'ol') {
         let items = parseOlFeatures(feat.data, map);
         items.forEach(f => {
-          f.set('resultId', feat.id)
-          f.set('feature_tpl', {...feat.feature_tpl});
+          f.set('resultId', feat.id);
         });
         grouped[layerId].features = grouped[layerId].features.concat(items);
       } else {
