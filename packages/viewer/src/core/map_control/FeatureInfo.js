@@ -77,8 +77,7 @@ export default function FeatureInfo({ core, config, actions }) {
             type: 'ol',
             data: serializeFeatures([feature]),
             layer: l ? l.get('title') : '',
-            layerId: l ? l.get('id') : null, 
-            feature_tpl: l.get('feature_tpl') ? l.get('feature_tpl') : null
+            layerId: l ? l.get('id') : null
           };
         } else {
           let data = {};
@@ -127,7 +126,6 @@ export default function FeatureInfo({ core, config, actions }) {
 
     // Found vector features
     if (features.length) {
-      //const acc = featureinfo;
       features.forEach(fl => {
         acc.push(displayFeature(fl.feature, fl.layer));
         dispatch(actions.viewer_set_featureinfo(acc));
