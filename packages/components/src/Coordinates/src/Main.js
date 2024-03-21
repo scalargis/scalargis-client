@@ -7,24 +7,38 @@ import Coordinates from './Coordinates'
 
 import './style.css'
 
+const MAPCONTROL_NAME = "Coordinates";
+
 /**
  * Main menu component
  */
 export function MainMenu({ className, config, actions, record }) {
   
+  const { viewer } = config;
+  const { selected_menu } = viewer.config_json;
+  const { exclusive_mapcontrol } = viewer;
+
   const { t } = useTranslation();
 
   const component_cfg = record.config_json || {}; 
   const title = record.title || t("searchByCoordinates", "Pesquisa por Coordenadas");
 
+  const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
   return (
     <Button
       title={title}
-      className={className}
+      className={`${className}${isInactive ? " menu-inactive" : ""}`}
       icon="fas fa-bullseye"
       style={{ margin: '0.5em 1em' }}
-      onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+      onClick={e => {
+        if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
+        if (exclusive_mapcontrol !== MAPCONTROL_NAME) {
+          config.dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
+        } else {
+          config.dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+        }
+      }}
     />
   )
 }
@@ -46,11 +60,11 @@ export default function Main({ as, core, config, actions, record }) {
   const isMobile = wsize[0] <= 768;
 
   useEffect(() => {
-    if (selected_menu === 'coordinates') dispatch(actions.viewer_set_exclusive_mapcontrol('Coordinates'));
+    if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
   }, [selected_menu]);
 
   useEffect(() => {
-    if (selected_menu === 'coordinates') {
+    if (selected_menu === record.id) {
       if (!isMobile && component_cfg.expand_menu === true) {
         dispatch(actions.layout_show_menu(true));
       }

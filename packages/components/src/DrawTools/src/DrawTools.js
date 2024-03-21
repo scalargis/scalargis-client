@@ -351,10 +351,10 @@ class DrawTools extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { viewer } = this.props;
-    if (this.state.enabled && (viewer.config_json.selected_menu !== 'drawtools')) {
+    if (this.state.enabled && (viewer.config_json.selected_menu !== 'drawtools' || viewer.exclusive_mapcontrol !== 'DrawTools')) {
       this.disableTools()
     }
-    if (!this.state.enabled && (viewer.config_json.selected_menu === 'drawtools')) {
+    if (!this.state.enabled && (viewer.config_json.selected_menu === 'drawtools' && viewer.exclusive_mapcontrol === 'DrawTools')) {
       this.enableTools()
     };
 

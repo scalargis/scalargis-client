@@ -9,6 +9,8 @@ import componentMessages from './messages'
 import FeatureResults from './FeatureResults'
 import './index.css'
 
+const MAPCONTROL_NAME = "FeatureInfo";
+
 export function traverseOlLayers(collection, cb) {
   collection.forEach(l => {
     cb(l);
@@ -21,18 +23,31 @@ export function traverseOlLayers(collection, cb) {
  */
 export function MainMenu({ className, config, actions, record }) {
 
+  const { viewer } = config;
+  const { selected_menu } = viewer.config_json;
+  const { exclusive_mapcontrol } = viewer;
+
   const { t } = useTranslation();
 
   const component_cfg = record.config_json || {};
   const title = record.title || t("identifyElements", "Identificar elementos");
 
+  const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
+
   return (
     <Button
       title={title}
-      className={className}
+      className={`${className}${isInactive ? " menu-inactive" : ""}`}
       icon="pi pi-info-circle"
       style={{ margin: '0.5em 1em' }}
-      onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+      onClick={e => {
+        if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
+        if (exclusive_mapcontrol !== MAPCONTROL_NAME) {
+          config.dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
+        } else {
+          config.dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+        }
+      }}
     />
   )
 }
@@ -41,7 +56,7 @@ export default function Main({ as, core, config, actions, record }) {
 
   const { viewer, dispatch, Models, mainMap } = config;
   //const { publish, subscribe } = core.pubsub ? core.pubsub : {}
-  const { featureinfo } = viewer;
+  const { featureinfo, exclusive_mapcontrol } = viewer;
   const { getWindowSize, showOnPortal } = Models.Utils;
   const { selected_menu, layers } = viewer.config_json;
 
@@ -56,11 +71,11 @@ export default function Main({ as, core, config, actions, record }) {
   const isMobile = wsize[0] <= 768;  
 
   useEffect(() => {
-    if (selected_menu === 'featureinfo') dispatch(actions.viewer_set_exclusive_mapcontrol('FeatureInfo'));
+    if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
   }, [selected_menu]);
 
   useEffect(() => {
-    if (selected_menu === 'featureinfo') {
+    if (selected_menu === record.id) {
       if (!isMobile && component_cfg.expand_menu === true) {
         dispatch(actions.layout_show_menu(true));
       }

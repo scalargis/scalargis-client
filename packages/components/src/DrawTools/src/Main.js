@@ -9,16 +9,22 @@ import DrawTools from './DrawTools'
  */
 export function MainMenu({ className, config, actions, record }) {
 
+  const { viewer } = config;
+  const { selected_menu } = viewer.config_json;
+  const { exclusive_mapcontrol } = viewer;
+
   const { t } = useTranslation();
 
   const component_cfg = record.config_json || {};
   const title = record.title || t("drawingTools", "Ferramentas de Desenho");
   const header = component_cfg.header || title;
 
+  const isInactive = selected_menu === record.id && exclusive_mapcontrol !== 'DrawTools';
+
   return (
     <Button
       title={title}
-      className={className}
+      className={`${className}${isInactive ? " menu-inactive" : ""}`}
       icon="pi pi-palette"
       style={{ margin: '0.5em 1em' }}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
@@ -43,7 +49,7 @@ export default function Main({ type, region, as, config, actions, record, utils 
   const isMobile = wsize[0] <= 768;  
 
   useEffect(() => {
-    if (selected_menu === 'drawtools') dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+    if (selected_menu === 'drawtools') dispatch(actions.viewer_set_exclusive_mapcontrol(null));
   }, [selected_menu])   
 
   function renderContent() {
