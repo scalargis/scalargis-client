@@ -14,9 +14,12 @@ import convert from 'convert'
 import { i18n } from '@scalargis/components';
 
 import componentMessages from './messages'
+import { MAPCONTROL_NAME } from './utils'
 
 export default function FeatureResults({ core, config, features, layers, actions, pubsub, dispatch, mainMap, record }) {
   const { viewer } = config;
+  const { selected_menu } = viewer.config_json;
+  const { exclusive_mapcontrol } = viewer;
   const { publish, subscribe } = pubsub ? pubsub : {};
 
   const { t } = useTranslation();
@@ -33,6 +36,8 @@ export default function FeatureResults({ core, config, features, layers, actions
   const grouped = groupResults(features, mainMap);
 
   const showExportAllFeatures = getShowExportAllFeatures(grouped, layers, userRoles);
+
+  const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
   //Set Export permissions
   useEffect(() => {
@@ -160,15 +165,27 @@ export default function FeatureResults({ core, config, features, layers, actions
     return val;
   }
 
-  if (Object.keys(grouped).length === 0) return (
-    <Message
-      severity="info"
-      text={t("identifyNoResults", "Sem resultados. Clique no mapa para identificar.")} 
-    />
-  )
+  if (Object.keys(grouped).length === 0) {
+    let msg = t("identifyNoResults", "Sem resultados. Clique no mapa para identificar.");
+    if (isInactive) msg = `${t("noResults", "Sem resultados")}. ${t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.")}`;
+    return (
+      <Message
+        severity="info"
+        text={msg}
+      />
+    )
+  }
 
   return (
     <div>
+
+      { isInactive &&
+        <Message
+          severity="info"
+          text={t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.")} 
+        />
+      }
+
       <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
         <Button
           title={t("clearResults", "Limpar resultados")}

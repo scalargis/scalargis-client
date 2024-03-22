@@ -3,11 +3,11 @@ import { useTranslation} from "react-i18next"
 import { Button } from 'primereact/button'
 import OLGroupLayer from "ol/layer/Group"
 import { Panel } from 'primereact/panel'
-import Coordinates from './Coordinates'
 
+import { MAPCONTROL_NAME } from './utils'
+import Coordinates from './Coordinates'
 import './style.css'
 
-const MAPCONTROL_NAME = "Coordinates";
 
 /**
  * Main menu component

@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
+
+import { MAPCONTROL_NAME } from './utils';
 import MapTools from './MapTools';
 
-const MAPCONTROL_NAME = "MapTools";
 
 /**
  * Main menu component

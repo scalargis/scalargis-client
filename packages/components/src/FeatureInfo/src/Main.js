@@ -6,10 +6,10 @@ import { Panel } from 'primereact/panel'
 
 import componentMessages from './messages'
 
+import { MAPCONTROL_NAME } from './utils'
 import FeatureResults from './FeatureResults'
 import './index.css'
 
-const MAPCONTROL_NAME = "FeatureInfo";
 
 export function traverseOlLayers(collection, cb) {
   collection.forEach(l => {

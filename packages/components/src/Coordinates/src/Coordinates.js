@@ -16,12 +16,15 @@ import OlPoint from 'ol/geom/Point'
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import * as OlProj from 'ol/proj';
 import { v4 as uuidV4 } from 'uuid';
+
+import { MAPCONTROL_NAME } from './utils'
 import './style.css'
-import { last } from 'underscore';
 
 export default function Coordinates({ core, config, actions, dispatch, record }) {
 
-  const { viewer, mainMap, Models } = config;  
+  const { viewer, mainMap, Models } = config; 
+  const { selected_menu } = viewer.config_json;
+  const { exclusive_mapcontrol } = viewer;
   const { getProjectionSrid } = Models.MapModel;  
   const { coordinates }  = viewer;
 
@@ -38,6 +41,8 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const [coordLon, setCoordLon] = useState(null);
   const [coordLat, setCoordLat] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
+
+  const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
 
   const buildSaveBtnItems = data => {
@@ -493,32 +498,20 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     if (coordinates && coordinates.length > 0) dispatch(actions.viewer_set_selectedmenu('coordinates'));
   }, [coordinates]);
 
-  /*
-  useEffect(()=>{
-    buildResultsTable();
-  }, [coordinates]);
-  */
 
-  {/*
-  if (!coordinates || coordinates.length == 0) return (
-    <Message
-      severity="info"
-      text={"Ative o botão 'Obter coordenadas' e clique no mapa."} 
-    />
-  )
-  */}
+  let msg = t("searchByCoordinateInfo", "Clique no mapa para obter as coordenadas ou indique os seus valores através seguinte formulário.");
+  if (isInactive) msg = t("searchByCoordinateNotActive", "Clique no botão do menu principal para ativar a ferramenta e depois clique no mapa para obter as coordenadas. Poderá também indicar os valores das coordenadas através do formulário.");
 
   return (
     <div>
 
-      { ( !coordinates || !coordinates.length ?
-          <div className="p-mt-2 p-mb-3">
-            <Message
-              severity="info"
-              text={t("searchByCoordinateInfo", "Clique no mapa para obter as coordenadas ou indique os seus valores através seguinte formulário.")}
-            />
-          </div> : null 
-      ) }
+      { (isInactive || !coordinates?.length) ?
+        <div className="p-mt-2 p-mb-3">
+          <Message
+            severity="info"
+            text={msg}
+          />
+        </div> : null }
 
       {(showDegrees &&
       <React.Fragment>
