@@ -137,6 +137,9 @@ body .p-dropdown {
   background-position-y: center !important;
 }
 
+.layout-sidebar #mainmenu button.menu-inactive {
+  background-color: #63abe3;
+}
 
 .layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #mainmenu,
 .layout-wrapper.layout-static.layout-mobile-sidebar-active .layout-sidebar #mainmenu {
@@ -319,7 +322,8 @@ body .p-multiselect {
   padding-right: 0.9em;
 }
 
-.p-button:enabled:focus {
+/*.p-button:enabled:focus {*/
+  .p-button:enabled:focus-visible {
   background: rgba(103, 58, 183, 0.76);
 }
 

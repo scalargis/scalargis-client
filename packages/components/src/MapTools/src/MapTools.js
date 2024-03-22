@@ -1,5 +1,5 @@
-import React from 'react';
-import i18next from 'i18next';
+import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation} from "react-i18next";
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
@@ -17,457 +17,381 @@ import OlStroke from 'ol/style/Stroke';
 import convert from 'convert';
 import './style.css';
 
-// TODO: create namespace in Store and pass actions through props
 
-class Main extends React.Component {
+// Drawing style
+const drawingsStyle = new OlStyle({
+  fill: new OlFill({
+    color: 'rgba(255, 255, 255, 0.2)'
+  }),
+  stroke: new OlStroke({
+    color: '#ffcc33',
+    width: 2
+  })
+});
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      helpModal: false,
-      helpLengthShowed: false,
-      helpAreaShowed: false,
-      control: props.selected_control || '',
-      length: 0,
-      area: 0
-    };
-
-    // Drawing style
-    this.drawingsStyle = new OlStyle({
-      fill: new OlFill({
-        color: 'rgba(255, 255, 255, 0.2)'
-      }),
-      stroke: new OlStroke({
-        color: '#ffcc33',
-        width: 2
-      })
-    });
-
-    // Draw style
-    this.drawStyle = new OlStyle({
-      fill: new OlFill({
-        color: 'rgba(255, 255, 255, 0.2)'
-      }),
-      stroke: new OlStroke({
-        color: 'rgba(0, 0, 0, 0.5)',
-        lineDash: [10, 10],
-        width: 2
-      }),
-      image: new OlCircle({
-        radius: 5,
-        stroke: new OlStroke({
-          color: 'rgba(0, 0, 0, 0.7)'
-        }),
-        fill: new OlFill({
-          color: 'rgba(255, 255, 255, 0.2)'
-        })
-      })
-    });
-
-    /**
-     * Currently drawn feature.
-     * @type {module:ol/Feature~Feature}
-     */
-    this.sketch = null;
-
-    /**
-     * The help tooltip element.
-     * @type {Element}
-     */
-    this.helpTooltipElement = null;
+// Draw style
+const drawStyle = new OlStyle({
+  fill: new OlFill({
+    color: 'rgba(255, 255, 255, 0.2)'
+  }),
+  stroke: new OlStroke({
+    color: 'rgba(0, 0, 0, 0.5)',
+    lineDash: [10, 10],
+    width: 2
+  }),
+  image: new OlCircle({
+    radius: 5,
+    stroke: new OlStroke({
+      color: 'rgba(0, 0, 0, 0.7)'
+    }),
+    fill: new OlFill({
+      color: 'rgba(255, 255, 255, 0.2)'
+    })
+  })
+});
 
 
-    /**
-     * Overlay to show the help messages.
-     * @type {module:ol/Overlay}
-     */
-    this.helpTooltip = null;
+export default function MapTools({ selectedControl, onControlSelect, core, viewer, actions, dispatch, mainMap, utils, record }) {
+  
+  const { exclusive_mapcontrol } = viewer;
+  const { showOnPortal, getWindowSize } = utils;
+
+  const { t } = useTranslation();
+
+  const [length, setLength] = useState(0);
+  const [area, setArea] = useState(0);
+  const [helpModal, setHelpModal] = useState(false);
+  const [helpLengthShowed, setHelpLengthShowed] = useState(false);
+  const [helpAreaShowed, setHelpAreaShowed] = useState(false);
+
+  const wsize = getWindowSize();
+  const isMobile = wsize[0] <= 768;
+
+  const layer = useRef();
+  const draw = useRef();
+
+  /**
+   * Currently drawn feature.
+   * @type {module:ol/Feature~Feature}
+   */
+    const sketch = useRef(null);
+  
+  /**
+   * The help tooltip element.
+   * @type {Element}
+   */
+  const helpTooltipElement = useRef();
+
+  /**
+   * Overlay to show the help messages.
+   * @type {module:ol/Overlay}
+   */
+  const helpTooltip = useRef(null);
 
 
-    /**
-     * The measure tooltip element.
-     * @type {Element}
-     */
-    this.measureTooltipElement = null;
+  /**
+   * Handle pointer move.
+   * @param {module:ol/MapBrowserEvent~MapBrowserEvent} evt The event.
+   */
+  const pointerMoveHandler = useRef((evt) => {
+    if (evt.dragging) {
+        return;
+    }
+    /** @type {string} */
+    let helpMsg = t('measureMsgStartDrawing', startDrawingMsg)
 
-
-    /**
-     * Overlay to show the measurement.
-     * @type {module:ol/Overlay}
-     */
-    this.measureTooltip = null;
-
-    /**
-     * Message to show before user start drawing.
-     * @type {string}
-     */
-    const startDrawingMsg = 'Clique para começar a desenhar';
-
-    /**
-     * Message to show when the user is drawing a polygon.
-     * @type {string}
-     */
-    const continuePolygonMsg = 'Clique para continuar a desenhar o polígono';
-
-
-    /**
-     * Message to show when the user is drawing a line.
-     * @type {string}
-     */
-    const continueLineMsg = 'Clique para continuar a desenhar a linha';
-
-
-    /**
-     * Handle pointer move.
-     * @param {module:ol/MapBrowserEvent~MapBrowserEvent} evt The event.
-     */
-    this.pointerMoveHandler = (evt) => {
-        if (evt.dragging) {
-            return;
+    if (sketch?.current) {
+        const geom = (sketch.current.getGeometry());
+        if (geom instanceof Polygon) {
+        helpMsg = t('measureMsgContinuePolygon', continuePolygonMsg);
+        } else if (geom instanceof LineString) {
+        helpMsg = t('measureMsgContinueLine', continueLineMsg);
         }
-        /** @type {string} */
-        let helpMsg = i18next.t('measureMsgStartDrawing', startDrawingMsg)
-
-        if (this.sketch) {
-            const geom = (this.sketch.getGeometry());
-            if (geom instanceof Polygon) {
-            helpMsg = i18next.t('measureMsgContinuePolygon', continuePolygonMsg);
-            } else if (geom instanceof LineString) {
-            helpMsg = i18next.t('measureMsgContinueLine', continueLineMsg);
-            }
-        }
-
-        this.helpTooltipElement.innerHTML = helpMsg;
-        this.helpTooltip.setPosition(evt.coordinate);
-
-        this.helpTooltipElement.classList.remove('hidden');
-    };
-
-    this.onMouseOutViewport = () => {
-      this.helpTooltipElement.classList.add('hidden');
     }
 
-    /**
-     * Format length output.
-     * @param {module:ol/geom/LineString~LineString} line The line.
-     * @return {string} The formatted length.
-     */
-    this.formatLength = function(line) {
-      let length = OlSphere.getLength(line, {projection: this.props.mainMap.getView().getProjection().getCode()});
-      if (this.props.record.config_json && this.props.record.config_json.crs) {
-        if (this.props.viewer.config_json.crs_list) {
-          const prj = this.props.viewer.config_json.crs_list.find(x => x.srid === this.props.record.config_json.crs);
-          if (prj) {
-            const geom = line.clone().transform(this.props.mainMap.getView().getProjection().getCode(), prj.code);
-            length = geom.getLength();
-          }
-        }
-      }
+    helpTooltipElement.current.innerHTML = helpMsg;
+    helpTooltip.current.setPosition(evt.coordinate);
 
-      let output = length;
-      if (this.props.record?.config_json?.length?.format) {
-        const format = this.props.record.config_json.length.format;
+    helpTooltipElement.current.classList.remove('hidden');
+  });
 
-        if (format.source_unit && format.output_unit) {
-          output = convert(length, format.source_unit).to(format.output_unit);
-        }
-        if (format.options) {
-          output = output.toLocaleString(format.locale || 'en-US', format.options);
-          if (format.options.useGrouping !== false) {
-            output = output.replace(/,/g," ");
-          }
-        }
-        if (format.expression) {
-          output = format.expression.replace('{value}', output);
-        }
-      } else {
-        if (length > 10000) {
-          output = (Math.round(length / 1000 * 1000) / 1000) + ' km';
-        } else {
-            output = (Math.round(length * 1000) / 1000) + ' m';
-        }
-      }
 
-      return output;
-    };
-
-    /**
-     * Format area output.
-     * @param {module:ol/geom/Polygon~Polygon} polygon The polygon.
-     * @return {string} Formatted area.
-     */
-    this.formatArea = function(polygon) {
-      let area = OlSphere.getArea(polygon, {projection: this.props.mainMap.getView().getProjection().getCode()});
-      if (this.props.record.config_json && this.props.record.config_json.crs) {
-        if (this.props.viewer.config_json.crs_list) {
-          const prj = this.props.viewer.config_json.crs_list.find(x => x.srid === this.props.record.config_json.crs);
-          if (prj) {
-            const geom = polygon.clone().transform(this.props.mainMap.getView().getProjection().getCode(), prj.code);
-            area = geom.getArea();
-          }
-        }
-      }      
-      
-      let output = area;
-      if (this.props.record?.config_json?.area?.format) {
-        const format = this.props.record.config_json.area.format;
-
-        if (format.source_unit && format.output_unit) {
-          output = convert(area, format.source_unit).to(format.output_unit);
-        }        
-        if (format.options) {
-          output = output.toLocaleString(format.locale || 'en-US', format.options);
-          if (format.options.useGrouping !== false) {
-            output = output.replace(/,/g," ");
-          }
-        }
-        if (format.expression) {
-          output = format.expression.replace('{value}', output);
-        }
-      } else if (area > 100000) {
-        output = (Math.round(area / 1000000 * 1000) / 1000) + ' km2';
-      } else {
-        output = (Math.round(area * 1000) / 1000) + ' m2';
-      }
-
-      return output;
-    };
-
-    /**
-     * Creates a new help tooltip
-     */
-    this.createHelpTooltip = () => {
-      if (this.helpTooltipElement) {
-        this.helpTooltipElement.parentNode.removeChild(this.helpTooltipElement);
-      }
-      this.helpTooltipElement = document.createElement('div');
-      this.helpTooltipElement.className = 'tooltip hidden';
-      this.helpTooltip = new Overlay({
-        element: this.helpTooltipElement,
-        offset: [15, 0],
-        positioning: 'center-left'
-      });
-      this.olMap.addOverlay(this.helpTooltip);
-    }
-  }
-
-  componentDidMount() {
-    if (!this.props.mainMap) return;
-    
-    this.olMap = this.props.mainMap;
-    this.draw = null;
+  useEffect(() => {
+    if (!mainMap) return;
 
     // Get user layer
-    const layers = this.olMap.getLayers();
-    //this.vector = layers.item(2).getLayers().item(0);
-    this.vector = this.props.utils.findOlLayer(this.olMap, 'userlayer');
+    layer.current = utils.findOlLayer(mainMap, 'userlayer');
+    layer.current.setStyle(drawingsStyle);
 
-    // TODO: find user layer
-    if (this.vector) {
-      this.vector.setStyle(this.drawingsStyle);
-      this.source = this.vector.getSource();
+    return () => {
+      if (mainMap) {
+        draw.current && mainMap.removeInteraction(draw.current);
+        mainMap.getViewport().removeEventListener('mouseout', onMouseOutViewport);
+
+        clearMeasureFeature();
+        clearHelpTooltip();
+      }
     }
 
-    if (this.state.control) this.addInteraction(this.state.control);
-  }
+  }, []);
 
-  componentDidUpdate(prevProps) {
+  useEffect(() => {
+    if (!(viewer?.exclusive_mapcontrol === 'MapTools')) {
+      onControlSelect(null);
+    }
+  }, [viewer?.exclusive_mapcontrol]);
 
-    if (prevProps.selected_control && !this.props.selected_control) {
+  useEffect(() => {    
+    if (draw.current) mainMap.removeInteraction(draw.current);
+    draw.current = null;
+
+    if (!mainMap) return;
+    if (!layer.current) return;
+
+    if(!selectedControl) {
+      clearMeasureFeature();
+      clearHelpTooltip();
+      if (exclusive_mapcontrol === 'MapTools') {
+        dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+      }
+      return;
+    }
+
+    // Show length tool help
+    if (selectedControl === 'length' && !helpLengthShowed) setHelpModal(true);
+    // Show area tool help
+    if (selectedControl === 'area' && !helpAreaShowed) setHelpModal(true);
+
+    dispatch(actions.viewer_set_exclusive_mapcontrol('MapTools'));
+
+    const source = layer.current.getSource();
+
+    const type = selectedControl == 'area' ? 'Polygon' : 'LineString';
+    draw.current = new OlDraw({
+      source: source,
+      type: type,
+      style: drawStyle
+      /*
+      style: function (feature) {
+        const geometryType = feature.getGeometry().getType();
+        if (geometryType === type || geometryType === 'Point') {
+          return style;
+        }
+      },
+      */
+    });
+    mainMap.addInteraction(draw.current);
+
+    createHelpTooltip();
+
+    let listener;
+    draw.current.on('drawstart', (ev) => {
+      const source = layer.current.getSource();
       //Clear previsous feature
-      if (this.source) {
-        const features = this.source.getFeatures();
+      if (source) {
+        const features = source.getFeatures();
         features.forEach((ft) => {
-            if (ft.get('tool') === 'maptools') {
-              this.source.removeFeature(ft);
-            }
+          if (ft.get('tool') == 'maptools') {
+            source.removeFeature(ft);
+          }
         });
       }
 
-      this.olMap.removeInteraction(this.draw);
-      this.olMap.un('pointermove', this.pointerMoveHandler);
-      this.olMap.getViewport().removeEventListener('mouseout', this.onMouseOutViewport);
-      if (this.helpTooltip) this.helpTooltip.setPosition(null);
+      // set sketch
+      sketch.current = ev.feature;
 
-      this.setState({
-        ...this.state,
-        helpModal: false,
-        control: ''
-      });      
-    }
-
-    if (this.state.control && this.props.viewer.config_json.selected_menu !== 'maptools') {
-      /*
-      const { actions, dispatch } = this.props;
-      const { control, helpLengthShowed, helpAreaShowed } = this.state;
-      */
-
-      //Clear previsous feature
-      if (this.source) {
-        const features = this.source.getFeatures();
-        features.forEach((ft) => {
-            if (ft.get('tool') === 'maptools') {
-              this.source.removeFeature(ft);
-            }
-        });
-        //this.source.clear();
-      }      
-
-      this.olMap.removeInteraction(this.draw);
-      this.olMap.un('pointermove', this.pointerMoveHandler);
-      this.olMap.getViewport().removeEventListener('mouseout', this.onMouseOutViewport);
-      if (this.helpTooltip) this.helpTooltip.setPosition(null);
-      this.setState({
-        ...this.state,
-        helpModal: false,
-        control: ''
-      });
-    }
-  }  
-
-  addInteraction(value) {
-    const type = (value === 'area' ? 'Polygon' : 'LineString');
-    this.draw = new OlDraw({
-      source: this.source,
-      type: type,
-      style: this.drawStyle
-    });
-    this.olMap.addInteraction(this.draw);
-
-    this.createHelpTooltip();
-
-    let listener;
-    this.draw.on('drawstart', (ev) => {
-
-        //Clear previsous feature
-        if (this.source) {
-          const features = this.source.getFeatures();
-          features.forEach((ft) => {
-              if (ft.get('tool') == 'maptools') {
-                this.source.removeFeature(ft);
-              }
-          });
-          //this.source.clear();
+      listener = sketch.current.getGeometry().on('change', (evt) => {
+        const geom = evt.target;
+        let output;
+        if (geom instanceof Polygon) {
+          output = formatArea(geom);
+          setArea(output);
+        } else if (geom instanceof LineString) {
+          output = formatLength(geom);
+          setLength(output);
         }
+      });
 
-        // set sketch
-        this.sketch = ev.feature;
+      draw.current.on('drawend', (evt) => {
+        evt.feature.set('tool', 'maptools');
+        // unset sketch
+        sketch.current = null;
+        unByKey(listener);
+      });
+    });
 
-        listener = this.sketch.getGeometry().on('change', (evt) => {
-          const geom = evt.target;
-          let output;
-          if (geom instanceof Polygon) {
-            output = this.formatArea(geom);
-            this.setState({...this.state, area: output});
-          } else if (geom instanceof LineString) {
-            output = this.formatLength(geom);
-            this.setState({...this.state, length: output});
-          }
-        });
-      }, this);
+    mainMap.on('pointermove', pointerMoveHandler.current);
+    mainMap.getViewport().addEventListener('mouseout', onMouseOutViewport);
 
-    this.draw.on('drawend', (evt) => {
-      
-      evt.feature.set('tool', 'maptools');
+  }, [selectedControl]);
 
-      // unset sketch
-      this.sketch = null;
-      unByKey(listener);
-    }, this);
-
-    this.olMap.on('pointermove', this.pointerMoveHandler);
-    this.olMap.getViewport().addEventListener('mouseout', this.onMouseOutViewport);
+  const closeHelp = () => {
+    setHelpModal(false);
+    if (selectedControl === 'length') setHelpLengthShowed(true);
+    if (selectedControl === 'area') setHelpAreaShowed(true);
   }
 
   /**
-   * Let user change the drawing control
+   * Format length output.
+   * @param {module:ol/geom/LineString~LineString} line The line.
+   * @return {string} The formatted length.
    */
-  changeMeasureControl(value) {
-    const { actions, dispatch } = this.props;
-    const { control, helpLengthShowed, helpAreaShowed } = this.state;
-    this.olMap.removeInteraction(this.draw);
-    this.olMap.un('pointermove', this.pointerMoveHandler);
-    this.olMap.getViewport().removeEventListener('mouseout', this.onMouseOutViewport);
-    if (this.helpTooltip) this.helpTooltip.setPosition(null);
+  const formatLength = (line) => {
+    let length = OlSphere.getLength(line, {projection: mainMap.getView().getProjection().getCode()});
+    if (record.config_json && record.config_json.crs) {
+      if (viewer.config_json.crs_list) {
+        const prj = viewer.config_json.crs_list.find(x => x.srid === record.config_json.crs);
+        if (prj) {
+          const geom = line.clone().transform(mainMap.getView().getProjection().getCode(), prj.code);
+          length = geom.getLength();
+        }
+      }
+    }
 
-    // Deactivate control
-    if ((control === value) || !value) {
+    let output = length;
+    if (record?.config_json?.length?.format) {
+      const format = record.config_json.length.format;
 
-      //Clear previsous feature
-      if (this.source) {
-        const features = this.source.getFeatures();
-        features.forEach((ft) => {
-            if (ft.get('tool') == 'maptools') {
-              this.source.removeFeature(ft);
-            }
-        }); 
-      }     
+      if (format.source_unit && format.output_unit) {
+        output = convert(length, format.source_unit).to(format.output_unit);
+      }
+      if (format.options) {
+        output = output.toLocaleString(format.locale || 'en-US', format.options);
+        if (format.options.useGrouping !== false) {
+          output = output.replace(/,/g," ");
+        }
+      }
+      if (format.expression) {
+        output = format.expression.replace('{value}', output);
+      }
+    } else {
+      if (length > 10000) {
+        output = (Math.round(length / 1000 * 1000) / 1000) + ' km';
+      } else {
+          output = (Math.round(length * 1000) / 1000) + ' m';
+      }
+    }
 
-      return this.setState({
-        ...this.state,
-        helpModal: false,
-        control: ''
-      }, () => {
-        if (this.props.viewer.exclusive_mapcontrol === 'MapTools') {
-          dispatch(actions.viewer_set_exclusive_mapcontrol(null));
-          this.props.onControlSelect(null);
+    return output;
+  };
+
+  /**
+  * Message to show before user start drawing.
+  * @type {string}
+  */
+  const startDrawingMsg = 'Clique para começar a desenhar';
+
+  /**
+  * Message to show when the user is drawing a polygon.
+  * @type {string}
+  */
+  const continuePolygonMsg = 'Clique para continuar a desenhar o polígono';
+
+  /**
+  * Message to show when the user is drawing a line.
+  * @type {string}
+  */
+  const continueLineMsg = 'Clique para continuar a desenhar a linha';
+
+  /**
+   * Format area output.
+   * @param {module:ol/geom/Polygon~Polygon} polygon The polygon.
+   * @return {string} Formatted area.
+   */
+  const formatArea = (polygon) => {
+    let area = OlSphere.getArea(polygon, {projection: mainMap.getView().getProjection().getCode()});
+    if (record.config_json && record.config_json.crs) {
+      if (viewer.config_json.crs_list) {
+        const prj = viewer.config_json.crs_list.find(x => x.srid === record.config_json.crs);
+        if (prj) {
+          const geom = polygon.clone().transform(mainMap.getView().getProjection().getCode(), prj.code);
+          area = geom.getArea();
+        }
+      }
+    }      
+    
+    let output = area;
+    if (record?.config_json?.area?.format) {
+      const format = record.config_json.area.format;
+
+      if (format.source_unit && format.output_unit) {
+        output = convert(area, format.source_unit).to(format.output_unit);
+      }        
+      if (format.options) {
+        output = output.toLocaleString(format.locale || 'en-US', format.options);
+        if (format.options.useGrouping !== false) {
+          output = output.replace(/,/g," ");
+        }
+      }
+      if (format.expression) {
+        output = format.expression.replace('{value}', output);
+      }
+    } else if (area > 100000) {
+      output = (Math.round(area / 1000000 * 1000) / 1000) + ' km2';
+    } else {
+      output = (Math.round(area * 1000) / 1000) + ' m2';
+    }
+
+    return output;
+  };
+
+  /**
+   * Creates a new help tooltip
+   */
+  const createHelpTooltip = () => {
+    if (helpTooltipElement.current) {
+      helpTooltipElement?.current?.parentNode && helpTooltipElement.current.parentNode.removeChild(helpTooltipElement.current);
+    }
+    helpTooltipElement.current = document.createElement('div');
+    helpTooltipElement.current.className = 'tooltip hidden';
+    helpTooltip.current = new Overlay({
+      element: helpTooltipElement.current,
+      offset: [15, 0],
+      positioning: 'center-left',
+    });
+    mainMap.addOverlay(helpTooltip.current);
+  }
+
+  /**
+   * Clear active help tooltip
+   */
+  const clearHelpTooltip = () => {
+    if (helpTooltipElement.current) {
+      helpTooltipElement?.current?.parentNode && helpTooltipElement.current.parentNode.removeChild(helpTooltipElement.current);
+    }
+    if (helpTooltip.current) {
+      helpTooltip.current.setPosition(null);
+      mainMap.removeOverlay(helpTooltip.current);
+    }
+  }
+
+  /**
+   * Clear active measure feature 
+   */
+  const clearMeasureFeature = () => {
+    if (!layer.current) return;
+
+    const source = layer.current.getSource();
+    //Clear previsous feature
+    if (source) {
+      const features = source.getFeatures();
+      features.forEach((ft) => {
+        if (ft.get('tool') == 'maptools') {
+          source.removeFeature(ft);
         }
       });
     }
-
-    // Activate control
-    this.addInteraction(value);
-    const showHelp = (value === 'length' && !helpLengthShowed)
-      || (value === 'area' && !helpAreaShowed)
-    this.setState({
-      ...this.state,
-      helpModal: showHelp,
-      control: value
-    }, () => {
-      dispatch(actions.viewer_set_exclusive_mapcontrol('MapTools'));
-      this.props.onControlSelect(value);
-    });
   }
 
-  componentWillUnmount() {
-    //Clear previsous feature
-    if (this.source) {
-      const features = this.source.getFeatures();
-      features.forEach((ft) => {
-          if (ft.get('tool') === 'maptools') {
-            this.source.removeFeature(ft);
-          }
-      });
-      //this.source.clear();
-    }    
-    this.sketch = null;
-    this.olMap.un('pointermove', this.pointerMoveHandler);
-    this.olMap.getViewport().removeEventListener('mouseout', this.onMouseOutViewport);
-    if (this.helpTooltipElement) {
-        this.helpTooltipElement.parentNode.removeChild(this.helpTooltipElement);
-    }
-    if (this.helpTooltip) {
-        this.olMap.removeOverlay(this.helpTooltip);
-    }
-    this.olMap.removeInteraction(this.draw);
+  const onMouseOutViewport = () => {
+    if (helpTooltipElement.current) helpTooltipElement.current.classList.add('hidden');
   }
 
-  closeHelp() {
-    const { control, helpLengthShowed, helpAreaShowed } = this.state;
-    this.setState({
-      ...this.state,
-      helpModal: false,
-      helpLengthShowed: control === 'length' ? true : helpLengthShowed,
-      helpAreaShowed: control === 'area' ? true : helpAreaShowed
-    });
-  }
-
-  render() {
-    const { control, helpModal } = this.state;
+  const render = () => {
+    //const { control, helpModal } = this.state;
     const controlOptions = [
-      { key: 'length', label: i18next.t("measureDistance", "Medir Distância"), icon: "pi pi-minus" },
-      { key: 'area', label: i18next.t("measureArea", "Medir Área"), icon: "fas fa-draw-polygon" },
+      { key: 'length', label: t("measureDistance", "Medir Distância"), icon: "pi pi-minus" },
+      { key: 'area', label: t("measureArea", "Medir Área"), icon: "fas fa-draw-polygon" },
     ];
 
     return (
@@ -477,9 +401,9 @@ class Main extends React.Component {
           <SelectButton 
             optionLabel="name"
             optionValue="key"
-            value={control || ''}
+            value={selectedControl || ''}
             options={controlOptions}
-            onChange={(e) => this.changeMeasureControl(e.value)}
+            onChange={(e) => onControlSelect(e.value)}
             itemTemplate={option => (
               <React.Fragment>
                 <i className={option.icon}>&nbsp;</i>{' '}
@@ -490,19 +414,19 @@ class Main extends React.Component {
 
           <div className="p-my-2">
 
-            { control === 'length' ? (
-              <InputText fluid
-                label={i18next.t("length", "Comprimento")}
-                value={this.state.length || ''}
-                placeholder={i18next.t("length", "Comprimento")}
+            { selectedControl === 'length' ? (
+              <InputText
+                label={t("length", "Comprimento")}
+                value={length || ''}
+                placeholder={t("length", "Comprimento")}
               />
             ) : null }
 
-            { control === 'area' ? (
-              <InputText fluid
-                label={i18next.t("area", "Área")}
-                value={this.state.area || ''}
-                placeholder={i18next.t("area", "Área")}
+            { selectedControl === 'area' ? (
+              <InputText
+                label={t("area", "Área")}
+                value={area || ''}
+                placeholder={t("area", "Área")}
               />
             ) : null }
 
@@ -510,36 +434,37 @@ class Main extends React.Component {
 
         </div>
 
-        <Dialog 
-          header={control === 'length' ? i18next.t("measureDistance", "Medir Distância") : i18next.t("measureArea", "Medir Área")}
+        {showOnPortal(<Dialog 
+          header={selectedControl === 'length' ? t("measureDistance", "Medir Distância") : t("measureArea", "Medir Área")}
           visible={helpModal}
-          style={{width: '50vw'}} 
+          _style={{width: '50vw'}}
+          style={{ width: isMobile ? '90%' : null }} 
           modal
           footer={(
             <Button 
               className="p-button-info"
               icon="pi pi-check"
               label="OK"
-              onClick={this.closeHelp.bind(this)}
+              onClick={closeHelp}
             />
           )}
-          onHide={e => this.closeHelp()}>
+          onHide={e => closeHelp()}>
           <div>
-            { control === 'length' ? <div>
-              <p dangerouslySetInnerHTML={{__html: i18next.t("measureInfoDistance", "1. para começar a medição clique no mapa na localização inicial<br /> 2. para medir um trajeto clique nas localizações intermédias<br /> 3. para terminar faça duplo-clique")}}
+            { selectedControl === 'length' ? <div>
+              <p dangerouslySetInnerHTML={{__html: t("measureInfoDistance", "1. para começar a medição clique no mapa na localização inicial<br /> 2. para medir um trajeto clique nas localizações intermédias<br /> 3. para terminar faça duplo-clique")}}
               />
             </div> : null}
-            { control === 'area' ? <div>
-              <p dangerouslySetInnerHTML={{__html: i18next.t("measureInfoArea", "1. para começar a medição clique no mapa numa localização inicial<br />2. continue clicando nas localizações que definem a área<br />3. para terminar faça duplo-clique")}}
+            { selectedControl === 'area' ? <div>
+              <p dangerouslySetInnerHTML={{__html: t("measureInfoArea", "1. para começar a medição clique no mapa numa localização inicial<br />2. continue clicando nas localizações que definem a área<br />3. para terminar faça duplo-clique")}}
               />
             </div> : null}
           </div>
-        </Dialog>
+        </Dialog>)}
 
       </div>
     );
   }
 
-}
+  return render();
 
-export default Main;
+}

@@ -30,7 +30,7 @@
 }
 
 #drawtools .p-button.tool.active:active,
-#drawtools .p-button.tool.active:focus,
+#drawtools .p-button.tool.active:focus-visible,
 #drawtools .p-button.tool.active:enabled {
   background: #673AB7 !important;
 }

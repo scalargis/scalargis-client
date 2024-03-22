@@ -3526,8 +3526,10 @@
   min-width: 4rem; }
   .p-button.p-button-icon-only {
     min-width: auto; }
-  .p-button:enabled:focus {
+  /*.p-button:enabled:focus {*/
+  .p-button:enabled:focus-visible {
     background: rgba(103, 58, 183, 0.76); }
+  */
   .p-button:enabled:active {
     background: #2196f3; }
   .p-button .p-ink {
@@ -4042,7 +4044,8 @@
   .p-input-filled .p-radiobutton .p-radiobutton-box:not(.p-disabled):hover {
     background-color: #ffffff; }
 
-.p-selectbutton .p-button:focus {
+/*.p-selectbutton .p-button:focus {*/
+  .p-selectbutton .p-button:focus-visible {
   background: #e0e0e1;
   border-color: #e0e0e1; }
   .p-selectbutton .p-button:focus.p-highlight {
