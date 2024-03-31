@@ -87,7 +87,7 @@ export default function Main({ core, config, actions, utils, record }) {
         return res.json();
     }).then(result => {
         if (activeSources?.length) {
-          setPlaces(result.filter((item)=>{ return activeSources.includes(item.origem); }));
+          setPlaces(result.filter((item)=>{ return activeSources.includes(item.source); }));
         } else {
           setPlaces(result);
         }
@@ -110,7 +110,7 @@ export default function Main({ core, config, actions, utils, record }) {
       let buffer = config.buffer || 1000;
       if (config?.sources?.length) {
         config.sources.forEach((src) => {
-          if(item.origem == src.id && src.buffer != null) {
+          if(item.source == src.id && src.buffer != null) {
               buffer = src.buffer;
           }
         });
