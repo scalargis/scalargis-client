@@ -1,5 +1,4 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import i18next from 'i18next'
 import { useTranslation } from "react-i18next"
 import { Dialog } from 'primereact/dialog'
 import Cookies from 'universal-cookie'
@@ -7,6 +6,7 @@ import { InputSwitch } from 'primereact/inputswitch'
 import { Button } from 'primereact/button'
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
+import { LocaleSelectorComponent } from'@scalargis/components';
 
 import './index.css'
 
@@ -17,7 +17,7 @@ const cookiePath = process.env.REACT_APP_COOKIE_PATH || '';
 
 export default function Main({ config, as, core, actions, utils, record }) {
 
-  const { mainMap, auth } = config;
+  const { auth } = config;
   const { showOnPortal } = utils;
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
@@ -27,10 +27,6 @@ export default function Main({ config, as, core, actions, utils, record }) {
 
   const wsize = utils.getWindowSize();
   const isMobile = wsize[0] <= 768;
-
-  useEffect(()=>{
-    loadTranslations();
-  }, []);
 
 
   function getInitialState() {
@@ -69,6 +65,10 @@ export default function Main({ config, as, core, actions, utils, record }) {
     }
   }
 
+  useEffect(()=>{
+    loadTranslations();
+  }, []);
+
   useEffect(() => {
     let state = getInitialState();
     setShowPopup(state);
@@ -101,6 +101,11 @@ export default function Main({ config, as, core, actions, utils, record }) {
     html = config?.html;
   }
 
+  const localeSelectorCfg = {
+    mode: "dropdown",
+    ...record?.config_json?.localeSelector
+  }
+
   return (
     <Fragment>
       {showOnPortal(<Dialog
@@ -122,13 +127,20 @@ export default function Main({ config, as, core, actions, utils, record }) {
                 <span>{t("doNotShowAgain", "Não mostrar novamente")}</span>
               </label>
             </div>)}
-            <div className="p-col" style={{ textAlign: 'right'}}>
+            <div className="p-col-12 p-md-6" style={{ textAlign: 'right'}}>
               <Button label={closeLabel} onClick={e => hidePopup() } />
             </div>
           </div>
         )}
         onHide={e => hidePopup()}>
-          <div dangerouslySetInnerHTML={{ __html: html }}></div>
+          <div>
+            { record?.config_json?.showLocaleSelector === true &&
+            <div className="p-col-12 p-pt-0" style={{ textAlign: 'right'}}>
+              <LocaleSelectorComponent config={config} actions={actions} componentConfig={localeSelectorCfg} className="popupinfo-locale-selector" />
+            </div>
+            }
+            <div dangerouslySetInnerHTML={{ __html: html }}></div>
+          </div>
       </Dialog>)}
     </Fragment>
   )

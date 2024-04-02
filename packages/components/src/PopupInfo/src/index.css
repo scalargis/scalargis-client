@@ -1,0 +1,14 @@
+.popupinfo-locale-selector.p-dropdown {
+    border: none;
+}
+
+.popupinfo-locale-selector.p-dropdown .p-hidden-accessible.p-dropdown-hidden-select,
+.popupinfo-locale-selector.p-dropdown .p-dropdown.p-dropdown-label,
+.popupinfo-locale-selector.p-dropdown .p-dropdown-label.p-inputtext,
+.popupinfo-locale-selector.p-dropdown .p-dropdown-trigger {
+    color: #2196f3;
+}
+
+.popupinfo-locale-selector.p-dropdown .p-dropdown-trigger {
+    border-left: 1px solid #2196f3;
+}

@@ -11,7 +11,16 @@
     "modileDialogWidth": "95%",
     "hideAuthenticated": false,
     "cookieName": "cosvgi_popup",
-    "maxAge": 86400,    
+    "maxAge": 86400,
+    "showLocaleSelector": true,
+    "localeSelector": {
+      "mode": "dropdown",
+      "showAlways": true,
+      "locales": [
+        "EN",
+        "PT"
+      ]
+    },
     "actions": {
       "hide": "UserLogin/Show"
     }
