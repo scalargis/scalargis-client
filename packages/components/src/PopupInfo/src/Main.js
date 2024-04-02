@@ -106,13 +106,15 @@ export default function Main({ config, as, core, actions, utils, record }) {
     ...record?.config_json?.localeSelector
   }
 
+  const modal = config?.modal != null ? config.modal : true;
+
   return (
     <Fragment>
       {showOnPortal(<Dialog
         header={header}
         visible={showPopup}
         style={{width: isMobile ? config?.modileDialogWidth ||'90%' : config?.dialogWidth || '35vw' }}
-        modal
+        modal={modal}
         footer={(
           <div className="p-grid">
             {(!config.hideOption &&

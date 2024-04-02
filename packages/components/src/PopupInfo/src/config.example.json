@@ -3,6 +3,7 @@
   "type": "PopupInfo",
   "title": "PopupInfo",
   "config_json": {
+    "modal": true,
     "header": "Bem-vindo ao",
     "html": "<div><h3 style='text-align: center'>Título</h3><div>Dscrição</div></div>",
     "closeLabel": "Fechar",
