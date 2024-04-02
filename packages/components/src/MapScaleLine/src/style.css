@@ -11,4 +11,7 @@
 .footer-right .mapscale-line .ol-scale-line .ol-scale-line-inner {
   height: 25px;
   padding-top: 5px;
+  border: 1px solid #fff;
+  border-top: none;
+  color: #fff;
 }
