@@ -201,5 +201,7 @@
     "warnThemeExists": "La couche existe déjà",
     "warnThemeNotFound": "La couche est introuvable dans la liste des couches de la carte",
   
-    "successActionMsg": "Opération réalisée avec succès"
+    "successActionMsg": "Opération réalisée avec succès",
+
+    "addThemes": "Ajouter couches"
   }

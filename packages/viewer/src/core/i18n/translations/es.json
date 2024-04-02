@@ -201,5 +201,7 @@
   "warnThemeExists": "La capa ya ha sido añadido al mapa",
   "warnThemeNotFound": "No se ha podido encontrar la capa en la lista de capas del mapa",
 
-  "successActionMsg": "Operação realizada com sucesso"
+  "successActionMsg": "Operação realizada com sucesso",
+
+  "addThemes": "Añadir Capas"
 }

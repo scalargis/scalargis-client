@@ -201,5 +201,7 @@
   "warnThemeExists": "The theme has already been added to the map",
   "warnThemeNotFound": "Couldn't find theme in map themes list",
 
-  "successActionMsg": "Operação realizada com sucesso"
+  "successActionMsg": "Operação realizada com sucesso",
+
+  "addThemes": "Add Themes"
 }
