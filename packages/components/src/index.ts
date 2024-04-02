@@ -42,6 +42,8 @@ import {
 
 import * as i18n from './utils/i18n';
 
+import  LocaleSelectorComponent from  './LocaleSelector/src/LocaleSelector';
+
 export {
   AttributesTable,
   Basemaps,
@@ -83,7 +85,9 @@ export {
   JsonFormDefaultRenderers,
   FormErrors,
 
-  i18n
+  i18n,
+
+  LocaleSelectorComponent
 };
 
 //export * from './JsonForm';
