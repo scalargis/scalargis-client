@@ -64,6 +64,8 @@ export const LAYOUT_TOGGLE_MOBILEMENU   = 'LAYOUT_TOGGLE_MOBILEMENU'
 export const VIEWER_ADD_NOTIFICATION    = 'VIEWER_ADD_NOTIFICATION'
 export const VIEWER_CLEAR_NOTIFICATIONS = 'VIEWER_CLEAR_NOTIFICATIONS'
 
+export const VIEWER_SET_TRANSLATION_NAMESPACES = 'VIEWER_SET_TRANSLATION_NAMESPACES' 
+
 
 // Get config URL
 const CONFIG_URL = process.env.REACT_APP_CONFIG_URL;
@@ -640,6 +642,11 @@ export function viewer_load(core, id, history) {
 
       dispatch(viewer_set_config(config));
 
+      // Load viewer custom translations
+      loadTranslations(config.id, (data, error, ns) => {
+        dispatch(viewer_set_translation_namespaces(ns));
+      });
+
       // Load components
       let count = 0;
       let { components } = config.config_json;
@@ -655,9 +662,6 @@ export function viewer_load(core, id, history) {
             // Finally, load into redux store
             dispatch(viewer_load_components(pitems));
             dispatch(viewer_load_done());
-
-            // Load viewer specific translations
-            loadTranslations(config.id);
           }
         })
       })
@@ -886,6 +890,14 @@ export function viewer_add_notification(notification) {
 export function viewer_clear_notifications() {
   let action = {
     type: VIEWER_CLEAR_NOTIFICATIONS
+  }
+  return action;
+}
+
+export function viewer_set_translation_namespaces(ns) {
+  let action = {
+    type: VIEWER_SET_TRANSLATION_NAMESPACES,
+    ns
   }
   return action;
 }

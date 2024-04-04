@@ -32,10 +32,13 @@ export const initTranslations = () => {
   });
 }
 
-export const loadTranslations = (id) => {
+export const loadTranslations = (id, callback) => {
   const API_URL = getAppApiUrl();
   const url = `${API_URL}/app/viewer/${id}/translations`;
   i18n.loadBackendTranslations(url, true, true, (data, error) => {
+    if (callback) {
+      callback(data, error, i18next?.options?.ns);
+    };
     //console.log(data);
     //console.log(i18n.getTranslations());
   });

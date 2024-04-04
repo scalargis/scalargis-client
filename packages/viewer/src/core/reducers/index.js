@@ -47,7 +47,9 @@ import {
   VIEWER_SET_COORDINATES,
 
   VIEWER_ADD_NOTIFICATION,
-  VIEWER_CLEAR_NOTIFICATIONS
+  VIEWER_CLEAR_NOTIFICATIONS,
+
+  VIEWER_SET_TRANSLATION_NAMESPACES
 } from '../actions';
 import { traverseLayersTree, getCookieAuthName } from '../utils';
 
@@ -627,6 +629,13 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
       return {
         ...state,
         notifications: []
+      }
+
+    // Set translation namespaces
+    case VIEWER_SET_TRANSLATION_NAMESPACES:
+      return {
+        ...state,
+        translation_namespaces: action.ns
       }
 
     // Not state change
