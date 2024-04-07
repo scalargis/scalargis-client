@@ -49,6 +49,15 @@ const initialData = {
   wmtsVersion: "1.0.0"
 };
 
+
+/**
+ * Component Translations
+ */
+export const translations = { 
+  load: loadTranslations
+};
+
+
 /**
  * Main menu component
  */
@@ -70,13 +79,8 @@ export function MainMenu({ className, config, actions, record }) {
 
 
 /**
- * Component Translations
+ * Main component
  */
-export const translations = { 
-  loadTranslations: loadTranslations
-};
-
-
 export default function Main(props) {
   const { core } = props;
   const component_cfg = props.record.config_json;

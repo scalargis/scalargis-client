@@ -175,7 +175,7 @@ Core.prototype.addComponent = function(core, component, done) {
 
     // Load component translations
     if (c.translations && typeof c.translations === 'object') {
-      c.translations.loadTranslations && c.translations.loadTranslations();
+      c.translations.load && c.translations.load();
     }
 
     // Registry Pattern: register react component in components registry
@@ -210,7 +210,7 @@ Core.prototype.addComponent = function(core, component, done) {
 
       // Load component translations
       if (c.translations && typeof c.translations === 'object') {
-        c.translations.loadTranslations && c.translations.loadTranslations();
+        c.translations.load && c.translations.load();
       }
 
       // Registry Pattern: register react component in components registry 

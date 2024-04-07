@@ -14,7 +14,17 @@ import './index.css'
 const cookiePopupName = process.env.REACT_APP_COOKIE_POPUP_NAME || 'scalargis_popup';
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || '';
 
+/**
+ * Component Translations
+ */
+export const translations = { 
+  load: loadTranslations
+};
 
+
+/**
+ * Main component
+ */
 export default function Main({ config, as, core, actions, utils, record }) {
 
   const { auth } = config;
@@ -64,10 +74,6 @@ export default function Main({ config, as, core, actions, utils, record }) {
       core.pubsub.publish(record?.config_json?.actions?.hide, null);
     }
   }
-
-  useEffect(()=>{
-    loadTranslations();
-  }, []);
 
   useEffect(() => {
     let state = getInitialState();
