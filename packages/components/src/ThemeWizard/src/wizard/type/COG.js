@@ -11,6 +11,8 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Fieldset } from 'primereact/fieldset';
 
+import { I18N_NAMESPACE } from './../../i18n/index';
+
 
 export default function COG(props) {
 
@@ -19,7 +21,7 @@ export default function COG(props) {
   const { hasProjection, addProjections } = Models.MapModel;
   const { getCOGImageProjCode } = Models.OWSModel;
 
-  const { t } = useTranslation(); 
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
@@ -82,11 +84,11 @@ export default function COG(props) {
             "title": image?.geoKeys?.GTCitationGeoKey || epsg,
             "defs": projText,
             "extent": "-180 -90 180 90",
-            "description": image?.geoKeys?.GTCitationGeoKey || `Dinamically loaded by COG image (${epsg})`
+            "description": image?.geoKeys?.GTCitationGeoKey || t("cogCoordinateSystemInfo", "Dinamically loaded by COG image ({{epsg}})", {epsg})
           }
           addProjections([newProj]);
         } catch (error) {
-          throw new Error(`Could not load unsupported coordinate reference system (EPSG:${code})`);
+          throw new Error(t("cogCoordinateSystemUnsupported", "Could not load unsupported coordinate reference system ({{epsg}})", {epsg}));
         }
       }
       return image;
@@ -217,7 +219,7 @@ export default function COG(props) {
           />
           <Button
             icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
+            tooltip={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
             disabled={loading}
             onClick={e => {
               e.preventDefault();
@@ -232,11 +234,11 @@ export default function COG(props) {
           */}
 
         <Accordion activeIndex={showAdvancedOptions ? 0 : -1} className="p-pt-2">
-          <AccordionTab header="Opções Avançadas">
+          <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
 
             <div className="p-fluid">
               <div className="p-field p-grid">
-                <Fieldset legend={t("bands", `Bandas` )} className="p-col-12">
+                <Fieldset legend={t("bands", "Bandas")} className="p-col-12">
                   <div className="p-field p-grid">
                     <label className="p-col-12 p-md-4">{t("red", "Vermelho")}</label>
                     <div className="p-col-12 p-md-8">
@@ -262,7 +264,7 @@ export default function COG(props) {
                     </div>
                   </div>
                   <div className="p-field p-grid">
-                    <label className="p-col-12 p-md-4">{t("azul", "Azul")}</label>
+                    <label className="p-col-12 p-md-4">{t("blue", "Azul")}</label>
                     <div className="p-col-12 p-md-8">
                       <Dropdown placeholder={t("selectBands", "Selecione a banda")}
                         options={bandOptions}

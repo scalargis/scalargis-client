@@ -1,25 +1,29 @@
-import React, {Component} from 'react';
+import React, { useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
 import {InputSwitch} from 'primereact/inputswitch';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
+import { I18N_NAMESPACE } from './../../i18n/index';
 
-class ArcGISMap extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = { showAdvanceOptions: false };
-  }
+export default function ArcGISMap(props) {
+
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
+
+  useEffect(() => {
+    if (props?.data?.dataType === 'arcgismap' && props?.data?.url) {
+      loadArcGISMapCapabilities();
+    }
+  }, [props?.data?.dataType]);
+
 
   /**
-   * Event handler for load ArcGIS Map Srvice capabilities
-   *
-   * @param {Object} e The click handler
+   * Event handler for load ArcGIS Map Service capabilities
    */
-  loadArcGISMapCapabilities() {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = this.props;
+  const loadArcGISMapCapabilities = () => {
+    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -32,17 +36,7 @@ class ArcGISMap extends Component {
       tiled: data.wmsTiled
     }
     let murl = `${data.url}?f=json`;
-    let lurl = `${data.url}/layers?f=json`; 
-
-    /*
-    //Add user authentication token
-    if (isUrlAppHostname(turl) && viewer.integrated_authentication) {
-      if (auth && auth.data && auth.data.auth_token) {
-        const authkey = viewer?.integrated_authentication_key || 'authkey';
-        turl = turl + '&' + authkey + '=' + auth.data.auth_token;
-      }
-    }
-    */
+    let lurl = `${data.url}/layers?f=json`;
 
     if (!isUrlAppOrigin(data.url)) {
       murl = core.MAP_PROXY_URL + encodeURIComponent(murl);
@@ -80,37 +74,26 @@ class ArcGISMap extends Component {
   }
 
   /**
-   * On component did mount
+   * Render ArcGISMap wizard
    */
-  componentDidMount() {
-    const { data } = this.props;
-    if (data.dataType === 'arcgismap' && data.url) {
-      this.loadArcGISMapCapabilities();
-    }
-  }
-
-  /**
-   * Render WMS wizard
-   */
-  render() {
-    const { loading, data, editField, getUrlHistory, winSize } = this.props;
+  const render = () => {
+    const { loading, data, editField, getUrlHistory } = props;
     const { wmsTiled } = data;
-    const { showAdvanceOptions } = this.state;
     return (
       <React.Fragment>
         <div className="p-inputgroup">
-          <InputText placeholder='http://...'
+          <InputText placeholder='https://...'
             value={data.url}
             list='urlhistory'
             onChange={e => editField('url', e.target.value.trim())}
           />
           <Button
             icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
+            tooltip={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
             disabled={loading}
             onClick={e => {
               e.preventDefault();
-              this.loadArcGISMapCapabilities()
+              loadArcGISMapCapabilities();
             }}
           />
         </div>
@@ -118,15 +101,20 @@ class ArcGISMap extends Component {
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 
-        <Accordion activeIndex={showAdvanceOptions ? 0 : -1} className="p-pt-2">
-          <AccordionTab header="Opções Avançadas">
-
+        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="p-pt-2"
+          onTabChange={(e) => {
+            const new_options = {
+              ...data?.options,
+              showAdvancedOptions: e.index === 0 ? true : false
+            }
+            editField("options", new_options);
+          }}>
+          <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
             <div className="p-fluid">
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">Usar quadrículas</label>
+                <label className="p-col-12 p-md-7">{t("useTiles", "Usar quadrículas")}</label>
                 <div className="p-col-12 p-md-5" style={{ textAlign: 'right' }}>
                   <InputSwitch
-                    id='Usar quadrículas'
                     checked={wmsTiled}
                     onChange={e => editField('wmsTiled', !wmsTiled)}
                   />
@@ -140,6 +128,7 @@ class ArcGISMap extends Component {
       </React.Fragment>
     )
   }
-}
 
-export default ArcGISMap;
+  return render();
+
+}

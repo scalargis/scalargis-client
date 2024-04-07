@@ -1,20 +1,25 @@
-import React, {Component} from 'react';
+import React from 'react';
+import { useTranslation } from "react-i18next";
 import { Dropdown } from 'primereact/dropdown';
 import { FileUpload } from 'primereact/fileupload';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 
+import { I18N_NAMESPACE } from './../../i18n/index';
 
-class GeoJSON extends Component {
+
+export default function GeoJSON (props) {
+
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   /**
    * Event handler for load file
    * 
    * @param {Object} e 
    */
-  loadGeoJSONFile(e) {
-    const { core, mainMap, viewer, data, setLoading, setData, setError, Models, fastFetch } = this.props;
+  const loadGeoJSONFile = (e) => {
+    const { core, mainMap, viewer, data, setLoading, setData, setError, Models, fastFetch } = props;
     const { isUrlAppOrigin } = Models.Utils;
     const endpoint = viewer.upload_url || core.UPLOAD_URL;
     const name = e.files[0].name;
@@ -29,7 +34,7 @@ class GeoJSON extends Component {
     fastFetch(endpoint, options, 8000)
       .then(res => {
         if (!res || !res.ok) {
-          throw new Error('Não foi possível obter uma resposta válida.');
+          throw new Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
         } else {
           return res.json();
         }        
@@ -37,7 +42,7 @@ class GeoJSON extends Component {
       .then(res => {
         // Validate response
         if (!res.Success) {
-          setError('Ocorreu um erro ao processar o ficheiro GeoJSON!');
+          setError(t("errorProcessingGeoJSONFile", "Ocorreu um erro ao processar o ficheiro GeoJSON."));
           return setLoading(false);
         }
 
@@ -68,14 +73,14 @@ class GeoJSON extends Component {
     });
   }
 
-  changeURL(value) {
-    let { data, setData } = this.props;
+  const changeURL = (value) => {
+    let { data, setData } = props;
     data.url = value.trim();
     setData(Object.assign({}, data));
   }
 
-  loadFromUserURL() {
-    let { core, data, setData, setSelected, setError, cookies, setLoading, Models } = this.props;
+  const loadFromUserURL = () => {
+    let { core, data, setData, setSelected, setError, cookies, setLoading, Models } = props;
     let { isUrlAppOrigin } = Models.Utils;
     let name = 'GeoJSON';
     let url = data.url || '';
@@ -89,7 +94,7 @@ class GeoJSON extends Component {
     fetch(url)
       .then(res => {     
         if (!res.ok) {
-          throw new Error('Não foi possível obter uma resposta válida.');
+          throw new Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
         } else {
           return res.json();
         }                   
@@ -103,7 +108,7 @@ class GeoJSON extends Component {
             // Add to cookies history
             //if (cookies) rememberUrl(cookies, 'geojson', data.url);
           } else {
-            throw Error('Não foi possível obter uma resposta válida.');
+            throw Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
           }
         } catch (e) {
           setLoading(false);
@@ -122,16 +127,16 @@ class GeoJSON extends Component {
   /**
    * Render GeoJSON wizard
    */
-  render() {
-    const { viewer, loading, data, editField, winSize } = this.props;
+  const render = () => {
+    const { viewer, loading, data, editField, winSize } = props;
     return (
       <React.Fragment>
         <div className="p-fluid">
 
           <div className="p-field">
-            <label>Sistema de Coordenadas</label>
+            <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
             <Dropdown 
-              placeholder='Escolha o sistema de coordenadas'
+              placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
               options={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
               value={data.crs || '4326'}
               onChange={(e) => editField('crs', e.value)}
@@ -139,25 +144,25 @@ class GeoJSON extends Component {
           </div>
 
           <TabView>
-            <TabPanel header="Ficheiro">
+            <TabPanel header={t("file", "Ficheiro")}>
               <div className="p-field">
-                <label>Ficheiro GeoJSON</label>
+                <label>{t("file", "Ficheiro")} GeoJSON</label>
                 <FileUpload 
                   name="upload"
                   accept="application/json,.geojson"
-                  maxFileSize={this.props.maxFileSize * 1024}
+                  maxFileSize={props.maxFileSize * 1024}
                   customUpload 
-                  uploadHandler={this.loadGeoJSONFile.bind(this)}
+                  uploadHandler={loadGeoJSONFile}
                   disabled={loading}
                   url="./upload"
-                  chooseLabel="Escolher"
-                  uploadLabel="Carregar"
-                  cancelLabel="Cancelar"
+                  chooseLabel={t("choose", "Escolher")}
+                  uploadLabel={t("load", "Carregar")}
+                  cancelLabel={t("cancel", "Cancelar")} 
                   invalidFileSizeMessageDetail=""
-                  invalidFileSizeMessageSummary={"O ficheiro não poderá ter mais de " + (Math.round((this.props.maxFileSize/1024) * 100) / 100) + " MB"}
+                  invalidFileSizeMessageSummary={t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}
                 />
-                { (this.props.maxFileSize && this.props.maxFileSize > 0) ?
-                <small id="upload-help" className="p-warn">Dimensão máxima do ficheiro: {Math.round((this.props.maxFileSize/1024) * 100) / 100} MB</small>
+                { (props.maxFileSize && props.maxFileSize > 0) ?
+                <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>
                 : null }
               </div>
             </TabPanel>
@@ -165,18 +170,18 @@ class GeoJSON extends Component {
               <div className="p-field">
                 <label>URL</label>
                 <div className="p-inputgroup">
-                  <InputText placeholder='URL...'
+                  <InputText placeholder='https://...'
                     value={data.url}
-                    onChange={e => this.changeURL(e.target.value)}
+                    onChange={e => changeURL(e.target.value)}
                     style={{ width: '100%' }}
                   />
                   <Button
                     icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-                    tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
+                    tooltip={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
                     disabled={loading}
                     onClick={e => {
                       e.preventDefault();
-                      this.loadFromUserURL()
+                      loadFromUserURL()
                     }}
                   />
                 </div>
@@ -192,6 +197,6 @@ class GeoJSON extends Component {
       </React.Fragment>
     )
   }
-}
 
-export default GeoJSON;
+  return render();
+}

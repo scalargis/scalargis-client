@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from "react-i18next";
-
 import { WMTSCapabilities } from 'ol/format';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -8,16 +7,12 @@ import { Dropdown } from 'primereact/dropdown';
 import {InputSwitch} from 'primereact/inputswitch';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
-
-const versions = [
-  { key: 'default', value: 'default', label: 'Especificada pelo Serviço' },
-  { key: '1.0.0', value: '1.0.0', label: '1.0.0' }
-];
+import { I18N_NAMESPACE } from './../../i18n/index';
 
 
 export default function WMTS(props) {
 
-  const { t } = useTranslation(); 
+  const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   useEffect(() => {
     if (props?.data?.dataType === 'wmts' && props?.data?.url) {
@@ -105,20 +100,25 @@ export default function WMTS(props) {
    * Render WMTS wizard
    */
   const render = () => {
-    const { loading, data, editField, getUrlHistory, winSize } = props;
+    const { loading, data, editField, getUrlHistory } = props;
     const { wmtsIgnoreServiceUrl, wmtsVersion } = data;
+
+    const versions = [
+      { key: 'default', value: 'default', label: t("specifiedByService", "Especificada pelo Serviço") },
+      { key: '1.0.0', value: '1.0.0', label: '1.0.0' }
+    ];
     
     return (
       <React.Fragment>
         <div className="p-inputgroup">
-          <InputText placeholder='http://...'
+          <InputText placeholder='https://...'
             value={data.url}
             list='urlhistory'
             onChange={e => editField('url', e.target.value.trim())}
           />
           <Button
             icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
+            tooltip={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
             disabled={loading}
             onClick={e => {
               e.preventDefault();
@@ -138,12 +138,12 @@ export default function WMTS(props) {
             }
             editField("options", new_options);
           }}>
-          <AccordionTab header="Opções Avançadas">
+          <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
 
             <div className="p-fluid">
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">Versão</label>
+                <label className="p-col-12 p-md-7">{t("version", "Versão")}</label>
                 <div className="p-col-12 p-md-5">
                   <Dropdown
                     options={versions}
@@ -154,10 +154,9 @@ export default function WMTS(props) {
               </div>
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">Ignorar URL do serviço</label>
+                <label className="p-col-12 p-md-7">{t("ignoreServiceUrl", "Ignorar URL do serviço")}</label>
                 <div className="p-col-12 p-md-5" style={{ textAlign: 'right' }}>
                   <InputSwitch
-                    id='Ignorar URL do serviço'
                     checked={wmtsIgnoreServiceUrl}
                     onChange={e => editField('wmtsIgnoreServiceUrl', !wmtsIgnoreServiceUrl)}
                   />

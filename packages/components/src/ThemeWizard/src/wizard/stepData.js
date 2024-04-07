@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 import { Button } from 'primereact/button';
 import WMS from './type/WMS';
 import WMTS from './type/WMTS';
@@ -16,6 +17,8 @@ import WMSThemesSelector from './WMSThemesSelector';
 import WMTSThemesSelector from './WMTSThemesSelector';
 import ThemesSelector from './ThemesSelector';
 
+import { I18N_NAMESPACE } from './../i18n/index';
+
 let toastEl = null;
 
 export default function WizardStepData(props) {
@@ -25,6 +28,8 @@ export default function WizardStepData(props) {
   const [filter, setFilter] = useState('');
   const { getWindowSize, showOnPortal } = Models.Utils;
   const winSize = getWindowSize();
+
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   //Set default upload max file size (2MB)
   //Filesize configuration is in KB
@@ -54,7 +59,7 @@ export default function WizardStepData(props) {
   function setError(message) {
     toastEl.show({
       severity: 'error',
-      summary: 'Ocorreu um erro inesperado',
+      summary: t("unexpectedError", "Ocorreu um erro inesperado"),
       detail: message,
       sticky: true
     });
@@ -152,7 +157,7 @@ export default function WizardStepData(props) {
       <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
         <Button 
           onClick={e => saveSelection()} 
-          label="Seguinte" 
+          label={t("next","Seguinte")} 
           disabled={props.loading || (Object.keys(selected).length === 0) || 
             (Object.keys(selected).length === 1 && !selected[Object.keys(selected)[0]].checked) }
           style={{ marginTop: '1em' }}

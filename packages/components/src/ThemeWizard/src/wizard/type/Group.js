@@ -1,11 +1,17 @@
-import React, {Component} from 'react';
+import React, {useEffect} from 'react';
+import { useTranslation } from "react-i18next";
 import { InputText } from 'primereact/inputtext';
-import { v4 as uuidV4 } from 'uuid'
+import { v4 as uuidV4 } from 'uuid';
 
-class Group extends Component {
+import { I18N_NAMESPACE } from './../../i18n/index';
 
-  componentDidMount() {
-    let { data, setData, setSelected } = this.props;
+
+export default function Group(props) {
+
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
+
+  useEffect(() => {
+    let { data, setData, setSelected } = props;
     
     // Create theme
     let theme = {
@@ -25,10 +31,11 @@ class Group extends Component {
     else theme = data.dataitems[0];
 
     setData(data);
-  }
+  }, []);
 
-  changeName(value) {
-    let { data, editField, setSelected } = this.props;
+
+  const changeName = (value) => {
+    let { data, editField, setSelected } = props;
     if (value.trim()) {
       const title = value;
       let theme = data.dataitems[0];
@@ -60,20 +67,20 @@ class Group extends Component {
   /**
    * Render WMS wizard
    */
-  render() {
-    const { data } = this.props;
+  const render = () => {
+    const { data } = props;
     const theme = data.dataitems.length ? data.dataitems[0] : null;
 
     return (
       <React.Fragment>
-        <InputText placeholder='Nome do grupo...'
+        <InputText placeholder={`${t("groupName", "Nome do Grupo")}...`}
           value={theme ? theme.title : ''}
-          onChange={e => this.changeName(e.target.value)}
+          onChange={e => changeName(e.target.value)}
           style={{ width: '100%' }}
         />
       </React.Fragment>
     )
   }
-}
 
-export default Group;
+  return render();
+}

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from "react-i18next";
-
 import { WMSCapabilities } from 'ol/format';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -8,18 +7,12 @@ import { Dropdown } from 'primereact/dropdown';
 import {InputSwitch} from 'primereact/inputswitch';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
-
-const versions = [
-  { key: 'default', value: 'default', label: 'Especificada pela Serviço' },
-  { key: '1.1.0', value: '1.1.0', label: '1.1.0' },
-  { key: '1.1.1', value: '1.1.1', label: '1.1.1' },
-  { key: '1.3.0', value: '1.3.0', label: '1.3.0' }
-];
+import { I18N_NAMESPACE } from './../../i18n/index';
 
 
 export default function WMS(props) {
 
-  const { t } = useTranslation(); 
+  const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   useEffect(() => {
     if (props?.data?.dataType === 'wms' && props?.data?.url) {
@@ -105,8 +98,15 @@ export default function WMS(props) {
    * Render WMS wizard
    */
   const render = () => {
-    const { loading, data, editField, getUrlHistory, winSize } = props;
+    const { loading, data, editField, getUrlHistory } = props;
     const { wmsServerType, wmsIgnoreServiceUrl, wmsVersion, wmsTiled } = data;
+
+    const versions = [
+      { key: 'default', value: 'default', label: t("specifiedByService", "Especificada pelo Serviço") },
+      { key: '1.1.0', value: '1.1.0', label: '1.1.0' },
+      { key: '1.1.1', value: '1.1.1', label: '1.1.1' },
+      { key: '1.3.0', value: '1.3.0', label: '1.3.0' }
+    ];
 
     let wmsServerTypeOtions = [
       { key: 999, value: '', label: t("notDefined", "Não Especificado") },
@@ -118,14 +118,14 @@ export default function WMS(props) {
     return (
       <React.Fragment>
         <div className="p-inputgroup">
-          <InputText placeholder='http://...'
+          <InputText placeholder='https://...'
             value={data.url}
             list='urlhistory'
             onChange={e => editField('url', e.target.value.trim())}
           />
           <Button
             icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
+            tooltip={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
             disabled={loading}
             onClick={e => {
               e.preventDefault();
@@ -145,7 +145,7 @@ export default function WMS(props) {
             }
             editField("options", new_options);
           }}>
-          <AccordionTab header="Opções Avançadas">
+          <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
 
             <div className="p-fluid">
 
@@ -161,7 +161,7 @@ export default function WMS(props) {
               </div> 
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Versão</label>
+                <label className="p-col-12 p-md-4">{t("version", "Versão")}</label>
                 <div className="p-col-12 p-md-8">
                   <Dropdown
                     options={versions}
@@ -172,10 +172,9 @@ export default function WMS(props) {
               </div>
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">Ignorar URL do serviço</label>
+                <label className="p-col-12 p-md-7">{t("ignoreServiceUrl", "Ignorar URL do serviço")}</label>
                 <div className="p-col-12 p-md-5" style={{ textAlign: 'right' }}>
                   <InputSwitch
-                    id='Ignorar URL do serviço'
                     checked={wmsIgnoreServiceUrl}
                     onChange={e => editField('wmsIgnoreServiceUrl', !wmsIgnoreServiceUrl)}
                   />
@@ -183,10 +182,9 @@ export default function WMS(props) {
               </div>
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">Usar quadrículas</label>
+                <label className="p-col-12 p-md-7">{t("useTiles", "Usar quadrículas")}</label>
                 <div className="p-col-12 p-md-5" style={{ textAlign: 'right' }}>
                   <InputSwitch
-                    id='Usar quadrículas'
                     checked={wmsTiled}
                     onChange={e => editField('wmsTiled', !wmsTiled)}
                   />

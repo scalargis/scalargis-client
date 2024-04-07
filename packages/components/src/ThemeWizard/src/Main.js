@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from "react-i18next";
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
+import {Steps} from 'primereact/steps';
 import { v4 as uuidV4 } from 'uuid';
 
-import {Steps} from 'primereact/steps';
+import { i18n } from '@scalargis/components';
+import { I18N_NAMESPACE, loadTranslations } from './i18n/index';
 import WizardStepType from './wizard/stepType';
 import WizardStepData from './wizard/stepData';
 import WizardStepConfirm from './wizard/stepConfirm';
@@ -12,9 +15,9 @@ import './index.css'
 
 
 const items = [
-  { label: 'Tipo' },
-  { label: 'Dados' },
-  { label: 'Confirmar' }
+  { value: "stepType", label: "Tipo" },
+  { value: "stepData", label: "Dados" },
+  { value: "stepConfirm", label: "Confirmar" }
 ];
 
 const source_types = [
@@ -51,8 +54,8 @@ const initialData = {
  */
 export function MainMenu({ className, config, actions, record }) {
   const component_cfg = record.config_json || {};
-  const title = record.title || 'Adicionar Temas';
-  const header = component_cfg.header || title;
+
+  const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("addThemes", "Adicionar Temas");
 
   return (
     <Button
@@ -65,11 +68,23 @@ export function MainMenu({ className, config, actions, record }) {
   )
 }
 
+
+/**
+ * Component Translations
+ */
+export const translations = { 
+  loadTranslations: loadTranslations
+};
+
+
 export default function Main(props) {
   const { core } = props;
   const component_cfg = props.record.config_json;
-  const title = props.record.title || 'Adicionar Temas';
-  const header = component_cfg.header || title;
+
+  const translation = useTranslation([I18N_NAMESPACE, "custom"]);
+  
+  const title = props?.record?.title ? i18n.translateValue(props.record.title, props.record.title) : i18n.translateValue("addThemes", "Adicionar Temas");
+  const header = component_cfg?.header ? i18n.translateValue(component_cfg.header, component_cfg.header) : title;
 
   const [activeIndex, setActiveIndex] = useState(
     props.config.data.type ? (props.config.data.items.length ? 2 : 1) : 0
@@ -96,6 +111,11 @@ export default function Main(props) {
     }
   }, []);
 
+  const stepItems = useMemo(()=> {
+    return items.map( n => {
+      return { label: translation.t(n.value, n.label)}
+    });
+  }, [translation?.i18n?.resolvedLanguage]);
 
   function externalLoad(data) {
     setActiveIndex(1);
@@ -264,7 +284,7 @@ export default function Main(props) {
     return (
       <div id="themewizard">
         <Steps 
-          model={items} 
+          model={stepItems} 
           activeIndex={activeIndex} 
           onSelect={(e) => changeStep(activeIndex, e.index)} 
           readOnly={false}

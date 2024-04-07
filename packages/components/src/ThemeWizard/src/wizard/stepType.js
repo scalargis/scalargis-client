@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useTranslation } from "react-i18next";
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
 
+import { I18N_NAMESPACE } from './../i18n/index';
+
 
 export default function WizardStepType(props) {
-  const { types } = props;
+
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
+
+  // Translate type
+  const types = useMemo(() => {
+    return (props?.types || []).map( tp => {
+      return {
+        ...tp,
+        label: t(tp.value, tp.label)
+      }
+    });
+  }, [i18n?.resolvedLanguage]);
 
   const type = props?.wizardData?.type;
 
@@ -32,7 +46,7 @@ export default function WizardStepType(props) {
           onClick={e => {
             props.onSave();
           }}
-          label="Seguinte" />
+          label={t("next", "Seguinte")} />
       </div>
     </div>
   )

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { Tree } from 'primereact/tree';
 import layerNode from './layerNode';
+
+import { I18N_NAMESPACE } from './../i18n/index';
+
 
 const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide }) => {
   const [loaded, setLoaded] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState({});
   const [isSelectAll, setIsSelectAll] = useState(false);
   const nodes = themes.map(l => layerNode(l));
+
+  const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   function expandNode(node) {
     let newExpandedKeys = { ...expandedKeys };
@@ -56,7 +62,7 @@ const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide }) => {
           &nbsp;
           <a style={{float: 'right', cursor: 'pointer'}}
             onClick={e => setIsSelectAll(!isSelectAll)}>
-            Selecionar/Remover Todos
+            {t("selectRemovalAll", "Selecionar/Remover Todos")}
           </a>
         </h5>
       ) : null }
@@ -69,7 +75,6 @@ const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide }) => {
         selectionMode={readOnly ? null : "checkbox"}
         selectionKeys={readOnly ? null : selected}
         onSelectionChange={e => {
-          /*console.log(e.value);*/
           const sel = {};
           Object.keys(e.value).forEach(key => {
             const selItem = e.value[key];

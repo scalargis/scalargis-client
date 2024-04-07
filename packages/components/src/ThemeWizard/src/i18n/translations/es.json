@@ -1,0 +1,68 @@
+{
+  "wms": "WMS - Web Map service",
+  "wmts": "WMTS - Web Map Tile Service",
+  "wfs": "WFS - Web Feature Service",
+  "arcgismap": "ArcGIS REST - Map Service",
+  "shape": "Shapefile - ficheiro .zip contendo .shp",
+  "kml": "KML - Keyhole Markup Language",
+  "gml": "GML - Geographic Markup Language",
+  "geojson": "GeoJSON",
+  "dxf": "DXF (v2000)",
+  "cog": "COG (GeoTiff)",
+  "group": "Grupo de Capas",
+
+  "file": "Archivo",
+
+  "next": "Siguiente",
+
+  "stepType": "Tipo",
+  "stepData": "Datos",
+  "stepConfirm": "Confirmar",
+
+  "unexpectedError": "Error inesperado",
+
+  "advancedOptions": "Opciones Avanzadas",
+  "selectServerType": "Elija el tipo de servidor",
+  "notDefined": "No especificado",
+  "serverType": "Tipo de servidor",
+  "version": "Versión",
+  "specifiedByService": "Especificado por el Servicio",
+  "ignoreServiceUrl": "Ignorar URL del servicio",
+  "useTiles": "Tiles",
+
+  "choose": "Elegir",
+  "load": "Cargar",
+  "cancel": "Cancelar",
+
+  "selectRemovalAll": "Seleccionar/eliminar Todo",
+
+  "selectTileMatrix": "Seleccione la Quadrícula",
+
+  "noThemeSelectedMsg": "No se ha seleccionado ningún tema. Vuelva al paso anterior y seleccione al menos un tema.",
+  "confirm": "Confirmar",
+  "finish": "Finalizar",
+
+  "coordinateSystem": "Sistema de Coordenadas",
+  "selectCoordinateSystem": "Escolha o sistema de coordenadas",
+  "shapefileFormatInfo": "Archivo ZIP con los ficheros SHP, DBF y SHX",
+  "kmlFormatInfo": "Archivo - KML/KMZ",
+
+  "maxFileSizeInfo": "Tamaño máximo del archivo: {{size}} MB",
+  "maxFileSizeError": "El archivo no puede ser mayor que {{size}} MB",
+
+  "errorProcessingKMLFile": "Se ha producido un error al procesar el archivo KML.",
+  "errorProcessingGeoJSONFile": "Se ha producido un error al procesar el archivo GeoJSON.",
+  "invalidResponse": "No fue posible obtener una respuesta válida.",
+
+  "bands": "Bandas",
+  "red": "Rojo",
+  "green": "Verde",
+  "blue": "Azul",
+  "selectBands": "Seleccione una banda",
+  "convertToRGB": "Convertir a RGB",
+  "nodataValue": "Valor NoData",
+  "cogCoordinateSystemInfo": "Cargado dinámicamente por imagen COG ({{epsg}})",
+  "cogCoordinateSystemUnsupported": "No se ha podido cargar un sistema de referencia de coordenadas no compatible ({{epsg}})",
+
+  "groupName": "Nombre del Grupo"
+}

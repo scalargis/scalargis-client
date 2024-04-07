@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { Tree } from 'primereact/tree';
 import { Dropdown } from 'primereact/dropdown';
 import layerNode from './layerNode';
+
+import { I18N_NAMESPACE } from './../i18n/index';
+
 
 const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, setSelected, readOnly }) => {
   const [loaded, setLoaded] = useState(false);
@@ -10,6 +14,8 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
   const [tilematrixset, setTilematrixset] =useState();
   const nodes = themes.map(l => layerNode(l));
   const matrixItems = tileMatrixSet.map( m => ({ label: m.Identifier, value: m.Identifier }));
+
+  const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   function expandNode(node) {
     let newExpandedKeys = { ...expandedKeys };
@@ -59,7 +65,7 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
   return (
     <div>
       <div className="p-d-flex p-mt-2 p-mb-2">
-        <Dropdown options={matrixItems} value={tilematrixset} showClear placeholder="Selecione a Grelha" style={{ width: "100%"}}
+        <Dropdown options={matrixItems} value={tilematrixset} showClear placeholder={t("selectTileMatrix", "Selecione a Grelha")} style={{ width: "100%"}}
         onChange={ e => selectTileMatrixSet(e.value)}/>    
       </div>
 
@@ -68,7 +74,7 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
           &nbsp;
           <a style={{float: 'right', cursor: 'pointer'}}
             onClick={e => setIsSelectAll(!isSelectAll)}>
-            Selecionar/Remover Todos
+            {t("selectRemovalAll", "Selecionar/Remover Todos")}
           </a>
         </h5>
       ) : null }

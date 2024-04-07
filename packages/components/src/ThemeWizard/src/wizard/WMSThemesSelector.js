@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from "react-i18next";
 import { Tree } from 'primereact/tree';
 import layerNode from './layerNode';
+
+import { I18N_NAMESPACE } from './../i18n/index';
+
 
 const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllGroups }) => {
   const [loaded, setLoaded] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState({});
   const [isSelectAll, setIsSelectAll] = useState(false);
   const nodes = themes.map(l => layerNode(l));
+
+  const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   function expandNode(node) {
     let newExpandedKeys = { ...expandedKeys };
@@ -71,7 +77,7 @@ const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllG
           &nbsp;
           <a style={{float: 'right', cursor: 'pointer'}}
             onClick={e => setIsSelectAll(!isSelectAll)}>
-            Selecionar/Remover Todos
+            {t("selectRemovalAll", "Selecionar/Remover Todos")}
           </a>
         </h5>
       ) : null }

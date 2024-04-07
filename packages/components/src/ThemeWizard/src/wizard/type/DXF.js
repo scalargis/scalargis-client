@@ -1,17 +1,22 @@
-import React, {Component} from 'react';
+import React from 'react';
+import { useTranslation } from "react-i18next";
 import { Dropdown } from 'primereact/dropdown';
 import { FileUpload } from 'primereact/fileupload';
 
+import { I18N_NAMESPACE } from './../../i18n/index';
 
-class DXF extends Component {
+
+export default function DXF(props) {
+
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   /**
    * Event handler for load file
    * 
    * @param {Object} e 
    */
-  loadDXFFile(e) {
-    const { core, mainMap, viewer, data, setLoading, setData, Models, fastFetch } = this.props;
+  const loadDXFFile = (e) => {
+    const { core, mainMap, viewer, data, setLoading, setData, Models, fastFetch } = props;
     const { isUrlAppOrigin } = Models.Utils;
     const endpoint = viewer.upload_url || core.UPLOAD_URL;
     const name = e.files[0].name;
@@ -64,16 +69,16 @@ class DXF extends Component {
   /**
    * Render DXF wizard
    */
-  render() {
-    const { viewer, loading, data, editField } = this.props;
+  const render = () => {
+    const { viewer, loading, data, editField } = props;
     return (
       <React.Fragment>
         <div className="p-fluid">
 
           <div className="p-field">
-            <label>Sistema de Coordenadas</label>
+            <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
             <Dropdown 
-              placeholder='Escolha o sistema de coordenadas'
+              placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
               options={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
               value={data.crs || '4326'}
               onChange={(e) => editField('crs', e.value)}
@@ -81,23 +86,23 @@ class DXF extends Component {
           </div>
 
           <div className="p-field">
-            <label>Ficheiro DXF</label>
+            <label>{t("file", "Ficheiro")} DXF</label>
             <FileUpload 
               name="upload"
               accept=".dxf"
-              maxFileSize={this.props.maxFileSize * 1024}
+              maxFileSize={props.maxFileSize * 1024}
               customUpload 
-              uploadHandler={this.loadDXFFile.bind(this)}
+              uploadHandler={loadDXFFile}
               disabled={loading}
               url="./upload"
-              chooseLabel="Escolher"
-              uploadLabel="Carregar"
-              cancelLabel="Cancelar"              
+              chooseLabel={t("choose", "Escolher")}
+              uploadLabel={t("load", "Carregar")}
+              cancelLabel={t("cancel", "Cancelar")}             
               invalidFileSizeMessageDetail=""
-              invalidFileSizeMessageSummary={"O ficheiro não poderá ter mais de " + (Math.round((this.props.maxFileSize/1024) * 100) / 100) + " MB"}
+              invalidFileSizeMessageSummary={t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}
             />
-            { (this.props.maxFileSize && this.props.maxFileSize > 0) ?
-            <small id="upload-help" className="p-warn">Dimensão máxima do ficheiro: {Math.round((this.props.maxFileSize/1024) * 100) / 100} MB</small>
+            { (props.maxFileSize && props.maxFileSize > 0) ?
+            <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>
             : null }            
           </div>
         </div>
@@ -105,6 +110,6 @@ class DXF extends Component {
       </React.Fragment>
     )
   }
-}
 
-export default DXF;
+  return render();
+}

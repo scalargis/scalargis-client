@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from "react-i18next";
-
 import xml2js from 'xml2js';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 
+import { I18N_NAMESPACE } from './../../i18n/index';
+
 
 export default function WFS(props) {
 
-  const { t } = useTranslation(); 
+  const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   useEffect(() => {
     if (props?.data?.dataType === 'wfs' && props?.data?.url) {
@@ -88,18 +89,18 @@ export default function WFS(props) {
    * Render WFS wizard
    */
   const render = () => {
-    const { loading, data, editField, getUrlHistory, winSize } = props;
+    const { loading, data, editField, getUrlHistory } = props;
     return (
       <React.Fragment>
         <div className="p-inputgroup">
-          <InputText placeholder='http://...'
+          <InputText placeholder='https://...'
             value={data.url}
             list='urlhistory'
             onChange={e => editField('url', e.target.value.trim())}
           />
           <Button
             icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            tooltip="Carregar" tooltipOptions={{position: 'bottom'}}
+            tooltip={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
             disabled={loading}
             onClick={e => {
               e.preventDefault();
