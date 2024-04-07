@@ -171,7 +171,12 @@ Core.prototype.addComponent = function(core, component, done) {
       Object.entries(c.reducers).forEach(function([key, reducer]) {
         core.store.reducerManager.add(key, reducer);
      });
-    }    
+    }
+
+    // Load component translations
+    if (c.translations && typeof c.translations === 'object') {
+      c.translations.loadTranslations && c.translations.loadTranslations();
+    }
 
     // Registry Pattern: register react component in components registry
     if (!!c.default && !this.__components[component.type]) {   
@@ -188,7 +193,6 @@ Core.prototype.addComponent = function(core, component, done) {
     done();
     
   } else {
-
     // Add plugin components
     import('./components/' + component.type + '/src/Main.js').then(c => {
 
@@ -199,9 +203,14 @@ Core.prototype.addComponent = function(core, component, done) {
 
       // Add component reducers
       if (c.reducers && typeof c.reducers === 'object') {
-        Object.entries(c.reducers).forEach(function([key, reducer]) {
-          core.store.reducerManager.add(key, reducer);
-      });
+          Object.entries(c.reducers).forEach(function([key, reducer]) {
+            core.store.reducerManager.add(key, reducer);
+        });
+      }
+
+      // Load component translations
+      if (c.translations && typeof c.translations === 'object') {
+        c.translations.loadTranslations && c.translations.loadTranslations();
       }
 
       // Registry Pattern: register react component in components registry 
