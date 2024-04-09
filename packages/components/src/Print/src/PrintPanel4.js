@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation} from "react-i18next";
 import Cookies from 'universal-cookie';
 import { Button } from 'primereact/button'
-import { Checkbox } from 'primereact/checkbox';
-import { Dropdown } from 'primereact/dropdown';
-import { Toolbar } from 'primereact/toolbar';
-import {InputText} from 'primereact/inputtext';
 import { Message } from 'primereact/message';
 import { Toast } from 'primereact/toast';
-import useFormFields from "./useFormFields";
-import PrintGroupItem from "./PrintGroupItem";
+
 import './style.css'
+
 
 export default function PrintPanel4(props) {
 
@@ -17,6 +14,8 @@ export default function PrintPanel4(props) {
   const { viewer, mainMap, dispatch, Models } = config;
   const { getScaleForResolution } = Models.MapModel;
   const { showOnPortal } = Models.Utils;
+
+  const { t } = useTranslation();
 
   const [isProcessing, setIsProcessing] = useState(true);
   const [isMergingFiles, setIsMergingFiles] = useState(false);
@@ -84,7 +83,7 @@ export default function PrintPanel4(props) {
         if (res.Success) {
           setMergedFile({ filename: res.Data.filename, url: res.Data.url });
         } else {
-          throw('Ocorreu um erro ao gerar o ficheiro');
+          throw(t("errorCreatingFile", "Ocorreu um erro ao gerar o ficheiro"));
         }
       }).catch(error => {
         setIsMergingFiles(false);
@@ -192,7 +191,7 @@ export default function PrintPanel4(props) {
             // 4. Set the state to our new copy        
             setTimeout(function(){ setFinalPrints(newFinalPrints); }, 500);
           } else {
-            throw(res.Message || 'Ocorreu um erro ao gerar a planta');
+            throw(res.Message || t("errorPrinting", "Ocorreu um erro ao gerar a planta"));
           }
           return {...item};
         }).catch(error => {
@@ -201,7 +200,7 @@ export default function PrintPanel4(props) {
           let item = {...print};
           item.processed = false;
           item.processing = false;
-          item.error = 'Não foi possível gerar a planta';
+          item.error = t("printError", "Não foi possível gerar a planta");
 
           newFinalPrints[index] = item;          
           setTimeout(function(){ setFinalPrints(newFinalPrints); }, 500);
@@ -220,7 +219,7 @@ export default function PrintPanel4(props) {
 
       if (hasInvalidPrints) {
         toast.current.show({ severity: 'warn', summary: printDetails.title || 'Emissão de plantas', 
-          detail: 'Não foi possível gerar todas as plantas', life: 3000 });
+          detail: t("printAllError", "Não foi possível gerar todas as plantas"), life: 3000 });
       }
 
       setFinalPrints([...res]);
@@ -241,8 +240,8 @@ export default function PrintPanel4(props) {
 
       <div className="p-fluid">
         { isProcessing ?    
-        <Message severity="info" text="A gerar as plantas ..." /> :
-        <Message severity="info" text="Plantas geradas. Pode descarregar as plantas pretendidas." />
+        <Message severity="info" text={t("generatingPrints", "A gerar as plantas...")} /> :
+        <Message severity="info" text={t("finishPrinting","Plantas geradas. Pode descarregar as plantas pretendidas.")} />
         }
       </div>      
 
@@ -291,7 +290,7 @@ export default function PrintPanel4(props) {
                   </div>
                   <div className="p-col">
                     { print.processed ?
-                      <a href={print.url} target="_blank" title="Abrir planta"
+                      <a href={print.url} target="_blank" title={t("openPrint", "Abrir planta")}
                         style={ { textDecoration: "none", color: "#2196f3"} }>
                         <i className="pi pi-external-link p-pl-2"></i>
                       </a> : null
@@ -307,7 +306,7 @@ export default function PrintPanel4(props) {
       { mergedFile ?
         <div className="card p-text-center">
           <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "#2196f3"} }>
-            <i className="pi pi-external-link p-pl-2"></i> Abrir PDF com todas as plantas
+            <i className="pi pi-external-link p-pl-2"></i> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
           </a>          
         </div> :
         null
@@ -315,7 +314,7 @@ export default function PrintPanel4(props) {
 
       { !isProcessing && !mergedFile && getFinalPrintsTotal() > 1 ?
         <div className="card p-text-center">
-          <Button label="Criar PDF com todas as plantas"
+          <Button label={t("createAllPrintsPDF", "Criar PDF com todas as plantas")}
             icon={ isMergingFiles ? 'pi pi-spin pi-spinner' : '' } 
             className="p-button"
             onClick={e => { mergePrintFiles(); }}
@@ -328,7 +327,7 @@ export default function PrintPanel4(props) {
         <div className="p-grid">
           <div className="p-col p-text-left">
             <Button
-                label="Voltar"
+                label={t("back", "Voltar")}
                 icon="pi pi-chevron-left"
                 className="p-button-sm"
                 onClick={e => { goPanelPrintPrev(); }}

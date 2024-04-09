@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Message } from 'primereact/message';
+import { useTranslation} from "react-i18next"
+import { Message } from 'primereact/message'
 import './style.css'
 
 export default function PrintPanelNoPrints(props) {
@@ -8,11 +9,13 @@ export default function PrintPanelNoPrints(props) {
   const control = props.control;
   const actions = props.actions;
 
+  const { i18n, t } = useTranslation();
+
   return (
     <div className="print-panel1">  
       <Message
         severity="warn"
-        text={"Este visualizador não tem plantas configuradas."} 
+        text={t("noPrintMsg", "Este visualizador não tem plantas configuradas.")} 
       />
     </div>
   )

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation} from "react-i18next"
 import { Button } from 'primereact/button'
-import { Message } from 'primereact/message';
+import { Message } from 'primereact/message'
 import './style.css'
 
 export default function PrintPanel1(props) {
@@ -8,6 +9,8 @@ export default function PrintPanel1(props) {
   const { viewer, mainMap, dispatch, Models } = props.config;
   const control = props.control;
   const actions = props.actions;
+
+  const { i18n, t } = useTranslation();
 
   function goPanelPrintGroup(group) {
     props.setPrintGroup(group);
@@ -23,7 +26,7 @@ export default function PrintPanel1(props) {
     <div className="print-panel1">  
       <Message
         severity="info"
-        text={"Escolha o tipo de planta que pretende emitir."} 
+        text={t("selectPrintTypeMsg", "Escolha o tipo de planta que pretende emitir.")} 
       />
 
       { (viewer.printing && viewer.printing.groups) && viewer.printing.groups.map( (group, index) => {

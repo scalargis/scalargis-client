@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from 'primereact/button'
-import { Checkbox } from 'primereact/checkbox';
+import { useTranslation} from "react-i18next";
+import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { Toolbar } from 'primereact/toolbar';
-import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
-import useFormFields from "./useFormFields";
 import PrintGroupItem from "./PrintGroupItem";
+
 import './style.css'
 
 export default function PrintPanel3(props) {
@@ -14,6 +12,8 @@ export default function PrintPanel3(props) {
   const { control, printGroup, printLayer, printDetails, setFinalPrints, fields, handleFieldChange, config, actions } = props;
   const { viewer, mainMap, dispatch, Models } = config;
   const { exclusive_mapcontrol } = viewer;
+
+  const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [formats, setFormats] = useState(null);
@@ -102,12 +102,12 @@ export default function PrintPanel3(props) {
       <h3>{printDetails.title}</h3>
 
       <div className="p-fluid">
-        <Message severity="info" text="Seleccione o formato e as plantas pretendidas e clique em Continuar" />
+        <Message severity="info" text={t("selectFormatAndPrints", "Selecione o formato e as plantas pretendidas e clique em Continuar")} />
       </div>
 
       <div className="p-fluid">
         <h4>Formato</h4>
-        <Dropdown id="layout" optionLabel="label" value={fields.layout} options={formats} onChange={handleFieldChange} placeholder="Selecione um Formato" />
+        <Dropdown id="layout" optionLabel="label" value={fields.layout} options={formats} onChange={handleFieldChange} placeholder={t("selectFormat", "Selecione um Formato")} />
       </div>
 
       <div className="p-fluid">
@@ -123,13 +123,13 @@ export default function PrintPanel3(props) {
         />
         {(printDetails.allow_selection && (printDetails.children.length + printDetails.prints.length > 1)) ?
           <div className="p-d-flex">
-            <Button label="Nenhuma"
+            <Button label={t("none", "Nenhuma")}
               className="p-button-sm p-button-warning p-button-text"
               onClick={() => {
                 setSelectedPrints([])
               }}
             />
-            <Button label="Todas"
+            <Button label={t("all", "Todas")}
               style={{ float: 'right' }}
               className="p-button-sm p-button-warning p-button-text"
               onClick={() => {
@@ -144,7 +144,7 @@ export default function PrintPanel3(props) {
         <div className="p-grid">
           <div className="p-col p-text-left">
             <Button
-              label="Voltar"
+              label={t("back", "Voltar")}
               icon="pi pi-chevron-left"
               className="p-button-sm"
               onClick={e => { goPanelPrintPrev(); }}
@@ -152,7 +152,7 @@ export default function PrintPanel3(props) {
           </div>
           <div className="p-col p-text-right">
             <Button
-              label="Continuar"
+              label={t("continue", "Continuar")}
               icon={isLoading ? "pi pi-spin pi-spinner" : ""}
               className="p-button-sm"
               onClick={e => { goPanelPrintNext(); }}

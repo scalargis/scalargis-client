@@ -392,7 +392,7 @@ export default function PrintPanel2(props) {
                         placeholder={!field.header && !field.showLabel ? field.title : ''}
                         tooltip={!field.header && !field.showLabel ? field.title : ''}
                         value={fields[field_key]} onChange={handleFieldChange} />
-                        { (field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">Campo de preenchimento obrigatório.</small> }
+                        { (field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small> }
                     </div>
                   }
                 }) }
@@ -416,7 +416,7 @@ export default function PrintPanel2(props) {
                       placeholder={!field.header && !field.showLabel ? field.title : ''}
                       tooltip={!field.header && !field.showLabel ? field.title : ''}                      
                       value={fields[field_key]} onChange={handleFieldChange} />
-                      { (field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">Campo de preenchimento obrigatório.</small> }
+                      { (field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small> }
                   </div>
                 </div>
                 </React.Fragment>
@@ -430,7 +430,7 @@ export default function PrintPanel2(props) {
           <div className="p-col p-text-left">
             {!standalone &&
             <Button
-                label="Voltar"
+                label={t("back", "Voltar")}
                 icon="pi pi-chevron-left"
                 className="p-button-sm"
                 onClick={e => { goPanelPrintPrev(); }}
@@ -439,7 +439,7 @@ export default function PrintPanel2(props) {
           </div>
           <div className="p-col p-text-right">
             <Button
-                label="Continuar"
+                label={t("continue", "Continuar")}
                 icon={isLoading ? "pi pi-spin pi-spinner": ""}
                 className="p-button-sm"
                 onClick={e => { goPanelPrintNext(); }}
