@@ -219,5 +219,8 @@
 
   "successActionMsg": "Operação realizada com sucesso",
 
-  "addThemes": "Adicionar Temas"
+  "addThemes": "Adicionar Temas",
+
+  "zoomTheme": "Enquadrar extensão do tema",
+  "switchOnOffTheme": "Ligar/desligar tema"
 }

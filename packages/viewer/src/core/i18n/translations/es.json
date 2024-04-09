@@ -219,5 +219,8 @@
 
   "successActionMsg": "Operação realizada com sucesso",
 
-  "addThemes": "Añadir Capas"
+  "addThemes": "Añadir Capas",
+
+  "zoomTheme": "Ajuste al área de la capa",
+  "switchOnOffTheme": "Activar/desactivar capa"
 }

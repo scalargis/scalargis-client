@@ -96,7 +96,7 @@ class Node extends React.Component {
                   
                   {!radioName ? (
                     <Checkbox
-                      title="Ligar/desligar tema"
+                      title={this.props.t("switchOnOffTheme", "Ligar/desligar tema")}
                       id={data.id}
                       checked={this.isChecked()}
                       onChange={e => actions.toggle(data.id, data)}
@@ -104,7 +104,7 @@ class Node extends React.Component {
                     />
                   ) : (
                     <RadioButton 
-                      title="Ligar/desligar tema" 
+                      title={this.props.t("switchOnOffTheme", "Ligar/desligar tema")}
                       id={data.id}
                       name={radioName}
                       checked={this.isChecked()}
@@ -143,7 +143,7 @@ class Node extends React.Component {
                   { data.bbox && data.show_zoom_extent !== false ? (
                     <Button
                       className="p-button-sm p-button-text"
-                      title="Zoom à extensão do tema"
+                      title={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
                       icon="pi pi-search"
                       onClick={e => this.onClickZoom(e, data)}
                     />

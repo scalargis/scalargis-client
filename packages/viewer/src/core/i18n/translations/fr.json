@@ -219,5 +219,8 @@
   
     "successActionMsg": "Opération réalisée avec succès",
 
-    "addThemes": "Ajouter couches"
+    "addThemes": "Ajouter couches",
+
+    "zoomTheme": "Zoom sur ç'éténdue de la couche",
+    "switchOnOffTheme": "Activer/désactiver couche"
   }

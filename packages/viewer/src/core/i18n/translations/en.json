@@ -219,5 +219,8 @@
 
   "successActionMsg": "Operação realizada com sucesso",
 
-  "addThemes": "Add Themes"
+  "addThemes": "Add Themes",
+
+  "zoomTheme": "Zoom to Theme",
+  "switchOnOffTheme": "Switch theme on/off"
 }
