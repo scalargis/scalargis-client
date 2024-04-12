@@ -22,11 +22,21 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
       proxy_requests = config.proxy_http_image_requests;
     }
 
-    const wmts_options = optionsFromCapabilities(config.wmts_capabilities, {
+    let wmts_options = {
       layer: config.layer,
       matrixSet: config.wmts_tilematrixset || 'EPSG:900913',
       format: 'image/png'
-    });
+    }
+    
+    try {
+      wmts_options = optionsFromCapabilities(config.wmts_capabilities, {
+        layer: config.layer,
+        matrixSet: config.wmts_tilematrixset || 'EPSG:900913',
+        format: 'image/png'
+      });
+    } catch (error) {
+      console.log(`Coul not load WMTS layer capabilities: ${config?.title}`);
+    }
 
     //Add user authentication token
     if (isUrlAppHostname(url) && viewer.integrated_authentication) {
@@ -89,11 +99,22 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
 
   // Changed config
   useEffect(() => {
-    const wmts_options = optionsFromCapabilities(config.wmts_capabilities, {
+    let wmts_options = {
       layer: config.layer,
       matrixSet: config.wmts_tilematrixset || 'EPSG:900913',
       format: 'image/png'
-    });
+    }
+
+    try {
+      wmts_options = optionsFromCapabilities(config.wmts_capabilities, {
+        layer: config.layer,
+        matrixSet: config.wmts_tilematrixset || 'EPSG:900913',
+        format: 'image/png'
+      });
+    } catch (error) {
+      console.log(`Coul not load WMTS layer capabilities: ${config?.title}`);
+    }
+    
     if (config.wmts_style) {
       wmts_options.style = config.wmts_style;
     }
