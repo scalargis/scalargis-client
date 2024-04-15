@@ -135,7 +135,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
                 <span>{t("doNotShowAgain", "Não mostrar novamente")}</span>
               </label>
             </div>)}
-            <div className="p-col-12 p-md-6" style={{ textAlign: 'right'}}>
+            <div className="p-col" style={{ textAlign: 'right'}}>
               <Button label={closeLabel} onClick={e => hidePopup() } />
             </div>
           </div>
