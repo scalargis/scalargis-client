@@ -1,5 +1,6 @@
 .locale-selector.p-dropdown.p-component.p-inputwrapper {
   margin-top: -10px;
+  border: none;
 }
 
 .locale-selector.p-dropdown.p-dropdown-label {
@@ -55,4 +56,29 @@
 }
 .locale-selector button.p-button-link.locale-selected > span.p-button-label {
   text-decoration: underline;
+}
+
+.p-menu .locale-selector.p-dropdown.p-component.p-inputwrapper {
+  margin-top: 0;
+}
+
+.p-menu .locale-selector.p-dropdown {
+  margin-left: 0;
+  border: none;
+}
+
+
+.p-menu .locale-selector.p-dropdown .p-hidden-accessible.p-dropdown-hidden-select,
+.p-menu .locale-selector.p-dropdown .p-dropdown.p-dropdown-label,
+.p-menu .locale-selector.p-dropdown .p-dropdown-label.p-inputtext, 
+.p-menu .locale-selector.p-dropdown .p-dropdown-trigger {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.p-menu .locale-selector.p-dropdown .p-dropdown-trigger {
+  border-left: 1px solid rgba(0, 0, 0, 0.87);
+}
+
+.layout-topbar .layout-topbar-icons .p-menu button {
+  color: rgba(0, 0, 0, 0.87);
 }

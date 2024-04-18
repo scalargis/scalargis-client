@@ -122,7 +122,7 @@ export function MainMenu({ className, config, actions, record }) {
   }
 }
 
-export default function Main({ as, config, actions, record }) {
+export default function Main({ type, as, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
@@ -169,10 +169,14 @@ export default function Main({ as, config, actions, record }) {
 
     return (
       <React.Fragment>
-        <button className="p-link" onClick={e => setShowPopup(true)} title={title}>
-          <span className="layout-topbar-item-text"></span>
-          <span className="layout-topbar-icon far far fa-question-circle" />
-        </button>
+        { type != 'menu' ?
+          <button className="p-link" onClick={e => setShowPopup(true)} title={title}>
+            <span className="layout-topbar-item-text"></span>
+            <span className="layout-topbar-icon far far fa-question-circle" />
+          </button> :
+          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => setShowPopup(true)} >
+            <span className="p-menuitem-icon far far fa-question-circle"></span><span className="p-menuitem-text">Ajuda</span>
+          </a> }
 
         {showOnPortal(<Dialog
           ref={dialog}        
@@ -230,12 +234,18 @@ export default function Main({ as, config, actions, record }) {
 
     // Render help button
     return (
-      <button className="p-link" title={title} onClick={e => { return; }}>
-        <a href={help_url} target="_blank" style={{"color": "#ffffff"}}>
-          <span className="layout-topbar-item-text">{title}</span>
-          <span className="layout-topbar-icon pi pi-question-circle"/>
-        </a>
-      </button>
+      <React.Fragment>
+      { type != 'menu' ?
+        <button className="p-link" title={title} onClick={e => { return; }}>
+          <a href={help_url} target="_blank" style={{"color": "#ffffff"}}>
+            <span className="layout-topbar-item-text">{title}</span>
+            <span className="layout-topbar-icon pi pi-question-circle"/>
+          </a>
+        </button> :
+        <a href={help_url} target="_blank" className="p-menuitem-link" role="menuitem" tabIndex="0" >
+          <span className="p-menuitem-icon pi pi-question-circle"></span><span className="p-menuitem-text">Ajuda</span>
+        </a> }
+      </React.Fragment>
     )
   }
 

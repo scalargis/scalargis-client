@@ -8,7 +8,7 @@ import './style.css';
 const defaultMode = 'dropddown';
 
 
-export default function LocaleSelector({ config, actions, componentConfig, className }) {
+export default function LocaleSelector({ type, config, actions, componentConfig, className }) {
   const { viewer, dispatch } = config;
   const { viewer_set_locale } = actions;
 
@@ -59,26 +59,53 @@ export default function LocaleSelector({ config, actions, componentConfig, class
 
   if (mode === 'inline') {
     return (
-      <div style={{ marginLeft: '20px' }} className={className ? `locale-selector ${className}` : 'locale-selector'}>
-        {localesList.map((item, index) => {
-          return (
-            <React.Fragment key={item.value} >
-              <Button
-                key={item.value}
-                label={item.label}
-                className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
-                onClick={(e) => dispatch(viewer_set_locale(item.value))}
-              />
-              {(index < localesList.length - 1) && <span>|</span>}
-            </React.Fragment>
-          );
-        })}
-      </div>
+      <React.Fragment>
+        { type != 'menu' ?
+          <div style={{ marginLeft: '15px' }} className={className ? `locale-selector ${className}` : 'locale-selector'}>
+            {localesList.map((item, index) => {
+              return (
+                <React.Fragment key={item.value} >
+                  <Button
+                    key={item.value}
+                    label={item.label}
+                    className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                    onClick={(e) => dispatch(viewer_set_locale(item.value))}
+                  />
+                  {(index < localesList.length - 1) && <span>|</span>}
+                </React.Fragment>
+              );
+            })}
+          </div> :
+          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" >
+            <span className="p-menuitem-icon pi pi-flag"></span>
+            <div className={className ? `locale-selector ${className}` : 'locale-selector'}>
+              {localesList.map((item, index) => {
+                return (
+                  <React.Fragment key={item.value} >
+                    <Button
+                      key={item.value}
+                      label={item.label}
+                      className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                      onClick={(e) => dispatch(viewer_set_locale(item.value))}
+                    />
+                    {(index < localesList.length - 1) && <span>|</span>}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </a> }
+      </React.Fragment>
     );
   }
 
   return (
-    <Dropdown value={locale.toLowerCase()} options={localesList} onChange={handleChange} className={className ? `locale-selector ${className}` : 'locale-selector'} />
+    <React.Fragment>
+      { type != 'menu' ?
+      <Dropdown value={locale.toLowerCase()} options={localesList} onChange={handleChange} className={className ? `locale-selector ${className}` : 'locale-selector'} /> :
+      <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" >
+        <span className="p-menuitem-icon pi pi-flag"></span><Dropdown value={locale.toLowerCase()} options={localesList} onChange={handleChange} className={className ? `locale-selector ${className}` : 'locale-selector'} />
+      </a> }
+    </React.Fragment>
   );
 
 }

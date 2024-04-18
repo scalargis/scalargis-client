@@ -10,8 +10,8 @@ export function MainMenu({ className, config, actions, record }) {
   return null;
 }
 
-export default function Main({ as, config, actions, record }) {
+export default function Main({ type, as, config, actions, record }) {
   return (
-    <LocaleSelector config={config} actions={actions} componentConfig={record?.config_json} />
+    <LocaleSelector type={type} config={config} actions={actions} componentConfig={record?.config_json} />
   );
 }

@@ -312,7 +312,45 @@ Core.prototype.renderComponentById = function({ id, as = '', props, }) {
   )
 }
 
-Core.prototype.renderComponents = function({ region, as = '', props, parent, separator = '', style = null, className = '' }) {
+Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], props, parent, separator = '', style = null, className = '' }) {
+  
+  // Validate not empty components registry
+  const keys = Object.keys(this.__components);
+  if (keys.length === 0) return null;
+
+  // From all components
+  let { components } = this.config.config_json;
+  
+  // Filter by parent
+  if (parent) components = components.filter(c => parent.children.includes(c.id));
+
+  // Filter by region
+  const regionComponents = components.filter(c => c.target === region && !mobileMenu.includes(c.id));
+
+  // Render components
+  return regionComponents.map(c => {
+    let PluginComponent = this.__components[c.type];
+
+    // Validate dynamic import is loaded
+    if (!PluginComponent) return null;
+    return (
+      <div key={c.id} className={className} style={style ? style(c) : null }>
+        <PluginComponent
+          record={c}
+          config={{ ...props, ...c.config_json }}
+          core={this}
+          actions={this.actions}
+          region={region}
+          as={c.as || as}
+          utils={utils}
+        />
+        { separator }
+      </div>
+    )
+  })
+}
+
+Core.prototype.renderComponentsMenu = function({ region, as = '', mobileMenu = [], props, parent, separator = '', style = null, className = '' }) {
   
   // Validate not empty components registry
   const keys = Object.keys(this.__components);
@@ -327,8 +365,19 @@ Core.prototype.renderComponents = function({ region, as = '', props, parent, sep
   // Filter by region
   const regionComponents = components.filter(c => c.target === region);
 
+  let menuComponents = [];
+  if (mobileMenu.length) {
+    mobileMenu.forEach(k => {
+      const cmp = regionComponents.find(c => c.id === k);
+      if (cmp) menuComponents.push(cmp);
+    });
+  } else {
+    menuComponents = regionComponents;
+  }
+
   // Render components
-  return regionComponents.map(c => {
+  //return regionComponents.map(c => {
+  return menuComponents.map(c => {
     let PluginComponent = this.__components[c.type];
 
     // Validate dynamic import is loaded
@@ -336,6 +385,7 @@ Core.prototype.renderComponents = function({ region, as = '', props, parent, sep
     return (
       <div key={c.id} className={className} style={style ? style(c) : null }>
         <PluginComponent
+          type="menu"
           record={c}
           config={{ ...props, ...c.config_json }}
           core={this}

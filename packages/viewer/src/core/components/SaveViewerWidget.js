@@ -13,7 +13,7 @@ import { getViewerSessionConfig } from '../model/MapModel'
 
 const cookies = new Cookies();
 
-function SaveViewerWidget({ viewer }) {
+function SaveViewerWidget({ type, viewer }) {
 
   const [showForm, setShowForm] = useState(false);
   const [id, setId] = useState(null);
@@ -77,10 +77,14 @@ function SaveViewerWidget({ viewer }) {
   // Render save button
   return (
     <React.Fragment>
+      { type != 'menu' ? 
       <button className="p-link" onClick={e => openForm()}>
         <span className="layout-topbar-item-text">Guardar</span>
         <span className="layout-topbar-icon pi pi-save"/>
-      </button>
+      </button> :
+        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => openForm()} >
+          <span className="p-menuitem-icon pi pi-save"></span><span className="p-menuitem-text">Guardar</span>
+        </a> }
 
       {showOnPortal(<Dialog
         header="Guardar Visualizador"

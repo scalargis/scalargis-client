@@ -13,7 +13,7 @@ import { getViewerSessionConfig } from '../model/MapModel'
 
 const cookies = new Cookies();
 
-function ShareViewerWidget({ viewer, record }) {
+function ShareViewerWidget({ type,viewer, record }) {
   const [showForm, setShowForm] = useState(false);
   const [id, setId] = useState(null);
   const [name, setName] = useState('');
@@ -107,12 +107,18 @@ function ShareViewerWidget({ viewer, record }) {
     return false;
   };
 
+  if (!allow_sharing) return null;
+
   return (
-    allow_sharing ? <React.Fragment>
-      <button className="p-link" onClick={e => openForm()} title="Partilhar mapa">
-        <span className="layout-topbar-item-text">Partilhar</span>
-        <span className="layout-topbar-icon pi pi-share-alt"/>
-      </button>
+    <React.Fragment>
+      { type != 'menu' ? 
+        <button className="p-link" onClick={e => openForm()} title="Partilhar mapa">
+          <span className="layout-topbar-item-text">Partilhar</span>
+          <span className="layout-topbar-icon pi pi-share-alt"/>
+        </button> :
+        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => openForm()} >
+          <span className="p-menuitem-icon pi pi-share-alt"></span><span className="p-menuitem-text">Partilhar</span>
+        </a> }
 
       {showOnPortal(<Dialog
         header="Partilhar Mapa"
@@ -218,7 +224,7 @@ function ShareViewerWidget({ viewer, record }) {
           </form>
       </Dialog>)}
 
-    </React.Fragment> : null
+    </React.Fragment>
   )
 }
 
