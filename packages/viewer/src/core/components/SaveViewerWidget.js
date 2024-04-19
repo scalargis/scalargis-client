@@ -1,15 +1,17 @@
-import React, { useContext, useState } from 'react'
-import Cookies from 'universal-cookie'
+import React, { useContext, useState } from 'react';
+import { useTranslation} from "react-i18next";
+import Cookies from 'universal-cookie';
+import { connect, useDispatch } from 'react-redux';
 import { InputText } from 'primereact/inputtext'
 import { InputTextarea } from 'primereact/inputtextarea';
-import { Button } from 'primereact/button'
-import { connect, useDispatch } from 'react-redux'
-import AppContext from '../../AppContext'
-import { Message } from 'primereact/message'
-import { InputSwitch } from 'primereact/inputswitch'
-import { Dialog } from 'primereact/dialog'
-import { getWindowSize, showOnPortal } from '../utils'
-import { getViewerSessionConfig } from '../model/MapModel'
+import { Button } from 'primereact/button';
+import { Message } from 'primereact/message';
+import { InputSwitch } from 'primereact/inputswitch';
+import { Dialog } from 'primereact/dialog';
+
+import AppContext from '../../AppContext';
+import { getWindowSize, showOnPortal } from '../utils';
+import { getViewerSessionConfig } from '../model/MapModel';
 
 const cookies = new Cookies();
 
@@ -25,13 +27,15 @@ function SaveViewerWidget({ type, viewer }) {
   const [allow_user_session, setAllowUserSession] = useState(false);
   const [allow_anonymous, setAllowAnonymous] = useState(true);
 
+  const { t } = useTranslation();
+
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
   
   // Enable redux actions
   const dispatch = useDispatch();
   const { core } = useContext(AppContext);
-  const { viewer_save_record } = core.actions;
+  const { viewer_save_record, viewer_add_notification } = core.actions;
 
   const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
 
@@ -71,7 +75,16 @@ function SaveViewerWidget({ type, viewer }) {
       allow_anonymous,
       config_json: JSON.stringify(newconfig)
     }
-    dispatch(viewer_save_record(record, null, null))
+    dispatch(viewer_save_record(record, null, null, (res) => {
+      if (res?.success) {
+        const msg = {
+          severity: "success",
+          summary: t("saveMap","Gravar mapa"),
+          detail: `${t("successActionMsg", "Operação realizada com sucesso")}.`
+        }
+        dispatch(viewer_add_notification({group: "viewer", message: msg}));
+      }
+    }));
   }
 
   // Render save button
@@ -79,15 +92,15 @@ function SaveViewerWidget({ type, viewer }) {
     <React.Fragment>
       { type != 'menu' ? 
       <button className="p-link" onClick={e => openForm()}>
-        <span className="layout-topbar-item-text">Guardar</span>
+        <span className="layout-topbar-item-text">{t("save", "Gravar")}</span>
         <span className="layout-topbar-icon pi pi-save"/>
       </button> :
         <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => openForm()} >
-          <span className="p-menuitem-icon pi pi-save"></span><span className="p-menuitem-text">Guardar</span>
+          <span className="p-menuitem-icon pi pi-save"></span><span className="p-menuitem-text">{t("save", "Gravar")}</span>
         </a> }
 
       {showOnPortal(<Dialog
-        header="Guardar Visualizador"
+        header={t("saveMap", "Gravar mapa")}
         visible={showForm}
         style={{width: isMobile ? '90%' : '35vw' }} 
         modal 
@@ -98,7 +111,7 @@ function SaveViewerWidget({ type, viewer }) {
             <div className="p-fluid">
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Nome</label>
+                <label className="p-col-12 p-md-4">{t("name", "Nome")}</label>
                 <div className="p-col-12 p-md-8">
                   <InputText
                     className={(!name || name.length == 0 ? 'p-invalid' : '')}
@@ -107,37 +120,37 @@ function SaveViewerWidget({ type, viewer }) {
                     onChange={e => setName(e.target.value)}
                   />
                   { (!name || name.length == 0) &&
-                  <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }                  
+                  <small className="p-invalid p-d-block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
                 </div>
               </div>
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Título</label>
+                <label className="p-col-12 p-md-4">{t("title", "Título")}</label>
                 <div className="p-col-12 p-md-8">
                   <InputText
                     className={(!title || title.length == 0 ? 'p-invalid' : '')}
                     value={title}
-                    placeholder="Título"
+                    placeholder={t("title", "Título")}
                     onChange={e => setTitle(e.target.value)}
                   />
                   { (!title || title.length == 0) &&
-                  <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }                  
+                  <small className="p-invalid p-d-block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
                 </div>
               </div>
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Descrição</label>
+                <label className="p-col-12 p-md-4">{t("description", "Descrição")}</label>
                 <div className="p-col-12 p-md-8">
                   <InputTextarea rows={3}
                     value={description}
-                    placeholder="Descrição"
+                    placeholder={t("description", "Descrição")}
                     onChange={e => setDescription(e.target.value)}
                   />
                 </div>
               </div>              
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Está ativo?</label>
+                <label className="p-col-12 p-md-4">{t("isActive", "Está ativo")}?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
                     checked={is_active}
@@ -159,7 +172,7 @@ function SaveViewerWidget({ type, viewer }) {
               */}
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Permitir gravar sessão?</label>
+                <label className="p-col-12 p-md-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
                     checked={allow_user_session}
@@ -169,7 +182,7 @@ function SaveViewerWidget({ type, viewer }) {
               </div>
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Permitir acesso anónimo?</label>
+                <label className="p-col-12 p-md-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
                     checked={allow_anonymous}
@@ -184,18 +197,18 @@ function SaveViewerWidget({ type, viewer }) {
               <Button 
                 color='green'
                 icon={ viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                label="Guardar" 
+                label={t("save", "Gravar")} 
                 onClick={submit}
                 disabled={(viewer.save_loading)}
               />
             </div>
 
             { viewer.save_error && 
-              <Message style={{ width: '100%' }} severity="error" text="Serviço Indisponível"></Message>
+              <Message style={{ width: '100%' }} severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
             }
 
             { viewer.save_response && !!viewer.save_response.message && 
-              <Message style={{ width: '100%' }} severity="error" text="Chave de URL inválida"></Message>
+              <Message style={{ width: '100%' }} severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
             }
 
           </form>

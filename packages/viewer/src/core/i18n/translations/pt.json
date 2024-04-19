@@ -222,5 +222,21 @@
   "addThemes": "Adicionar Temas",
 
   "zoomTheme": "Enquadrar extensão do tema",
-  "switchOnOffTheme": "Ligar/desligar tema"
+  "switchOnOffTheme": "Ligar/desligar tema",
+
+  "share": "Partilhar",
+  "shareMap": "Partilhar mapa",
+
+  "allowAddThemes" : "Permitir adicionar temas ao mapa",
+  "allowSaveSession": "Permitir gravar sessão",
+  "allowAnonymousAccess": "Permitir acesso anónimo",
+  "copyUrl": "Copiar Url",
+  "getLink": "Obter Url",
+  "unavailableService": "Serviço indisponível",
+
+  "save": "Gravar",
+  "saveMap": "Gravar mapa",
+
+  "name": "Nome",
+  "isActive": "Está ativo"
 }

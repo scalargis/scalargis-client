@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { useTranslation} from "react-i18next";
 import Cookies from 'universal-cookie'
 import { InputText } from 'primereact/inputtext'
 import { InputTextarea } from 'primereact/inputtextarea'
@@ -23,6 +24,8 @@ function ShareViewerWidget({ type,viewer, record }) {
   const [allow_add_layers, setAllowAddLayers] = useState(true);
   const [allow_user_session, setAllowUserSession] = useState(false);
   const [allow_anonymous, setAllowAnonymous] = useState(true);
+
+  const { t } = useTranslation();
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
@@ -112,16 +115,16 @@ function ShareViewerWidget({ type,viewer, record }) {
   return (
     <React.Fragment>
       { type != 'menu' ? 
-        <button className="p-link" onClick={e => openForm()} title="Partilhar mapa">
-          <span className="layout-topbar-item-text">Partilhar</span>
+        <button className="p-link" onClick={e => openForm()} title={t("shareMap", "Partilhar mapa")}>
+          <span className="layout-topbar-item-text">{t("share", "Partilhar")}</span>
           <span className="layout-topbar-icon pi pi-share-alt"/>
         </button> :
         <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => openForm()} >
-          <span className="p-menuitem-icon pi pi-share-alt"></span><span className="p-menuitem-text">Partilhar</span>
+          <span className="p-menuitem-icon pi pi-share-alt"></span><span className="p-menuitem-text">{t("share", "Partilhar")}</span>
         </a> }
 
       {showOnPortal(<Dialog
-        header="Partilhar Mapa"
+        header={t("shareMap", "Partilhar mapa")}
         visible={showForm}
         style={{width: isMobile ? '90%' : '35vw' }} 
         modal 
@@ -130,32 +133,32 @@ function ShareViewerWidget({ type,viewer, record }) {
           <form onSubmit={e => submit()}>
             <div className="p-fluid">
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Título</label>
+                <label className="p-col-12 p-md-4">{t("title", "Título")}</label>
                 <div className="p-col-12 p-md-8">
                   <InputText
                     className={(!title || title.length === 0 ? 'p-invalid' : '')}
                     value={title}
-                    placeholder="Título"
+                    placeholder={t("title", "Título")}
                     onChange={e => setTitle(e.target.value)}
                   />
                   { (!title || title.length == 0) &&
-                  <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }
+                  <small className="p-invalid p-d-block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }
                 </div>
               </div>
 
               <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Descrição</label>
+                <label className="p-col-12 p-md-4">{t("description", "Descrição")}</label>
                 <div className="p-col-12 p-md-8">
                   <InputTextarea rows={3}
                     value={description}
-                    placeholder="Descrição"
+                    placeholder={t("description", "Descrição")}
                     onChange={e => setDescription(e.target.value)}
                   />
                 </div>
               </div>
 
               { record?.config_json?.show_allow_add_layers !== false && <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Permitir adicionar temas ao mapa?</label>
+                <label className="p-col-12 p-md-4">{t("allowAddThemes", "Permitir adicionar temas ao mapa")}?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
                     checked={allow_add_layers}
@@ -165,7 +168,7 @@ function ShareViewerWidget({ type,viewer, record }) {
               </div> }
 
               { cookieData && record?.config_json?.show_allow_user_session !== false && <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Permitir gravar sessão?</label>
+                <label className="p-col-12 p-md-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
                     checked={allow_user_session}
@@ -175,7 +178,7 @@ function ShareViewerWidget({ type,viewer, record }) {
               </div> }
 
               { cookieData && record?.config_json?.show_allow_anonymous !== false && <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Permitir acesso anónimo?</label>
+                <label className="p-col-12 p-md-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
                 <div className="p-col-12 p-md-8">
                   <InputSwitch
                     checked={allow_anonymous}
@@ -198,7 +201,7 @@ function ShareViewerWidget({ type,viewer, record }) {
                         icon="pi pi-copy"
                         className="p-button p-component p-button-rounded p-button-outlined p-button-help p-button-icon-only"
                         onClick={(e) => { e.preventDefault(); e.currentTarget.blur(); copyToClipboard(getViewerPublicUrl(viewer.save_response.uuid)) }}
-                        tooltip="Copiar Url" tooltipOptions={{position: 'top'}}
+                        tooltip={t("copyUrl", "Copiar Url")} tooltipOptions={{position: 'top'}}
                     />
                 </div>
             </div>
@@ -208,18 +211,18 @@ function ShareViewerWidget({ type,viewer, record }) {
               <Button 
                 color='green'
                 icon={ viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                label="Obter Link" 
+                label={t("getLink", "Obter Link")} 
                 onClick={submit}
                 disabled={(viewer.save_loading)}
               />
             </div>
 
             { viewer.save_error && 
-              <Message style={{ width: '100%' }} severity="error" text="Serviço Indisponível"></Message>
+              <Message style={{ width: '100%' }} severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
             }
 
             { viewer.save_response && !!viewer.save_response.message && 
-              <Message style={{ width: '100%' }} severity="error" text="Ocorreu um erro"></Message>
+              <Message style={{ width: '100%' }} severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
             }           
           </form>
       </Dialog>)}

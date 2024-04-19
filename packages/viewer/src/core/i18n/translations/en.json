@@ -217,10 +217,26 @@
   "warnThemeExists": "The theme has already been added to the map",
   "warnThemeNotFound": "Couldn't find theme in map themes list",
 
-  "successActionMsg": "Operação realizada com sucesso",
+  "successActionMsg": "Operation successfully completed",
 
   "addThemes": "Add Themes",
 
   "zoomTheme": "Zoom to Theme",
-  "switchOnOffTheme": "Switch theme on/off"
+  "switchOnOffTheme": "Switch theme on/off",
+
+  "share": "Share",
+  "shareMap": "Share map",
+
+  "allowAddThemes" : "Allow themes to be added to the map",
+  "allowSaveSession": "Allow session recording?",
+  "allowAnonymousAccess": "Allow anonymous access",
+  "copyUrl": "Copy Url",
+  "getLink": "Get Url",
+  "unavailableService": "Unavailable service",
+
+  "save": "Save",
+  "saveMap": "Save map",
+
+  "name": "Name",
+  "isActive": "Is active"
 }

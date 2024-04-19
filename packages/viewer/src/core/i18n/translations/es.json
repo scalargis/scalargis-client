@@ -217,10 +217,26 @@
   "warnThemeExists": "La capa ya ha sido añadido al mapa",
   "warnThemeNotFound": "No se ha podido encontrar la capa en la lista de capas del mapa",
 
-  "successActionMsg": "Operação realizada com sucesso",
+  "successActionMsg": "Operación realizada con éxito",
 
   "addThemes": "Añadir Capas",
 
   "zoomTheme": "Ajuste al área de la capa",
-  "switchOnOffTheme": "Activar/desactivar capa"
+  "switchOnOffTheme": "Activar/desactivar capa",
+
+  "share": "Compartir",
+  "shareMap": "Compartir mapa",
+
+  "allowAddThemes" : "Permitir añadir temas al mapa",
+  "allowSaveSession": "Permitir la grabación de la sesión",
+  "allowAnonymousAccess": "Permitir acceso anónimo",
+  "copyUrl": "Copiar Url",
+  "getLink": "Obtener Url",
+  "unavailableService": "Servicio no disponible",
+
+  "save": "Salvar",
+  "saveMap": "Salvar mapa",
+
+  "name": "Nombre",
+  "isActive": "Es activo"
 }
