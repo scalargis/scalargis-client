@@ -76,7 +76,7 @@ const cookiePath = process.env.REACT_APP_COOKIE_PATH || '';
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
 
-export function viewer_save_record(record, history, redirect) {
+export function viewer_save_record(record, history, redirect, cb) {
   return function (dispatch, getState) {
     dispatch(viewer_save_http_loading());
 
@@ -109,6 +109,7 @@ export function viewer_save_record(record, history, redirect) {
           allow_anonymous: record.allow_anonymous,
           is_active: record.is_active
         } : null;
+        if (cb) cb(res);
         dispatch(viewer_save_response(res, save_options));
       }).catch(error => {
         console.log('error', error);
