@@ -17,7 +17,8 @@ import componentMessages from './messages'
 import { MAPCONTROL_NAME } from './utils'
 
 export default function FeatureResults({ core, config, features, layers, actions, pubsub, dispatch, mainMap, record }) {
-  const { viewer } = config;
+  const { viewer, Models } = config;
+  const { findOlLayer } = Models.Utils;
   const { selected_menu } = viewer.config_json;
   const { exclusive_mapcontrol } = viewer;
   const { publish, subscribe } = pubsub ? pubsub : {};
@@ -212,6 +213,17 @@ export default function FeatureResults({ core, config, features, layers, actions
           { Object.keys(grouped).map(layerId => {
             // Validate layer
             let layer = layers.find(l => l.id === layerId);
+
+            //If layer was added programmatically to map
+            if (!layer) {
+              const olLayer = findOlLayer(mainMap, layerId);
+              if (olLayer) {
+                const lprops = olLayer.getProperties();
+                const { id, title, feature_tpl, featureinfo_export_roles } = lprops;
+                layer = { id, title, feature_tpl, featureinfo_export_roles }
+              }
+            }
+
             if (!layer) return null;
 
             //Get export permissions from layer config
