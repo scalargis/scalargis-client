@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import Cookies from 'universal-cookie';
 import { Dropdown } from 'primereact/dropdown';
-import { InputText } from 'primereact/inputtext';
 import { containsCoordinate } from 'ol/extent';
 import { transform } from 'ol/proj';
 import MousePosition from 'ol/control/MousePosition';
@@ -18,7 +18,7 @@ function isCoordInExtent(coords, proj_coords, extent) {
   return containsCoordinate(parseExtent(extent), wgsCoords) === false
 }
 
-export default function Main({ config, actions, record }) {
+export default function Main({ core, config, actions, record }) {
   const { viewer, mainMap, dispatch } = config;
   const { display_crs, center } = viewer.config_json;
   const { viewer_set_displaycrs } = actions;
@@ -30,6 +30,17 @@ export default function Main({ config, actions, record }) {
   const handleChange = (event) => {
     dispatch(viewer_set_displaycrs(event.value));
   }
+
+  const userRoles = useMemo(()=>{
+    const cookies = new Cookies();
+    const logged = cookies.get(core.COOKIE_AUTH_NAME);
+  
+    let user_roles = [];
+    if (logged && logged.userroles && logged.userroles.length) {
+      user_roles = [...logged.userroles];
+    }
+    return user_roles;
+  }, []);
 
   useEffect(() => {
     if (record && record.config_json && record.config_json.crs_list && record.config_json.crs_list.length) {
@@ -43,6 +54,16 @@ export default function Main({ config, actions, record }) {
   useEffect(() => {
     const selected = listCRS.find(v => v.srid === display_crs);
     let precision = String(selected.precision).length-1;
+
+    if (selected.precision_roles?.length && userRoles?.length) {
+      const rp = selected.precision_roles.find(elem => (elem?.roles || []).some(item => userRoles.includes(item)));
+      if (rp) {
+        if (rp.precision) {
+          precision = String(rp.precision).length-1;
+        }
+      }
+    }
+
     const mousePosition = new MousePosition({
       target:  cursorRef.current,
       coordinateFormat: createStringXY(precision),
@@ -94,15 +115,7 @@ export default function Main({ config, actions, record }) {
         })} 
         onChange={handleChange} 
         placeholder={listCRS ? listCRS.find(v => v.srid === display_crs).label : 'Escolha'}
-      />      
-      {/*
-      <InputText 
-        value={display.join(selected.separator)}
-        readOnly 
-        style={{ width: '240px' }}
-        className="p-inputtext-sm p-d-block p-mb-2"
       />
-      */}
     </div>
   );
 }

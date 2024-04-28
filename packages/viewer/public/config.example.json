@@ -20,7 +20,17 @@
           "defs": "+proj=tmerc +lat_0=39.66825833333333 +lon_0=-8.133108333333334 +k=1 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
           "extent": "-9.5000 36.9000 -6.1900 42.1500",
           "description": "PT-TM06/ETRS89",
-          "precision": 10000
+          "precision": 10000,
+          "precision_roles": [
+            {
+              "roles": ["Authenticated"],
+              "precision": 10
+            },
+            {
+              "roles": ["Admin"],
+              "precision": 100
+            }
+          ]
         },
         {
           "srid": 27493,

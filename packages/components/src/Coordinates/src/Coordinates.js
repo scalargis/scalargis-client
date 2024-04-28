@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { useTranslation} from "react-i18next"
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation} from "react-i18next";
+import Cookies from 'universal-cookie';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
-import { TabView,TabPanel } from 'primereact/tabview';
 import { transform } from 'ol/proj'
 import { Button } from 'primereact/button'
 import {SplitButton} from 'primereact/splitbutton';
 import { Message } from 'primereact/message';
 import { Dropdown } from 'primereact/dropdown';
-import { InputText } from 'primereact/inputtext';
 import { InputMask } from 'primereact/inputmask';
 import { InputNumber } from 'primereact/inputnumber';
 import { RadioButton } from 'primereact/radiobutton';
@@ -41,6 +40,17 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const [coordLon, setCoordLon] = useState(null);
   const [coordLat, setCoordLat] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
+
+  const userRoles = useMemo(()=>{
+    const cookies = new Cookies();
+    const logged = cookies.get(core.COOKIE_AUTH_NAME);
+  
+    let user_roles = [];
+    if (logged && logged.userroles && logged.userroles.length) {
+      user_roles = [...logged.userroles];
+    }
+    return user_roles;
+  }, []);
 
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
@@ -90,6 +100,10 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       featureProjection: mainMap.getView().getProjection().getCode()
     };
 
+    if (list.length && list[0]?.results['EPSG:' + crs]?.precision) {
+      parseOptions["decimals"] = String(list[0].results['EPSG:' + crs].precision).length - 1;
+    }
+
     list.forEach(item => {
       const rec =  new OlFeature({
         geometry: new OlPoint(item.coordinates)
@@ -106,8 +120,18 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         if (found) {
           const field_prefix = (key || '').replace(':','');
 
-          rec.set(field_prefix + '_x', elem.coordinates[0]);
-          rec.set(field_prefix + '_y', elem.coordinates[1]);
+          let x = elem.coordinates[0];
+          let y = elem.coordinates[1];
+
+          //Set output precision
+          if (elem?.precision) {
+            const precision = elem.precision;
+            x = (Math.round(x * precision)  / precision);
+            y = (Math.round(y * precision)  / precision)
+          }
+
+          rec.set(field_prefix + '_x', x);
+          rec.set(field_prefix + '_y', y);
         }
       });
 
@@ -132,7 +156,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   }
 
   const serializeCoordinatesCSV = (list) => {
-    
+
     if (list == null || !list.length) {
       return null;
     }    
@@ -146,7 +170,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     //Build field names
     const fields = [];
     Object.entries(list[0].results).map(([key, elem]) => {
-      let found = true;            
+      let found = true;
       if (listCRS && listCRS.length) {
         const ss = listCRS.find(c => c.value == key);
         if (!ss) {
@@ -176,8 +200,16 @@ export default function Coordinates({ core, config, actions, dispatch, record })
           } 
         }
         if (found) {
-          values.push(item.results[key].coordinates[0]);
-          values.push(item.results[key].coordinates[1]);
+          let x = item.results[key].coordinates[0];
+          let y = item.results[key].coordinates[1];
+          //Set output precision
+          if (item.results[key]?.precision) {
+            const precision = item.results[key]?.precision;
+            x = (Math.round(x * precision)  / precision);
+            y = (Math.round(y * precision)  / precision)
+          }
+          values.push(x);
+          values.push(y);
         }
       });
       rows.push(values.join(col_dlm));
@@ -211,8 +243,18 @@ export default function Coordinates({ core, config, actions, dispatch, record })
 
     viewer.config_json.crs_list.forEach(crs => {
       const coords = transform(new_coords,  mainMap.getView().getProjection(), crs.code);
+
+      //Set precision for user role
+      let precision = crs.precision;
+      if (crs.precision_roles?.length && userRoles?.length) {
+        const rp = crs.precision_roles.find(elem => (elem?.roles || []).some(item => userRoles.includes(item)));
+        if (rp?.precision) {
+          precision = rp?.precision;
+        }
+      }
+
       trans_coords[crs.code] = { code: crs.code, title: crs.title, description: crs.description, 
-        srid: crs.srid, precision: crs.precision, coordinates: coords }
+        srid: crs.srid, precision: precision, coordinates: coords }
     }); 
 
     let item = { id: uuidV4(), coordinates: new_coords, crs: mainMap.getView().getProjection().getCode(), results: trans_coords };
@@ -259,8 +301,18 @@ export default function Coordinates({ core, config, actions, dispatch, record })
             let coords = [];
             if (result.results[crs.code]) {
               coords = [result.results[crs.code].x, result.results[crs.code].y];
+
+              //Set precision for user role
+              let precision = crs.precision;
+              if (crs.precision_roles?.length && userRoles?.length) {
+                const rp = crs.precision_roles.find(elem => (elem?.roles || []).some(item => userRoles.includes(item)));
+                if (rp?.precision) {
+                  precision = rp?.precision;
+                }
+              }
+
               trans_coords[crs.code] = { code: crs.code, title: crs.title, description: crs.description, 
-                srid: crs.srid, precision: crs.precision, coordinates: coords }
+                srid: crs.srid, precision: precision, coordinates: coords }
             }
           });          
           const new_coords = trans_coords[mainMap.getView().getProjection().getCode()].coordinates;    

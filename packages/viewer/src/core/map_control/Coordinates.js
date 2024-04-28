@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import Cookies from 'universal-cookie';
 import { transform } from 'ol/proj'
 import 'ol/ol.css';
 import VectorLayer from 'ol/layer/Vector'
@@ -54,13 +55,34 @@ export default function Coordinates({ core, config, actions }) {
 
   const coordinatesLayer = useRef();
 
+  const userRoles = useMemo(()=>{
+    const cookies = new Cookies();
+    const logged = cookies.get(core.COOKIE_AUTH_NAME);
+  
+    let user_roles = [];
+    if (logged && logged.userroles && logged.userroles.length) {
+      user_roles = [...logged.userroles];
+    }
+    return user_roles;
+  }, []);
+
 
   function transformCoordinates(x, y) {
     const trans_coords = {};
     viewer.config_json.crs_list.forEach(crs => {
       const coords = transform([x, y],  mainMap.getView().getProjection(), crs.code);
+
+      //Set precision for user role
+      let precision = crs.precision;
+      if (crs.precision_roles?.length && userRoles?.length) {
+        const rp = crs.precision_roles.find(elem => (elem?.roles || []).some(item => userRoles.includes(item)));
+        if (rp?.precision) {
+          precision = rp?.precision;
+        }
+      }
+
       trans_coords[crs.code] = { code: crs.code, title: crs.title, description: crs.description, 
-        srid: crs.srid, precision: crs.precision, coordinates: coords }
+        srid: crs.srid, precision: precision, coordinates: coords }
     });     
     setNewCoord({ id: uuidV4(), coordinates: [x, y], crs: mainMap.getView().getProjection().getCode(), results: trans_coords });
   }
@@ -88,8 +110,18 @@ export default function Coordinates({ core, config, actions }) {
             let coords = [];
             if (result.results[crs.code]) {
               coords = [result.results[crs.code].x, result.results[crs.code].y];
+
+              //Set precision for user role
+              let precision = crs.precision;
+              if (crs.precision_roles?.length && userRoles?.length) {
+                const rp = crs.precision_roles.find(elem => (elem?.roles || []).some(item => userRoles.includes(item)));
+                if (rp?.precision) {
+                  precision = rp?.precision;
+                }
+              }
+              
               trans_coords[crs.code] = { code: crs.code, title: crs.title, description: crs.description, 
-                srid: crs.srid, precision: crs.precision, coordinates: coords }
+                srid: crs.srid, precision: precision, coordinates: coords }
             }
           });          
           const new_coords = [x, y];
