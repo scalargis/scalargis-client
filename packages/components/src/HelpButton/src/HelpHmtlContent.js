@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from "react-i18next";
+
+import { i18n as i18nUtils } from '@scalargis/components';
 
 import './style.css';
 
@@ -8,21 +9,24 @@ export default function HelpHtmlContent({ config }) {
 
   const [dialogContent, setDialogContent ] = useState(null);
 
-  const { i18n } = useTranslation(["common", "custom"]);
+  const lang = i18nUtils.getResolvedLanguage();
 
   let html;
   if (typeof config?.html === "object") {
     html = config.html["default"] ? config.html["default"] : "";
-    html = config.html[i18n.resolvedLanguage] ? config.html[i18n.resolvedLanguage] : html;
+    html = config.html[lang] ? config.html[lang] : html;
   } else {
     html = config?.html || "";
   }
 
+  console.log(html);
+
   useEffect(() => {    
     if (config.url) {
-      const url = i18n.resolvedLanguage ? 
-        config.url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
+      const url = lang ? 
+        config.url.replace("{lang}", lang).replace("{language}", lang)
         : config.url;
+      
       fetch(url).then(res => {
           return res.text();
       }).then(result => {

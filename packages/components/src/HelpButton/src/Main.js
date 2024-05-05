@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { useTranslation } from "react-i18next";
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { Dialog } from 'primereact/dialog';
+
+import { i18n as i18nUtils } from '@scalargis/components';
 
 import HelpHtmlContent from './HelpHmtlContent';
 
@@ -16,8 +17,6 @@ export function MainMenu({ className, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
-  const { i18n, t } = useTranslation(["common", "custom"]);
-
   const [showPopup, setShowPopup] = useState(false);
   const [size, setSize] = useState(null);
   const [maximized, setMaximized] = useState(false);
@@ -25,17 +24,19 @@ export function MainMenu({ className, config, actions, record }) {
   const dialog = useRef();
 
   const component_cfg = record.config_json || {};
-  const title = record.title ? t(record.title, record.title, {"ns": "custom"}) : t("help", "Ajuda");
-  const header = component_cfg.header ? t(component_cfg.header, component_cfg.header, {"ns": "custom"}) : title;
+  const title = record.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("help", "Ajuda");
+  const header = component_cfg?.header ? i18nUtils.translateValue(component_cfg.header, component_cfg.header) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  if (record.as === 'popup') {    
-    const closeLabel = component_cfg.closeLabel ? t(component_cfg.closeLabel, component_cfg.closeLabel, {"ns": "custom"}) : t("close", "Fechar");
+  const lang = i18nUtils.getResolvedLanguage();
 
-    let url = i18n.resolvedLanguage ? 
-      component_cfg.url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
+  if (record.as === 'popup') {
+    const closeLabel = component_cfg.closeLabel ? i18nUtils.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18nUtils.translateValue("close", "Fechar");
+
+    let url = lang ? 
+      component_cfg.url.replace("{lang}", lang).replace("{language}", lang)
       : component_cfg.url;
 
     return (
@@ -97,8 +98,8 @@ export function MainMenu({ className, config, actions, record }) {
 
     if (!help_url) return null;
 
-    help_url = i18n.resolvedLanguage ? 
-      help_url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
+    help_url = lang ? 
+      help_url.replace("{lang}", lang).replace("{language}", lang)
       : help_url;
 
     return (
@@ -127,8 +128,6 @@ export default function Main({ type, as, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
-  const { i18n, t } = useTranslation(["common", "custom"]);
-
   const [showPopup, setShowPopup] = useState(false);
   const [size, setSize] = useState(null);
   const [maximized, setMaximized] = useState(false);
@@ -136,15 +135,17 @@ export default function Main({ type, as, config, actions, record }) {
   const dialog = useRef();    
 
   const component_cfg = record.config_json || {};
-  const title = record.title ? t(record.title, record.title, {"ns": "custom"}) : t("help", "Ajuda");
-  const header = component_cfg.header ? t(component_cfg.header, component_cfg.header, {"ns": "custom"}) : title;
+  const title = record.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("help", "Ajuda");
+  const header = component_cfg?.header ? i18nUtils.translateValue(component_cfg.header, component_cfg.header) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  const closeLabel = component_cfg.closeLabel ? t(component_cfg.closeLabel, component_cfg.closeLabel, {"ns": "custom"}) : t("close", "Fechar");
-  
-  const openAs = record?.as || as; 
+  const closeLabel = component_cfg.closeLabel ? i18nUtils.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18nUtils.translateValue("close", "Fechar");
+
+  const openAs = record?.as || as;
+
+  const lang = i18nUtils.getResolvedLanguage();
 
   // Render content
   function renderContent() {
@@ -163,9 +164,13 @@ export default function Main({ type, as, config, actions, record }) {
 
   if (openAs === 'popup') {
     
-    let url = i18n.resolvedLanguage ? 
-      component_cfg.url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
-      : component_cfg.url;
+    let url;
+    
+    if (component_cfg.url) {
+      url = lang ? 
+        component_cfg.url.replace("{lang}", lang).replace("{language}", lang)
+        : component_cfg.url;
+    }
 
     return (
       <React.Fragment>
@@ -228,8 +233,8 @@ export default function Main({ type, as, config, actions, record }) {
 
     if (!help_url) return null;
 
-    help_url = i18n.resolvedLanguage ? 
-      help_url.replace("{lang}", i18n.resolvedLanguage).replace("{language}", i18n.resolvedLanguage)
+    help_url = lang ? 
+      help_url.replace("{lang}", lang).replace("{language}", lang)
       : help_url;
 
     // Render help button
