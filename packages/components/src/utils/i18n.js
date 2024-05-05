@@ -45,3 +45,7 @@ export const translateValue = (value, defaultString=null, lang=i18next.resolvedL
   }
   return translatedValue;
 }
+
+export const getResolvedLanguage = () => {
+  return i18next?.resolvedLanguage;
+}
