@@ -51,8 +51,13 @@
 
 .ol-control button:hover, .ol-control button:focus {
     text-decoration: none;
-    background: rgba(103, 58, 183, 0.76);
+    color: #ffffff;
+    background-color: rgba(33, 150, 243);
     outline: 0;
+}
+
+.ol-control button:hover {
+    background-color: rgba(33, 150, 243, 0.92);
 }
 
 .ol-touch .ol-control button {
@@ -81,4 +86,17 @@
 }
 .ol-attribution.ol-collapsed button {
     padding-bottom: .2rem;
+}
+
+#map .p-button:hover, #map .p-button:focus {
+    color: #ffffff;
+    background-color: rgba(33, 150, 243);
+}
+
+#map .p-button:hover {
+    background-color: rgba(33, 150, 243, 0.92);
+}
+
+#map .p-button.active {
+    background-color: #2681c9;
 }
