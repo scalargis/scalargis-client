@@ -238,5 +238,51 @@
   "saveMap": "Gravar mapa",
 
   "name": "Nome",
-  "isActive": "Está ativo"
+  "isActive": "Está ativo",
+
+  "endSession": "Terminar sessão",
+  "user": "Utilizador",
+  "login": "Entrar",
+  "userRegistration": "Criar utilizador",
+  "passwordReset": "Recuperar password",
+  "password": "Palavra-passe",
+  "required": "Preenchimento obrigatório",
+  "wrongUsernamePassword": "Nome de Utilizador ou Palavra-passe inválido",
+  "wrongUser": "O Utilizador indicado não é válido",
+  "send": "Enviar",
+  "passwordResetRequestSuccessMsg": "Foi enviado um email com as instruções para recuperação da palavra-passe.",
+  "passwordResetRequestInfoMsg": "Caso não receba o email com as instruções para recuperação da palavra-passe durante os próximos minutos, verifique se este não foi direcionado para a área de SPAM do seu correio eletrónico.",
+  "userRegistrationData": "Dados de registo",
+  "userRegistrationDataName": "Nome",
+  "userRegistrationDataEmail": "Email",
+  "userRegistrationDataUsername": "Nome de utilizador",
+  "userRegistrationDataPassword": "Password",
+
+  "suggestions": "Sugestões",
+  "weakPasswordLabel": "Fraca",
+  "mediumPasswordLabel": "Média",
+  "strongPasswordLabel": "Forte",
+  "passwordLowerRule": "Pelo menos uma minúscula",
+  "passwordUpperRule": "Pelo menos uma maiúscula",
+  "passwordDigitRule": "Pelo menos um dígito",
+  "passwordSizeRule": "Pelo menos 8 caracteres",
+  "enterPassword": "Introduza a password",
+
+  "acceptThe": "Aceito os",
+  "termsAndConditions": "termos e condições de utilização",
+
+  "userRegistrationSuccess": "Registo realizado com sucesso",
+  "userRegistrationSuccessMsg": "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.",
+  "userRegistrationErrorAlreadyExists": "Já existe um utilizador com o username ou email indicado",
+  "createUser": "Criar utilizador",
+
+  "activeUserSession": "Existe uma sessão ativa para o utilizador <i><strong>{{username}}</strong></i>.",
+  "clickTo": "Clique para",
+  "andFinishUserRegistration": "e concluir registo de novo utilizador",
+  "userRegistrationConfirmation": "Confirmação de registo de utilizador",
+  "userRegistrationConfirmationSuccess": "Registo de utilizador confirmado com sucesso",
+  "userRegistrationInvalid": "Confirmação de registo inválida",
+  "userRegistrationFillEmail": "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo",
+  "userRegistrationConfirmationSentToEmail": "Enviada confirmação de registo de utilizador para o email {{email}}.",
+  "userRegistrationConfirmationWrongEmail": "Não existe nenhum registo de utilizador com o email indicado."
 }

@@ -6,6 +6,8 @@ import { connect, useDispatch } from 'react-redux'
 import AppContext from '../../AppContext'
 import { Message } from 'primereact/message'
 
+import { i18n as i18nUtils } from '@scalargis/components';
+
 const cookies = new Cookies();
 
 function RegistrationConfirmationWidget({ token, auth, registration, history, redirect, urlRedirect }) {
@@ -26,20 +28,20 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
  
     dispatch(registration_confirmation({ token }, history, redirect));
   }, []);
-  
+
   // Render user
   if (cookieData) {
     const { username } = cookieData;
     return (
       <div>
-        <p>Existe uma sessão ativa para o utilizador <i><strong>{ username }</strong></i>.</p>
+        <p dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("activeUserSession", "Existe uma sessão ativa para o utilizador <i><strong>{{username}}</strong></i>", undefined, undefined, undefined, {username: username})}} />
         <p>
-          Clique para 
+          {i18nUtils.translateValue("clickTo", "Clique para ")}
           <Button
             className="p-button-link"
-            label="terminar sessão"
+            label={i18nUtils.translateValue("endSession", "terminar sessão").toLowerCase()}
             onClick={e => dispatch(logout())}
-          />e concluir registo de novo utilizador.
+          />{i18nUtils.translateValue("andFinishUserRegistration", "e concluir registo de novo utilizador")}.
         </p>
       </div>
     )
@@ -52,10 +54,10 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
   if (registration.response && !!registration.response && !!registration.response.authenticated) {
     return (
       <div className="p-d-flex p-ai-center p-dir-col p-px-3">
-        <h3>Registo de utilizador</h3>
+        <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
         <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
-        <p style={{ lineHeight: 1.5 }}>Registo de utilizador confirmado com sucesso!</p>
-        <Button label="Continuar" 
+        <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
+        <Button label={i18nUtils.translateValue("continue", "Continuar")} 
           onClick={ e => {
             setGoRedirect(true);
             dispatch(login(registration.response, history, redirect, urlRedirect));
@@ -69,7 +71,7 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
   return (
     <React.Fragment>
       { auth.http_error && !auth.response &&
-        <Message style={{ width: '100%' }} severity="error" text="Serviço Indisponível"></Message>
+        <Message style={{ width: '100%' }} severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}></Message>
       }
 
       { auth.http_error && auth.response && !!auth.response.message && 
@@ -80,7 +82,7 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
 
             <div className="p-field p-grid">
               <div className="p-col-12">
-                <h3>Confirmação de registo de utilizador</h3>
+                <h3>{i18nUtils.translateValue("userRegistrationConfirmation", "Confirmação de registo de utilizador")}</h3>
               </div>
             </div>
 
@@ -91,11 +93,11 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
             </div>
 
             <div className="p-field p-grid">
-              <div className="p-col-12">Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo.</div>
+              <div className="p-col-12">{i18nUtils.translateValue("userRegistrationFillEmail", "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo")}.</div>
             </div>                     
 
             <div className="p-field p-grid">
-              <label className="p-col-12 p-md-2">Email</label>
+              <label className="p-col-12 p-md-2">{i18nUtils.translateValue("email", "Email")}</label>
               <div className="p-col-12 p-md-10">
                 <InputText value={emailConfirmation} onChange={(e) => setEmailConfirmation(e.target.value)} />
               </div>
@@ -106,7 +108,7 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
             <Button 
               color='green'
               icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-              label="Enviar" 
+              label={i18nUtils.translateValue("send", "Enviar")}
               onClick={sendEmailConfirmation}
               disabled={auth.loading}
             />
@@ -119,7 +121,7 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
           <div className="p-fluid" style={{"maxWidth": "500px"}}>
             <div className="p-field p-grid">
               <div className="p-col-12">
-                <h3>Confirmação de registo de utilizador</h3>
+                <h3>{i18nUtils.translateValue("userRegistrationConfirmation", "Confirmação de registo de utilizador")}</h3>
               </div>
             </div>
             <Message style={{ width: '100%' }} severity="info" text={auth.response.message}></Message>

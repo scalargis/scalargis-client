@@ -238,5 +238,51 @@
   "saveMap": "Enregistrer la carte",
 
   "name": "Nom",
-  "isActive": "Est-il actif"
+  "isActive": "Est-il actif",
+
+  "endSession": "End session",
+  "user": "User",
+  "login": "Login",
+  "userRegistration": "New user",
+  "passwordReset": "Reset password",
+  "password": "Password",
+  "required": "Required field",
+  "wrongUsernamePassword": "Wrong user or password",
+  "wrongUser": "Invalid user",
+  "send": "Send",
+  "passwordResetRequestSuccessMsg": "An email has been sent with instructions for recovering your password.",
+  "passwordResetRequestInfoMsg": "If you do not receive the email with instructions for recovering your password within the next few minutes, check that it has not been sent to the SPAM area of ​​your email.",
+  "userRegistrationData": "User data",
+  "userRegistrationDataName": "Name",
+  "userRegistrationDataEmail": "Email",
+  "userRegistrationDataUsername": "Username",
+  "userRegistrationDataPassword": "Password",
+
+  "suggestions": "Suggestions",
+  "weakPasswordLabel": "Weak",
+  "mediumPasswordLabel": "Medium",
+  "strongPasswordLabel": "Strong",
+  "passwordLowerRule": "At least a lower case letter",
+  "passwordUpperRule": "At least an upper case letter",
+  "passwordDigitRule": "At least one digit",
+  "passwordSizeRule": "At least 8 characters",
+  "enterPassword": "Enter password",
+
+  "acceptThe": "I accept the",
+  "termsAndConditions": "terms and conditions",
+  
+  "userRegistrationSuccess": "User created with success",
+  "userRegistrationSuccessMsg": "Your account was created with the <b>{{username}}</b> username, you must activate it within the next 24 hours. Please check the account activation instructions sent to <b>{{email}}</b>.",
+  "userRegistrationErrorAlreadyExists": "A user with the specified username or email already exists",
+  "createUser": "Create user",
+
+  "activeUserSession": "There is an active session for the user <i><strong>{{username}}</strong></i>.",
+  "clickTo": "Click to",
+  "andFinishUserRegistration": "and complete the user creation process",
+  "userRegistrationConfirmation": "User creation confirmation",
+  "userRegistrationConfirmationSuccess": "User creation confirmed successfully",
+  "userRegistrationInvalid": "Invalid user confirmation",
+  "userRegistrationFillEmail": "Enter the email used to create the user so that a new confirmation can be sent",
+  "userRegistrationConfirmationSentToEmail": "User creation confirmation sent to email {{email}}.",
+  "userRegistrationConfirmationWrongEmail": "There is no user with the email indicated."
 }

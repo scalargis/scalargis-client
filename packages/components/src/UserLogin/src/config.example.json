@@ -8,6 +8,7 @@
     "header": "Entrar - COSvgi",
     "closable": false,
     "reset_password": true,
+    "reset_password_login_error": true,
     "user_registration": true,
     "actions": {
       "login": "COSvgi/Login",
