@@ -32,16 +32,16 @@ export const getTranslations = () => {
   return i18next.options.resources;
 }
 
-export const translateValue = (value, defaultString=null, lang=i18next.resolvedLanguage, t=i18next?.t, namespaces=i18next?.options?.ns) => {
+export const translateValue = (value, defaultString=null, lang=i18next.resolvedLanguage, t=i18next?.t, namespaces=i18next?.options?.ns, variables={}) => {
   let translatedValue = defaultString;
   if (typeof value === 'object') {
     translatedValue = value["default"] ? value["default"] : "";
     translatedValue = value[lang] ? value[lang] : translatedValue;
 
     const _defaultString = typeof defaultString === 'string' ? defaultString : translatedValue;
-    translatedValue = translatedValue ? (namespaces ? t(translatedValue, _defaultString, { ns: namespaces }) : t(translatedValue, _defaultString)) : "";
+    translatedValue = translatedValue ? (namespaces ? t(translatedValue, _defaultString, { ns: namespaces, ...variables}) : t(translatedValue, _defaultString, variables)) : "";
   } else {
-    translatedValue = value ? (namespaces ? t(value, defaultString, { ns: namespaces }) : t(value, defaultString)) : "";
+    translatedValue = value ? (namespaces ? t(value, defaultString, { ns: namespaces, ...variables }) : t(value, defaultString, variables)) : "";
   }
   return translatedValue;
 }
