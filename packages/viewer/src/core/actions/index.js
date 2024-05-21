@@ -1,5 +1,7 @@
 import { transformExtent } from "../model/MapModel"
 import Cookies from 'universal-cookie'
+
+import { i18n as i18nUtils } from '@scalargis/components'
 import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from '../utils'
 import { isThemeOnScale as isThemeOnScaleMapModel } from '../model/MapModel'
 import { loadTranslations } from "../i18n"
@@ -178,7 +180,7 @@ export function login_post(post, history, redirect, urlRedirect) {
             window.location.reload();
           }
         } else {
-          dispatch(login_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
+          dispatch(login_http_error({ status: 401, message: i18nUtils.translateValue("wrongUsernamePassword", "Nome de Utilizador ou Palavra-passe inválido")}));
         }
       }).catch(error => {
         console.log('error', error);
@@ -260,7 +262,11 @@ export function login_reset_password(post, history, redirect) {
         if (!res.error) {
           dispatch(login_response({reset_password:true, ...res}));
         } else {
-          dispatch(login_http_error({status: res.status, message: res.message}));
+          let msg = res.message;
+          if (res?.status === 401) {
+            msg = i18nUtils.translateValue("wrongUser", "O Utilizador indicado não é válido")
+          }
+          dispatch(login_http_error({status: res.status, message: msg}));
         }
       }).catch(error => {
         dispatch(login_http_error());
@@ -359,7 +365,11 @@ export function login_user_registration(post, history, redirect) {
         if (!res.error) {
           dispatch(login_response({register_user:true, username, email, redirect, ...res}));
         } else {
-          dispatch(login_http_error({status: res.status, message: res.message}));
+          if (res.status === 409) {
+            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", res.message)}));
+          } else {
+            dispatch(login_http_error({status: res.status, message: res.message}));
+          }
         }
       }).catch(error => {
         dispatch(login_http_error());
@@ -420,7 +430,12 @@ export function registration_confirmation(post, history, redirect) {
         if (!res.error) {
           dispatch(registration_response(res));
         } else {
-          dispatch(login_http_error({status: res.status, valid_token:false, message: res.message}));
+          if (res.status === 401) {
+            console.log(res.message);
+            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationInvalid", res.message)}));
+          } else {
+            dispatch(login_http_error({status: res.status, valid_token:false, message: res.message}));
+          }
         }
       }).catch(error => {
         dispatch(login_http_error());
@@ -443,9 +458,18 @@ export function registration_send_confirmation(post, history, redirect) {
       .then(res => res.json())
       .then(res => {
         if (!res.error) {
-          dispatch(login_response(res));
+          if (res?.email) {
+            const msg = i18nUtils.translateValue("userRegistrationConfirmationSentToEmail","Enviada confirmação de registo de utilizador para o email {{email}}.", undefined, undefined, undefined, {email: res.email})
+            dispatch(login_response({...res, message: msg}));
+          } else {
+            dispatch(login_response(res));
+          }
         } else {
-          dispatch(login_http_error({status: res.status, message: res.message}));
+          if (res?.status === 401) {
+            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationConfirmationWrongEmail", res.message)}));
+          } else {
+            dispatch(login_http_error({status: res.status, message: res.message}));
+          }
         }    
       }).catch(error => {
         dispatch(login_http_error());
