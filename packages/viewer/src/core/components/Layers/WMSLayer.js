@@ -113,6 +113,9 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
     if (t && config.datasource) t.set("datasource", config.datasource);
     if (t && config.get_feature_info_format) t.set('get_feature_info_format', config.get_feature_info_format);
 
+    //Dimensions
+    if (t && Array.isArray(config?.dimensions)) t.set("dimensions", [...config.dimensions]);
+
     if (t && config.min_resolution) {
       t.setMinResolution(config.min_resolution);
     }
