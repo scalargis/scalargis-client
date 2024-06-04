@@ -303,7 +303,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
   let result = [];
 
   // Get formats for GetMap request
-  let get_map_formats = wms.Capability.Request.GetMap.Format.join(',');
+  let get_map_formats =  Array.isArray(wms?.Capability?.Request?.GetMap?.Format) ? wms.Capability.Request.GetMap.Format.join(',') : '';
   // Set prefered getMap format
   let get_map_format_preference = [
     'image/png',
@@ -326,7 +326,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
   }
 
   // Get formats for GetFeatureInfo request
-  let get_feature_info_formats = wms.Capability.Request.GetFeatureInfo.Format.join(',');
+  let get_feature_info_formats = Array.isArray(wms?.Capability?.Request?.GetFeatureInfo?.Format) ? wms.Capability.Request.GetFeatureInfo.Format.join(',') : '';
   // Set prefered getFeatureInfo format
   let get_feature_info_format_preference = [
     'application/json',
