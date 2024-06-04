@@ -236,7 +236,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
     return (
       <div style={{width: "100%"}}> 
-        <Message severity="info" text={`O tema "${theme?.id}" não está visível`} className="p-mt-2" style={{width: "100%" }} />
+        <Message severity="info" text={`O tema "${theme?.title}" não está visível`} className="p-mt-2" style={{width: "100%" }} />
       </div>
     )
   }
