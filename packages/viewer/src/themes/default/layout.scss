@@ -332,7 +332,8 @@ body .p-multiselect {
 .map-region-top-right,
 .map-region-left,
 .map-region-bottom-left,
-.map-region-bottom-right {
+.map-region-bottom-right,
+.map-region-bottom-center {
   position: absolute;
   z-index: 1;
 }
@@ -346,7 +347,7 @@ body .p-multiselect {
 .map-region-top-right {
   top: 1.5em;
   right: 0.5em;
-  width: inherit;
+  /*width: inherit;*/
 }
 
 .map-region-left {
@@ -370,6 +371,19 @@ body .p-multiselect {
   width: inherit;
 }
 
+.map-region-bottom-center {
+  bottom: 1.8em;
+  /*
+  margin-left: 40%;
+  margin-right: 40%;
+  text-align: center;
+  width: inherit;
+  */
+  max-width: max-content;
+  margin-left: 40%;
+  margin-right: auto;
+}
+
 .map-region-left .p-button:hover,
 .map-region-left .p-button:focus,
 .map-region-top-left .p-button:hover,
@@ -379,7 +393,8 @@ body .p-multiselect {
 .map-region-bottom-left .p-button:hover,
 .map-region-bottom-left .p-button:focus,
 .map-region-bottom-right .p-button:hover,
-.map-region-bottom-right .p-button:focus
+.map-region-bottom-right .p-button:focus,
+.map-region-bottom-center .p-button:focus
 {
   text-decoration: none;
   background: rgba(103, 58, 183, 0.76);

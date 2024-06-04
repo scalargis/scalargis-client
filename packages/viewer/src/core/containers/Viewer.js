@@ -15,6 +15,7 @@ import MapControlsTopLeft from './MapControlsTopLeft'
 import MapControlsTopRight from './MapControlsTopRight'
 import MapControlsLeft from './MapControlsLeft'
 import MapControlsBottomLeft from './MapControlsBottomLeft'
+import MapControlsBottomCenter from './MapControlsBottomCenter'
 import MapControlsBottomRight from './MapControlsBottomRight'
 import OlControls from '../map_control'
 import { mapStateToProps } from '../utils'
@@ -126,6 +127,7 @@ function Viewer(props) {
         <MapControlsTopRight />
         <MapControlsLeft />
         <MapControlsBottomLeft />
+        <MapControlsBottomCenter />
         <MapControlsBottomRight />
 
         { !!map_controls && map_controls.map(ctrl => {
