@@ -27,6 +27,7 @@
     float: right;
     right: 0px;
     top: -15px;
+    width: max-content;
 }
 
 .map-region-top-right .basemaps-control > div {
