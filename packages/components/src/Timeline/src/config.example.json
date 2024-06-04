@@ -1,0 +1,14 @@
+{
+    "id": "timeline",
+    "type": "Timeline",
+    "title": "Timeline Control",
+    "target": "map_controls_bottom_center",
+    "config_json": {
+        "datasource": {
+        "layer_id": "layer1"
+        },
+        "dimension": {
+        "name": "time"
+        }
+    }
+}
