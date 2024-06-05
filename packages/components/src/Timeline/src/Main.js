@@ -35,86 +35,102 @@ export default function Main(props) {
     let dimension_name;
 
     if (component_cfg?.datasource?.layer_id) {
-      const theme = viewer.config_json.layers.find(l => l.id === component_cfg?.datasource?.layer_id);
+      const _theme = viewer.config_json.layers.find(l => l.id === component_cfg?.datasource?.layer_id);
       
-      if (theme) {
-        setTheme(theme);
-        if (theme.dimension_name) dimension_name = theme.dimension_name;
-
-        if (theme?.dimensions?.length) {
-          dimension = theme.dimensions.find(d => d.name === dimension_name);
-        }
-
-        if (dimension) {
-          //Set Dimension to state
-          setDimension(dimension);
-        } else {
-          let url = theme.url;;
-          url = removeUrlParam(url, 'request')
-          url = removeUrlParam(url, 'service')
-          url = removeUrlParam(url, 'version')
-          url = url + (url.indexOf('?') > -1 ? '' : '?')
-          url = url + '&SERVICE=WMS&REQUEST=GetCapabilities';
-          if (theme?.version) {
-            url = url + '&VERSION=' + theme.version;
-          }
-      
-          //Add user authentication token
-          if (isUrlAppHostname(url) && viewer.integrated_authentication) {
-            if (auth && auth.data && auth.data.auth_token) {
-              const authkey = viewer?.integrated_authentication_key || 'authkey';
-              url = url + '&' + authkey + '=' + auth.data.auth_token;
-            }
-          }
-      
-          if (!isUrlAppOrigin(url)) {
-            url = core.MAP_PROXY_URL + encodeURIComponent(url);
-          }
-
-          fetch(url)
-          .then(res => {
-            if (!res.ok) throw Error(res.statusText);
-            return res;
-          })
-          .then(res => res.text())
-          .then((r) => {
-            try {
-              const parser = new WMSCapabilities();
-              const wms = parser.read(r);
-  
-              let layer;
-              if (wms?.Capability?.Layer?.Layer.length) {
-                layer = wms.Capability.Layer.Layer[0];
-              } else {
-                layer = wms.Capability.Layer.Layer;
-              }
-  
-              if (layer) {
-                if (layer?.Dimension?.length) {
-                  dimension = layer.Dimension.find(d => d.name === theme.dimension_name);
-                } else if (layer.Dimension) {
-                  dimension = layer.Dimension || null;
-                }
-                
-                if (dimension) {
-                  //Set Dimension to state
-                  setDimension(dimension);
-                }
-              }
-            } catch (e) {
-              console.log(e);
-            }
-          }).catch((error) => {
-              console.log(e);
-          });
-        }
+      if (_theme) {
+        setTheme(_theme);
       } else {
         //TODO
       }
-
+    } else {
+      //TODO
     }
 
   }, [mainMap]);
+
+  useEffect(() => {
+
+    if (!mainMap) return;
+    if (!theme) return;
+
+    let dimension;
+    let dimension_name;
+      
+    if (theme) {
+      if (theme.dimension_name) dimension_name = theme.dimension_name;
+
+      if (theme?.dimensions?.length) {
+        dimension = theme.dimensions.find(d => d.name === dimension_name);
+      }
+
+      if (dimension) {
+        //Set Dimension to state
+        setDimension(dimension);
+      } else {
+        let url = theme.url;;
+        url = removeUrlParam(url, 'request')
+        url = removeUrlParam(url, 'service')
+        url = removeUrlParam(url, 'version')
+        url = url + (url.indexOf('?') > -1 ? '' : '?')
+        url = url + '&SERVICE=WMS&REQUEST=GetCapabilities';
+        if (theme?.version) {
+          url = url + '&VERSION=' + theme.version;
+        }
+    
+        //Add user authentication token
+        if (isUrlAppHostname(url) && viewer.integrated_authentication) {
+          if (auth && auth.data && auth.data.auth_token) {
+            const authkey = viewer?.integrated_authentication_key || 'authkey';
+            url = url + '&' + authkey + '=' + auth.data.auth_token;
+          }
+        }
+    
+        if (!isUrlAppOrigin(url)) {
+          url = core.MAP_PROXY_URL + encodeURIComponent(url);
+        }
+
+        fetch(url)
+        .then(res => {
+          if (!res.ok) throw Error(res.statusText);
+          return res;
+        })
+        .then(res => res.text())
+        .then((r) => {
+          try {
+            const parser = new WMSCapabilities();
+            const wms = parser.read(r);
+
+            let layer;
+            if (wms?.Capability?.Layer?.Layer.length) {
+              layer = wms.Capability.Layer.Layer.find(l => l.Name === theme.layers);
+            } else {
+              layer = wms.Capability.Layer.Layer;
+            }
+
+            if (layer) {
+              if (layer?.Dimension?.length) {
+                dimension = layer.Dimension.find(d => d.name === theme.dimension_name);
+              } else if (layer.Dimension) {
+                dimension = layer.Dimension || null;
+              }
+              
+              if (dimension) {
+                //Set Dimension to state
+                setDimension(dimension);
+              }
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }).catch((error) => {
+            console.log(e);
+        });
+      }
+    } else {
+      //TODO
+    }
+
+  }, [theme]);
 
   function renderContent() {
     return (
@@ -152,5 +168,5 @@ export default function Main(props) {
   )
 
   // Render component
-  return renderContent()
+  return renderContent();
 }
