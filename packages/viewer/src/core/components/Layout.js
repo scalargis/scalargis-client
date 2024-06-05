@@ -6,7 +6,7 @@ import 'primereact/resources/primereact.min.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import { getWindowSize, buildRelativeUrlPath } from '../utils'
-import Script, {ScriptHtml} from './Script'
+import Script, {ScriptWithProps, ScriptHtml} from './Script'
 import Style, {StyleHtml} from './Style'
 import LoadingScreen from './LoadingScreen'
 import EventManager from '../events/EventManager'
@@ -151,9 +151,17 @@ function Layout(props) {
 
         <div className="layout-mask"></div>
 
-        { !loaded && <LoadingScreen /> }         
+        { !loaded && <LoadingScreen /> }
 
-        { (config && config.scripts) ? config.scripts.map((k, i) => <Script key={i} src={k} async={false} />) : null }
+        {/*{ (config && config.scripts) ? config.scripts.map((k, i) => <Script key={i} src={k} async={false} />) : null }*/}
+        { (config && config.scripts) ? config.scripts.map((k, i) => {
+            if (typeof k === 'object' && k !== null) {
+              return <ScriptWithProps key={i} {...k} />
+            } else {
+              return <Script key={i} src={k} async={false} />
+            }
+          }) : null
+        }
         { (config && config.styles) ? config.styles.map((k, i) => <Style key={i} src={k} async={false} />) : null }
         
         { (config && config.custom_style) ? <StyleHtml style={config.custom_style} 

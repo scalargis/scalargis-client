@@ -15,6 +15,22 @@ const useScript = (url, async) => {
   }, [url])
 }
 
+const useScriptWithProps = (props) => {
+  useEffect(() => {
+    const script = document.createElement('script');
+
+    for (const [key, value] of Object.entries(props)) {
+      script.setAttribute(key, value);
+    }
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    }
+  }, [props])
+}
+
 const useScriptHmtl = (code) => {
   useEffect(() => {
     const script = document.createElement('script');
@@ -33,8 +49,13 @@ const useScriptHmtl = (code) => {
   }, [code])  
 }
 
-export default function Script({ src, async=true}) {
+export default function Script({ src, async=true }) {
   useScript(src, async);
+  return null;
+}
+
+export function ScriptWithProps(props) {
+  useScriptWithProps(props);
   return null;
 }
 
