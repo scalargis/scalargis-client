@@ -4,7 +4,7 @@ import { Panel } from 'primereact/panel'
 import { getRenderPixel } from 'ol/render';
 import LayerCompare from './LayerCompare.js';
 
-import { findOlLayer } from '../../../core/utils'  // ? can t access Models from config ?
+//import { findOlLayer } from '../../../core/utils'  // ? can t access Models from config ?
 
 import './style.css';
 import './control.css'
@@ -50,7 +50,8 @@ export function MainMenu({ className, config, actions, record }) {
 /**
  * Main component
  */
-export default function Main({ as, config, actions, core, record }) {
+export default function Main({ as, config, actions, core, record, utils }) {
+
 
   const { viewer, dispatch, mainMap } = config;
   const component_cfg = record.config_json || {};
@@ -356,6 +357,7 @@ export default function Main({ as, config, actions, core, record }) {
                 setCompareTool={setCompareTool}
                 opacitySliderValue={opacitySliderValue}
                 setOpacitySliderValue={setOpacitySliderValue}
+                utils={utils}
               />
             </div>
           </div>
@@ -377,6 +379,7 @@ export default function Main({ as, config, actions, core, record }) {
           setCompareTool={setCompareTool}
           opacitySliderValue={opacitySliderValue}
           setOpacitySliderValue={setOpacitySliderValue}
+          utils={utils}
         />
 
 
