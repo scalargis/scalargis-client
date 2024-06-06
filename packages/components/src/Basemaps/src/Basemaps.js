@@ -9,7 +9,7 @@ export default function Basemaps({ core, viewer, mainMap, config, actions, recor
   const dispatch = config.dispatch;
 
   const [autoClose, setAutoClose] = useState(record.config_json && record.config_json.auto_close)
-  const [opened, setOpened] = useState(false);
+  const [opened, setOpened] = useState(record.config_json.opened === true ? true : false);
 
   const layersIds = layers.map(l => l.id);
 
@@ -36,14 +36,12 @@ export default function Basemaps({ core, viewer, mainMap, config, actions, recor
         className={opened ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised" } 
         onClick={(e) => { e.currentTarget.blur(); setOpened(!opened) } } 
       />
-      { opened &&
-      <div className="basemaps-control">
+      <div className={`basemaps-control${record?.config_json?.vertical === true ? " basemaps-control-vertical": ""}`} style={{ visibility: opened ? "visible": "hidden" }}>
         <div className="p-d-inline-flex p-flex-row p-flex-wrap">
-          { layers.map((item, i) => <BasemapItem key={item.id}  viewer={viewer} mainMap={mainMap} layer={item} 
+          { (layers || []).map((item, i) => <BasemapItem key={item.id}  viewer={viewer} mainMap={mainMap} layer={item} 
             selected={selectedLayer && selectedLayer===item.id} setSelected={selectLayer} core={core} />) }
         </div>      
       </div>
-      }
     </div>
   )
 }

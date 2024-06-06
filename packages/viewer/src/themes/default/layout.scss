@@ -287,7 +287,7 @@ body .p-dropdown {
 .layout-main div#map {
   position: relative;
   width: 100%; 
-  height: calc(100% - 18px);
+  height: calc(100% - 27px);
   height: -moz-calc(100% - 27px);
   height: -webkit-calc(100% - 27px);
 }
@@ -360,19 +360,19 @@ body .p-multiselect {
 }
 
 .map-region-bottom-left {
-  bottom: 1.2em;
+  bottom: 1.5em;
   left: 0.5em;
-  width: inherit;
+  /*width: inherit;*/
 }
 
 .map-region-bottom-right {
-  bottom: 1.8em;
+  bottom: 1.5em;
   right: 0.5em;
-  width: inherit;
+  /*width: inherit;*/
 }
 
 .map-region-bottom-center {
-  bottom: 1.8em;
+  bottom: 1.5em;
   /*
   margin-left: 40%;
   margin-right: 40%;

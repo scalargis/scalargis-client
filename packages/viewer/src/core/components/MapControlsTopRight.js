@@ -1,4 +1,8 @@
-import React from 'react'
+import React from 'react';
+
+import MapModel from '../model/MapModel';
+import OWSModel from '../model/OWSModel';
+import * as Utils from '../utils';
 
 export default function MapControlsTopRight(props) {
 
@@ -9,7 +13,7 @@ export default function MapControlsTopRight(props) {
 
       { core.renderComponents({
         region: 'map_controls_top_right',
-        props: { viewer, dispatch, mainMap },
+        props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } },
         className: "map-region-top-right"
       })}
       

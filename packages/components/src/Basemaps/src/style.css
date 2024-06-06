@@ -6,20 +6,32 @@
 
 .basemaps-control {
     position: absolute;
-    /*margin-top: -50px;*/
+}
 
-    /*display: -webkit-inline-box;*/
-    /*margin-left: 40px;*/
-    /*padding: 5px;
-    background-color: #d3d3d3;
-    max-width: 200px;
-    overflow-x: scroll;*/
+.map-region-top-left .basemaps-control,
+.map-region-top-right .basemaps-control,
+.map-region-bottom-left .basemaps-control,
+.map-region-bottom-right .basemaps-control {
+    width: max-content;
+}
+
+.map-region-top-left .basemaps-control,
+.map-region-top-right .basemaps-control,
+.map-region-bottom-left .basemaps-control,
+.map-region-bottom-right .basemaps-control {
+    width: max-content;
+}
+
+.map-region-top-left .basemaps-control-vertical,
+.map-region-top-right .basemaps-control-vertical,
+.map-region-bottom-left .basemaps-control-vertical,
+.map-region-bottom-right .basemaps-control-vertical {
+    width: auto;
 }
 
 .map-region-top-left .basemaps-control {
     margin-left: 40px;
     top: -15px;
-    width: max-content;
 }
 
 .map-region-top-right .basemaps-control {
@@ -27,11 +39,10 @@
     float: right;
     right: 0px;
     top: -15px;
-    width: max-content;
 }
 
 .map-region-top-right .basemaps-control > div {
-    justify-content: flex-end;
+    flex-direction: row-reverse !important;
 }
 
 .map-region-top-right .basemaps button {
@@ -39,10 +50,6 @@
     right: 0px;
 }
 
-.map-region-bottom-right .basemaps button {
-    position: absolute;
-    right: 0px;
-}
 
 .map-region-bottom-left .basemaps button {
     position: absolute;
@@ -58,16 +65,22 @@
     flex-wrap: wrap-reverse;
 }
 
+.map-region-bottom-right .basemaps button {
+    position: absolute;
+    bottom: 0px;
+}
+
 .map-region-bottom-right .basemaps-control {
-    float: right;
-    right: 35px;
+    right: 40px;
     bottom: 0px;
 }
 
 .map-region-bottom-right .basemaps-control > div {
-    justify-content: flex-end;
+    justify-content: end;
     flex-wrap: wrap-reverse;
+    flex-direction: row-reverse !important;
 }
+
 
 .basemaps-menu .basemaps-control-item {
     padding: 10px 20px;
