@@ -1,0 +1,24 @@
+{
+    "id": "layer_compare",
+    "type": "LayerCompare",
+    "title": "LayerCompare",
+    "config_json": {
+      "header": "LayerCompare",
+      "active": true,
+      "layers": [
+        "caop_concelhos",
+        "ortos2021_rgb",
+        "ortos2018_rgb",
+        "ortos2015_rgb",
+        "ortos2012_rgb",
+        "ortos2010_rgb",
+        "ortos2007_rgb",
+        "ortos2004_2006_rgb"
+      ]
+    },
+    "config_version": "1.0",
+    "regions": [],
+    "target": "mainmenu",
+    "target_valid_options": ["map_controls_top_right","mainmenu" ],
+    "children": []
+  }

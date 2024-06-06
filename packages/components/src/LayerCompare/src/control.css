@@ -1,0 +1,294 @@
+.map-region-top-right {
+    z-index: 2 !important;
+  }
+  
+  #map.layercompare-control-content-opened {
+    width: calc(100% - 32em) !important;
+  }
+  
+  #map.layercompare-control-content-opened .layercompare-main-control,
+  #map.layercompare-control-content-opened .layercompare-legend-control {
+    display: none;
+  }
+  
+  .layercompare-control .layercompare-control-content {
+    position: fixed;
+    top: 50px + 1px;
+    padding: 0;
+    right: 1em;
+    display: block;
+    width: 28em;
+    z-index: 998;
+    height: content;
+    max-width: 100%;
+    max-height: calc(100% - 150px);
+    transform: translate3d(32em, 0px, 0px);
+    transition: transform 0.2s;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    box-shadow: 0 2px 10px 0 rgb(0 0 0 / 75%);
+    color: #333333;
+    background-color: #ffffff;
+    overflow-y: auto;
+    /* opacity: 0; */
+    /* transition: opacity 1s; */
+  }
+  
+  .layercompare-control .layercompare-control-content.layercompare-control-content-opened {
+    transform: translate3d(0px, 0px, 0px);
+  }
+  
+  .layercompare-control .layercompare-control-close {
+    /*position: unset !important;*/
+    /*
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    right: 20px;
+    top: 10px;
+    */
+  
+    /*
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    */
+    position: fixed;
+    top: 60px;
+    right: 10px;  
+    z-index: 1000;
+    background-color: #e54a51;
+    transition: background-color 0.2s;
+    /*border-radius: 50%;*/
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  
+  .layercompare-control .layercompare-control-close i {
+    color: #ffffff;
+    line-height: inherit;
+    font-size: 12px;
+  }
+  
+  .layercompare-control .layercompare-control-help {
+    /*
+    position: absolute;
+    top: -11px;
+    right: 40px;
+    */
+    position: fixed;
+    top: 60px;
+    right: 50px;  
+    z-index: 1000;
+    background-color: #7e7e7e;
+    transition: background-color 0.2s;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .layercompare-control .layercompare-control-help i {
+    color: #ffffff;
+    line-height: inherit;
+    font-size: 12px;
+  }
+  
+  .layercompare-control .layercompare-main-control {
+    position: absolute;
+    right: 0px; 
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 0.5em;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 1s;
+
+  }
+  
+  .layercompare-control .layercompare-main-control-menu {
+    width: unset;
+    background-color: rgba(255,255, 255, 0.7);
+  }
+  
+  .layercompare-control .layercompare-main-control-menu:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .layercompare-control .p-menuitem.layercompare-menu-selected {
+    background-color: rgb(255, 255, 255);
+  }
+  
+  .layercompare-control .p-menuitem.layercompare-menu-selected .p-menuitem-link .p-menuitem-text,
+  .layercompare-control .p-menuitem.layercompare-menu-selected .p-menuitem-link .p-menuitem-icon {
+    color: rgb(84, 165, 105);
+  }
+  
+  .layercompare-control .p-speeddial>button,
+  .layercompare-control .p-speeddial>button.p-button.p-button-icon-only.p-button-rounded {
+    height: 5rem;
+    width: 5rem;
+  }
+  
+  .layercompare-control .p-speeddial>ul {
+    --item-diff-x: .5px !important;
+    --item-diff-y: .5px !important;
+  }
+  
+  .layercompare-control .p-speeddial-action {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: #495057;
+    color: #fff;
+  }
+  
+  .layercompare-control .p-speeddial-action.p-speeddial-action-active {
+    background-color: #FBC02D;
+  }
+  
+  .layercompare-control .p-button.layercompare-menu-selected {
+    line-height: 1.27em;
+  }
+  
+  .layercompare-control .layercompare-control-content .p-grid {
+    margin-right: unset;
+  }
+  
+  
+  .layercompare-control .layercompare-control-content .p-divider.p-divider-horizontal {
+    margin: 1.25rem 0;
+    padding: 0 1.25rem;
+    color: #d3d3d3;
+  }
+  
+  .layercompare-control .layercompare-control-content .p-divider-dashed.p-divider-horizontal:before {
+    border-width: thin;
+  }
+  
+  .layercompare-control .layercompare-control-content .p-tag {
+    font-size: 1rem;
+  }
+  
+  .layercompare-control .layercompare-control-content .p-divider.p-component {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .layercompare-control .layercompare-control-content .layercompare-stats-groups .p-dropdown.p-component {  
+    width: -webkit-fill-available !important;
+    margin-left: 0px !important;
+    margin-bottom: 5px;
+  }
+  
+  .layercompare-control .layercompare-control-content .p-button.btn-zoom-admin-unit {
+    background-color: rgb(131, 131, 131);
+  }
+  
+  .layercompare-control .layercompare-control-content .p-button.btn-zoom-admin-unit:enabled:hover {
+    background: rgb(84, 165, 105);
+  }
+  
+  .layercompare-stats-serie {
+    cursor: pointer;
+  }
+  
+  .layercompare-stats-serie-selected {
+    /*background: linear-gradient(0deg, #9fc222c4 0%, rgba(255,255,255,1) 100%);*/
+    background: #f5f5f5;
+  }
+  
+  .layercompare-control .layercompare-control-content .layercompare-legend-checkbox {
+    margin-bottom: 1px;
+  }
+  
+  .layercompare-control .layercompare-control-content .layercompare-legend-class {
+    margin-left: 4px;
+    line-height: 19px;
+    width: 30px;
+    min-width: 30px;
+  }
+  
+  .layercompare-control .layercompare-control-content .layercompare-legend-buttons {
+    margin-top: 5px;
+    text-align: center;
+  }
+  
+  .layercompare-control .layercompare-legend-control {
+    position: absolute;
+    right: 0px;
+    top: 220px;
+    /*width: 250px;*/
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 0.5em;
+    border-radius: 4px;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-control-button {
+    color: white;
+    background-color: rgb(158 194 34);
+    border-radius: 4px;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-control-button>button {
+    width: 100%;
+    min-width: 125px;
+    border-radius: 4px;
+  }
+  
+  .layercompare-control .layercompare-legend-control>div {
+    /*width: unset;*/
+    max-width: 230px;
+    background-color: rgba(255,255, 255, 0.7);
+  }
+  .layercompare-control .layercompare-legend-control>div:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .layercompare-control .layercompare-legend-control .p-tabview-panels {
+    padding: 0.2rem;
+    padding-top: 0.5rem;
+  }
+  
+  .layercompare-control .layercompare-legend-control .p-tabview-panel {
+    overflow-y: scroll;
+    max-height: 220px;
+    font-size: .9rem;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-control-title {
+    text-align: center;
+    font-size: 1rem;
+    padding-top: .5rem;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-class {
+    width: 20px;
+    margin-left: 5px;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-control-classes-opacity {
+    margin-left: 0px;
+    margin-right: 15px;
+  }
+  .layercompare-control .layercompare-legend-control .layercompare-legend-control-classes-opacity>div>div {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  
+  .layercompare-control .layercompare-legend-control .p-field-checkbox.layercompare-legend-checkbox {
+    margin-bottom: .5rem;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-class {
+    min-width: 20px;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-buttons {
+    text-align: center;
+  }
+  
+  .layercompare-control .layercompare-legend-control .layercompare-legend-buttons .p-button.p-component.p-button-text {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  
+  .layercompare-control .layercompare-legend-control .legend-empty-message {
+    margin: 1rem;
+  }

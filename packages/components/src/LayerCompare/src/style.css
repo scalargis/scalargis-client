@@ -1,0 +1,41 @@
+
+
+/* .cosvgi-icon {
+    background-image: url("../assets/images/cosvgi_logo.svg")
+} */
+
+.map-slider-layers-control {
+    position: absolute;
+    top: 95%;
+    /* left: 50%; */
+    transform: translate(-50%, -50%);
+    touch-action: none;
+    /* width: 100%; */
+    background: transparent
+}
+
+.map-slider {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    touch-action: none;
+    width: 100%;
+    background: rgba(0, 0, 0, 0);
+}
+
+.map-slider .p-slider-range {
+    background: rgba(0, 0, 0, 0);
+}
+
+.map-slider .p-slider-handle {
+    cursor: w-resize;
+    height: 50px;
+    width: 50px;
+    margin-top: -25px !important;
+    margin-left: -25px !important;
+    background: #FF9800;
+}
+
+
+
