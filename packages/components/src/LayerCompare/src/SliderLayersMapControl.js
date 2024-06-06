@@ -47,7 +47,7 @@ export default function SliderLayersMapControl({
                         optionDisabled={e => (e.id === selectedLayer?.id ? true : false)}
                         onChange={(e) => selectSliderLayer(e.value)}
                         optionLabel="item_name"
-                        placeholder="Selecionar o tema direita"
+                        placeholder="Selecionar o tema direito"
                         showClear={true}
                     />
                 </div>
