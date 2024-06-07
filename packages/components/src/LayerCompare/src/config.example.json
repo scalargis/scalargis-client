@@ -1,0 +1,19 @@
+{
+    "id": "layer_compare",
+    "type": "LayerCompare",
+    "title": "LayerCompare",
+    "config_json": {
+      "header": "LayerCompare",
+      "active": true,
+      "layers": [
+        "layer1",
+        "layer2",
+        "layer8"
+      ]
+    },
+    "config_version": "1.0",
+    "regions": [],
+    "target": "mainmenu",
+    "target_valid_options": ["map_controls_top_right","mainmenu" ],
+    "children": []
+  }

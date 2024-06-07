@@ -10,6 +10,7 @@ import * as GeoLocation from './GeoLocation/src/Main'
 import * as HelpButton from './HelpButton/src/Main'
 import * as HtmlContent from './HtmlContent'
 import * as LayerAttributesTable from './LayerAttributesTable/src/Main'
+import * as LayerCompare from './LayerCompare/src/Main'
 import * as LayerDownload from './LayerDownload/src/Main'
 import * as LayerEdit from './LayerEdit/src/Main'
 import * as LayerMetadata from './LayerMetadata/src/Main'
@@ -58,6 +59,7 @@ export {
   HelpButton,
   HtmlContent,
   LayerAttributesTable,
+  LayerCompare,
   LayerDownload,
   LayerEdit,
   LayerMetadata,

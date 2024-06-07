@@ -284,5 +284,13 @@
   "userRegistrationInvalid": "Confirmação de registo inválida",
   "userRegistrationFillEmail": "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo",
   "userRegistrationConfirmationSentToEmail": "Enviada confirmação de registo de utilizador para o email {{email}}.",
-  "userRegistrationConfirmationWrongEmail": "Não existe nenhum registo de utilizador com o email indicado."
+  "userRegistrationConfirmationWrongEmail": "Não existe nenhum registo de utilizador com o email indicado.",
+
+  "layerCompare": "Comparar Temas",
+  "splitMap": "Dividir mapa",
+  "transparency": "Transparência",
+  "selectLeftTheme": "Selecionar tema da esquerda",
+  "selectRightTheme": "Selecionar tema da direita",
+  "selectTopTheme": "Selecionar tema de topo",
+  "selectBottomTheme": "Selecionar tema de baixo"
 }

@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  backoffice:
+    image: scalargis-backoffice-dev
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile.dev
+    container_name: scalargis-backoffice-dev
+    working_dir: /var/scalargis
+    tty: true
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./:/var/scalargis/      
+    ports:
+      - 5003:5000
+    command: ["yarn", "start:backoffice"]
+
+  viewer:
+    image: scalargis-viewer-dev
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile.dev
+    container_name: scalargis-viewer-dev
+    working_dir: /var/scalargis
+    stdin_open: true
+    tty: true
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./:/var/scalargis
+    ports:
+      - 5004:5000
+    command: "yarn start:viewer"
+
+volumes:
+  node-modules:
