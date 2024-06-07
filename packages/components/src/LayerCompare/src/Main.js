@@ -1,20 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Button } from 'primereact/button'
-import { Panel } from 'primereact/panel'
+import React, { useState, useEffect, useRef } from 'react';
+import { Button } from 'primereact/button';
+import { Panel } from 'primereact/panel';
 import { getRenderPixel } from 'ol/render';
+
+import { i18n as i18nUtils } from '@scalargis/components';
+
 import LayerCompare from './LayerCompare.js';
 
-//import { findOlLayer } from '../../../core/utils'  // ? can t access Models from config ?
-
 import './style.css';
-import './control.css'
+import './control.css';
 
 /**
  * Main menu component
  */
 export function MainMenu({ className, config, actions, record }) {
-
-  const title = record.title || 'LayerCompare';
+  
+  const title = record?.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("layerCompare", "LayerCompare");
 
   return (
     <Button
@@ -55,8 +56,9 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
   const { viewer, dispatch, mainMap } = config;
   const component_cfg = record.config_json || {};
-  const title = record.title || 'TimeLine...';
-  const header = component_cfg.header || title;
+
+  const title = record?.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("layerCompare", "LayerCompare");
+  const header = component_cfg?.header ? i18nUtils.translateValue(component_cfg.header, component_cfg.header) : title;
 
   const [toolUIposition, setToolUIposition] = useState()
 
@@ -76,8 +78,8 @@ export default function Main({ as, config, actions, core, record, utils }) {
   const layoutOptionRef = useRef('vertical') // horizontal: works but need devs on ui & css (slider, etc..)
 
   const compareToolOptions = [
-    { name: 'Dividir tela', value: 1, icon: 'pi  pi-pause' },
-    { name: 'Transparência', value: 2, icon: 'pi  pi-clone' }
+    { name: i18nUtils.translateValue("splitMap", "Dividir mapa"), value: 1, icon: 'pi  pi-pause' },
+    { name: i18nUtils.translateValue("transparency", "Transparência"), value: 2, icon: 'pi  pi-clone' }
   ]
   const [compareTool, setCompareTool] = useState(1);
   const [opacitySliderValue, setOpacitySliderValue] = useState(50)
@@ -98,8 +100,6 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
   //----------------------------------------------------------- load model
   useEffect(() => {
-    console.log("ScalarGIS LayerCompare plugin. Welcome.")
-
     //    get layers from component config
     if (viewer && viewer.config_json && component_cfg.layers) {
       const config_layers = viewer.config_json.layers.filter(
@@ -381,12 +381,6 @@ export default function Main({ as, config, actions, core, record, utils }) {
           setOpacitySliderValue={setOpacitySliderValue}
           utils={utils}
         />
-
-
-
-
-
-
     )
   }
 

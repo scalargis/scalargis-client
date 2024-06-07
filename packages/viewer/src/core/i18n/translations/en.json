@@ -284,5 +284,13 @@
   "userRegistrationInvalid": "Invalid user confirmation",
   "userRegistrationFillEmail": "Enter the email used to create the user so that a new confirmation can be sent",
   "userRegistrationConfirmationSentToEmail": "User creation confirmation sent to email {{email}}.",
-  "userRegistrationConfirmationWrongEmail": "There is no user with the email indicated."
+  "userRegistrationConfirmationWrongEmail": "There is no user with the email indicated.",
+
+  "layerCompare": "Layer Compare",
+  "splitMap": "Dividir mapa",
+  "transparency": "Transparency",
+  "selectLeftTheme": "Select left theme",
+  "selectRightTheme": "Select right theme",
+  "selectTopTheme": "Selecionar top theme",
+  "selectBottomTheme": "Selecionar bottom theme"
 }

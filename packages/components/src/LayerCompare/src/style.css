@@ -1,17 +1,16 @@
 
 
-/* .cosvgi-icon {
-    background-image: url("../assets/images/cosvgi_logo.svg")
-} */
-
 .map-slider-layers-control {
     position: absolute;
-    top: 95%;
-    /* left: 50%; */
+    /*top: 95%;*/
+    top: calc(100% - 30px);
     transform: translate(-50%, -50%);
     touch-action: none;
-    /* width: 100%; */
     background: transparent
+}
+
+.map-slider-layers-control {
+    bottom: -1em;
 }
 
 .map-slider {
@@ -24,16 +23,30 @@
     background: rgba(0, 0, 0, 0);
 }
 
+.map-slider.p-slider {
+    background: transparent;
+}
+
 .map-slider .p-slider-range {
-    background: rgba(0, 0, 0, 0);
+    background: transparent !important;
 }
 
 .map-slider .p-slider-handle {
     cursor: w-resize;
-    height: 50px;
-    width: 50px;
+    height: 30px !important;
+    width: 30px !important;
     background: #FF9800;
+    margin-left: -15px !important;
 }
 
+@media only screen and (max-width: 768px) {
+    .map-slider-layers-control .p-grid>.p-col, .map-slider-layers-control .p-grid>[class*=p-col] {
+        max-width: 50%;
+    }
+}
 
-
+@media only screen and (max-width: 768px) {
+    .map-slider-layers-control .p-dropdown {
+        max-width: 95%;
+    }
+}

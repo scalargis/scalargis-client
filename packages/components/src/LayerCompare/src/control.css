@@ -30,8 +30,7 @@
     color: #333333;
     background-color: #ffffff;
     overflow-y: auto;
-    /* opacity: 0; */
-    /* transition: opacity 1s; */
+    max-width: calc(100% - 60px);
   }
   
   .layercompare-control .layercompare-control-content.layercompare-control-content-opened {
@@ -39,28 +38,12 @@
   }
   
   .layercompare-control .layercompare-control-close {
-    /*position: unset !important;*/
-    /*
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    text-align: center;
-    right: 20px;
-    top: 10px;
-    */
-  
-    /*
-    position: absolute;
-    top: 60px;
-    right: 10px;
-    */
     position: fixed;
     top: 60px;
     right: 10px;  
     z-index: 1000;
     background-color: #e54a51;
     transition: background-color 0.2s;
-    /*border-radius: 50%;*/
     padding-top: 5px;
     padding-bottom: 5px;
   }
@@ -72,11 +55,6 @@
   }
   
   .layercompare-control .layercompare-control-help {
-    /*
-    position: absolute;
-    top: -11px;
-    right: 40px;
-    */
     position: fixed;
     top: 60px;
     right: 50px;  
@@ -95,12 +73,13 @@
   .layercompare-control .layercompare-main-control {
     position: absolute;
     right: 0px; 
+    width: max-content;
+    max-width: 300px;
     background-color: rgba(255, 255, 255, 0.5);
     padding: 0.5em;
     border-radius: 4px;
     opacity: 0;
     transition: opacity 1s;
-
   }
   
   .layercompare-control .layercompare-main-control-menu {

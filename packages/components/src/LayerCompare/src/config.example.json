@@ -6,14 +6,9 @@
       "header": "LayerCompare",
       "active": true,
       "layers": [
-        "caop_concelhos",
-        "ortos2021_rgb",
-        "ortos2018_rgb",
-        "ortos2015_rgb",
-        "ortos2012_rgb",
-        "ortos2010_rgb",
-        "ortos2007_rgb",
-        "ortos2004_2006_rgb"
+        "layer1",
+        "layer2",
+        "layer8"
       ]
     },
     "config_version": "1.0",

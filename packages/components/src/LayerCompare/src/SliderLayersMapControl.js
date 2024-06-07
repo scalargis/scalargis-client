@@ -1,6 +1,8 @@
 import React, { useRef } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 
+import { i18n as i18nUtils } from '@scalargis/components';
+
 import './style.css';
 
 export default function SliderLayersMapControl({
@@ -35,7 +37,7 @@ export default function SliderLayersMapControl({
                         optionDisabled={e => (e.id === selectedSliderLayer?.id ? true : false)}
                         onChange={(e) => selectLayer(e.value)}
                         optionLabel="item_name"
-                        placeholder="Selecionar o tema esquerdo"
+                        placeholder={`<- ${i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda")}`}
                         showClear={true}
                     />
                 </div>
@@ -47,7 +49,7 @@ export default function SliderLayersMapControl({
                         optionDisabled={e => (e.id === selectedLayer?.id ? true : false)}
                         onChange={(e) => selectSliderLayer(e.value)}
                         optionLabel="item_name"
-                        placeholder="Selecionar o tema direito"
+                        placeholder={`${i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita")} ->`}
                         showClear={true}
                     />
                 </div>
