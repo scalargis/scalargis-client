@@ -38,8 +38,6 @@ export default function Main({ core, config, record }) {
       outputFormat: "application/vnd.google-earth.kml+xml" }
   ];
 
-  console.log(defaultExportFormats);
-
   const component_cfg = record.config_json;
 
   let exportFormats = [...defaultExportFormats];
