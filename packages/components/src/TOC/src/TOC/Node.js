@@ -11,7 +11,7 @@ import { i18n } from '@scalargis/components';
 
 class Node extends React.Component {
 
-  state = { detailsOpen: false }
+  state = { detailsOpen: false, isDraggable: true }
 
   isChecked() {
     const { data, checked } = this.props;
@@ -68,6 +68,10 @@ class Node extends React.Component {
     // Check if has visible childrens
     const isChildrenVisible = isGroup && (!nodeChildren.length || nodeChildren.filter(child => !child.hidden).length > 0);
 
+    // Is dragabble
+    const draggable = (config.draggable === false ? false : true) && this.state.isDraggable;
+
+
     // Render theme node
     return (
       <React.Fragment>
@@ -78,7 +82,7 @@ class Node extends React.Component {
           models={config.Models}
           onDragStart={this.props.onDragStart}
           id={data.id}
-          draggable={config.draggable}>
+          draggable={draggable}>
           <table style={{width: '100%'}}>
             <tbody>
               <tr>
@@ -119,7 +123,9 @@ class Node extends React.Component {
                     {i18n.translateValue(data.title)}
                   </label>
                   { !data.system && (
-                    <div className={"theme-tools" + (detailsOpen ? "" : " hidden") }>
+                    <div className={"theme-tools" + (detailsOpen ? "" : " hidden") } 
+                      onMouseEnter={(e) => this.setState({ ...this.state, isDraggable: false })} 
+                      onMouseLeave={(e) => this.setState({ ...this.state, isDraggable: true })}>
 
                       { core.renderComponents({
                         region: 'layer_tools',
