@@ -146,6 +146,9 @@ body .p-dropdown {
   margin-bottom: 35px;
 }
 
+.layout-wrapper.layout-mobile-sidebar-no-logo .layout-sidebar .layout-sidebar-panel {
+  height: calc(100% - 50px) !important;
+}
 
 .layout-sidebar #content {
   position: relative;

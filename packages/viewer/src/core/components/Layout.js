@@ -41,12 +41,16 @@ function Layout(props) {
   const entityName = process.env.REACT_APP_ENTITY_NAME;
   const entityUrl = process.env.REACT_APP_ENTITY_URL;
 
+  const showLogoMobile = viewer?.config_json?.mobile_show_logo === false ? false : true;
+
+
   const wrapperClass = classNames('layout-wrapper', {
     'layout-overlay': viewer.layoutMode === 'overlay',
     'layout-static': viewer.layoutMode === 'static',
     'layout-static-sidebar-inactive': viewer.staticMenuInactive && viewer.layoutMode === 'static',
     'layout-overlay-sidebar-active': viewer.overlayMenuActive && viewer.layoutMode === 'overlay',
-    'layout-mobile-sidebar-active': viewer.mobileMenuActive
+    'layout-mobile-sidebar-active': viewer.mobileMenuActive,
+    'layout-mobile-sidebar-no-logo': viewer.mobileMenuActive && !showLogoMobile
   }, config?.config_json?.layout_class || config?.layout_class);
 
   const sidebarClassName = classNames("layout-sidebar", {
@@ -94,6 +98,7 @@ function Layout(props) {
       }
     </div> : null
 
+
   return (
     <div className={wrapperClass} onClick={onWrapperClick}>
 
@@ -116,7 +121,7 @@ function Layout(props) {
           onClick={onSidebarClick}
           style={{ width: viewer.mobileMenuActive && size[0] <= 768 ? size[0] : null }}
           >
-            { viewer.mobileMenuActive &&
+            { viewer.mobileMenuActive && showLogoMobile &&
             <div className="layout-logo">
                 { title_logo ?
                   <div dangerouslySetInnerHTML={{__html: title_logo }}></div> : null

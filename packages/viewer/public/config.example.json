@@ -10,6 +10,7 @@
         "srid": 3857
       }
     },
+    "mobile_show_logo": true,
     "selected_menu": "toc",
     "display_crs": 3857,
     "crs_list": [
