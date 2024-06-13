@@ -4,6 +4,8 @@ import Node from "./Node";
 
 class Tree extends React.Component {
 
+  state = { detailsOpen: false }
+
   render() {
     const {
       id,
@@ -48,6 +50,8 @@ class Tree extends React.Component {
                 olmap={olmap}
                 actions={actions}
                 onDragStart={this.props.onDragStart}
+                isDraggable={this.props.isDraggable}
+                setDraggable={this.props.setDraggable}
               />
               {!child.hidden && <DragSlot i={i+1}
                 parent={id}

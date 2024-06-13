@@ -57,6 +57,7 @@ class Main extends React.Component {
     const API_URL = core.API_URL;
 
     this.state = {
+      isDraggable: true,
       dragging: false,
       config: props.config,
       filter: '',
@@ -451,6 +452,8 @@ class Main extends React.Component {
             olmap={olmap}
             actions={tocActions}
             onDragStart={e => this.setState({ ...this.state, dragging: true })}
+            isDraggable={this.state.isDraggable} 
+            setDraggable={(val) => this.setState({ ...this.state, isDraggable: val })}
           />
 
         </div>

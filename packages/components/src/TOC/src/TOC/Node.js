@@ -11,7 +11,8 @@ import { i18n } from '@scalargis/components';
 
 class Node extends React.Component {
 
-  state = { detailsOpen: false, isDraggable: true }
+  //state = { detailsOpen: false, isDraggable: true }
+  state = { detailsOpen: false }
 
   isChecked() {
     const { data, checked } = this.props;
@@ -69,8 +70,8 @@ class Node extends React.Component {
     const isChildrenVisible = isGroup && (!nodeChildren.length || nodeChildren.filter(child => !child.hidden).length > 0);
 
     // Is dragabble
-    const draggable = (config.draggable === false ? false : true) && this.state.isDraggable;
-
+    //const draggable = (config.draggable === false ? false : true) && this.state.isDraggable;
+    const draggable = (config.draggable === false ? false : true) && this.props.isDraggable;
 
     // Render theme node
     return (
@@ -124,8 +125,8 @@ class Node extends React.Component {
                   </label>
                   { !data.system && (
                     <div className={"theme-tools" + (detailsOpen ? "" : " hidden") } 
-                      onMouseEnter={(e) => this.setState({ ...this.state, isDraggable: false })} 
-                      onMouseLeave={(e) => this.setState({ ...this.state, isDraggable: true })}>
+                      onMouseEnter={(e) => this.props.setDraggable(false)} 
+                      onMouseLeave={(e) => this.props.setDraggable(true)} >
 
                       { core.renderComponents({
                         region: 'layer_tools',
@@ -200,6 +201,8 @@ class Node extends React.Component {
                       editNode={editNode}
                       olmap={olmap}
                       onDragStart={this.props.onDragStart}
+                      isDraggable={this.props.isDraggable}
+                      setDraggable={this.props.setDraggable}
                     />
                   </td>
                 </tr>
