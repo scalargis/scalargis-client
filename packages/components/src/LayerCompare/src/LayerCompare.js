@@ -58,7 +58,7 @@ export default function LayerCompare({
 
     return (
         <div style={{ height: '100%' }}>
-            {compareTool === 1 && sliderIsActive ? ReactDOM.createPortal(slider_map_controls, map) : null}
+            {compareTool === 1 && sliderIsActive && config?.showMapSelectControls !== false ? ReactDOM.createPortal(slider_map_controls, map) : null}
             {compareTool === 1 && (selectedLayer || selectedSliderLayer) && sliderIsActive ? ReactDOM.createPortal(slider_el, map) : null}
 
 

@@ -5,6 +5,7 @@
     "config_json": {
       "header": "LayerCompare",
       "active": true,
+      "showMapSelectControls": true,
       "layers": [
         "layer1",
         "layer2",
