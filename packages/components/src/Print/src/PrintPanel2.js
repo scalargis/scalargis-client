@@ -151,7 +151,7 @@ export default function PrintPanel2(props) {
           const val = fields[field_key];            
           if (val) {
             const fieldName = field.name || fieldKey;
-            formData[fieldName] = val;
+            formData[fieldName] = encodeURIComponent(val);
           } else {
             if (field.required) isFormInvalid = true;
           }
@@ -164,7 +164,7 @@ export default function PrintPanel2(props) {
         const val = fields[field_key];            
         if (val) {
           const fieldName = field.name || fieldKey;
-          formData[fieldName] = val;
+          formData[fieldName] = encodeURIComponent(val);
         } else {
           if (field.required) isFormInvalid = true;
         }
