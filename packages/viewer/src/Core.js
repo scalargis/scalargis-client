@@ -255,29 +255,35 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
   }
   
   // Render components
-  return mainmenuComponents.map(c => {
-    let PluginComponent = this.__mainmenu[c.type];
+  return (
+    <nav aria-label="Menu principal">
+      <ul>
+        { mainmenuComponents.map(c => {
+          let PluginComponent = this.__mainmenu[c.type];
 
-    // Validate dynamic import is loaded
-    if (!PluginComponent) return null;
+          // Validate dynamic import is loaded
+          if (!PluginComponent) return null;
 
-    const className = selected_menu === c.id ?
-    "p-button-rounded p-button-raised p-button-sm" :
-    "p-button-rounded p-button-raised p-button-sm p-button-outlined";
+          const className = selected_menu === c.id ?
+          "p-button-rounded p-button-raised p-button-sm" :
+          "p-button-rounded p-button-raised p-button-sm p-button-outlined";
 
-    return (
-      <React.Fragment key={c.id}>
-        <PluginComponent
-          className={className}
-          record={c}
-          config={{ className, ...props, ...c.config_json }}
-          core={this}
-          actions={this.actions}
-          utils={utils}
-        />
-      </React.Fragment>
-    )
-  })
+          return (
+            <li key={c.id}>
+              <PluginComponent
+                className={className}
+                record={c}
+                config={{ className, ...props, ...c.config_json }}
+                core={this}
+                actions={this.actions}
+                utils={utils}
+              />
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
+  )
 }
 
 Core.prototype.renderComponentById = function({ id, as = '', props, }) {
