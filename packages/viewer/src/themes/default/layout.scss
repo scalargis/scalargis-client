@@ -81,8 +81,11 @@ body .p-dropdown {
   height: 50px;
 }
 
-.layout-logo > img {
-  height: 46px;
+.layout-logo > img,
+.layout-logo > h1 > img {
+  height: 40px;
+  margin: 5px 5px 5px 12px;
+  font-size: 0;
 }
 
 .p-formgroup-inline .p-field-checkbox > label, 
@@ -129,7 +132,18 @@ body .p-dropdown {
   height: 5px;
 }
 
+.layout-sidebar #mainmenu > div > nav > ul {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+  text-align: center;
+}
 
+.layout-sidebar #mainmenu > div > nav > ul > li > button {
+  margin: 0.5em 0.5em !important;
+}
+
+/* ----- TODO -----*/
 .layout-sidebar #mainmenu .main-menu-btn-image {
   background-size: contain !important;
   background-repeat: no-repeat !important;
@@ -140,6 +154,7 @@ body .p-dropdown {
 .layout-sidebar #mainmenu button.menu-inactive {
   background-color: #63abe3;
 }
+/* ----- END TODO -----*/
 
 .layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #mainmenu,
 .layout-wrapper.layout-static.layout-mobile-sidebar-active .layout-sidebar #mainmenu {

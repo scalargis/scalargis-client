@@ -92,7 +92,7 @@ function Layout(props) {
   }
 
   const logoComponent = size[0] > 768 ? <div className="layout-logo">
-      <img alt="Logo" src={logo} />
+      <h1><img src={logo} alt={config?.title || ''} /></h1>
       { title_logo ?
         <div dangerouslySetInnerHTML={{__html: title_logo }}></div> : null
       }
@@ -126,7 +126,7 @@ function Layout(props) {
                 { title_logo ?
                   <div dangerouslySetInnerHTML={{__html: title_logo }}></div> : null
                 }
-                <img alt="Logo" src={logo} />
+                <h1><img src={logo} alt={config?.title || ''} /></h1>
             </div>
             }
 
