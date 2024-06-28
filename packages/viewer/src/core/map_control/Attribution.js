@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import OLAttribution from 'ol/control/Attribution';
+import VectorLayer from 'ol/layer/Vector'
+import { Vector } from 'ol/source';
+
 import { isMobile } from '../utils';
 
 export default function Attribution({ config, actions, record }) {
@@ -8,11 +11,10 @@ export default function Attribution({ config, actions, record }) {
 
   const [controlLoaded, setControlLoaded] = useState(false);
 
-  useEffect(() => {
-  }, []);
-
   // Add attribution control
   useEffect(() => {
+    let layer;
+
     if (!mainMap) return;
     if (controlLoaded) return;
     
@@ -33,6 +35,22 @@ export default function Attribution({ config, actions, record }) {
 
     const control = new OLAttribution(options);
     mainMap.addControl(control);
+
+    //Add layer for global attribution
+    const attributions = viewer?.config_json?.attributions || viewer?.attributions;
+    if (attributions) {
+      layer = new VectorLayer({
+        source: new Vector({
+          attributions: attributions
+        })
+      });
+
+      mainMap.getLayers().insertAt(0, layer);
+    }
+
+    return () => {
+      if (mainMap && layer) mainMap.removeLayer(layer);
+    }
 
   }, [mainMap]);
 
