@@ -40,6 +40,7 @@ function RGPD({ cookies, children }) {
             <CookieConsent
               location="bottom"
               buttonText={t("accept", "Aceito")}
+              ariaAcceptLabel={t("accept", "Aceito")}
               cookieName={cookieName}
               cookieValue={cookieValue}
               expires={cookieExpiresDays}

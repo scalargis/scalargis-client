@@ -25,7 +25,7 @@ function SplashScreen(props) {
 
   return (
     <div className="splashscreen p-d-flex p-jc-center">
-      <div className="p-as-center">
+      <div role="main" className="p-as-center">
 
         <div className="login-logo p-text-center">
           <img onError={addDefaultSrc} className="img-responsive" src={viewerLogo} alt="Logo" style={{maxWidth: "100%"}} />  
