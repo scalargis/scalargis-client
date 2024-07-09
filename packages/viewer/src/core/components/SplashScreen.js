@@ -31,7 +31,7 @@ function SplashScreen(props) {
           <img onError={addDefaultSrc} className="img-responsive" src={viewerLogo} alt="Logo" style={{maxWidth: "100%"}} />  
         </div>
 
-        <h3>{`${t("welcome", "Bem-vindo")}!`}</h3>
+        <h1>{`${t("welcome", "Bem-vindo")}!`}</h1>
         <p>
           { process.env.REACT_APP_COOKIE_MESSAGE ? 
             t(process.env.REACT_APP_COOKIE_MESSAGE, process.env.REACT_APP_COOKIE_MESSAGE)  
