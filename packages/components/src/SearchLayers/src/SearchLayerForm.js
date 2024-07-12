@@ -3,6 +3,7 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Message } from 'primereact/message';
 
+import { i18n } from '@scalargis/components';
 import {   
   JsonForm,
   JsonFormContext, 
@@ -22,6 +23,8 @@ export default function SearchLayerForm(props) {
   const {schema={}, uischema={}, geometry_field} = schemaConfig || {};
 
   const id = searchConfig?.id;
+
+  const searchTitle = searchConfig?.title ? i18n.translateValue(searchConfig.title, searchConfig?.title) : "";
 
   const [loaded, setLoaded] = useState(false);
   const [errorSchema, setErrorSchema] = useState(null);
@@ -119,7 +122,7 @@ export default function SearchLayerForm(props) {
         </div>  
       </div>}
 
-      <div className="p-mt-2">{searchConfig.title}</div>        
+      <div className="p-mt-2">{searchTitle}</div>
       <hr />
 
       { errorSchema && <React.Fragment>
