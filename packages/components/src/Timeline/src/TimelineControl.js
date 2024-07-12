@@ -1,9 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { Slider } from 'primereact/slider';
 import { Message } from 'primereact/message';
+
+import { Legend } from '@scalargis/components';
 
 import './style.css';
 
@@ -61,6 +63,41 @@ function addDurationToDate(date, duration) {
   resultDate.setHours(resultDate.getHours() + hours);
   resultDate.setMinutes(resultDate.getMinutes() + minutes);
   resultDate.setSeconds(resultDate.getSeconds() + seconds);
+
+  return resultDate;
+}
+
+function subtractDurationToDate(date, duration) {
+  // Regular expression pattern for ISO 8601 duration
+  const durationPattern = /P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?/;
+  
+  const match = duration.match(durationPattern);
+  
+  if (!match) {
+      throw new Error("Invalid duration format");
+  }
+  
+  const [
+      , // full match
+      years = 0,
+      months = 0,
+      weeks = 0,
+      days = 0,
+      hours = 0,
+      minutes = 0,
+      seconds = 0
+  ] = match.map(num => parseFloat(num) || 0);
+
+  // Create a new Date instance from the input date to avoid mutating the original date
+  let resultDate = new Date(date);
+
+  // Add duration components to the date
+  resultDate.setFullYear(resultDate.getFullYear() - years);
+  resultDate.setMonth(resultDate.getMonth() - months);
+  resultDate.setDate(resultDate.getDate() - (weeks * 7 + days));
+  resultDate.setHours(resultDate.getHours() - hours);
+  resultDate.setMinutes(resultDate.getMinutes() - minutes);
+  resultDate.setSeconds(resultDate.getSeconds() - seconds);
 
   return resultDate;
 }
@@ -134,22 +171,150 @@ function parseDateTimeList(inputString) {
     parsedValues = parsedValues.map(v => v.value);
   }
   
-  return parsedValues;
+  return parsedValues.map(d => d.indexOf(".") > -1  ? d.split('.')[0]+"Z" : d);
 }
 
-function formatDate(val) { 
-  let date, month, year;
+function formatDate(val, format) { 
+  let day, month, year, hour, minute, second;
 
   const inputDate = new Date(val);
 
-  date = inputDate.getDate();
+  day = inputDate.getDate();
   month = inputDate.getMonth() + 1;
   year = inputDate.getFullYear();
-  date = date.toString().padStart(2, '0');
+  day = day.toString().padStart(2, '0');
   month = month.toString().padStart(2, '0');
-  return `${date}-${month}-${year}`;
+
+  hour = inputDate.getHours().toString().padStart(2, '0');
+  minute = inputDate.getMinutes().toString().padStart(2, '0');
+  second = inputDate.getSeconds().toString().padStart(2, '0');
+
+  if (format) {
+    const val = format.replace("{dd}", day).replace("{mm}", month).replace("{yyyy}", year).replace("{h}", hour).replace("{m}", minute).replace("{s}", second);
+    return val;
+  }
+
+  return(inputDate.toISOString());
 }
 
+
+const calculateSelectedDate = (value, defaultValue = new Date()) => {
+  let calculatedDate = defaultValue;
+
+  // With default
+  if (value == 'now') {
+    calculatedDate = new Date();
+  } else if (value == 'today') {
+    calculatedDate = new Date();
+    calculatedDate.setUTCHours(0, 0, 0, 0);
+  } else if (value == 'tomorrow') {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    date.setUTCHours(0, 0, 0, 0);
+    calculatedDate = date;
+  } else if (value == 'yesterday') {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    date.setUTCHours(0, 0, 0, 0);
+    calculatedDate = date;
+  } else if (value) {
+    if (value.startsWith("-")) {
+      calculatedDate = subtractDurationToDate(new Date(), value.substring(value.indexOf("-")));
+    } else {
+      calculatedDate = addDurationToDate(new Date(), value);
+    }
+  }
+
+  return calculatedDate;
+}
+
+
+const calculateDates = (config, data) => {
+
+  let values = [];
+  let defaultPos = 0;
+
+  if (data) {
+    values = parseDateTimeList(data);
+
+    const refDate = formatDate(calculateSelectedDate(config.value));
+
+    if (config?.interval?.length > 1) {
+      const minDate = new Date(config.interval[0]);
+      const maxDate = new Date(config.interval[1]);
+
+      values = values.filter(d => {
+        const dt = new Date(d);
+        return dt >= minDate && dt <= maxDate;
+      });
+      defaultPos = values.findIndex(d => formatDate(d) == refDate);
+    } else {
+      values.forEach((val, idx) => {
+        const dt = formatDate(val);
+        if (refDate == dt) defaultPos = idx;
+      });
+
+      if (config?.steps != null) {
+        // With steps
+        let leftSteps = 0; 
+        let rightSteps = 0;
+        if (Array.isArray(config.steps)) {
+          if (config.steps.length > 1) {
+            leftSteps = defaultPos - config.steps[0];
+            rightSteps = defaultPos + config.steps[1] + 1;
+          }
+        } else if (Number.isInteger(config.steps)) {
+          leftSteps = defaultPos - config.steps;
+          rightSteps = defaultPos + config.steps + 1;
+        }
+        values = values.slice(leftSteps, rightSteps);
+        defaultPos = values.findIndex(d => formatDate(d) == refDate);
+      } else if (config?.delta) {
+        // With delta
+        let minDate = refDate;
+        let maxDate = refDate;
+        if (Array.isArray(config?.delta)) {
+           if (config.delta.length > 1) {
+            minDate = subtractDurationToDate(refDate, config.delta[0]);
+            maxDate = addDurationToDate(refDate, config.delta[1]);
+           }
+        } else {
+          minDate = subtractDurationToDate(refDate, config.delta);
+          maxDate = addDurationToDate(refDate, config.delta);
+        }
+
+        values = values.filter(d => {
+          const dt = new Date(d);
+          return dt.setHours(0, 0, 0, 0) >= minDate.setHours(0, 0, 0, 0) && dt <= maxDate.setHours(0, 0, 0, 0);
+        });
+        defaultPos = values.findIndex(d => {  
+          return formatDate(d) == refDate
+        });
+      }
+    }
+  }
+
+  if (config?.selectedIndex != null) {
+    if (Number.isInteger(config.selectedIndex)) {
+      if (config.selectedIndex > (values.length)) {
+        defaultPos = values.length - 1;
+      } else {
+        defaultPos = config.selectedIndex - 1;
+      }
+    } else {
+      if (config.selectedIndex === "first") {
+        defaultPos = 0
+      } else if (config.selectedIndex === "last") {
+        defaultPos = values.length - 1;
+      }
+    }
+  }
+
+  if (defaultPos < 0) defaultPos = 0;
+  
+  return [values, defaultPos];
+
+}
 
 export default function TimelineConstrol({ core, viewer, mainMap, dispatch, actions, record, utils, Models, theme, dimension, opened }) {
 
@@ -157,35 +322,47 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
   const [timeData, setTimeData] = useState();
 
-  const [currentDatePos, setCurrentDatePos] = useState();
-  const [frameRate, setFrameRate] = useState(0.5);
+  const [frameRate, setFrameRate] = useState(record?.config_json?.speed ? record?.config_json?.speed : 0.5);
 
   const controlLayer = useRef();
-  const currentPos = useRef();
-  const animationId = useRef();
-    
-  function setTime() {
-    if (currentPos.current >= timeData.length) {
-     setCurrentDatePos(0);
-    } else {
-     setCurrentDatePos(currentPos.current + 1);
+  
+  const [currentPos, setCurrentPos] = useState(0);
+  const [intervalId, setIntervalId] = useState(0);
+
+  // Start the interval
+  const startIntervalHandler = () => {
+    //Start interval condition
+    if (currentPos >= timeData?.length - 1) {
+      setCurrentPos(0);
     }
-  }
-    
-  const stop = function () {
-    if (animationId?.current !== null) {
-      window.clearInterval(animationId.current);
-      animationId.current = null;
-    }
+
+    let newIntervalId = setInterval(() => {
+      setCurrentPos((val) => {
+        if (val + 1 >= timeData.length) {
+          if (record?.config_json?.loop === true) {
+            setCurrentPos(0);
+          } else {
+            clearInterval(newIntervalId);
+            setIntervalId(0);
+          }
+
+          return val;
+        }
+        return val + 1;
+      });
+    }, 1000 / frameRate);
+
+    setIntervalId(newIntervalId);
   };
-    
-  const play = function () {
-    stop();
-    animationId.current = window.setInterval(setTime, 1000 / frameRate);
+
+  // Stopping the interval
+  const stopIntervalHandler = () => {
+    clearInterval(intervalId);
+    setIntervalId(0);
   };
+
 
   useEffect(() => {
-
     if (!mainMap) return;
     if (!theme) return;
     if (controlLayer.current) return;
@@ -202,34 +379,40 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
     if (!mainMap) return;
     if (!dimension) return;
 
-    let values = []
-    if (dimension?.values) {
-      values = parseDateTimeList(dimension.values);
-      //console.log(parseDateTimeList(dimension.values));
-      //console.log(parseDateTimeList("2024-06-01T00:00:00Z/2024-06-03T00:00:00Z/PT24H"));
-      //console.log(parseDateTimeList("2024-06-01T00:00:00Z/PT12H"));
+    const [values, defaultPos] = calculateDates(record?.config_json, dimension?.values);;
 
-      setTimeData(values);
-      setCurrentDatePos(0);
-    }
+    setTimeData(values);
+    setCurrentPos(defaultPos);
   }, [dimension]);
 
   useEffect(() => {
-    if (!animationId.current) return;
+    if (!intervalId) return;
 
     if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
       stop();
     }
   }, [viewer?.config_json?.checked]);
 
-  useEffect(() => {
-    currentPos.current = currentDatePos;
-    if (timeData?.length && controlLayer != null) {
-      controlLayer.current.getSource().updateParams({'TIME': timeData[currentDatePos]});
-    }
-  }, [currentDatePos]);
 
-  const options = (timeData || []).map((v, idx) => {return { value: idx, label: formatDate(v) }});
+  useEffect(()=> {
+    if (intervalId === 0) {
+      //setCurrentPos(0);
+    }
+
+    //Clear interval on unmount
+    return () => { if (intervalId) clearInterval(intervalId); }
+  }, [intervalId])
+
+  useEffect(() => {
+    if (timeData?.length && controlLayer != null) {
+      controlLayer.current.getSource().updateParams({'TIME': timeData[currentPos]});
+    }
+  }, [currentPos]);
+
+  const options = (timeData || []).map((v, idx) => { 
+    const format = record?.config_json?.displayFormat;
+    return { value: idx, label: formatDate(v, format) }
+  });
 
   if(!opened) return <React.Fragment></React.Fragment>
 
@@ -241,23 +424,40 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
     )
   }
 
+  const showLegend = theme && record?.config_json?.showLegend === true;
+
   return (
-    <div style={{width: "200px", padding: "10px 10px"}}>
+    <div style={{padding: "10px 10px"}}>
+      { showLegend && <div className="p-mb-2"><Legend data={theme} core={core} actions={actions} models={Models}/></div> }
       <div className="p-text-center p-mb-3">
-      <Dropdown value={currentDatePos} options={options} filter={options?.length > 20}
-          onChange={(e) => {setCurrentDatePos(e.value)}} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" />
+        <Dropdown value={currentPos} options={options} filter={options?.length > 20}
+          onChange={(e) => { setCurrentPos(e.value) }} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" />
       </div>
-      <Slider className="p-mb-3" value={currentDatePos} onChange={(e) => setCurrentDatePos(e.value)} max={timeData?.length ? timeData?.length - 1 : 100} disabled={!timeData?.length} />
+      <Slider className="p-mb-3" value={currentPos} onChange={(e) => { setCurrentPos(e.value) }} max={timeData?.length ? timeData?.length - 1 : 100} disabled={!timeData?.length} />
       <div className="scalargis-timeline p-text-center">
         <div className="p-inputgroup scalargis-timeline">
-          <Button icon="pi pi-angle-double-left" onClick={(e) => { setCurrentDatePos(0); }}></Button>
-          <Button icon="pi pi-angle-left" onClick={(e) => { currentDatePos && setCurrentDatePos(currentDatePos - 1); }}></Button>
-          { animationId.current ? 
-            <Button icon="pi pi-pause" onClick={(e) => { stop(); }}></Button> :
-            <Button icon="pi pi-play" onClick={(e) => { play(); }}></Button>
+          <Button icon="pi pi-angle-double-left" onClick={(e) => { setCurrentPos(0); }}></Button>
+          <Button icon="pi pi-angle-left" 
+            onClick={(e) => { 
+              if (currentPos) setCurrentPos(currentPos - 1);
+            }}
+          />
+          { intervalId ? 
+            <Button icon="pi pi-pause" onClick={(e) => { stopIntervalHandler(); }}></Button> :
+            <Button icon="pi pi-play" onClick={(e) => { startIntervalHandler(); }}></Button>
           }
-          <Button icon="pi pi-angle-right" onClick={(e) => { setCurrentDatePos(currentDatePos + 1); }}></Button>
-          <Button icon="pi pi-angle-double-right" onClick={(e) => { setCurrentDatePos(timeData.length - 1); }}></Button>
+          <Button icon="pi pi-angle-right" 
+            onClick={(e) => { 
+              if (timeData?.length) {
+                if (currentPos + 1 < timeData.length) {
+                  setCurrentPos(currentPos + 1);
+                } else if (record?.config_json?.loop === true) {
+                  setCurrentPos(0);
+                }
+              }
+            }}
+          />
+          <Button icon="pi pi-angle-double-right" onClick={(e) => { setCurrentPos(timeData.length - 1) }}></Button>
         </div>
       </div>
     </div>

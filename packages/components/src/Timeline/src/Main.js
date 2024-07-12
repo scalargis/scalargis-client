@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidV4 } from 'uuid';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import TimelineControl from './TimelineControl';
@@ -19,6 +20,7 @@ export default function Main(props) {
 
   const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
 
+
   const component_cfg = record.config_json || {};
   const title = record.title || 'Timeline';
   const header = component_cfg.header || title;
@@ -31,19 +33,26 @@ export default function Main(props) {
   useEffect(() => {
     if (!mainMap) return;
 
-    let dimension;
-    let dimension_name;
+    let _theme;
 
     if (component_cfg?.datasource?.layer_id) {
-      const _theme = viewer.config_json.layers.find(l => l.id === component_cfg?.datasource?.layer_id);
-      
-      if (_theme) {
-        setTheme(_theme);
-      } else {
-        //TODO
-      }
+      _theme = viewer.config_json.layers.find(l => l.id === component_cfg?.datasource?.layer_id);
+    }
+
+    if (_theme) {
+      setTheme(_theme);
     } else {
-      //TODO
+      if (component_cfg?.datasource?.layer) {
+        _theme = { id: String(uuidV4()), ...component_cfg?.datasource?.layer}
+        const _parent = component_cfg?.datasource?.parent_id || "main";
+        dispatch(actions.viewer_add_themes(
+          _parent,
+          [_theme],
+          true
+        ));
+        dispatch(actions.layers_set_checked([ ...viewer.config_json.checked, _theme.id])); 
+        setTheme(_theme);
+      }
     }
 
   }, [mainMap]);
@@ -131,6 +140,21 @@ export default function Main(props) {
     }
 
   }, [theme]);
+
+  useEffect(() => {
+    if (!mainMap) return;
+    if (!theme) return;
+
+    if (component_cfg?.hideLayerOnCollapse === true) {
+      let checked = [...viewer.config_json.checked];
+      if (opened) {
+        if (!checked.includes(theme.id)) checked.push(theme.id);
+      } else {
+        checked = checked.filter(p => p !== theme.id);
+      }
+      dispatch(actions.layers_set_checked(checked));
+    }
+  }, [opened]);
 
   function renderContent() {
     return (

@@ -1,5 +1,5 @@
 .scalargis-timeline.p-inputgroup {
-    display: inline-block;
+    justify-content: center;
 }
 
 .scalargis-timeline.p-inputgroup button:last-child {

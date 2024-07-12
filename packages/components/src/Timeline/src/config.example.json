@@ -5,10 +5,72 @@
     "target": "map_controls_bottom_center",
     "config_json": {
         "datasource": {
-        "layer_id": "layer1"
+            "layer_id": "layer1",
+            "parent_id": "main"
         },
         "dimension": {
-        "name": "time"
-        }
+            "name": "time"
+        },
+        "value": "today",
+        "steps": [
+          1,
+          2
+        ],
+        "selectedIndex": "first",
+        "loop": true,
+        "displayFormat": "{dd}-{mm}-{yyyy} {h}:{m}:{s}",
+        "speed": 0.5,
+        "hideLayerOnCollapse": true,
+        "showLegend": true
+    }
+},
+
+{
+    "id": "timeline",
+    "type": "Timeline",
+    "title": "Timeline Control",
+    "target": "map_controls_bottom_center",
+    "config_json": {
+        "datasource": {
+            "parent_id": "dynamic",
+            "layer": {
+                
+            }
+        },
+        "dimension": {
+            "name": "time"
+        },
+        "value": "P1D",
+        "delta": [
+          "P1D",
+          "P2D"
+        ],
+        "loop": true,
+        "displayFormat": "{dd}-{mm}-{yyyy}",
+        "speed": 0.5
+    }
+},
+
+{
+    "id": "timeline",
+    "type": "Timeline",
+    "title": "Timeline Control",
+    "target": "map_controls_bottom_center",
+    "config_json": {
+        "datasource": {
+            "layer_id": "layer1",
+            "parent_id": "dynamic",
+        },
+        "dimension": {
+            "name": "time"
+        },
+        "interval": [
+            "2024-06-29T00:00:00.000Z",
+            "2024-07-03T00:00:00.000Z"
+        ],
+        "selectedIndex": 2,
+        "loop": true,
+        "displayFormat": "{dd}-{mm}-{yyyy}",
+        "speed": 0.5
     }
 }
