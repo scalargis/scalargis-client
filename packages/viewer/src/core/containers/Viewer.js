@@ -12,6 +12,7 @@ import FooterLeft from './FooterLeft'
 import FooterRight from './FooterRight'
 import TopbarRight from './TopbarRight'
 import MapControlsTopLeft from './MapControlsTopLeft'
+import MapControlsTopCenter from './MapControlsTopCenter'
 import MapControlsTopRight from './MapControlsTopRight'
 import MapControlsLeft from './MapControlsLeft'
 import MapControlsBottomLeft from './MapControlsBottomLeft'
@@ -124,6 +125,7 @@ function Viewer(props) {
         </Layers>
 
         <MapControlsTopLeft />
+        <MapControlsTopCenter />
         <MapControlsTopRight />
         <MapControlsLeft />
         <MapControlsBottomLeft />

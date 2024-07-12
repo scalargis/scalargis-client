@@ -348,6 +348,7 @@ body .p-multiselect {
 
 .map-region-top-left,
 .map-region-top-right,
+.map-region-top-center,
 .map-region-left,
 .map-region-bottom-left,
 .map-region-bottom-right,
@@ -367,6 +368,14 @@ body .p-multiselect {
   right: 0.5em;
   /*width: inherit;*/
 }
+
+.map-region-top-center {
+  top: 1.5em;
+  max-width: max-content;
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
 
 .map-region-left {
   top: 5em;
@@ -391,15 +400,9 @@ body .p-multiselect {
 
 .map-region-bottom-center {
   bottom: 1.5em;
-  /*
-  margin-left: 40%;
-  margin-right: 40%;
-  text-align: center;
-  width: inherit;
-  */
   max-width: max-content;
-  margin-left: 40%;
-  margin-right: auto;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
 
 .map-region-left .p-button:hover,
@@ -408,6 +411,7 @@ body .p-multiselect {
 .map-region-top-left .p-button:focus,
 .map-region-top-right .p-button:hover,
 .map-region-top-right .p-button:focus,
+.map-region-top-center .p-button:focus
 .map-region-bottom-left .p-button:hover,
 .map-region-bottom-left .p-button:focus,
 .map-region-bottom-right .p-button:hover,
