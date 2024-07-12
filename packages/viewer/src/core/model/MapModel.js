@@ -620,8 +620,8 @@ const createLegendUrl = (url, layer, srs) => {
         'VERSION=1.1.1',
         'REQUEST=GetLegendGraphic',
         'FORMAT=image%2Fpng',
-        'SRS=' + (srs.indexOf(':') === -1 ? 'EPSG:' + srs : srs),
-        'CRS=' + (srs.indexOf(':') === -1 ? 'EPSG:' + srs : srs),
+        'SRS=' + ((srs + "").indexOf(':') === -1 ? 'EPSG:' + srs : srs),
+        'CRS=' + ((srs + "").indexOf(':') === -1 ? 'EPSG:' + srs : srs),
         'LAYER=' + layer
     ].join('&'));
 };
