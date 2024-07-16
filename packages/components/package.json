@@ -13,7 +13,10 @@
   "dependencies": {
     "@scalargis/jsonforms-primereact-renderers": "^3.1.0",
     "convert": "^4.13.1",
-    "react-image-file-resizer": "^0.4.8"
+    "react-image-file-resizer": "^0.4.8",
+    "fig-tree-evaluator": "^2.16.1",
+    "object-property-assigner": "^0.9.0",
+    "object-property-extractor": "^1.0.6"
   },
   "devDependencies": {
   } 

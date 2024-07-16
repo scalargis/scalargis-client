@@ -7,6 +7,8 @@ import { get, merge } from 'lodash';
 import { JsonFormContext } from './JsonFormContext';
 import { i18nDefaults } from './util/i18nDefaults';
 import { getTranslations } from './../utils/i18n';
+import { useFigTreeEvaluator } from './useFigTreeEvaluator';
+
 
 export const JsonForm = (props) => {
   const {
@@ -17,6 +19,8 @@ export const JsonForm = (props) => {
     renderers,
     cells,
     i18n,
+    figTreeEvaluatorOptions,
+    loadingElement
   } = props;
 
   const ctx = useContext(JsonFormContext);
@@ -37,6 +41,8 @@ export const JsonForm = (props) => {
       translations = merge(translations, props.translations);
     }
 
+    //console.log(translations);
+
     const createTranslator = (locale) => (key, defaultMessage) => {
 
       //console.log({ key, defaultMessage});
@@ -50,15 +56,30 @@ export const JsonForm = (props) => {
     return createTranslator(locale);
   },  [props.locale, props.translations, props.i18n, i18next.resolvedLanguage]);
 
+
+  const _i18n = i18n || ctx?.i18n || {locale: locale, translate: translation} 
+
+  const defaultLoadingElement = useMemo(() => {  
+    return {
+      type: 'VerticalLayout',
+      elements: [{ type: 'Html', text: `<div class="p-mb-4"><i class="pi pi-spin pi-spinner p-mr-2" style={{'fontSize': '2em'}}></i><span>${_i18n.translate("common.loading", "A carregar ...")}</span></div>` }],
+    }
+  }, [i18next.resolvedLanguage]);
+
+  const _loadingElement =  loadingElement || defaultLoadingElement;
+
+  const { evaluatedSchema = {}, evaluatedUiSchema } = useFigTreeEvaluator(data, schema, uischema, figTreeEvaluatorOptions, _loadingElement);
+
+
   return (
     <JsonForms
+      schema={evaluatedSchema}
+      uischema={evaluatedUiSchema}
       data={data}
       onChange={onChange}
-      schema={schema}
-      uischema={uischema}
       renderers={renderers || defaultRenderers}
       cells={cells || vanillaCells}
-      i18n={i18n || ctx?.i18n || {locale: locale, translate: translation}}
+      i18n={_i18n}
     />
   );
 }

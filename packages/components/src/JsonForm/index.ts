@@ -15,8 +15,14 @@ import {
   PhotoControl,
   photoControlTester,
   FileControl,
-  fileControlTester  
+  fileControlTester,
+  TextDisplay,
+  textDisplayTester,
+  HtmlDisplay,
+  htmlDisplayTester
 } from './controls';
+
+import { useFigTreeEvaluator } from  './useFigTreeEvaluator';
 
 const {  
   primereactGroupTester, PrimereactGroupLayout,
@@ -36,6 +42,8 @@ const defaultRenderers = [
   // Scalargis custom renderers
   { tester: photoControlTester, renderer: PhotoControl },
   { tester: fileControlTester, renderer: FileControl },
+  { tester: textDisplayTester, renderer: TextDisplay},
+  { tester: htmlDisplayTester, renderer: HtmlDisplay},
   { tester: arrayPhotoControlTester, renderer: ArrayPhotoControlRenderer },
   { tester: arrayFileControlTester, renderer: ArrayFileControlRenderer }
 ];
@@ -44,5 +52,6 @@ export {
   JsonForm,
   JsonFormContext,
   defaultRenderers as JsonFormDefaultRenderers,
-  FormErrors
+  FormErrors,
+  useFigTreeEvaluator
 }

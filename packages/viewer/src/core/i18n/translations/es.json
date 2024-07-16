@@ -292,5 +292,7 @@
   "selectLeftTheme": "Selecionar tema da esquerda",
   "selectRightTheme": "Selecionar tema da direita",
   "selectTopTheme": "Selecionar tema de topo",
-  "selectBottomTheme": "Selecionar tema de baixo"
+  "selectBottomTheme": "Selecionar tema de baixo",
+
+  "loading": "Cargando ..."
 }
