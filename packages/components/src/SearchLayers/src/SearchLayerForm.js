@@ -121,6 +121,7 @@ export default function SearchLayerForm(props) {
 
         <div className="p-text-center">
           <Button onClick={() => {
+              setData({});
               const new_formdata = {...formData};
               new_formdata[id] = {};
               setFormData(new_formdata);
