@@ -35,7 +35,8 @@ export const i18nDefaults = {
       "addFileRequired": "You need to add a file."
     },    
     "error":{
-      "required":"field is required"
+      "required":"field is required",
+      "pattern": "invalid format"
     },
   },
   "pt": {
@@ -69,7 +70,8 @@ export const i18nDefaults = {
       "addFileRequired": "É necessário adicionar um ficheiro."
     },
     "error":{
-      "required":"Campo obrigatório"
+      "required": "Campo obrigatório",
+      "pattern": "Formato inválido"
     }
   }
 }

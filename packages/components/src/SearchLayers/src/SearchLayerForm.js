@@ -3,21 +3,23 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Message } from 'primereact/message';
 
-import { i18n } from '@scalargis/components';
-import {   
+import {
+  i18n,
   JsonForm,
   JsonFormContext, 
   JsonFormDefaultRenderers
-} from './../../JsonForm';
+} from '@scalargis/components';
 
-import { getDescribeFeatureType, getFeatures } from './service';
+import { getFeatures } from './service';
 import SearchLayerResults from './SearchLayerResults';
+
 
 let toastEl = null;
 
+
 export default function SearchLayerForm(props) {
   const {core, viewer, auth, actions, pubsub, dispatch, mainMap, Models, layers, layer, 
-    searchConfig, schemaConfig, updateLayerSchema, goPanelSearchPrev} = props;
+    searchConfig, schemaConfig, goPanelSearchPrev} = props;
   const { showOnPortal } = Models.Utils;
   
   const {schema={}, uischema={}, geometry_field} = schemaConfig || {};
@@ -25,49 +27,11 @@ export default function SearchLayerForm(props) {
   const id = searchConfig?.id;
 
   const searchTitle = searchConfig?.title ? i18n.translateValue(searchConfig.title, searchConfig?.title) : "";
-
-  const [loaded, setLoaded] = useState(false);
-  const [errorSchema, setErrorSchema] = useState(null);
+  
+  const [data, setData] = useState({});
   const [formData, setFormData] = useState({});
   const [results, setResults] = useState({});
 
-  useEffect(() => {    
-    setErrorSchema(null);
-
-    if (schema && Object.keys(schema).length > 0 && uischema && Object.keys(uischema).length) {
-      setLoaded(true);
-      return;
-    }
-
-    setLoaded(false);
-
-    props.setBlockedPanel(true);
-
-    getDescribeFeatureType({cfg: searchConfig, core, viewer, auth}).then(data => {
-      try {
-        if (searchConfig?.uischema) {
-          updateLayerSchema(id, {
-            ...data,
-            uischema: {
-              type: 'VerticalLayout',
-              elements: [...data?.uischema?.elements],
-              ...searchConfig?.uischema
-            }
-          });
-        } else {
-          updateLayerSchema(id, data);
-        }
-      } catch (err) {
-        return Promise.reject(err);
-      }
-      setLoaded(true);
-    }).catch(error => {      
-      console.log(error);
-      setErrorSchema({message:'Não foi possível obter informação do tema'});
-    }).finally(()=> {
-      props.setBlockedPanel(false);
-    });
-  }, [id]);
 
   const doSearch = (startIndex=0, maxFeatures, filter, sort) => {
     let start = null;
@@ -104,6 +68,7 @@ export default function SearchLayerForm(props) {
       });      
     }).finally(()=> props.setBlockedPanel(false));
   }
+
   
   return (
     <>
@@ -125,23 +90,24 @@ export default function SearchLayerForm(props) {
       <div className="p-mt-2">{searchTitle}</div>
       <hr />
 
-      { errorSchema && <React.Fragment>
+      { props?.errorSchema && <React.Fragment>
         <Message
           severity="warn"
-          text={errorSchema.message} 
+          text={props?.errorSchema.message} 
         />
       </React.Fragment> }
 
-      { loaded && <React.Fragment>
+      <React.Fragment>
         <div className="p-mt-3">
           <JsonFormContext.Provider value={{utils: Models.Utils}}>
             <JsonForm
               schema={schema}
               uischema={uischema}
-              data={formData[id]}
+              data={data}
               renderers={JsonFormDefaultRenderers}
               //cells={vanillaCells}
               onChange={({ data, _errors }) => {
+                setData(data);
                 const new_formdata = {...formData};
                 new_formdata[id] = data;
                 setFormData(new_formdata);
@@ -155,13 +121,13 @@ export default function SearchLayerForm(props) {
 
         <div className="p-text-center">
           <Button onClick={() => {
-            const new_formdata = {...formData};
-            new_formdata[id] = {};
-            setFormData(new_formdata);
-            const new_results = {...results};
-            new_results[id] = null;
-            setResults(new_results);
-            if (layer && layer.current) layer.current.getSource().clear();
+              const new_formdata = {...formData};
+              new_formdata[id] = {};
+              setFormData(new_formdata);
+              const new_results = {...results};
+              new_results[id] = null;
+              setResults(new_results);
+              if (layer && layer.current) layer.current.getSource().clear();
             }}
             className="p-mr-2"
             color='primary'>
@@ -268,7 +234,7 @@ export default function SearchLayerForm(props) {
             doSearch={doSearch}
           />
         }
-      </React.Fragment> }  
+      </React.Fragment> 
     </>
   )
 

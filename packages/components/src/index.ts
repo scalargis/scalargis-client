@@ -40,7 +40,8 @@ import {
   JsonForm, 
   JsonFormContext,
   JsonFormDefaultRenderers,
-  FormErrors
+  FormErrors,
+  useFigTreeEvaluator
 } from './JsonForm'
 
 import * as i18n from './utils/i18n';
@@ -91,6 +92,7 @@ export {
   JsonFormContext,
   JsonFormDefaultRenderers,
   FormErrors,
+  useFigTreeEvaluator,
 
   i18n,
 
