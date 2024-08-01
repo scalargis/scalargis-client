@@ -15,10 +15,28 @@ const checkDate = (date) => {
   };
 
   const getAsOneOfObjects = (data, constField, titleField) => {
-    const vals = data.map(d => { 
-      return { const: extractProperty(d, constField, null), title: extractProperty(d, titleField, null) } 
+    function formatData(data, elem) {
+      if (typeof(elem) === 'object') {
+        const retVal = {...elem};
+        for (const [key, value] of Object.entries(retVal)) {
+          if (typeof(value) === 'object') {
+            retVal[key] = formatData(data, retVal[key]);
+          } else {
+            retVal[key] = extractProperty(data, retVal[key], null);
+          }
+        }
+        return retVal;
+      } else {
+        return extractProperty(data, elem, null);
+      }
+    }
+
+    const _constField = typeof(constField) === 'object' ? {...constField} : constField;
+
+    return data.map(item => {
+      const val = formatData(item, _constField);
+      return { const: val, title: extractProperty(item, titleField, null) }
     });
-    return vals;
   }
   
   export { checkDate, getAsOneOfObjects };

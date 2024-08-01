@@ -36,7 +36,10 @@ export const i18nDefaults = {
     },    
     "error":{
       "required":"field is required",
-      "pattern": "invalid format"
+      "pattern": "invalid format",
+      "oneOf": "must match exactly one schema in oneOf",
+      "const": "must be equal to constant",
+      "enum": "must be equal to one of the allowed values"
     },
   },
   "pt": {
@@ -71,7 +74,10 @@ export const i18nDefaults = {
     },
     "error":{
       "required": "Campo obrigatório",
-      "pattern": "Formato inválido"
+      "pattern": "Formato inválido",
+      "oneOf": "Deve corresponder a um dos valores da permitidos",
+      "const": "Deve ser igual à constante",
+      "enum": "Deve corresponder a um dos valores permitidos"
     }
   }
 }

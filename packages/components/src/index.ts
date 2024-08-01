@@ -41,12 +41,14 @@ import {
   JsonFormContext,
   JsonFormDefaultRenderers,
   FormErrors,
-  useFigTreeEvaluator
+  useFigTreeEvaluator,
+  ValidationMode
 } from './JsonForm'
 
 import * as i18n from './utils/i18n';
 
 import  LocaleSelectorComponent from  './LocaleSelector/src/LocaleSelector';
+
 
 export {
   AttributesTable,
@@ -93,6 +95,7 @@ export {
   JsonFormDefaultRenderers,
   FormErrors,
   useFigTreeEvaluator,
+  ValidationMode as JsonFormValidationMode,
 
   i18n,
 

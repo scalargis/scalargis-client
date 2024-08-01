@@ -45,10 +45,13 @@ export const useFigTreeEvaluator = (data, schema, uischema, figOptions, loadingE
       });
 
     fig.evaluate(schema, { data }).then((result) => {
+      //console.log({data, result});
       setEvaluatedSchema(result);
       setSchemaEvaluated(true);
     });
   }, [data, simplifiedRulePaths, schemaEvaluated]);
+
+  //console.log({data, evaluatedSchema, evaluatedUiSchema});
 
   return { evaluatedSchema, evaluatedUiSchema };
 };

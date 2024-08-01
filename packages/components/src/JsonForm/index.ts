@@ -12,6 +12,10 @@ import {
 } from './complex';
 
 import {
+  PrimereactEnumExtendedControl,
+  primereactEnumExtendedControlTester,
+  PrimereactOneOfEnumExtendedControl,
+  primereactOneOfEnumExtendedControlTester,
   PhotoControl,
   photoControlTester,
   FileControl,
@@ -21,6 +25,10 @@ import {
   HtmlDisplay,
   htmlDisplayTester
 } from './controls';
+
+import {
+  ValidationMode
+} from './util/enums';
 
 import { useFigTreeEvaluator } from  './useFigTreeEvaluator';
 
@@ -40,6 +48,8 @@ const defaultRenderers = [
   { tester: primereactHorizontalLayoutTester, renderer: PrimereactHorizontalLayout },
   { tester: primereactArrayLayoutTester, renderer: PrimereactArrayLayout },
   // Scalargis custom renderers
+  { tester: primereactEnumExtendedControlTester, renderer: PrimereactEnumExtendedControl },
+  { tester: primereactOneOfEnumExtendedControlTester, renderer: PrimereactOneOfEnumExtendedControl },
   { tester: photoControlTester, renderer: PhotoControl },
   { tester: fileControlTester, renderer: FileControl },
   { tester: textDisplayTester, renderer: TextDisplay},
@@ -53,5 +63,6 @@ export {
   JsonFormContext,
   defaultRenderers as JsonFormDefaultRenderers,
   FormErrors,
-  useFigTreeEvaluator
+  useFigTreeEvaluator,
+  ValidationMode
 }

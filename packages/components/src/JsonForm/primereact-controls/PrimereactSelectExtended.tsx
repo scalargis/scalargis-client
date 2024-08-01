@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react';
 import { EnumCellProps, WithClassname } from '@jsonforms/core';
-
-//import { MenuItem, Select } from '@mui/material';
-import { Dropdown } from 'primereact/dropdown';
-import merge from 'lodash/merge';
 import { TranslateProps } from '@jsonforms/react';
-import { i18nDefaults } from '../util';
+import merge from 'lodash/merge';
+import { Dropdown } from 'primereact/dropdown';
+
+
+import { i18nDefaults } from '@scalargis/jsonforms-primereact-renderers'
 
 
 interface RequiredProp {
   required?: boolean;
 }
 
-export const PrimereactSelect = React.memo(function MuiSelect(
+export const PrimereactSelectExtended = React.memo(function PrimereactSelectExtended(
   props: EnumCellProps & WithClassname & TranslateProps & RequiredProp
 ) {
   const {
@@ -39,42 +39,26 @@ export const PrimereactSelect = React.memo(function MuiSelect(
         : msg = t('enum.placeholder', i18nDefaults['enum.placeholder'], { schema, uischema, path });    
       return msg;
     }, [t, schema, uischema, path]);
+
   return(
     <Dropdown
       className={`${className || ''}${!isValid ? ' p-invalid' : ''}`}
       inputId={id}
-      value={data || ''}
+      value={data?.const || data || ''}
       disabled={!enabled}
       options={options}
-      onChange={ev => handleChange(path, ev.value)}
-      emptyMessage=""
+      emptyMessage="" 
+      onChange={ev => {
+        handleChange(path, ev.value);
+
+        //Custom behaviour - clear dependent controls values on change
+        if (Array.isArray(schema["dependent_controls" as string]) && schema["dependent_controls" as string]?.length) {
+          schema["dependent_controls"].forEach(ctrlPath => {
+            handleChange(ctrlPath, undefined);
+          });
+        }
+      }}
       placeholder={noneOptionLabel}
       showClear={!required && data} />
-  );  
-  /*
-  return (
-    <Select
-      className={className}
-      id={id}
-      disabled={!enabled}
-      autoFocus={appliedUiSchemaOptions.focus}
-      value={data !== undefined ? data : ''}
-      onChange={(ev) => handleChange(path, ev.target.value || undefined)}
-      fullWidth={true}
-      variant={'standard'}
-    >
-      {[
-        <MenuItem value={''} key='jsonforms.enum.none'>
-          <em>{noneOptionLabel}</em>
-        </MenuItem>,
-      ].concat(
-        options.map((optionValue) => (
-          <MenuItem value={optionValue.value} key={optionValue.value}>
-            {optionValue.label}
-          </MenuItem>
-        ))
-      )}
-    </Select>
   );
-  */
 });

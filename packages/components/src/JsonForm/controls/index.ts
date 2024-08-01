@@ -1,3 +1,11 @@
+import PrimereactEnumExtendedControl, { 
+  primereactEnumExtendedControlTester
+} from './PrimereactEnumExtendedControl';
+
+import PrimereactOneOfEnumExtendedControl, { 
+  primereactOneOfEnumExtendedControlTester
+} from './PrimereactOneOfEnumExtendedControl';
+
 import PhotoControl, {
   photoControlTester  
 } from './PhotoControl';
@@ -15,6 +23,10 @@ import HtmlDisplay, {
 } from './HtmlDisplay';
 
 export {
+  PrimereactEnumExtendedControl,
+  primereactEnumExtendedControlTester,
+  PrimereactOneOfEnumExtendedControl,
+  primereactOneOfEnumExtendedControlTester,
   PhotoControl,
   photoControlTester,  
   FileControl,

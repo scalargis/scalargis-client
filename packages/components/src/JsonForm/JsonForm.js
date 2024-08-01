@@ -2,7 +2,8 @@ import React, { useMemo, useContext, useEffect } from "react";
 import i18next from "i18next";
 import { JsonForms } from '@jsonforms/react';
 import { vanillaCells, vanillaRenderers } from '@jsonforms/vanilla-renderers';
-import { get, merge } from 'lodash';
+import { createAjv, toDataPath, toDataPathSegments } from '@jsonforms/core';
+import { get, set, merge } from 'lodash';
 
 import { JsonFormContext } from './JsonFormContext';
 import { i18nDefaults } from './util/i18nDefaults';
@@ -19,6 +20,8 @@ export const JsonForm = (props) => {
     renderers,
     cells,
     i18n,
+    ajvOptions,
+    validationMode,
     figTreeEvaluatorOptions,
     loadingElement
   } = props;
@@ -44,9 +47,7 @@ export const JsonForm = (props) => {
     //console.log(translations);
 
     const createTranslator = (locale) => (key, defaultMessage) => {
-
       //console.log({ key, defaultMessage});
-
       let msg;
       locale
         ? msg = get(translations, `${locale}.${key}`, get(translations, `${key}`, defaultMessage))
@@ -56,6 +57,28 @@ export const JsonForm = (props) => {
     return createTranslator(locale);
   },  [props.locale, props.translations, props.i18n, i18next.resolvedLanguage]);
 
+
+  const ajv = useMemo(() => {
+    let _ajv;
+    if (!ajvOptions) {
+      _ajv = createAjv({useDefaults: true});
+    } else {
+      _ajv = createAjv({useDefaults: true, ...ajvOptions});
+    }
+
+    if (_ajv?.schemas) {
+      for (const item in _ajv?.schemas) {
+        if (_ajv.schemas[item]?.schema?.definitions?.schemaArray?.minItems != null) {
+          _ajv.schemas[item].schema.definitions.schemaArray.minItems = 0;
+        }
+        if (_ajv.schemas[item]?.schema?.properties?.enum?.minItems != null) {
+          _ajv.schemas[item].schema.properties.enum.minItems = 0;
+        }
+      }
+    }
+
+    return _ajv;
+  }, [ajvOptions]);
 
   const _i18n = i18n || ctx?.i18n || {locale: locale, translate: translation} 
 
@@ -76,10 +99,27 @@ export const JsonForm = (props) => {
       schema={evaluatedSchema}
       uischema={evaluatedUiSchema}
       data={data}
-      onChange={onChange}
+      onChange={({ data, errors }) => {
+        /*
+        if (errors?.length) {
+          errors.forEach((err, index) => {
+            console.log(err);
+            if (err.keyword === "oneOf" || err.keyword === "enum") {
+              const path = toDataPath(err.schemaPath);
+              set(data, path, undefined);
+              errors.splice(index, 1);
+            }
+          });
+        }
+        console.log({evaluatedSchema, evaluatedUiSchema, data, errors});
+        */
+        onChange({ data, errors });
+      }}
       renderers={renderers || defaultRenderers}
       cells={cells || vanillaCells}
       i18n={_i18n}
+      ajv={ajv}
+      validationMode={validationMode}
     />
   );
 }
