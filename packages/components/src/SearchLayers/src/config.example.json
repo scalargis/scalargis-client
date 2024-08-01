@@ -32,7 +32,7 @@
                             "type": "string"
                         }                                
                     },
-                    "required": ["seccaoj"]
+                    "required": ["seccao"]
                 },
                 "uischema": {
                     "type": "HorizontalLayout",
@@ -52,6 +52,28 @@
                             "label": "Proprietário",
                             "scope": "#/properties/proprietario"
                         }                                
+                    ]
+                },
+                "validationMode": "NoValidation",
+                "transformer": {
+                    "operator": "buildObject",
+                    "properties": [
+                        {
+                            "key": "num_predio",
+                            "value": {
+                                "operator": "objectProperties",
+                                "property": "predio",
+                                "fallback": null
+                            }
+                        },
+                        {
+                            "key": "seccao",
+                            "value": {
+                                "operator": "objectProperties",
+                                "property": "seccao",
+                                "fallback": null
+                            }
+                        }
                     ]
                 }
             },

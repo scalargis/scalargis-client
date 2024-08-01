@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { FigTreeEvaluator } from 'fig-tree-evaluator';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Message } from 'primereact/message';
@@ -7,7 +8,8 @@ import {
   i18n,
   JsonForm,
   JsonFormContext, 
-  JsonFormDefaultRenderers
+  JsonFormDefaultRenderers,
+  JsonFormValidationMode
 } from '@scalargis/components';
 
 import { getFeatures } from './service';
@@ -15,6 +17,8 @@ import SearchLayerResults from './SearchLayerResults';
 
 
 let toastEl = null;
+
+const fig = new FigTreeEvaluator({ evaluateFullObject: true });
 
 
 export default function SearchLayerForm(props) {
@@ -28,10 +32,11 @@ export default function SearchLayerForm(props) {
 
   const searchTitle = searchConfig?.title ? i18n.translateValue(searchConfig.title, searchConfig?.title) : "";
   
-  const [data, setData] = useState({});
   const [formData, setFormData] = useState({});
+  const [formErrors, setFormErrors] = useState({});
   const [results, setResults] = useState({});
 
+  const validationMode = JsonFormValidationMode[searchConfig?.validationMode];
 
   const doSearch = (startIndex=0, maxFeatures, filter, sort) => {
     let start = null;
@@ -69,7 +74,6 @@ export default function SearchLayerForm(props) {
     }).finally(()=> props.setBlockedPanel(false));
   }
 
-  
   return (
     <>
       {showOnPortal(<Toast ref={(el) => toastEl = el} />)}
@@ -103,15 +107,19 @@ export default function SearchLayerForm(props) {
             <JsonForm
               schema={schema}
               uischema={uischema}
-              data={data}
+              data={id ? formData[id] || {} : {} }
               renderers={JsonFormDefaultRenderers}
               //cells={vanillaCells}
-              onChange={({ data, _errors }) => {
-                setData(data);
-                const new_formdata = {...formData};
-                new_formdata[id] = data;
-                setFormData(new_formdata);
-              }}                            
+              onChange={({ data, errors }) => {
+                const _formdata = {...formData};
+                _formdata[id] = data;
+                setFormData(_formdata);
+
+                const _formerrors = {...formErrors}
+                _formerrors[id] = errors;
+                setFormErrors(_formerrors);
+              }}
+              validationMode={validationMode}
               //locale={locale}
               //translations={translations}
               //i18n={{locale: locale, translate: translation}}
@@ -121,23 +129,34 @@ export default function SearchLayerForm(props) {
 
         <div className="p-text-center">
           <Button onClick={() => {
-              setData({});
-              const new_formdata = {...formData};
-              new_formdata[id] = {};
-              setFormData(new_formdata);
-              const new_results = {...results};
-              new_results[id] = null;
-              setResults(new_results);
+              const _formdata = {...formData};
+              _formdata[id] = {};
+              setFormData(_formdata);
+
+              const _formerrors = {...formErrors};
+              _formerrors[id] = {};
+              setFormErrors(_formerrors);
+
+              const _results = {...results};
+              _results[id] = null;
+              setResults(_results);
+
               if (layer && layer.current) layer.current.getSource().clear();
             }}
             className="p-mr-2"
             color='primary'>
             Limpar
           </Button>
-          <Button onClick={(e) => {
-              const getFormData = (schema, formData, config) => {
-                let finalFormData = {...formData};
-                
+          <Button onClick={async (e) => {
+              if (formErrors[id]?.length) return;
+
+              const getFormData = async (schema, formData, config) => {
+                let _formData = {...formData};
+                if (config?.transformer) {
+                  const result = await fig.evaluate(config?.transformer, {data: _formData});
+                  _formData = result;
+                }
+
                 if (config?.fields_exclude_query?.length) {
                   const tmpFields = {};
                   Object.keys(finalFormData).forEach(k => {
@@ -145,16 +164,16 @@ export default function SearchLayerForm(props) {
                       tmpFields[k] = finalFormData[k];
                     }
                   });
-                  finalFormData = {...tmpFields}
+                  _formData = {...tmpFields}
                 }
 
                 const template = config?.fields_form;
 
-                if (!finalFormData || !template) return finalFormData;
+                if (!_formData || !template) return _formData;
 
                 //Get filled form fields
                 const formvalues = {};
-                Object.entries(finalFormData).forEach(([k, v]) => {
+                Object.entries(_formData).forEach(([k, v]) => {
                   const val = (typeof v == 'number' && Number.isNaN(v)) ? null : v + '';
                   if (val !== null && val !== '') {
                     formvalues[k] = v;
@@ -178,7 +197,7 @@ export default function SearchLayerForm(props) {
                 //Apply expression to virtual form fields
                 const virtualdata = Object.entries(template).filter(([k, v]) => {
                   //Exclude form fields
-                  return !(k in (finalFormData || {})) && !(k in (schema?.properties || {}));
+                  return !(k in (_formData || {})) && !(k in (schema?.properties || {}));
                 }).map(([k, v]) => {
                   let final_value = v.expression;
                   Object.entries(formvalues).forEach(([f, z]) => {
@@ -194,7 +213,7 @@ export default function SearchLayerForm(props) {
               }
               
               //Combine values of form and virtual fields
-              const data = getFormData(schema, formData[id], searchConfig);
+              const data = await getFormData(schema, formData[id], searchConfig);
 
               //Set default sort field
               let sort;
