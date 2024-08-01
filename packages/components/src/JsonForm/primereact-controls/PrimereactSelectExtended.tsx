@@ -51,9 +51,21 @@ export const PrimereactSelectExtended = React.memo(function PrimereactSelectExte
       onChange={ev => {
         handleChange(path, ev.value);
 
+        let dependentControls;
+        for (const [key, value] of Object.entries(schema)) {
+          if (key === "dependent_controls") {
+            dependentControls = value;
+            break;
+          }
+        }
+
+        console.log(dependentControls);
+
         //Custom behaviour - clear dependent controls values on change
-        if (Array.isArray(schema["dependent_controls" as string]) && schema["dependent_controls" as string]?.length) {
-          schema["dependent_controls"].forEach(ctrlPath => {
+        //if (Array.isArray(schema["dependent_controls" as string]) && schema["dependent_controls" as string]?.length) {
+        //  schema["dependent_controls"].forEach(ctrlPath => {
+        if (Array.isArray(dependentControls) && dependentControls.length) {
+          dependentControls.forEach(ctrlPath => {
             handleChange(ctrlPath, undefined);
           });
         }
