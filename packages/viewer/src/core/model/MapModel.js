@@ -1291,7 +1291,11 @@ export const buildMultiGeom = function (geoms) {
       break;
     case 'POLYGON':
       outGeom = new OlMultiPolygon([]);
-      geoms.forEach(g => outGeom.appendPolygon(g.clone()));
+      geoms.forEach(g => {
+        if (g.getType().toUpperCase() === 'POLYGON') {
+          outGeom.appendPolygon(g.clone());
+        }
+      });
       break;
     default:
       return;

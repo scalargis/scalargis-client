@@ -25,7 +25,7 @@
     "file-saver": "^2.0.5",
     "i18next": "^23.4.6",
     "i18next-browser-languagedetector": "^7.1.0",    
-    "ol": "^8.2.0",
+    "ol": "^10.0.0",
     "primeflex": "2.0.0",
     "primeicons": "^4.1.0",
     "primereact": "^6.6.0",
