@@ -153,7 +153,7 @@ function ParameterForm(props) {
 
             <div className="p-field p-col-12">
               <label htmlFor="setting_value">Valor</label>
-              <InputTextarea rows={5} id="notes" name="setting_value" {...register('setting_value', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.setting_value })} />
+              <InputTextarea rows={25} id="notes" name="setting_value" {...register('setting_value', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.setting_value })} />
               {getFormErrorMessage(errors, 'setting_value')}
             </div>
 
