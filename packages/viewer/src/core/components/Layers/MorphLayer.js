@@ -13,6 +13,9 @@ import GeoJSONLayer from "./GeoJSONLayer";
 import KMLLayer from "./KMLLayer";
 import ArcGISMapLayer from "./ArcGISMapLayer";
 import COGLayer from "./COGLayer";
+import OGCMapTileLayer from "./OGCMapTileLayer";
+import OGCVectorTileLayer from "./OGCVectorTileLayer";
+
 import GroupLayer from './GroupLayer';
 import { removeUrlParam, addUrlParam} from '../../utils';
 
@@ -142,7 +145,15 @@ const MorphLayer = ({ layers, config, group, checked, viewer }) => {
     case 'COG':      
       LayerComponent = COGLayer;
       break;
-      
+
+    case 'OGCMapTile':
+      LayerComponent = OGCMapTileLayer;
+      break;
+
+    case 'OGCVectorTile':
+      LayerComponent = OGCVectorTileLayer;
+      break; 
+
     case 'GROUP':
       LayerComponent = GroupLayer;
       break;
