@@ -41,6 +41,7 @@ export const PrimereactInputInteger = React.memo(function MuiInputInteger(
         handleChange(path, newVal);
       }}
       className={`${className || ''}${!isValid ? ' p-invalid' : ''}`}
+      format={ uischema?.options?.formatNumber === false ? false : true }
       disabled={!enabled}
     />
   );  
