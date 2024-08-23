@@ -524,3 +524,25 @@ export const isAdminOrManager = (auth) => {
 
   return retVal;
 }
+
+export const isComponentExcludedForLayer = (viewer, layer, componentClass) => {
+  let exclude = false;
+
+  //Use viewer config exclude_components to exclude component
+  if (viewer?.config_json?.exclude_components && viewer.config_json.exclude_components.includes(componentClass)) exclude = true;
+  // Use layer.exclude_components prop to exclude component
+  if (layer?.exclude_components && layer.exclude_components.includes(componentClass)) exclude = true;
+  
+  // Use layer.include_components prop to include component
+  if (layer?.include_components && layer.include_components.includes(componentClass)) {
+    exclude = false;
+  // Always show component for session layers
+  } else if (viewer?.session_layers?.length && viewer?.session_layers.includes(layer.id)) {
+    exclude = false;
+  //Alway show component if user is viewer owner
+  } else if (viewer?.is_owner) {
+    exclude = false;
+  }
+
+  return exclude;
+}

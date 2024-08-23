@@ -4,11 +4,12 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import EditNode from './EditNode';
 
-export default function Main({ config }) {
+export default function Main(props) {
 
-  const { layer, actions, models } = config;
-  const { getWindowSize, showOnPortal } = models.Utils;
-  //const [modalEditOpen, setModalEditOpen] = useState(false);
+  const { config } = props;
+  const { layer, actions, models, viewer } = config;
+  const { getWindowSize, showOnPortal, isComponentExcludedForLayer } = models.Utils;
+
   const [modalEditOpen, setModalEditOpen] = useState(null);
 
   const { t } = useTranslation();  
@@ -16,8 +17,9 @@ export default function Main({ config }) {
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  // Use layers.exclude_components prop to exclude component
-  if (layer && layer.exclude_components && layer.exclude_components.includes('LayerEdit')) return null;
+  const exclude = isComponentExcludedForLayer(viewer, layer, "LayerEdit");
+
+  if (exclude) return null;
   
   return (
     <React.Fragment>

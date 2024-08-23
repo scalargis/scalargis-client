@@ -3,15 +3,19 @@ import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 
-export default function Main({ config }) {
+export default function Main(props) {
 
-  const { layer, actions } = config;
+  const { config } = props;
+  const { layer, actions, models, viewer } = config;
+  const { isComponentExcludedForLayer } = models.Utils;
+
   const [confirmDeleteTheme, setConfirmDeleteTheme] = useState(false);
 
   const { t } = useTranslation();
 
-  // Use layers.exclude_components prop to exclude component
-  if (layer && layer.exclude_components && layer.exclude_components.includes('LayerRemove')) return null;
+  const exclude = isComponentExcludedForLayer(viewer, layer, "LayerRemove");
+
+  if (exclude) return null;
 
   return (
     <React.Fragment>
