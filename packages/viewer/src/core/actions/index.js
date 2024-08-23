@@ -783,12 +783,13 @@ export function layers_update_theme(theme) {
   return action;
 }
 
-export function viewer_add_themes(parentId, themes = [], top) {
+export function viewer_add_themes(parentId, themes = [], top, isSession=false) {
   let action = {
     type: VIEWER_ADD_THEMES,
     parentId,
     themes, 
-    top
+    top,
+    isSession
   }
   return action;
 }

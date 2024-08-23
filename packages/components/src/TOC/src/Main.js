@@ -277,6 +277,7 @@ class Main extends React.Component {
 
     let record = {
       id: viewer.id,
+      session_layers: Object.assign([], viewer?.session_layers),
       config_json: JSON.stringify(newconfig)
     }
 

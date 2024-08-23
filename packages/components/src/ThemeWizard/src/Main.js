@@ -179,9 +179,9 @@ export default function Main(props) {
           }
 
           if (!parent) {
-            dispatch(viewer_add_themes('main', [item], addThemesTop));
+            dispatch(viewer_add_themes('main', [item], addThemesTop, true));
           } else {
-            dispatch(viewer_add_themes(parent.id, [item], addThemesTop));
+            dispatch(viewer_add_themes(parent.id, [item], addThemesTop, true));
           }
 
           if (children && children.length) {

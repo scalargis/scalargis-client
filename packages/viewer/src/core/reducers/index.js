@@ -426,6 +426,16 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
     // Remove layers
     case LAYERS_REMOVE_ITEMS:
       let updated = Object.assign([], state.viewer.config_json.layers);
+      
+      // Update session layers list
+      let removedLayers = [];
+      traverseLayersTree(updated.filter(l => action.ids.includes(l.id)), null, (l, i) => {
+        removedLayers.push(l.id);
+        if (l?.children?.length) {
+          removedLayers = [...removedLayers, ...l.children];
+        }
+      });
+      const sessionLayers = Object.assign([], state.viewer.session_layers).filter(l => !removedLayers.includes(l));
 
       // Remove as child layers
       traverseLayersTree(updated, null, (l, i) => {
@@ -441,6 +451,7 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
         ...state,
         viewer: {
           ...state.viewer,
+          session_layers: sessionLayers,
           config_json: {
             ...state.viewer.config_json,
             layers: updated
@@ -483,10 +494,20 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
       }
       newlayers.splice(parentIndex, 1, parent);
 
+      // Update session layers list
+      let newSessionLayers = [];
+      if (Array.isArray(state?.viewer?.session_layers)) {
+        newSessionLayers = [...state.viewer.session_layers];
+      }
+      if (action?.isSession) {
+        newSessionLayers = [...newSessionLayers, ...action.themes.map(l => l.id)];
+      }
+
       return {
         ...state,
         viewer: {
           ...state.viewer,
+          session_layers: newSessionLayers,
           config_json: {
             ...state.viewer.config_json,
             layers: newlayers
