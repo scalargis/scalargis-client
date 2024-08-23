@@ -90,7 +90,18 @@ export const getFeatures = (options) => {
   
   let fields = null;
   if (cfg.fields_list && Object.keys(cfg.fields_list).length > 0) {
-    fields = Object.keys(cfg.fields_list);
+    fields = [];
+    for (const [key, fld] of Object.entries(cfg.fields_list)) {
+      if (fld.fields) {
+        if (Array.isArray(fld.fields)) {
+          fields = [...new Set([...fields, ...fld.fields])];
+        } else {
+          if (!fields.includes(fld.fields)) fields.push(fld.fields);
+        }
+      } else {
+        fields.push(key);
+      }
+    }
   } else if (schema && schema.properties && Object.keys(schema.properties).length > 0) {
     fields = Object.keys(schema.properties);
   }

@@ -244,6 +244,7 @@ export default function SearchLayerForm(props) {
             viewer={viewer}
             auth={auth}          
             actions={actions}
+            Models={Models}
             pubsub={pubsub}
             dispatch={dispatch}
             mainMap={mainMap}

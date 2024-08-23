@@ -7,12 +7,14 @@ import { Dropdown } from 'primereact/dropdown';
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import OlFeature from 'ol/Feature';
 import {getCenter as olGetCenter} from 'ol/extent';
+
+import { i18n } from '@scalargis/components';
+
 import { getFeatureById } from './service';
 
 export default function SearchLayerResults(props) {
-
   const { core, viewer, auth, actions, dispatch, mainMap, layer, searchConfig, doSearch, results } = props;
-  const { publish, subscribe } = props.pubsub ? props.pubsub : {}
+  const { publish, subscribe } = props.pubsub ? props.pubsub : {};
 
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -175,10 +177,12 @@ export default function SearchLayerResults(props) {
 
     //Replace label value
     let label = action.icon ? action.label : action.label || 'Abrir';
-    label = formatTemplateValue(rowData, label);  
+    label = i18n.translateValue(label);
+    label = formatTemplateValue(rowData, label);
 
     //Replace tooltip value
     let tooltip = action.tooltip;
+    tooltip = i18n.translateValue(tooltip);
     tooltip = formatTemplateValue(rowData, tooltip);
 
     //Replace value
@@ -186,17 +190,23 @@ export default function SearchLayerResults(props) {
     new_value = formatTemplateValue(rowData, new_value);    
 
     if (action.show_null === true || new_value != null) {
+
+      let data = {...action.data}
+      Object.entries(data).forEach(([key, value]) => {
+        data[key] = formatTemplateValue(rowData, value);
+      });
+
       return <Button label={label} icon={action.icon}
           className={action.classname || action.className}
           title={tooltip}
-          onClick={(e) => publish(action.type, action.data)}
+          onClick={(e) => publish(action.type, data)}
         />
     }
     
     return null;
 
   }
-
+  
   const valueTemplate = (rowData, field) => {
     let new_value = field.value ? field.value : rowData[field.name];
     const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
@@ -210,21 +220,46 @@ export default function SearchLayerResults(props) {
 
   const formatTemplateValue = (rowData, value) => {
     let new_value = value;
-
-    const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
-    if (rf) {
-      if (rf.length === 1) {
-        const fld = rf[0];
-        if (fld in rowData) {
-          new_value = rowData[fld];
+  
+    const _isPureObject = (input) => {
+      return null !== input && 
+        typeof input === 'object' &&
+        Object.getPrototypeOf(input).isPrototypeOf(Object);
+    }
+  
+    const _formatValue = (data, value) => {
+      let _new_value = value;
+  
+      const rf = (_new_value && _new_value.match) ? _new_value.match(/[^{}]+(?=})/g) : null;
+      if (rf) {
+        if (rf.length === 1) {
+          const fld = rf[0];
+          if (fld in data) {
+            _new_value = _new_value.replace(`{${fld}}`, data[fld] || '');
+          }
+        } else {
+          rf.forEach(fld => {
+            _new_value = _new_value.replace(`{${fld}}`, data[fld] || '');
+          });
         }
-      } else {
-        rf.forEach(fld => {
-          new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');      
+      }
+      return _new_value;
+    }
+  
+    if (_isPureObject(value)) {
+      function iter(o) {
+        Object.keys(o).forEach(function (k) {
+            if (o[k] !== null && typeof o[k] === 'object') {
+                iter(o[k]);
+                return;
+            }
+            o[k] = _formatValue(rowData, o[k]);
         });
       }
+      iter(new_value);
+    } else {
+      new_value = _formatValue(rowData, value);
     }
-   
     return new_value;
   }
 
