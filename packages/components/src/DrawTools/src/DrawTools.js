@@ -111,7 +111,7 @@ class DrawTools extends React.Component {
       { key: '1', label: 'circle', labelDefault: "círculo", value: 'circle' },
       { key: '2', label: 'square', labelDefault: "quadrado", value: 'square' },
       { key: '3', label: 'triangle', labelDefault: "triângulo", value: 'triangle' },
-      { key: '4', label: 'square', labelDefault: "estrela", value: 'star' },
+      { key: '4', label: 'estrela', labelDefault: "estrela", value: 'star' },
       { key: '5', label: 'cross', labelDefault: "cruz", value: 'cross' },
       { key: '10', label: 'x', labelDefault: "x", value: 'x' }
     ];
@@ -816,12 +816,12 @@ class DrawTools extends React.Component {
       case 'fill':
         return {
           backgroundColor: fillStr,
-          color: 'black'
+          color: 'gray'
         }
       case 'stroke':
         return {
           backgroundColor: strokeStr,
-          color: 'white'
+          color: 'gray'
         }
       default: ;
     }
