@@ -142,7 +142,7 @@ export default function FeatureResults({ core, config, features, layers, actions
     download('selecao.geojson', text);
   }
 
-  const valueTemplate = (rowData) => {    
+  const valueTemplate = (rowData) => {
     let val = rowData.value;
     if (rowData.action && rowData.action.type) {
       const action = rowData.action || {};
@@ -152,7 +152,7 @@ export default function FeatureResults({ core, config, features, layers, actions
             className={action.classname || action.className}
             title={i18n.translateValue(action.tooltip)}
             onClick={(e) => {
-              publish(action.type, action.data)
+              publish(action.type, action.data);
             }}
           />
       } else {
@@ -392,7 +392,7 @@ function getFeatureRows(feat, layer) {
               key, 
               name: field.title, 
               value: formatValue(new_value, field.format), 
-              type: field.type 
+              type: field.type
             });
           }
         })
@@ -419,6 +419,7 @@ function groupResults(features, map) {
       if (feat.type === 'ol') {
         let items = parseOlFeatures(feat.data, map);
         items.forEach(f => {
+          f.set('layerId', layerId);
           f.set('resultId', feat.id);
         });
         grouped[layerId].features = grouped[layerId].features.concat(items);
