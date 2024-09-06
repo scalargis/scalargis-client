@@ -294,5 +294,10 @@
   "selectTopTheme": "Selecionar tema de topo",
   "selectBottomTheme": "Selecionar tema de baixo",
 
-  "loading": "A carregar ..."
+  "loading": "A carregar ...",
+
+  "expand": "Expandir",
+  "collapse": "Recolher",
+  "folderNotFound": "Pasta não encontrada",
+  "emptyFolder": "Pasta vazia"
 }

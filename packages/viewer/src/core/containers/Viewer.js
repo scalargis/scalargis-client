@@ -19,6 +19,7 @@ import MapControlsBottomLeft from './MapControlsBottomLeft'
 import MapControlsBottomCenter from './MapControlsBottomCenter'
 import MapControlsBottomRight from './MapControlsBottomRight'
 import OlControls from '../map_control'
+import DialogWindows from './DialogWindows'
 import { mapStateToProps } from '../utils'
 import {PageView, initGA} from '../components/Tracking'
 
@@ -31,7 +32,7 @@ function Viewer(props) {
   // Get router props
   const { url } = props.match;
   const { id } = props.match.params;
-  const { history, loading, viewer, config, notifications } = props;
+  const { history, loading, viewer, config, notifications, dialogWindows } = props;
   const { exclusive_mapcontrol } = viewer;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
@@ -93,6 +94,7 @@ function Viewer(props) {
       core={core}
       viewer={viewer}
       notifications={notifications}
+      dialogWindows={dialogWindows}
       layout_wrapper_click={e => dispatch(layout_wrapper_click())}
       layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
       mainMenu={<MainMenu history={history} onMenuClick={isDesktop => dispatch(layout_show_menu(isDesktop))} />}
@@ -146,6 +148,9 @@ function Viewer(props) {
         })}
 
       </MainMap>
+
+      <DialogWindows core={core} dialogWindows={viewer?.dialogWindows} />
+
     </Layout>
   );
 }

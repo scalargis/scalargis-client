@@ -1,6 +1,11 @@
 import { transformExtent } from "../model/MapModel"
 import Cookies from 'universal-cookie'
 
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+
+
+import { core } from '../../AppContext';
 import { i18n as i18nUtils } from '@scalargis/components'
 import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from '../utils'
 import { isThemeOnScale as isThemeOnScaleMapModel } from '../model/MapModel'
@@ -65,6 +70,11 @@ export const LAYOUT_TOGGLE_MOBILEMENU   = 'LAYOUT_TOGGLE_MOBILEMENU'
 
 export const VIEWER_ADD_NOTIFICATION    = 'VIEWER_ADD_NOTIFICATION'
 export const VIEWER_CLEAR_NOTIFICATIONS = 'VIEWER_CLEAR_NOTIFICATIONS'
+
+export const VIEWER_ADD_DIALOG_WINDOW   = 'VIEWER_ADD_DIALOG_WINDOW '
+export const VIEWER_REMOVE_DIALOG_WINDOW = 'VIEWER_REMOVE_DIALOG_WINDOW'
+export const VIEWER_UPDATE_DIALOG_WINDOW = 'VIEWER_UPDATE_DIALOG_WINDOW'
+export const VIEWER_CLEAR_DIALOG_WINDOWS = 'VIEWER_CLEAR_DIALOG_WINDOWS'
 
 export const VIEWER_SET_TRANSLATION_NAMESPACES = 'VIEWER_SET_TRANSLATION_NAMESPACES' 
 
@@ -916,6 +926,46 @@ export function viewer_add_notification(notification) {
 export function viewer_clear_notifications() {
   let action = {
     type: VIEWER_CLEAR_NOTIFICATIONS
+  }
+  return action;
+}
+
+export function viewer_add_dialog_window({config, child}) {
+  const dialogWindow = {
+    key: config.key || new Date().getTime(),
+    config,
+    child,
+    visible: true,
+  }
+
+  let action = {
+    type: VIEWER_ADD_DIALOG_WINDOW,
+    dialogWindow: dialogWindow
+  }
+  return action;
+}
+
+export function viewer_remove_dialog_window(key) {
+  let action = {
+    type: VIEWER_REMOVE_DIALOG_WINDOW,
+    key
+  }
+  return action;
+}
+
+export function viewer_update_dialog_window({config, child, visible}) {
+  let action = {
+    type: VIEWER_UPDATE_DIALOG_WINDOW,
+    config,
+    child,
+    visible
+  }
+  return action;
+}
+
+export function viewer_clear_dialog_windows() {
+  let action = {
+    type: VIEWER_CLEAR_DIALOG_WINDOWS
   }
   return action;
 }
