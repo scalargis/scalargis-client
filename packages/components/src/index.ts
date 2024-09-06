@@ -31,10 +31,13 @@ import * as SearchLayers from './SearchLayers/src/Main'
 import * as StreetView from './StreetView/src/Main'
 import * as ThemeWizard from './ThemeWizard/src/Main'
 import * as TOC from './TOC/src/Main'
+import * as DocumentBrowser from './DocumentBrowser/src/Main'
+import DocumentList from './DocumentBrowser/src/DocumentList'
 import Legend from './TOC/src/TOC/Legend'
 import * as Timeline from './Timeline/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
 import * as URLparams from './URLparams/src/Main'
+import ProgressControl from './ProgressControl'
 
 import { 
   JsonForm, 
@@ -46,6 +49,8 @@ import {
 } from './JsonForm'
 
 import * as i18n from './utils/i18n';
+import * as utils from './utils/common';
+
 
 import  LocaleSelectorComponent from  './LocaleSelector/src/LocaleSelector';
 
@@ -87,8 +92,12 @@ export {
   UserLogin,
   URLparams,
   Timeline,
+  DocumentBrowser,
+  DocumentList,
 
   Legend,
+
+  ProgressControl,
 
   JsonForm,
   JsonFormContext,
@@ -98,6 +107,7 @@ export {
   ValidationMode as JsonFormValidationMode,
 
   i18n,
+  utils,
 
   LocaleSelectorComponent
 };

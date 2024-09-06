@@ -49,9 +49,15 @@ import {
   VIEWER_ADD_NOTIFICATION,
   VIEWER_CLEAR_NOTIFICATIONS,
 
+  VIEWER_ADD_DIALOG_WINDOW,
+  VIEWER_REMOVE_DIALOG_WINDOW,
+  VIEWER_UPDATE_DIALOG_WINDOW,
+  VIEWER_CLEAR_DIALOG_WINDOWS,
+
   VIEWER_SET_TRANSLATION_NAMESPACES
 } from '../actions';
 import { traverseLayersTree, getCookieAuthName } from '../utils';
+import { config } from 'process';
 
 
 const initialViewer = {
@@ -71,7 +77,20 @@ const cookies = new Cookies();
 const cookieAuthName = getCookieAuthName();
 
 //export default (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, config: null, viewer: initialViewer, components: {} }, action) => {
-const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, registration: {}, password: {}, config: null, viewer: initialViewer, components: {}, notifications: [] }, action) => {
+const root = (
+    state = {
+      loading: true,
+      auth: { data: cookies.get(cookieAuthName)},
+      registration: {},
+      password: {},
+      config: null,
+      viewer: initialViewer,
+      components: {},
+      notifications: [],
+      dialogWindows:[] 
+    }, 
+    action
+  ) => {
 
   //console.log('action', action);
   
@@ -650,6 +669,52 @@ const root = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)
       return {
         ...state,
         notifications: []
+      }
+
+    // Add dialog window
+    case VIEWER_ADD_DIALOG_WINDOW:
+      const arr = Object.assign([], state.viewer.dialogWindows);
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          dialogWindows: [...arr, action.dialogWindow]
+        }
+      }
+
+    // Remove dialog window
+    case VIEWER_REMOVE_DIALOG_WINDOW:
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          dialogWindows: state.viewer.dialogWindows.filter( p => p.key != action.key)
+        }
+      }
+
+    case VIEWER_UPDATE_DIALOG_WINDOW:
+      const dw = state.viewer.dialogWindows.find(p => p.key === action?.config?.key);
+      if (dw) {
+        dw.visible = action.visible;
+        dw.config = action.config;
+        dw.child = action.child;
+      }
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          dialogWindows: [...state.viewer.dialogWindows]
+        }
+      }
+
+    // Remove all dialog window
+    case VIEWER_CLEAR_DIALOG_WINDOWS:
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          dialogWindows: []
+        }
       }
 
     // Set translation namespaces

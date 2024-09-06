@@ -294,5 +294,10 @@
   "selectTopTheme": "Selecionar top theme",
   "selectBottomTheme": "Selecionar bottom theme",
 
-  "loading": "Loading ..."
+  "loading": "Loading ...",
+
+  "expand": "Expand",
+  "collapse": "Collpase",
+  "folderNotFound": "Folder not found",
+  "emptyFolder": "Empty folder"
 }

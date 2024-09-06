@@ -2,14 +2,17 @@ import { confirmDialog } from 'primereact/confirmdialog';
 import { v4 as uuid } from 'uuid';
 
 import defaults from '../components/Layers/defaults';
+import { DocumentList } from '@scalargis/components';
 
 
 export const VIEWER_ADD_THEME = 'Viewer/AddTheme';
 export const VIEWER_REMOVE_THEME = 'Viewer/RemoveTheme';
 
+export const VIEWER_SHOW_DOCUMENTS = 'Viewer/ShowDocuments';
 
-export const viewer_add_theme = (data, mainMap, viewer, actions, dispatch, t) => {
 
+export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => {
+    const { actions } = core;
     const { viewer_add_themes, layers_set_checked, transform_extent, map_set_extent, viewer_add_notification } = actions;
 
     const themeId = data.themeId || uuid();
@@ -95,9 +98,10 @@ export const viewer_add_theme = (data, mainMap, viewer, actions, dispatch, t) =>
     }
 };
 
-export const viewer_remove_theme = (data, mainMap, viewer, actions, dispatch, t) => {
-    const { themeId } = data;
+export const viewer_remove_theme = ({data, mainMap, viewer, core, dispatch, t}) => {
+    const { actions } = core;
     const { viewer_remove_themes, viewer_add_notification } = actions;
+    const { themeId } = data;
 
     const doAction = () => {
         const layer = viewer.config_json.layers.find( l => l.id === themeId);
@@ -139,7 +143,41 @@ export const viewer_remove_theme = (data, mainMap, viewer, actions, dispatch, t)
     }
 }
 
+export const viewer_show_documents = ({data, mainMap, viewer, core, dispatch, t}) => {
+    const { actions } = core;
+    const { viewer_add_dialog_window, viewer_update_dialog_window } = actions;
+
+    const key = data.dialogKey || new Date().getTime();
+
+    if (viewer?.dialogWindows?.length > 0) {
+        const dw = viewer.dialogWindows.find(w => w.key === key);
+        if (dw) {           
+            const config = { 
+                ...dw.config,
+                header: data?.dialogOptions?.header || data.title
+            }
+            
+            const childKey = new Date().getTime();
+            const child = <DocumentList key={childKey} core={core} documentList={data} />
+
+            dispatch(viewer_update_dialog_window({config: config, child: child, visible: true }));
+            return;
+        }
+    }
+
+    const config = Object.assign({}, data?.dialogOptions);
+    config.key = key ;
+    config.header = data?.dialogOptions?.header || data.title; 
+
+    const childKey = new Date().getTime();
+    const child = <DocumentList key={childKey} core={core} documentList={data} />
+
+    dispatch(viewer_add_dialog_window({config, child}));
+}
+
 export const EventList = {
     VIEWER_ADD_THEME: { topic: VIEWER_ADD_THEME, fn: viewer_add_theme},
-    VIEWER_REMOVE_THEME: { topic: VIEWER_REMOVE_THEME, fn: viewer_remove_theme}
+    VIEWER_REMOVE_THEME: { topic: VIEWER_REMOVE_THEME, fn: viewer_remove_theme},
+
+    VIEWER_SHOW_DOCUMENTS: { topic: VIEWER_SHOW_DOCUMENTS, fn: viewer_show_documents}
 }

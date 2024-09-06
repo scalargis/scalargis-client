@@ -23,10 +23,9 @@ export default function EventManager(props) {
             const topic = list[k].topic;
             const unsubscribe = props.core.pubsub.subscribe(topic, (data) => {
                 const { mainMap, viewer, core, dispatch } = propsRef.current;
-                const { actions } = core;
                 const fn = list[k].fn;
 
-                fn(data, mainMap, viewer, actions, dispatch, t);
+                fn({data, mainMap, viewer, core, dispatch, t});
             });
             events.push(unsubscribe);
         });

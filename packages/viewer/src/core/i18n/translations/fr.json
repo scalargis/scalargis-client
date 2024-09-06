@@ -294,5 +294,10 @@
   "selectTopTheme": "Selecionar tema de topo",
   "selectBottomTheme": "Selecionar tema de baixo",
 
-  "loading": "Chargement ..."
+  "loading": "Chargement ...",
+
+  "expand": "Ouvrir",
+  "collapse": "Fermer",
+  "folderNotFound": "Dossier non trouvé",
+  "emptyFolder": "Dossier vide"
 }
