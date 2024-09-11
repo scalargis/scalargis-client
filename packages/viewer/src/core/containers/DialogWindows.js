@@ -16,6 +16,13 @@ const DialogWindows = (props) => {
 
     const isMobile = utils.isMobile();
 
+    const onDialogClose = (evt) => {
+        if (evt.onClose && evt.onClose(evt) === false) {
+            return;
+        }
+        core.store.dispatch(viewer_remove_dialog_window(evt.key));
+    }
+
     return (
         <React.Fragment>
             {dialogs.map( item => {
@@ -32,13 +39,11 @@ const DialogWindows = (props) => {
                     footer={(
                     <div className="p-grid">
                         <div className="p-col" style={{ textAlign: 'right'}}>
-                        <Button label={closeLabel} onClick={e => {
-                            core.store.dispatch(viewer_remove_dialog_window(key));
-                        }} />
+                        <Button label={closeLabel} onClick={e => onDialogClose(item)} />
                         </div>
                     </div>
                     )}
-                    onHide={e => core.store.dispatch(viewer_remove_dialog_window(key))}>
+                    onHide={e => onDialogClose(item)}>
 
                     {child}
 

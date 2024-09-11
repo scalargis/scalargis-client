@@ -930,12 +930,13 @@ export function viewer_clear_notifications() {
   return action;
 }
 
-export function viewer_add_dialog_window({config, child}) {
+export function viewer_add_dialog_window({config, child, onClose}) {
   const dialogWindow = {
     key: config.key || new Date().getTime(),
     config,
     child,
     visible: true,
+    onClose
   }
 
   let action = {

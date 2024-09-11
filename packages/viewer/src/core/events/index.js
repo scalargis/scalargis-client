@@ -166,13 +166,13 @@ export const viewer_show_documents = ({data, mainMap, viewer, core, dispatch, t}
     }
 
     const config = Object.assign({}, data?.dialogOptions);
-    config.key = key ;
-    config.header = data?.dialogOptions?.header || data.title; 
+    config.key = key;
+    config.header = data?.dialogOptions?.header || data.title;
 
     const childKey = new Date().getTime();
     const child = <DocumentList key={childKey} core={core} documentList={data} />
 
-    dispatch(viewer_add_dialog_window({config, child}));
+    dispatch(viewer_add_dialog_window({config, child, onClose: data?.onClose}));
 }
 
 export const EventList = {
