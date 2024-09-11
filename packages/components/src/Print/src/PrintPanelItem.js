@@ -171,7 +171,8 @@ export default function PrintPanelItem(props) {
     props.changeActivePanel('p1');
   }
 
-  function doPrint() {
+  function doPrint() {  //---------------------------------------------------------------------------------- DO PRINT
+
     let isFormInvalid = false;
 
     setPrintFile(null);
@@ -249,6 +250,10 @@ export default function PrintPanelItem(props) {
       extentWKT: ''
     }
 
+    if (viewer.config_json.drawings && viewer.config_json.drawings.length > 0) {
+      record['userDrawings'] = JSON.stringify(viewer.config_json.drawings);
+    }
+
     if (formData) {
       record['formFields'] = JSON.stringify(formData);
     }
@@ -315,6 +320,8 @@ export default function PrintPanelItem(props) {
         });
       });
   }
+
+  //---------------------------------------------------------------------------------- END DO PRINT
 
   function getScalesTabs() {
     const tabs = [];
