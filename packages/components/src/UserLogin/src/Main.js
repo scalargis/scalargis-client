@@ -136,10 +136,6 @@ export default function Main({ type, region, as, core, config, actions, record }
                 setMode(2);
               }}
               showPasswordReset={() => {
-                if (record?.config_json?.actions?.reset_password) {
-                  core.pubsub.publish(record?.config_json?.actions?.registration, null);
-                  return;
-                }
                setMode(3);
               }}
             />
