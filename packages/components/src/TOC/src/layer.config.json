@@ -33,6 +33,7 @@
       "LayerMetadata"
   ],
   "activate_parents": true,
-  "deactivatec_children": true,
-  "open_children": true
+  "deactivate_children": true,
+  "open_children": true,
+  "details_opened": true
 }

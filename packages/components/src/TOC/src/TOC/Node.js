@@ -11,8 +11,7 @@ import { i18n } from '@scalargis/components';
 
 class Node extends React.Component {
 
-  //state = { detailsOpen: false, isDraggable: true }
-  state = { detailsOpen: false }
+  state = { detailsOpen: this?.props?.data?.details_opened || false }
 
   isChecked() {
     const { data, checked } = this.props;
