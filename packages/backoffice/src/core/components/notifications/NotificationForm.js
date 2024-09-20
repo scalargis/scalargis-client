@@ -184,7 +184,7 @@ function NotificationForm(props) {
                 </div>
                 <div className="p-field p-col-12 p-md-5">
                     <label htmlFor="name">Nome</label>
-                    <InputText id="nam" type="text" value={DataTransfer.name} disabled />
+                    <InputText id="nam" type="text" value={data.name} disabled />
                 </div>
                 <div className="p-field p-col-12 p-md-5">
                     <label htmlFor="email">Email</label>
