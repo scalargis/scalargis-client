@@ -4,6 +4,7 @@
   "title": "",
   "config_json": {
       "header": "Ajuda",
+      "elementType": "link",
       "closeLabel": "Fechar",
       "url": "/static/viewer/{language}/help.html",      
       "html": "<h1>Cabeçalho</h1><div>Texto</div>"

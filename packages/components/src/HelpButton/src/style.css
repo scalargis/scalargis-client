@@ -1,0 +1,9 @@
+.sg-help-button-link {
+    position: relative;
+    /*color: #ffffff;*/
+    margin-left: 20px;
+    display: inline-block;
+    text-decoration: none;
+    transition: color 0.2s;
+    overflow: visible;
+}

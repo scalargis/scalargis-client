@@ -237,19 +237,29 @@ export default function Main({ type, as, config, actions, record }) {
       help_url.replace("{lang}", lang).replace("{language}", lang)
       : help_url;
 
-    // Render help button
+
+    if (type === 'menu') {
+      return (
+        <a href={help_url} target="_blank" className="p-menuitem-link" role="menuitem" tabIndex="0" >
+          <span className="p-menuitem-icon pi pi-question-circle"></span><span className="p-menuitem-text">{title}</span>
+        </a>
+      )
+    }
+
     return (
       <React.Fragment>
-      { type != 'menu' ?
+      { component_cfg?.elementType === 'link' ?
+        <div title={title} className="p-link">
+          <a href={help_url} target="_blank" className="sg-help-button-link" style={{"color": "#ffffff"}}>
+            <span class="layout-topbar-icon pi pi-question-circle"></span>
+          </a>
+        </div> :
         <button className="p-link" title={title} onClick={e => { return; }}>
           <a href={help_url} target="_blank" style={{"color": "#ffffff"}}>
             <span className="layout-topbar-item-text">{title}</span>
             <span className="layout-topbar-icon pi pi-question-circle"/>
           </a>
-        </button> :
-        <a href={help_url} target="_blank" className="p-menuitem-link" role="menuitem" tabIndex="0" >
-          <span className="p-menuitem-icon pi pi-question-circle"></span><span className="p-menuitem-text">Ajuda</span>
-        </a> }
+        </button> }
       </React.Fragment>
     )
   }
