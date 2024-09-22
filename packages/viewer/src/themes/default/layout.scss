@@ -438,6 +438,9 @@ body .p-multiselect {
 
 #user_menu {
   position: absolute;
+  transform: translateX(-145px);
+  max-width: fit-content;
+  min-width: 200px;
   z-index: 9;
 }
 
