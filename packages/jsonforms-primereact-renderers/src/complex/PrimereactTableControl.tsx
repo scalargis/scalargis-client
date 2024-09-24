@@ -426,6 +426,7 @@ const TableRows = ({
   );
 };
 
+// TODO: Finish PrimereactTableControl implementation
 export class PrimereactTableControl extends React.Component<
   ArrayLayoutProps & WithDeleteDialogSupport,
   any
@@ -443,7 +444,8 @@ export class PrimereactTableControl extends React.Component<
       visible,
       enabled,
       cells,
-      translations,
+      // Avoid typescript error
+      //translations,
     } = this.props;
 
     const controlElement = uischema as ControlElement;
@@ -454,7 +456,7 @@ export class PrimereactTableControl extends React.Component<
 
     // TODO
     return (
-      <div>TODO: PrimereactTableContro</div>
+      <div>TODO: PrimereactTableControl</div>
     );
     /*
     return (
