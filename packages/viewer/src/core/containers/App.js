@@ -124,7 +124,10 @@ const App = () => {
                 */}
 
                 <Route path="/" render={(props) => {
-                    return <Redirect to={`/map/${props.location.search || ''}`} />
+                  if (config?.home) {
+                    return <Redirect to={`${config.home}${props.location.search || ''}${props.location.hash || ''}`} />
+                  }
+                  return <Redirect to={`/map/${props.location.search || ''}${props.location.hash || ''}`} />
                 }} />
 
               </Switch>
