@@ -1,16 +1,14 @@
 import { transformExtent } from "../model/MapModel"
 import Cookies from 'universal-cookie'
 
-import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
 
-
-import { core } from '../../AppContext';
 import { i18n as i18nUtils } from '@scalargis/components'
 import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from '../utils'
 import { isThemeOnScale as isThemeOnScaleMapModel } from '../model/MapModel'
 import { loadTranslations } from "../i18n"
 
+
+export const SITE_LOAD                  = 'SITE_LOAD'
 
 export const AUTH_HTTP_LOADING          = 'AUTH_HTTP_LOADING'
 export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
@@ -86,6 +84,35 @@ const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || ''; 
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);
+
+
+export function site_load(core, callback) {
+  return async function (dispatch, getState) {
+    const url = API_URL + '/app/site/config';
+
+    try {
+      await fetch(url, {
+          signal: AbortSignal.timeout(10000)
+        })
+        .then(resp => { 
+            return resp.json();
+        })
+        .then(data => {
+          core.setSiteConfig(data);
+          callback && callback(data);
+        })
+        .catch(error => {
+          console.log(error);
+          callback && callback({});
+        });
+    } catch (error) {
+      // Timeouts if the request takes
+      // longer than 10 seconds
+      console.log(error);
+      callback && callback({});
+    }
+  }
+}
 
 
 export function viewer_save_record(record, history, redirect, cb) {

@@ -110,6 +110,11 @@ function Core(config, reducers) {
   }
 
   /**
+   * Hold programatic site config
+   */
+  this.siteConfig = {};
+
+  /**
    * Hold programatic config
    */
   this.config = {};
@@ -144,6 +149,11 @@ function Core(config, reducers) {
    * Secure app props
    */
   this.__secureProps = ['config', 'actions', 'store', 'Renderer', '__components', '__mainmenu'];
+}
+
+// Set core site config
+Core.prototype.setSiteConfig = function(config) {
+  this.siteConfig = config;
 }
 
 // Set core config
