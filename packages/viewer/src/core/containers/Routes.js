@@ -25,16 +25,16 @@ const Routes = ({core, pages}) => {
             <Route path="/mapas/:id?" children={<Viewer />} />
             
             {pages.map((p, i) => {
-            const CustomPage = p.children;
-            return (
-                <Route key={i} path={p.path} render={(props) => {
+                const CustomPage = p.children;
                 return (
-                    <CustomPage
-                    core={core}
-                    action={props.match.params.action} />
+                    <Route key={i} path={p.path} render={(props) => {
+                    return (
+                        <CustomPage
+                        core={core}
+                        action={props.match.params.action} />
+                    )
+                    }} />
                 )
-                }} />
-            )
             })}
 
             <Route path="/:id" children={<Viewer />} />
@@ -50,10 +50,11 @@ const Routes = ({core, pages}) => {
             */}
 
             <Route path="/" render={(props) => {
-            if (core?.siteConfig?.home) {
-                return <Redirect to={`${core.siteConfig.home}${props.location.search || ''}${props.location.hash || ''}`} />
-            }
-            return <Redirect to={`/map/${props.location.search || ''}${props.location.hash || ''}`} />
+                if (core?.siteConfig?.home) {
+                    return <Redirect to={`${core.siteConfig.home}${props.location.search || ''}${props.location.hash || ''}`} />
+                } else {
+                    return <Redirect to={`/map/${props.location.search || ''}${props.location.hash || ''}`} />
+                }
             }} />
 
         </Switch>
