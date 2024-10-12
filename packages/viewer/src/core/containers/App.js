@@ -1,22 +1,17 @@
-import React, { useMemo } from 'react'
-import Viewer from './Viewer'
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import HomePage from '../components/HomePage'
-import Page404 from '../components/Page404'
-import Page401 from '../components/Page401'
-import AppContext, { core, mainMap } from '../../AppContext'
-import PageLogin from '../components/PageLogin'
-import PageRegistrationConfirmation from '../components/PageRegistrationConfirmation'
-import PagePassword from '../components/PagePassword'
-import RGPD from '../components/RGPD'
-import { getAppBaseUrl } from '../utils'
+import React, { useEffect, useState, useRef } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
+
+import AppContext, { core, mainMap } from '../../AppContext';
+import RGPD from '../components/RGPD';
+import Routes from './Routes';
+import LoadingScreen from './../components/LoadingScreen'
+import { getAppBaseUrl } from '../utils';
 
 //import { useTranslation } from 'react-i18next';
 
-const App = () => {
 
-  const base_url = getAppBaseUrl();
+const App = () => {
 
   /*
   const { t } = useTranslation();
@@ -24,36 +19,50 @@ const App = () => {
   console.log(s);
   */
 
+  const [pagesLoaded, setPagesLoaded] = useState(false);
+  const [pages, setPages] = useState([]);
+
+  const base_url = getAppBaseUrl();
+
+  useEffect(()=> {
+    const {actions} = core;
+    const {site_load} = actions;
+    const dispatch = core.store.dispatch;
+
+    dispatch(site_load(core, (config) => {
+      const _getRoutesInfo = (module) => {
+        if (!!module["getPageRoutes"]) {
+          return module.getPageRoutes();
+        }
+        return [];
+      }
+
+      let routes = (config?.customComponents || []).map(async item => {
+          return await import(`./../../components/${item}/src/Main.js`)
+            .then(module => _getRoutesInfo(module)).catch((error) => {console.log(error); return null})
+      });
+
+      return Promise.all(routes).then((result) => {
+        return result.flat();
+      }).then(data => {
+        //Filter out invalid elements
+        const validData = (data || []).filter(d => d != null); 
+        setPages(validData);
+      })
+      .catch(error => {
+          console.log(error);
+      })
+      .finally(()=> {setPagesLoaded(true)});
+    }));
+  }, []);
+
   return (
     <React.StrictMode>
       <AppContext.Provider value={{ core, mainMap }}>
         <Provider store={core.store}>
           <Router basename={base_url}>
             <RGPD>
-              <Switch>
-                <Route path="/login" children={<PageLogin />} />
-                <Route path="/registration" children={<PageRegistrationConfirmation />} />
-                <Route path="/password" children={<PagePassword/>} />
-                <Route path="/not-found" children={<Page404 />} />
-                <Route path="/not-allowed" children={<Page401 />} />
-                <Route path="/mapa/session/:id?" children={<Viewer />} />
-                <Route path="/map/session/:id?" children={<Viewer />} />
-                <Route path="/mapa/:id?" children={<Viewer />} />
-                <Route path="/map/:id?" children={<Viewer />} />
-                <Route path="/:id" children={<Viewer />} />
-                {/*
-                <Route path="/:id" render={(props) => {
-                    console.log(props);
-                    return <Redirect to={`/map/${props.match.params.id || ''}${props.location.search || ''}`} />
-                }} />
-                */}
-                {/*
-                <Route path="/" children={<HomePage />} />
-                */}
-                <Route path="/" render={(props) => {
-                    return <Redirect to={`/map/${props.location.search || ''}`} />
-                }} />
-              </Switch>
+              {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
             </RGPD>
           </Router>
         </Provider>
