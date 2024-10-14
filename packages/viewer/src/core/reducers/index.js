@@ -57,8 +57,6 @@ import {
   VIEWER_SET_TRANSLATION_NAMESPACES
 } from '../actions';
 import { traverseLayersTree, getCookieAuthName } from '../utils';
-import { config } from 'process';
-
 
 const initialViewer = {
   layoutMode: 'static',

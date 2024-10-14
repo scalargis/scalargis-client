@@ -9,10 +9,12 @@
   ],
   "scripts": {
     "start:viewer": "cd ./packages/viewer && yarn start",
-    "build:viewer": "cd ./packages/viewer && yarn build",
+    "_build:viewer": "cd ./packages/viewer && yarn build",
+    "build:viewer": "cd ./packages/viewer && npm run build",
     "test:viewer": "cd ./packages/viewer && yarn test",
     "start:backoffice": "cd ./packages/backoffice && yarn start",
-    "build:backoffice": "cd ./packages/backoffice && yarn build",
+    "_build:backoffice": "cd ./packages/backoffice && yarn build",
+    "build:backoffice": "cd ./packages/backoffice && npm run build",
     "test:backoffice": "cd ./packages/backoffice && yarn test",
     "build:all": "lerna run build --concurrency 1",
     "start:all": "lerna run start --parallel",
@@ -25,10 +27,13 @@
     "@babel/core": "^7.16.7",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "babel-loader": "^8.1.0",
+    "buffer": "^6.0.3",
     "copyfiles": "2.4.1",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
-    "lerna": "^4.0.0"
+    "lerna": "^4.0.0",
+    "stream-browserify": "^3.0.0",
+    "timers-browserify": "^2.0.12"
   },
   "dependencies": {
     "primeflex": "2.0.0",
@@ -38,8 +43,9 @@
   "resolutions": {
     "babel-loader": "8.1.0",
     "webpack": "4.44.2",
+    "ajv": "8.17.1",
+    "ajv-keywords": "5.1.0",
     "@types/react": "17.0.0",
-    "ajv-keywords": "^3.5.2",
     "fast-uri": "2.2.0"
   }
 }

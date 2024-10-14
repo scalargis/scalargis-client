@@ -3529,7 +3529,6 @@
   /*.p-button:enabled:focus {*/
   .p-button:enabled:focus-visible {
     background: rgba(103, 58, 183, 0.76); }
-  */
   .p-button:enabled:active {
     background: #2196f3; }
   .p-button .p-ink {
