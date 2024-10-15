@@ -6,7 +6,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
-import { Captcha } from 'primereact/captcha';
+//import { Captcha } from 'primereact/captcha';
 import ContactInfo from './ContactInfo';
 import './style.css';
 
@@ -339,6 +339,7 @@ export default function ContactFrom(props) {
 
           </div> }
           
+          {/*
           { showCaptcha ?
           <div className="p-field">
             <Captcha siteKey={viewer.captcha_key}
@@ -347,6 +348,7 @@ export default function ContactFrom(props) {
               onExpire={onCaptchaExpire}
               />
           </div> : null }
+          */}
         </div>
         
         <ContactInfo
