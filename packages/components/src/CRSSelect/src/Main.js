@@ -97,9 +97,13 @@ export default function Main({ core, config, actions, record }) {
   let proj_code = mainMap ? mainMap.getView().getProjection().getCode() : 'EPSG:3857';
   let display = center;
   let selected = listCRS.find(v => v.srid === display_crs);
-  if (selected.code !== proj_code) display = transform(center, proj_code, 'EPSG:' + selected.srid);
-  let fixedLength = String(selected.precision).length-1;
-  display = display.map(v => (Math.round(parseFloat(v) * selected.precision) / selected.precision).toFixed(fixedLength));
+  try {
+    if (selected.code !== proj_code) display = transform(center, proj_code, 'EPSG:' + selected.srid);
+    let fixedLength = String(selected.precision).length-1;
+    display = display.map(v => (Math.round(parseFloat(v) * selected.precision) / selected.precision).toFixed(fixedLength));
+  } catch (e) {
+    console.log(e);
+  }
   return (
     <div className="crsselect">
       <div id="cursor_coords" ref={cursorRef}></div>

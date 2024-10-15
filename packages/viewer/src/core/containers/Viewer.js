@@ -103,7 +103,6 @@ function Viewer(props) {
       footerRight={<FooterRight />}
       mainOlMap={mainMap}
     >
-
       <MainMap 
         olMap={mainMap}
         config={config}

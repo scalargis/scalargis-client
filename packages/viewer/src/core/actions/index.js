@@ -244,20 +244,13 @@ export function login(auth, history, redirect, urlRedirect) {
     }
   }
 }
-/*
-export function login(data) {
-  const action = {
-    type: AUTH_LOGIN,
-    data
-  }
-  return action
-}
-*/
 
 export function logout() {
-  const cookies = new Cookies();
-  cookies.remove(cookieAuthName, { path: cookiePath });
-  window.location.reload();
+  return function (dispatch, getState) {
+    const cookies = new Cookies();
+    cookies.remove(cookieAuthName, { path: cookiePath });
+    window.location.reload();
+  }
 }
 
 export function login_http_error(res) {
@@ -726,8 +719,9 @@ export function viewer_load(core, id, history) {
             dispatch(viewer_load_done());
           }
         })
-      })
-
+      });
+      //dispatch(viewer_load_components({}));
+      //dispatch(viewer_load_done());
     }).catch(error => {
 
       // Redirect to login or error pages

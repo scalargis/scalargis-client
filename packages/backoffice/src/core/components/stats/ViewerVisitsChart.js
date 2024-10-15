@@ -1,6 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react'
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+import { defaults } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { defaults } from 'react-chartjs-2'
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown'
 import { ProgressSpinner } from 'primereact/progressspinner'
@@ -12,6 +22,16 @@ import { fetchJson } from  '../../../service/fetch'
 
 
 defaults.animation = false
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
 
 export default function ViewerVisitsChart(props) {
 

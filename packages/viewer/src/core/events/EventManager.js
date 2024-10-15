@@ -31,7 +31,11 @@ export default function EventManager(props) {
         });
 
         return () => {
-            (events || []).forEach(ev => ev());
+            if (events?.length) {
+                events.forEach(ev => {
+                    ev();
+                });
+            }
         };
     }, []);
 

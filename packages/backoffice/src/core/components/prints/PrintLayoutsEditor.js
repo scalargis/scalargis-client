@@ -104,6 +104,7 @@ const LayoutEditor = props => {
                     name="layout-config"         
                     editorProps={{ $blockScrolling: true }}
                     setOptions={{
+                      useWorker: false,
                       tabSize: 2
                     }}              
                   />

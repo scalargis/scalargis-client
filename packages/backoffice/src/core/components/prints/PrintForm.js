@@ -567,6 +567,7 @@ function PrintForm(props) {
                       name="print-config"         
                       editorProps={{ $blockScrolling: true }}
                       setOptions={{
+                        useWorker: false,
                         tabSize: 2
                       }}              
                     />

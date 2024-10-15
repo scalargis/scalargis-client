@@ -71,9 +71,11 @@ export function login_post(post, history, redirect) {
 }
 
 export function logout() {
-  const cookies = new Cookies();
-  cookies.remove(cookieAuthName, { path: '/' });
-  window.location.reload();
+  return function (dispatch, getState) {
+    const cookies = new Cookies();
+    cookies.remove(cookieAuthName, { path: '/' });
+    window.location.reload();
+  }
 }
 
 export function login_http_error(res) {

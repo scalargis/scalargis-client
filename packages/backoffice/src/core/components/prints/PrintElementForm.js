@@ -163,6 +163,7 @@ function PrintElementForm(props) {
                       name="config"         
                       editorProps={{ $blockScrolling: true }}
                       setOptions={{
+                        useWorker: false,
                         tabSize: 2
                       }}                                 
                     />

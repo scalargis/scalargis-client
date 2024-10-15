@@ -36,7 +36,7 @@ const App = () => {
         }
         return [];
       }
-
+      
       let routes = (config?.customComponents || []).map(async item => {
           return await import(`./../../components/${item}/src/Main.js`)
             .then(module => _getRoutesInfo(module)).catch((error) => {console.log(error); return null})

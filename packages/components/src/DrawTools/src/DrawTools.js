@@ -137,8 +137,8 @@ class DrawTools extends React.Component {
 
     const olmap = this.props.mainMap;
     this.drawingsLayer = props.utils.findOlLayer(olmap, 'userlayer');
-    this.vectorSource = this.drawingsLayer.getSource();
-    this.features = this.vectorSource.getFeaturesCollection();
+    this.vectorSource = this?.drawingsLayer ? this.drawingsLayer.getSource() : null;
+    this.features = this?.vectorSource ? this.vectorSource.getFeaturesCollection() : [];
 
     this.modify = null;
 
@@ -343,8 +343,8 @@ class DrawTools extends React.Component {
   componentDidMount() {
     const olmap = this.props.mainMap;
     this.drawingsLayer = this.props.utils.findOlLayer(olmap, 'userlayer');
-    this.vectorSource = this.drawingsLayer.getSource();
-    this.features = this.vectorSource.getFeaturesCollection();
+    this.vectorSource = this?.drawingsLayer ? this.drawingsLayer.getSource() : null;
+    this.features = this?.vectorSource ? this.vectorSource.getFeaturesCollection(): null;
     this.props.mainMap.addInteraction(this.select);
     this.select.setActive(false);
   }
@@ -733,9 +733,12 @@ class DrawTools extends React.Component {
       this.modify = null;
     }
     mainMap.removeInteraction(this.draw);
-    this.findInteraction(OlInteractionDragPan).setActive(true);
-    this.findInteraction(OlInteractionDoubleClickZoom).setActive(true);
-    this.findInteraction(OlInteractionPinchZoom).setActive(true);
+    let interaction = this.findInteraction(OlInteractionDragPan);
+    interaction && interaction.setActive(true);
+    interaction = this.findInteraction(OlInteractionDoubleClickZoom);
+    interaction && interaction.setActive(true);
+    interaction = this.findInteraction(OlInteractionPinchZoom)
+    interaction && interaction.setActive(true);
   }
 
   download(format) {

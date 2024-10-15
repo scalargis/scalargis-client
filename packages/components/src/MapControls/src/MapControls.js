@@ -25,8 +25,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
   const geo_location_control = viewer.config_json.map_controls.find(c => c.id === 'GeoLocation');
   const geoLocationActive = geo_location_control ? geo_location_control.active : false;
   const geoLocationTracking = geo_location_control ? geo_location_control.tracking : false;
-  const geo_location_component = viewer.config_json.components.find(c => c.config_json &&
-    c.config_json.map_control === 'GeoLocation');
+  const geo_location_component = viewer?.config_json?.components?.length ? viewer.config_json.components.find(c => c.config_json &&
+    c.config_json.map_control === 'GeoLocation') : null;
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, viewer_set_exclusive_mapcontrol } = actions;
 
   const { t } = useTranslation();

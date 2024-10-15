@@ -490,6 +490,7 @@ function ViewerForm(props) {
                       name="UNIQUE_ID_OF_MANIFEST"         
                       editorProps={{ $blockScrolling: true }}
                       setOptions={{
+                        useWorker: false,
                         tabSize: 2,
                         maxLines: 20,
                         printMargin: false                    
@@ -560,6 +561,7 @@ function ViewerForm(props) {
                     name="UNIQUE_ID_OF_DIV2"         
                     editorProps={{ $blockScrolling: true }}
                     setOptions={{
+                      useWorker: false,
                       tabSize: 2,
                       maxLines: 20,
                       printMargin: false                    
@@ -640,6 +642,7 @@ function ViewerForm(props) {
                 name="UNIQUE_ID_OF_DIV"         
                 editorProps={{ $blockScrolling: true }}
                 setOptions={{
+                  useWorker: false,
                   tabSize: 2,
                   printMargin: false 
                 }}              

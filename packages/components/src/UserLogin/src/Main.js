@@ -43,7 +43,10 @@ export default function Main({ type, region, as, core, config, actions, record }
 
     const unsubscribeRegistration = core.pubsub.subscribe(componentMessages.USERLOGIN_REGISTRATION, data => setMode(2));
 
-    return [unsubscribeLogin, unsubscribeRegistration]
+    return () => {
+      unsubscribeLogin && unsubscribeLogin();
+      unsubscribeRegistration && unsubscribeRegistration();
+    }
   }, []);
 
 

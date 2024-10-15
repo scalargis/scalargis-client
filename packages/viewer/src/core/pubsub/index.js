@@ -15,12 +15,14 @@ export function subscribe(topic, fn, override=true) {
     }
   }
 
+
   return () => {
     if (!topics[topic]) {
       topics[topic] = null;
       delete topics[topic];
     }
   }
+
 }
 
 export function publish(topic, args) {

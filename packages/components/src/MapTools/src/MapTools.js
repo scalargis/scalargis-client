@@ -121,7 +121,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
 
     // Get user layer
     layer.current = utils.findOlLayer(mainMap, 'userlayer');
-    layer.current.setStyle(drawingsStyle);
+    if (layer?.current) layer.current.setStyle(drawingsStyle);
 
     return () => {
       if (mainMap) {

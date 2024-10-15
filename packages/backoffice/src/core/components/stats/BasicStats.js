@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { defaults } from 'react-chartjs-2'
+//import { defaults } from 'react-chartjs-2'
+import { defaults } from 'chart.js'
 
 defaults.animation = false
 
