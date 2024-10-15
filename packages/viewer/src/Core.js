@@ -1,6 +1,6 @@
 import React from 'react'
 import { extend, omit } from 'underscore'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import * as local_components from './core/components'
 import * as core_components from '@scalargis/components'

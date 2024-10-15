@@ -1,6 +1,6 @@
 import React from 'react'
 import { extend, omit } from 'underscore'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
 import * as actions from './core/actions'
 import * as utils from './core/utils'
