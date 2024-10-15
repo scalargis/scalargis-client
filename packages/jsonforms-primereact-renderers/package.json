@@ -6,7 +6,6 @@
   "types": "dist/types/index.d.ts",
   "scripts": {
     "tsc": "tsc --project tsconfig.build.json",
-    "_build": "yarn run tsc && yarn run transpile && yarn run copy",
     "build": "npm run tsc && npm run transpile && npm run copy",
     "transpile": "babel src -d dist --root-mode upward --extensions '.ts,.tsx' --ignore '**/*.test.ts,**/*.test.tsx,**/tests,**/__tests__'",
     "copy": "copyfiles -u 1 \"./src/**/*.{css,html}\" \"./dist/\""
