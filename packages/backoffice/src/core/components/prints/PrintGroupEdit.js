@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
@@ -18,11 +18,19 @@ function PrintGroupEdit(props) {
 
   const { core } = useContext(AppContext);
 
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const {
-    history,
     dispatch,
     backoffice
   } = props;
+
+  const history = {
+    location,
+    navigate
+  }
 
   const { id } = useParams();
 
@@ -77,4 +85,4 @@ function PrintGroupEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, backoffice: state.backoffice }))(withRouter(PrintGroupEdit));
+export default connect(state => ({ loading: state.loading, backoffice: state.backoffice }))(PrintGroupEdit);

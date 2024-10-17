@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { TabMenu } from 'primereact/tabmenu';
@@ -53,10 +53,12 @@ const tabItems = [
 function ViewerForm(props) {
 
   const {
-    history,
     dispatch
   } = props;
 
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -181,7 +183,8 @@ function ViewerForm(props) {
   } 
 
   const goBack = () => {
-    if (history.location.state && history.location.state.from) {
+    if (location?.state?.from) {
+      /*
       const location = {
         pathname: history.location.state.from,
         state: { 
@@ -189,8 +192,14 @@ function ViewerForm(props) {
         }
       }
       history.replace(location);
+      */
+      const state = { 
+        searchParams: {...location.state.previousSearchParams}
+      }
+      navigate(location.state.from, { state });
     } else {
-      history.goBack();
+      //history.goBack();
+      navigate(-1);
     }
   }  
 
@@ -678,4 +687,4 @@ function ViewerForm(props) {
 
 }
 
-export default connect(state => ({ auth: state.auth }))(withRouter(ViewerForm));
+export default connect(state => ({ auth: state.auth }))(ViewerForm);

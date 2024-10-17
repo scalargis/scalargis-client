@@ -1,6 +1,6 @@
 import React from 'react'
 import Viewer from './Viewer'
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Routes as ReactRoutes, Route, Navigate, useLocation } from 'react-router-dom'
 import HomePage from '../components/HomePage'
 import Page404 from '../components/Page404'
 import Page401 from '../components/Page401'
@@ -10,20 +10,23 @@ import PagePassword from '../components/PagePassword'
 
 const Routes = ({core, pages}) => {
 
-    return (
-        <Switch>
-            <Route path="/login" children={<PageLogin />} />
-            <Route path="/registration" children={<PageRegistrationConfirmation />} />
-            <Route path="/password" children={<PagePassword/>} />
-            <Route path="/not-found" children={<Page404 />} />
-            <Route path="/not-allowed" children={<Page401 />} />
-            <Route path="/mapa/session/:id?" children={<Viewer />} />
-            <Route path="/map/session/:id?" children={<Viewer />} />
-            <Route path="/mapa/:id?" children={<Viewer />} />
-            <Route path="/map/:id?" children={<Viewer />} />
+    const location = useLocation();
 
-            <Route path="/mapas/:id?" children={<Viewer />} />
+    return (
+        <ReactRoutes>
+            <Route path="/login" element={<PageLogin />} />
+            <Route path="/registration" element={<PageRegistrationConfirmation />} />
+            <Route path="/password" element={<PagePassword/>} />
+            <Route path="/not-found" element={<Page404 />} />
+            <Route path="/not-allowed" element={<Page401 />} />
+            <Route path="/mapa/session/:id?" element={<Viewer />} />
+            <Route path="/map/session/:id?" element={<Viewer />} />
+            <Route path="/mapa/:id?" element={<Viewer />} />
+            <Route path="/map/:id?" element={<Viewer />} />
+
+            <Route path="/mapas/:id?" element={<Viewer />} />
             
+            {/*
             {pages.map((p, i) => {
                 const CustomPage = p.children;
                 return (
@@ -36,28 +39,23 @@ const Routes = ({core, pages}) => {
                     }} />
                 )
             })}
-
-            <Route path="/:id" children={<Viewer />} />
-
-            {/*
-            <Route path="/:id" render={(props) => {
-                console.log(props);
-                return <Redirect to={`/map/${props.match.params.id || ''}${props.location.search || ''}`} />
-            }} />
-            */}
-            {/*
-            <Route path="/" children={<HomePage />} />
             */}
 
-            <Route path="/" render={(props) => {
-                if (core?.siteConfig?.home) {
-                    return <Redirect to={`${core.siteConfig.home}${props.location.search || ''}${props.location.hash || ''}`} />
-                } else {
-                    return <Redirect to={`/map/${props.location.search || ''}${props.location.hash || ''}`} />
-                }
-            }} />
+            {pages.map((p, i) => {
+                const CustomPage = p.children;
+                return (
+                    <Route key={i} path={p.path} element={<CustomPage core={core} />} />
+                )
+            })}
 
-        </Switch>
+            <Route path="/:id" element={<Viewer />} />
+
+            <Route path="/" element={core?.siteConfig?.home ? 
+                <Navigate to={`${core.siteConfig.home}${location.search || ''}${location.hash || ''}`} /> : 
+                <Navigate to={`/map/${location.search || ''}${location.hash || ''}`} />} 
+            />
+
+        </ReactRoutes>
     )
 }
 

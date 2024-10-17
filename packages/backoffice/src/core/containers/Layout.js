@@ -1,7 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import LayoutComponent from '../components/Layout'
-import { connect } from 'react-redux'
-import { withRouter, Route, useHistory } from 'react-router-dom';
 
 function Layout(props) {
 
@@ -86,4 +85,4 @@ function Layout(props) {
   )
 }
 
-export default connect(state => ({ backoffice: state.backoffice, auth: state.auth }))(withRouter(Layout));
+export default connect(state => ({ backoffice: state.backoffice, auth: state.auth }))(Layout);

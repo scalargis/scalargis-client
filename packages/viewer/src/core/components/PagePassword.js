@@ -1,11 +1,19 @@
 import React, { useEffect, useContext } from 'react';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PasswordWidget from './PasswordWidget';
 import AppContext from '../../AppContext';
 
 function PagePassword(props) {
-  //const { token } = props.match.params;
-  const { search } = props.location;
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate()
+
+  const history = {
+    location,
+    navigate
+  }
+
+  const { search } = location
 
   const { core } = useContext(AppContext);
 
@@ -13,7 +21,6 @@ function PagePassword(props) {
   
   const query = new URLSearchParams(search);
   const token = query.get('token');
-  //const redirect = query.get('redirect');
 
   const foundRedirect = /redirect=(.*)/i.exec(search);
   const foundUrlRedirect = /url_redirect=(.*)/i.exec(search);
@@ -35,7 +42,7 @@ function PagePassword(props) {
         
         <PasswordWidget
           token={token}
-          history={props.history}
+          history={history}
           redirect={foundRedirect ? foundRedirect[1] : null }
           urlRedirect={foundUrlRedirect ? foundUrlRedirect[1] : null }
         />
@@ -45,4 +52,4 @@ function PagePassword(props) {
   )
 }
 
-export default withRouter(PagePassword);
+export default PagePassword;

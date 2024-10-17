@@ -1,6 +1,6 @@
 import React, { useContext, useState, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { InputText } from 'primereact/inputtext';
@@ -14,7 +14,9 @@ import dataProvider from '../../../service/DataProvider';
 
 function NotificationForm(props) {
 
-  const { history } = props;
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -27,16 +29,22 @@ function NotificationForm(props) {
   const API_URL = core.API_URL; 
 
   const goBack = () => {
-    if (history.location.state && history.location.state.from) {
-      const location = {
-        pathname: history.location.state.from,
+    if (location.state && location.state.from) {
+      /*
+      const new_location = {
+        pathname: location.state.from,
         state: { 
-          searchParams: {...history.location.state.previousSearchParams}
+          searchParams: {...location.state.previousSearchParams}
         }
       }
-      history.replace(location);
+      location.replace(new_location);
+      */
+      const state = { 
+        searchParams: {...location.state.previousSearchParams}
+      }
+      navigate(location.state.from, { replace: true, state })
     } else {
-      history.goBack();
+      navigate(-1);
     }
   }
 
@@ -250,4 +258,4 @@ function NotificationForm(props) {
 
 }
 
-export default connect(state => ({ auth: state.auth }))(withRouter(NotificationForm));
+export default connect(state => ({ auth: state.auth }))(NotificationForm);

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -64,4 +64,4 @@ function NotificationEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading }))(withRouter(NotificationEdit));
+export default connect(state => ({ loading: state.loading }))(NotificationEdit);

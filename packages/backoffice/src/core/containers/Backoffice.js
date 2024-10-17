@@ -1,9 +1,8 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import Layout from './Layout';
-//import { HashRouter,  BrowserRouter as Router, Route, useHistory } from 'react-router-dom';
-import { withRouter, Route, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import AppContext from '../../AppContext';
+import Layout from './Layout';
 
 /**
  * Backoffice layout container
@@ -11,11 +10,18 @@ import AppContext from '../../AppContext';
  */
 function Backoffice(props) {
 
-  // Get router props
-  const { url } = props.match;
-  const { id } = props.match.params;
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
 
-  const { history, dispatch, loading, backoffice, config } = props;
+  const history = {
+    location,
+    navigate,
+    params
+  }
+
+  const { dispatch, loading, backoffice, config } = props;
   //const history = useHistory();
 
   // Enable redux actions
@@ -45,4 +51,4 @@ function Backoffice(props) {
   );
 }
 
-export default connect(state => ({ backoffice: state.backoffice }))(withRouter(Backoffice));
+export default connect(state => ({ backoffice: state.backoffice }))(Backoffice);

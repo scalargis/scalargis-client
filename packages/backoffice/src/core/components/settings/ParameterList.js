@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import { withRouter, Route, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
@@ -26,9 +26,9 @@ const initialSearchParams = {
 
 function ParameterList(props) {
 
-  const {
-    history   
-  } = props;
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const parameters_table = props.parametersTable || 'site';
 
@@ -50,10 +50,10 @@ function ParameterList(props) {
   const API_URL = core.API_URL;
 
   useEffect(() => {
-    if (!loaded.current && history.location?.state?.searchParams) {
+    if (!loaded.current && location?.state?.searchParams) {
       loaded.current = true;
 
-      const _searchParams = {...history.location.state.searchParams};
+      const _searchParams = {...location.state.searchParams};
       setSearchParams(_searchParams);
     } else {
       loadData();
@@ -61,6 +61,7 @@ function ParameterList(props) {
   }, [searchParams]);
 
   const newRecord = () => {
+    /*
     const location = {
       pathname: `/settings/parameters/create`,
       state: { 
@@ -68,10 +69,17 @@ function ParameterList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);   
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate(`/settings/parameters/create`, { state });
   }
 
   const editRecord = (record) => {
+    /*
     const location = {
       pathname: `/settings/parameters/edit/${record.id}`,
       state: { 
@@ -80,6 +88,12 @@ function ParameterList(props) {
       }
     }
     history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate(`/settings/parameters/edit/${record.id}`, { state });
   }
 
   const deleteSelectedRecords = () => {
@@ -243,13 +257,13 @@ function ParameterList(props) {
                 selection={selectedRecords} onSelectionChange={onSelectionChange}
                 paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
                 onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-                filters={searchParams.filters} onFilter={onFilter} loading={loading}
+                filterDisplay="row" filters={searchParams.filters} onFilter={onFilter} loading={loading}
                 emptyMessage="Não foram encontrados registos." >
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-                <Column field="id" header="Id" sortable filter filterPlaceholder="Id" headerStyle={{ width: '6rem' }} />
-                <Column field="code" header="Código" sortable filter filterPlaceholder="Código" style={{"wordBreak": "break-all"}} />
-                <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" style={{"wordBreak": "break-all"}} />
-                <Column field="notes" header="Descrição" sortable filter filterPlaceholder="Descrição" style={{"wordBreak": "break-all"}} />
+                <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+                <Column field="code" header="Código" sortable filter filterPlaceholder="Código" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+                <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+                <Column field="notes" header="Descrição" sortable filter filterPlaceholder="Descrição" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
                 <Column header="Valor" body={valueBodyTemplate} headerStyle={{ width: '5rem' }} />
                 <Column body={actionBodyTemplate} style={{"textAlign": "center"}} />
             </DataTable>
@@ -263,4 +277,4 @@ function ParameterList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(withRouter(ParameterList));
+export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(ParameterList);

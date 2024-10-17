@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import Layout from './Layout'
-import { withRouter } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import AppContext from '../../AppContext'
 import MainMap from '../components/MainMap'
 import MainMenu from './MainMenu'
@@ -29,14 +29,25 @@ import {PageView, initGA} from '../components/Tracking'
  */
 function Viewer(props) {
 
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+
   // Get router props
-  const { url } = props.match;
-  const { id } = props.match.params;
-  const { history, loading, viewer, config, notifications, dialogWindows } = props;
+  const url = location?.pathname || '';
+  const { id } = params;
+  const { loading, viewer, config, notifications, dialogWindows } = props;
   const { exclusive_mapcontrol } = viewer;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
   
+  const history = {
+    location,
+    navigate,
+    params
+  }
+
   //Localization
   const { i18n } = useTranslation();
 
@@ -48,7 +59,8 @@ function Viewer(props) {
   const { core, mainMap } = useContext(AppContext);
   const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu, viewer_update_mapcontrol } = core.actions;
 
-  const gaTrackingId = process.env.REACT_APP_GA_TRACKING_ID;  
+  const gaTrackingId = process.env.REACT_APP_GA_TRACKING_ID;
+  
 
   // Get config
   React.useEffect(() => {
@@ -157,4 +169,4 @@ function Viewer(props) {
 export default connect(state => {
   const gstate = mapStateToProps(state);
   return ({ viewer: gstate.viewer, notifications: gstate.notifications });
-})(withRouter(Viewer));
+})(Viewer);

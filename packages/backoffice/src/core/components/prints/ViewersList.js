@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
@@ -198,19 +197,19 @@ function ViewersList(props) {
         <DataTable ref={dt} header={renderHeader()} value={records} lazy paginator
             first={lazyParams.first} rows={10} totalRecords={totalRecords} onPage={onPage}
             onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-            onFilter={onFilter} filters={lazyParams.filters} loading={loading}
+            filterDisplay="row" onFilter={onFilter} filters={lazyParams.filters} loading={loading}
             emptyMessage="Não foram encontrados registos"
             className="data-table-filter-sized">
-          <Column field="id" header="Id" sortable filter filterPlaceholder="Id" 
+          <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false}
             bodyStyle={{"wordBreak": "break-word"}} style={{width: '100px'}} />
-          <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" bodyStyle={{"wordBreak": "break-word"}} />
-          <Column field="title" header="Título" filter filterPlaceholder="Título" sortable bodyStyle={{"wordBreak": "break-word"}} />
-          <Column field="is_active" header="Ativo" body={isActiveTemplate} filter filterElement={statusFilter} style={{width: '140px'}} className="p-text-center" />
-          <Column field="is_shared" header="Tipo" body={isSharedTemplate} filter filterElement={sharedFilter} style={{width: '150px'}} className="p-text-center" />
+          <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} bodyStyle={{"wordBreak": "break-word"}} />
+          <Column field="title" header="Título" filter filterPlaceholder="Título" showFilterMenu={false} sortable bodyStyle={{"wordBreak": "break-word"}} />
+          <Column field="is_active" header="Ativo" body={isActiveTemplate} filter filterElement={statusFilter} showFilterMenu={false} style={{width: '140px'}} className="p-text-center" />
+          <Column field="is_shared" header="Tipo" body={isSharedTemplate} filter filterElement={sharedFilter} showFilterMenu={false} style={{width: '150px'}} className="p-text-center" />
         </DataTable>
       </Dialog>
     </React.Fragment>
   )
 }
 
-export default connect(state => ({}))(withRouter(ViewersList));
+export default connect(state => ({}))(ViewersList);

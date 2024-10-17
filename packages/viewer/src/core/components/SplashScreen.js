@@ -1,21 +1,25 @@
 import React, { useContext } from 'react';
 import { useTranslation} from "react-i18next";
-import { withRouter } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import AppContext from '../../AppContext';
 
 
 function SplashScreen(props) {
 
-  const { history, children } = props;
+  console.log(props);
+
+  const { children } = props;
 
   const { t } = useTranslation();
 
   const { core } = useContext(AppContext);
 
+  const location = useLocation();
+
   const { CLIENT_URL } = core;
 
   const defaultLogo = CLIENT_URL + 'assets/images/logo-splash.png';
-  const viewerLogo = CLIENT_URL + 'assets/images' + (props.location.pathname || '') + '/logo-splash.png';
+  const viewerLogo = CLIENT_URL + 'assets/images' + (location.pathname || '') + '/logo-splash.png';
 
   const addDefaultSrc = (ev) => {
     ev.target.src = defaultLogo;
@@ -46,4 +50,4 @@ function SplashScreen(props) {
   )
 }
 
-export default withRouter(SplashScreen);
+export default SplashScreen;

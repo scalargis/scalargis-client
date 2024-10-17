@@ -1,11 +1,19 @@
 import React, { useContext }  from 'react';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import LoginWidget from './LoginWidget';
 import AppContext from '../../AppContext';
 
 function PageLogin(props) {
-  const { search } = props.location;
-  //const foundRedirect = /redirect=(.*)/i.exec(search);
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const history = {
+    location,
+    navigate
+  }
+
+  const { search } = location;
 
   const params = new URLSearchParams(search)
   const redirect = params.get('redirect');
@@ -27,8 +35,7 @@ function PageLogin(props) {
         </div>
         
         <LoginWidget
-          history={props.history}
-          /*redirect={foundRedirect ? foundRedirect[1] : null}*/
+          history={history}
           redirect={redirect || null}
           path={path || null}
           urlRedirect = {url_redirect || null}
@@ -39,4 +46,4 @@ function PageLogin(props) {
   )
 }
 
-export default withRouter(PageLogin);
+export default PageLogin;

@@ -1,11 +1,13 @@
 import React from 'react';
 import { useTranslation} from "react-i18next";
+import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
-import { withRouter } from 'react-router-dom';
 
 function Page404({ history }) {
 
   const { t } = useTranslation();
+
+  const { navigate } = useNavigate();
 
   return (
     <div className="p-d-flex p-jc-center" style={{ height: '100%' }}>
@@ -14,11 +16,11 @@ function Page404({ history }) {
         <p>{t("viewerNotFound", "O visualizador solicitado não existe.")}</p>
         <p>{t("goHomeMsg", "Clique para ir para a página inicial")}</p>
         <p>
-          <Button label={t("Home", "Página Inicial")} onClick={e => history.push({ pathname: "/" })}></Button>
+          <Button label={t("Home", "Página Inicial")} onClick={e => navigate("/")}></Button>
         </p>
       </div>
   </div>
   )
 }
 
-export default withRouter(Page404);
+export default Page404;

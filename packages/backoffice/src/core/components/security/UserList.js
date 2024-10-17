@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
@@ -25,9 +25,9 @@ const initialSearchParams = {
 
 function UserList(props) {
 
-  const {
-    history    
-  } = props;
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { core } = useContext(AppContext);
 
@@ -46,10 +46,10 @@ function UserList(props) {
   const API_URL = core.API_URL;
 
   useEffect(() => {
-    if (!loaded.current && history.location?.state?.searchParams) {
+    if (!loaded.current && location?.state?.searchParams) {
       loaded.current = true;
 
-      const _searchParams = {...history.location.state.searchParams};
+      const _searchParams = {...location.state.searchParams};
       setSearchParams(_searchParams);
     } else {
       loadData();
@@ -57,6 +57,7 @@ function UserList(props) {
   }, [searchParams]);
 
   const newRecord = () => {
+    /*
     const location = {
       pathname: '/security/users/create',
       state: { 
@@ -64,10 +65,17 @@ function UserList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);   
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate('/security/users/create', { state });
   }
 
   const editRecord = (record) => {
+    /*
     const location = {
       pathname: `/security/users/edit/${record.id}`,
       state: { 
@@ -76,6 +84,12 @@ function UserList(props) {
       }
     }
     history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate(`/security/users/edit/${record.id}`, { state });
   }
 
   const deleteSelectedRecords = () => {
@@ -249,14 +263,14 @@ function UserList(props) {
                 selection={selectedRecords} onSelectionChange={onSelectionChange}
                 paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
                 onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-                filters={searchParams.filters} onFilter={onFilter} loading={loading}
+                filterDisplay="row" filters={searchParams.filters} onFilter={onFilter} loading={loading}
                 emptyMessage="Não foram encontrados registos." >
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-                <Column field="id" header="Id" sortable filter filterPlaceholder="Id" headerStyle={{ width: '6rem' }} />
-                <Column field="username" header="Username" sortable filter filterPlaceholder="Username" style={{"wordBreak": "break-all"}} />
-                <Column field="email" header="Email" sortable filter filterPlaceholder="Email" style={{"wordBreak": "break-all"}} />
-                <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" style={{"wordBreak": "break-all"}} />
-                <Column field="active" header="Ativo" body={statusBodyTemplate} sortable filter filterElement={statusFilter} className="p-text-center" headerStyle={{ width: '9rem' }} />
+                <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+                <Column field="username" header="Username" sortable filter filterPlaceholder="Username" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+                <Column field="email" header="Email" sortable filter filterPlaceholder="Email" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+                <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+                <Column field="active" header="Ativo" body={statusBodyTemplate} sortable filter filterElement={statusFilter} showFilterMenu={false} className="p-text-center" headerStyle={{ width: '9rem' }} />
                 <Column body={actionBodyTemplate} style={{"textAlign": "center"}} />
             </DataTable>
           </div>
@@ -266,4 +280,4 @@ function UserList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(withRouter(UserList));
+export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(UserList);

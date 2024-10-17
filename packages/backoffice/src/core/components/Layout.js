@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import classNames from 'classnames';
-import { withRouter, Route, useHistory } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
 import { AppTopbar } from './AppTopbar';
@@ -180,75 +180,61 @@ function Layout(props) {
 
         <div className="layout-main">
 
-            <Route path="/account" component={AccountEdit} />
+            <Routes>
 
-            <Route path="/notifications/edit/:id" component={NotificationEdit} />
-            <Route path="/notifications/list" render={(props) => (
-                <NotificationList {...props} />
-            )} />
+                <Route path="/account" element={AccountEdit} />
 
-            <Route path="/" exact component={Dashboard} />
-            <Route path="/dashboard" exact component={Dashboard} />
+                <Route path="/notifications/edit/:id" element={NotificationEdit} />
+                <Route path="/notifications/list" element={<NotificationList />} />
 
-            <Route path="/viewers/create" component={ViewerEdit} />
-            <Route path="/viewers/edit/:id" component={ViewerEdit} />
-            <Route path="/viewers/list" render={(props) => (
-                <ViewerList {...props} />
-            )} />
+                <Route path="/" exact element={<Dashboard />} />
+                <Route path="/dashboard" exact element={<div>Teste</div>} />
+                
+                <Route path="/viewers/create" element={<ViewerEdit />} />
+                <Route path="/viewers/edit/:id" element={<ViewerEdit />} />
+                <Route path="/viewers/list" element={<ViewerList />} />
 
-            <Route path="/prints/create" component={PrintEdit} />
-            <Route path="/prints/edit/:id" component={PrintEdit} />
-            <Route path="/prints/list" render={(props) => (
-                <PrintList {...props}  />
-            )} />
-            <Route path="/prints/groups/create" component={PrintGroupEdit} />
-            <Route path="/prints/groups/edit/:id" component={PrintGroupEdit} />         
-            <Route path="/prints/groups/list" render={(props) => (
-                <PrintGroupList {...props}  />
-            )} />             
-            <Route path="/prints/elements/create" component={PrintElementEdit} />
-            <Route path="/prints/elements/edit/:id" component={PrintElementEdit} />            
-            <Route path="/prints/elements/list" render={(props) => (
-                <PrintElementList {...props} />
-            )} />                      
+                <Route path="/prints/create" element={<PrintEdit />} />
+                <Route path="/prints/edit/:id" element={<PrintEdit />} />
+                <Route path="/prints/list" element={<PrintList />} />
+                <Route path="/prints/groups/create" element={<PrintGroupEdit />} />
+                <Route path="/prints/groups/edit/:id" element={<PrintGroupEdit />} />         
+                <Route path="/prints/groups/list" element={<PrintGroupList />} />
+                <Route path="/prints/elements/create" element={<PrintElementEdit />} />
+                <Route path="/prints/elements/edit/:id" element={<PrintElementEdit />} />            
+                <Route path="/prints/elements/list" element={<PrintElementList />} />                      
 
-            <Route path="/modules/:id/:sub?/:action?" render={(props) => {
-                return (
-                    <ModuleManager {...props}
-                    core={core}
-                    module={props.match.params.id}
-                    submodule={props.match.params.sub}
-                    action={props.match.params.action} />
-                )
-            }} />
+                {/*
+                <Route path="/modules/:id/:sub?/:action?" render={(props) => {
+                    return (
+                        <ModuleManager {...props}
+                        core={core}
+                        module={props.match.params.id}
+                        submodule={props.match.params.sub}
+                        action={props.match.params.action} />
+                    )
+                }} />
+                */}
+                <Route path="/modules/:id/:sub?/:action?" element={<ModuleManager />} />
 
-            {}          
+                {}          
 
-            <Route path="/security/users/create" component={UserEdit}  />
-            <Route path="/security/users/edit/:id" component={UserEdit} />             
-            <Route path="/security/users/list" render={(props) => (
-                <UserList {...props} />
-            )} />
-            <Route path="/security/roles/create" component={RoleEdit}  />
-            <Route path="/security/roles/edit/:id" component={RoleEdit} />                
-            <Route path="/security/roles/list" render={(props) => (
-                <RoleList {...props} />
-            )} />
-            <Route path="/security/groups/create" component={GroupEdit}  />
-            <Route path="/security/groups/edit/:id" component={GroupEdit} />                
-            <Route path="/security/groups/list" render={(props) => (
-                <GroupList {...props} />
-            )} />             
-            <Route path="/settings/parameters/create" component={ParameterEdit}  />
-            <Route path="/settings/parameters/edit/:id" component={ParameterEdit} />            
-            <Route path="/settings/parameters/list" render={(props) => (
-                <ParameterList {...props} parametersTable='site' />
-            )} />             
-            <Route path="/settings/coordinate_systems/create" component={CoordinateSystemEdit}  />
-            <Route path="/settings/coordinate_systems/edit/:id" component={CoordinateSystemEdit} />
-            <Route path="/settings/coordinate_systems/list" render={(props) => (
-                <CoordinateSystemList {...props} />
-            )} />            
+                <Route path="/security/users/create" element={<UserEdit />}  />
+                <Route path="/security/users/edit/:id" element={<UserEdit />} />             
+                <Route path="/security/users/list" element={<UserList />} />
+                <Route path="/security/roles/create" element={<RoleEdit />}  />
+                <Route path="/security/roles/edit/:id" element={<RoleEdit />} />                
+                <Route path="/security/roles/list" element={ <RoleList />} />
+                <Route path="/security/groups/create" element={<GroupEdit />}  />
+                <Route path="/security/groups/edit/:id" element={<GroupEdit />} />                
+                <Route path="/security/groups/list" element={<GroupList />} />             
+                <Route path="/settings/parameters/create" element={<ParameterEdit />}  />
+                <Route path="/settings/parameters/edit/:id" element={<ParameterEdit />} />            
+                <Route path="/settings/parameters/list" element={<ParameterList parametersTable='site' />} />             
+                <Route path="/settings/coordinate_systems/create" element={<CoordinateSystemEdit />}  />
+                <Route path="/settings/coordinate_systems/edit/:id" element={<CoordinateSystemEdit />} />
+                <Route path="/settings/coordinate_systems/list" element={<CoordinateSystemList />} />
+            </Routes>
         </div>
 
         <AppFooter />

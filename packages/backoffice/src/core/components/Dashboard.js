@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux';
 import AppContext from "../../AppContext";
 
 import ViewerVisitsChart from '../components/stats/ViewerVisitsChart';
@@ -46,4 +45,4 @@ function Dashboard(props) {
     );
 }
 
-export default connect(state => ({ loading: state.loading, backoffice: state.backoffice }))(withRouter(Dashboard));
+export default connect(state => ({ loading: state.loading, backoffice: state.backoffice }))(Dashboard);

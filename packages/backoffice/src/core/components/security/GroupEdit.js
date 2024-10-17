@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -12,7 +12,6 @@ function GroupEdit(props) {
   const { core } = useContext(AppContext);
 
   const {
-    history,
     dispatch
   } = props;
 
@@ -65,4 +64,4 @@ function GroupEdit(props) {
 
 }
 
-export default connect(state => ({}))(withRouter(GroupEdit));
+export default connect(state => ({}))(GroupEdit);

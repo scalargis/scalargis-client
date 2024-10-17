@@ -1,6 +1,6 @@
 import React, { useContext, useState, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
@@ -15,9 +15,12 @@ import dataProvider from '../../../service/DataProvider';
 function CoordinateSystemForm(props) {
 
   const {
-    history,
     dispatch
   } = props;
+
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -35,6 +38,7 @@ function CoordinateSystemForm(props) {
   });
 
   const goBack = () => {
+    /*
     const location = {
       pathname: history.location.state.from,
       state: { 
@@ -42,6 +46,11 @@ function CoordinateSystemForm(props) {
       }
     }
     history.replace(location);
+    */
+    const state = { 
+      searchParams: {...location.state.previousSearchParams}
+    }
+    navigate(location.state.from, { state });
     //history.goBack();
   }
 
@@ -249,4 +258,4 @@ function CoordinateSystemForm(props) {
 
 }
 
-export default connect(state => ({}))(withRouter(CoordinateSystemForm));
+export default connect(state => ({}))(CoordinateSystemForm);

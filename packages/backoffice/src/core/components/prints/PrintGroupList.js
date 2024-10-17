@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
@@ -27,9 +27,12 @@ const initialSearchParams = {
 function PrintGroupList(props) {
 
   const {
-    history,
     groupsFilter
   } = props;
+
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { core } = useContext(AppContext);
 
@@ -61,6 +64,7 @@ function PrintGroupList(props) {
 
     
   const newRecord = () => {
+    /*
     const location = {
       pathname: '/prints/groups/create',
       state: { 
@@ -68,10 +72,17 @@ function PrintGroupList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);   
+    history.push(location);
+    */
+    const state = {
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate('/prints/groups/create', { state })
   }
 
   const editRecord = (record) => {
+    /*
     const location = {
       pathname: `/prints/groups/edit/${record.id}`,
       state: { 
@@ -79,7 +90,13 @@ function PrintGroupList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);    
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate(`/prints/groups/edit/${record.id}`, { state });
   }  
 
   const deleteSelectedRecords = () => {
@@ -273,15 +290,15 @@ function PrintGroupList(props) {
               selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
               paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
               onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-              filters={searchParams.filters} onFilter={onFilter} loading={loading}
+              filterDisplay="row" filters={searchParams.filters} onFilter={onFilter} loading={loading}
               emptyMessage="Não foram encontrados registos." >
               <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-              <Column field="id" header="Id" sortable filter filterPlaceholder="Id" headerStyle={{ width: '6rem' }} />
-              <Column field="code" header="Código" sortable filter filterPlaceholder="Código" style={{"wordBreak": "break-all"}} />
-              <Column field="title" header="Título" sortable filter filterPlaceholder="Título" style={{"wordBreak": "break-all"}} /> 
-              <Column field="groups" header="Grupos" body={groupsTemplate} filter filterPlaceholder="Grupo" style={{"wordBreak": "break-all"}} />
-              <Column field="prints" header="Plantas" body={printsTemplate} filter filterPlaceholder="Planta" style={{"wordBreak": "break-all"}} />
-              <Column field="viewers" header="Visualizadores" body={viewersTemplate} filter filterPlaceholder="Visualizador" style={{"wordBreak": "break-all"}} />
+              <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+              <Column field="code" header="Código" sortable filter filterPlaceholder="Código" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+              <Column field="title" header="Título" sortable filter filterPlaceholder="Título" showFilterMenu={false} style={{"wordBreak": "break-all"}} /> 
+              <Column field="groups" header="Grupos" body={groupsTemplate} filter filterPlaceholder="Grupo" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+              <Column field="prints" header="Plantas" body={printsTemplate} filter filterPlaceholder="Planta" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+              <Column field="viewers" header="Visualizadores" body={viewersTemplate} filter filterPlaceholder="Visualizador" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
               <Column body={actionBodyTemplate} />
           </DataTable>
         </div>
@@ -291,4 +308,4 @@ function PrintGroupList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(withRouter(PrintGroupList));
+export default connect(state => ({ loading: state.loading, filters: state.filters }))(PrintGroupList);

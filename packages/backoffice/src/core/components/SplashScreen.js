@@ -1,5 +1,4 @@
 import React, { useContext }  from 'react';
-import { withRouter } from 'react-router-dom';
 import AppContext from '../../AppContext';
 
 function SplashScreen({ history }) {
@@ -25,4 +24,4 @@ function SplashScreen({ history }) {
   )
 }
 
-export default withRouter(SplashScreen);
+export default SplashScreen;

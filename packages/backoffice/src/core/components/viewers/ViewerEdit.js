@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { BlockUI } from 'primereact/blockui';
 
 import AppContext from '../../../AppContext';
@@ -13,7 +13,6 @@ function ViewerEdit(props) {
   const { core } = useContext(AppContext);
 
   const {
-    history,
     dispatch
   } = props;
 
@@ -65,4 +64,4 @@ function ViewerEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading }))(withRouter(ViewerEdit));
+export default connect(state => ({ loading: state.loading }))(ViewerEdit);

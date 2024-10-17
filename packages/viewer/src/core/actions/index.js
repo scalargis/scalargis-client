@@ -211,8 +211,8 @@ export function login_post(post, history, redirect, urlRedirect) {
           cookies.set(cookieAuthName, res, { path: urlRedirect || cookiePath, expires: expireDate });
           if (urlRedirect) {
             window.location.assign(urlRedirect);
-          } else if (redirect && history) {
-             history.push({ pathname: redirect }); 
+          } else if (redirect && history?.navigate) {
+            history.navigate(redirect);
           } else {
             window.location.reload();
           }
@@ -236,8 +236,8 @@ export function login(auth, history, redirect, urlRedirect) {
       cookies.set(cookieAuthName, auth, { path: urlRedirect || cookiePath, expires: expireDate });
       if (urlRedirect) {
         window.location.assign(urlRedirect);
-      } else if (redirect && history) {
-        history.push({ pathname: redirect }); 
+      } else if (redirect && history?.navigate) {
+        history.navigate(redirect);
       } else {
         window.location.reload();
       } 
@@ -433,7 +433,7 @@ export function registration_post(post, history, redirect) {
           let expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
           cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
-          if (redirect && history) history.push({ pathname: redirect }); 
+          if (redirect && history?.navigate) history.navigate(redirect); 
           else window.location.reload();
         } else {
           //dispatch(registration_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
@@ -595,7 +595,7 @@ export function viewer_error(history) {
     type: VIEWER_LOAD_ERROR,
     redirect: '/not-found'
   }
-  if (action.redirect && history) history.push({ pathname: action.redirect })
+  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
 
@@ -604,17 +604,16 @@ export function viewer_not_found(history) {
     type: VIEWER_NOT_FOUND,
     redirect: '/not-found'
   }
-  if (action.redirect && history) history.push({ pathname: action.redirect })
+  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
-
 
 export function viewer_not_authorized(history, redirect) {
   const action = {
     type: VIEWER_NOT_AUTHORIZED,
     redirect: redirect ? redirect : '/not-allowed'
   }
-  if (action.redirect && history) history.push({ pathname: action.redirect })
+  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
 
@@ -735,7 +734,7 @@ export function viewer_load(core, id, history) {
           } else if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL) < 0) {
             redirect += '&url_redirect=/' + id;
           }
-          history.push(redirect);
+          history.navigate(redirect);
         } else dispatch(viewer_not_authorized(history));
       } else dispatch(viewer_not_found(history));
     })
@@ -743,12 +742,11 @@ export function viewer_load(core, id, history) {
 }
 
 export function viewer_session_load(history) {
-  const action =  {
-    type: VIEWER_SESSION_LOAD,
-    redirect: history.location.pathname + (history.location.search ? history.location.search + '&session=true' : '?session=true')
+  return function (dispatch, getState) {
+    if (history?.navigate) {
+      history.navigate({ pathname: history.location.pathname, search: history.location.search ? history.location.search + '&session=true' : '?session=true'});
+    }
   }
-  if (action.redirect && history) history.push({ pathname: action.redirect })
-  return action;
 }
 
 export function viewer_session_saved(session) {

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
@@ -23,8 +23,11 @@ const initialSearchParams = {
 
 function PrintElementList(props) {
 
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const {
-    history,
     elementsFilter
   } = props;
 
@@ -58,6 +61,7 @@ function PrintElementList(props) {
 
   
   const newRecord = () => {
+    /*
     const location = {
       pathname: '/prints/elements/create',
       state: { 
@@ -65,10 +69,17 @@ function PrintElementList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);   
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate('/prints/elements/create', { state });   
   }
 
   const editRecord = (record) => {
+    /*
     const location = {
       pathname: `/prints/elements/edit/${record.id}`,
       state: { 
@@ -76,7 +87,13 @@ function PrintElementList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);    
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate(`/prints/elements/edit/${record.id}`, { state }); 
   }  
 
   const deleteSelectedRecords = () => {
@@ -226,12 +243,12 @@ function PrintElementList(props) {
               selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
               paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
               onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-              filters={searchParams.filters} onFilter={onFilter} loading={loading}
+              filterDisplay="row" filters={searchParams.filters} onFilter={onFilter} loading={loading}
               emptyMessage="Não foram encontrados registos." >
               <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-              <Column field="id" header="Id" sortable filter filterPlaceholder="Id" headerStyle={{ width: '6rem' }} />
-              <Column field="code" header="Código" sortable filter filterPlaceholder="Código" style={{"wordBreak": "break-all"}} />
-              <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" style={{"wordBreak": "break-all"}} />
+              <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+              <Column field="code" header="Código" sortable filter filterPlaceholder="Código" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+              <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
               <Column body={actionBodyTemplate} />
           </DataTable>
         </div>
@@ -241,4 +258,4 @@ function PrintElementList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(withRouter(PrintElementList));
+export default connect(state => ({ loading: state.loading, filters: state.filters }))(PrintElementList);

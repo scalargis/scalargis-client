@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter  } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { TabMenu } from 'primereact/tabmenu';
@@ -54,9 +54,12 @@ const pageOrientationList = ['Retrato', 'Paisagem'];
 function PrintGroupForm(props) {
 
   const {
-    history,
     dispatch
   } = props;
+
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -193,6 +196,7 @@ function PrintGroupForm(props) {
   } 
 
   const goBack = () => {
+    /*
     const location = {
       pathname: history.location.state.from,
       state: { 
@@ -200,6 +204,11 @@ function PrintGroupForm(props) {
       }
     }
     history.replace(location);
+    */
+    const state = { 
+      searchParams: {...location.state.previousSearchParams}
+    }
+    navigate(location.state.from, { state });
     //history.goBack();
   }  
 
@@ -569,4 +578,4 @@ function PrintGroupForm(props) {
 
 }
 
-export default connect(state => ({ auth: state.auth }))(withRouter(PrintGroupForm));
+export default connect(state => ({ auth: state.auth }))(PrintGroupForm);

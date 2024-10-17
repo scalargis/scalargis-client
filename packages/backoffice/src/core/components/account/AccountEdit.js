@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -58,4 +58,4 @@ function AccountEdit(props) {
 
 }
 
-export default connect(state => ({}))(withRouter(AccountEdit));
+export default connect(state => ({}))(AccountEdit);

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
@@ -15,9 +15,12 @@ import dataProvider from '../../../service/DataProvider';
 function ParameterForm(props) {
 
   const {
-    history,
     dispatch
   } = props;
+
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const parameters_table = props.parametersTable || 'site';
 
@@ -39,6 +42,7 @@ function ParameterForm(props) {
   });
 
   const goBack = () => {
+    /*
     const location = {
       pathname: history.location.state.from,
       state: { 
@@ -46,6 +50,11 @@ function ParameterForm(props) {
       }
     }
     history.replace(location);
+    */
+    const state = { 
+      searchParams: {...location.state.previousSearchParams}
+    }
+    navigate(location.state.from, { state });
     //history.goBack();
   }
 
@@ -166,4 +175,4 @@ function ParameterForm(props) {
 
 }
 
-export default connect(state => ({}))(withRouter(ParameterForm));
+export default connect(state => ({}))(ParameterForm);

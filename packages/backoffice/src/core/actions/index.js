@@ -1,5 +1,7 @@
 import Cookies from 'universal-cookie'
-import { getAppApiUrl, getCookieAuthName } from '../utils'
+import { getBackofficeBaseUrl, getAppApiUrl, getCookieAuthName } from '../utils'
+
+export const SITE_LOAD                  = 'SITE_LOAD'
 
 export const AUTH_HTTP_LOADING          = 'AUTH_HTTP_LOADING'
 export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
@@ -32,6 +34,35 @@ const API_URL = getAppApiUrl();
 const cookieAuthName = getCookieAuthName();
 
 
+export function site_load(core, callback) {
+  return async function (dispatch, getState) {
+    const url = API_URL + '/app/site/config';
+
+    try {
+      await fetch(url, {
+          signal: AbortSignal.timeout(10000)
+        })
+        .then(resp => { 
+            return resp.json();
+        })
+        .then(data => {
+          core.setSiteConfig(data);
+          callback && callback(data);
+        })
+        .catch(error => {
+          console.log(error);
+          callback && callback({});
+        });
+    } catch (error) {
+      // Timeouts if the request takes
+      // longer than 10 seconds
+      console.log(error);
+      callback && callback({});
+    }
+  }
+}
+
+
 export function login_http_loading() {
   const action = {
     type: AUTH_HTTP_LOADING
@@ -58,7 +89,7 @@ export function login_post(post, history, redirect) {
         if (res.authenticated) {
           const cookies = new Cookies();
           cookies.set(cookieAuthName, res, { path: '/' });
-          if (redirect && history) history.push({ pathname: redirect }); 
+          if (redirect && history?.navigate) history.navigate(redirect); 
           else window.location.reload();
         } else {
           dispatch(login_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
@@ -134,7 +165,7 @@ export function backoffice_error(history) {
     type: BACKOFFICE_LOAD_ERROR,
     redirect: '/not-found'
   }
-  if (action.redirect && history) history.push({ pathname: action.redirect })
+  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
 
@@ -143,7 +174,7 @@ export function backoffice_not_found(history) {
     type: BACKOFFICE_NOT_FOUND,
     redirect: '/not-found'
   }
-  if (action.redirect && history) history.push({ pathname: action.redirect })
+  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
 
@@ -153,7 +184,7 @@ export function backoffice_not_authorized(history, redirect) {
     type: BACKOFFICE_NOT_AUTHORIZED,
     redirect: redirect ? redirect : '/not-allowed'
   }
-  if (action.redirect && history) history.push({ pathname: action.redirect })
+  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
 
@@ -222,15 +253,17 @@ export function backoffice_load(core, history) {
       })
 
     }).catch(error => {
+      const base_url = getBackofficeBaseUrl();
+
       // Redirect to login or error pages
       if (error.message === 'Not found') {
         //TODO: Bad API endpoint, redirect to page with more info to user
-        const redirect = '/login?redirect=/';
-        history.push(redirect);
+        const redirect = `/login?redirect=${base_url}`;
+        history.navigate(redirect);
       } else if (error.message === 'Unauthorized') {
         if (!logged) {
-          const redirect = '/login?redirect=/';
-          history.push(redirect);
+          const redirect = `/login?redirect=${base_url}`;
+          history.navigate(redirect);
         } else dispatch(backoffice_not_authorized(history));
       } else {
         dispatch(logout());

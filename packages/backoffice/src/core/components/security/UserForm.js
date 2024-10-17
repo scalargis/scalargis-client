@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
@@ -41,9 +41,12 @@ const sortGroupsArray = (data) => {
 function UserForm(props) {
 
   const {
-    history,
     dispatch
   } = props;
+
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -147,6 +150,7 @@ function UserForm(props) {
   }
 
   const goBack = () => {
+    /*
     const location = {
       pathname: history.location.state.from,
       state: { 
@@ -154,6 +158,11 @@ function UserForm(props) {
       }
     }
     history.replace(location);
+    */
+    const state = { 
+      searchParams: {...location.state.previousSearchParams}
+    }
+    navigate(location.state.from, { state });
     //history.goBack();
   }
 
@@ -427,4 +436,4 @@ function UserForm(props) {
 
 }
 
-export default connect(state => ({}))(withRouter(UserForm));
+export default connect(state => ({}))(UserForm);

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { MultiSelect } from 'primereact/multiselect';
@@ -43,9 +43,9 @@ const status = [
 
 function NotificationList(props) {
 
-  const {
-    history
-  } = props;
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { core } = useContext(AppContext);
 
@@ -84,14 +84,21 @@ function NotificationList(props) {
   }, [searchParams]);
 
   const editRecord = (record) => {
+    /*
     const location = {
       pathname: `/notifications/edit/${record.id}`,
       state: { 
-        from: history.location.pathname,
+        from: location.pathname,
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);    
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate(`/notifications/edit/${record.id}`, { state });
   }
 
   const exportCSV = () => {
@@ -368,4 +375,4 @@ function NotificationList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(withRouter(NotificationList));
+export default connect(state => ({ loading: state.loading, filters: state.filters }))(NotificationList);

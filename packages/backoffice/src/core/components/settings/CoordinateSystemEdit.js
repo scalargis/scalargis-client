@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -12,7 +12,6 @@ function CoordinateSystemEdit(props) {
   const { core } = useContext(AppContext);
 
   const {
-    history,
     dispatch
   } = props;
 
@@ -79,4 +78,4 @@ function CoordinateSystemEdit(props) {
 
 }
 
-export default connect(state => ({}))(withRouter(CoordinateSystemEdit));
+export default connect(state => ({}))(CoordinateSystemEdit);

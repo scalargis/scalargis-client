@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
@@ -27,9 +27,9 @@ const initialSearchParams = {
 
 function ViewerList(props) {
 
-  const {
-    history
-  } = props;
+  // Routing
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { core } = useContext(AppContext);
 
@@ -53,8 +53,8 @@ function ViewerList(props) {
   useEffect(() => {
     setLoaded(true);
     
-    if (props?.history?.location?.state?.searchParams) {
-      setSearchParams({...props.history.location.state.searchParams});
+    if (location?.state?.searchParams) {
+      setSearchParams({...location.state.searchParams});
     } else {
       loadData();
     }
@@ -72,6 +72,7 @@ function ViewerList(props) {
   }, [searchParams]); 
   
   const newRecord = () => {
+    /*
     const location = {
       pathname: '/viewers/create',
       state: { 
@@ -79,10 +80,17 @@ function ViewerList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);   
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate('/viewers/create', {state });
   }
 
   const editRecord = (record) => {
+    /*
     const location = {
       pathname: `/viewers/edit/${record.id}`,
       state: { 
@@ -90,7 +98,13 @@ function ViewerList(props) {
         previousSearchParams: {...searchParams}
       }
     }
-    history.push(location);    
+    history.push(location);
+    */
+    const state = { 
+      from: location.pathname,
+      previousSearchParams: {...searchParams}
+    }
+    navigate(`/viewers/edit/${record.id}`, { state });
   }  
 
   const deleteSelectedRecords = () => {
@@ -271,13 +285,13 @@ function ViewerList(props) {
               selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
               paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
               onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-              filters={searchParams.filters} loading={loading}
+              filterDisplay="row" filters={searchParams.filters} loading={loading}
               emptyMessage="Não foram entrados registos." >
               <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-              <Column field="id" header="Id" sortable filter filterElement={idFilter} filterPlaceholder="Id" headerStyle={{ width: '6rem' }} />
-              <Column field="name" header="Nome" sortable filter filterElement={nameFilter} filterPlaceholder="Nome" style={{"wordBreak": "break-all"}}  />
-              <Column field="title" header="Título" sortable filter filterElement={titleFilter} filterPlaceholder="Título" style={{"wordBreak": "break-all"}} />
-              <Column field="description" header="Descrição" sortable filter filterElement={descriptionFilter} filterPlaceholder="Descrição" style={{"wordBreak": "break-all"}} />
+              <Column field="id" header="Id" sortable filter filterElement={idFilter} filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+              <Column field="name" header="Nome" sortable filter filterElement={nameFilter} filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}}  />
+              <Column field="title" header="Título" sortable filter filterElement={titleFilter} filterPlaceholder="Título" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+              <Column field="description" header="Descrição" sortable filter filterElement={descriptionFilter} filterPlaceholder="Descrição" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
               <Column field="keywords" header="Keywords" body={keywordsTemplate} />
               { adminOrManager && <Column field="owner" header="Dono" body={ownerTemplate} /> }
               <Column body={actionBodyTemplate} />
@@ -289,4 +303,4 @@ function ViewerList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(withRouter(ViewerList));
+export default connect(state => ({ loading: state.loading, filters: state.filters }))(ViewerList);

@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import AppContext, { core, mainMap } from '../../AppContext';
 import RGPD from '../components/RGPD';
 import Routes from './Routes';
-import LoadingScreen from './../components/LoadingScreen'
+import LoadingScreen from './../components/LoadingScreen';
 import { getAppBaseUrl } from '../utils';
 
 //import { useTranslation } from 'react-i18next';
