@@ -4,7 +4,7 @@ import { withCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
 
-const cookieName = process.env.REACT_APP_COOKIE_NAME || 'websig_dgt_rgpd';
+const cookieName = process.env.REACT_APP_COOKIE_NAME || 'scalargis_rgpd';
 const cookieValue = process.env.REACT_APP_COOKIE_VALUE || '2';
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || '/';
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);

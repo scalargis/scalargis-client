@@ -167,7 +167,7 @@ function Layout(props) {
 
         <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
             <div ref={sidebar} className={sidebarClassName} onClick={onSidebarClick}>
-                <div className="layout-logo" style={{cursor: 'pointer'}} onClick={() => history.push('/')}>
+                <div className="layout-logo" style={{cursor: 'pointer'}} onClick={() => history.navigate('/')}>
                     <img alt="Logo" src={logo} />
                 </div>
                 <AppProfile core={props.core} dispatch={props.dispatch} auth={props.auth} />
@@ -215,7 +215,8 @@ function Layout(props) {
                     )
                 }} />
                 */}
-                <Route path="/modules/:id/:sub?/:action?" element={<ModuleManager />} />
+                <Route path="/modules/:module/:submodule?/:action?" element={<ModuleManager 
+                    core={core} history={history} dispatch={dispatch} backoffice={backoffice} />} />
 
                 {}          
 

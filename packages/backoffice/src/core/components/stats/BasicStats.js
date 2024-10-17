@@ -18,13 +18,10 @@ export default function BasicStats(props) {
         fetch(url).then(res => {
             return res.json();
         }).then(result => {
-            console.log(result)
             set_basicstats(result)
-
+        }).catch(error => {
+            console.log("fetch error")
         })
-            .catch(error => {
-                console.log("fetch error")
-            })
     }, [])
 
 

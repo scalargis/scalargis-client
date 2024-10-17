@@ -1,14 +1,14 @@
 import React from 'react';
-
-//import MapModel from '../model/MapModel';
-//import OWSModel from '../model/OWSModel';
+import { useParams } from 'react-router-dom';
 import * as Utils from '../utils';
 import dataProvider from '../../service/DataProvider';
 
 
 export default function ModuleManager(props) {
 
-  const { history, core, backoffice, dispatch, module, submodule, action } = props;
+  const { history, core, backoffice, dispatch } = props;
+
+  const { module, submodule, action } = useParams();
 
   return (
     <div>
