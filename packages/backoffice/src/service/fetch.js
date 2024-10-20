@@ -1,14 +1,4 @@
-import { stringify } from 'query-string';
-import Cookies from 'universal-cookie'
-
-/*
-export interface Options extends RequestInit {
-    user?: {
-        authenticated?: boolean;
-        token?: string;
-    };
-}
-*/
+import Cookies from 'universal-cookie';
 
 class HttpError extends Error {
   constructor(message, status,body = null) {
@@ -83,8 +73,6 @@ export const fetchJson = (url, options = {}) => {
             return Promise.resolve({ status, headers, body, json });
         });
 };
-
-export const queryParameters = stringify;
 
 const isValidObject = value => {
     if (!value) {

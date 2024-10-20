@@ -1,5 +1,5 @@
 import { fetchJson } from  './fetch'
-import { stringify } from 'query-string';
+//import queryString from 'query-string';
 
 const provider = (apiUrl, httpClient = fetchJson) => ({
 
@@ -20,7 +20,10 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
             per_page: perPage,
             filter: JSON.stringify(params.filter),
         };
-        const url = `${apiUrl}/${resource}?${stringify(query)}`;
+
+        const parsed = new URLSearchParams(query);
+        const qstring = parsed.toString();
+        const url = `${apiUrl}/${resource}?${qstring}`;
 
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json,
@@ -38,7 +41,11 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
         const query = {
             filter: JSON.stringify({ id: params.ids }),
         };
-        const url = `${apiUrl}/${resource}?${stringify(query)}`;
+
+        const parsed = new URLSearchParams(query);
+        const qstring = parsed.toString();
+        const url = `${apiUrl}/${resource}?${qstring}`;
+
         return httpClient(url).then(({ json }) => ({ 
             data: json.items || json,
             total: json.total != null ? json.total : json.length || 0
@@ -58,7 +65,10 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
                 [params.target]: params.id,
             }),
         };
-        const url = `${apiUrl}/${resource}?${stringify(query)}`;
+
+        const parsed = new URLSearchParams(query);
+        const qstring = parsed.toString();
+        const url = `${apiUrl}/${resource}?${qstring}`;
 
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json,
@@ -77,7 +87,11 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
         const query = {
             filter: JSON.stringify({ id: params.ids}),
         };
-        return httpClient(`${apiUrl}/${resource}?${stringify(query)}`, {
+
+        const parsed = new URLSearchParams(query);
+        const qstring = parsed.toString();
+
+        return httpClient(`${apiUrl}/${resource}?${qstring}`, {
             method: 'PUT',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({ data: json }));
@@ -106,7 +120,11 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
         const query = {
             filter: JSON.stringify({ id: params.ids}),
         };
-        return httpClient(`${apiUrl}/${resource}?${stringify(query)}`, {
+
+        const parsed = new URLSearchParams(query);
+        const qstring = parsed.toString();
+
+        return httpClient(`${apiUrl}/${resource}?${qstring}`, {
             method: 'DELETE',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({ data: json }));

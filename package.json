@@ -8,12 +8,12 @@
     "packages/viewer/src/themes/*"
   ],
   "scripts": {
-    "start:viewer": "cd ./packages/viewer && npm run start",
-    "build:viewer": "cd ./packages/viewer && npm run build",
-    "test:viewer": "cd ./packages/viewer && npm run test",
-    "start:backoffice": "cd ./packages/backoffice && npm run start",
-    "build:backoffice": "cd ./packages/backoffice && npm run build",
-    "test:backoffice": "cd ./packages/backoffice && npm run test",
+    "start:viewer": "cd ./packages/viewer && yarn start",
+    "build:viewer": "cd ./packages/viewer && yarn build",
+    "test:viewer": "cd ./packages/viewer && yarn test",
+    "start:backoffice": "cd ./packages/backoffice && yarn start",
+    "build:backoffice": "cd ./packages/backoffice && yarn build",
+    "test:backoffice": "cd ./packages/backoffice && yarn test",
     "build:all": "lerna run build --concurrency 1",
     "start:all": "lerna run start --parallel",
     "deploy-server:viewer": "cd ./packages/viewer && npm run build:deploy-server",
@@ -22,14 +22,16 @@
     "deploy:all": "lerna run build:deploy --concurrency 2"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.7",
+    "@babel/core": "^7.25.8",
+    "@babel/cli": "^7.25.7",
+    "@babel/preset-env": "^7.25.2",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
-    "babel-loader": "^8.1.0",
+    "babel-loader": "^9.2.1",
     "buffer": "^6.0.3",
     "copyfiles": "2.4.1",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
-    "lerna": "^4.0.0",
+    "lerna": "^8.1.8",
     "stream-browserify": "^3.0.0",
     "timers-browserify": "^2.0.12"
   },
@@ -39,11 +41,9 @@
     "primereact": "^10.8.3"
   },
   "resolutions": {
-    "babel-loader": "8.1.0",
-    "webpack": "4.44.2",
-    "ajv": "8.17.1",
-    "ajv-keywords": "5.1.0",
+    "babel-loader": "9.2.1",
+    "webpack": "5.95.0",
     "@types/react": "18.3.1",
-    "fast-uri": "2.2.0"
+    "fast-uri": "3.0.3"
   }
 }

@@ -5,7 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 
 import AppContext from '../../../AppContext'
@@ -13,7 +13,7 @@ import dataProvider from '../../../service/DataProvider';
 
 
 const initialSearchParams = {
-  filters: {},
+  filters: undefined,
   first: 0,
   rows: 20,
   page: 0,
@@ -27,10 +27,6 @@ function PrintElementList(props) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const {
-    elementsFilter
-  } = props;
-
   const { core } = useContext(AppContext);
 
   const toast = useRef(null);
@@ -41,36 +37,36 @@ function PrintElementList(props) {
 
   const [searchParams, setSearchParams] = useState({...initialSearchParams});
 
-  const loaded = useRef(false);
+  const [loaded, setLoaded] = useState(false);
+
   const dt = useRef(null);
 
   const API_URL = core.API_URL;
 
-  useEffect(() => {
-    if (!loaded.current) return;
 
-    loaded.current = true;
-    if (elementsFilter) {
-      setSearchParams(...elementsFilter);
+  useEffect(() => {
+    setLoaded(true);
+    
+    if (location?.state?.searchParams) {
+      setSearchParams({...location.state.searchParams});
+    } else {
+      loadData();
     }
   }, []);
 
   useEffect(() => {
-    loadData();
+    if (!loaded) return;
+
+    const handler = setTimeout(() => {
+      loadData();
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };    
   }, [searchParams]);
 
   
   const newRecord = () => {
-    /*
-    const location = {
-      pathname: '/prints/elements/create',
-      state: { 
-        from: history.location.pathname,
-        previousSearchParams: {...searchParams}
-      }
-    }
-    history.push(location);
-    */
     const state = { 
       from: location.pathname,
       previousSearchParams: {...searchParams}
@@ -79,16 +75,6 @@ function PrintElementList(props) {
   }
 
   const editRecord = (record) => {
-    /*
-    const location = {
-      pathname: `/prints/elements/edit/${record.id}`,
-      state: { 
-        from: history.location.pathname,
-        previousSearchParams: {...searchParams}
-      }
-    }
-    history.push(location);
-    */
     const state = { 
       from: location.pathname,
       previousSearchParams: {...searchParams}
@@ -103,6 +89,7 @@ function PrintElementList(props) {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
+      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/portal');
         const params = {
@@ -127,6 +114,7 @@ function PrintElementList(props) {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
+      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/portal');
         const params = {
@@ -150,23 +138,21 @@ function PrintElementList(props) {
     //dt.current.exportCSV();
   }
 
-  const loadData = (filters) => {
+  const loadData = () => {
     const provider = dataProvider(API_URL + '/portal');
   
     const _filter = {};
-    if (filters) {
-      Object.entries(filters).forEach(([key, item]) => {
-        _filter[key] = item.value;
-      });
-    } else if (searchParams.filters) {
+    if (searchParams.filters) {
       Object.entries(searchParams.filters).forEach(([key, item]) => {
-        _filter[key] = item.value;
+        if (item.value) {
+          _filter[key] = item.value;
+        }
       });
     }
 
     const params = {
       pagination: { page: searchParams.page + 1, perPage: searchParams.rows},
-      sort: { field: searchParams.sortField, order: searchParams.sortOrder == -1 ? 'Desc' : 'Asc' },
+      sort: { field: searchParams.sortField, order: searchParams.sortOrder === -1 ? 'Desc' : 'Asc' },
       filter: _filter
     }
 
@@ -183,23 +169,24 @@ function PrintElementList(props) {
   }
 
   const onPage = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    setSearchParams(_searchParams);
+    setSearchParams({...searchParams, ...event});
   }
 
   const onSort = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    setSearchParams(_searchParams);
+    setSearchParams({...searchParams, ...event});
   }
 
   const onFilter = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    _searchParams['first'] = 0;
-    setSearchParams(_searchParams);    
+    setSearchParams({
+      ...searchParams,
+      ...event,
+      first: 0,
+      page: 0
+    });    
   }
 
   const onFilterClear = (event) => {
-    setSearchParams({ ...initialSearchParams});    
+    setSearchParams({...initialSearchParams});    
   }
 
   const leftToolbarTemplate = () => {
@@ -235,16 +222,17 @@ function PrintElementList(props) {
 
       <div className="p-grid p-fluid print-list">
         <Toast ref={toast} baseZIndex={2000} />
+        <ConfirmDialog />
         <div className="card">
-          <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+          <Toolbar className="p-mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
-          <DataTable ref={dt} value={records ? records.data : []} lazy
-              selectionMode="checkbox"
-              selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
-              paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
-              onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-              filterDisplay="row" filters={searchParams.filters} onFilter={onFilter} loading={loading}
-              emptyMessage="Não foram encontrados registos." >
+          <DataTable ref={dt} value={records ? records.data : []} lazy dataKey="id"
+            selectionMode="checkbox"
+            selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
+            paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
+            onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}  
+            filterDisplay="row" filters={searchParams?.filters} onFilter={onFilter} loading={loading}
+            emptyMessage="Não foram encontrados registos." >
               <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
               <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
               <Column field="code" header="Código" sortable filter filterPlaceholder="Código" showFilterMenu={false} style={{"wordBreak": "break-all"}} />

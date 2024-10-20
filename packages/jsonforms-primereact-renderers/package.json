@@ -6,7 +6,7 @@
   "types": "dist/types/index.d.ts",
   "scripts": {
     "tsc": "tsc --project tsconfig.build.json",
-    "build": "npm run tsc && npm run transpile && npm run copy",
+    "build": "yarn tsc && yarn transpile && yarn copy",
     "transpile": "babel src -d dist --root-mode upward --extensions '.ts,.tsx' --ignore '**/*.test.ts,**/*.test.tsx,**/tests,**/__tests__'",
     "copy": "copyfiles -u 1 \"./src/**/*.{css,html}\" \"./dist/\""
   },
@@ -18,7 +18,7 @@
     "@jsonforms/core": "^3.1.0",
     "@jsonforms/react": "^3.1.0",
     "@jsonforms/vanilla-renderers": "^3.1.0",
-    "@types/lodash": "^4.14.197",
+    "@types/lodash": "^4.17.10",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.8.3"

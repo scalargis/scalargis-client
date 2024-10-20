@@ -6,15 +6,19 @@ import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
 
 const initialSearchParams = {
-  filters: { 
-    "active": { "value": true}
+  filters: {
+    "id": {value: null, matchMode: 'startsWith'},
+    "username": {value: null, matchMode: 'startsWith'},
+    "email": {value: null, matchMode: 'startsWith'},
+    "name": {value: null, matchMode: 'startsWith'},
+    "active": {value: true, matchMode: 'equals'}
   },
   first: 0,
   rows: 20,
@@ -24,7 +28,6 @@ const initialSearchParams = {
 }
 
 function UserList(props) {
-
   // Routing
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,37 +39,38 @@ function UserList(props) {
   const [loading, setLoading] = useState(false);  
   const [records, setRecords] = useState([]);
   const [selectedRecords, setSelectedRecords] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(true);
 
   const [searchParams, setSearchParams] = useState({...initialSearchParams});  
 
-  const loaded = useRef(false);
+  const [loaded, setLoaded] = useState(false);
+
   const dt = useRef(null);
 
   const API_URL = core.API_URL;
 
   useEffect(() => {
-    if (!loaded.current && location?.state?.searchParams) {
-      loaded.current = true;
-
-      const _searchParams = {...location.state.searchParams};
-      setSearchParams(_searchParams);
+    setLoaded(true);
+    
+    if (location?.state?.searchParams) {
+      setSearchParams({...location.state.searchParams});
     } else {
       loadData();
     }
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    const handler = setTimeout(() => {
+      loadData();
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };    
   }, [searchParams]);
+  
 
   const newRecord = () => {
-    /*
-    const location = {
-      pathname: '/security/users/create',
-      state: { 
-        from: history.location.pathname,
-        previousSearchParams: {...searchParams}
-      }
-    }
-    history.push(location);
-    */
     const state = { 
       from: location.pathname,
       previousSearchParams: {...searchParams}
@@ -75,16 +79,6 @@ function UserList(props) {
   }
 
   const editRecord = (record) => {
-    /*
-    const location = {
-      pathname: `/security/users/edit/${record.id}`,
-      state: { 
-        from: history.location.pathname,
-        previousSearchParams: {...searchParams}
-      }
-    }
-    history.push(location);
-    */
     const state = { 
       from: location.pathname,
       previousSearchParams: {...searchParams}
@@ -99,6 +93,7 @@ function UserList(props) {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
+      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/security');
         const params = {
@@ -123,6 +118,7 @@ function UserList(props) {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
+      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/security');
         const params = {
@@ -146,17 +142,15 @@ function UserList(props) {
     //dt.current.exportCSV();
   }
 
-  const loadData = (filters) => {
+  const loadData = () => {
     const provider = dataProvider(API_URL + '/security');
-
+  
     const _filter = {};
-    if (filters) {
-      Object.entries(filters).forEach(([key, item]) => {
-        _filter[key] = item.value;
-      });
-    } else if (searchParams.filters) {
+    if (searchParams.filters) {
       Object.entries(searchParams.filters).forEach(([key, item]) => {
-        _filter[key] = item.value;
+        if (item.value != null) {
+          _filter[key] = item.value;
+        }
       });
     }
 
@@ -171,33 +165,47 @@ function UserList(props) {
     provider.getList('users', params).then(d => {
       setSelectedRecords(null);
       setRecords({ ...d, page: searchParams.page });
-    }).catch(e => {
-      toast.current.show({life: 3000, severity: 'error', summary: 'Pesquisa de Utilizadores', detail: 'Ocorreu um erro ao realizar a pesquisa'});
-    }).finally(() => {
       setLoading(false);
+    }).catch(e => {
+      setLoading(false);
+      toast.current && toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Utilizadores', detail: 'Ocorreu um erro na pesquisa'});
     });
   }
 
   const onPage = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    setSearchParams(_searchParams);
+    setSearchParams({ ...searchParams, ...event });
   }
 
   const onSort = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    setSearchParams(_searchParams);
+    setSearchParams({ ...searchParams, ...event });
   }
 
   const onFilter = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    _searchParams['first'] = 0;
-    setSearchParams(_searchParams);    
+    setSearchParams({
+      ...searchParams,
+      ...event,
+      first: 0,
+      page: 0
+    });    
   }
 
   const onFilterClear = (event) => {
-    setSearchParams({ ...initialSearchParams});
-    setSelectedStatus(true);
-  }    
+    setSearchParams({...initialSearchParams});
+    /*
+    setSearchParams({
+      ...initialSearchParams,
+      filters: 
+        {
+          ...initialSearchParams?.filters, 
+          active: {
+            ...initialSearchParams?.filters?.active,
+            value: null
+          }
+        }
+      }
+    );
+    */
+  }   
 
   const onSelectionChange = (event) => {
     setSelectedRecords(event.value.filter(v => !v.read_only));
@@ -205,8 +213,7 @@ function UserList(props) {
 
   const onStatusChange = (e) => {
     dt.current.filter(e.value, 'active', 'equals');
-    setSelectedStatus(e.value);
-  }  
+  }
 
   const statusBodyTemplate = (rowData) => {
     if (rowData.active) {
@@ -247,7 +254,8 @@ function UserList(props) {
     }
   }
 
-  const statusFilter = <Dropdown value={selectedStatus} options={[{label: 'Sim', value: true}, {label: 'Não', value: false}]} onChange={onStatusChange} placeholder="" className="p-column-filter" showClear />;
+  const statusFilter = <Dropdown value={searchParams?.filters?.active?.value} options={[{label: 'Sim', value: true}, {label: 'Não', value: false}]} onChange={onStatusChange} placeholder="" className="p-column-filter" showClear />;
+
 
   return (
       <React.Fragment>
@@ -255,16 +263,17 @@ function UserList(props) {
 
         <div className="p-grid p-fluid viewer-list">
           <Toast ref={toast} baseZIndex={2000} />
+          <ConfirmDialog />
           <div className="card">
-            <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+            <Toolbar className="p-mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
-            <DataTable ref={dt} value={records ? records.data : []} lazy
-                selectionMode="checkbox"
-                selection={selectedRecords} onSelectionChange={onSelectionChange}
-                paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
-                onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-                filterDisplay="row" filters={searchParams.filters} onFilter={onFilter} loading={loading}
-                emptyMessage="Não foram encontrados registos." >
+            <DataTable ref={dt} value={records ? records.data : []} lazy dataKey="id"
+              selectionMode="checkbox"
+              selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
+              paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
+              onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}  
+              filterDisplay="row" filters={searchParams?.filters} onFilter={onFilter} loading={loading}
+              emptyMessage="Não foram encontrados registos." >
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
                 <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
                 <Column field="username" header="Username" sortable filter filterPlaceholder="Username" showFilterMenu={false} style={{"wordBreak": "break-all"}} />

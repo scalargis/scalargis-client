@@ -6,8 +6,9 @@ import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Chip } from 'primereact/chip';
-import { InputText } from 'primereact/inputtext';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { Badge } from 'primereact/badge';
+import { Dropdown } from 'primereact/dropdown';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 
 import AppContext from '../../../AppContext'
@@ -16,7 +17,13 @@ import { isAdminOrManager } from '../../utils';
 
 
 const initialSearchParams = {
-  filters: {},
+  filters: {
+    "id": {value: null, matchMode: 'startsWith'},
+    "name": {value: null, matchMode: 'startsWith'},
+    "title": {value: null, matchMode: 'startsWith'},
+    "description": {value: null, matchMode: 'startsWith'},
+    "is_shared": {value: false, matchMode: 'equals'}
+  },
   first: 0,
   rows: 20,
   page: 0,
@@ -26,7 +33,6 @@ const initialSearchParams = {
 
 
 function ViewerList(props) {
-
   // Routing
   const location = useLocation();
   const navigate = useNavigate();
@@ -72,16 +78,6 @@ function ViewerList(props) {
   }, [searchParams]); 
   
   const newRecord = () => {
-    /*
-    const location = {
-      pathname: '/viewers/create',
-      state: { 
-        from: history.location.pathname,
-        previousSearchParams: {...searchParams}
-      }
-    }
-    history.push(location);
-    */
     const state = { 
       from: location.pathname,
       previousSearchParams: {...searchParams}
@@ -90,16 +86,6 @@ function ViewerList(props) {
   }
 
   const editRecord = (record) => {
-    /*
-    const location = {
-      pathname: `/viewers/edit/${record.id}`,
-      state: { 
-        from: history.location.pathname,
-        previousSearchParams: {...searchParams}
-      }
-    }
-    history.push(location);
-    */
     const state = { 
       from: location.pathname,
       previousSearchParams: {...searchParams}
@@ -114,6 +100,7 @@ function ViewerList(props) {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
+      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/portal');
         const params = {
@@ -138,6 +125,7 @@ function ViewerList(props) {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
+      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/portal');
         const params = {
@@ -163,17 +151,11 @@ function ViewerList(props) {
 
   const loadData = (filters) => {
     const provider = dataProvider(API_URL + '/portal');
-  
+
     const _filter = {};
-    if (filters) {
-      Object.entries(filters).forEach(([key, item]) => {
-        if (item.value) {
-          _filter[key] = item.value;
-        }
-      });
-    } else if (searchParams.filters) {
+    if (searchParams.filters) {
       Object.entries(searchParams.filters).forEach(([key, item]) => {
-        if (item.value) {
+        if (item.value != null) {
           _filter[key] = item.value;
         }
       });
@@ -198,24 +180,29 @@ function ViewerList(props) {
   }
 
   const onPage = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    setSearchParams(_searchParams);
+    setSearchParams({ ...searchParams, ...event });
   }
 
   const onSort = (event) => {
-    let _searchParams = { ...searchParams, ...event };
-    setSearchParams(_searchParams);
+    setSearchParams({ ...searchParams, ...event });
   } 
 
-  const onFilterChange = (event) => {
-    const filter = {...searchParams?.filters};
-    filter[event.target.name] = { value: event.target.value };
-    setSearchParams({...searchParams, filters: {...filter}});
+  const onFilter = (event) => {
+    setSearchParams({
+      ...searchParams,
+      ...event,
+      first: 0,
+      page: 0
+    });    
   }
   
   const onFilterClear = (event) => {
-    setSearchParams({ ...initialSearchParams});    
-  }   
+    setSearchParams({...initialSearchParams});    
+  } 
+
+  const onSharedChange = (e) => {
+    dt.current.filter(e.value, 'is_shared', 'equals');
+  }
 
   const keywordsTemplate = (rowData) => {
     return (
@@ -266,35 +253,46 @@ function ViewerList(props) {
     );
   }
 
-  const idFilter = <InputText name="id" value={searchParams?.filters?.id?.value} onChange={onFilterChange} className="p-column-filter" placeholder="Id" disabled={loading} />;
-  const nameFilter = <InputText name="name" value={searchParams?.filters?.name?.value} onChange={onFilterChange} className="p-column-filter" placeholder="Nome" disabled={loading} />;
-  const titleFilter = <InputText name="title" value={searchParams?.filters?.title?.value} onChange={onFilterChange} className="p-column-filter" placeholder="Nome" disabled={loading} />;
-  const descriptionFilter = <InputText name="description" value={searchParams?.filters?.description?.value} onChange={onFilterChange} className="p-column-filter" placeholder="Descrição" disabled={loading}/>;
+  const isSharedTemplate = (rowData) => {
+    if (rowData.is_shared === true) {
+      return (
+        <Badge value="Partilha" severity="warning"></Badge>
+      );
+    }
+
+    return (
+      <Badge value="Principal" severity="info"></Badge>
+    );
+  }
+
+  const sharedFilter = <Dropdown value={searchParams?.filters?.is_shared?.value} options={[{label: 'Principal', value: false}, {label: 'Partilha', value: true}]} onChange={onSharedChange}  placeholder="" className="p-column-filter" showClear />;
 
   return (
     <React.Fragment>
       <div className="p-col-12"><h3>Visualizadores</h3></div>
 
       <div className="p-grid p-fluid viewer-list">
-        <Toast ref={toast} baseZIndex={2000} />          
+        <Toast ref={toast} baseZIndex={2000} />
+        <ConfirmDialog />
         <div className="card">
-          <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+          <Toolbar className="p-mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
-          <DataTable ref={dt} value={records ? records.data : []} lazy
-              selectionMode="checkbox"
-              selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
-              paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
-              onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-              filterDisplay="row" filters={searchParams.filters} loading={loading}
-              emptyMessage="Não foram entrados registos." >
+          <DataTable ref={dt} value={records ? records.data : []} lazy dataKey="id"
+            selectionMode="checkbox"
+            selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
+            paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
+            onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}  
+            filterDisplay="row" filters={searchParams?.filters} onFilter={onFilter} loading={loading}
+            emptyMessage="Não foram encontrados registos." >
               <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-              <Column field="id" header="Id" sortable filter filterElement={idFilter} filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
-              <Column field="name" header="Nome" sortable filter filterElement={nameFilter} filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}}  />
-              <Column field="title" header="Título" sortable filter filterElement={titleFilter} filterPlaceholder="Título" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
-              <Column field="description" header="Descrição" sortable filter filterElement={descriptionFilter} filterPlaceholder="Descrição" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+              <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+              <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}}  />
+              <Column field="title" header="Título" sortable filter filterPlaceholder="Título" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
+              <Column field="description" header="Descrição" sortable filter filterPlaceholder="Descrição" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
               <Column field="keywords" header="Keywords" body={keywordsTemplate} />
+              <Column field="is_shared" header="Tipo" body={isSharedTemplate} filter filterElement={sharedFilter} showFilterMenu={false} style={{width: '150px'}} className="p-text-center" />
               { adminOrManager && <Column field="owner" header="Dono" body={ownerTemplate} /> }
-              <Column body={actionBodyTemplate} />
+              <Column body={actionBodyTemplate} style={{width: '100px'}} />
           </DataTable>             
         </div>
       </div>

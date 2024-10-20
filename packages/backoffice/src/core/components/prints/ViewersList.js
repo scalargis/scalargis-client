@@ -12,6 +12,16 @@ import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 
 
+const initialSearchParams = {
+  filters: undefined,
+  first: 0,
+  rows: 20,
+  page: 0,
+  sortField: 'id',
+  sortOrder: 1
+}
+
+
 function ViewersList(props) {
 
   const { core } = useContext(AppContext);
@@ -20,16 +30,10 @@ function ViewersList(props) {
 
   const [loading, setLoading] = useState(false);
 
-  const [selectedStatus, setSelectedStatus] = useState(null);
-  const [selectedShared, setSelectedShared] = useState(null);
-
   const [totalRecords, setTotalRecords] = useState(0);
   const [records, setRecords] = useState(null);
-  const [lazyParams, setLazyParams] = useState({
-      first: 0,
-      rows: 10,
-      page: 0,
-  });
+
+  const [searchParams, setSearchParams] = useState({...initialSearchParams});
 
   const dt = useRef(null);
 
@@ -37,38 +41,29 @@ function ViewersList(props) {
 
   const API_URL = core.API_URL;
 
-  //Filter Options
-  const statuses = [
-    'Ativo', 'Inativo'
-  ];
-
-  //Filter Options
-  const sharedOptions = [
-    'Principal', 'Partilha'
-  ];  
-
-
   useEffect(() => {
       if (!visible) return;
 
-      loadLazyData();
-  },[lazyParams]) // eslint-disable-line react-hooks/exhaustive-deps
+      loadData();
+  }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadLazyData = () => {
+  const loadData = () => {
       setLoading(true);
 
       const provider = dataProvider(API_URL + '/portal');
       
       const _filter = {};
-      if (lazyParams.filters) {
-        Object.entries(lazyParams.filters).forEach(([key, item]) => {
-          _filter[key] = item.value;
+      if (searchParams.filters) {
+        Object.entries(searchParams.filters).forEach(([key, item]) => {
+          if (item.value != null) {
+            _filter[key] = item.value;
+          }
         });
       }
 
       const params = {
-        pagination: { page: lazyParams.page + 1, perPage: lazyParams.rows},
-        sort: { field: lazyParams.sortField || 'id', order: lazyParams.sortOrder === -1 ? 'Desc' : 'Asc' },
+        pagination: { page: searchParams.page + 1, perPage: searchParams.rows},
+        sort: { field: searchParams.sortField || 'id', order: searchParams.sortOrder === -1 ? 'Desc' : 'Asc' },
         filter: _filter
       }
   
@@ -86,50 +81,38 @@ function ViewersList(props) {
   }
 
   const onButtonClick = (event) => {
-    loadLazyData();
+    loadData();
   }
 
   const onPage = (event) => {
-      let _lazyParams = { ...lazyParams, ...event };
-      setLazyParams(_lazyParams);
+      setSearchParams({ ...searchParams, ...event });
   }
 
   const onSort = (event) => {
-      let _lazyParams = { ...lazyParams, ...event };
-      setLazyParams(_lazyParams);
+      setSearchParams({ ...searchParams, ...event });
   }
 
   const onFilter = (event) => {
-      let _lazyParams = { ...lazyParams, ...event };
-      _lazyParams['first'] = 0;
-      _lazyParams['page'] = 0;
-      setLazyParams(_lazyParams);
+      setSearchParams({
+        ...searchParams,
+        ...event,
+        first: 0,
+        page: 0
+      }); 
   }
 
   const onStatusChange = (e) => {
-    let val;
-
-    if (e.value === 'Ativo') val = true;
-    if (e.value === 'Inativo') val = false;
-    
-    dt.current.filter(val, 'is_active', 'equals');
-    setSelectedStatus(e.value);
+    dt.current.filter(e.value, 'is_active', 'equals');
   }
 
   const onSharedChange = (e) => {
-    let val;
-
-    if (e.value === 'Partilha') val = true;
-    if (e.value === 'Principal') val = false;
-    
-    dt.current.filter(val, 'is_shared', 'equals');
-    setSelectedShared(e.value);
+    dt.current.filter(e.value, 'is_shared', 'equals');
   }
 
-  
   const onHide = (event) => {
     setVisible(false);
-    setLazyParams({
+    setSearchParams({
+      filters: undefined,
       first: 0,
       rows: 10,
       page: 0,
@@ -170,19 +153,11 @@ function ViewersList(props) {
     return (
       <Badge value="Principal" severity="info"></Badge>
     );
-  }  
-
-  const sharedItemTemplate = (option) => {
-    return <span className={`customer-badge status-${option}`}>{option}</span>;
   }
 
-  const statusItemTemplate = (option) => {
-    return <span className={`customer-badge status-${option}`}>{option}</span>;
-  }
+  const statusFilter = <Dropdown value={searchParams?.filters?.is_active?.value} options={[{label: 'Sim', value: true}, {label: 'Não', value: false}]} onChange={onStatusChange} placeholder="" className="p-column-filter" showClear />;
+  const sharedFilter = <Dropdown value={searchParams?.filters?.is_shared?.value} options={[{label: 'Principal', value: false}, {label: 'Partilha', value: true}]} onChange={onSharedChange}  placeholder="" className="p-column-filter" showClear />;
 
-  const statusFilter = <Dropdown value={selectedStatus} options={statuses} onChange={onStatusChange} itemTemplate={statusItemTemplate} placeholder="" className="p-column-filter" showClear />;
-  
-  const sharedFilter = <Dropdown value={selectedShared} options={sharedOptions} onChange={onSharedChange} itemTemplate={sharedItemTemplate} placeholder="" className="p-column-filter" showClear />;
 
   return (
     <React.Fragment>
@@ -195,9 +170,9 @@ function ViewersList(props) {
         breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '75vw'}}
         modal onHide={onHide}>
         <DataTable ref={dt} header={renderHeader()} value={records} lazy paginator
-            first={lazyParams.first} rows={10} totalRecords={totalRecords} onPage={onPage}
-            onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-            filterDisplay="row" onFilter={onFilter} filters={lazyParams.filters} loading={loading}
+            first={searchParams.first} rows={10} totalRecords={totalRecords} onPage={onPage}
+            onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
+            filterDisplay="row" onFilter={onFilter} filters={searchParams.filters} loading={loading}
             emptyMessage="Não foram encontrados registos"
             className="data-table-filter-sized">
           <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false}
