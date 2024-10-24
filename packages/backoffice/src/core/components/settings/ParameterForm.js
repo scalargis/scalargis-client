@@ -42,20 +42,10 @@ function ParameterForm(props) {
   });
 
   const goBack = () => {
-    /*
-    const location = {
-      pathname: history.location.state.from,
-      state: { 
-        searchParams: {...history.location.state.previousSearchParams}
-      }
-    }
-    history.replace(location);
-    */
     const state = { 
       searchParams: {...location.state.previousSearchParams}
     }
     navigate(location.state.from, { state });
-    //history.goBack();
   }
 
   const onSubmit = (formData) => {
@@ -119,7 +109,7 @@ function ParameterForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary p-mr-4"
+              className="p-button-secondary mr-4"
               disabled={isSaving ? true : false} 
               onClick={goBack} />
             <Button
@@ -136,39 +126,41 @@ function ParameterForm(props) {
 
           <Toast ref={toast} baseZIndex={2000} />
 
-          <div className="p-fluid p-formgrid p-grid">      
-            <div className="p-field p-col-12 p-md-2">
+          <div className="formgrid grid">      
+            <div className="field col-12 md:col-2">
               <label htmlFor="id">Id</label>
-              <InputText id="id" type="text" value={data.id || ''} disabled />
+              <InputText id="id" type="text" value={data.id || ''} disabled  className="w-full" />
             </div>              
 
-            <div className="p-field p-col-12 p-md-2">
+            <div className="field col-12 md:col-3">
               <label htmlFor="code">Código</label>
-              <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.code })} />
+              <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus
+               className={classNames({ 'w-full': true, 'p-invalid': errors.code })} />
               {getFormErrorMessage(errors, 'code')}
             </div>           
 
-            <div className="p-field p-col-12 p-md-8">
+            <div className="field col-12 md:col-7">
               <label htmlFor="name">Designação</label>        
-              <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.name })} />
+              <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })}
+               autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.name })} />
               {getFormErrorMessage(errors, 'name')}
             </div>
 
-            <div className="p-field p-col-12 p-md-12">
+            <div className="field col-12">
               <label htmlFor="notes">Descrição</label>        
-              <InputText id="notes" name="notes" {...register('notes')} autoFocus />
+              <InputText className="w-full" id="notes" name="notes" {...register('notes')} autoFocus />
               {getFormErrorMessage(errors, 'notes')}
             </div>
 
-            <div className="p-field p-col-12">
+            <div className="field col-12">
               <label htmlFor="setting_value">Valor</label>
-              <InputTextarea rows={25} id="notes" name="setting_value" {...register('setting_value', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.setting_value })} />
+              <InputTextarea rows={25} id="notes" name="setting_value" {...register('setting_value', { required: 'Campo obrigatório.' })} autoFocus className={classNames({'w-full': true, 'p-invalid': errors.setting_value })} />
               {getFormErrorMessage(errors, 'setting_value')}
             </div>
 
           </div>
 
-        <Toolbar className="p-mt-4 p-mb-4" right={rightToolbarTemplate}></Toolbar>
+        <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>
 
       </form>
   );

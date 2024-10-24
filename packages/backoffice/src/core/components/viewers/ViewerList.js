@@ -207,19 +207,19 @@ function ViewerList(props) {
   const keywordsTemplate = (rowData) => {
     return (
         <React.Fragment>
-          { rowData.keywords && rowData.keywords.map( (item) => <Chip label={item} className="p-mr-2 p-mb-2" /> ) }
+          { rowData.keywords && rowData.keywords.map( (item) => <Chip label={item} className="mr-2 mb-2" /> ) }
         </React.Fragment>
     );
   }
 
   const ownerTemplate = (rowData) => {
-    let elem = <Chip label="Anónimo" icon="far fa-user" className="p-mr-2 p-mb-2" />;
+    let elem = <Chip label="Anónimo" icon="far fa-user" className="mr-2 mb-2" />;
 
     if (rowData?.owner?.id > 0) {
       if (rowData.owner.active) {
-        elem = <Chip label={rowData.owner.username} icon="fas fa-user-alt" className="p-mr-2 p-mb-2" /> 
+        elem = <Chip label={rowData.owner.username} icon="fas fa-user-alt" className="mr-2 mb-2" /> 
       } else {
-        elem = <Chip label={rowData.owner.username} icon="fas fa-user-alt-slash" className="p-mr-2 p-mb-2" /> 
+        elem = <Chip label={rowData.owner.username} icon="fas fa-user-alt-slash" className="mr-2 mb-2" /> 
       }
     }
 
@@ -229,7 +229,7 @@ function ViewerList(props) {
   const leftToolbarTemplate = () => {
     return (
         <React.Fragment>
-            <Button label="Novo" icon="pi pi-plus" className="p-button-success p-mr-2" onClick={newRecord} />
+            <Button label="Novo" icon="pi pi-plus" className="p-button-success mr-2" onClick={newRecord} />
             <Button label="Eliminar" icon="pi pi-trash" className="p-button-danger" onClick={deleteSelectedRecords} disabled={!selectedRecords || !selectedRecords.length} />
         </React.Fragment>
     )
@@ -238,7 +238,7 @@ function ViewerList(props) {
   const rightToolbarTemplate = () => {
     return (
         <React.Fragment>
-            <Button label="Limpar" icon="pi pi-times" className="p-button-help p-mr-2" onClick={onFilterClear} />
+            <Button label="Limpar" icon="pi pi-times" className="p-button-help mr-2" onClick={onFilterClear} />
             {/*<Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />*/}
         </React.Fragment>
     )
@@ -247,7 +247,7 @@ function ViewerList(props) {
   const actionBodyTemplate = (rowData) => {
     return (
         <React.Fragment>
-            <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editRecord(rowData)} />
+            <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editRecord(rowData)} />
             <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => deleteRecord(rowData)} />
         </React.Fragment>
     );
@@ -269,13 +269,13 @@ function ViewerList(props) {
 
   return (
     <React.Fragment>
-      <div className="p-col-12"><h3>Visualizadores</h3></div>
+      <div className="col-12"><h3>Visualizadores</h3></div>
 
-      <div className="p-grid p-fluid viewer-list">
+      <div className="grid viewer-list">
         <Toast ref={toast} baseZIndex={2000} />
         <ConfirmDialog />
-        <div className="card">
-          <Toolbar className="p-mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+        <div className="card col-12">
+          <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
           <DataTable ref={dt} value={records ? records.data : []} lazy dataKey="id"
             selectionMode="checkbox"
@@ -285,14 +285,14 @@ function ViewerList(props) {
             filterDisplay="row" filters={searchParams?.filters} onFilter={onFilter} loading={loading}
             emptyMessage="Não foram encontrados registos." >
               <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-              <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+              <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '120px' }} />
               <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}}  />
               <Column field="title" header="Título" sortable filter filterPlaceholder="Título" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
               <Column field="description" header="Descrição" sortable filter filterPlaceholder="Descrição" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
               <Column field="keywords" header="Keywords" body={keywordsTemplate} />
-              <Column field="is_shared" header="Tipo" body={isSharedTemplate} filter filterElement={sharedFilter} showFilterMenu={false} style={{width: '150px'}} className="p-text-center" />
+              <Column field="is_shared" header="Tipo" body={isSharedTemplate} filter filterElement={sharedFilter} showFilterMenu={false} className="text-center" />
               { adminOrManager && <Column field="owner" header="Dono" body={ownerTemplate} /> }
-              <Column body={actionBodyTemplate} style={{width: '100px'}} />
+              <Column body={actionBodyTemplate} style={{width: '110px'}} />
           </DataTable>             
         </div>
       </div>

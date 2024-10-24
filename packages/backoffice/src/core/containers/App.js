@@ -52,19 +52,17 @@ const App = () => {
   }, []);
 
   return (
-      <React.StrictMode>
-          <AppContext.Provider value={{ core }}>
-              <Provider store={core.store}>           
-                  <Router basename={base_url}>
-                      <ScrollToTop>                        
-                          <RGPD>
-                              {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
-                          </RGPD>
-                      </ScrollToTop>
-                  </Router>
-              </Provider>
-          </AppContext.Provider>
-      </React.StrictMode>
+    <AppContext.Provider value={{ core }}>
+        <Provider store={core.store}>           
+            <Router basename={base_url}>
+                <ScrollToTop>                        
+                    <RGPD>
+                        {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
+                    </RGPD>
+                </ScrollToTop>
+            </Router>
+        </Provider>
+    </AppContext.Provider>
   );
 }
 

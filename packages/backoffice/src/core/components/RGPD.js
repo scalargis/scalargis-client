@@ -5,7 +5,7 @@ import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
 
 const cookieName = process.env.REACT_APP_COOKIE_NAME || 'scalargis_rgpd';
-const cookieValue = process.env.REACT_APP_COOKIE_VALUE || '2';
+const cookieValue = process.env.REACT_APP_COOKIE_VALUE || 2;
 const cookiePath = process.env.REACT_APP_COOKIE_PATH || '/';
 const cookieExpiresDays = parseInt(process.env.REACT_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
@@ -25,6 +25,8 @@ function RGPD({ cookies, children }) {
         secure: false, httpOnly: false });
     }
   }
+
+  console.log({cookiergpd,cookieValue});
 
   return (
     <React.Fragment>

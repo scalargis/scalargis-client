@@ -47,35 +47,35 @@ function LoginWidget({ auth, history, redirect }) {
 
   return (
     <form onSubmit={e => submit()}>
-
-      <div className="p-fluid">
-
-        <div className="p-field p-grid">
-          <label className="p-col-12 p-md-4">Nome de Utilizador / E-mail</label>
-          <div className="p-col-12 p-md-8">
-            <InputText
-              value={username}
-              placeholder="Nome de Utilizador"
-              onChange={e => setUsername(e.target.value)}
-            />
-          </div>
+      
+      <div className="flex flex-column">
+        <div className="field">
+          <label for="username">Nome de Utilizador / E-mail</label>
+          <InputText
+            id="username"
+            className="block w-full"
+            value={username}
+            placeholder="Nome de Utilizador"
+            onChange={e => setUsername(e.target.value)}
+          />
         </div>
 
-        <div className="p-field p-grid">
-          <label className="p-col-12 p-md-4">Palavra-passe</label>
-          <div className="p-col-12 p-md-8">
-            <Password
-              value={password}
-              placeholder="Palavra-passe"
-              feedback={false}
-              onChange={e => setPassword(e.target.value)}
-            />
-          </div>
+        <div className="field">
+          <label for="password">Palavra-passe</label>
+          <Password
+            id="password"
+            className="block"
+            inputClassName="w-full"
+            value={password}
+            placeholder="Palavra-passe"
+            feedback={false}
+            toggleMask
+            onChange={e => setPassword(e.target.value)}
+          />
         </div>
-
       </div>
 
-      <div className="p-dialog-myfooter">
+      <div className="dialog-footer">
         <Button 
           color='green'
           icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }

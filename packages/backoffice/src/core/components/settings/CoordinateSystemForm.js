@@ -38,20 +38,10 @@ function CoordinateSystemForm(props) {
   });
 
   const goBack = () => {
-    /*
-    const location = {
-      pathname: history.location.state.from,
-      state: { 
-        searchParams: {...history.location.state.previousSearchParams}
-      }
-    }
-    history.replace(location);
-    */
     const state = { 
       searchParams: {...location.state.previousSearchParams}
     }
     navigate(location.state.from, { state });
-    //history.goBack();
   }
 
   const onSubmit = (formData) => {
@@ -130,7 +120,7 @@ function CoordinateSystemForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary p-mr-4"
+              className="p-button-secondary mr-4"
               disabled={isSaving ? true : false} 
               onClick={goBack} />
             <Button
@@ -147,93 +137,85 @@ function CoordinateSystemForm(props) {
 
           <Toast ref={toast} baseZIndex={2000} />
 
-          <div className="p-fluid p-formgrid p-grid">      
-            <div className="p-field p-col-12 p-md-2">
+          <div className="formgrid grid">      
+            <div className="field col-12 md:col-2">
               <label htmlFor="id">Id</label>
-              <InputText id="id" type="text" value={data.id || ''} disabled />
+              <InputText id="id" type="text" value={data.id || ''} disabled className="w-full" />
             </div>              
 
-            <div className="p-field p-col-12 p-md-2">
+            <div className="field col-12 md:col-2">
               <label htmlFor="code">Código</label>
-              <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.code })} />
+              <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus
+               className={classNames({ 'w-full': true, 'p-invalid': errors.code })} />
               {getFormErrorMessage(errors, 'code')}
             </div>
 
-            <div className="p-field p-col-12 p-md-2">
+            <div className="field col-12 md:col-2">
               <label htmlFor="srid">SRID</label>
               <InputText id="srid" name="srid" {...register('srid', { required: true, pattern: { value: /^[0-9]+$/, message: 'Formato inválido'} })}
-                autoFocus className={classNames({ 'p-invalid': errors.srid })} />
+                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.srid })} />
               {getFormErrorMessage(errors, 'srid')}
             </div>            
 
-            <div className="p-field p-col-12 p-md-6">
+            <div className="field col-12 md:col-6">
               <label htmlFor="name">Designação</label>        
-              <InputText id="name" name="name" {...register('name', { required: 'This is required.' })} autoFocus className={classNames({ 'p-invalid': errors.name })} />
+              <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} autoFocus
+                className={classNames({ 'w-full': true, 'p-invalid': errors.name })} />
               {getFormErrorMessage(errors, 'name')}
             </div>
             
-            <div className="p-field p-col-12 p-md-4">
+            <div className="field col-12 md:col-6">
               <label htmlFor="label">Label</label>        
-              <InputText id="label" name="label" {...register('label')} autoFocus className={classNames({ 'p-invalid': errors.label })} />
+              <InputText id="label" name="label" {...register('label')} autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.label })} />
               {getFormErrorMessage(errors, 'label')}
             </div>
 
-            <div className="p-field p-col-12 p-md-8">
+            <div className="field col-12 md:col-6">
               <label htmlFor="description">Descrição</label>        
-              <InputText id="description" name="description" {...register('description', { required: 'This is required.' })} autoFocus className={classNames({ 'p-invalid': errors.description })} />
+              <InputText id="description" name="description" {...register('description', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.description })} />
               {getFormErrorMessage(errors, 'description')}
             </div>
 
-            <div className="p-field p-col-12">
+            <div className="field col-12">
               <label htmlFor="defs">Definição</label>        
-              <InputText id="defs" name="defs" {...register('defs')} autoFocus />
+              <InputText id="defs" name="defs" {...register('defs')} autoFocus className="w-full" />
             </div>
 
-            <div className="p-field p-col-12 p-md-3">
+            <div className="field col-12 md:col-3">
               <label htmlFor="minx">Min X</label>
               <InputText id="minx" name="minx" {...register('minx', { required: 'Campo obrigatório.', 
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'},
                 min: -180, max: 180 } )} 
-                autoFocus className={classNames({ 'p-invalid': errors.minx })} />
+                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.minx })} />
               {getFormErrorMessage(errors, 'minx')}
             </div>
 
-            <div className="p-field p-col-12 p-md-3">
+            <div className="field col-12 md:col-3">
               <label htmlFor="miny">Min Y</label>
               <InputText id="miny" name="minx" {...register('miny', { required: 'Campo obrigatório.', 
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'},
                 min: -90, max: 90 } )}
-                autoFocus className={classNames({ 'p-invalid': errors.miny })} />
+                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.miny })} />
               {getFormErrorMessage(errors, 'miny')}
             </div>
 
-            <div className="p-field p-col-12 p-md-3">
+            <div className="field col-12 md:col-3">
               <label htmlFor="maxx">Max X</label>        
               <InputText id="maxx" name="maxx" {...register('maxx', { required: 'Campo obrigatório.', 
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} 
-                autoFocus className={classNames({ 'p-invalid': errors.maxx })} />
+                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.maxx })} />
               {getFormErrorMessage(errors, 'maxx')}
             </div>
 
-            <div className="p-field p-col-12 p-md-3">
+            <div className="field col-12 md:col-3">
               <label htmlFor="maxy">Max Y</label>        
               <InputText id="maxy" name="minx" {...register('maxy', { required: 'Campo obrigatório.', 
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} 
-                autoFocus className={classNames({ 'p-invalid': errors.maxy })} />
+                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.maxy })} />
               {getFormErrorMessage(errors, 'maxy')}
             </div>
 
-            {/*
-            <div className="p-field p-col-12 p-md-3">
-              <label htmlFor="precision">Precisão</label>        
-              <InputText id="precision" name="precision" {...register('precision', { required: true,
-                pattern: { value: /^[0-9]+$/, message: 'Formato inválido'} })}
-                autoFocus className={classNames({ 'p-invalid': errors.precision })} />
-              {getFormErrorMessage(errors, 'precision')}
-            </div>
-            */}
-
-            <div className="p-field p-col-12 p-md-3">
+            <div className="field col-12 md:col-3">
               <label htmlFor="precision">Precisão</label>
               <Controller name="precision" control={control} render={(props) => (
                 <Dropdown  id="precision" value={props.field.value} 
@@ -245,13 +227,13 @@ function CoordinateSystemForm(props) {
                   })}
                   onChange={(e) => props.field.onChange(e.value)}
                   showClear
-                  className={classNames({ 'p-invalid': errors.precision })} />                    
+                  className={classNames({ 'w-full': true, 'p-invalid': errors.precision })} />                    
               )} />
             </div>            
 
           </div>
 
-        <Toolbar className="p-mt-4 p-mb-4" right={rightToolbarTemplate}></Toolbar>
+        <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>
 
       </form>
   );

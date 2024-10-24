@@ -124,9 +124,9 @@ function ViewersList(props) {
 
   const renderHeader = () => {
     return (
-        <div className="p-grid">
-            <div className="p-col">Lista Visualizadores</div>
-            <div className="p-col p-text-right">Total de registos: {totalRecords}</div>
+        <div className="grid">
+            <div className="col">Lista Visualizadores</div>
+            <div className="col text-right">Total de registos: {totalRecords}</div>
         </div>
     );
   }

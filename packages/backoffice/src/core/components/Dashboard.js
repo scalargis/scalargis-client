@@ -29,16 +29,16 @@ function Dashboard(props) {
     }
 
     return (
-        <div className="p-grid p-fluid dashboard">
+        <div className="grid dashboard">
             
             { adminOrManager && <BasicStats core={core} /> }
 
-            <div className={(contacts && contacts.length > 0)  ? "p-col-12 p-lg-9" : "p-col-12"}>
+            <div className={(contacts && contacts.length > 0)  ? "col-12 md:col-9" : "col-12"}>
                 <ViewerVisitsChart core={core} stats={stats} />
             </div>
 
             { (contacts && contacts.length > 0) ?
-            <div className="p-col-12 p-lg-3 contacts">
+            <div className="col-12 md:col-3 contacts">
                 <ContactList core={core} contacts={contacts} />
             </div> : null }
         </div>

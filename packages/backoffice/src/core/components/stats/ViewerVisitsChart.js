@@ -297,12 +297,12 @@ export default function ViewerVisitsChart(props) {
 
     return (
         <div className="card">
-            <div className="p-grid p-fluid">
-                <div className="p-col-12 p-lg-5">
-                    <Dropdown value={op_type} options={types} onChange={(e) => changeOpType(e.value)} />
+            <div className="grid">
+                <div className="col-12 md:col-6">
+                    <Dropdown className="w-full" value={op_type} options={types} onChange={(e) => changeOpType(e.value)} />
 
                     { !props?.stats?.viewers?.length > 0 &&
-                        <div className="p-col-12 p-pl-0 p-pr-0">
+                        <div className="col-12 pl-0 pr-0">
                             <AutoComplete
                                 delay={500}
                                 value={selected_viewer ? [selected_viewer] : null}
@@ -315,59 +315,59 @@ export default function ViewerVisitsChart(props) {
                                 onUnselect={(e) => set_selected_viewer(null)} />
                         </div>
                     }
-                    
-                    { props?.stats?.viewers?.length > 0 &&
-                        <div className="p-col-12 p-pl-0 p-pr-0">
-                            <Dropdown
-                                value={selected_viewer?.value}
-                                options={props?.stats?.viewers}
-                                placeholder="Escolha um Visualizador"
-                                filter={(props?.stats?.viewers || []).length > 25}
-                                showClear
-                                onChange={(e) => {
-                                    let new_val = null;
-                                    if (props?.stats?.viewers?.length) {
-                                        new_val = props?.stats?.viewers.find(d => d.value === e.value);
-                                    }
-                                    set_selected_viewer(new_val)
-                                }}
-                                onUnselect={(e) => set_selected_viewer(null)} />                               
-                        </div>                                                
-                    }
-
                 </div>
-
-                <div className="p-col-12 p-lg-5">
-                    <Dropdown value={timerange} options={timeranges} onChange={(e) => changeTimeRangeAction(e.value)} />
+                <div className="col-12 md:col-6">
+                    { props?.stats?.viewers?.length > 0 &&
+                        <Dropdown
+                            className="w-full"
+                            value={selected_viewer?.value}
+                            options={props?.stats?.viewers}
+                            placeholder="Escolha um Visualizador"
+                            filter={(props?.stats?.viewers || []).length > 25}
+                            showClear
+                            onChange={(e) => {
+                                let new_val = null;
+                                if (props?.stats?.viewers?.length) {
+                                    new_val = props?.stats?.viewers.find(d => d.value === e.value);
+                                }
+                                set_selected_viewer(new_val)
+                            }}
+                            onUnselect={(e) => set_selected_viewer(null)} />
+                    }
+                </div>
+                <div className="col-12 md:col-6">
+                    <Dropdown className="w-full" value={timerange} options={timeranges} onChange={(e) => changeTimeRangeAction(e.value)} />
 
                     { timerange === 'custom' &&
-                    <div className="p-grid p-col-12">
-                        <div className="p-col-5 p-pl-0 p-pr-0">
+                    <div className="grid mt-1">
+                        <div className="col">
                             <Calendar
+                                className="w-full"
                                 dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"
                                 value={customRange?.length ? customRange[0] : null}
                                 onChange={(e) => changeCustomRange(0, e.value)} />
                         </div>
-                        <div className="p-col-1 p-mt-2 p-text-center">e</div>
-                        <div className="p-col-5 p-pl-0">
+                        <div className="align-content-center text-center">e</div>
+                        <div className="col">
                             <Calendar
+                                className="w-full"
                                 dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"
                                 value={customRange?.length ? customRange[1] : null}
                                 onChange={(e) => changeCustomRange(1, e.value)} />
                         </div>
                     </div>
                     }
-
                 </div>
-
-                <div className="p-col-12 p-lg-2">
-                    {loading_data_chart ? <ProgressSpinner style={{ width: '25px', height: '30px' }} /> : null}
+                { loading_data_chart && 
+                <div className="col-12 md:col-6 text-right">
+                    <ProgressSpinner style={{ width: '25px', height: '30px' }} />
                 </div>
+                }
 
-                <div className="p-col-12 p-text-right">
+                <div className="col-12 text-right">
                     <Button label="Exportar CSV" 
                         className="p-button-outlined"
-                        icon="pi pi-download" style={{width: 'unset'}}
+                        icon="pi pi-download"
                         onClick={exportCSV}
                         disabled={!data_values?.length} />
                 </div>

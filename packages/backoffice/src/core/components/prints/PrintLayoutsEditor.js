@@ -5,7 +5,7 @@ import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { confirmPopup } from 'primereact/confirmpopup';
+import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { useForm, Controller } from 'react-hook-form';
@@ -15,7 +15,14 @@ import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-github";
 
 
+import { utils } from '@scalargis/components';
+
 const LayoutEditor = props => {
+
+  const { getWindowSize } = utils;
+
+  const wsize = getWindowSize();
+  const isMobile = wsize[0] <= 768;
 
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
     defaultValues: {...props.data}
@@ -39,7 +46,7 @@ const LayoutEditor = props => {
 
   const renderFooter = (name) => {
     return (
-        <div className="p-mt-4">
+        <div className="mt-4">
             <Button 
               label="Fechar"
               icon="pi pi-times"
@@ -54,34 +61,34 @@ const LayoutEditor = props => {
   }
 
   return (
-    <Dialog header={"Edição de Layout"} visible={props.show} style={{ width: '50vw' }} footer={renderFooter} onHide={() => { props.onHide(); }}>
+    <Dialog header={"Edição de Layout"} visible={props.show} style={{width: isMobile ? '90%' : '45vw' }} footer={renderFooter} onHide={() => { props.onHide(); }}>
       <form>
-        <div className="p-fluid p-formgrid p-grid">
-          <div className="p-field p-col-12 p-md-6">
+        <div className="grid formgrid">
+          <div className="field col-12 md:col-6">
             <label htmlFor="format">Formato</label>
             <Controller name="format" control={control} rules={{ required: 'Campo obrigatório.' }}
               render={({ field }) => {
                 return <Dropdown id="format" {...field}
                   options={props.pageFormatList.map(val=>{return {label: val, value: val}})}
                   onChange={(e) => field.onChange(e.value)}
-                  className={classNames({ 'p-invalid': errors.format})} />
+                  className={classNames({ 'w-full': true, 'p-invalid': errors.format})} />
               }}                    
             />            
             {getFormErrorMessage(errors, 'format')}
           </div>
-          <div className="p-field p-col-12 p-md-6">
+          <div className="field col-12 md:col-6">
             <label htmlFor="orientation">Orientação</label>
             <Controller name="orientation" control={control} rules={{ required: 'Campo obrigatório.' }}
               render={({ field }) => {
                 return <Dropdown id="orientation" {...field}
                   options={props.pageOrientationList.map(val=>{return {label: val, value: val}})}
                   onChange={(e) => field.onChange(e.value)}
-                  className={classNames({ 'p-invalid': errors.format})} />
+                  className={classNames({ 'w-full': true, 'p-invalid': errors.format})} />
               }}                    
             />             
             {getFormErrorMessage(errors, 'orientation')}
           </div>
-          <div className="p-field p-col-12">
+          <div className="field col-12">
             <label htmlFor="config">Configuração</label>
             <div id="editor-parent">
 
@@ -226,7 +233,7 @@ const PrintLayoutsEditor = props => {
   const rightToolbarTemplate = () => {
     return (
       <React.Fragment>
-          <Button type="button" label="Novo" icon="pi pi-plus" className="p-button-success p-mr-2" 
+          <Button type="button" label="Novo" icon="pi pi-plus" className="p-button-success mr-2" 
             onClick={() => {
               editRecord({ key: '' });
             }}
@@ -244,7 +251,7 @@ const PrintLayoutsEditor = props => {
   const actionBodyTemplate = (rowData) => {
     return (
       <div style={{textAlign: "right"}}>
-          <Button type="button" icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={(e) => {
+          <Button type="button" icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={(e) => {
             editRecord(rowData);
           }} />
           <Button type="button" icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={(e) => {
@@ -257,6 +264,7 @@ const PrintLayoutsEditor = props => {
   return (
     <div>
       <Toast ref={toast} baseZIndex={2000} />
+      <ConfirmPopup />
 
       { showLayoutForm && 
         <LayoutEditor data={layoutEdition} 
@@ -267,19 +275,21 @@ const PrintLayoutsEditor = props => {
           onSave={onLayoutFormSave} />
       }
 
-      <div className="card">
-        <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+      <div className="grid">
+        <div className="card col-12">
+          <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
-        <DataTable ref={dt} value={records ? records : []}
-          selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
-          reorderableColumns onRowReorder={onRowReorder}
-          emptyMessage="Não foram encontrados registos." >
-            <Column rowReorder rowReorderIcon="fas fa-arrows-alt" style={{width: '3em'}} />
-            <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-            <Column field="format" header="Formato" filterPlaceholder="Format" />
-            <Column field="orientation" header="Orientação" filterPlaceholder="Orientação" />
-            <Column body={actionBodyTemplate} />
-        </DataTable>
+          <DataTable ref={dt} value={records ? records : []}
+            selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
+            reorderableRows onRowReorder={onRowReorder}
+            emptyMessage="Não foram encontrados registos." >
+              <Column rowReorder rowReorderIcon="fas fa-arrows-alt" style={{width: '3em'}} />
+              <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
+              <Column field="format" header="Formato" filterPlaceholder="Format" />
+              <Column field="orientation" header="Orientação" filterPlaceholder="Orientação" />
+              <Column body={actionBodyTemplate} />
+          </DataTable>
+        </div>
       </div>
     </div>
   )

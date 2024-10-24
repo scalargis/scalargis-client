@@ -193,7 +193,7 @@ const GeometryFilterEditor = props => {
   }, []);
   
   // Callback version of watch.  It's your responsibility to unsubscribe when done.
-  React.useEffect(() => {
+  useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       //Refresh feature
       refreshFeatures(value);
@@ -241,24 +241,24 @@ const GeometryFilterEditor = props => {
 
     <React.Fragment>
       
-      <div className="p-field p-col-12 p-mt-2 p-mb-4">
+      <div className="field col-12 mt-2 mb-4">
         <div>
           { data.geometryWKT ?
-            <Message severity="info" text="Clique em 'Editar' para configurar o filtro espacial." /> 
+            <Message severity="info" text="Clique em 'Editar' para configurar o filtro espacial." className="w-full" /> 
             :
-            <Message severity="warn" text="Sem filtro espacial definido. Clique em 'Editar' para definir um filtro espacial." />
+            <Message severity="warn" text="Sem filtro espacial definido. Clique em 'Editar' para definir um filtro espacial." className="w-full" />
           }
         </div>
       </div>  
 
-      <div className="p-grid">
-        <div className="p-col-6">
+      <div className="grid">
+        <div className="col-6">
           { data.geometryWKT &&      
           <Button type="text" label="Remover" icon="pi pi-trash" className="p-button-danger p-button-outlined"
            onClick={(e)=> {e.preventDefault(); onRemove();}} />
           }
         </div>
-        <div className="p-col-6">
+        <div className="col-6">
           <Button type="text" label="Editar" icon="pi pi-times" className="p-button-outlined"
           onClick={(e)=> {e.preventDefault(); setShowForm(true)}} />     
         </div>
@@ -269,28 +269,28 @@ const GeometryFilterEditor = props => {
         footer={renderFooter} 
         onHide={onHide}>
         <form>
-          <div className="p-fluid p-formgrid p-grid">
-            <div className="p-field p-col-12">
+          <div className="grid formgrid">
+            <div className="field col-12">
               <TabView>
                 <TabPanel header="WKT">          
-                  <div className="p-col p-field">
+                  <div className="field col">
                     <label htmlFor="format">Sistema de Coordenadas</label>
                     <Controller name="geometrySRID" control={control} rules={{required: 'Campo obrigatório.' }}
                       render={({ field }) => {
                         return <Dropdown id="geometrySRID" {...field} 
                           options={coordinateSystems} showClear
                           onChange={(e) => field.onChange(e.value)}
-                          className={classNames({ 'p-invalid': errors.geometrySRID })}
+                          className={classNames({ 'w-full': true, 'p-invalid': errors.geometrySRID })}
                         />
                       }}                    
                     />
                     {getFormErrorMessage(errors, 'geometrySRID')} 
                   </div>
-                  <div className="p-field p-col-12">
+                  <div className="field col-12">
                     <label htmlFor="orientation">Geometria (WKT)</label>
                     <InputTextarea id="geometryWKT" name="geometryWKT" rows={5}
                       {...register("geometryWKT", { required: 'Campo obrigatório.' })} 
-                      className={classNames({ 'p-invalid': errors.geometryWKT })} />
+                      className={classNames({ 'w-full': true, 'p-invalid': errors.geometryWKT })} />
                     {getFormErrorMessage(errors, 'geometryWKT')}  
                   </div>
                 </TabPanel>
@@ -301,12 +301,12 @@ const GeometryFilterEditor = props => {
                 </TabPanel>
               </TabView>
             </div>
-            <div className="p-field p-col-12">
+            <div className="field col-12">
               <label htmlFor="tolerance">Tolerância (m)</label>
               <Controller name="tolerance" control={control}
                 render={({ field }) => {
                   return <InputNumber id="tolerance" {...field}                    
-                    onChange={(e) => field.onChange(e.value)} />
+                    onChange={(e) => field.onChange(e.value)} className="w-full" />
                 }}                    
               />
             </div>

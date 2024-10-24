@@ -4,16 +4,22 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import {Checkbox} from 'primereact/checkbox';
 import { Tooltip } from 'primereact/tooltip';
-import { confirmPopup } from 'primereact/confirmpopup';
+import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import { Panel } from 'primereact/panel';
 import { Message } from 'primereact/message';
 import { classNames } from 'primereact/utils';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useForm, Controller } from 'react-hook-form';
+import { utils } from '@scalargis/components';
 import { ReorderGroups, ReorderFields, getItemStyle, getGroupListStyle, getFieldListStyle } from "./utils";
 
 
 const FieldFormEditor = props => {
+  const { getWindowSize } = utils;
+
+  const wsize = getWindowSize();
+  const isMobile = wsize[0] <= 768;
+
   const [field, setField] = useState(props.data ? {...props.data} : {});
 
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
@@ -40,7 +46,6 @@ const FieldFormEditor = props => {
     setField({...props.data});
   }, [props.data]);
 
-
   const renderFooter = (name) => {
     return (
         <div>
@@ -58,10 +63,10 @@ const FieldFormEditor = props => {
   }
 
   return (
-    <Dialog header={"Edição de Campo"} visible={props.show} style={{ width: '50vw' }} footer={renderFooter} onHide={() => { props.onHide(); }}>
+    <Dialog header={"Edição de Campo"} visible={props.show} style={{width: isMobile ? '90%' : '45vw' }} footer={renderFooter} onHide={() => { props.onHide(); }}>
       <form>
-        <div className="p-fluid p-formgrid p-grid">
-          <div className="p-field p-col-12">
+        <div className="grid formgrid">
+          <div className="field col-12">
             <label htmlFor="key">Chave</label>
             <div className="p-inputgroup">
               <InputText  id="key" type="text" {...register("key", { required: 'Campo obrigatório.',  pattern: /^(?![0-9])[a-zA-Z0-9$_]+$/i })} className={classNames({ 'p-invalid': errors.key })} />            
@@ -77,40 +82,40 @@ const FieldFormEditor = props => {
             </div>
             {getFormErrorMessage(errors, 'key')}
           </div>
-          <div className="p-field p-col-12">
+          <div className="field col-12">
             <label htmlFor="title">Título</label>
-            <InputText  id="title" type="text" {...register("title", { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.title })} />
+            <InputText  id="title" type="text" {...register("title", { required: 'Campo obrigatório.' })} className={classNames({ 'w-full': true, 'p-invalid': errors.title })} />
             {getFormErrorMessage(errors, 'title')}
           </div>
-          <div className="p-field p-col-12">
+          <div className="field col-12">
             <label htmlFor="header">Cabeçalho</label>
-            <InputText  id="header" type="text" {...register("header")} />
+            <InputText  id="header" type="text" {...register("header")} className="w-full" />
           </div>
-          <div className="p-fluid p-formgrid p-grid p-col-12">
-            <div className="p-field p-col-6">
+          <div className="grid formgrid col-12">
+            <div className="field col-6">
               <Controller name="required" control={control}
                 render={({ field }) => {                      
-                  return <Checkbox id="required" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                  return <Checkbox id="required" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                 }}
               />
               <label htmlFor="required" className="p-checkbox-label" style={{display: "inline"}}>Preenchimento obrigatório</label>
             </div>
-            <div className="p-field p-col-6">
+            <div className="field col-6">
               <Controller name="showLabel" control={control}
                 render={({ field }) => {                      
-                  return <Checkbox id="showLabel" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                  return <Checkbox id="showLabel" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                 }}
               />
               <label htmlFor="showLabel" className="p-checkbox-label" style={{display: "inline"}}>Mostrar título</label>
             </div>            
           </div>
           
-          <div className="p-field p-col-12"><hr /></div>
+          <div className="field col-12"><hr /></div>
           
-          <div className="p-field p-col-6">
+          <div className="field col-6">
             <Controller name="active" control={control}
               render={({ field }) => {                      
-                return <Checkbox id="active" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                return <Checkbox id="active" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
               }}                    
             />          
             <label htmlFor="active" className="p-checkbox-label" style={{display: "inline"}}>Activo</label>
@@ -122,6 +127,11 @@ const FieldFormEditor = props => {
 }
 
 const GroupFormEditor = props => {
+  const { getWindowSize } = utils;
+
+  const wsize = getWindowSize();
+  const isMobile = wsize[0] <= 768;
+
   const [group, setGroup] = useState(props.data ? {...props.data} : {});
 
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
@@ -166,10 +176,10 @@ const GroupFormEditor = props => {
   }
 
   return (
-  <Dialog header={"Edição de Grupo"} visible={props.show} style={{ width: '50vw' }} footer={renderFooter} onHide={() => { props.onHide(); }}>
+  <Dialog header={"Edição de Grupo"} visible={props.show} style={{width: isMobile ? '90%' : '45vw' }} footer={renderFooter} onHide={() => { props.onHide(); }}>
     <form>
-      <div className="p-fluid p-formgrid p-grid">
-        <div className="p-field p-col-12">
+      <div className="grid formgrid">
+        <div className="field col-12">
           <label htmlFor="key">Chave</label>
           <div className="p-inputgroup">
             <InputText  id="key" type="text" {...register("key", { required: 'Campo obrigatório.',  pattern: /^(?![0-9])[a-zA-Z0-9$_]+$/i })} className={classNames({ 'p-invalid': errors.key })} />            
@@ -185,18 +195,18 @@ const GroupFormEditor = props => {
           </div>
           {getFormErrorMessage(errors, 'key')}
         </div>
-        <div className="p-field p-col-12">
+        <div className="field col-12">
           <label htmlFor="title">Título</label>
-          <InputText  id="title" type="text" {...register("title", { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.title })} />
+          <InputText  id="title" type="text" {...register("title", { required: 'Campo obrigatório.' })} className={classNames({ 'w-full': true, 'p-invalid': errors.title })} />
           {getFormErrorMessage(errors, 'title')}
         </div>
 
-        <div className="p-field p-col-12"><hr /></div>
+        <div className="field col-12"><hr /></div>
 
-        <div className="p-field p-col-12">
+        <div className="field col-12">
           <Controller name="active" control={control}
             render={({ field }) => {                      
-              return <Checkbox id="active" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+              return <Checkbox id="active" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
             }}                    
           />          
           <label htmlFor="active" className="p-checkbox-label" style={{display: "inline"}}>Activo</label>
@@ -248,10 +258,8 @@ const GroupFields = props => {
           style={getFieldListStyle(snapshot.isDraggingOver)}
         >
           {Object.keys(group.data.fields || {}).length === 0 &&
-            <div className="p-fluid">
-              <div className="p-col-12">
-                  <Message severity="info" text="Clique em '+' para adicionar um campo" />
-              </div>
+            <div className="col-12">
+                <Message severity="info" text="Clique em '+' para adicionar um campo" className="w-full" />
             </div>
           }
 
@@ -318,49 +326,47 @@ const GroupFields = props => {
                           <FieldFormEditor data={fieldEdition} show={showFieldForm} onHide={onFieldFormHide} onSave={onFieldFormSave} />
                         }
 
-                        <div className="p-fluid p-pt-2">
-                          <div className="p-field p-grid p-mb-0">
-                            <div className="p-col-10">
-                              <div className="p-grid">
-                                <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
-                                <div className="p-col-12 p-md-10">
+                        <div className="pt-2">
+                          <div className="grid field mb-0">
+                            <div className="col-12 md:col-10">
+                              <div className="grid">
+                                <label className="col-12 md:col-2"><strong>Título: </strong></label>
+                                <div className="col-12 md:col-10">
                                     <span>{field.title}</span>
                                 </div>
                               </div>
                             </div>
-                            <div className="p-col-2">
-                              <div className="p-grid">
-                                <div className="p-field-checkbox">
-                                    <Checkbox checked={field.active} disabled/>
-                                    <label>Ativo</label>
-                                </div>
+                            <div className="col-12 md:col-2 mt-2">
+                              <div className="field-checkbox">
+                                  <Checkbox checked={field.active} disabled/>
+                                  <label>Ativo</label>
                               </div>
                             </div>
                           </div>
-                          <div className="p-field p-grid">
-                            <div className="p-col-12">
-                              <div className="p-grid">
-                                <label className="p-col-12 p-md-2"><strong>Cabeçalho: </strong></label>
-                                <div className="p-col-12 p-md-10">
+                          <div className="grid field">
+                            <div className="col-12">
+                              <div className="grid">
+                                <label className="col-12 md:col-2"><strong>Cabeçalho: </strong></label>
+                                <div className="col-12 md:col-10">
                                     <span>{field.header}</span>
                                 </div>
                               </div>                       
                             </div>
                           </div>
-                          <div className="p-field p-grid p-col-12">
-                            <div className="p-col-7">
-                              <div className="p-field-checkbox">
+                          <div className="grid field">
+                            <div className="col-12 md:col-7">
+                              <div className="field-checkbox">
                                   <Checkbox checked={field.required} disabled/>
                                   <label>Preenchimento obrigatório</label>
                               </div>
                             </div>
-                            <div className="p-col-5">
-                              <div className="p-field-checkbox">
+                            <div className="col-12 md:col-5">
+                              <div className="field-checkbox">
                                   <Checkbox checked={field.showLabel} disabled/>
                                   <label>Mostrar título</label>
                               </div>
                             </div>
-                          </div>                     
+                          </div>                   
                         </div>
 
                     </div>
@@ -420,10 +426,8 @@ const Fields = props => {
             style={getFieldListStyle(snapshot.isDraggingOver)}
           >
             {Object.keys(fields || {}).length === 0 &&
-              <div className="p-fluid">
-                <div className="p-col-12">
-                    <Message severity="info" text="Clique em 'Novo Campo' para adicionar um campo" />
-                </div>
+              <div className="col-12">
+                  <Message severity="info" text="Clique em 'Novo Campo' para adicionar um campo" className="w-full" />
               </div>
             }
 
@@ -489,44 +493,42 @@ const Fields = props => {
                       <FieldFormEditor data={fieldEdition} show={showFieldForm} onHide={onFieldFormHide} onSave={onFieldFormSave} />
                     }
 
-                    <div className="p-fluid p-pt-2">
-                      <div className="p-field p-grid p-mb-0">
-                        <div className="p-col-10">
-                          <div className="p-grid">
-                            <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
-                            <div className="p-col-12 p-md-10">
+                    <div className="pt-2">
+                      <div className="grid field mb-0">
+                        <div className="col-12 md:col-10">
+                          <div className="grid">
+                            <label className="col-12 md:col-2"><strong>Título: </strong></label>
+                            <div className="col-12 md:col-10">
                                 <span>{field.data.title}</span>
                             </div>
                           </div>
                         </div>
-                        <div className="p-col-2">
-                          <div className="p-grid">
-                            <div className="p-field-checkbox">
-                                <Checkbox checked={field.data.active} disabled/>
-                                <label>Ativo</label>
-                            </div>
+                        <div className="col-12 md:col-2 mt-2">
+                          <div className="field-checkbox">
+                              <Checkbox checked={field.data.active} disabled/>
+                              <label>Ativo</label>
                           </div>
                         </div>
                       </div>
-                      <div className="p-field p-grid">
-                        <div className="p-col-12">
-                          <div className="p-grid">
-                            <label className="p-col-12 p-md-2"><strong>Cabeçalho: </strong></label>
-                            <div className="p-col-12 p-md-10">
+                      <div className="grid field">
+                        <div className="col-12">
+                          <div className="grid">
+                            <label className="col-12 md:col-2"><strong>Cabeçalho: </strong></label>
+                            <div className="col-12 md:col-10">
                                 <span>{field.data.header}</span>
                             </div>
                           </div>                     
                         </div>
                       </div>
-                      <div className="p-field p-grid">
-                        <div className="p-col-6">
-                          <div className="p-field-checkbox">
+                      <div className="grid field">
+                        <div className="col-12 md:col-6">
+                          <div className="field-checkbox">
                               <Checkbox checked={field.data.required} disabled/>
                               <label>Preenchimento obrigatório</label>
                           </div>
                         </div>
-                        <div className="p-col-6">
-                          <div className="p-field-checkbox">
+                        <div className="col-12 md:col-6">
+                          <div className="field-checkbox">
                               <Checkbox checked={field.data.showLabel} disabled/>
                               <label>Mostrar título</label>
                           </div>
@@ -703,22 +705,24 @@ class FormFieldsEditor extends Component {
   render() {
     return (
 
-      <div className="p-fluid p-formgrid p-grid">
+      <div className="grid formgrid">
+
+        <ConfirmPopup />
 
         { this.state.showFieldForm && 
           <FieldFormEditor data={this.fieldEdition} show={this.state.showFieldForm} onHide={this.onFieldFormHide} onSave={this.onFieldFormSave} />
         }
 
-        <div className="p-field p-col-12 p-md-6">
+        <div className="field col-12 md:col-6">
           <Panel header="Campos">
 
-            <div className="p-col-12">
+            <div className="col-12">
 
               <div>
-                <div className="p-grid">
-                  <div className="p-col-12 p-md-8">
+                <div className="grid">
+                  <div className="col-12 md:col-8">
                   </div>
-                  <div className="p-col-12 p-md-4 p-mt-2 p-mb-2" >
+                  <div className="col-12 md:col-4 mt-2 mb-2 text-center">
                     <Button
                       type="button"
                       label="Novo Campo"
@@ -743,20 +747,20 @@ class FormFieldsEditor extends Component {
           </Panel>
         </div>
 
-        <div className="p-field p-col-12 p-md-6">
+        <div className="field col-12 md:col-6">
           <Panel header="Grupos">
 
-          <div className="p-col-12">
+          <div className="col-12">
 
             <div>
               { this.state.showGroupForm && 
                 <GroupFormEditor data={this.groupEdition} show={this.state.showGroupForm} onHide={this.onGroupFormHide} onSave={this.onGroupFormSave} />
               }
 
-              <div className="p-grid">
-                <div className="p-col-12 p-md-8">
+              <div className="grid">
+                <div className="col-12 md:col-8">
                 </div>           
-                <div className="p-col-12 p-md-4 p-mt-2 p-mb-2" >
+                <div className="col-12 md:col-4 mt-2 mb-2 text-center" >
                   <Button
                     type="button"
                     label="Novo Grupo"
@@ -785,10 +789,8 @@ class FormFieldsEditor extends Component {
                     style={getGroupListStyle(snapshot.isDraggingOver)}
                   >
                     {Object.keys(this.state.data.groups || {}).length === 0 &&
-                      <div className="p-fluid">
-                        <div className="p-col-12">
-                            <Message severity="info" text="Clique em 'Novo Grupo' para adicionar um grupo" />
-                        </div>
+                      <div className="col-12">
+                          <Message severity="info" text="Clique em 'Novo Grupo' para adicionar um grupo" className="w-full" />
                       </div>
                     }                    
 
@@ -865,30 +867,28 @@ class FormFieldsEditor extends Component {
                               </div>                        
                             </div>
 
-                            <div><hr className="p-mt-1 p-pb-3" /></div>
+                            <div><hr className="mt-1 pb-3" /></div>
 
-                            <div className="p-fluid">
-                              <div className="p-grid">
-                                <div className="p-col-10">
-                                  <div className="p-grid">
-                                    <label className="p-col-12 p-md-2"><strong>Título: </strong></label>
-                                    <div className="p-col-12 p-md-10">
+                            <div>
+                              <div className="grid">
+                                <div className="col-12 md:col-10">
+                                  <div className="grid">
+                                    <label className="col-12 md:col-2"><strong>Título: </strong></label>
+                                    <div className="col-12 md:col-10">
                                         <span>{group.data.title}</span>
                                     </div>
                                   </div>
                                 </div>
-                                <div className="p-col-2">
-                                  <div className="p-grid">
-                                    <div className="p-field-checkbox">
-                                        <Checkbox checked={true} disabled/>
-                                        <label>Ativo</label>
-                                    </div>
+                                <div className="col-12 md:col-2 mt-2">
+                                  <div className="field-checkbox">
+                                      <Checkbox checked={true} disabled/>
+                                      <label>Ativo</label>
                                   </div>
                                 </div>
                               </div>
-                              <div className="p-grid">
-                                <label className="p-col-12"><strong>Campos:</strong></label>
-                                <div className="p-col-12">
+                              <div className="grid">
+                                <label className="col-12"><strong>Campos:</strong></label>
+                                <div className="col-12">
                                   <GroupFields groupNum={group.id} group={group} onChange={this.onGroupFieldsChange} />
                                 </div>
                               </div>

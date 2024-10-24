@@ -294,7 +294,7 @@ function ViewerForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary p-mr-4"
+              className="p-button-secondary mr-4"
               disabled={isSaving ? true : false} 
               onClick={goBack} />
             <Button
@@ -322,14 +322,14 @@ function ViewerForm(props) {
 
             <div className="card">
 
-              <div className="p-fluid p-formgrid p-grid">
+              <div className="fluid formgrid grid">
 
                 <div className="p-field p-col-3">
                   <label htmlFor="id">Id</label>
                   <InputText id="id" type="text" value={data.id || ''} />
                 </div>
 
-                <div className="p-field p-col-4">
+                <div className="field col-4">
                   <label>&nbsp;</label>
                   <Controller
                     control={control}
@@ -341,7 +341,7 @@ function ViewerForm(props) {
                 </div>
                 
                 { adminOrManager &&
-                <div className="p-field p-col-4">
+                <div className="field col-4">
                   <label>Dono</label>
                   <div>                
                       <div className="p-inputgroup">
@@ -383,73 +383,73 @@ function ViewerForm(props) {
                 </div>
                 }              
 
-                <div className="p-field p-col-12 p-md-6">
+                <div className="field col-12 md:col-6">
                   <label htmlFor="name">Designação</label>        
                   <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.name })} />
                   {getFormErrorMessage(errors, 'name')}
                   {/*{errors.name && <span>This field is required</span>}*/}
                 </div>
 
-                <div className="p-field p-col-12 p-md-6">
+                <div className="field col-12 md:col-6">
                   <label htmlFor="name">Título</label>        
                   <InputText id="title" name="title" {...register('title', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.title })} />
                   {getFormErrorMessage(errors, 'title')}       
                 </div>          
 
-                <div className="p-field p-col-12 p-md-6">
+                <div className="field col-12 md:col-6">
                   <label htmlFor="slug">Slug</label>
                   <InputText id="slug" name="slug" {...register('slug')} />
                 </div>
 
-                <div className="p-field p-col-6">
+                <div className="p-field col-6">
                   <label htmlFor="tags">Tags</label>
                   <Controller name="keywords" control={control} defaultValue={data.keywords} render={(props) => (
                       <Chips id="keywords" value={props.field.value} onChange={(e) => props.field.onChange(e.value) } />
                   )} />            
                 </div>            
 
-                <div className="p-field p-col-12 p-md-6">
+                <div className="field col-12 md:col-6">
                   <label>Perfis</label>
-                  <div className="p-card p-p-2">
+                  <div className="p-card p-2">
                     { (availableRoles && availableRoles.length > 0) && 
                     <>
-                    <div className="p-field p-col-12 p-pl-0">
+                    <div className="field col-12 pl-0">
                       <MultiSelect value={selectedRoles} options={availableRoles} 
                         optionLabel="name" optionValue="id" display="chip" showClear 
                         filter filterValue={filterRolesValue} 
                         onFilterValueChange={(e) => setFilterRolesValue(e.value)}
                         onChange={(e) => setSelectedRoles(e.value)} placeholder="Selecionar" />
                     </div>              
-                    <div className="p-grid">
-                      <div className="p-col"></div>
-                      <div className="p-col">
+                    <div className="grid">
+                      <div className="col"></div>
+                      <div className="col">
                           <Button label="Adicionar" type="button" 
                             disabled={(!selectedRoles || selectedRoles.length === 0)}
                           onClick={addRoles} />
                       </div>
-                      <div className="p-col"></div>
+                      <div className="col"></div>
                     </div>
                     </>
                     }
                     { (roles && roles.length > 0) ?
                       <>        
-                      <div className="p-field p-col-12 p-pl-0 p-pt-2">
-                        <ListBox optionLabel="name" optionValue="id" className="p-p-1"
+                      <div className="field col-12 pl-0 pt-2">
+                        <ListBox optionLabel="name" optionValue="id" className="p-1"
                           options={roles} value={removedRoles}
                           onChange={(e) => setRemovedRoles(e.value)} multiple />
                       </div>
-                      <div className="p-grid">
-                        <div className="p-col"></div>
-                        <div className="p-col">
+                      <div className="grid">
+                        <div className="col"></div>
+                        <div className="col">
                           <Button label="Remover" type="button" 
                           disabled={(!removedRoles || removedRoles.length === 0)}
                           onClick={removeRoles} />
                         </div>
-                        <div className="p-col"></div>
+                        <div className="col"></div>
                       </div>
                       </> :
-                      <div className="p-grid p-justify-center">
-                        <div className="p-col-12 p-mt-4 p-mb-2">
+                      <div className="grid justify-center">
+                        <div className="col-12 mt-4 mb-2">
                           <Message severity="warn" text="Adicione um ou mais Perfis" />
                         </div>
                       </div>
@@ -465,24 +465,24 @@ function ViewerForm(props) {
 
           {activeIndex === 1 ?
             <div className="card">            
-              <div className="p-fluid p-formgrid p-grid">
+              <div className="fluid formgrid grid">
 
-                <div className="p-field p-col-4">
+                <div className="field col-4">
                   <label htmlFor="img_icon">Icon</label>
                   <InputText id="img_icon" name="img_icon" {...register('img_icon')} />
                 </div>
 
-                <div className="p-field p-col-4">
+                <div className="field col-4">
                   <label htmlFor="img_logo">Logo</label>
                   <InputText id="img_logo" name="img_logo" {...register('img_logo')} />
                 </div>
 
-                <div className="p-field p-col-4">
+                <div className="field col-4">
                   <label htmlFor="img_logo_alt">Logo Alternativo</label>
                   <InputText id="img_logo_alt" name="img_logo_alt" {...register('img_logo_alt')} />
                 </div>
 
-                <div className="p-field p-col-12" id="manifest-editor-parent">
+                <div className="field col-12" id="manifest-editor-parent">
                   <label htmlFor="manifest_editor">App Manifest</label>
                     <AceEditor
                       ref={jsonManifestEditor}
@@ -507,16 +507,16 @@ function ViewerForm(props) {
                     />
                 </div>
 
-                <div className="p-field p-col-12" id="style-editor-parent">
-                <Toolbar className="p-mb-1" left={() => { return (
+                <div className="field col-12" id="style-editor-parent">
+                <Toolbar className="mb-1" end={() => { return (
                 <React.Fragment>
-                  <Button icon="pi pi-undo" className="p-mr-2 p-pl-3 p-pr-3"
+                  <Button icon="pi pi-undo" className="mr-2 pl-3 pr-3"
                   title="Undo"
                   onClick={e => {
                     e.preventDefault();
                     customStyleEditor.current.editor.undo();
                   }} />
-                  <Button icon="pi pi-refresh" className="p-mr-2 p-pl-3 p-pr-3"
+                  <Button icon="pi pi-refresh" className="mr-2 pl-3 pr-3"
                   title="Redo"
                   onClick={e => {
                     e.preventDefault();
@@ -584,15 +584,15 @@ function ViewerForm(props) {
 
           {activeIndex === 2 ?
             <div className="card" id="editor-parent">
-              <Toolbar className="p-mb-1" left={() => { return (
+              <Toolbar className="mb-1" end={() => { return (
                 <React.Fragment>
-                  <Button icon="pi pi-undo" className="p-mr-2 p-pl-3 p-pr-3"
+                  <Button icon="pi pi-undo" className="mr-2 pl-3 pr-3"
                   title="Undo"
                   onClick={e => {
                     e.preventDefault();
                     jsonConfigEditor.current.editor.undo();
                   }} />
-                  <Button icon="pi pi-refresh" className="p-mr-2 p-pl-3 p-pr-3"
+                  <Button icon="pi pi-refresh" className="mr-2 pl-3 pr-3"
                   title="Redo"
                   onClick={e => {
                     e.preventDefault();
@@ -675,7 +675,7 @@ function ViewerForm(props) {
             </div>
           : null}
 
-          <Toolbar className="p-mt-4 p-mb-4" right={rightToolbarTemplate}></Toolbar>
+          <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>
 
         </form>
       

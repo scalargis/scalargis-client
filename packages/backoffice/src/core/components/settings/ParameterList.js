@@ -201,7 +201,7 @@ function ParameterList(props) {
   const leftToolbarTemplate = () => {
     return (
         <React.Fragment>
-            <Button label="Novo" icon="pi pi-plus" className="p-button-success p-mr-2" onClick={newRecord} />
+            <Button label="Novo" icon="pi pi-plus" className="p-button-success mr-2" onClick={newRecord} />
             <Button label="Eliminar" icon="pi pi-trash" className="p-button-danger" onClick={deleteSelectedRecords} disabled={!selectedRecords || !selectedRecords.length} />
         </React.Fragment>
     )
@@ -210,7 +210,7 @@ function ParameterList(props) {
   const rightToolbarTemplate = () => {
     return (
       <React.Fragment>
-          <Button label="Limpar" icon="pi pi-times" className="p-button-help p-mr-2" onClick={onFilterClear} />
+          <Button label="Limpar" icon="pi pi-times" className="p-button-help mr-2" onClick={onFilterClear} />
           {/*<Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />*/}
       </React.Fragment>
     );
@@ -222,7 +222,7 @@ function ParameterList(props) {
     } else {
       return (
           <React.Fragment>
-              <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editRecord(rowData)} />
+              <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editRecord(rowData)} />
               <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => deleteRecord(rowData)} />
           </React.Fragment>
       );
@@ -237,13 +237,13 @@ function ParameterList(props) {
 
   return (
     <React.Fragment>
-      <div className="p-col-12"><h3>Parâmetros</h3></div>
+      <div className="col-12"><h3>Parâmetros</h3></div>
 
-      <div className="p-grid p-fluid viewer-list">
+      <div className="grid viewer-list">
           <Toast ref={toast} baseZIndex={2000} />
           <ConfirmDialog />
-          <div className="card">
-            <Toolbar className="p-mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+          <div className="card col-12">
+            <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
             <DataTable ref={dt} value={records ? records.data : []} lazy dataKey="id"
               selectionMode="checkbox"
@@ -253,12 +253,12 @@ function ParameterList(props) {
               filterDisplay="row" filters={searchParams?.filters} onFilter={onFilter} loading={loading}
               emptyMessage="Não foram encontrados registos." >
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-                <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '6rem' }} />
+                <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '120px' }} />
                 <Column field="code" header="Código" sortable filter filterPlaceholder="Código" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
                 <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
                 <Column field="notes" header="Descrição" sortable filter filterPlaceholder="Descrição" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
                 <Column header="Valor" body={valueBodyTemplate} headerStyle={{ width: '5rem' }} />
-                <Column body={actionBodyTemplate} style={{"textAlign": "center"}} />
+                <Column body={actionBodyTemplate} style={{width: '110px'}} />
             </DataTable>
             <Dialog header="Valor" visible={displayFieldValue} style={{ width: '50vw' }} onHide={() => setDisplayFieldValue(false)}>
               <div dangerouslySetInnerHTML={{__html: fieldValue }} />

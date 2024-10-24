@@ -46,7 +46,7 @@ export const getItemStyle = (isDragging, draggableStyle) => {
 
 export const getGroupListStyle = isDraggingOver => ({
   background: isDraggingOver ? "lightgray" : "none",
-  padding: 8,
+  padding: 4,
   //width: 350
 });
 

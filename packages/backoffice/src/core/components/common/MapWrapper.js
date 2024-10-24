@@ -20,7 +20,7 @@ function MapWrapper(props) {
   const [ selectedCoord , setSelectedCoord ] = useState();
 
   // pull refs
-  const mapElement = useRef()
+  const mapElement = useRef();
   
   // create state ref that can be accessed in OpenLayers onclick callback function
   //  https://stackoverflow.com/a/60643670
@@ -28,8 +28,7 @@ function MapWrapper(props) {
   mapRef.current = map;
 
   // initialize map on first render - logic formerly put into componentDidMount
-  useEffect( () => {
-
+  useEffect(() => {
     // create and add vector source layer
     const initalFeaturesLayer = new VectorLayer({
       source: new VectorSource()
@@ -39,30 +38,11 @@ function MapWrapper(props) {
     const initialMap = new Map({
       target: mapElement.current,
       layers: [
-        
-        /*
-        // USGS Topo
-        new TileLayer({
-          source: new XYZ({
-            url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
-          })
-        }),
-        */
-
         // OSM
         new TileLayer({
           source: new OSM()
         }),
-
-        // Google Maps Terrain
-        /* new TileLayer({
-          source: new XYZ({
-            url: 'http://mt0.google.com/vt/lyrs=p&hl=en&x={x}&y={y}&z={z}',
-          })
-        }), */
-
         initalFeaturesLayer
-        
       ],
       view: new View({
         projection: 'EPSG:3857',
@@ -86,6 +66,10 @@ function MapWrapper(props) {
     }
     setFeaturesLayer(initalFeaturesLayer);
 
+    return () => {
+      // Avoid map duplication in development mode
+      initialMap.setTarget(null);
+    }
   },[]);
 
   // update map if features prop changes - logic formerly put into componentDidUpdate
@@ -121,8 +105,6 @@ function MapWrapper(props) {
 
     // set React state
     setSelectedCoord(transormedCoord);
-
-    console.log(transormedCoord);
   }
 
   // render component

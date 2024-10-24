@@ -191,26 +191,13 @@ function PrintForm(props) {
   } 
 
   const goBack = () => {
-    /*
-    const location = {
-      pathname: history.location.state.from,
-      state: { 
-        searchParams: {...history.location.state.previousSearchParams}
-      }
-    }
-    history.replace(location);
-    */
     const state = { 
       searchParams: {...location.state.previousSearchParams}
     }
     navigate(location.state.from, { state });
-    //history.goBack();
   }  
 
   const onSubmit = (formData) => {
-
-    //console.log(formData);
-
     let new_data = {
       ...formData,
       form_fields: formFields ? {...formFields}  : {},
@@ -223,8 +210,6 @@ function PrintForm(props) {
         ...geometryFilter
       }
     }
-
-    //console.log(new_data);
 
     setIsSaving(true);
 
@@ -278,7 +263,7 @@ function PrintForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary p-mr-4"
+              className="p-button-secondary mr-4"
               disabled={isSaving ? true : false} 
               onClick={goBack} />
             <Button
@@ -318,29 +303,31 @@ function PrintForm(props) {
         {activeIndex === 0 ?
           <div className="card">
 
-            <div className="p-fluid p-formgrid p-grid">
+            <div className="formgrid grid">
 
-              <div className="p-field p-col-1">
+              <div className="field col-12 md:col-1">
                 <label htmlFor="id">Id</label>
-                <InputText id="id" type="text" value={data.id || ''} />
+                <InputText id="id" type="text" value={data.id || ''} className="w-full" />
               </div>
 
-              <div className="p-field p-col-12 p-md-2">
+              <div className="field col-12 md:col-2">
                 <label htmlFor="code">Código</label>        
-                <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.code })} />
+                <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus
+                 className={classNames({ 'w-full': true, 'p-invalid': errors.code })} />
                 {getFormErrorMessage(errors, 'code')}
                 {/*{errors.name && <span>This field is required</span>}*/}
               </div>              
 
-              <div className="p-field p-col-12 p-md-7">
+              <div className="field col-12 md:col-7">
                 <label htmlFor="name">Designação</label>        
-                <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.name })} />
+                <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} autoFocus
+                 className={classNames({ 'w-full': true, 'p-invalid': errors.name })} />
                 {getFormErrorMessage(errors, 'name')}
                 {/*{errors.name && <span>This field is required</span>}*/}
               </div>
 
-              <div className="p-field p-col-12 p-md-2">
-                <label>&nbsp;</label>
+              <div className="field col-12 md:col-2 text-center">
+                <label className="w-full">&nbsp;</label>
                 <Controller
                   control={control}
                   name="is_active"
@@ -350,60 +337,63 @@ function PrintForm(props) {
                 />                 
               </div>
 
-              <div className="p-field p-col-12 p-md-12">
+              <div className="field col-12">
                 <label htmlFor="name">Título</label>        
-                <InputText id="title" name="title" {...register('title', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.title })} />
+                <InputText id="title" name="title" {...register('title', { required: 'Campo obrigatório.' })} autoFocus
+                 className={classNames({ 'w-full': true, 'p-invalid': errors.title })} />
                 {getFormErrorMessage(errors, 'title')}       
               </div>
 
-              <div className="p-field p-col-12 p-md-12">
+              <div className="field col-12">
                 <label htmlFor="name">Descrição</label>        
-                <InputText id="description" name="description" {...register('description')} />   
+                <InputText id="description" name="description" {...register('description')} className="w-full" />   
               </div>
 
-              <div className="p-field p-col-12 p-md-6">
-                <div className="p-grid">
-                  <div className="p-col p-field">
+              <div className="field col-12 md:col-6">
+                <div className="grid">
+                  <div className="field col-12 md:col-4">
                     <label htmlFor="scale">Escala</label>                    
                     <Controller name="scale" control={control}
                       render={({ field }) => {
-                        return <InputMask id="scale" {...field} onChange={(e) => field.onChange(e.value)} mask="1:999?999999" unmask={true} autoClear={false} />
+                        return <InputMask id="scale" {...field}
+                         onChange={(e) => field.onChange(e.value)} mask="1:999?999999" unmask={true} autoClear={false}
+                         className="w-full" />
                       }}                    
                     />
                   </div>
-                  <div className="p-col p-field">
+                  <div className="field col-12 md:col-4">
                     <label htmlFor="format">Formato</label>
                     <Controller name="format" control={control}
                       render={({ field }) => {
-                        return <Dropdown id="format" {...field} options={pageFormatList.map(val=>{return {label: val, value: val}})} onChange={(e) => field.onChange(e.value)} showClear />
+                        return <Dropdown id="format" {...field} options={pageFormatList.map(val=>{return {label: val, value: val}})}
+                         onChange={(e) => field.onChange(e.value)} showClear className="w-full" />
                       }}                    
                     />
                   </div>
-                  <div className="p-col p-field">
+                  <div className="field col-12 md:col-4">
                     <label htmlFor="format">Orientação</label>
                     <Controller name="orientation" control={control}
                       render={({ field }) => {
-                        return <Dropdown id="orientation" {...field} options={pageOrientationList.map(val=>{return {label: val, value: val}})} onChange={(e) => field.onChange(e.value)} showClear />
+                        return <Dropdown id="orientation" {...field} options={pageOrientationList.map(val=>{return {label: val, value: val}})}
+                         onChange={(e) => field.onChange(e.value)} showClear className="w-full" />
                       }}                    
                     />                    
-                  </div>                                   
-                </div>
-                <div className="p-grid">
-                  <div className="p-col p-field">
+                  </div>
+                  <div className="field col-12">
                     <label htmlFor="format">Sistema de Coordenadas</label>
                     <Controller name="srid" control={control} rules={{ required: 'Campo obrigatório.' }}
                       render={({ field }) => {
                         return <Dropdown id="srid" {...field} options={coordinateSystems} 
                           onChange={(e) => field.onChange(e.value)} 
-                          className={classNames({ 'p-invalid': errors.srid})} />
+                          className={classNames({ 'w-full': true, 'p-invalid': errors.srid})} />
                       }}                    
                     />
                     {getFormErrorMessage(errors, 'srid')}
-                  </div>                  
+                  </div>                                   
                 </div>
               </div>  
 
-              <div className="p-field p-col-12 p-md-6">
+              <div className="field col-12 md:col-6">
                 <Panel header="Filtro Geográfico">
                   <GeometryFilterEditor 
                     data={
@@ -434,37 +424,37 @@ function PrintForm(props) {
                 </Panel>
               </div>                
                 
-              <div className="p-field p-col-12 p-md-6"> 
+              <div className="field col-12 md:col-6"> 
                 <Panel header="Opções de Escalas">
-                  <div className="p-grid">
-                    <div className="p-col p-field p-mt-2">
+                  <div className="grid">
+                    <div className="field col-12 md:col-6 mt-2">
                       <Controller name="free_scale" control={control}
                         render={({ field }) => {                      
                           return <Checkbox id="free_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}                    
                       />                            
-                      <label htmlFor="map_scale" className="p-checkbox-label" style={{display: "inline"}}>Escala livre</label>
+                      <label htmlFor="map_scale" className="p-checkbox-label pl-2" style={{display: "inline"}}>Escala livre</label>
                     </div>
-                    <div className="p-col p-field p-mt-2">
+                    <div className=" field col-12 md:col-6 mt-2">
                       <Controller name="map_scale" control={control}
                         render={({ field }) => {                      
                           return <Checkbox id="map_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}                    
                       />                            
-                      <label htmlFor="map_scale" className="p-checkbox-label" style={{display: "inline"}}>Escala do mapa</label>
+                      <label htmlFor="map_scale" className="p-checkbox-label pl-2" style={{display: "inline"}}>Escala do mapa</label>
                     </div>                    
                   </div>
-                  <div className="p-grid">
-                    <div className="p-col p-field p-mt-3">
+                  <div className="grid">
+                    <div className="field col-12 md:col-6 mt-2">
                       <Controller name="restrict_scales" control={control}
                         render={({ field }) => {                      
                           return <Checkbox id="restrict_scales" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}                    
                       />
-                      <label htmlFor="cb1" className="p-checkbox-label" style={{display: "inline"}}>Escalas restritas</label>
+                      <label htmlFor="cb1" className="p-checkbox-label pl-2" style={{display: "inline"}}>Escalas restritas</label>
                     </div>
                     {restrictScales && (
-                    <div className="p-col p-field p-mt-2">
+                    <div className="field col-12 md:col-6 mt-2">
                       <div className="p-inputgroup"> 
                         <Controller name="restrict_scales_list" control={control}
                           render={({ field }) => {                                                  
@@ -486,57 +476,57 @@ function PrintForm(props) {
                 </Panel>
               </div>
 
-              <div className="p-field p-col-12 p-md-6">
-                <Panel header="Opções de impressão" className="p-pb-1">
-                  <div className="p-grid">
-                    <div className="p-col p-field p-mt-2">
+              <div className="field col-12 md:col-6">
+                <Panel header="Opções de impressão">
+                  <div className="grid">
+                    <div className="field col-12 md:col-6 mt-2">
                       <Controller name="free_printing" control={control}
                         render={({ field }) => {
                           return <Checkbox id="free_printing" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}
                       />
-                      <label htmlFor="free_printing" className="p-checkbox-label" style={{display: "inline"}}>Emissão livre</label>
+                      <label htmlFor="free_printing" className="p-checkbox-label pl-2" style={{display: "inline"}}>Emissão livre</label>
                     </div>
                   </div>
                 </Panel>
               </div>
 
-              <div className="p-field p-col-12 p-md-6">
-                <Panel header="Marcação de local e geometrias" className="p-mt-2">
-                  <div className="p-grid">
-                    <div className="p-col p-field p-mt-2">
+              <div className="field col-12 md:col-6">
+                <Panel header="Marcação de local e geometrias" className="mt-2">
+                  <div className="grid">
+                    <div className="field col-12 md:col-6 mt-2">
                       <Controller name="allow_drawing" control={control}
                         render={({ field }) => {
                           return <Checkbox id="allow_drawing" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}
                       />
-                      <label htmlFor="allow_drawing" className="p-checkbox-label" style={{display: "inline"}}>Permitir desenhar</label>
+                      <label htmlFor="allow_drawing" className="p-checkbox-label pl-2" style={{display: "inline"}}>Permitir desenhar</label>
                     </div>
-                    <div className="p-col p-field p-mt-2">
+                    <div className="field col-12 md:col-6 mt-2">
                       <Controller name="location_marking" control={control}
                         render={({ field }) => {                      
                           return <Checkbox id="location_marking" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}                    
                       />                            
-                      <label htmlFor="location_marking" className="p-checkbox-label" style={{display: "inline"}}>Obrigatório marcar local</label>
+                      <label htmlFor="location_marking" className="p-checkbox-label pl-2" style={{display: "inline"}}>Obrigatório marcar local</label>
                     </div>
                   </div>
-                  <div className="p-grid">
-                    <div className="p-col p-field p-mt-2">
+                  <div className="grid">
+                    <div className="field col-12 md:col-6 mt-2">
                       <Controller name="draw_location" control={control}
                         render={({ field }) => {                      
                           return <Checkbox id="draw_location" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}                    
                       />
-                      <label htmlFor="cb1" className="p-checkbox-label" style={{display: "inline"}}>Desenhar local</label>
+                      <label htmlFor="cb1" className="p-checkbox-label pl-2" style={{display: "inline"}}>Desenhar local</label>
                     </div>
-                    <div className="p-col p-field p-mt-2">
+                    <div className="field col-12 md:col-6 mt-2">
                       <Controller name="multi_geom" control={control}
                         render={({ field }) => {                      
                           return <Checkbox id="multi_geom" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
                         }}                    
                       />
-                      <label htmlFor="cb1" className="p-checkbox-label" style={{display: "inline"}}>Múltiplas geometrias</label>
+                      <label htmlFor="cb1" className="p-checkbox-label pl-2" style={{display: "inline"}}>Múltiplas geometrias</label>
                     </div>                                        
                   </div>
                 </Panel>               
@@ -552,7 +542,7 @@ function PrintForm(props) {
 
           <div className="card">
 
-            <div className="p-field p-col-12">
+            <div className="field col-12">
               <label htmlFor="orientation">Configuração</label>
               <div id="config-editor-parent">
 
@@ -605,10 +595,8 @@ function PrintForm(props) {
         : null}          
           
         {activeIndex === 3 ?
-
           <div className="card">
 
-            <div className="p-fluid p-formgrid p-grid">
               <PrintLayoutsEditor data={layouts}
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
                 onChange={(data) => {
@@ -616,14 +604,11 @@ function PrintForm(props) {
                   setLayouts(data);
                 }}
               />
-            </div>
-
           </div>
-
+          
         : null} 
 
-
-        <Toolbar className="p-mt-4 p-mb-4" right={rightToolbarTemplate}></Toolbar>        
+        <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>        
 
       </form>
 

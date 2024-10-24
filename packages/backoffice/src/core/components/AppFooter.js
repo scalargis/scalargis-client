@@ -4,7 +4,7 @@ export const AppFooter = () => {
     
     return (
         <div className="layout-footer">
-            <span className="footer-text" style={{ 'marginLeft': '5px' }}>&copy; {new Date().getFullYear()} {process.env.REACT_APP_ENTITY_NAME || ''}</span>
+            <span className="footer-text ml-2">&copy; {new Date().getFullYear()} {process.env.REACT_APP_ENTITY_NAME || ''}</span>
         </div>
     );
 }

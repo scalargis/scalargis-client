@@ -10,8 +10,8 @@ function SplashScreen({ history }) {
   // Render page
   const logo = CLIENT_URL + 'assets/images/logo-splash.png'
   return (
-    <div className="p-d-flex p-jc-center" style={{ height: '100%' }}>
-      <div className="p-as-center" style={{ backgroundColor: 'white', padding: '6rem' }}>
+    <div className="flex align-items-center justify-content-center" style={{ height: '100%' }}>
+      <div style={{ backgroundColor: 'white', padding: '6rem' }}>
 
         <div className="login-logo">
           <img alt="Logo" src={logo} />  
