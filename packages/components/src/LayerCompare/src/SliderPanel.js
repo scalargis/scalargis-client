@@ -37,8 +37,8 @@ export default function SliderPanel({
 
     return (
 
-        <div className='p-grid p-p-2' >
-            <div className='p-col-12'>
+        <div className='grid p-2' >
+            <div className='col-12'>
                 <SelectButton
                     unselectable={false}
                     value={compareTool}
@@ -48,15 +48,15 @@ export default function SliderPanel({
                     onChange={(e) => setCompareTool(e.value)} />
             </div>
 
-            <div className='p-grid p-col-12'>
-                <div className='p-col-1 p-pt-3'>
+            <div className='grid col-12'>
+                <div className='col-1 pt-3'>
                     {compareTool === 1 ?
                         <i className="pi pi-arrow-left" ></i>
                         :
                         <i className="pi pi-arrow-up" ></i>
                     }
                 </div>
-                <div className={compareTool === 1 ? 'p-col-11 p-d-flex p-jc-start' : 'p-col-11 p-d-flex p-jc-start'}>
+                <div className={compareTool === 1 ? 'col-11 flex justify-content-end' : 'col-11 flex justify-content-start'}>
                     <Dropdown
                         showClear={true}
                         value={selectedLayer}
@@ -73,11 +73,11 @@ export default function SliderPanel({
                 </div>
 
                 {compareTool === 2 ?
-                    <div className='p-col-1 p-pt-3'>
+                    <div className='col-1 pt-3'>
                         < i className="pi pi-arrow-down" ></i>
                     </div>
                     : null}
-                <div className={compareTool === 1 ? 'p-col-11 p-d-flex p-jc-end' : 'p-col-11 p-d-flex p-jc-start'}>
+                <div className={compareTool === 1 ? 'col-11 flex justify-content-end' : 'col-11 flex justify-content-start'}>
                     <Dropdown
                         showClear={true}
                         value={selectedSliderLayer}
@@ -94,14 +94,14 @@ export default function SliderPanel({
                 </div>
 
                 {compareTool === 1 ?
-                    <div className='p-col-1 p-pt-3'>
+                    <div className='col-1 pt-3'>
                         <i className="pi pi-arrow-right" ></i>
                     </div>
                     : null}
             </div>
 
             {compareTool === 2 ?
-                <div className='p-col-12 p-p-4'>
+                <div className='col-12 p-4'>
                     <Slider
                         step={0.1}
                         value={opacitySliderValue}

@@ -110,9 +110,9 @@ function SaveViewerWidget({ type, viewer }) {
 
             <div className="p-fluid">
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("name", "Nome")}</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("name", "Nome")}</label>
+                <div className="col-12 md:col-8">
                   <InputText
                     className={(!name || name.length == 0 ? 'p-invalid' : '')}
                     value={name}
@@ -120,13 +120,13 @@ function SaveViewerWidget({ type, viewer }) {
                     onChange={e => setName(e.target.value)}
                   />
                   { (!name || name.length == 0) &&
-                  <small className="p-invalid p-d-block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
+                  <small className="p-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
                 </div>
               </div>
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("title", "Título")}</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("title", "Título")}</label>
+                <div className="col-12 md:col-8">
                   <InputText
                     className={(!title || title.length == 0 ? 'p-invalid' : '')}
                     value={title}
@@ -134,13 +134,13 @@ function SaveViewerWidget({ type, viewer }) {
                     onChange={e => setTitle(e.target.value)}
                   />
                   { (!title || title.length == 0) &&
-                  <small className="p-invalid p-d-block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
+                  <small className="p-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
                 </div>
               </div>
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("description", "Descrição")}</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("description", "Descrição")}</label>
+                <div className="col-12 md:col-8">
                   <InputTextarea rows={3}
                     value={description}
                     placeholder={t("description", "Descrição")}
@@ -149,9 +149,9 @@ function SaveViewerWidget({ type, viewer }) {
                 </div>
               </div>              
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("isActive", "Está ativo")}?</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("isActive", "Está ativo")}?</label>
+                <div className="col-12 md:col-8">
                   <InputSwitch
                     checked={is_active}
                     onChange={(e) => setIsActive(!is_active)}
@@ -159,21 +159,9 @@ function SaveViewerWidget({ type, viewer }) {
                 </div>
               </div>
 
-              {/*
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">Permitir adicionar temas ao mapa?</label>
-                <div className="p-col-12 p-md-8">
-                  <InputSwitch
-                    checked={allow_add_layers}
-                    onChange={(e) => setAllowAddLayers(!allow_add_layers)}
-                  />
-                </div>
-              </div>
-              */}
-
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
+                <div className="col-12 md:col-8">
                   <InputSwitch
                     checked={allow_user_session}
                     onChange={(e) => setAllowUserSession(!allow_user_session)}
@@ -181,9 +169,9 @@ function SaveViewerWidget({ type, viewer }) {
                 </div>
               </div>
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
+                <div className="col-12 md:col-8">
                   <InputSwitch
                     checked={allow_anonymous}
                     onChange={(e) => setAllowAnonymous(!allow_anonymous)}
@@ -203,12 +191,16 @@ function SaveViewerWidget({ type, viewer }) {
               />
             </div>
 
-            { viewer.save_error && 
-              <Message style={{ width: '100%' }} severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
+            { viewer.save_error &&
+              <div className="p-fluid"> 
+                <Message severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
+              </div>
             }
 
-            { viewer.save_response && !!viewer.save_response.message && 
-              <Message style={{ width: '100%' }} severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
+            { viewer.save_response && !!viewer.save_response.message &&
+              <div className="p-fluid">
+                <Message severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
+              </div>
             }
 
           </form>

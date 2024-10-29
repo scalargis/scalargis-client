@@ -36,7 +36,7 @@ const GroupComponent = React.memo(function GroupComponent({
   const groupLayout = uischema as GroupLayout;
 
   return (
-    <Card title={label || ''} className="p-mb-2">
+    <Card title={label || ''} className="mb-2">
       <PrimereactLayoutRenderer
         {...props}
         visible={visible}

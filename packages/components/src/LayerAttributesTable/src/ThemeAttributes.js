@@ -5,9 +5,9 @@ class ThemeAttributes extends React.Component {
     const { theme } = this.props;
     return (
       <div>
-        <div className="p-grid">
-            <div className="p-col-4">Título</div>
-            <div className="p-col-8">{theme.title}</div>
+        <div className="grid">
+            <div className="col-4">Título</div>
+            <div className="col-8">{theme.title}</div>
         </div>
       </div>
     );

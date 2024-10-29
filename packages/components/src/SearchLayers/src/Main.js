@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Button } from 'primereact/button';
-import OLGroupLayer from 'ol/layer/Group';
 import { Panel } from 'primereact/panel';
 import componentActions from './actions';
 import componentReducers from './reducers';
@@ -71,7 +70,7 @@ export default function Main(props) {
 
 
   const component_store_state = useSelector((state) => {
-    return state?.searchlayers || {};
+    return state?.searchlayers;
   });
 
   useEffect(() => {

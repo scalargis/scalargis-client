@@ -48,8 +48,8 @@ export function MainMenu({ className, config, actions, record }) {
           style={{width: isMobile ? '90%' : '35vw' }} 
           modal
           footer={(
-            <div className="p-grid">
-              <div className="p-col" style={{ textAlign: 'right'}}>
+            <div className="grid">
+              <div className="col">
                 <Button label={closeLabel} onClick={e => setShowPopup(false)} />
               </div>
             </div>

@@ -28,8 +28,8 @@ export default function SliderLayersMapControl({
             style={{width: '100%',  left: sliderValue + '%' }}
         >
 
-            <div className='p-grid' >
-                <div className='p-col'
+            <div className='grid' >
+                <div className='col'
                     style={{ display: "flex", justifyContent: "right", alignItems: "center" }}>
                     <Dropdown
                         value={selectedLayer}
@@ -41,7 +41,7 @@ export default function SliderLayersMapControl({
                         showClear={true}
                     />
                 </div>
-                <div className='p-col'
+                <div className='col'
                     style={{ display: "flex", justifyContent: "left", alignItems: "center" }}>
                     <Dropdown
                         value={selectedSliderLayer}

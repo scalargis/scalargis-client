@@ -10,7 +10,21 @@ import PrintPanel3 from './PrintPanel3';
 import PrintPanel4 from './PrintPanel4';
 import PrintPanelItem from './PrintPanelItem';
 import useFormFields from "./useFormFields";
-import './style.css'
+import './style.css';
+
+
+const printStyle = new Style({
+  image: new CircleStyle({
+      radius: 4,
+      fill: new Fill({
+      color: '#fff',
+      }),
+      stroke: new Stroke({
+      color: '#FF0000',
+      width: 2,
+      }),
+  })
+});
 
 export default function Print({core, config, actions, dispatch, record}) {
 
@@ -27,19 +41,6 @@ export default function Print({core, config, actions, dispatch, record}) {
   const [geometries, setGeometries] = useState([]);
 
   const printLayer = useRef();
-
-  const printStyle = new Style({
-    image: new CircleStyle({
-        radius: 4,
-        fill: new Fill({
-        color: '#fff',
-        }),
-        stroke: new Stroke({
-        color: '#FF0000',
-        width: 2,
-        }),
-    })
-  });
 
   function getTotalPrints() {
     let total = 0;
@@ -81,55 +82,34 @@ export default function Print({core, config, actions, dispatch, record}) {
   // Add print layer
   useEffect(() => {
     if (!mainMap) return;
+    
+    if (!viewer?.loaded) return;
 
-    printLayer.current = new VectorLayer({
-      id: 'print',
-      renderMode: 'vector',
-      source: new Vector({}),
-      //style: style_pts,
-      selectable: false
-    })
+    const _layer = Models.Utils.findOlLayer(mainMap, 'print');
 
-    const parentLayer = Models.Utils.findOlLayer(mainMap, 'overlays');
-
-    if (parentLayer) {
-      parentLayer.getLayers().getArray().push(printLayer.current);
+    if (_layer) {
+      printLayer.current = _layer;
     } else {
-      mainMap.addLayer(printLayer.current); 
+      printLayer.current = new VectorLayer({
+        id: 'print',
+        renderMode: 'vector',
+        source: new Vector({}),
+        //style: style_pts,
+        selectable: false
+      });
+
+      const parentLayer = Models.Utils.findOlLayer(mainMap, 'overlays');
+
+      if (parentLayer) {
+        parentLayer.getLayers().getArray().push(printLayer.current);
+      } else {
+        mainMap.addLayer(printLayer.current); 
+      }
     }
 
-    /*
-    setTimeout(() => {     
+  }, [viewer?.loaded, mainMap]);
 
-      //Add theme
-      dispatch(actions.viewer_add_themes(
-          "componentslayer",
-          [
-              {
-              id: "print",
-              title: "Print",
-              description: "Print",
-              active: true,
-              open: false,
-              type: "VECTOR",
-              opacity: 1,
-              selectable: false
-              }
-          ]
-      ));      
-
-      setTimeout(() => {       
-        printLayer.current = Models.Utils.findOlLayer(mainMap, 'print');
-        //printLayer && printLayer.current.setStyle(printStyle);
-
-        // Turn layer on
-        dispatch(actions.layers_set_checked([ ...viewer.config_json.checked, 'print']));        
-      }, 500);
-
-    }, 1500);
-    */
-
-  }, [mainMap]);
+  if (!printLayer.current) return null;
 
   return (
     <div style={{ height: '100%' }}>

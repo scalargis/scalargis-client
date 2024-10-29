@@ -57,7 +57,7 @@ export default function PrintGroupItem(props) {
                     <Checkbox value={print.uuid}
                       onChange={onSelectedPrintChange} checked={selectedPrints.includes(print.uuid)} />
                   }
-                  <span className="task-name p-ml-1">{print.title}</span>
+                  <span className="task-name ml-1">{print.title}</span>
                 </li>
               )
             })}

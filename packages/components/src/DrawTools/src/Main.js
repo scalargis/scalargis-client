@@ -52,6 +52,9 @@ export default function Main({ type, region, as, config, actions, record, utils 
     if (selected_menu === 'drawtools') dispatch(actions.viewer_set_exclusive_mapcontrol(null));
   }, [selected_menu])   
 
+
+  if (!viewer?.loaded) return null;
+
   function renderContent() {
     return (
       <div>

@@ -233,15 +233,15 @@ export default function COG(props) {
         </datalist>
           */}
 
-        <Accordion activeIndex={showAdvancedOptions ? 0 : -1} className="p-pt-2">
+        <Accordion activeIndex={showAdvancedOptions ? 0 : -1} className="pt-2">
           <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
 
             <div className="p-fluid">
-              <div className="p-field p-grid">
-                <Fieldset legend={t("bands", "Bandas")} className="p-col-12">
-                  <div className="p-field p-grid">
-                    <label className="p-col-12 p-md-4">{t("red", "Vermelho")}</label>
-                    <div className="p-col-12 p-md-8">
+              <div className="field grid">
+                <Fieldset legend={t("bands", "Bandas")} className="col-12">
+                  <div className="field grid">
+                    <label className="col-12 md:col-4">{t("red", "Vermelho")}</label>
+                    <div className="col-12 md:col-8">
                       <Dropdown placeholder={t("selectBands", "Selecione a banda")}
                         options={bandOptions}
                         value={selectedBands[0]}
@@ -251,9 +251,9 @@ export default function COG(props) {
                       />
                     </div>
                   </div>
-                  <div className="p-field p-grid">
-                    <label className="p-col-12 p-md-4">{t("green", "Verde")}</label>
-                    <div className="p-col-12 p-md-8">
+                  <div className="field grid">
+                    <label className="col-12 md:col-4">{t("green", "Verde")}</label>
+                    <div className="col-12 md:col-8">
                       <Dropdown placeholder={t("selectBands", "Selecione a banda")}
                         options={bandOptions}
                         value={selectedBands[1]}
@@ -263,9 +263,9 @@ export default function COG(props) {
                       />
                     </div>
                   </div>
-                  <div className="p-field p-grid">
-                    <label className="p-col-12 p-md-4">{t("blue", "Azul")}</label>
-                    <div className="p-col-12 p-md-8">
+                  <div className="field grid">
+                    <label className="col-12 md:col-4">{t("blue", "Azul")}</label>
+                    <div className="col-12 md:col-8">
                       <Dropdown placeholder={t("selectBands", "Selecione a banda")}
                         options={bandOptions}
                         value={selectedBands[2]}
@@ -277,16 +277,16 @@ export default function COG(props) {
                   </div>
                 </Fieldset>
               </div>
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-6">{t("convertToRGB", "Converter para RGB")}</label>
+              <div className="field grid">
+                <label className="col-12 md:col-6">{t("convertToRGB", "Converter para RGB")}</label>
                 <InputSwitch checked={convertToRGB} onChange={(e) => {
                   onChangeConvertToRGB(e.value);
                 }} />
               </div> 
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("nodataValue", "Valor NoData")}</label>
-                <div className="p-col-12 p-md-8">
+              <div className="field grid">
+                <label className="col-12 md:col-4">{t("nodataValue", "Valor NoData")}</label>
+                <div className="col-12 md:col-8">
                   <InputNumber value={nodata} mode="decimal" onValueChange={(e) => {
                     onChangeNoData(e.value);
                   }} />

@@ -53,7 +53,7 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
 
   if (registration.response && !!registration.response && !!registration.response.authenticated) {
     return (
-      <div className="p-d-flex p-ai-center p-dir-col p-px-3">
+      <div className="flex justify-content-center p-dir-col p-px-3">
         <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
         <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
         <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
@@ -80,25 +80,25 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
         <React.Fragment>
           <div className="p-fluid" style={{"maxWidth": "500px"}}>
 
-            <div className="p-field p-grid">
-              <div className="p-col-12">
+            <div className="field grid">
+              <div className="col-12">
                 <h3>{i18nUtils.translateValue("userRegistrationConfirmation", "Confirmação de registo de utilizador")}</h3>
               </div>
             </div>
 
-            <div className="p-field p-grid">
-              <div className="p-col-12 ">
+            <div className="field grid">
+              <div className="col-12 ">
                 <Message style={{ width: '100%' }} severity="error" text={auth.response.message}></Message> 
               </div>
             </div>
 
-            <div className="p-field p-grid">
-              <div className="p-col-12">{i18nUtils.translateValue("userRegistrationFillEmail", "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo")}.</div>
+            <div className="field grid">
+              <div className="col-12">{i18nUtils.translateValue("userRegistrationFillEmail", "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo")}.</div>
             </div>                     
 
-            <div className="p-field p-grid">
-              <label className="p-col-12 p-md-2">{i18nUtils.translateValue("email", "Email")}</label>
-              <div className="p-col-12 p-md-10">
+            <div className="field grid">
+              <label className="col-12 md:col-2">{i18nUtils.translateValue("email", "Email")}</label>
+              <div className="col-12 md:col-10">
                 <InputText value={emailConfirmation} onChange={(e) => setEmailConfirmation(e.target.value)} />
               </div>
             </div>         
@@ -119,8 +119,8 @@ function RegistrationConfirmationWidget({ token, auth, registration, history, re
 
       { !auth.http_error && auth.response && !!auth.response.message && 
           <div className="p-fluid" style={{"maxWidth": "500px"}}>
-            <div className="p-field p-grid">
-              <div className="p-col-12">
+            <div className="field grid">
+              <div className="col-12">
                 <h3>{i18nUtils.translateValue("userRegistrationConfirmation", "Confirmação de registo de utilizador")}</h3>
               </div>
             </div>

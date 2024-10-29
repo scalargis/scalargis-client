@@ -133,7 +133,7 @@ export default function GeoJSON (props) {
       <React.Fragment>
         <div className="p-fluid">
 
-          <div className="p-field">
+          <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
             <Dropdown 
               placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
@@ -145,7 +145,7 @@ export default function GeoJSON (props) {
 
           <TabView>
             <TabPanel header={t("file", "Ficheiro")}>
-              <div className="p-field">
+              <div className="field">
                 <label>{t("file", "Ficheiro")} GeoJSON</label>
                 <FileUpload 
                   name="upload"
@@ -167,7 +167,7 @@ export default function GeoJSON (props) {
               </div>
             </TabPanel>
             <TabPanel header="URL">
-              <div className="p-field">
+              <div className="field">
                 <label>URL</label>
                 <div className="p-inputgroup">
                   <InputText placeholder='https://...'

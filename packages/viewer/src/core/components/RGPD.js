@@ -35,7 +35,7 @@ function RGPD({ cookies, children }) {
   return (
     <ThemeSelector theme={theme}>
       <React.Fragment>
-        { cookiergpd !== cookieValue && (
+        { String(cookiergpd || '') !== String(cookieValue || '') && (
           <SplashScreen>
             <CookieConsent
               location="bottom"

@@ -122,7 +122,7 @@ export default function PrintPanel3(props) {
           setSelectedPrints={setSelectedPrints}
         />
         {(printDetails.allow_selection && (printDetails.children.length + printDetails.prints.length > 1)) ?
-          <div className="p-d-flex">
+          <div className="flex">
             <Button label={t("none", "Nenhuma")}
               className="p-button-sm p-button-warning p-button-text"
               onClick={() => {
@@ -141,8 +141,8 @@ export default function PrintPanel3(props) {
       </div>
 
       <div className="card">
-        <div className="p-grid">
-          <div className="p-col p-text-left">
+        <div className="grid">
+          <div className="col text-left">
             <Button
               label={t("back", "Voltar")}
               icon="pi pi-chevron-left"
@@ -150,7 +150,7 @@ export default function PrintPanel3(props) {
               onClick={e => { goPanelPrintPrev(); }}
             />
           </div>
-          <div className="p-col p-text-right">
+          <div className="col text-right">
             <Button
               label={t("continue", "Continuar")}
               icon={isLoading ? "pi pi-spin pi-spinner" : ""}

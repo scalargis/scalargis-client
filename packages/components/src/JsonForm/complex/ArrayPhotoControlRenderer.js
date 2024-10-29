@@ -56,7 +56,7 @@ export const ArrayPhotoControlRenderer = (props) => {
   }, [props.path]);
   
   return(    
-    <div className="p-grid">
+    <div className="grid">
       {showPhotoForm && showOnPortal(
         <PhotoForm
           schema={schema}
@@ -86,10 +86,10 @@ export const ArrayPhotoControlRenderer = (props) => {
         />
       )}
 
-      <div className="p-field p-col-12 p-mb-0 p-pb-0">
+      <div className="field col-12 mb-0 pb-0">
         { (props?.data?.length) ? 
-          <div className="p-col-12">
-            <div className="card p-text-center  p-mb-1 p-p-0">
+          <div className="col-12">
+            <div className="card p-text-center mb-1 p-0">
               <Tag severity="info" rounded style={{width:'80%'}} 
                 value={props.data.length + " " + (props.data.length > 1 ? 
                   translateMsg("common.photos", "photos", "Fotografias", i18Props) : 
@@ -105,9 +105,9 @@ export const ArrayPhotoControlRenderer = (props) => {
                         <td className="" style={{"wordBreak": "break-all", "textAlign": "center"}}>
                           <Image src={f.data || `${f.file_url}`} alt={f.filename} width={100} preview />
                         </td>
-                        <td className="p-col-9" style={{"wordBreak": "break-all", "textAlign": "center"}}>{(f?.original_filename || f?.filename)}</td>
-                        <td className="p-col-1" style={{"verticalAlign": "top", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2" 
+                        <td className="col-9" style={{"wordBreak": "break-all", "textAlign": "center"}}>{(f?.original_filename || f?.filename)}</td>
+                        <td className="col-1" style={{"verticalAlign": "top", "textAlign": "center"}}>
+                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined mb-2" 
                             tooltip={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
@@ -147,7 +147,7 @@ export const ArrayPhotoControlRenderer = (props) => {
         }              
       </div>
 
-      <div className="p-col-12 p-text-center">
+      <div className="col-12 text-center">
         <Button label={translateMsg("addPhoto", null, "Adicionar Fotografia", i18Props)} className="p-button-text" style={buttonAddStyle}
           onClick={(e) => {
             e.preventDefault();

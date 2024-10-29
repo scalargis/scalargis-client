@@ -313,7 +313,7 @@ export default function SearchLayerResults(props) {
           new_sort[e.sortField] = e.sortOrder === 1 ? 'ASC' : 'DESC'
           doSearch(0, results.maxFeatures, results.filter, new_sort);
         }}
-        paginatorClassName="p-jc-end" className="p-mt-4"> 
+        paginatorClassName="p-jc-end" className="mt-4"> 
         {(columns && columns.length > 0) && <Column key={0} body={zoomActionTemplate} style={{width: '30px'}} />}
         {buildColumns(searchConfig, columns).map(c => c)}
       </DataTable>
@@ -322,7 +322,8 @@ export default function SearchLayerResults(props) {
         <Paginator first={results.startIndex} rows={results.maxFeatures} totalRecords={totalRecords} pageLinkSize={3} 
           onPageChange={e => {
               doSearch(e.first, results.maxFeatures, results.filter, results.sort);
-          }} 
+          }}
+          className="pl-1 pr-1 w-max" 
           style={{fontSize: ".8rem"}}></Paginator>
       }
     </>

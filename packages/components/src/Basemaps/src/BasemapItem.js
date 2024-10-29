@@ -19,11 +19,11 @@ export default function BasemapItem({ core, viewer, mainMap, layer, selected, se
                         title={(selected ? t('clickTurnOff', 'Clicar para desligar') : t('clickTurnOn', 'Clicar para ligar') )}
                         onClick={() => setSelected(selected ? null : layer.id) } />
 
-    const itemClass = 'p-mr-2 p-mb-1 basemaps-control-item' + (selected ? ' active' : '');
+    const itemClass = 'mr-2 mb-1 basemaps-control-item' + (selected ? ' active' : '');
 
     return (
         <div className={itemClass}>
-            <Card className="p-text-center" title={title} subTitle={subtitle} header={header}></Card>                        
+            <Card className="text-center" title={title} subTitle={subtitle} header={header}></Card>                        
         </div>
     )
 }

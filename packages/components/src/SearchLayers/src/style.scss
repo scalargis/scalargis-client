@@ -63,16 +63,16 @@
     }
   }
 
-  .p-field .control label {
+  .field .control label {
     display: inline-block;
     margin-bottom: .5rem;
   }
   
-  .p-field .control select, .p-field .control .input {
+  .field .control select, .field .control .input {
     width: 100%;
   }
   
-  .p-field .control .input, .p-field .control .select {
+  .field .control .input, .field .control .select {
     padding: 0.33rem 0.49rem !important;
   }
 

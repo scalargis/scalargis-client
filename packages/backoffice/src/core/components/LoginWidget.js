@@ -86,11 +86,15 @@ function LoginWidget({ auth, history, redirect }) {
       </div>
       
       { auth.http_error && !auth.response &&
-        <Message style={{ width: '100%' }} severity="error" text="Serviço Indisponível"></Message>
+        <div className="p-fluid p-fluid pt-4">
+          <Message severity="error" text="Serviço Indisponível"></Message>
+        </div>
       }
 
-      { auth.response && !!auth.response && !!auth.response.message && 
-        <Message style={{ width: '100%' }} severity="error" text="Nome de Utilizador ou Palavra-passe inválido"></Message>
+      { auth.response && !!auth.response && !!auth.response.message &&
+        <div className="p-fluid pt-4"> 
+          <Message severity="error" text="Nome de Utilizador ou Palavra-passe inválido"></Message>
+        </div>
       }
 
     </form>

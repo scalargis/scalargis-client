@@ -15,7 +15,7 @@ export default function MainMenu(props) {
   return (
     <div className="layout-sidebar-panel">
       <div id="mainmenu"
-        className="p-d-flex p-flex-column"
+        className="flex flex-column"
         onClick={onMenuClick}
         >
         <div>
@@ -24,7 +24,7 @@ export default function MainMenu(props) {
             props: { components, history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils }, auth }
           })}
         </div>
-        <div className="p-mt-auto">
+        <div className="mt-auto">
           { core.renderMainMenu({
             selected_menu,
             section: 'bottom',
@@ -34,7 +34,7 @@ export default function MainMenu(props) {
 
       </div>
 
-      <div id="content" className="p-d-flex p-flex-column p-jc-between">
+      <div id="content" className="flex flex-column justify-content-between">
         
         { core.renderComponents({
           id: selected_menu,

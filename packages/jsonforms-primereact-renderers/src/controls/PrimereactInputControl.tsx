@@ -69,7 +69,7 @@ export const PrimereactInputControl = (props: ControlProps & WithInput) => {
       onFocus={onFocus}
       onBlur={onBlur}
       id={id}
-      className='p-field'
+      className='field'
     >
       <label htmlFor={id + '-input'} className={labelClassName}>
         {labelText}

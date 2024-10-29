@@ -57,17 +57,15 @@ const App = () => {
   }, []);
 
   return (
-    <React.StrictMode>
-      <AppContext.Provider value={{ core, mainMap }}>
-        <Provider store={core.store}>
-          <Router basename={base_url}>
-            <RGPD>
-              {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
-            </RGPD>
-          </Router>
-        </Provider>
-      </AppContext.Provider>
-    </React.StrictMode>
+    <AppContext.Provider value={{ core, mainMap }}>
+      <Provider store={core.store}>
+        <Router basename={base_url}>
+          <RGPD>
+            {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
+          </RGPD>
+        </Router>
+      </Provider>
+    </AppContext.Provider>
   )
 }
 

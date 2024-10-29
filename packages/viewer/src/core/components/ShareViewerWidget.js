@@ -132,9 +132,9 @@ function ShareViewerWidget({ type,viewer, record }) {
 
           <form onSubmit={e => submit()}>
             <div className="p-fluid">
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("title", "Título")}</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("title", "Título")}</label>
+                <div className="col-12 md:col-8">
                   <InputText
                     className={(!title || title.length === 0 ? 'p-invalid' : '')}
                     value={title}
@@ -142,13 +142,13 @@ function ShareViewerWidget({ type,viewer, record }) {
                     onChange={e => setTitle(e.target.value)}
                   />
                   { (!title || title.length == 0) &&
-                  <small className="p-invalid p-d-block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }
+                  <small className="p-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }
                 </div>
               </div>
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("description", "Descrição")}</label>
-                <div className="p-col-12 p-md-8">
+              <div className="grid field">
+                <label className="col-12 md:col-4">{t("description", "Descrição")}</label>
+                <div className="col-12 md:col-8">
                   <InputTextarea rows={3}
                     value={description}
                     placeholder={t("description", "Descrição")}
@@ -157,9 +157,9 @@ function ShareViewerWidget({ type,viewer, record }) {
                 </div>
               </div>
 
-              { record?.config_json?.show_allow_add_layers !== false && <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("allowAddThemes", "Permitir adicionar temas ao mapa")}?</label>
-                <div className="p-col-12 p-md-8">
+              { record?.config_json?.show_allow_add_layers !== false && <div className="grid field">
+                <label className="col-12 md:col-4">{t("allowAddThemes", "Permitir adicionar temas ao mapa")}?</label>
+                <div className="col-12 md:col-8">
                   <InputSwitch
                     checked={allow_add_layers}
                     onChange={(e) => setAllowAddLayers(!allow_add_layers)}
@@ -167,9 +167,9 @@ function ShareViewerWidget({ type,viewer, record }) {
                 </div>
               </div> }
 
-              { cookieData && record?.config_json?.show_allow_user_session !== false && <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
-                <div className="p-col-12 p-md-8">
+              { cookieData && record?.config_json?.show_allow_user_session !== false && <div className="grid field">
+                <label className="col-12 md_col-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
+                <div className="col-12 md:col-8">
                   <InputSwitch
                     checked={allow_user_session}
                     onChange={(e) => setAllowUserSession(!allow_user_session)}
@@ -177,9 +177,9 @@ function ShareViewerWidget({ type,viewer, record }) {
                 </div>
               </div> }
 
-              { cookieData && record?.config_json?.show_allow_anonymous !== false && <div className="p-field p-grid">
-                <label className="p-col-12 p-md-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
-                <div className="p-col-12 p-md-8">
+              { cookieData && record?.config_json?.show_allow_anonymous !== false && <div className="grid field">
+                <label className="col-12 md:col-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
+                <div className="col-12 md:col-8">
                   <InputSwitch
                     checked={allow_anonymous}
                     onChange={(e) => setAllowAnonymous(!allow_anonymous)}
@@ -189,13 +189,13 @@ function ShareViewerWidget({ type,viewer, record }) {
             </div>
 
             { viewer.save_response &&  
-            <div className="p-grid">
-                <label className="p-col-12"><strong>Url</strong></label>
-                <div className="p-col-12 p-md-10">
+            <div className="grid">
+                <label className="col-12 pb-0"><strong>Url</strong></label>
+                <div className="col-12 md:col-10 align-content-center">
                     <a style={{wordBreak: "break-all"}} href={getViewerPublicUrl(viewer.save_response.uuid)}
                       target="_blank" rel="noopener noreferrer">{getViewerPublicUrl(viewer.save_response.uuid)}</a>
                 </div>
-                <div className="p-col-12 p-md-2">
+                <div className="col-12 md:col-2 pr-3 text-right">
                     <Button
                         style={{marginLeft:"0px", color: "#2196F"}} 
                         icon="pi pi-copy"
@@ -218,11 +218,15 @@ function ShareViewerWidget({ type,viewer, record }) {
             </div>
 
             { viewer.save_error && 
-              <Message style={{ width: '100%' }} severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
+              <div className="p-fluid">
+                <Message severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
+              </div>
             }
 
-            { viewer.save_response && !!viewer.save_response.message && 
-              <Message style={{ width: '100%' }} severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
+            { viewer.save_response && !!viewer.save_response.message &&
+              <div className="p-fluid">
+                <Message severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
+              </div>
             }           
           </form>
       </Dialog>)}

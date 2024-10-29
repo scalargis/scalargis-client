@@ -5,6 +5,8 @@ import { TreeTable } from 'primereact/treetable';
 import { Message } from 'primereact/message';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 import { Button } from 'primereact/button';
 
 import { i18n } from '@scalargis/components';
@@ -108,7 +110,7 @@ export default function DocumentList({ core, documentList }) {
   if (!loaded) {
     return (
       <div>
-        <div className="p-mt-4 p-mb-4 p-text-center">
+        <div className="mt-4 mb-4 text-center">
           <ProgressControl>
             <div>{i18n.translateValue("loading", "A carregar ...")}</div>
           </ProgressControl>
@@ -121,8 +123,8 @@ export default function DocumentList({ core, documentList }) {
     console.log(error);
     return (
       <div>
-        <div className="p-mt-4 p-mb-4 p-text-left">
-          <Message severity="error" text={translatedText.folderNotFound} className="p-col-12" />
+        <div className="mt-4 mb-4 text-left">
+          <Message severity="error" text={translatedText.folderNotFound} className="col-12" />
         </div>
       </div>
     );
@@ -131,23 +133,22 @@ export default function DocumentList({ core, documentList }) {
   if (!data?.length) {
     return (
       <div>
-        <div className="p-mt-4 p-mb-4 p-text-left">
-          <Message severity="warn" text={translatedText.emptyFolder}  className="p-col-12" />
+        <div className="mt-4 mb-4 text-left">
+          <Message severity="warn" text={translatedText.emptyFolder}  className="col-12" />
         </div>
       </div>
     );
   }
 
   const header = (documentList?.showExpandButtons || documentList?.showFilter) &&
-    <div className='p-grid'>
-      {documentList?.showFilter && <div className="p-col-12 p-text-right">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText type="search" onInput={(e) => setFilter(e.target.value)} placeholder={`${translatedText.filter}...`} 
-            className="sg-document-list p-inputtext-sm" />
-        </span>
+    <div className='grid'>
+      {documentList?.showFilter && <div className="flex col-12 justify-content-end">
+        <IconField iconPosition="left">
+            <InputIcon className="pi pi-search"> </InputIcon>
+            <InputText value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={`${translatedText.filter}...`} />
+        </IconField>
       </div>}
-      {documentList?.showExpandButtons && <div className="p-col-12 p-text-left">
+      {documentList?.showExpandButtons && <div className="col-12">
         <div className="p-buttonset" style={{"display": "inline-flex"}}>
           <Button label={translatedText.expand} icon="pi pi-plus-circle" className="p-button-outlined p-button-sm"
             onClick={() => {

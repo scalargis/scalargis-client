@@ -101,7 +101,7 @@ export default function ArcGISMap(props) {
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 
-        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="p-pt-2"
+        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="pt-2"
           onTabChange={(e) => {
             const new_options = {
               ...data?.options,
@@ -111,9 +111,9 @@ export default function ArcGISMap(props) {
           }}>
           <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
             <div className="p-fluid">
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">{t("useTiles", "Usar quadrículas")}</label>
-                <div className="p-col-12 p-md-5" style={{ textAlign: 'right' }}>
+              <div className="field grid">
+                <label className="col-12 md:col-7">{t("useTiles", "Usar quadrículas")}</label>
+                <div className="col-12 md:col-5" style={{ textAlign: 'right' }}>
                   <InputSwitch
                     checked={wmsTiled}
                     onChange={e => editField('wmsTiled', !wmsTiled)}

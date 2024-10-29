@@ -20,7 +20,7 @@ import FileSaver from 'file-saver';
 import './index.css';
 
 const drawElementsOptions = [
-  { value: "symbol", title: "drawingAddSymbol", defaultTitle: "Adicionar símbolo", icon: "pi pi-star-o" },
+  { value: "symbol", title: "drawingAddSymbol", defaultTitle: "Adicionar símbolo", icon: "pi pi-star" },
   { value: "text", title: "drawingAddText", defaultTitle: "Adicionar texto", icon: "pi pi-info-circle" },
   { value: "point", title: "drawingAddPoint", defaultTitle: "Adicionar ponto", icon: "pi pi-circle-on" },
   { value: "line", title: "drawingAddLine", defaultTitle: "Adicionar linha", icon: "pi pi-minus" },
@@ -1099,7 +1099,7 @@ class DrawTools extends React.Component {
             <Column
               field="properties.id"
               header="ID"
-              body={(row, table) => table.value.indexOf(row) + 1}
+              body={(row, props) => props.rowIndex + 1}
             />
             <Column
               field="properties.type"
@@ -1107,6 +1107,7 @@ class DrawTools extends React.Component {
               body={row => i18next.t(typeLabels[row.properties.type], row.properties.type)}
             />
             <Column
+              align="right"
               body={row => (
                 <React.Fragment>
                   <Button

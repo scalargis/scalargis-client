@@ -75,9 +75,9 @@ function LoginWidget(props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <div className="p-fluid">
-        <div className="p-field p-grid">
-          <label htmlFor="username" className="p-col-12 p-md-4">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
-          <div className="p-col-12 p-md-8">
+        <div className="field grid">
+          <label htmlFor="username" className="col-12 md:col-4">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
+          <div className="col-12 md:col-8">
             <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
                 <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })}
                   autoComplete="off"
@@ -87,10 +87,9 @@ function LoginWidget(props) {
             {getFormValidationErrorMessage(errors, 'username')}
           </div>
         </div>
-
-        <div className="p-field p-grid">
-          <label htmlFor="password" className="p-col-12 p-md-4">{i18nUtils.translateValue("password", "Palavra-passe")}</label>
-          <div className="p-col-12 p-md-8">
+        <div className="field grid">
+          <label htmlFor="password" className="col-12 md:col-4">{i18nUtils.translateValue("password", "Palavra-passe")}</label>
+          <div className="col-12 md:col-8">
             <Controller name="password" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
               <Password id={field.name} {...field} 
                 toggleMask 
@@ -104,19 +103,17 @@ function LoginWidget(props) {
           </div>
         </div>
 
-        { (componentCfg.reset_password === true || componentCfg.reset_password_login_error === true || componentCfg.user_registration) && <div className="p-field p-grid p-text-center">
-          { (componentCfg.reset_password || (componentCfg.reset_password_login_error && auth.response && !!auth.response && !!auth.response.message)) && <div className={`p-col p-p-2 p-text-center`}>
+        { (componentCfg.reset_password === true || componentCfg.reset_password_login_error === true || componentCfg.user_registration) && <div className="field grid">
+          { (componentCfg.reset_password || (componentCfg.reset_password_login_error && auth.response && !!auth.response && !!auth.response.message)) && <div className={`col p-2`}>
             <Button
               className="p-button-link"
-              style={{width: 'auto'}}
               label={i18nUtils.translateValue("passwordReset", "Recuperar password")}
               onClick={ (e) => { e.preventDefault(); showPasswordReset() }}
             />
           </div> }
-          { componentCfg.user_registration && <div className='p-col p-p-2 p-text-center'>
+          { componentCfg.user_registration && <div className='col p-2'>
             <Button
               className="p-button-link"
-              style={{width: 'auto'}}
               label={i18nUtils.translateValue("userRegistration", "Novo utilizador")}
               onClick={ (e) => { e.preventDefault(); showRegistration() }}
             />
@@ -135,11 +132,15 @@ function LoginWidget(props) {
       </div>
       
       { auth.http_error && !auth.response &&
-        <Message style={{ width: '100%' }} severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+        <div className="p-fluid">
+          <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+        </div>
       }
 
-      { auth.response && !!auth.response && !!auth.response.message && 
-        <Message style={{ width: '100%' }} severity="error" text={auth?.response?.message}></Message>
+      { auth.response && !!auth.response && !!auth.response.message &&
+        <div className="p-fluid">
+          <Message severity="error" text={auth?.response?.message}></Message>
+        </div>
       }
 
     </form>

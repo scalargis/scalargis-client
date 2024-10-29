@@ -78,9 +78,9 @@ export default function SearchLayerForm(props) {
     <>
       {showOnPortal(<Toast ref={(el) => toastEl = el} />)}
 
-      {goPanelSearchPrev && <div className="p-mt-2">
-        <div className="p-grid">
-          <div className="p-col p-text-left">
+      {goPanelSearchPrev && <div className="mt-2">
+        <div className="grid">
+          <div className="col text-left">
             <Button
                 label="Voltar"
                 icon="pi pi-chevron-left"
@@ -91,7 +91,7 @@ export default function SearchLayerForm(props) {
         </div>  
       </div>}
 
-      <div className="p-mt-2">{searchTitle}</div>
+      <div className="mt-2">{searchTitle}</div>
       <hr />
 
       { props?.errorSchema && <React.Fragment>
@@ -102,7 +102,7 @@ export default function SearchLayerForm(props) {
       </React.Fragment> }
 
       <React.Fragment>
-        <div className="p-mt-3">
+        <div className="mt-3">
           <JsonFormContext.Provider value={{utils: Models.Utils}}>
             <JsonForm
               schema={schema}
@@ -127,7 +127,7 @@ export default function SearchLayerForm(props) {
           </JsonFormContext.Provider>
         </div>
 
-        <div className="p-text-center">
+        <div className="text-center">
           <Button onClick={() => {
               const _formdata = {...formData};
               _formdata[id] = {};
@@ -143,7 +143,7 @@ export default function SearchLayerForm(props) {
 
               if (layer && layer.current) layer.current.getSource().clear();
             }}
-            className="p-mr-2"
+            className="mr-2"
             color='primary'>
             Limpar
           </Button>
@@ -230,7 +230,7 @@ export default function SearchLayerForm(props) {
         </div>
 
         {(results && results[id] && results[id].total === 0) &&
-          <div className="p-mt-4" style={{textAlign: 'center'}}>
+          <div className="mt-4" style={{textAlign: 'center'}}>
             <Message
               severity="info"
               text='Pesquisa sem resultados'

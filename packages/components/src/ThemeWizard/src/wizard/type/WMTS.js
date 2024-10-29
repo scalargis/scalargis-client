@@ -130,7 +130,7 @@ export default function WMTS(props) {
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 
-        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="p-pt-2"
+        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="pt-2"
           onTabChange={(e) => {
             const new_options = {
               ...data?.options,
@@ -142,9 +142,9 @@ export default function WMTS(props) {
 
             <div className="p-fluid">
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">{t("version", "Versão")}</label>
-                <div className="p-col-12 p-md-5">
+              <div className="field grid">
+                <label className="col-12 md:col-7">{t("version", "Versão")}</label>
+                <div className="col-12 md:col-5">
                   <Dropdown
                     options={versions}
                     value={wmtsVersion}
@@ -153,9 +153,9 @@ export default function WMTS(props) {
                 </div>
               </div>
 
-              <div className="p-field p-grid">
-                <label className="p-col-12 p-md-7">{t("ignoreServiceUrl", "Ignorar URL do serviço")}</label>
-                <div className="p-col-12 p-md-5" style={{ textAlign: 'right' }}>
+              <div className="field grid">
+                <label className="col-12 md:col-7">{t("ignoreServiceUrl", "Ignorar URL do serviço")}</label>
+                <div className="col-12 md:col-5" style={{ textAlign: 'right' }}>
                   <InputSwitch
                     checked={wmtsIgnoreServiceUrl}
                     onChange={e => editField('wmtsIgnoreServiceUrl', !wmtsIgnoreServiceUrl)}

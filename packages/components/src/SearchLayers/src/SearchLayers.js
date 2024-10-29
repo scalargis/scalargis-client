@@ -126,7 +126,7 @@ export default function SearchLayers(props) {
 
           const iconClass = {
             "pi": !l.icon,
-            "p-mt-3": true
+            "mt-3": true
           }
           iconClass[l.icon] = l.icon ? true : false;
           iconClass['pi-bars'] = l.icon ? false : true;

@@ -130,7 +130,7 @@ function TopButtonContact({ viewer }) {
           <form onSubmit={e => submit()}>
 
             <div className="p-fluid">
-              <div className="p-field">
+              <div className="field">
                   <label htmlFor="contact_name">Nome</label>
                   <InputText
                       id="contact_name"
@@ -141,9 +141,9 @@ function TopButtonContact({ viewer }) {
                       onChange={e => {setName(e.target.value); setInfoMessage(null);}}
                     />
                     { (!name || name.length === 0) &&
-                    <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }                                  
+                    <small className="p-error block">Campo de preenchimento obrigatório</small> }                                  
               </div>
-              <div className="p-field">
+              <div className="field">
                   <label htmlFor="contact_email">Email</label>
                   <InputText
                       id="contact_email"
@@ -154,9 +154,9 @@ function TopButtonContact({ viewer }) {
                       onChange={e => {setEmail(e.target.value); setInfoMessage(null);}}
                     />
                     { (!email || email.length === 0) &&
-                    <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }                                  
+                    <small className="p-error block">Campo de preenchimento obrigatório</small> }                                  
               </div>
-              <div className="p-field">
+              <div className="field">
                   <label htmlFor="contact_description">Descrição</label>
                   <InputTextarea rows={3}
                       id="contact_description"
@@ -166,7 +166,7 @@ function TopButtonContact({ viewer }) {
                       onChange={e => {setDescription(e.target.value); setInfoMessage(null);}}
                     />
                     { (!description || description.length === 0) &&
-                    <small className="p-invalid p-d-block">Campo de preenchimento obrigatório</small> }
+                    <small className="p-error block">Campo de preenchimento obrigatório</small> }
               </div>            
             </div>
             
@@ -175,8 +175,10 @@ function TopButtonContact({ viewer }) {
             }
                       
             <div className="p-mb-2">
-              { (infoMessage && infoMessage.type) && 
-                <Message style={{ width: '100%' }} severity={infoMessage.type} text={infoMessage.message}></Message>
+              { (infoMessage && infoMessage.type) &&
+                <div className="p-fluid"> 
+                  <Message severity={infoMessage.type} text={infoMessage.message}></Message>
+                </div>
               }
             </div>                   
 

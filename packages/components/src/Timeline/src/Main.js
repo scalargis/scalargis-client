@@ -50,7 +50,7 @@ export default function Main(props) {
           [_theme],
           true
         ));
-        dispatch(actions.layers_set_checked([ ...viewer.config_json.checked, _theme.id])); 
+        dispatch(actions.layers_set_checked([ ...(viewer?.config_json?.checked || []), _theme.id])); 
         setTheme(_theme);
       }
     }

@@ -64,7 +64,7 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
 
   return (
     <div>
-      <div className="p-d-flex p-mt-2 p-mb-2">
+      <div className="flex mt-2 mb-2">
         <Dropdown options={matrixItems} value={tilematrixset} showClear placeholder={t("selectTileMatrix", "Selecione a Grelha")} style={{ width: "100%"}}
         onChange={ e => selectTileMatrixSet(e.value)}/>    
       </div>

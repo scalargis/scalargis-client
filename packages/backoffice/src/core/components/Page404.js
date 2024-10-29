@@ -7,8 +7,8 @@ function Page404({ history }) {
   const navigate = useNavigate();
 
   return (
-    <div className="p-d-flex p-jc-center" style={{ height: '100%' }}>
-      <div className="p-as-center" style={{ backgroundColor: 'white', padding: '6rem' }}>
+    <div className="flex justify-content-center" style={{ height: '100%' }}>
+      <div className="align-self-center p-8" style={{ backgroundColor: 'white' }}>
         <h1>Ops...</h1>
         <p>O visualizador pedido não existe.</p>
         <p>Clique para voltar a página inicial</p>

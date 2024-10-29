@@ -76,7 +76,7 @@ export default function GML(props) {
       <React.Fragment>
         <div className="p-fluid">
 
-          <div className="p-field">
+          <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
             <Dropdown 
               placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
@@ -86,7 +86,7 @@ export default function GML(props) {
             />
           </div>
 
-          <div className="p-field">
+          <div className="field">
             <label>{t("file", "Ficheiro")} GML</label>
             <FileUpload 
               name="upload"

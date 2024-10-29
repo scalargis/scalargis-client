@@ -394,7 +394,7 @@ class Main extends React.Component {
           { !!withHeading && <h3>{this.props.t("themes","Temas")}</h3> }
 
           { (!!cookieData && !!config.viewer.allow_user_session) && 
-            <Toolbar className="p-mb-2"
+            <Toolbar className="mb-2"
               left={(config.viewer.is_session && 
                 <Button label={this.props.t("session", "Sessão")} className="p-button-sm p-button-rounded p-button-info" 
                   icon="pi pi-check" tooltip={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}  />)} 
@@ -420,14 +420,14 @@ class Main extends React.Component {
               <div className="p-inputgroup">
                 <InputText 
                   placeholder={`${this.props.t('filter', "Filtro")}...`}
-                  className="p-inputtext-sm p-mb-2"
+                  className="p-inputtext-sm mb-2"
                   value={filter}
                   onChange={this.changeFilter.bind(this)}
                 />
                 <Button
                   icon="pi pi-times"
                   label={this.props.t('clear', "Limpar")}
-                  className="p-button-sm p-mb-2"
+                  className="p-button-sm mb-2"
                   onClick={this.clearFilter.bind(this)}
                 />
               </div>

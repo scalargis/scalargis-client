@@ -44,24 +44,6 @@
   border-radius: 0;
 }
 
-.coordinates-item .coordinates-item-tools .p-menu.p-menu-overlay {
-  width: 7rem;
-  left: -30px !important;
-}
-
-.coordinates-item .coordinates-item-tools .p-splitbutton-defaultbutton {
-  display: none
-}
-
-.coordinates-item .coordinates-item-tools .p-splitbutton-menubutton span.pi:before {
-  content: "\e956";
-}
-
-
-.coordinates .p-formgroup-inline.flex-no-wrap {
-  flex-wrap: nowrap;
-}
-
 .coordinates .p-inputtext.p-inputnumber-input {
   font-size: 1rem;
 }

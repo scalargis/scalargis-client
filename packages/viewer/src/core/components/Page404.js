@@ -10,12 +10,12 @@ function Page404({ history }) {
   const { navigate } = useNavigate();
 
   return (
-    <div className="p-d-flex p-jc-center" style={{ height: '100%' }}>
-      <div className="p-as-center" style={{ backgroundColor: 'white', padding: '6rem' }}>
+    <div className="flex justify-content-center" style={{ height: '100%' }}>
+      <div className="align-self-center p-6 sm:p-8" style={{ backgroundColor: 'white' }}>
         <h1>{t("pageNotFound", "Página não encontrada")}</h1>
         <p>{t("viewerNotFound", "O visualizador solicitado não existe.")}</p>
         <p>{t("goHomeMsg", "Clique para ir para a página inicial")}</p>
-        <p>
+        <p className="text-center pt-4">
           <Button label={t("Home", "Página Inicial")} onClick={e => navigate("/")}></Button>
         </p>
       </div>

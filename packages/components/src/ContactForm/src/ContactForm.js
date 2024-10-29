@@ -285,7 +285,7 @@ export default function ContactFrom(props) {
                   onChange={e => {setName(e.target.value); setInfoMessage(null);}}
                 />
                 { (!name || name.length === 0) &&
-                <small className="p-invalid p-d-block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
+                <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
           </div>
           <div className="p-field">
               <label htmlFor="contact_email">Email</label>
@@ -298,7 +298,7 @@ export default function ContactFrom(props) {
                   onChange={e => {setEmail(e.target.value); setInfoMessage(null);}}
                 />
                 { (!email || email.length === 0) &&
-                <small className="p-invalid p-d-block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
+                <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
           </div>
           <div className="p-field">
               <label htmlFor="contact_description">Descrição</label>
@@ -310,7 +310,7 @@ export default function ContactFrom(props) {
                   onChange={e => {setDescription(e.target.value); setInfoMessage(null);}}
                 />
                 { (!description || description.length === 0) &&
-                <small className="p-invalid p-d-block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }
+                <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }
           </div>
 
           { upload_cfg.enabled &&
@@ -335,7 +335,7 @@ export default function ContactFrom(props) {
                 emptyTemplate={<p className="m-0">{ upload_cfg.emptyMessage || "Arraste para aqui o ficheiros a enviar." }</p>} 
               />
 
-              { (upload_cfg.maxFileSize) && <small className="p-invalid p-d-block">Tamanho máximo do ficheiro: {(upload_cfg.maxFileSize / 1048576).toFixed(2)} MB</small> } 
+              { (upload_cfg.maxFileSize) && <small className="p-invalid block">Tamanho máximo do ficheiro: {(upload_cfg.maxFileSize / 1048576).toFixed(2)} MB</small> } 
 
           </div> }
           

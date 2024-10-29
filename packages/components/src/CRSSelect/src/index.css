@@ -12,6 +12,7 @@
 
 .footer-right .crsselect .p-dropdown.p-component .p-dropdown-label.p-inputtext {
   max-width: 200px;
+  padding-top: 5px;
 }
 
 .footer-right .viewer-mouse-position {

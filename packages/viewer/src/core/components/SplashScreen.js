@@ -6,8 +6,6 @@ import AppContext from '../../AppContext';
 
 function SplashScreen(props) {
 
-  console.log(props);
-
   const { children } = props;
 
   const { t } = useTranslation();
@@ -28,10 +26,10 @@ function SplashScreen(props) {
   const message = t("defaultRGPDmsg", "Este website usa cookies para melhorar a sua experiência de navegação. Ao pressionar 'Aceito' está a concordar com a sua utilização.");
 
   return (
-    <div className="splashscreen p-d-flex p-jc-center">
-      <div role="main" className="p-as-center">
+    <div className="splashscreen flex align-items-center justify-content-center">
+      <div role="main">
 
-        <div className="login-logo p-text-center">
+        <div className="login-logo text-center mb-4">
           <img onError={addDefaultSrc} className="img-responsive" src={viewerLogo} alt="Logo" style={{maxWidth: "100%"}} />  
         </div>
 

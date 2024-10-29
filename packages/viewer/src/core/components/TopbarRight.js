@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Menu } from 'primereact/menu';
 
 import MapModel from '../model/MapModel';
 import OWSModel from '../model/OWSModel';
@@ -18,7 +19,6 @@ export default function TopbarRight(props) {
 
   const menuRef = useRef();
 
-
   if (isMobileSmall) {
     let mobileMenu = viewer?.config_json?.topbar_right?.menu_mobile?.children?.length ? viewer.config_json.topbar_right.menu_mobile.children : [];
 
@@ -27,6 +27,12 @@ export default function TopbarRight(props) {
       mobileMenu = mobileMenu.filter( c => ids.includes(c));
     }
 
+    const menuItems = core.renderComponentsMenu({
+      region: 'topbar_right',
+      mobileMenu: mobileMenu,
+      props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } },
+    }).map((c, k) => { return { template: <div className='p-menuitem-content'>{c}</div>} }); 
+
     return(
       <React.Fragment>
         { core.renderComponents({
@@ -34,23 +40,14 @@ export default function TopbarRight(props) {
           mobileMenu: mobileMenu,
           props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } }
         })}
-
-        { mobileMenu?.length ? <div ref={menuRef} className="topbar-menu-button-container">
-          <button className="p-link layout-menu-button" onClick={(event) => setShowMenu(!showMenu)}>
-            <span className="pi pi-chevron-circle-down"/>
-          </button>
-          {showMenu && 
-            <div className="p-menu p-component p-menu-overlay p-mt-2" style={{zIndex: "1001", position: "absolute", right: "10px"}}>
-              <ul className="p-menu-list p-reset" role="menu">
-                { core.renderComponentsMenu({
-                    region: 'topbar_right',
-                    mobileMenu: mobileMenu,
-                    props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } },
-                  }).map((c, k) => <li key={k} className="p-menuitem" role="none">{c}</li>) }
-              </ul>
-            </div>
-          }
-        </div> : null }
+  
+        { mobileMenu?.length ?
+          <div className="topbar-menu-button-container">
+            <Menu model={menuItems} popup ref={menuRef} id="topbar_right_menu" /> 
+            <button className="p-link layout-menu-button" onClick={(event) => menuRef.current.toggle(event)}>
+              <span className="pi pi-chevron-circle-down"/>
+            </button>
+          </div> : null }
       </React.Fragment>
     );
   }

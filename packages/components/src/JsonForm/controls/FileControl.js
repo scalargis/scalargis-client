@@ -100,7 +100,7 @@ export const FileControl = (props) => {
       {showOnPortal(<Toast ref={toast} baseZIndex={2000} />)}
       <form onSubmit={(e)=>{ e.preventDefault(); }}>
         <div className="p-fluid">    
-          <div className="p-field">
+          <div className="field">
             { (file && file.data && file.original_filename) ?
             <div>
               <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" style={{color:"var(--primary-color)"}} /></div>
@@ -113,7 +113,7 @@ export const FileControl = (props) => {
             </div>
             }
           </div>
-          <div className="p-field p-col-12">
+          <div className="field col-12">
             <FileUpload
               ref={file_upload} 
               name="upload"

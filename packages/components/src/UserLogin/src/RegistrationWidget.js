@@ -3,11 +3,14 @@ import { connect } from 'react-redux';
 import Cookies from 'universal-cookie';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { Message } from 'primereact/message';
 import { Divider } from 'primereact/divider';
+import { FloatLabel } from 'primereact/floatlabel';
 import { classNames } from 'primereact/utils';
 
 import { i18n as i18nUtils } from '@scalargis/components';
@@ -54,9 +57,9 @@ function RegistrationWidget(props) {
 
   const passwordFooter = (
     <React.Fragment>
-        <Divider className="p-mt-2" />
-        <p className="p-mt-2">{i18nUtils.translateValue("suggestions", "Sugestões")}:</p>
-        <ul className="p-pl-2 p-ml-2 p-mt-0" style={{ lineHeight: '1.5' }}>
+        <Divider className="mt-2" />
+        <p className="mt-2">{i18nUtils.translateValue("suggestions", "Sugestões")}:</p>
+        <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
             <li>{i18nUtils.translateValue("passwordLowerRule", "Pelo menos uma minúscula")}</li>
             <li>{i18nUtils.translateValue("passwordUpperRule", "Pelo menos uma maiúscula")}</li>
             <li>{i18nUtils.translateValue("passwordDigitRule", "Pelo menos um dígito")}</li>
@@ -68,7 +71,7 @@ function RegistrationWidget(props) {
 
   if (auth?.response?.register_user === true && !auth?.response?.error) {
     return (
-      <div className="p-d-flex p-ai-center p-dir-col p-pt-6 p-px-3">
+      <div className="flex align-items-center p-dir-col pt-6 p-px-3">
         <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
         <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
         <p style={{ lineHeight: 1.5 }} dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
@@ -77,7 +80,7 @@ function RegistrationWidget(props) {
           dispatch(login_post({ username: formData.username, password: formData.password }, history, redirect))
         } />
         */}
-<       div className='p-col-12 p-md-6 p-p-2 p-text-center'>
+<       div className='col-12 md:col-6 p-2 text-center'>
           <Button
             className="p-button-link"
             style={{width: 'auto'}}
@@ -91,31 +94,33 @@ function RegistrationWidget(props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-      <div className="p-fluid p-mt-2">
+      <div className="p-fluid">
         <h3>{i18nUtils.translateValue("userRegistrationData", "Dados de registo")}</h3>
 
-        <div className="p-field">
-          <span className="p-float-label">
+        <div className="field pt-2">
+          <FloatLabel>
             <Controller name="name" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
                 <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
             )} />
             <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>{i18nUtils.translateValue("userRegistrationDataName", "Nome")}*</label>
-          </span>
+          </FloatLabel>
           {getFormValidationErrorMessage(errors, 'name')}
         </div>
-        <div className="p-field">
-          <span className="p-float-label p-input-icon-right">
-            <i className="pi pi-envelope" />
-            <Controller name="email" control={control}
-                rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório"), pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: 'Email inválido. E.g. exemplo@email.pt' }}}
-                render={({ field, fieldState }) => (
-                    <InputText id={field.name} {...field} disabled={!!cookieData} className={classNames({ 'p-invalid': fieldState.invalid })} />
-            )} />
-            <label htmlFor="email" className={classNames({ 'p-error': !!errors.email })}>{i18nUtils.translateValue("userRegistrationDataEmail", "Email")}*</label>
-          </span>
+        <div className="field">
+            <FloatLabel className="mt-4">
+              <IconField iconPosition="right">
+                <InputIcon className="pi pi-envelope" />
+                  <Controller name="email" control={control}
+                      rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório"), pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: 'Email inválido. E.g. exemplo@email.pt' }}}
+                      render={({ field, fieldState }) => (
+                          <InputText id={field.name} {...field} disabled={!!cookieData} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                  )} />
+                </IconField>
+              <label htmlFor="email" className={classNames({ 'p-error': !!errors.email })}>{i18nUtils.translateValue("userRegistrationDataEmail", "Email")}*</label>
+            </FloatLabel>
           {getFormValidationErrorMessage(errors, 'email')}
         </div>              
-        <div className="p-field">
+        <div className="field pt-2">
           <span className="p-float-label">
             <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
                 <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} 
@@ -125,7 +130,7 @@ function RegistrationWidget(props) {
           </span>
           {getFormValidationErrorMessage(errors, 'username')}
         </div>
-        <div className="p-field">
+        <div className="field pt-2">
           <span className="p-float-label">
               <Controller name="password" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
                   <Password id={field.name} {...field}
@@ -141,7 +146,7 @@ function RegistrationWidget(props) {
           </span>
           {getFormValidationErrorMessage(errors, 'password')}
         </div>
-        <div className="p-field-checkbox">
+        <div className="field-checkbox">
             <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
                 <Checkbox inputId={field.name} onChange={(e) => field.onChange(e.checked)} checked={field.value} className={classNames({ 'p-invalid': fieldState.invalid })} />
             )} />
@@ -150,8 +155,8 @@ function RegistrationWidget(props) {
       </div>
 
       { showLogin && <div className="p-fluid">
-          <div className="p-field p-grid">
-            <div className="p-col-12">
+          <div className="field grid">
+            <div className="col-12">
               <Button
                 className="p-button-link"
                 label = "Login"
@@ -175,11 +180,15 @@ function RegistrationWidget(props) {
       </div>
       
       { auth.http_error && !auth.response &&
-        <Message style={{ width: '100%' }} severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}></Message>
+        <div className="p-fluid">
+          <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}></Message>
+        </div>
       }
 
-      { auth.response && !!auth.response && !!auth.response.message && 
-        <Message style={{ width: '100%' }} severity="error" text={auth.response.message}></Message>
+      { auth.response && !!auth.response && !!auth.response.message &&
+        <div className="p-fluid">
+          <Message severity="error" text={auth.response.message}></Message>
+        </div>
       }
 
     </form>

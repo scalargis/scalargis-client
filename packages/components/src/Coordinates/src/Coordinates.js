@@ -430,8 +430,8 @@ export default function Coordinates({ core, config, actions, dispatch, record })
 
   function renderCoordinatesItem(data) {
     return (data ? (
-      <div className="p-col-12 coordinates-item">
-        <div className="coordinates-item-tools p-text-right">
+      <div className="col-12 coordinates-item">
+        <div className="coordinates-item-tools text-right">
           <Button
             title={t("zoomToElement", "Aproximar ao elemento")}
             icon="pi pi-search"
@@ -558,7 +558,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     <div>
 
       { (isInactive || !coordinates?.length) ?
-        <div className="p-mt-2 p-mb-3">
+        <div className="mt-2 mb-3">
           <Message
             severity="info"
             text={msg}
@@ -567,39 +567,37 @@ export default function Coordinates({ core, config, actions, dispatch, record })
 
       {(showDegrees &&
       <React.Fragment>
-        <div className="p-fluid p-formgrid p-grid p-mt-2">
-          <div className="p-field p-col-12">
+        <div className="grid formgrid mt-2">
+          <div className="field col-12">
             <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
-            <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")}/>
+            <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")} className="w-full"/>
           </div>
-          <div className="p-field p-col-12">
-            <div className="p-formgroup-inline flex-no-wrap">
-                <div className="p-field-checkbox">
-                    <RadioButton value="dd" onChange={(e) => setUnits(e.value)} checked={units === 'dd'}  />
-                    <label>{t("decimalDegrees", "Graus decimais")}</label>
-                </div>
-                <div className="p-field-checkbox">
-                    <RadioButton value="dms" onChange={(e) => setUnits(e.value)} checked={units === 'dms'}  />
-                    <label>{`${t("degrees", "Graus")} / ${t("minutes", "Minutos")} / ${t("seconds", "Segundos")}`}</label>
-                </div>
+          <div className="field col-12">
+            <div className="field-checkbox">
+                <RadioButton value="dd" onChange={(e) => setUnits(e.value)} checked={units === 'dd'}  />
+                <label>{t("decimalDegrees", "Graus decimais")}</label>
+            </div>
+            <div className="field-checkbox mb-1">
+                <RadioButton value="dms" onChange={(e) => setUnits(e.value)} checked={units === 'dms'}  />
+                <label>{`${t("degrees", "Graus")} / ${t("minutes", "Minutos")} / ${t("seconds", "Segundos")}`}</label>
             </div>
           </div>
-          <div className="p-field p-col-12">
+          <div className="field col-12">
           { units === 'dd' &&
-            <div className="p-fluid p-formgrid p-grid">
-              <div className="p-field p-col">
+            <div className="grid formgrid">
+              <div className="field col-12 md:col-6">
                 <label>{t("longitude", "Longitude")}</label>
-                <InputNumber value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm" />
+                <InputNumber value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
               </div>
-              <div className="p-field p-col">
+              <div className="field col-12 md:col-6">
                 <label>{t("latitude", "Latitude")}</label>
-                <InputNumber value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm" />
+                <InputNumber value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
               </div>
             </div>          
           }
           { units === 'dms' &&
-            <div className="p-fluid p-formgrid p-grid">
-              <div className="p-field p-col">
+            <div className="grid formgrid">
+              <div className="field col-12 md:col-6">
                 <label>{t("longitude", "Longitude")}</label>
                 <div className="p-inputgroup">
                   <select value={optLongitude} onChange={e => setOptLongitude(e.target.value)}>
@@ -609,7 +607,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                   <InputMask mask="999º 99' 99?.99''" value={coordLon} onChange={(e) => setCoordLon(e.value)} />
                 </div>
               </div>
-              <div className="p-field p-col">
+              <div className="field col-12 md:col-6">
                 <label>{t("latitude", "Latitude")}</label>
                 <div className="p-inputgroup">
                 <select value={optLatitude} onChange={e => setOptLatitude(e.target.value)}>
@@ -627,22 +625,22 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       )}
       {(!showDegrees &&
       <React.Fragment>
-        <div className="p-fluid p-formgrid p-grid p-mt-2">
-            <div className="p-field p-col-12">
+        <div className="grid formgrid mt-2">
+            <div className="field col-12">
               <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
-              <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")}/>
+              <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")} className="w-full" />
             </div>
-            <div className="p-field p-col">
+            <div className="field col-12 md:col-6">
                 <label htmlFor="coordX">X</label>
-                <InputNumber id="coordX" value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm" />
+                <InputNumber id="coordX" value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
             </div>
-            <div className="p-field p-col">
+            <div className="field col-12 md:col-6">
                 <label htmlFor="coordY">Y</label>              
-                <InputNumber id="coordY" value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm" />
+                <InputNumber id="coordY" value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
             </div>
         </div>      
       </React.Fragment>)}
-      <div className="card p-text-center">
+      <div className="card text-center">
         <Button
             label={t("locate","Localizar")}
             icon="pi pi-search"
@@ -667,14 +665,14 @@ export default function Coordinates({ core, config, actions, dispatch, record })
               title={t("exportResults", "Exportar resultados")}
               label="CSV"
               icon="pi pi-download"
-              className="p-button-outlined p-button-sm p-ml-2"
+              className="p-button-outlined p-button-sm ml-2"
               onClick={e => exportAll('csv')}
             />
             <Button
               title={t("exportResults", "Exportar resultados")}
               label="GeoJSON"
               icon="pi pi-download"
-              className="p-button-outlined p-button-sm p-ml-2"
+              className="p-button-outlined p-button-sm ml-2"
               onClick={e => exportAll('geojson')}
             />                       
           </div>         

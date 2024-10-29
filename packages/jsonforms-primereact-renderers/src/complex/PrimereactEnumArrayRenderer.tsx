@@ -98,7 +98,7 @@ export const PrimereactEnumArrayRenderer = ({
       onFocus={onFocus}
       onBlur={onBlur}
       id={id}
-      className='p-field'
+      className='field'
     >     
       <label htmlFor={id + '-input'} className={labelClassName}>
         {labelText}
@@ -143,7 +143,7 @@ export const PrimereactEnumArrayRenderer = ({
                 uischema={uischema}
                 visible={visible}
                 enabled={enabled}
-                className="p-mr-1"
+                className="mr-1"
                 {...otherProps}
               />
               <label htmlFor={`${id}-${option.value}-input`}>{option.label}</label>

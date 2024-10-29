@@ -135,7 +135,7 @@ export default function KML(props) {
 
           <TabView>
             <TabPanel header={t("file", "Ficheiro")}>
-              <div className="p-field">
+              <div className="field">
                 <label>{t("kmlFormatInfo", "Ficheiro - KML/KMZ")}</label>
                 <FileUpload 
                   name="upload"
@@ -157,7 +157,7 @@ export default function KML(props) {
               </div>
             </TabPanel>
             <TabPanel header="URL">
-              <div className="p-field">
+              <div className="field">
                 <label>URL - KML</label>
                 <div className="p-inputgroup">
                   <InputText placeholder='https://...'

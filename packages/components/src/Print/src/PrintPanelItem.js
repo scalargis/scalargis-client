@@ -8,7 +8,7 @@ import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { InputNumber } from 'primereact/inputnumber';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Checkbox } from 'primereact/checkbox';
 import OlInteractionDraw from 'ol/interaction/Draw';
@@ -120,6 +120,7 @@ export default function PrintPanelItem(props) {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: t("yes", "Sim"),
       rejectLabel: t("no", "Não"),
+      defaultFocus: "reject",
       accept: () => {
         features.forEach((f) => {
           printLayer.current.getSource().removeFeature(f);
@@ -621,7 +622,7 @@ export default function PrintPanelItem(props) {
           icon={opt.icon}
           label={opt.label ? opt.label : ''}
           tooltip={t(opt.title, opt.defaultTitle)}
-          className={"p-button-sm p-mr-2 tool" + (opt.value === drawTool ? " active" : "")}
+          className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "")}
           onClick={(e) => selectDrawTool(e, opt.value)}
         />
       )}
@@ -633,13 +634,13 @@ export default function PrintPanelItem(props) {
       <Button
         icon="pi pi-trash"
         tooltip={t("deleteElement(s)", "Eliminar elemento(s)")}
-        className="p-button-sm p-mr-2 tool"
+        className="p-button-sm mr-1 tool"
         onClick={(e) => deletedSelectedFeature()}
       />
       <Button
         icon="fas fa-search-plus"
         tooltip={t("viewAllElements", "Ver todos os elementos")}
-        className="p-button-sm p-mr-2 tool"
+        className="p-button-sm mr-1 tool"
         onClick={(e) => zoomFeaturesExtent()}
       />
     </React.Fragment>
@@ -649,13 +650,14 @@ export default function PrintPanelItem(props) {
     <div className="print-panel-item">
       {showOnPortal(<Toast ref={toast} position="top-right" />)}
       {showOnPortal(<Toast ref={toastDialog} />)}
+      <ConfirmDialog />
 
       <h3>{props.printItem.title}</h3>
 
       {(printItem.allow_drawing !== false) && <div className="p-fluid">
         <h4>{t("locationMarking", "Marcação do Local")}</h4>
         <div>
-          <Toolbar left={toolbarLeftContents} right={toolbarRightContents} />
+          <Toolbar start={toolbarLeftContents} end={toolbarRightContents} className="pl-2 pr-2" />
         </div>
         {printItem.location_marking &&
           <Message severity={ geometryError === true ? "error" : "info" } text={t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")} />
@@ -682,7 +684,7 @@ export default function PrintPanelItem(props) {
       </div>
 
       {(printItem.form_fields && printItem.form_fields.groups) &&
-        <div className="p-mt-2">
+        <div className="mt-2">
           {Object.entries(printItem.form_fields.groups).map(([groupKey, group]) => {
             if (group.active) {
               return <div key={groupKey} className="p-fluid">
@@ -690,10 +692,10 @@ export default function PrintPanelItem(props) {
                 {group.fields && Object.entries(group.fields).map(([fieldKey, field]) => {
                   const field_key = groupKey + '.' + fieldKey;
                   if (field.active) {
-                    return <div key={field_key} className="p-field">
+                    return <div key={field_key} className="field">
                       {field.header && <h4>{field.header}</h4>}
                       {field.showLabel && <label>{field.title}</label>}
-                      <InputText id={field_key} className="p-inputtext p-d-block"
+                      <InputText id={field_key} className="p-inputtext block"
                         placeholder={!field.header && !field.showLabel ? field.title : ''}
                         tooltip={!field.header && !field.showLabel ? field.title : ''}
                         value={fields[field_key]} onChange={handleFieldChange} />
@@ -708,16 +710,16 @@ export default function PrintPanelItem(props) {
       }
 
       {(printItem.form_fields && printItem.form_fields.fields) &&
-        <div className="p-mt-2">
+        <div className="mt-2">
           {Object.entries(printItem.form_fields.fields).map(([fieldKey, field]) => {
             const field_key = fieldKey;
             if (field.active) {
               return <React.Fragment>
                 <div key={field_key} className="p-fluid">
                   {field.header && <h4>{field.header}</h4>}
-                  <div className="p-field">
+                  <div className="field">
                     {field.showLabel && <label>{field.title}</label>}
-                    <InputText id={field_key} className="p-inputtext p-d-block"
+                    <InputText id={field_key} className="p-inputtext block"
                       placeholder={!field.header && !field.showLabel ? field.title : ''}
                       tooltip={!field.header && !field.showLabel ? field.title : ''}
                       value={fields[field_key]} onChange={handleFieldChange} />
@@ -731,21 +733,21 @@ export default function PrintPanelItem(props) {
       }
 
       {isPrinting ?
-        <div className="card p-text-center p-mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
-          <div><i className="pi pi-spin pi-spinner p-mr-1"></i>{t("generatingPrint", "A gerar a planta...")}</div>
+        <div className="card text-center mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
+          <div><i className="pi pi-spin pi-spinner mr-1"></i>{t("generatingPrint", "A gerar a planta...")}</div>
         </div> : null
       }
       {!isPrinting && printFile ?
-        <div className="card p-text-center p-mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
+        <div className="card text-center mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
           <a href={printFile.url} target="_blank">
-            <i className="pi pi-external-link p-pl-2 p-mr-1"></i>{t("openPrintPdf", "Abrir PDF da planta")}
+            <i className="pi pi-external-link pl-2 mr-1"></i>{t("openPrintPdf", "Abrir PDF da planta")}
           </a>
         </div> : null
       }
 
       <div className="card">
-        <div className="p-grid">
-          <div className="p-col p-text-left">
+        <div className="grid">
+          <div className="col text-left">
             {!standalone &&
               <Button
                 label={t("back", "Voltar")}
@@ -754,7 +756,7 @@ export default function PrintPanelItem(props) {
                 onClick={e => { goPanelPrintPrev(); }}
               />}
           </div>
-          <div className="p-col p-text-right">
+          <div className="col text-right">
             <Button
               label={t("print", "Imprimir")}
               icon="pi pi-print"
@@ -769,7 +771,7 @@ export default function PrintPanelItem(props) {
         <div className="field-checkbox">
           <Checkbox inputId="binary" checked={paperBox}
             onChange={e => setPaperBox(e.checked)} />
-          <label htmlFor="binary" className="p-pl-2">{t("showPrintArea", "Visualizar área de impressão")}</label>
+          <label htmlFor="binary" className="pl-2">{t("showPrintArea", "Visualizar área de impressão")}</label>
         </div>
       </div> : null}
     </div>

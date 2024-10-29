@@ -292,6 +292,7 @@ export default function Main(props) {
           activeIndex={activeIndex} 
           onSelect={(e) => changeStep(activeIndex, e.index)} 
           readOnly={false}
+          className="mb-4"
         />
         { step }
       </div>

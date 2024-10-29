@@ -59,8 +59,8 @@ export function MainMenu({ className, config, actions, record }) {
           maximized={maximized} 
           modal
           footer={(
-            <div className="p-grid">
-              <div className="p-col" style={{ textAlign: 'right'}}>
+            <div className="grid">
+              <div className="col">
                 <Button label={closeLabel} onClick={e => setShowPopup(false)} />
               </div>
             </div>
@@ -192,8 +192,8 @@ export default function Main({ type, as, config, actions, record }) {
           maximized={maximized} 
           modal
           footer={(
-            <div className="p-grid">
-              <div className="p-col" style={{ textAlign: 'right'}}>
+            <div className="grid">
+              <div className="col">
                 <Button label={closeLabel} onClick={e => setShowPopup(false)} />
               </div>
             </div>

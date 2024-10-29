@@ -71,7 +71,7 @@ const FieldFormEditor = props => {
             <div className="p-inputgroup">
               <InputText  id="key" type="text" {...register("key", { required: 'Campo obrigatório.',  pattern: /^(?![0-9])[a-zA-Z0-9$_]+$/i })} className={classNames({ 'p-invalid': errors.key })} />            
               <Tooltip target=".tooltip-form-field-key" autoHide={false}>
-                  <div className="p-d-flex p-ai-center">
+                  <div className="flex align-items-center">
                       <span style={{minWidth: '5rem'}}>
                         O campo <i>chave</i> é de preenchimento obrigatório e serve como identificador único de cada campo.
                         Deverá ser preenchido com uma cadeia de caracteres, sem espaços.
@@ -184,7 +184,7 @@ const GroupFormEditor = props => {
           <div className="p-inputgroup">
             <InputText  id="key" type="text" {...register("key", { required: 'Campo obrigatório.',  pattern: /^(?![0-9])[a-zA-Z0-9$_]+$/i })} className={classNames({ 'p-invalid': errors.key })} />            
             <Tooltip target=".tooltip-form-field-key" autoHide={false}>
-                <div className="p-d-flex p-ai-center">
+                <div className="flex align-items-center">
                     <span style={{minWidth: '5rem'}}>
                       O campo <i>chave</i> é de preenchimento obrigatório e serve como identificador único de cada grupo.
                       Deverá ser preenchido com uma cadeia de caracteres, sem espaços.
@@ -303,6 +303,7 @@ const GroupFields = props => {
                                   icon: 'pi pi-exclamation-triangle',
                                   acceptLabel: 'Sim',
                                   rejectLabel: 'Não',
+                                  defaultFocus: 'reject',
                                   accept: () => {                                      
                                     const new_fields = {...group.data.fields};
                                     delete new_fields[field.id];
@@ -470,6 +471,7 @@ const Fields = props => {
                               icon: 'pi pi-exclamation-triangle',
                               acceptLabel: 'Sim',
                               rejectLabel: 'Não',
+                              defaultFocus: 'reject',
                               accept: () => {                                      
                                 const new_fields = {...fields};
                                 delete new_fields[field.id];
@@ -845,6 +847,7 @@ class FormFieldsEditor extends Component {
                                         icon: 'pi pi-exclamation-triangle',
                                         acceptLabel: 'Sim',
                                         rejectLabel: 'Não',
+                                        defaultFocus: 'reject',
                                         accept: () => { 
                                           const new_data = {...this.state.data.groups};
                                           if (new_data[group.id]) delete new_data[group.id];

@@ -200,13 +200,13 @@ export default function FeatureResults({ core, config, features, layers, actions
           title={t("exportResults", "Exportar resultados")}
           label={t("export", "Exportar")}
           icon="pi pi-download"
-          className="p-button-outlined p-button-sm p-ml-2"
+          className="p-button-outlined p-button-sm ml-2"
           onClick={e => exportAll()}
         /> : null }
       </div>
 
       <Accordion
-        className="p-pt-2"
+        className="pt-2"
         multiple
         activeIndex={activeIndex} 
         onTabChange={(e) => setActiveIndex(e.index)}>

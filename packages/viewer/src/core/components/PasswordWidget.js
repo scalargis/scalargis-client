@@ -69,9 +69,9 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
 
   const passwordFooter = (
       <React.Fragment>
-          <Divider className="p-mt-2" />
-          <p className="p-mt-2">Sugestões:</p>
-          <ul className="p-pl-2 p-ml-2 p-mt-0" style={{ lineHeight: '1.5' }}>
+          <Divider className="mt-2" />
+          <p className="mt-2">Sugestões:</p>
+          <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
               <li>Pelo menos uma minúscula</li>
               <li>Pelo menos uma maiúscula</li>
               <li>Pelo menos um dígito</li>
@@ -106,7 +106,7 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
   if (pwd.response && !!pwd.response && !!pwd.response.authenticated) {
     const username = pwd.response.username;
     return (
-      <div className="p-d-flex p-ai-center p-dir-col p-px-3">
+      <div className="flex align-items-center p-dir-col p-px-3">
         <h3>Definição de Palavra-passe</h3>
         <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
         <p style={{ lineHeight: 1.5 }}>A Palavra-passe foi alterada com sucesso!</p>
@@ -127,20 +127,20 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
         <React.Fragment>
           <div className="p-fluid">
 
-            <div className="p-field p-grid">
-              <div className="p-col-12">
+            <div className="field grid">
+              <div className="col-12">
                 <h3>Alteração de Palavra-passe</h3>
               </div>
             </div>
 
-            <div className="p-field p-grid">
-              <div className="p-col-12 ">
-              <Message style={{ width: '100%' }} severity="info" text={auth.response.message}></Message> 
+            <div className="p-fluid field grid">
+              <div className="col-12 ">
+              <Message severity="info" text={auth.response.message}></Message> 
               </div>
             </div>
 
-            <div className="p-field p-grid">
-              <div className="p-col-12">
+            <div className="field grid">
+              <div className="col-12">
                 <Button
                   className="p-button-link"
                   label = "Login"
@@ -160,16 +160,16 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
         <React.Fragment>
           <div className="p-fluid">
 
-            <div className="p-field p-grid">
-              <div className="p-col-12">
+            <div className="field grid">
+              <div className="col-12">
                 <h3>Alteração de Palavra-passe</h3>
                 <p>Indique o seu <i>username</i> ou <i>email</i> para receber um email com instruções para alterar a palavra-passe.</p>
               </div>
             </div>
 
-            <div className="p-field p-grid">
-              <label className="p-col-12 p-md-4">Nome de Utilizador / E-mail</label>
-              <div className="p-col-12 p-md-8">
+            <div className="field grid">
+              <label className="col-12 md:col-4">Nome de Utilizador / E-mail</label>
+              <div className="col-12 md:col-8">
                 <InputText
                   value={username}
                   placeholder="Nome de Utilizador"
@@ -190,7 +190,9 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
           </div>
 
           { auth.response && !!auth.response && !!auth.response.message && 
-            <Message style={{ width: '100%' }} severity={auth.http_error ? "error" : "info"} text={auth?.response?.message}></Message>
+            <div className="p-fluid">
+              <Message severity={auth.http_error ? "error" : "info"} text={auth?.response?.message}></Message>
+            </div>
           }
 
         </React.Fragment>   
@@ -203,16 +205,16 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
       <form onSubmit={handleSubmit(onSubmit)} autoComplete="new-password">
         <div className="p-fluid">       
 
-          <div className="p-field p-grid">
-            <div className="p-col-12">
+          <div className="field grid">
+            <div className="col-12">
               <h3>Definição de Password</h3>
               <p>Por favor, defina e confirme a sua nova palavra-passe</p>
             </div>
           </div>
 
-          <div className="p-field p-grid">
-            <label htmlFor="newPassword" className={classNames({ 'p-col-12 p-md-4': true,'p-error': errors.newPassword })}>Palavra-passe*</label>
-            <div className="p-col-12 p-md-8">
+          <div className="field grid">
+            <label htmlFor="newPassword" className={classNames({ 'col-12 md:col-4': true,'p-error': errors.newPassword })}>Palavra-passe*</label>
+            <div className="col-12 md:col-8">
               <Controller name="newPassword" control={control} rules={{ required: 'Preenchimento obrigatório.' }} render={({ field, fieldState }) => (
                 <Password id={field.name} {...field} 
                   toggleMask
@@ -227,9 +229,9 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
             </div>
           </div>
 
-          <div className="p-field p-grid">
-            <label htmlFor="confirmPassword" className={classNames({ 'p-col-12 p-md-4': true,'p-error': errors.confirmPassword })}>Confirmar Palavra-passe*</label>
-            <div className="p-col-12 p-md-8">
+          <div className="field grid">
+            <label htmlFor="confirmPassword" className={classNames({ 'col-12 md:col-4': true,'p-error': errors.confirmPassword })}>Confirmar Palavra-passe*</label>
+            <div className="col-12 md:col-8">
               <Controller name="confirmPassword" control={control} rules={{ required: 'Preenchimento obrigatório.', validate: ()=>{ if (getValues('newPassword') !== getValues('confirmPassword')) return "As passwords não são iguais." } }} render={({ field, fieldState }) => (
                 <Password id={field.name} {...field} 
                   toggleMask 
@@ -255,11 +257,15 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
         </div>
         
         { pwd.http_error && !pwd.response &&
-          <Message style={{ width: '100%' }} severity="error" text="Serviço Indisponível"></Message>
+          <div className="p-fluid">
+            <Message severity="error" text="Serviço Indisponível"></Message>
+          </div>
         }
 
-        { pwd.response && !!pwd.response && !pwd.authenticated && !!pwd.response.message && 
-          <Message style={{ width: '100%' }} severity="error" text="Dados inválidos"></Message>
+        { pwd.response && !!pwd.response && !pwd.authenticated && !!pwd.response.message &&
+          <div className="p-fluid"> 
+            <Message severity="error" text="Dados inválidos"></Message>
+          </div>
         }
 
       </form>

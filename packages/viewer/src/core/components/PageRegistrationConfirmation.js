@@ -30,8 +30,8 @@ function PageRegistrationConfirmation(props) {
   const logo = CLIENT_URL + 'assets/images/logo.png';
 
   return (
-    <div id="login-page" className="p-d-flex p-jc-center" style={{ height: '100%' }}>
-      <div className="p-as-center" style={{ backgroundColor: 'white', padding: '6rem' }}>
+    <div id="login-page" className="flex justify-content-center" style={{ height: '100%' }}>
+      <div className="align-self-center p-6 sm:p-8" style={{ backgroundColor: 'white' }}>
         
         <div className="login-logo">
           <img alt="Logo" src={logo} />  

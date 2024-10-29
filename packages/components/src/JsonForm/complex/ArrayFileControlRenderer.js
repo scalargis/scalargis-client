@@ -56,7 +56,7 @@ export const ArrayFileControlRenderer = (props) => {
   }, [props.path]);
   
   return(    
-    <div className="p-grid">
+    <div className="grid">
       {showFileForm && showOnPortal(
         <FileForm
           schema={schema}
@@ -86,10 +86,10 @@ export const ArrayFileControlRenderer = (props) => {
         />
       )}
 
-      <div className="p-field p-col-12 p-mb-0 p-pb-0">
+      <div className="field col-12 mb-0 pb-0">
         { (props?.data?.length) ? 
-          <div className="p-col-12">
-            <div className="card p-text-center  p-mb-1 p-p-0">
+          <div className="col-12">
+            <div className="card text-center mb-1 p-0">
               <Tag severity="info" rounded style={{width:'80%'}} 
                 value={props.data.length + " " + (props.data.length > 1 ? 
                   translateMsg("common.files", "files", "Ficheiros", i18Props) : 
@@ -102,12 +102,12 @@ export const ArrayFileControlRenderer = (props) => {
                     const f = item.file || {};
                     return (
                       <tr key={index}>                 
-                        <td className="p-col-9" style={{"verticalAlign": "top", "wordBreak": "break-all"}}>
+                        <td className="col-9" style={{"verticalAlign": "top", "wordBreak": "break-all"}}>
                           <div>{(f?.original_filename || f?.filename)}</div>
                           <div className="file-description" style={{"fontSize": "0.9rem","color": "#b7bdbb"}}>{(item?.description)}</div>
                         </td>
-                        <td className="p-col-1" style={{"verticalAlign": "middle", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-mb-2"
+                        <td className="col-1" style={{"verticalAlign": "middle", "textAlign": "center"}}>
+                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined mb-2"
                             tooltip={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
@@ -123,7 +123,7 @@ export const ArrayFileControlRenderer = (props) => {
                               confirmDialog({
                                 message: `${translateMsg("common.deleteFileConfirmation", "deleteFileConfirmation", "Deseja remover a ficheiro", i18Props)} "${f.original_filename || f.filename}"?`,
                                 header:  translateMsg("common.confirmation", "confirmation", "Confirmação", i18Props),
-                                icon: 'pi pi-exclamation-triangle p-mr-1',
+                                icon: 'pi pi-exclamation-triangle mr-1',
                                 acceptLabel: 'Sim',
                                 rejectLabel: 'Não',
                                 accept: () => {
@@ -148,7 +148,7 @@ export const ArrayFileControlRenderer = (props) => {
         }              
       </div>
 
-      <div className="p-col-12 p-text-center">
+      <div className="col-12 text-center">
         <Button label={translateMsg("addFile", null, "Adicionar Ficheiro", i18Props)} className="p-button-text" style={buttonAddStyle} 
           onClick={(e) => {
             e.preventDefault();

@@ -18,7 +18,7 @@ export default function Main({ config }) {
   // Render component
   return (
     <div title={t("setTransparency", "Definir Transparência")} className="toc-slider-wrapper">
-      <Slider discrete
+      <Slider
         color="red"
         min={1}
         max={100}

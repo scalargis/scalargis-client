@@ -145,7 +145,7 @@ export const PhotoControl = (props) => {
       {showOnPortal(<Toast ref={toast} baseZIndex={2000} />)}
       <form onSubmit={(e)=>{ e.preventDefault(); }}>
         <div className="p-fluid">    
-          <div className="p-field">
+          <div className="field">
             { (file && file.data && file.original_filename) ?
             <div>
               <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" style={{color:"var(--primary-color)"}} /></div>
@@ -158,7 +158,7 @@ export const PhotoControl = (props) => {
             </div>
             }
           </div>
-          <div className="p-field p-col-12">
+          <div className="field col-12">
             <FileUpload
               ref={file_upload} 
               name="upload"
@@ -179,9 +179,9 @@ export const PhotoControl = (props) => {
             <small id="upload-help" className="p-warn">{labels.maxFileSize}: {Math.round((maxFileSize/1024) * 100) / 100} MB</small>
             : null }
           </div>
-          <div className="p-field p-col-12">
+          <div className="field col-12">
             { (file?.data || file?.file_url) &&
-            <div className="p-field p-col-6">
+            <div className="field col-6">
               <img src={file.data || `${file.file_url}`} alt={file.original_filename} style={{"maxWidth": "300px"}} />
             </div> }
           </div>

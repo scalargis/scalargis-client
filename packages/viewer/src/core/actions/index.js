@@ -715,12 +715,12 @@ export function viewer_load(core, id, history) {
 
             // Finally, load into redux store
             dispatch(viewer_load_components(pitems));
-            dispatch(viewer_load_done());
+            // Give time to create viewer and load componentes and layers 
+            setTimeout(() => dispatch(viewer_load_done()), 500);
+            //dispatch(viewer_load_done());
           }
         })
       });
-      //dispatch(viewer_load_components({}));
-      //dispatch(viewer_load_done());
     }).catch(error => {
 
       // Redirect to login or error pages

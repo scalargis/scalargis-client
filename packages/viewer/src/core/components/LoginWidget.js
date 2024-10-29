@@ -52,9 +52,9 @@ function LoginWidget({ auth, history, redirect, path, urlRedirect }) {
 
       <div className="p-fluid">
 
-        <div className="p-field p-grid">
-          <label className="p-col-12 p-md-4">Nome de Utilizador / E-mail</label>
-          <div className="p-col-12 p-md-8">
+        <div className="field grid">
+          <label className="col-12 md:col-4">Nome de Utilizador / E-mail</label>
+          <div className="col-12 md:col-8">
             <InputText
               value={username}
               placeholder="Nome de Utilizador"
@@ -63,9 +63,9 @@ function LoginWidget({ auth, history, redirect, path, urlRedirect }) {
           </div>
         </div>
 
-        <div className="p-field p-grid">
-          <label className="p-col-12 p-md-4">Palavra-passe</label>
-          <div className="p-col-12 p-md-8">
+        <div className="field grid">
+          <label className="col-12 md:col-4">Palavra-passe</label>
+          <div className="col-12 md:col-8">
             <Password
               value={password}
               placeholder="Palavra-passe"

@@ -41,7 +41,7 @@ export const PrimereactCheckbox = React.memo(function PrimereactCheckbox(
       inputId={id}
       disabled={!enabled}
       onChange={e => handleChange(path, e.checked)}      
-      className={`p-mr-1 ${className}`}
+      className={`mr-1 ${className}`}
       //inputProps={inputPropsMerged}
     />
   );

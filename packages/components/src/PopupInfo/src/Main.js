@@ -122,20 +122,18 @@ export default function Main({ config, as, core, actions, utils, record }) {
         style={{width: isMobile ? config?.modileDialogWidth ||'90%' : config?.dialogWidth || '35vw' }}
         modal={modal}
         footer={(
-          <div className="p-grid">
+          <div className="grid mt-2">
             {(!config.hideOption &&
-            <div className="p-col-12 p-md-6" style={{ textAlign: 'left'}}>
+            <div className="field col-12 md:col-6 text-left">
               <InputSwitch
                 inputId="permanentSwitch"
                 checked={permanent}
                 onChange={(e) => setPermanent(!permanent)}
+                className="mr-2" style={{float: "left"}} 
               />
-              {' '}
-              <label htmlFor="permanentSwitch">
-                <span>{t("doNotShowAgain", "Não mostrar novamente")}</span>
-              </label>
+              <label htmlFor="permanentSwitch" className="p-checkbox-label" style={{display: "inline"}}>{t("doNotShowAgain", "Não mostrar novamente")}</label>
             </div>)}
-            <div className="p-col" style={{ textAlign: 'right'}}>
+            <div className="col text-right">
               <Button label={closeLabel} onClick={e => hidePopup() } />
             </div>
           </div>
@@ -143,7 +141,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
         onHide={e => hidePopup()}>
           <div>
             { record?.config_json?.showLocaleSelector === true &&
-            <div className="p-col-12 p-pt-0" style={{ textAlign: 'right'}}>
+            <div className="col-12 pt-0" style={{ textAlign: 'right'}}>
               <LocaleSelectorComponent config={config} actions={actions} componentConfig={localeSelectorCfg} className="popupinfo-locale-selector" />
             </div>
             }

@@ -130,11 +130,11 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
         text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : t("myLocationSelectOption","Selecione a opção 'Ver Posição' para ativar a visualização da sua posição.")}
       />
 
-      <div className="p-mt-3 p-pt-3 p-pr-2 p-pl-2" style={{"border": "1px solid rgb(111 57 57 / 12%)"}}>
-        <div className="p-grid">
-          <div className="p-col" style={{ textAlign: 'left'}}>
+      <div className="mt-3 pt-3 pr-2 pl-2" style={{"border": "1px solid rgb(111 57 57 / 12%)"}}>
+        <div className="grid">
+          <div className="col flex align-items-center">
             <InputSwitch
-              className="p-mr-1"
+              className="mr-1"
               inputId="geolocationSwitch"
               checked={geoLocationActive}
               onChange={(e) => toggleGeoLocationControl(e.value)}
@@ -145,14 +145,12 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
             </label>
           </div>
         </div>
-        <div className="p-grid p-mt-2">
-          <div className="p-col" style={{ textAlign: 'left'}}>
-            <div className="p-field-checkbox p-mb-1">
+        <div className="grid mt-2">
+          <div className="col flex align-items-center">
             <Checkbox onChange={e => trackingGeoLocationControl(e.checked)} checked={geoLocationTracking} disabled={!geoLocationActive}></Checkbox>
-            <label className={"p-checkbox-label" + (!geoLocationActive ? " p-disabled" : "")}>{t("myLocationUpdate", "Atualizar")}</label>
-            </div>
+            <label className={"p-checkbox-label ml-2" + (!geoLocationActive ? " p-disabled" : "")}>{t("myLocationUpdate", "Atualizar")}</label>
           </div>
-          <div className="p-col" style={{ textAlign: 'right'}}>
+          <div className="col text-right">
             <Button
               label={t("locate", "Localizar")}
               icon="pi pi-search"
@@ -165,7 +163,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
       </div>
 
       { geolocation &&
-      <div className="card p-pt-1">          
+      <div className="card pt-2 p-0">          
           <DataTable value={results}>
             <Column field="field" header=""></Column>
             <Column field="value" header=""></Column>

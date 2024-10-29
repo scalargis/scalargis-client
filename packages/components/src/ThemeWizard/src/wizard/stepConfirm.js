@@ -16,7 +16,7 @@ export default function WizardStepConfirm(props) {
   return (
     <div>
       
-      <h1>{t("confirm", "Confirmar")}</h1>
+      <h2 className="mb-2">{t("confirm", "Confirmar")}</h2>
       
       { data.items && data.items.length > 0 ? (
         data.type === 'wms' ? (

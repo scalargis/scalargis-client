@@ -245,54 +245,54 @@ export default function PrintPanel4(props) {
         }
       </div>      
 
-      <div className="p-mt-4">
+      <div className="mt-4">
         { finalPrints.map( print => {
           if (print.error) {
             return (
-              <div className="p-grid">
-                <div className="p-col-fixed" style={{ width: '30px' }}>
-                  <div className="p-pl-2">
+              <div className="grid">
+                <div className="col-fixed" style={{ width: '30px' }}>
+                  <div className="pl-2">
                     <i className='pi pi-times-circle print-error'></i>
                   </div>
                 </div>                
-                <div className="p-col-9">
+                <div className="col-9">
                   { print.groupTitle ? print.groupTitle + ' - ' + print.title :  print.title }
                 </div>
-                <div className="p-col">
-                  <i className="pi pi-external-link p-pl-2"></i>
+                <div className="col">
+                  <i className="pi pi-external-link pl-2"></i>
                 </div>
               </div>
             )
           } else {
             if (printDetails.merge_prints) {
               return (
-                <div className="p-grid">
-                  <div className="p-col-fixed" style={{ width: '30px' }}>
-                    <div className="p-pl-2">
+                <div className="grid">
+                  <div className="col-fixed" style={{ width: '30px' }}>
+                    <div className="pl-2">
                       <i className={print.processed ? 'pi pi-check print-success' : 'pi pi-spin pi-spinner'}></i>
                     </div>
                   </div>
-                  <div className="p-col">
+                  <div className="col">
                       { print.groupTitle ? print.groupTitle + ' - ' + print.title :  print.title }
                   </div>               
                 </div>
               )
             } else {
               return (
-                <div className="p-grid">
-                  <div className="p-col-fixed" style={{ width: '30px' }}>
-                    <div className="p-pl-2">
+                <div className="grid">
+                  <div className="col-fixed" style={{ width: '30px' }}>
+                    <div className="pl-2">
                       <i className={print.processed ? 'pi pi-check print-success' : 'pi pi-spin pi-spinner'}></i>
                     </div>
                   </div>
-                  <div className="p-col-9">
+                  <div className="col-9">
                       { print.groupTitle ? print.groupTitle + ' - ' + print.title :  print.title }
                   </div>
-                  <div className="p-col">
+                  <div className="col">
                     { print.processed ?
                       <a href={print.url} target="_blank" title={t("openPrint", "Abrir planta")}
                         style={ { textDecoration: "none", color: "#2196f3"} }>
-                        <i className="pi pi-external-link p-pl-2"></i>
+                        <i className="pi pi-external-link pl-2"></i>
                       </a> : null
                     }
                   </div>                
@@ -304,16 +304,16 @@ export default function PrintPanel4(props) {
       </div>
 
       { mergedFile ?
-        <div className="card p-text-center">
+        <div className="card text-center">
           <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "#2196f3"} }>
-            <i className="pi pi-external-link p-pl-2"></i> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
+            <i className="pi pi-external-link pl-2"></i> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
           </a>          
         </div> :
         null
       }
 
       { !isProcessing && !mergedFile && getFinalPrintsTotal() > 1 ?
-        <div className="card p-text-center">
+        <div className="card text-center">
           <Button label={t("createAllPrintsPDF", "Criar PDF com todas as plantas")}
             icon={ isMergingFiles ? 'pi pi-spin pi-spinner' : '' } 
             className="p-button"
@@ -324,8 +324,8 @@ export default function PrintPanel4(props) {
       }
 
       <div className="card">
-        <div className="p-grid">
-          <div className="p-col p-text-left">
+        <div className="grid">
+          <div className="col text-left">
             <Button
                 label={t("back", "Voltar")}
                 icon="pi pi-chevron-left"

@@ -289,7 +289,11 @@ const root = (
     case VIEWER_LOAD_DONE:
       return {
         ...state,
-        loading: false
+        loading: false,
+        viewer: {
+          ...state.viewer,
+          loaded: true
+        }
       }
 
     // Map set extent

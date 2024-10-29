@@ -45,8 +45,8 @@ export function MainMenu({ className, core, config, actions, record }) {
           style={{width: isMobile ? '90%' : '45vw' }} 
           modal
           footer={(
-            <div className="p-grid">
-              <div className="p-col" style={{ textAlign: 'right'}}>
+            <div className="grid">
+              <div className="col">
                 <Button label={closeLabel} onClick={e => setShowPopup(false)} />
               </div>
             </div>
@@ -147,8 +147,8 @@ export default function Main({ region, as, core, config, actions, record }) {
             style={{width: isMobile ? '90%' : '45vw' }} 
             modal
             footer={(
-              <div className="p-grid">
-                <div className="p-col" style={{ textAlign: 'right'}}>
+              <div className="grid">
+                <div className="col">
                   <Button label={closeLabel} onClick={e => setShowForm(false)} />
                 </div>
               </div>

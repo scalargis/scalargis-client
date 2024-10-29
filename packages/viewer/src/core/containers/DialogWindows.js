@@ -32,14 +32,14 @@ const DialogWindows = (props) => {
                 const header = i18n.translateValue(config.header, config.header);
 
                 return <Dialog
-                    key={item.key}
                     visible={item.visible}
                     style={{width: isMobile ? '90%' : '35vw' }}
                     {...{...config, header}}
+                    key={item.key}
                     footer={(
-                    <div className="p-grid">
-                        <div className="p-col" style={{ textAlign: 'right'}}>
-                        <Button label={closeLabel} onClick={e => onDialogClose(item)} />
+                    <div className="grid">
+                        <div className="col">
+                            <Button label={closeLabel} onClick={e => onDialogClose(item)} />
                         </div>
                     </div>
                     )}

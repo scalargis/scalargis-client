@@ -52,7 +52,7 @@ export default function Main(props) {
         )} 
         onHide={() => setConfirmDeleteTheme(false)}>
           <div className="confirmation-content">
-              <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem' }} />
+              <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
               <span>{t("confirmAction", "Tem a certeza?")}</span>
           </div>
       </Dialog>

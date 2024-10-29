@@ -10,7 +10,7 @@ const formatMetadataValue = (element) => {
     } else if (element.type === 'hyperlink') {
         return (
             <a href={element.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}>
-                <i className="pi pi-external-link p-mr-2"></i>{ element.value || element.url }
+                <i className="pi pi-external-link mr-2"></i>{ element.value || element.url }
             </a>
         );
     } else {
@@ -38,45 +38,45 @@ class ThemeInfo extends React.Component {
     const { viewer, mainMap, core, theme, actions, models } = this.props;
     return (
       <div>
-        <div className="p-grid">
-            <div className="p-col-4">{i18next.t("title", "Título")}</div>
-            <div className="p-col-8">{i18n.translateValue(theme.title)}</div>
+        <div className="field grid">
+            <div className="col-4">{i18next.t("title", "Título")}</div>
+            <div className="col-8">{i18n.translateValue(theme.title)}</div>
         </div>
         { theme.description ?
-        <div className="p-grid">
-            <div className="p-col-4">{i18next.t("description", "Descrição")}</div>
-            <div className="p-col-8">{theme.description}</div>
+        <div className="field grid">
+            <div className="col-4">{i18next.t("description", "Descrição")}</div>
+            <div className="col-8">{theme.description}</div>
         </div> : null }
         { (theme.metadata && theme.metadata.url) ?
-        <div className="p-grid">
-            <div className="p-col-4">{i18next.t("metadata", "Metadados")}</div>
-            <div className="p-col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><i className="pi pi-external-link p-mr-2"></i>{i18next.t("openMetadataDetails","Abrir Ficha")}</a></div>
+        <div className="field grid">
+            <div className="col-4">{i18next.t("metadata", "Metadados")}</div>
+            <div className="col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><i className="pi pi-external-link p-mr-2"></i>{i18next.t("openMetadataDetails","Abrir Ficha")}</a></div>
         </div> : null }
         { (theme.metadata && theme.metadata.data) ?
             theme.metadata.data.map(d => {
                 return (
-                    <div className="p-grid">
-                        <div className="p-col-4">{d.title || d.name}</div>
-                        <div className="p-col-8">{formatMetadataValue(d)}</div>
+                    <div className="field grid">
+                        <div className="col-4">{d.title || d.name}</div>
+                        <div className="col-8">{formatMetadataValue(d)}</div>
                     </div>
                 )
             }) : null }        
         { (theme.exclude_service_metadata !== true) ?
         (<>               
-            <div className="p-grid">
-                <div className="p-col-4">{i18next.t("type", "Tipo")}</div>
-                <div className="p-col-8">{this.getTypeDescription(theme.type)}</div>
+            <div className="field grid">
+                <div className="col-4">{i18next.t("type", "Tipo")}</div>
+                <div className="col-8">{this.getTypeDescription(theme.type)}</div>
             </div>
             { !['GROUP'].includes(theme.type) ? (
-            <div className="p-grid">
-                <div className="p-col-4">URL</div>
-                <div className="p-col-8" style={{wordBreak: "break-all"}}>{theme.url}</div>
+            <div className="grid">
+                <div className="col-4">URL</div>
+                <div className="col-8" style={{wordBreak: "break-all"}}>{theme.url}</div>
             </div>
             ) : null }
             { !['GROUP', 'ArcGISMap'].includes(theme.type) ? (
-            <div className="p-grid">
-                <div className="p-col-4">{i18next.t("coordinateSystem", "Sistema de Coordenadas")}</div>
-                <div className="p-col-8">
+            <div className="field grid">
+                <div className="col-4">{i18next.t("coordinateSystem", "Sistema de Coordenadas")}</div>
+                <div className="col-8">
                     { theme.crs_options ? (
                         <ul>
                         { theme.crs_options.split(',').map((t, j) => (
@@ -90,9 +90,9 @@ class ThemeInfo extends React.Component {
             </div>
             ) : null }
             { ['WMS'].includes(theme.type) ? (
-            <div className="p-grid">
-                <div className="p-col-4">{i18next.t("getMapFormats", "Formatos de GetMap")}</div>
-                <div className="p-col-8">
+            <div className="field grid">
+                <div className="col-4">{i18next.t("getMapFormats", "Formatos de GetMap")}</div>
+                <div className="col-8">
                     { theme.get_map_formats ? (
                         <ul>
                         { theme.get_map_formats.split(',').map((t, j) => (
@@ -104,9 +104,9 @@ class ThemeInfo extends React.Component {
             </div>
             ) : null }
             { ['WMS'].includes(theme.type) ? (
-            <div className="p-grid">
-                <div className="p-col-4">{i18next.t("getFeatureInfoFormats", "Formatos de GetFeatureInfo")}</div>
-                <div className="p-col-8">
+            <div className="field grid">
+                <div className="col-4">{i18next.t("getFeatureInfoFormats", "Formatos de GetFeatureInfo")}</div>
+                <div className="col-8">
                     { theme.get_feature_info_formats ? (
                         <ul>
                         { theme.get_feature_info_formats.split(',').map((t, j) => (

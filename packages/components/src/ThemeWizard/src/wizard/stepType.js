@@ -25,9 +25,9 @@ export default function WizardStepType(props) {
   return (
     <div>
       
-      <div className="p-mt-2">
+      <div className="mt-2">
         { types.map(t => (
-          <div className="p-field-radiobutton" key={t.value}>
+          <div className="field-radiobutton" key={t.value}>
             <RadioButton
               id={'wizard_type' + t.value}
               value={t.value}

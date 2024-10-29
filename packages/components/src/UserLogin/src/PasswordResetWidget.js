@@ -71,9 +71,9 @@ function PasswordResetWidget(props) {
     return (
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
             <div className="p-fluid">
-                <div className="p-field p-grid">
-                    <label htmlFor="username" className="p-col-12 p-md-4">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
-                    <div className="p-col-12 p-md-8">
+                <div className="field grid">
+                    <label htmlFor="username" className="col-12 md:col-4">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
+                    <div className="col-12 md:col-8">
                     <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
                         <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })}
                             autoComplete="off"
@@ -86,8 +86,8 @@ function PasswordResetWidget(props) {
             </div>
 
             { showLogin && <div className="p-fluid">
-                <div className="p-field p-grid">
-                    <div className="p-col-12">
+                <div className="field grid">
+                    <div className="col-12">
                         <Button
                             className="p-button-link"
                             label = {i18nUtils.translateValue("login", "Login")}
@@ -110,11 +110,15 @@ function PasswordResetWidget(props) {
             </div>
             
             { auth.http_error && !auth.response &&
-                <Message style={{ width: '100%' }} severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                <div className="p-fluid">
+                    <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                </div>
             }
 
-            { auth.response && !!auth.response && !!auth.response.message && 
-                <Message style={{ width: '100%' }} severity="error" text={auth?.response?.message}></Message>
+            { auth.response && !!auth.response && !!auth.response.message &&
+                <div className="p-fluid">
+                    <Message severity="error" text={auth?.response?.message}></Message>
+                </div>
             }
 
         </form>

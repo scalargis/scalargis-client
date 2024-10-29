@@ -119,6 +119,8 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
   useEffect(() => {
     if (!mainMap) return;
 
+    if (!viewer?.loaded) return;
+
     // Get user layer
     layer.current = utils.findOlLayer(mainMap, 'userlayer');
     if (layer?.current) layer.current.setStyle(drawingsStyle);
@@ -133,7 +135,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
       }
     }
 
-  }, []);
+  }, [viewer?.loaded, mainMap]);
 
   useEffect(() => {
     if (!(viewer?.exclusive_mapcontrol === 'MapTools')) {
@@ -396,7 +398,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
 
     return (
       <div style={{ height: '100%' }}>
-        <div id="map-tools" className="plugin-main p-p-2">
+        <div id="map-tools" className="plugin-main p-2">
           
           <SelectButton 
             optionLabel="name"
@@ -412,7 +414,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
             )}
           />
 
-          <div className="p-my-2">
+          <div className="mt-2">
 
             { selectedControl === 'length' ? (
               <InputText

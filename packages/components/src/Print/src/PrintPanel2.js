@@ -336,7 +336,7 @@ export default function PrintPanel2(props) {
           icon={opt.icon}
           label={ opt.label ? opt.label : ''}
           tooltip={t(opt.title, opt.defaultTitle)}
-          className={"p-button-sm p-mr-2 tool" + (opt.value === drawTool ? " active" : "") }
+          className={"p-button-sm mr-2 tool" + (opt.value === drawTool ? " active" : "") }
           onClick={(e) => selectDrawTool(e, opt.value) }
         />
       )}     
@@ -348,13 +348,13 @@ export default function PrintPanel2(props) {
         <Button 
           icon="pi pi-trash"
           tooltip={t("deleteSelectedElment", "Eliminar elemento selecionado")}
-          className="p-button-sm p-mr-2 tool"
+          className="p-button-sm mr-2 tool"
           onClick={(e) => deletedSelectedFeature() }
         />
         <Button 
           icon="fas fa-search-plus"
           tooltip={t("viewAllElements", "Ver todos os elementos")}
-          className="p-button-sm p-mr-2 tool"
+          className="p-button-sm mr-2 tool"
           onClick={(e) => zoomFeaturesExtent() }
         />        
     </React.Fragment>
@@ -377,7 +377,7 @@ export default function PrintPanel2(props) {
       </div>}
 
       { (printGroup.form_fields && printGroup.form_fields.groups) &&
-        <div className="p-mt-2">
+        <div className="mt-2">
           { Object.entries(printGroup.form_fields.groups).map(([groupKey, group]) => {
             if (group.active) {
               return <div key={groupKey} className="p-fluid">
@@ -385,10 +385,10 @@ export default function PrintPanel2(props) {
                 { group.fields && Object.entries(group.fields).map(([fieldKey, field]) => {
                   const field_key = groupKey + '.' + fieldKey;
                   if (field.active) {                    
-                    return <div className="p-field">
+                    return <div className="field">
                       { field.header && <h4>{field.header}</h4> }
                       { field.showLabel && <label>{field.title}</label> }
-                      <InputText key={field_key} id={field_key} className="p-inputtext p-d-block" 
+                      <InputText key={field_key} id={field_key} className="p-inputtext block" 
                         placeholder={!field.header && !field.showLabel ? field.title : ''}
                         tooltip={!field.header && !field.showLabel ? field.title : ''}
                         value={fields[field_key]} onChange={handleFieldChange} />
@@ -403,16 +403,16 @@ export default function PrintPanel2(props) {
       }
 
       { (printGroup.form_fields && printGroup.form_fields.fields) &&
-        <div className="p-mt-2">
+        <div className="mt-2">
           { Object.entries(printGroup.form_fields.fields).map(([fieldKey, field]) => {
             const field_key = fieldKey;
             if (field.active) {
               return <React.Fragment>
                 <div key={field_key} className="p-fluid">
                   { field.header && <h4>{field.header}</h4> }
-                  <div className="p-field">
+                  <div className="field">
                     { field.showLabel && <label>{field.title}</label> }
-                    <InputText id={field_key} className="p-inputtext p-d-block" 
+                    <InputText id={field_key} className="p-inputtext block" 
                       placeholder={!field.header && !field.showLabel ? field.title : ''}
                       tooltip={!field.header && !field.showLabel ? field.title : ''}                      
                       value={fields[field_key]} onChange={handleFieldChange} />
@@ -426,8 +426,8 @@ export default function PrintPanel2(props) {
       }
 
       <div className="card">
-        <div className="p-grid">
-          <div className="p-col p-text-left">
+        <div className="grid">
+          <div className="col text-left">
             {!standalone &&
             <Button
                 label={t("back", "Voltar")}
@@ -437,7 +437,7 @@ export default function PrintPanel2(props) {
             />
             }
           </div>
-          <div className="p-col p-text-right">
+          <div className="col text-right">
             <Button
                 label={t("continue", "Continuar")}
                 icon={isLoading ? "pi pi-spin pi-spinner": ""}

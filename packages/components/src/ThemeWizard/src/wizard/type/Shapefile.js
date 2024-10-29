@@ -78,7 +78,7 @@ export default function ArcGISMap(props) {
       <React.Fragment>
         <div className="p-fluid">
 
-          <div className="p-field">
+          <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
             <Dropdown 
               placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
@@ -88,7 +88,7 @@ export default function ArcGISMap(props) {
             />
           </div>
 
-          <div className="p-field">
+          <div className="field">
             <label>{t("shapefileFormatInfo", "Ficheiro ZIP contendo os ficheiros SHP, DBF e SHX")}</label>
             <FileUpload 
               name="upload"

@@ -37,7 +37,7 @@ export default function Basemaps({ core, viewer, mainMap, config, actions, recor
         onClick={(e) => { e.currentTarget.blur(); setOpened(!opened) } } 
       />
       <div className={`basemaps-control${record?.config_json?.vertical === true ? " basemaps-control-vertical": ""}`} style={{ visibility: opened ? "visible": "hidden" }}>
-        <div className="p-d-inline-flex p-flex-row p-flex-wrap">
+        <div className="inline-flex flex-row flex-wrap">
           { (layers || []).map((item, i) => <BasemapItem key={item.id}  viewer={viewer} mainMap={mainMap} layer={item} 
             selected={selectedLayer && selectedLayer===item.id} setSelected={selectLayer} core={core} />) }
         </div>      
