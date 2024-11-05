@@ -31,7 +31,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
   const { t } = useTranslation();
 
-  const [loaded, setLoaded] = useState(loaded, false);
+  const [loaded, setLoaded] = useState(false);
 
   const [dragBox, setDragBox] = useState(false);
 
