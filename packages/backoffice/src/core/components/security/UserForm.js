@@ -17,6 +17,8 @@ import { v4 as uuidV4 } from 'uuid'
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { systemRoles } from '../../utils';
+
 
 const sortRolesArray = (data) => {
   if (!data) return data;
@@ -45,12 +47,14 @@ function UserForm(props) {
     dispatch
   } = props;
 
+  console.log(props);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [data, setData] = useState(props.data || {});
 
-  const [roles, setRoles] = useState(props?.data?.roles ? sortRolesArray([...props.data.roles]) : []);
+  const [roles, setRoles] = useState(props?.data?.roles ? sortRolesArray([...props.data.roles]).filter(r => !systemRoles.includes(r.name)) : []);
   const [availableRoles, setAvailableRoles] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState(null);
   const [removedRoles, setRemovedRoles] = useState(null);
@@ -82,10 +86,10 @@ function UserForm(props) {
     Promise.all([
       dataProvider(API_URL + '/security').getList('roles', params).catch((error) => error),
       dataProvider(API_URL + '/security').getList('groups', params).catch((error) => error)
-    ]).then((result) => {      
+    ]).then((result) => {
       const roles_result = result[0];
       const rids = props?.data?.roles ? props.data.roles.map(v => v.id) : [];
-      setAvailableRoles(sortRolesArray(roles_result.data.filter(v => !rids.includes(v.id))
+      setAvailableRoles(sortRolesArray(roles_result.data.filter(v => !rids.includes(v.id) && !systemRoles.includes(v.name))
         .map(r => { return { id: r.id, name: r.name} })));
 
       const groups_result = result[1];

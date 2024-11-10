@@ -179,3 +179,5 @@ export const getAppDefaultLocale = () => {
 export const getCookieAuthName = () => {
   return process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis_webgis';
 }
+
+export const systemRoles = ['Anonymous', 'Authenticated'];
