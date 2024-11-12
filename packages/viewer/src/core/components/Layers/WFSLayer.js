@@ -125,8 +125,6 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
           } else {
             url += '&bbox=' + extent.join(',') + ','+crs;
           }
-        } else if (bbox) {
-          url += '&bbox=' + bbox.join(',') + ',EPSG:'+bbox_crs;
         }         
         
         if (config?.max_features) {

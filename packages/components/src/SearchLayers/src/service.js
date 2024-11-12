@@ -10,7 +10,7 @@ import {  isUrlAppOrigin, isUrlAppHostname,
 export const getDescribeFeatureType = (options) => {
   const { core, cfg, viewer, auth } = options;
 
-  const featureType = `${cfg.feature_prefix}:${cfg.feature_type}`;
+  const featureType = cfg.feature_prefix ? `${cfg.feature_prefix}:${cfg.feature_type}` : cfg.feature_type;
   let url = cfg.source_url + (cfg.source_url.indexOf('?') > -1 ? '' : '?');
   url = `${url}&service=WFS&version=2.0.0&request=DescribeFeatureType&typeName=${featureType}&outputFormat=application/json`
 
@@ -194,7 +194,7 @@ export const getFeatures = (options) => {
   })
   .then(function (json) {
     const features = new GeoJSON().readFeatures(json);
-    return Promise.resolve({features, total: json.totalFeatures}); 
+    return Promise.resolve({features, total: json.totalFeatures || json?.features?.length}); 
   }).catch(error => {
     return Promise.reject(error);
   });
