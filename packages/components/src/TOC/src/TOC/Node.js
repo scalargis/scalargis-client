@@ -104,12 +104,14 @@ class Node extends React.Component {
           onDragStart={this.props.onDragStart}
           id={data.id}
           draggable={draggable}>
-          <table style={tocGroupStyle}>
-            <tbody>
-              <tr style={tocItemStyle}>
-                <td className="activate">
 
-                  {isGroup && (
+          <div style={tocGroupStyle}>
+            <div className="p-d-flex p-flex-row p-jc-between p-flex-wrap">
+    
+              <div className="p-d-flex p-flex-row p-col-12" style={tocItemStyle}>
+
+                {isGroup && (
+                  <div>
                     <Button
                       className="p-button-sm p-button-text"
                       style={!isChildrenVisible ? { visibility: "hidden" } : null}
@@ -117,8 +119,10 @@ class Node extends React.Component {
                       icon={this.isOpen() ? "pi pi-chevron-down" : "pi pi-chevron-right"}
                       onClick={e => actions.open(e, data.id)}
                     />
-                  )}
+                  </div>
+                )}
 
+                <div>
                   {!radioName ? (
                     <Checkbox
                       title={this.props.t("switchOnOffTheme", "Ligar/desligar tema")}
@@ -137,74 +141,80 @@ class Node extends React.Component {
                       className={!isGroup ? "toc-leaf" : ""}
                     />
                   )}
-                </td>
-                <td className={(onScale ? "title" : "title outofscale") + (isGroup ? " title-grp" : "")}>
-                  {data.style_color ? <i className='pi pi-square' style={{ color: `rgba(${data.style_color})` }} /> : null}
-                  <label style={tocTextStyle} htmlFor={data.id} className={"label" + (isGroup ? " label-grp" : "") }>
-                    {i18n.translateValue(data.title)}
-                  </label>
-                  {!data.system && (
-                    <div className={"theme-tools" + (detailsOpen ? "" : " hidden")}
-                      onMouseEnter={(e) => this.props.setDraggable(false)}
-                      onMouseLeave={(e) => this.props.setDraggable(true)} >
+                </div>
 
-                      {core.renderComponents({
-                        region: 'layer_tools',
-                        props: { layer: data, actions, viewer: config.viewer, dispatch: config.dispatch, models: config.Models, mainMap: config.mainMap },
-                        separator: " ",
-                        parent: record
-                      })}
+                <div className={(onScale ? "title" : "title outofscale") + (isGroup ? " title-grp" : "") + " p-col p-pt-0 p-pb-0 p-pl-2 p-pr-2"}>
 
+                  <div className="p-d-flex p-flex-row p-jc-between">
+                    <div>
+                      {data.style_color ? <i className='pi pi-square' style={{ color: `rgba(${data.style_color})` }} /> : null}
+                      <label style={tocTextStyle} htmlFor={data.id} className={"label" + (isGroup ? " label-grp" : "") }>
+                        {i18n.translateValue(data.title)}
+                      </label>
                     </div>
-                  )}
-                </td>
-                <td className="buttons">
-                  {data.show_details !== false ?
-                    <Button
-                      className={"p-button-sm" + (detailsOpen ? "" : " p-button-text")}
-                      title={this.props.t("showHideDetails", "Mostrar/esconder detalhes")}
-                      icon={this.isOpen() ? "pi pi-cog" : "pi pi-cog"}
-                      onClick={e => this.setState({ ...this.state, detailsOpen: !detailsOpen })}
-                    /> : null}
-                  {' '}
-                  {data.bbox && data.show_zoom_extent !== false ? (
-                    <Button
-                      className="p-button-sm p-button-text"
-                      title={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
-                      icon="pi pi-search"
-                      onClick={e => this.onClickZoom(e, data)}
-                    />
-                  ) : null}
-                </td>
-              </tr>
+                    <div>
+                      <div className="buttons">
+                        {data.show_details !== false ?
+                          <Button
+                            className={"p-button-sm" + (detailsOpen ? "" : " p-button-text")}
+                            title={this.props.t("showHideDetails", "Mostrar/esconder detalhes")}
+                            icon={this.isOpen() ? "pi pi-cog" : "pi pi-cog"}
+                            onClick={e => this.setState({ ...this.state, detailsOpen: !detailsOpen })}
+                          /> : null}
+                        {' '}
+                        {data.bbox && data.show_zoom_extent !== false ? (
+                          <Button
+                            className="p-button-sm p-button-text"
+                            title={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
+                            icon="pi pi-search"
+                            onClick={e => this.onClickZoom(e, data)}
+                          />
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+              {!data.system && (
+                <div className={"theme-tools" + (detailsOpen ? "" : " hidden")}
+                  onMouseEnter={(e) => this.props.setDraggable(false)}
+                  onMouseLeave={(e) => this.props.setDraggable(true)} >
+
+                  {core.renderComponents({
+                    region: 'layer_tools',
+                    props: { layer: data, actions, viewer: config.viewer, dispatch: config.dispatch, models: config.Models, mainMap: config.mainMap },
+                    separator: " ",
+                    parent: record
+                  })}
+
+                </div>
+              )}
 
               {detailsOpen ? (
-                <tr>
-                  <td colSpan="3">
+                <React.Fragment>
+                  <div className="detail-container">
                     {core.renderComponents({
                       region: 'layer_tools_block',
                       props: { layer: data, actions, viewer: config.viewer, dispatch: config.dispatch, models: config.Models, mainMap: config.mainMap },
                       separator: " ",
                       parent: record
                     })}
-                  </td>
-                </tr>
-              ) : null}
+                  </div>
 
-              {detailsOpen ? (
-                <tr className="detail-container">
-                  <td colSpan="3">
+                  <div className="detail-container">
                     {!!data.description &&
                       <div className="theme-description" dangerouslySetInnerHTML={{ __html: data.description }}></div>
                     }
                     <Legend data={data} core={core} actions={actions} models={config.Models} />
-                  </td>
-                </tr>
+                  </div>
+                </React.Fragment>
               ) : null}
 
               {isGroup && this.isOpen() ? (
-                <tr>
-                  <td colSpan="3">
+                <div class="p-col-12 p-p-0">
                     <Tree
                       id={data.id}
                       record={record}
@@ -224,12 +234,13 @@ class Node extends React.Component {
                       isDraggable={this.props.isDraggable}
                       setDraggable={this.props.setDraggable}
                     />
-                  </td>
-                </tr>
+                </div>
               ) : null}
 
-            </tbody>
-          </table>
+            </div>
+
+          </div>
+
         </DraggableItem>
       </React.Fragment>
     );
