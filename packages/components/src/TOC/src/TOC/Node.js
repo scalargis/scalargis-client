@@ -108,10 +108,10 @@ class Node extends React.Component {
           <div style={tocGroupStyle}>
             <div className="p-d-flex p-flex-row p-jc-between p-flex-wrap">
     
-              <div className="p-d-flex p-flex-row p-col-12" style={tocItemStyle}>
+              <div className="p-d-flex p-flex-row p-col-12 p-pl-0 p-pr-0" style={tocItemStyle}>
 
                 {isGroup && (
-                  <div>
+                  <div className="group-button">
                     <Button
                       className="p-button-sm p-button-text"
                       style={!isChildrenVisible ? { visibility: "hidden" } : null}
@@ -143,7 +143,7 @@ class Node extends React.Component {
                   )}
                 </div>
 
-                <div className={(onScale ? "title" : "title outofscale") + (isGroup ? " title-grp" : "") + " p-col p-pt-0 p-pb-0 p-pl-2 p-pr-2"}>
+                <div className={(onScale ? "title" : "title outofscale") + (isGroup ? " title-grp" : "") + " p-col p-pt-0 p-pb-0 p-pl-2 p-pr-0"}>
 
                   <div className="p-d-flex p-flex-row p-jc-between">
                     <div>

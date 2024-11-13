@@ -58,6 +58,10 @@
   cursor: -webkit-grab;
 }
 
+#layer-switcher .group-button {
+  margin-top: -3px;
+}
+
 #layer-switcher .buttons {
   min-width: 76px;
   text-align: right;
