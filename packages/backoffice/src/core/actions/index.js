@@ -5,6 +5,7 @@ export const AUTH_HTTP_LOADING          = 'AUTH_HTTP_LOADING'
 export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
 export const AUTH_RESPONSE              = 'AUTH_RESPONSE'
 export const AUTH_LOGIN                 = 'AUTH_LOGIN'
+export const AUTH_UPDATE                = 'AUTH_UPDATE'
 
 export const BACKOFFICE_LOAD            = 'BACKOFFICE_LOAD'
 export const BACKOFFICE_LOAD_DONE       = 'BACKOFFICE_LOAD_DONE'
@@ -54,8 +55,8 @@ export function login_post(post, history, redirect) {
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
-        dispatch(login_response(res));
         if (res.authenticated) {
+          dispatch(login(res));
           const cookies = new Cookies();
           cookies.set(cookieAuthName, res, { path: '/' });
           if (redirect && history) history.push({ pathname: redirect }); 
@@ -67,6 +68,17 @@ export function login_post(post, history, redirect) {
         console.log('error', error);
         dispatch(login_http_error(null));
       });
+  }
+}
+
+export function refresh_auth(auth) {
+  return function (dispatch, getState) {
+
+    const cookies = new Cookies();
+
+    cookies.set(cookieAuthName, auth, { path: '/' });
+
+    dispatch(auth_update(auth));
   }
 }
 
@@ -99,6 +111,15 @@ export function login(data) {
   }
   return action
 }
+
+export function auth_update(data) {
+  const action = {
+    type: AUTH_UPDATE,
+    data
+  }
+  return action
+}
+
 
 export function backoffice_set_config(config) {
   const action = {

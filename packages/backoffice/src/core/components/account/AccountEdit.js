@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -11,31 +11,21 @@ function AccountEdit(props) {
 
   const { core } = useContext(AppContext);
 
-  const { id } = useParams();
-
   const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState(null);
 
   const API_URL = core.API_URL;
 
   useEffect(() => {
-    if (id) {
-      loadData();
-    } else {
-      setRecord({});
-    }
+    loadData();
   }, []);
 
   const loadData = () => {
     const provider = dataProvider(API_URL + '/security');
 
-    const params = {
-      id: id
-    }
-
     setLoading(true);    
 
-    provider.getOne('users', params).then(d => {
+    provider.get('account').then(d => {
       const data = {...d.data}
       data.auth_token_expire = data.auth_token && data.auth_token_expire ? new Date(data.auth_token_expire) : null;
       setRecord(data);      
@@ -48,11 +38,13 @@ function AccountEdit(props) {
 
   return (
     <React.Fragment>
-    { record ?      
-        <AccountForm data={record} />
-      :
-      <div>loading...</div>
-    }
+      <div className="p-col-12"><h3>Conta</h3></div>
+
+      { record ?      
+          <AccountForm data={record} />
+        :
+        <div>loading...</div>
+      }
     </React.Fragment>
   );
 

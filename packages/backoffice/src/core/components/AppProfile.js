@@ -8,16 +8,12 @@ export const AppProfile = (props) => {
     const { core, dispatch } = props;
     const { logout } = core.actions;
 
-    const auth = props.auth?.data ? props.auth?.data : props.auth?.response || {};
+    const auth = props.auth?.data || {};
     const { name, username, email } = auth;
 
     const cfg = core?.config?.config_json;
 
     const [expanded, setExpanded] = useState(false);
-
-    const cookieAuthName = core.COOKIE_AUTH_NAME;
-
-    const CLIENT_URL = core.CLIENT_URL;
 
     const onClick = (event) => {
         setExpanded(prevState => !prevState);
