@@ -15,6 +15,7 @@ import {
   AUTH_HTTP_LOADING,
   AUTH_RESPONSE,
   AUTH_LOGIN,
+  AUTH_UPDATE,
 } from '../actions'
 import { getCookieAuthName } from '../utils'
 
@@ -75,6 +76,19 @@ const reducer = (state = { loading: true, auth: { data: cookies.get(cookieAuthNa
         auth: {
           loading: false,
           data: action.data
+        }
+      }
+
+    // Update user auth
+    case AUTH_UPDATE:
+      return {
+        ...state,
+        auth: {
+          ...state?.auth,
+          data: {
+            ...state?.auth?.data,
+            ...action.data
+          }
         }
       }
     

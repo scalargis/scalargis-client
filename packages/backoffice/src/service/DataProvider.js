@@ -3,8 +3,15 @@ import { stringify } from 'query-string';
 
 const provider = (apiUrl, httpClient = fetchJson) => ({
 
-    getSimpleList: (resource) => {
-        const url = `${apiUrl}/${resource}`;
+    get: (resource, params) => {
+        const url = params?.id != null ? `${apiUrl}/${resource}/${params.id}` : `${apiUrl}/${resource}`;
+        return httpClient(url).then(({ json }) => ({
+            data: json,
+        }))
+    },
+
+    getSimpleList: (resource, params) => {
+        const url = params?.id != null ? `${apiUrl}/${resource}/${params.id}` : `${apiUrl}/${resource}`;
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json
         }));        
@@ -24,7 +31,6 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
 
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json,
-            //total: parseInt(headers.get('content-range').split('/').pop(), 10),
             total: json.total != null ? json.total : json.length || 0
         }));
     },
@@ -62,16 +68,17 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
 
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json,
-            //total: parseInt(headers.get('content-range').split('/').pop(), 10),
             total: json.total != null ? json.total : json.length || 0
         }));
     },
 
-    update: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`, {
+    update: (resource, params) => {
+        const url = params?.id != null ? `${apiUrl}/${resource}/${params.id}` : `${apiUrl}/${resource}`;
+        return httpClient(url, {
             method: 'PUT',
             body: JSON.stringify(params.data),
-        }).then(({ json }) => ({ data: json })),
+        }).then(({ json }) => ({ data: json }))
+    },
 
     updateMany: (resource, params) => {
         const query = {
@@ -98,8 +105,8 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
         }).then(({ json }) => ({ data: json })),
     */
     delete: (resource, params) =>
-    httpClient(`${apiUrl}/${resource}/${params.id}`, {
-        method: 'DELETE',
+        httpClient(`${apiUrl}/${resource}/${params.id}`, {
+            method: 'DELETE',
     }).then(({ json }) => ({ data: { "id": params.id} })),    
 
     deleteMany: (resource, params) => {
@@ -150,7 +157,8 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
     deleteDocument: (resource, params) =>
         httpClient(`${apiUrl}/${resource}/docs/${params.id}`, {
             method: 'DELETE',
-        }).then(({ json }) => ({ data: { "id": params.id} })),           
+        }).then(({ json }) => ({ data: { "id": params.id} })),
+    
 });
 
 

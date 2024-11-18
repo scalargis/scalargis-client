@@ -1,43 +1,19 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
-import { connect, useDispatch } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import React, { useContext, useState, useRef } from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
-import { Password } from 'primereact/password';
-import { ToggleButton } from 'primereact/togglebutton';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
-import { MultiSelect } from 'primereact/multiselect';
-import { ListBox } from 'primereact/listbox';
-import { Message } from 'primereact/message';
 import { classNames } from 'primereact/utils';
-import { v4 as uuidV4 } from 'uuid'
+import { v4 as uuidV4 } from 'uuid';
 
 import AppContext from '../../../AppContext';
-import useFormFields from '../../useFormFields';
 import dataProvider from '../../../service/DataProvider';
+import PasswordChange from './PasswordChange';
 
-const sortRolesArray = (data) => {
-  if (!data) return data;
-
-  return data.sort(function(a, b) {
-    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-    if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-    return 0;
-  });
-}
-
-const sortGroupsArray = (data) => {
-  if (!data) return data;
-
-  return data.sort(function(a, b) {
-    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-    if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-    return 0;
-  });
-}
 
 function AccountForm(props) {
 
@@ -48,7 +24,9 @@ function AccountForm(props) {
 
   const { core } = useContext(AppContext);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { auth_update, logout } = core?.actions;
+
+  const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [data, setData] = useState(props.data || {});
@@ -57,63 +35,41 @@ function AccountForm(props) {
 
   const API_URL = core.API_URL;
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, control, handleSubmit, formState: { errors }, setValue } = useForm({
     defaultValues: {...data}
   });
 
-  const goBack = () => {
-    const location = {
-      pathname: history.location.state.from,
-      state: { 
-        searchParams: {...history.location.state.previousSearchParams}
-      }
-    }
-    history.replace(location);
-    //history.goBack();
-  }  
-
   const onSubmit = (formData) => {
+
     const new_data = {
       first_name: formData.first_name,
       last_name: formData.last_name,
       name: formData.name,
       username: formData.username,
       email: formData.email,
-      password: formData.password || null
+      auth_token: formData.auth_token || null,
+      auth_token_expire: formData.auth_token_expire || null
     }
 
     setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/security');      
-    if (data.id) {
-      const params = {
-        id: data.id,
-        data: {...new_data}
-      }
-      provider.update('users', params).then(d => {       
-        toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
-        setValue('password', '', {
-          shouldValidate: true,
-          shouldDirty: true
-        });
-      }).catch(e => {
-        toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});        
-      }).finally(() => {
-        setIsSaving(false);
-      });
-    } else {
-      const params = {
-        data: {...new_data}
-      }
-      provider.create('users', params).then(d => {
-        setData({...data, id: d.data.id});
-        toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
-      }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: 'Ocorreu um erro ao criar o registo'});
-      }).finally(() => {
-        setIsSaving(false);
-      });       
+    const provider = dataProvider(API_URL + '/security');
+    const params = {
+      data: new_data
     }
+    provider.update('account', params).then(d => {       
+      toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
+
+      setData(new_data);
+
+      if (d?.data) dispatch(auth_update(d?.data));
+
+    }).catch(e => {
+      const msg = e.message || 'Ocorreu um erro ao alterar o registo';
+      toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: msg});        
+    }).finally(() => {
+      setIsSaving(false);
+    });
   };
 
   const getFormErrorMessage = (errors, name) => {
@@ -128,18 +84,60 @@ function AccountForm(props) {
         return <small className="p-error">{errors[name].message}</small>
       }
     }      
-  };  
+  };
+  
+  
+  const leftToolbarTemplate = () => {
+    if (isEditMode ) return null;
+
+    return (
+      <Button
+        type="button"
+        label="Sair"
+        icon="pi pi-power-off"
+        className="p-button-danger"
+        onClick={e => { e.preventDefault(); dispatch(logout()); }} />
+    );
+  }
  
   const rightToolbarTemplate = () => {
-    return (
+    if (isEditMode) {
+      return (
         <React.Fragment>
-            <Button
-              type="submit" 
-              label="Gravar"
-              icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-              disabled={isSaving ? true : false} />
+
+          <Button
+            type="button"
+            label="Cancelar"
+            className="p-mr-2"
+            onClick={e => { 
+              e.preventDefault(); 
+              setIsEditMode(false);
+
+              Object.entries(data).forEach(([key, val]) => {
+                setValue(key, val, {shouldDirty: false, shouldTouch: false, shouldValidate: false});
+              });
+            }}
+            disabled={isSaving ? true : false} />
+
+          <Button
+            type="submit" 
+            label="Gravar"
+            icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
+            disabled={isSaving ? true : false} />
         </React.Fragment>
+      )
+    }
+
+    return (
+      <React.Fragment>
+        <Button
+          type="button"
+          label="Editar"
+          icon="pi pi pi-pencil"
+          onClick={e => { e.preventDefault(); setIsEditMode(true)} } />
+      </React.Fragment>
     )
+
   }
 
   return (
@@ -150,45 +148,42 @@ function AccountForm(props) {
       <div className="p-fluid p-formgrid p-grid">
         <div className="p-field p-col-12 p-md-3">
           <label htmlFor="first_name">Primeiro Nome</label>
-          <InputText id="first_name" name="first_name" {...register('first_name')} autoFocus />
+          <InputText id="first_name" name="first_name" {...register('first_name')} autoFocus disabled={!isEditMode} />
         </div>            
         <div className="p-field p-col-12 p-md-3">
           <label htmlFor="last_name">Último Nome</label>
-          <InputText id="last_name" name="last_name" {...register('last_name')} />
+          <InputText id="last_name" name="last_name" {...register('last_name')} disabled={!isEditMode} />
         </div>
         <div className="p-field p-col-12 p-md-6">
           <label htmlFor="name">Nome</label>
-          <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.name })} />
+          <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} disabled={!isEditMode} className={classNames({ 'p-invalid': errors.name })} />
           {getFormErrorMessage(errors, 'name')}
         </div>
 
         <div className="p-field p-col-12 p-md-3">
           <label htmlFor="username">Username</label>
-          <InputText id="username" name="username" {...register('username', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.username })} />
+          <InputText id="username" name="username" {...register('username', { required: 'Campo obrigatório.' })} disabled={!isEditMode} className={classNames({ 'p-invalid': errors.username })} />
           {getFormErrorMessage(errors, 'username')}
         </div>
         <div className="p-field p-col-12 p-md-4">
           <label htmlFor="email">Email</label>
-          <InputText id="email" name="email" {...register('email', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.email })} />
+          <InputText id="email" name="email" {...register('email', { required: 'Campo obrigatório.' })} disabled={!isEditMode} className={classNames({ 'p-invalid': errors.email })} />
           {getFormErrorMessage(errors, 'email')}
         </div>
-        <div className="p-field p-col-12 p-md-4">
+
+        { !isEditMode &&
+        <div className="p-field p-pl-2">
           <label htmlFor="password">Password</label>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => {
-              return <Password {...field} feedback={false}  onChange={(e) => field.onChange(e.target.value)} />
-            }} 
-          />
+          <PasswordChange core={core} />
         </div>
+        }
 
         <div className="p-field p-col-12 p-md-6">
           <label htmlFor="auth_token">Token de Autenticação</label>
           <div className="p-inputgroup">
-              <Button type="button" label="Gerar" icon="pi pi-check" className="p-button-primary" onClick={(e) => { setValue('auth_token', String(uuidV4())); } } />
-              <InputText id="auth_token" name="auth_token" {...register('auth_token')} placeholder="Token não definido" />
-              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => { setValue('auth_token', null); setValue('auth_token_expire', null); } } />                
+              <Button type="button" label="Gerar" icon="pi pi-check" className="p-button-primary" onClick={(e) => {setValue('auth_token', String(uuidV4()));}} disabled={!isEditMode} />
+              <InputText id="auth_token" name="auth_token" {...register('auth_token')} placeholder="Token não definido" disabled={!isEditMode} />
+              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => {setValue('auth_token', null); setValue('auth_token_expire', null);}} disabled={!isEditMode} />                
           </div>
         </div>
         <div className="p-field p-col-12 p-md-3">
@@ -201,16 +196,17 @@ function AccountForm(props) {
                   return <Calendar {...field} 
                     dateFormat="yy-mm-dd"
                     onChange={(e) => field.onChange(e.target.value)} 
-                    showIcon showTime showSeconds />
+                    showIcon showTime showSeconds
+                    disabled={!isEditMode} />
                 }} 
               />                    
-              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => setValue('auth_token_expire', null) } />
+              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => setValue('auth_token_expire', null)} disabled={!isEditMode} />
           </div>
         </div>
 
       </div>
 
-      <Toolbar className="p-mt-4 p-mb-4" right={rightToolbarTemplate}></Toolbar>
+      <Toolbar className="p-mt-4 p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
     </form>
   );
