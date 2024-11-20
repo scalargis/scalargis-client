@@ -106,7 +106,7 @@ export default function FeatureInfo({ core, config, actions }) {
           fvt.set(k, props[k]);;
         });
         if (props.id) fvt.setId(props.id)        
-        if (l.get("datasource") && l.get("datasource").cql_fields && l.get("datasource").cql_filter) {
+        if (l.get("datasource") && ((l.get("datasource").cql_fields && l.get("datasource").cql_filter) || l.get("datasource").type=="ogcapi-features")) {
           if (l.get("datasource").allow_multi === false) {
             if (!layers_selected.includes(l.get('id'))) {
               fvt_remote.push({ feature: fvt, layer: l });
@@ -134,69 +134,71 @@ export default function FeatureInfo({ core, config, actions }) {
 
     //Get info for VectorTile features
     fvt_remote.forEach(item => {
-      let nativeCRS = item.layer.get("datasource").crs || 'EPSG:4326';
-      let filter = item.layer.get("datasource").cql_filter;
-      let fields = item.layer.get("datasource").cql_fields;
+
+      let filter = item.layer.get("datasource").cql_filter || "";
+      let fields = item.layer.get("datasource").cql_fields || [];
       fields.forEach((f, index) => {
         //replace based on field names
         filter = filter.replaceAll('{' + f + '}', item.feature.get(f));
         //replace based on field index
         filter = filter.replaceAll('{' + index + '}', item.feature.get(f));
       });
-      //replace based on XY coordinates
-      const coords = transform(coordinate, mainMap.getView().getProjection().getCode(), nativeCRS);
-      filter = filter.replaceAll('{X}', coords[0]);
-      filter = filter.replaceAll('{Y}', coords[1]);
 
-      utils.getWFSFeaturesFilterByGeom(
-        item.layer.get("datasource").url, 
-        item.layer.get("datasource").typeNames,
-        nativeCRS,
-        50,
-        null,
-        filter
-      )
-      .then(res => res.json())
-      .then(json => {
+      const datasourceType = item.layer.get("datasource").type;
 
-        // Parse JSON feature
-        const parser = new OlFormatGeoJSON();
-        const parseOptions = {
-          dataProjection: nativeCRS,
-          featureProjection: mapCRS
-        };
-        const features = parser.readFeatures(json, parseOptions);
-        if (!features) return;
+      if (datasourceType == "ogcapi-features") {
+        const url = item.layer.get("datasource").url;
+        const format = item.layer.get("datasource").format;
+        const nativeCRS = item.layer.get("datasource").crs || 'http://www.opengis.net/def/crs/OGC/1.3/CRS84';
 
-        // Add results
-        features.forEach(feat => {
-          acc.push(displayFeature(feat, item.layer));
-        });
-        dispatch(actions.viewer_set_featureinfo(acc));          
-      })
-      .catch(err => console.log(err));
-    });
-      
-    // Find features from WMS layers strategy
-    const viewResolution = (mainMap.getView().getResolution());
-    const mapCRS = mainMap.getView().getProjection().getCode();
-    const lrs = utils.findActiveWMSLayer(mainMap.getLayers());
-    lrs.forEach(l => {
-      if (l.get('selectable') === false) return;
+        let bbox = null;
 
-      // Get features using datasource
-      if (l.get("datasource")) {
-        let buffer = 2;
-        let nativeCRS = l.get("datasource").crs || 'EPSG:4326';
-        let bbox = [coordinate[0]-buffer, coordinate[1]-buffer, coordinate[0]+buffer, coordinate[1]+buffer];
-        const nativeBBOX = transformExtent(bbox, mapCRS, nativeCRS);
+        if (!filter) {
+          const buffer = item.layer.get("datasource").identify_buffer ? item.layer.get("datasource").identify_buffer : 0;
+          bbox = transformExtent([coordinate[0] - buffer, coordinate[1] - buffer,coordinate[0] + buffer, coordinate[1] + buffer], mainMap.getView().getProjection().getCode(), nativeCRS);
+        }
+
+        utils.getOGCAPIFeaturesFilterByCQL(
+          url,
+          filter,
+          bbox,
+          nativeCRS,
+          1,
+          format
+        )
+        .then(res => res.json())
+        .then(json => {
+          // Parse JSON feature
+          const parser = new OlFormatGeoJSON();
+          const parseOptions = {
+            dataProjection: nativeCRS,
+            featureProjection: mapCRS
+          };
+          const features = parser.readFeatures(json, parseOptions);
+          if (!features) return;
+
+          // Add results
+          features.forEach(feat => {
+            acc.push(displayFeature(feat, item.layer));
+          });
+          dispatch(actions.viewer_set_featureinfo(acc)); 
+
+        })
+        .catch(err => console.log(err));
+      } else {
+        const nativeCRS = item.layer.get("datasource").crs || 'EPSG:4326';
+        //replace based on XY coordinates
+        const coords = transform(coordinate, mainMap.getView().getProjection().getCode(), nativeCRS);
+        filter = filter.replaceAll('{X}', coords[0]);
+        filter = filter.replaceAll('{Y}', coords[1]);
+
         utils.getWFSFeaturesFilterByGeom(
-          l.get("datasource").url, 
-          l.get("datasource").typeNames,
+          item.layer.get("datasource").url, 
+          item.layer.get("datasource").typeNames,
           nativeCRS,
           50,
-          nativeBBOX
-          //"CONTAINS(" + l.get("datasource").geomName + ",POINT(" + coordinate.join(" ") + "))"
+          null,
+          filter
         )
         .then(res => res.json())
         .then(json => {
@@ -212,11 +214,96 @@ export default function FeatureInfo({ core, config, actions }) {
 
           // Add results
           features.forEach(feat => {
-            acc.push(displayFeature(feat, l));
+            acc.push(displayFeature(feat, item.layer));
           });
           dispatch(actions.viewer_set_featureinfo(acc));          
         })
         .catch(err => console.log(err));
+      }
+    });
+      
+    // Find features from WMS layers strategy
+    const viewResolution = (mainMap.getView().getResolution());
+    const mapCRS = mainMap.getView().getProjection().getCode();
+    const lrs = utils.findActiveWMSLayer(mainMap.getLayers());
+    lrs.forEach(l => {
+      if (l.get('selectable') === false) return;
+
+      // Get features using datasource
+      if (l.get("datasource")) {
+
+        const datasourceType = l.get("datasource").type;
+
+        if (datasourceType == "ogcapi-features") {
+          const url = l.get("datasource").url;
+          const format = l.get("datasource").format;
+          const nativeCRS = l.get("datasource").crs || 'http://www.opengis.net/def/crs/OGC/1.3/CRS84';
+  
+          let bbox = null;
+  
+          const buffer = l.get("datasource").identify_buffer ? l.get("datasource").identify_buffer : 0;
+          bbox = transformExtent([coordinate[0] - buffer, coordinate[1] - buffer,coordinate[0] + buffer, coordinate[1] + buffer], mainMap.getView().getProjection().getCode(), nativeCRS);
+  
+          utils.getOGCAPIFeaturesFilterByCQL(
+            url,
+            null,
+            bbox,
+            nativeCRS,
+            1,
+            format
+          )
+          .then(res => res.json())
+          .then(json => {
+            // Parse JSON feature
+            const parser = new OlFormatGeoJSON();
+            const parseOptions = {
+              dataProjection: nativeCRS,
+              featureProjection: mapCRS
+            };
+            const features = parser.readFeatures(json, parseOptions);
+            if (!features) return;
+  
+            // Add results
+            features.forEach(feat => {
+              acc.push(displayFeature(feat, l));
+            });
+            dispatch(actions.viewer_set_featureinfo(acc)); 
+  
+          })
+          .catch(err => console.log(err));
+        } else {
+          let buffer = 2;
+          let nativeCRS = l.get("datasource").crs || 'EPSG:4326';
+          let bbox = [coordinate[0]-buffer, coordinate[1]-buffer, coordinate[0]+buffer, coordinate[1]+buffer];
+          const nativeBBOX = transformExtent(bbox, mapCRS, nativeCRS);
+          utils.getWFSFeaturesFilterByGeom(
+            l.get("datasource").url, 
+            l.get("datasource").typeNames,
+            nativeCRS,
+            50,
+            nativeBBOX
+            //"CONTAINS(" + l.get("datasource").geomName + ",POINT(" + coordinate.join(" ") + "))"
+          )
+          .then(res => res.json())
+          .then(json => {
+
+            // Parse JSON feature
+            const parser = new OlFormatGeoJSON();
+            const parseOptions = {
+              dataProjection: nativeCRS,
+              featureProjection: mapCRS
+            };
+            const features = parser.readFeatures(json, parseOptions);
+            if (!features) return;
+
+            // Add results
+            features.forEach(feat => {
+              acc.push(displayFeature(feat, l));
+            });
+            dispatch(actions.viewer_set_featureinfo(acc));          
+          })
+          .catch(err => console.log(err));
+        }
 
       // Get features using any other strategy
       } else {
@@ -429,6 +516,63 @@ class FeatureInfoUtils  {
    *
    * @param {String} serviceUrl Url of wfs service to query
    */
+  getOGCAPIFeaturesFilterByCQL(serviceUrl, filter=null, bbox=null, bboxCRS=null, limit=null, format='json') {
+    const params = [];
+
+    const _filter = [];
+
+    // Add Fiels FILTER
+    if (filter) _filter.push(filter)
+    
+    // Add bbox Filter
+    if (bbox) {
+      _filter.push(`BBOX(geometry,${bbox.join(",")})`);
+      if (bboxCRS) params.push(`filter-crs=${bboxCRS}`);
+    }
+
+    // Add attributes filter
+    if (_filter.length) {
+      params.push(`filter=${_filter.join(' AND ')}`);
+    }
+    
+    // Add number of records limit
+    if (limit) {
+      params.push(`limit=${limit}`);
+    }
+
+    // Add CQL dialect
+    params.push("filter-lang=cql-text");
+
+    // Add response format
+    if (format) {
+      params.push(`f=${format}`)
+    }
+    
+    // Build final URL
+    let url = serviceUrl.indexOf("?") < 0 ? serviceUrl + '?' + params.join('&') : serviceUrl + params.join('&') ;
+
+    // Use map proxy
+    if (!isUrlAppOrigin(url)) {
+      url = this.core.MAP_PROXY_URL + encodeURIComponent(url);
+    };
+
+    // Set request options
+    const options = {
+      "body": null,
+      "method": "GET"
+    };
+
+    // return request
+    return fetch(url, options);
+  }
+
+
+
+  /**
+   * TODO: add description
+   *
+   * @param {String} serviceUrl Url of wfs service to query
+   */
   getWFSFeaturesFilterByGeom(serviceUrl, typeNames, srsName, count, bbox, cql_filter) {
     let params = [
       "SERVICE=wfs",
@@ -480,6 +624,7 @@ class FeatureInfoUtils  {
     // return request
     return fetch(url, options);
   }
+
 
   getFeatureInfoGeoJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
     let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/geojson');

@@ -546,7 +546,11 @@ const formatTemplateValue = (rowData, value) => {
   const _formatValue = (data, value) => {
     let _new_value = value;
 
+    //TODO: use regex processing
+    if (_new_value?.replaceAll) _new_value = value.replaceAll("{{", "[[[").replaceAll("}}", "]]]");
+
     const rf = (_new_value && _new_value.match) ? _new_value.match(/[^{}]+(?=})/g) : null;
+
     if (rf) {
       if (rf.length === 1) {
         const fld = rf[0];
@@ -559,6 +563,10 @@ const formatTemplateValue = (rowData, value) => {
         });
       }
     }
+
+    //TODO: use regex processing
+    if (_new_value?.replaceAll) _new_value = _new_value.replaceAll("[[[", "{").replaceAll("]]]", "}");
+
     return _new_value;
   }
 
