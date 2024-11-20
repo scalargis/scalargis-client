@@ -77,7 +77,8 @@ const VectorTileLayer = ({ config, group, checked }) => {
     return new VectorLayer({
       ...config,
       visible: config.active,
-      style: getStyle,
+      //style: getStyle,
+      style: (config.styleType == "native" && config.style != null) ? config.style : getStyle,
       source: new VectorTile({
         tilePixelRatio: 1, // oversampling when > 1
         tileGrid: createXYZ({ maxZoom: 19 }),
