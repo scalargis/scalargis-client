@@ -1,5 +1,5 @@
 # Build phase
-FROM node:16.10.0 as build
+FROM node:18.0 as build
 
 # Instal base packages
 WORKDIR /var/scalargis
