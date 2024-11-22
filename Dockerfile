@@ -1,6 +1,8 @@
 # Build phase
 FROM node:18.0 as build
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 # Instal base packages
 WORKDIR /var/scalargis
 COPY package.json .
