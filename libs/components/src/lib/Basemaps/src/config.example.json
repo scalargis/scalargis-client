@@ -1,0 +1,11 @@
+{
+    "id": "basemaps",
+    "type": "Basemaps",
+    "target": "map_controls_top_left",
+    "config_json": {
+        "auto_close": true,
+        "vertical": true,
+        "opened": true
+    },
+    "children": []
+}

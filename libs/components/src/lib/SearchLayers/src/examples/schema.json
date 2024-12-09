@@ -1,0 +1,65 @@
+{
+    "type": "object",
+    "properties": {
+      "email": { "type": "string", "pattern": "^\\S+@\\S+\\.\\S+$" },
+      "country": {
+        "type": "string",
+        "title": "Select your country",
+        "enum": {
+          "$GET": { "url": "https://countriesnow.space/api/v0.1/countries/flag/unicode", "returnProperty": "data.name" }
+        }
+      },
+      "city": {
+        "type": "string",
+        "title": "Select your city",
+        "enum": {
+          "$?": {
+            "condition": { "getData": "country", "fallback": false },
+            "valueIfTrue": {
+              "$post": {
+                "url": "https://countriesnow.space/api/v0.1/countries/cities",
+                "parameters": { "country": { "operator": "getData", "property": "country" } }
+              },
+              "returnProperty": "data",
+              "fallback": ["Loading cities, please wait..."]
+            },
+            "valueIfFalse": ["Please select a country first"]
+          }
+        }
+      },
+      "multiSelect": {
+        "type": "array",
+        "uniqueItems": true,
+        "title": "Please choose",
+        "items": {
+          "type": "string",
+          "enum": ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Lima"]
+        }
+      },
+      "number1": {
+        "type": "integer"
+      },
+      "number2": {
+        "type": "integer"
+      },
+      "vegetarian": {
+        "type": "boolean"
+      },
+      "mealChoice": {
+        "type": "string",
+        "enum": {
+          "$?": {
+            "condition": { "$getData": "vegetarian" },
+            "valueIfTrue": ["Tomato soup", "Vegetable lasagna"],
+            "valueIfFalse": ["Shepherd's pie", "Roast lamb"]
+          }
+        }
+      },
+      "date": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "required": ["country", "city", "date"]
+}
+  

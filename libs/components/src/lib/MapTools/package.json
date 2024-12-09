@@ -1,0 +1,8 @@
+{
+  "name": "websig_maptools",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "convert": "^4.13.1"
+  }
+}

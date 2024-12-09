@@ -1,0 +1,5 @@
+.layout-main {
+    @include transition(margin-left $transitionDuration);
+    padding: 0px 0px 0px 0px;
+    height: 100%;
+}

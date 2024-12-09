@@ -1,0 +1,15 @@
+{
+  "id": "print",
+  "type": "Print",
+  "target": "mainmenu",
+  "links": "map_controls_left",
+  "title": "Imprimir",
+  "config_json": {
+      "header": "Imprimir",
+      "closeLabel": "Fechar",
+      "defaultScaleSelector": "map",
+      "defaultScaleSelectorHelp": "Use key of TabPanel: predefined, freescale and map",      
+      "showPreview": true
+  },
+  "children": []
+}

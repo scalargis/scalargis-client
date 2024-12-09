@@ -1,0 +1,18 @@
+{
+  "id": "localeselector",
+  "type": "LocaleSelector",
+  "title": "Selecionar Idioma",
+  "regions": [],
+  "target": "topbar_right",
+  "_config_json": {
+    "mode": "inline",
+    "_mode": "dropdown",
+    "show_always": true,
+    "locales": [
+      "EN",
+      "PT",
+      "ES"
+    ]
+  },
+  "children": []
+}

@@ -1,0 +1,17 @@
+.export-map-features {
+  margin-left: 33px;
+  padding: 0.5em;
+  background-color: #f9f9f9;
+}
+
+.export-map-features table {
+  font-size: 0.8em;
+}
+
+.export-map-features table td:nth-child(2) {
+  text-align: right;
+}
+
+.export-map-features table th {
+  padding-bottom: 1em;
+}

@@ -1,0 +1,12 @@
+{
+  "id": "6",
+  "type": "LayerDownload",
+  "title": "Descarregar Tema",
+  "config_json": {
+    "exclude_export_formats": ["gml", "shape"]
+  },
+  "config_version": "1.0",
+  "regions": [],
+  "target": "theme_info_tools",
+  "children": []
+}

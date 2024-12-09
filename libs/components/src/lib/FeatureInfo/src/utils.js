@@ -1,0 +1,1 @@
+export const MAPCONTROL_NAME = "FeatureInfo";

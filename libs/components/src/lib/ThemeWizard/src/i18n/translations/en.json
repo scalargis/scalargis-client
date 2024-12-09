@@ -1,0 +1,68 @@
+{
+  "wms": "WMS - Web Map service",
+  "wmts": "WMTS - Web Map Tile Service",
+  "wfs": "WFS - Web Feature Service",
+  "arcgismap": "ArcGIS REST - Map Service",
+  "shape": "Shapefile - .zip file with .shp",
+  "kml": "KML - Keyhole Markup Language",
+  "gml": "GML - Geographic Markup Language",
+  "geojson": "GeoJSON",
+  "dxf": "DXF (v2000)",
+  "cog": "COG (GeoTiff)",
+  "group": "Group",
+
+  "file": "File",
+
+  "next": "Next",
+
+  "stepType": "Type",
+  "stepData": "Data",
+  "stepConfirm": "Confirm",
+
+  "unexpectedError": "Unexpected error",
+
+  "advancedOptions": "Advanced Options",
+  "selectServerType": "Select server type",
+  "serverType": "Server Type",
+  "notDefined": "Not Specified",
+  "version": "Version",
+  "specifiedByService": "Specified by Service",
+  "ignoreServiceUrl": "Ignore service URL",
+  "useTiles": "Tiles",
+
+  "choose": "Choose",
+  "load": "Load",
+  "cancel": "Cancel",
+
+  "selectRemovalAll": "Select/Remove All",
+
+  "selectTileMatrix": "Select Tile Matrix",
+
+  "noThemeSelectedMsg": "No theme selected. Go back to the previous step and select at least one theme.",
+  "confirm": "Confirm",
+  "finish": "Finish",
+
+  "coordinateSystem": "Coordinate System",
+  "selectCoordinateSystem": "Select the coordinate system",
+  "shapefileFormatInfo": "ZIP file containing the SHP, DBF and SHX files",
+  "kmlFormatInfo": "File - KML/KMZ",
+
+  "maxFileSizeInfo": "Max file size: {{size}} MB",
+  "maxFileSizeError": "The file cannot be larger than {{size}} MB",
+
+  "errorProcessingKMLFile": "An error occurred while processing the KML file.",
+  "errorProcessingGeoJSONFile": "An error occurred while processing the GeoJSON file.",
+  "invalidResponse": "It was not possible to get a valid response.",
+
+  "bands": "Bands",
+  "red": "Red",
+  "green": "Green",
+  "blue": "Blue",
+  "selectBands": "Select a band",
+  "convertToRGB": "Convert to RGB",
+  "nodataValue": "NoData value",
+  "cogCoordinateSystemInfo": "Dinamically loaded by COG image ({{epsg}})",
+  "cogCoordinateSystemUnsupported": "Could not load unsupported coordinate reference system ({{epsg}})",
+
+  "groupName": "Grupo name"
+}

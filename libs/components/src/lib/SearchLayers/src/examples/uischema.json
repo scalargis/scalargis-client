@@ -1,0 +1,168 @@
+{
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/email"
+          },
+          { "type": "Text", "text": "Where are you from?" },
+          {
+            "type": "Control",
+            "scope": "#/properties/country"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/city",
+            "visible": { "$getData": "country", "fallback": false, "outputType": "bool" }
+          },
+          {
+            "type": "Text",
+            "text": {
+              "$?": {
+                "condition": {
+                  "$and": [
+                    { "$getData": "city", "fallback": false },
+                    { "$getData": "country", "fallback": false }
+                  ]
+                },
+                "valueIfTrue": {
+                  "$stringSubstitution": {
+                    "string": "You are from %1, %2",
+                    "replacements": ["$getData(city)", "$getData(country)"]
+                  }
+                },
+                "valueIfFalse": ""
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Text",
+            "text": {
+              "$?": {
+                "condition": { "$>": [{ "$count": { "$getData": "multiSelect", "fallback": [] } }, 0] },
+                "valueIfTrue": {
+                  "$stringSubstitution": {
+                    "string": "You have selected %1 items",
+                    "replacements": [{ "$count": { "$getData": "multiSelect" }, "fallback": 0 }]
+                  }
+                },
+                "valueIfFalse": "Please select some items"
+              }
+            }
+          },
+          {
+            "type": "VerticalLayout",
+            "label": "Select some items",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Select multiple",
+                "scope": "#/properties/multiSelect"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/number1"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/number2"
+              }
+            ]
+          },
+          {
+            "type": "Text",
+            "text": {
+              "$stringSubstitution": {
+                "string": "%1 plus %2 equals %3",
+                "replacements": ["$num1", "$num2", { "$+": ["$num1", "$num2"] }]
+              },
+              "$num1": { "$getData": "number1", "fallback": 0 },
+              "$num2": { "$getData": "number2", "fallback": 0 }
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Are you vegetarian?",
+                    "scope": "#/properties/vegetarian"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/mealChoice"
+                  }
+                ]
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/date",
+                    "$isEnabled": { "$getData": "mealChoice", "fallback": false, "outputType": "bool" },
+                    "label": {
+                      "$?": {
+                        "condition": "$isEnabled",
+                        "valueIfTrue": "Select a date",
+                        "valueIfFalse": "Waiting for meal choice..."
+                      }
+                    },
+                    "enabled": "$isEnabled"
+                  },
+                  {
+                    "type": "Text",
+                    "text": {
+                      "$stringSubstitution": {
+                        "string": "The selected date is %1",
+                        "replacements": [
+                          {
+                            "operator": "match",
+                            "match": {
+                              "operator": "customFunctions",
+                              "functionPath": "checkDate",
+                              "args": [{ "operator": "getData", "property": "date" }]
+                            },
+                            "branches": { "0": "today", "1": "in the future", "-1": "in the past" }
+                          }
+                        ]
+                      },
+                      "fallback": ""
+                    },
+                    "visible": { "operator": "getData", "property": "date", "fallback": false, "outputType": "bool" }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+}
+  

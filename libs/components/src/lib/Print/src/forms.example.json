@@ -1,0 +1,25 @@
+{
+	"groups": {
+		"identification": {
+			"title": "Identificação",
+			"active": true,
+			"fields": {
+				"nif":{"title": "NIF","active":true,"required": true, "name": "identificationNIF", "label": "NIF"},
+				"nome":{"title": "Nome", "active":true,"required": true, "name": "identificationName", "label": "Nome"},
+				"morada":{"title": "Morada", "active": false, "required": false},
+				"codpostal":{"title": "Código Postal", "active": false, "required": false},
+				"local":{"title": "Localidade", "active": false, "required": false}
+			}
+		},
+		"purpose": {
+			"title": "Finalidade",
+			"active": true,
+			"fields": {
+				"purpose": {"title": "Finalidade", "active": true, "required": false, "name": "printPurpose"}
+			}
+		}
+	},
+	"fields": {
+		"payment_reference": {"title": "Referência de Pagamento", "active": true, "required": false, "header": "Pagamento"}
+	}
+}

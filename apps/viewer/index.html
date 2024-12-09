@@ -2,15 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Viewer</title>
+    <title>%VITE_APP_TITLE%</title>
+
     <base href="/" />
 
+    <!--
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/src/styles.css" />
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <meta name="author" content="%VITE_APP_ENTITY_NAME%">
+    <meta name="description" content="%VITE_APP_DESCRIPTION%">
+    <meta name="keywords" content="">
+
+    <script id="scalargis_env">
+      window.SCALARGIS_ROOT_PATH="__SCALARGIS_ROOT_PATH__";
+      window.SCALARGIS_ROOT_PATH_BASE_URL="__SCALARGIS_ROOT_PATH_BASE_URL__";
+      window.SCALARGIS_DEFAULT_LOCALE="__SCALARGIS_DEFAULT_LOCALE__";
+    </script>
+
+    <style>
+      html, body, #root {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        height: 100%;
+      }
+    </style>    
   </head>
   <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <div id="portal-root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

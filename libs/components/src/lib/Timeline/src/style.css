@@ -1,0 +1,8 @@
+.scalargis-timeline.p-inputgroup {
+    justify-content: center;
+}
+
+.scalargis-timeline.p-inputgroup button:last-child {
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+}

@@ -10,6 +10,25 @@ export default defineConfig({
   server: {
     port: 4200,
     host: 'localhost',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000/geoportal_dev/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      "/proxy": {
+        target: 'http://localhost:5000/geoportal_dev/proxy',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/proxy/, ''),
+      },
+
+      '/scalar_event': {
+        target: 'http://localhost:5000/geoportal_dev/scalar_event',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/scalar_event/, ''),
+      },
+
+    },
   },
   preview: {
     port: 4300,
@@ -28,4 +47,11 @@ export default defineConfig({
       transformMixedEsModules: true,
     },
   },
+  resolve: {
+    alias: {
+      'stream': 'stream-browserify',
+      'timers': 'timers-browserify'
+    },
+    preserveSymlinks: true
+  }
 });

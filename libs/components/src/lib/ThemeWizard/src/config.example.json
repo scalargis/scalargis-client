@@ -1,0 +1,27 @@
+{
+  "id": "themewizard",
+  "type": "ThemeWizard", 
+  "target": "mainmenu", 
+  "order": 1,
+  "config_json": {
+    "data": {
+      "type": "",
+      "url": "",
+      "wmsIgnoreServiceUrl": true,
+      "wmsVersion": "1.3.0",
+      "wmsTiled": true,
+      "wmtsIgnoreServiceUrl": true,
+      "wmtsVersion": "1.0.0",
+      "crs": "4326",
+      "dataitems": [],
+      "items": [],
+      "get_map_format": "image/png",
+      "get_feature_info_format": "text/plain"
+    },
+    "layer_visible": true,
+    "layer_group_opened": true,
+    "upload_maxfilesize": 1024,
+    "exclude_types": ["gml", "dxf", "shape"]
+  },
+  "children": []
+}

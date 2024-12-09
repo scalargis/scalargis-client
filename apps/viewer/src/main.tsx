@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import App from './app/app';
 

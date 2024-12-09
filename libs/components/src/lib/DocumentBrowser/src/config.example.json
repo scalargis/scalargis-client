@@ -1,0 +1,24 @@
+{
+    "id": "documentbrowser",
+    "type": "DocumentBrowser",
+    "target": "mainmenu",
+    "_as": "popup",
+    "title": "Documents",
+    "config_json": {
+      "folder": "images",
+      "path": "/2024",
+      "_url": "api/documents/list/images/2024",
+      "baseUrl": "//localhost:5000",
+      "showExpandButtons": true,
+      "showFilter": true,
+      "dialogKey": "images",
+      "dialogOptions": {
+        "position": "center",
+        "modal": true,
+        "resizable": true,
+        "draggable": true,
+        "maximizable": true,
+        "maximized": false
+      }
+    }
+}

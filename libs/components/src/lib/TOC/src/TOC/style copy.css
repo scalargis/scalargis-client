@@ -1,0 +1,243 @@
+#layer-switcher .p-toolbar {
+  border: 1px solid #e0e0e0;
+  padding: 0.3rem;
+}
+
+#layer-switcher ul {
+  list-style-type: none;
+}
+
+#layer-switcher ul {
+  margin: 0;
+  padding-left: 0;
+}
+
+#layer-switcher ul ul {
+  padding-left: 1rem;
+}
+
+#layer-switcher ul > li > table > tbody > tr.detail-container td,
+#layer-switcher ul ul > li > table > tbody > tr.detail-container td {
+  padding-left: 2.1rem;
+}
+
+#layer-switcher li {
+  margin-bottom: 0;
+}
+
+#layer-switcher .drag-slot {
+  transition: padding-top .3s linear, padding-bottom .3s linear;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+#layer-switcher .drag-slot + .drag-slot {
+  display: none;
+}
+
+#layer-switcher.dragging .drag-slot {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border: 2px dashed #f0f0f0;
+}
+
+#layer-switcher.dragging .drag-slot.drag-over {
+  border: 2px dashed red;
+}
+/*
+#layer-switcher li:first-child,
+#layer-switcher li:last-child {
+  padding-bottom: 10px;
+}
+*/
+#layer-switcher .draggable {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+#layer-switcher table {
+  width: 100%;
+  border-collapse: collapse;
+  min-height: 38px;
+}
+
+#layer-switcher td {
+  padding: 0;
+  vertical-align: top;
+}
+
+#layer-switcher td:nth-child(2) {
+  padding-left: .5rem;
+  /*padding-top: .45rem;*/
+}
+
+#layer-switcher .activate {
+  width: 20px;
+}
+
+#layer-switcher .activate .ui.checkbox {
+  top: 2px;
+}
+
+#layer-switcher .buttons {
+  min-width: 76px;
+  text-align: right;
+}
+
+#layer-switcher .ui.toggle.checkbox {
+  margin-top: 3px;
+}
+
+#layer-switcher .label {
+  cursor: pointer;
+}
+
+#layer-switcher .title i.circular {
+  display: none;
+  margin-left: 3px;
+  cursor: pointer;
+  font-size: 80%;
+  margin-top: 5px;
+}
+
+#layer-switcher .title .label {
+  word-break: break-word;
+  margin-top: 8px;
+}
+
+#layer-switcher .title:hover i {
+  display: inline-block;
+}
+
+#layer-switcher .title.outofscale {
+  color: #909090 !important;
+  font-style: italic;
+}
+/*
+#layer-switcher tr.detail-container td {
+  padding-top: 1rem;
+}
+*/
+#layer-switcher tr.detail-container p {
+  margin-top: 0;
+  word-break: break-all;
+}
+
+#layer-switcher .legend-container {
+  max-width: 100%;
+  max-height: 210px;
+  overflow: auto;
+  margin-bottom: 1em;
+}
+
+#layer-switcher .legend-container a,
+#layer-switcher .legend-container img
+{
+  max-width: inherit;
+}
+
+#layer-switcher li:last-of-type {
+  padding-bottom: 0;
+}
+
+#layer-switcher .theme-description {
+  font-size: 0.9em;
+  margin-bottom: 1em;
+  text-align: justify;
+}
+
+.sb-show-main h1 {
+  display: block;
+}
+
+.sb-show-main .p-field-checkbox,
+.sb-show-main .p-field-radiobutton {
+  margin-bottom: 1rem;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.p-dialog-content {
+  overflow-y: none;
+}
+
+.p-dialog-myfooter {
+  border-top: 1px solid #c8c8c8;
+  background: #ffffff;
+  color: #333333;
+  padding: 0.571rem 1rem;
+  text-align: right;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+#layer-switcher .activate {
+  width: 52px !important;
+}
+
+.p-checkbox {
+  margin-bottom: 4px;
+}
+
+.p-checkbox .p-checkbox-box {
+  position: relative;
+  /*top: -6px;*/
+}
+
+#layer-switcher td:nth-child(2) {
+  /*padding-top: .6rem;*/
+}
+
+.theme-tools {
+  display: flex;
+  flex-direction: row;
+  margin: 0.5rem 0 0.25rem -2em;
+  min-height: 30px;
+}
+.theme-tools:empty {
+  min-height: 10px;
+  min-height: unset;
+}
+
+.hidden {
+  display: none;
+}
+
+#layer-switcher .title-grp {
+  padding-top: 4px;
+  padding-bottom: 15px
+}
+
+#layer-switcher .label-grp {
+  font-weight: bold;
+}
+
+.p-button.p-button-sm {
+  padding: 0.33rem 0.25rem;
+}
+
+.p-checkbox {
+  margin-left: 4px;
+}
+
+.toc-leaf {
+  /*margin-top: 9px;*/
+  /*margin-left: 33px;*/
+  margin-left: 29px;
+}
+
+.toc-slider-wrapper {
+  width: 60px;
+  margin-top: 0.8em;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#layer-switcher .p-button.p-button-icon-only {
+  width: 1.8rem !important;
+  height: 1.8rem !important;
+}

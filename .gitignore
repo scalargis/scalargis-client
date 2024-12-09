@@ -42,3 +42,9 @@ Thumbs.db
 .nx/workspace-data
 
 vite.config.*.timestamp*
+
+# sources
+apps/viewer/src/app/components/*
+apps/backoffice/src/app/components/*
+apps/viewer/src/app/themes/*
+!apps/viewer/src/app/themes/default/

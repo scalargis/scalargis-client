@@ -1,0 +1,6 @@
+.footer-right .mapscale-input input.p-inputtext {
+  max-width: 100px;
+  min-width: 100px;
+  line-height: 10px;
+  height: 30px;  
+}

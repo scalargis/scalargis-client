@@ -1,0 +1,37 @@
+#themewizard .p-tree-filter-container .p-inputtext {
+  padding: 0.5rem 0.75rem;
+}
+
+#themewizard .p-fileupload .p-fileupload-row > div {
+  overflow: hidden;
+  padding: 0rem;
+}
+
+#themewizard .p-tabview .p-tabview-panels {
+  padding: 0.75rem 0;
+}
+
+#themewizard .p-fileupload .p-fileupload-buttonbar {
+  padding: 0.5rem !important;
+}
+
+#themewizard .p-fileupload .p-fileupload-buttonbar .p-button {
+  font-size: 0.8rem !important;
+  padding: 0.5rem 0.5rem !important;
+  margin-right: 0.3rem !important;
+}
+
+#themewizard .p-fileupload .p-fileupload-row .p-fileupload-file-badge.p-badge {
+  display: none;
+}
+
+#themewizard .p-dropdown-items-wrapper {
+  display: contents;
+}
+
+@media screen and (min-width: 768px) {
+  #themewizard .p-dropdown-items-wrapper {
+    position: fixed;
+    background-color: white;
+  }
+}

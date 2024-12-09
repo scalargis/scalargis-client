@@ -1,0 +1,129 @@
+/* style */
+.basemaps-menu {
+    margin-left: 15%;
+    margin-right: 15%;
+}
+
+.basemaps-control {
+    position: absolute;
+}
+
+.map-region-top-left .basemaps-control,
+.map-region-top-right .basemaps-control,
+.map-region-bottom-left .basemaps-control,
+.map-region-bottom-right .basemaps-control {
+    width: max-content;
+}
+
+.map-region-top-left .basemaps-control,
+.map-region-top-right .basemaps-control,
+.map-region-bottom-left .basemaps-control,
+.map-region-bottom-right .basemaps-control {
+    width: max-content;
+}
+
+.map-region-top-left .basemaps-control-vertical,
+.map-region-top-right .basemaps-control-vertical,
+.map-region-bottom-left .basemaps-control-vertical,
+.map-region-bottom-right .basemaps-control-vertical {
+    width: auto;
+}
+
+.map-region-top-left .basemaps-control {
+    margin-left: 40px;
+    top: -15px;
+}
+
+.map-region-top-right .basemaps-control {
+    margin-right: 35px;
+    float: right;
+    right: 0px;
+    top: -15px;
+}
+
+.map-region-top-right .basemaps-control > div {
+    flex-direction: row-reverse !important;
+}
+
+.map-region-top-right .basemaps button {
+    position: absolute;
+    right: 0px;
+}
+
+
+.map-region-bottom-left .basemaps button {
+    position: absolute;
+    bottom: 0px;
+}
+
+.map-region-bottom-left .basemaps-control {
+    left: 40px;
+    bottom: 0px;
+}
+
+.map-region-bottom-left .basemaps-control > div {
+    flex-wrap: wrap-reverse;
+}
+
+.map-region-bottom-right .basemaps button {
+    position: absolute;
+    bottom: 0px;
+}
+
+.map-region-bottom-right .basemaps-control {
+    right: 40px;
+    bottom: 0px;
+}
+
+.map-region-bottom-right .basemaps-control > div {
+    justify-content: end;
+    flex-wrap: wrap-reverse;
+    flex-direction: row-reverse !important;
+}
+
+
+.basemaps-menu .basemaps-control-item {
+    padding: 10px 20px;
+    max-width: 250px;
+}
+
+.basemaps-control .basemaps-control-item {    
+    max-width: 80px;
+    margin-right: 0.2rem !important;
+}
+
+.basemaps-control-item .p-card-header img {
+    padding: 3px 3px 0px;
+}
+
+.basemaps-control-item .p-card .p-card-body {
+    min-width: 80px;
+    max-height: 190px;
+    font-size: 0.8rem;
+    padding: 0.25rem;
+}
+
+.basemaps-control-item .p-card .p-card-header {
+    cursor: pointer;
+}
+
+.basemaps-control .basemaps-control-item .p-card .p-card-title {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;    
+}
+
+.basemaps-control-item .p-card .p-card-title {
+    font-weight: 400;
+}
+
+.basemaps-control-item.active .p-card .p-card-title {
+    font-weight: 500;
+}
+
+.basemaps-control-item .p-card .p-card-header img {
+    opacity: 0.45;
+}
+
+.basemaps-control-item.active .p-card .p-card-header img {
+    opacity: 1;
+}

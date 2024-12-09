@@ -1,0 +1,32 @@
+.map-controls {
+  width: 2.5em;
+}
+
+.ol-control button:focus {
+  background-color: #2196f3;
+}
+
+.ol-control button:hover {
+  background-color: rgba(103, 58, 183, 0.76);
+}
+
+.ol-zoom-extent {
+  top: 16em;
+  left: .5em;
+}
+
+.map-controls-geolocation {
+  display: inline-flex;
+} 
+
+.btn-geolocation-options {
+  /*position: relative;*/
+  top: -25px; 
+  left: 35px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  width: 140px;
+  min-width: 140px;
+  height: 30px;
+  line-height: 30px;  
+}

@@ -1,0 +1,36 @@
+{
+  "id": "parcelas",
+  "title": "Parcelas - IFAP",
+  "exclude_service_metadata": true,
+  "metadata": {
+      "url": "https://snig.dgterritorio.gov.pt/rndg/srv/por/catalog.search#/metadata/80a742cf-4215-47c2-9268-b29a4b4cb2a8"
+  },
+  "active": false,
+  "open": false,
+  "opacity": 0.7,
+  "type": "WFS",
+  "url": "https://www.ifap.pt/isip/ows/isip.data/ows",
+  "layers": "isip.data:parcelas.2022jun10",
+  "children": [],
+  "crs": 4326,
+  "version": "2.0.0",
+  "bbox": "-31.2663596620201 32.6347862889916 -6.19084916315683 42.1391331906749",
+  "bbox_crs": 4326,
+  "max_scale": 25000,
+  "selectable": true,
+  "max_features": 500,
+  "strategy": "bbox",
+  "style_color": null,
+  "style_stroke_color": "255, 0, 0, 1",
+  "style_stroke_width": 1,
+  "style_text_font": "12px Calibri,sans-serif",
+  "style_text_fill_color": "255, 0, 0, 1",
+  "style_text_stroke_color": "255, 255, 255, 1",
+  "style_text_value": "{PAR_ID}",              
+  "exclude_components": [
+      "LayerEdit",
+      "LayerDownload",
+      "LayerRemove"
+  ],
+  "description": "Sistema de Identificação Parcelar (iSIP) - IFAP."
+}

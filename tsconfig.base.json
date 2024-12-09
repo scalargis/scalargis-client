@@ -14,7 +14,12 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@scalargis/components": ["libs/components/src/index.ts"],
+      "@scalargis/jsonforms-primereact-renderers": [
+        "libs/jsonforms-primereact-renderers/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

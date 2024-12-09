@@ -1,0 +1,11 @@
+{
+  "id": "drawtools",
+  "type": "DrawTools", 
+  "target": "mainmenu", 
+  "order": 4,
+  "config_json": { 
+    "exclude_export_formats": ["gml", "kml", "shape"],
+    "export_crs": 3763
+  },
+  "children": []
+}

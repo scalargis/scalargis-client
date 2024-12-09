@@ -1,0 +1,21 @@
+{
+  "id": "toc",
+  "type": "TOC",
+  "target": "mainmenu",
+  "config_json": {
+      "show_filter": false,
+      "activate_parents": true,
+      "deactivate_children": true,
+      "open_children": true,
+      "draggable": false
+  },
+  "children": [
+      "searchlayerstoc",
+      "layeropacity",
+      "layeredit",
+      "layermetadata",
+      "layerremove",
+      "layerattributestable",
+      "exportfeat"                  
+  ]
+}

@@ -1,0 +1,11 @@
+.sg-document-list.p-inputtext.p-inputtext-sm {
+    padding-left: 30px !important;
+}
+
+.sg-document-list.p-treetable .p-treetable-thead {
+    display: none;
+}
+
+.sg-document-list.p-treetable .p-treetable-tbody > tr > td {
+    padding: unset !important;
+}

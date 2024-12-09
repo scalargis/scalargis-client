@@ -1,0 +1,146 @@
+{
+    "schema": {
+        "type": "object",
+        "properties": {
+            "country1": {
+                "type": "string",
+                "title": "Select your country",
+                "oneOf": {
+                    "operator": "customFunctions",
+                    "functionPath": "getAsOneOfObjects",
+                    "args": [
+                        {
+                            "$GET": {
+                            "url": "https://countriesnow.space/api/v0.1/countries/flag/unicode",
+                            "returnProperty": "data"
+                            }
+                        },
+                        "name",
+                        "name"
+                    ]
+                }
+            },
+            "country": {
+            "type": "string",
+            "title": "Select your country",
+            "enum": {
+                "$GET": {
+                "url": "https://countriesnow.space/api/v0.1/countries/flag/unicode",
+                "returnProperty": "data.name"
+                }
+            }
+            },
+            "city": {
+            "type": "string",
+            "title": "Select your city",
+            "enum": {
+                "$?": {
+                "condition": {
+                    "getData": "country",
+                    "fallback": false
+                },
+                "valueIfTrue": {
+                    "$post": {
+                    "url": "https://countriesnow.space/api/v0.1/countries/cities",
+                    "parameters": {
+                        "country": {
+                        "operator": "getData",
+                        "property": "country"
+                        }
+                    }
+                    },
+                    "returnProperty": "data",
+                    "fallback": [
+                    "Loading cities, please wait..."
+                    ]
+                },
+                "valueIfFalse": [
+                    "Please select a country first"
+                ]
+                }
+            }
+            },
+            "fid": {
+                "type": "integer"
+            },
+            "NUTSIII": {
+                "type": "string"
+            },
+            "DICO": {
+                "type": "string"
+            },
+            "Distrito": {
+                "type": "string",
+                "oneOf": [
+                    {
+                    "const": "Aveiro",
+                    "title": "Aveiro"
+                    },
+                    {
+                    "const": "Beja",
+                    "title": "Beja"
+                    },
+                    {
+                    "const": "Braga",
+                    "title": "Braga"
+                    }
+                ]
+            },
+            "Municipio": {
+                "type": "string"
+            }
+        }
+    },
+    "uischema": {
+        "type": "VerticalLayout",
+        "elements": [
+            {
+                "type": "Control",
+                "scope": "#/properties/country1"
+            },
+            {
+                "type": "Control",
+                "scope": "#/properties/country"
+            },
+            {
+                "type": "Control",
+                "scope": "#/properties/city",
+                "label": "Cidade",
+                "visible": {
+                    "$getData": "country",
+                    "fallback": false,
+                    "outputType": "bool"
+                }
+            },
+            {
+                "type": "Control",
+                "label": "Id",
+                "scope": "#/properties/fid"
+            },
+            {
+                "type": "Control",
+                "label": "DICO",
+                "scope": "#/properties/DICO"
+            },
+            {
+                "type": "Control",
+                "label": "Distrito",
+                "scope": "#/properties/Distrito"
+            },
+            {
+                "type": "Control",
+                "label": "Município",
+                "scope": "#/properties/Municipio",
+                "rule": {
+                    "effect": "DISABLE",
+                    "condition": {
+                        "scope": "#/properties/Distrito",
+                        "schema": {
+                            "maxLength": 0
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

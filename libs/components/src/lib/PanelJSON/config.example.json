@@ -1,0 +1,151 @@
+{
+  "id": "paneljson",
+  "type": "PanelJSON",
+  "target": "mainmenu",
+  "_as": "popup",
+  "order": 11,
+  "title": "Planos",
+  "config_json": {
+    "header": "Planos",
+    "closeLabel": "Fechar",
+    "url": "/api/documents/temporary/cfg.json",
+    "_data": [
+      {
+        "component": "ul",
+        "children": [
+          {
+            "component": "li",
+            "children": "Filho1"
+          },
+          {
+            "component": "li",
+            "className": "c-teste1",
+            "style": {
+              "backgroundColor": "red",
+              "fontWeight": "bold"
+            },
+            "children": [
+              {
+                "component": "input",
+                "props": {
+                  "type": "checkbox"
+                },
+                "className": "c-teste2"
+              },
+              {
+                "component": "label",
+                "children": "Teste"
+              }
+            ]
+          },
+          {
+            "component": "li",
+            "children": [
+              {
+                "component": "a",
+                "props": {
+                  "href": "https://www.wkt.pt",
+                  "target": "_blank",
+                  "title": "teste"
+                },
+                "children": "Link"
+              }
+            ]
+          },
+          {
+            "component": "button",
+            "props": {
+              "label": "Submit",
+              "loading": false,
+              "loadingOptions": {"position": "right"}
+            }
+          }
+        ]
+      },
+      {
+        "component": "tree",
+        "props":{
+          "value": [
+              {
+                  "key": "0",
+                  "label": "Documents",
+                  "data": "Documents Folder",
+                  "icon": "pi pi-fw pi-inbox",
+                  "children": [{
+                      "key": "0-0",
+                      "label": "Work",
+                      "data": "Work Folder",
+                      "icon": "pi pi-fw pi-cog",
+                      "children": [
+                        { "key": "0-0-0", "label": "asdasdasd.doc", "icon": "pi pi-fw pi-file", "data": "adsasd", "className": "c-ggggg", "style": {"color": "green"} },
+                        { "key": "0-0-1", "label": "Resume.doc", "icon": "pi pi-fw pi-file", "data": "Resume Document" },
+                        { "key": "0-0", "label": "Getting Started", "icon": "pi pi-fw pi-file", "content": [
+                            {
+                              "component": "a",
+                              "props": {
+                                "href": "https://reactjs.org/docs/add-react-to-a-websites.html",
+                                "target": "_blank"
+                              },
+                              "children": "Getting Startedss"
+                            }
+                          ]
+                        },
+                        { "key": "0-1", "label": "Add React", "icon": "pi pi-fw pi-file", "url": "https://reactjs.org/docs/add-react-to-a-website.html",
+                          "props": {"target": "_blank"},
+                          "className": "c-ggggg",
+                          "style": {"backgroundColor": "green"}
+                        },
+                        { "key": "0-2", "label": "Create an App", "icon": "pi pi-fw pi-file", "url": "https://reactjs.org/docs/create-a-new-react-app.html" },
+                        { "key": "0-3", "label": "CDN Links", "icon": "pi pi-fw pi-file", "url": "https://reactjs.org/docs/cdn-links.html" }
+                      ]
+                  },
+                  {
+                      "key": "0-1",
+                      "label": "Home",
+                      "data": "Home Folder",
+                      "icon": "pi pi-fw pi-home",
+                      "children": [
+                  { "key": "0-1-0", "label": "Invoices.txt", "icon": "pi pi-fw pi-file", "data": "Invoices for this month" }
+                ]
+                  }]
+              },
+              {
+                  "key": "1",
+                  "label": "Events",
+                  "data": "Events Folder",
+                  "icon": "pi pi-fw pi-calendar",
+                  "children": [
+                      { "key": "1-0", "label": "Meeting", "icon": "pi pi-fw pi-calendar-plus", "data": "Meeting" },
+                      { "key": "1-1", "label": "Product Launch", "icon": "pi pi-fw pi-calendar-plus", "data": "Product Launch" },
+                      { "key": "1-2", "label": "Report Review", "icon": "pi pi-fw pi-calendar-plus", "data": "Report Review" }]
+              },
+              {
+                  "key": "2",
+                  "label": "Movies",
+                  "data": "Movies Folder",
+                  "icon": "pi pi-fw pi-star",
+                  "children": [{
+                      "key": "2-0",
+                      "icon": "pi pi-fw pi-star",
+                      "label": "Al Pacino",
+                      "data": "Pacino Movies",
+                      "children": [{ "key": "2-0-0", "label": "Scarface", "icon": "pi pi-fw pi-video", "data": "Scarface Movie" }, { "key": "2-0-1", "label": "Serpico", "icon": "pi pi-fw pi-video", "data": "Serpico Movie" }]
+                  },
+                  {
+                      "key": "2-1",
+                      "label": "Robert De Niro",
+                      "icon": "pi pi-fw pi-star",
+                      "data": "De Niro Movies",
+                      "children": [
+                  { "key": "2-1-0", "label": "Goodfellas", "icon": "pi pi-fw pi-video", "data": "Goodfellas Movie" },
+                  { "key": "2-1-1", "label": "Untouchables", "icon": "pi pi-fw pi-video", "data": "Untouchables Movie" }
+                ]
+                  }]
+              }
+          ]
+        }
+      }
+    ]
+  },
+  "children": []
+}
