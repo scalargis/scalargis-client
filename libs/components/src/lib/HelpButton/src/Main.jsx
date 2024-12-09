@@ -251,7 +251,7 @@ export default function Main({ type, as, config, actions, record }) {
       { component_cfg?.elementType === 'link' ?
         <div title={title} className="p-link">
           <a href={help_url} target="_blank" className="sg-help-button-link" style={{"color": "#ffffff"}}>
-            <span class="layout-topbar-icon pi pi-question-circle"></span>
+            <span className="layout-topbar-icon pi pi-question-circle"></span>
           </a>
         </div> :
         <button className="p-link" title={title} onClick={e => { return; }}>

@@ -214,7 +214,7 @@ class Node extends React.Component {
               ) : null}
 
               {isGroup && this.isOpen() ? (
-                <div class="col-12 p-0">
+                <div className="col-12 p-0">
                     <Tree
                       id={data.id}
                       record={record}
