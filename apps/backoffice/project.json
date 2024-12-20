@@ -5,5 +5,20 @@
   "projectType": "application",
   "tags": [],
   "// targets": "to see all targets run: nx show project backoffice --web",
-  "targets": {}
+  "targets": {
+    "build-deploy-server": {
+      "metadata": {
+        "description": "Build the application for production and copies output files to scalargis-server static folder"
+      },
+      "dependsOn": ["^build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/backoffice",
+        "sourcemap": true,
+        "outDir": "../../../scalargis-server/scalargis/app/static/backoffice",
+        "emptyOutDir": true,
+        "command": "vite build"
+      }
+    }
+  }
 }

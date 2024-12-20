@@ -74,7 +74,7 @@ Core.prototype.setConfig = function(config) {
 
 // Add components
 Core.prototype.addComponent = function(core, component, done) {
-  import(/* @vite-ignore */'./components/' + component.type + '/src/Main.js').then(c => {
+  import(`./components/${component.type}/src/Main.jsx`).then(c => {
 
     // Basic Decorator Pattern: decorates core with additional functionality
     if (c.decorators && typeof c.decorators === 'object') {

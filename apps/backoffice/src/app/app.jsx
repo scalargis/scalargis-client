@@ -36,7 +36,7 @@ const App = () => {
       }
       
       let routes = (config?.customComponents || []).map(async item => {
-          return await import(/* @vite-ignore */`./components/${item}/src/Main.js`)
+          return await import(`./components/${item}/src/Main.jsx`)
             .then(module => _getRoutesInfo(module)).catch((error) => {console.log(error); return null})
       });
 

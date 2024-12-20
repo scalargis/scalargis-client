@@ -98,7 +98,8 @@ export const getAppBaseUrl = () => {
   const root_path = _getAppRootPath();
   let url = root_path + '';
   if (_getAppBaseUrl()) {
-    url = root_path + _getAppBaseUrl();
+    //url = root_path + _getAppBaseUrl();
+    url = _getAppBaseUrl();
   }
   if (!url.endsWith("/")) {
     url += '/';
@@ -117,7 +118,8 @@ export const getBackofficeBaseUrl = () => {
 
 export const getAppClientUrl = () => {
   const root_path = _getAppRootPath();
-  let url = root_path + '/static/backoffice/';
+  //let url = root_path + '/static/backoffice/';
+  let url = root_path;
   if (import.meta.env.VITE_APP_CLIENT_URL) {
     url = root_path + import.meta.env.VITE_APP_CLIENT_URL;
   }
