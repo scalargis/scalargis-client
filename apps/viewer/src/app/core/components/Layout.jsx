@@ -5,7 +5,6 @@ import {AppTopbar} from './AppTopbar'
 import 'primereact/resources/primereact.min.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
-import { getWindowSize, buildRelativeUrlPath } from '../utils'
 import Script, {ScriptWithProps, ScriptHtml} from './Script'
 import Style, {StyleHtml} from './Style'
 import LoadingScreen from './LoadingScreen'
@@ -27,7 +26,7 @@ function Layout(props) {
 
   const { t } = useTranslation(["common", "custom"]);
 	
-  const { CLIENT_URL } = core;
+  const { utils } = core;
 
   const [loaded, setLoaded] = useState(false);
 
@@ -59,22 +58,22 @@ function Layout(props) {
   });
 
   // Use window width for sidebar in mobile
-  const size = getWindowSize();
+  const size = utils.getWindowSize();
 
   let logo = viewer.layoutColorMode === 'dark' ?
-    CLIENT_URL + 'assets/images/logo-light.png':
-    CLIENT_URL + 'assets/images/logo.png';
+    utils.buildRelativeUrlPath('assets/images/logo-light.png') :
+    utils.buildRelativeUrlPath('assets/images/logo.png')
 
   if (viewer.staticMenuInactive && viewer.layoutMode === 'static') {
-    logo = CLIENT_URL + 'assets/images/logo-light.png';
+    logo = utils.buildRelativeUrlPath('assets/images/logo-light.png');
   }
 
   if (config && config.img_logo) {
-    logo = buildRelativeUrlPath(config.img_logo);
+    logo = utils.buildRelativeUrlPath(config.img_logo);
   }
 
   if (config && config.img_logo_alt &&  viewer.staticMenuInactive && viewer.layoutMode === 'static') {
-    logo = buildRelativeUrlPath(config.img_logo_alt);
+    logo = utils.buildRelativeUrlPath(config.img_logo_alt);
   }
 
   let title_logo = null;
@@ -158,7 +157,6 @@ function Layout(props) {
 
         { !loaded && <LoadingScreen /> }
 
-        {/*{ (config && config.scripts) ? config.scripts.map((k, i) => <Script key={i} src={k} async={false} />) : null }*/}
         { (config && config.scripts) ? config.scripts.map((k, i) => {
             if (typeof k === 'object' && k !== null) {
               return <ScriptWithProps key={i} {...k} />

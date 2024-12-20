@@ -26,7 +26,7 @@ import {
   AUTH_CLEAR_ERROR,
   AUTH_HTTP_LOADING,
   AUTH_RESPONSE,
-  //AUTH_LOGIN,
+  AUTH_LOGIN,
   PASSWORD_HTTP_ERROR,
   PASSWORD_HTTP_LOADING,
   PASSWORD_RESPONSE,
@@ -137,7 +137,6 @@ const root = (
         }
       }
     
-    /*
     // Login user
     case AUTH_LOGIN:
       return {
@@ -147,7 +146,6 @@ const root = (
           data: action.data
         }
       }
-    */
 
     // Password loading
     case PASSWORD_HTTP_LOADING:

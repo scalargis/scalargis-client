@@ -1,11 +1,11 @@
-import { transformExtent } from "../model/MapModel"
+//import { transformExtent } from "../model/MapModel"
 import Cookies from 'universal-cookie'
 
-
-import { i18n as i18nUtils } from '@scalargis/components'
-import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from '../utils'
-import { isThemeOnScale as isThemeOnScaleMapModel } from '../model/MapModel'
+import { i18n as i18nUtils } from "@scalargis/components"
 import { loadTranslations } from "../i18n"
+import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from "../utils"
+import { isThemeOnScale as isThemeOnScaleMapModel, transformExtent } from "../model/MapModel"
+import { fetchJson } from "../service/fetch"
 
 
 export const SITE_LOAD                  = 'SITE_LOAD'
@@ -203,12 +203,13 @@ export function login_post(post, history, redirect, urlRedirect) {
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
-        dispatch(login_response(res));
+        //dispatch(login_response(res));
         if (res.authenticated) {
           const cookies = new Cookies();
           let expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
           cookies.set(cookieAuthName, res, { path: urlRedirect || cookiePath, expires: expireDate });
+          dispatch(auth_login(res));
           if (urlRedirect) {
             window.location.assign(urlRedirect);
           } else if (redirect && history?.navigate) {
@@ -234,6 +235,7 @@ export function login(auth, history, redirect, urlRedirect) {
       let expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
       cookies.set(cookieAuthName, auth, { path: urlRedirect || cookiePath, expires: expireDate });
+      dispatch(auth_login(auth));
       if (urlRedirect) {
         window.location.assign(urlRedirect);
       } else if (redirect && history?.navigate) {
@@ -245,11 +247,15 @@ export function login(auth, history, redirect, urlRedirect) {
   }
 }
 
-export function logout() {
+export function logout(history=null, redirect=null) {
   return function (dispatch, getState) {
     const cookies = new Cookies();
     cookies.remove(cookieAuthName, { path: cookiePath });
-    window.location.reload();
+    if (redirect && history?.navigate) {
+      history.navigate(redirect);
+    } else {
+      window.location.reload();
+    }
   }
 }
 
@@ -272,6 +278,14 @@ export function login_response(res) {
   const action = {
     type: AUTH_RESPONSE,
     res
+  }
+  return action;
+}
+
+export function auth_login(data) {
+  const action = {
+    type: AUTH_LOGIN,
+    data
   }
   return action;
 }
@@ -328,10 +342,10 @@ export function password_reset_validation(post, history, redirect) {
         if (!res.error) {
           dispatch(password_response(res));
         } else {
-          dispatch(login_http_error({status: res.status, valid_token:false, message: res.message}));
+          dispatch(login_http_error({status: res.status, valid_token: false, message: res.message}));
         }
       }).catch(error => {
-        dispatch(login_http_error({status: 401, valid_token:false, message: 'Serviço indisponível'}));
+        dispatch(login_http_error({status: 401, valid_token: false, message: 'Serviço indisponível'}));
       });
   }
 }
@@ -377,33 +391,40 @@ export function password_http_error(res) {
   return action;
 }
 
-export function login_user_registration(post, history, redirect) {
+export function login_user_registration(core, data, redirect) {
   return function (dispatch, getState) {
-    dispatch(login_http_loading());
-    
-    const { username, email } = post;
 
-    let options = {
-      method: 'POST',
-      body: JSON.stringify({...post, redirect})
-    }
+    const { actions } = core;
 
-    let url = API_URL + '/security/register_user';;
-    fetch(url, options)
-      .then(res => res.json())
-      .then(res => {
-        if (!res.error) {
-          dispatch(login_response({register_user:true, username, email, redirect, ...res}));
-        } else {
-          if (res.status === 409) {
-            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", res.message)}));
-          } else {
-            dispatch(login_http_error({status: res.status, message: res.message}));
-          }
-        }
-      }).catch(error => {
-        dispatch(login_http_error());
+    dispatch(actions.login_http_loading());
+
+    const headers = new Headers({
+        "content-type": 'application/json',
+        accept: 'application/json'
       });
+
+    let url = core.API_URL + '/security/register_user';
+    fetchJson(url, { method: 'POST', headers, body: JSON.stringify(data) }).then(res => {
+        if (res.status === 200) {
+            return res.json;
+        }      
+    }).then(result => {
+        if (!result.error) {
+            dispatch(actions.login_response({register_user:true, username: data.username, email:data.email, redirect, ...result}));
+        } else {
+            if (result.status === 409) {
+              dispatch(actions.login_http_error({status: result.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", result.message)}));
+            } else {
+              dispatch(actions.login_http_error({status: result.status, message: result.message}));
+            }
+        }
+    }).catch(error => {
+        if (error?.status === 409) {
+            dispatch(actions.login_http_error({status: error.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", error.message)}));
+        } else {
+            dispatch(actions.login_http_error({status: error.status, message: error.message}));
+        }
+    });
   }
 }
 
@@ -464,7 +485,7 @@ export function registration_confirmation(post, history, redirect) {
             console.log(res.message);
             dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationInvalid", res.message)}));
           } else {
-            dispatch(login_http_error({status: res.status, valid_token:false, message: res.message}));
+            dispatch(login_http_error({status: res.status, valid_token: false, message: res.message}));
           }
         }
       }).catch(error => {
@@ -489,7 +510,7 @@ export function registration_send_confirmation(post, history, redirect) {
       .then(res => {
         if (!res.error) {
           if (res?.email) {
-            const msg = i18nUtils.translateValue("userRegistrationConfirmationSentToEmail","Enviada confirmação de registo de utilizador para o email {{email}}.", undefined, undefined, undefined, {email: res.email})
+            const msg = i18nUtils.translateValue("userRegistrationConfirmationSentToEmail","A confirmação de registo de utilizador foi enviada para o email {{email}}.", undefined, undefined, undefined, {email: res.email})
             dispatch(login_response({...res, message: msg}));
           } else {
             dispatch(login_response(res));
@@ -722,13 +743,13 @@ export function viewer_load(core, id, history) {
         })
       });
     }).catch(error => {
-
-      console.log(error);
-
       // Redirect to login or error pages
       if (error.message === 'Unauthorized') {
         if (!logged) {
-          let redirect = '/login?redirect=' + (id || '/');
+          //let redirect = '/login?redirect=/mapa/' + (id || '/');
+          let redirect = '/login?redirect=' + history.location.pathname;
+          console.log(history);
+          /*
           if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'mapa') > -1) {
             redirect += '&path=/mapa/';
           } else if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'map') > -1) {
@@ -736,8 +757,11 @@ export function viewer_load(core, id, history) {
           } else if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL) < 0) {
             redirect += '&url_redirect=/' + id;
           }
+          */
           history.navigate(redirect);
-        } else dispatch(viewer_not_authorized(history));
+        } else {
+          dispatch(viewer_not_authorized(history));
+        }
       } else dispatch(viewer_not_found(history));
     })
   }

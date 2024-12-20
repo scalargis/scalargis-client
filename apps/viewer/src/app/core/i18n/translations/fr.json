@@ -152,6 +152,7 @@
   "printMapScaleOptionMsg": "Le plan sera émis en fonction de l'échelle de visualisation de la carte",
   "noPrintMsg": "Ce visualiseur n'a pas de plantes configurées.",
   "requiredField": "Remplissage obligatoire",
+  "invalidEmailFormat": "Invalid Email. E.g. example@email.pt",
   "contactForm": "Formulaire de contact",
   "errorCreatingFile": "Une erreur s'est produite lors de la génération du fichier",
   "errorPrinting": "Une erreur s'est produite lors de la génération de le plante",
@@ -250,13 +251,16 @@
   "wrongUsernamePassword": "Wrong user or password",
   "wrongUser": "Invalid user",
   "send": "Send",
+  "passwordResetIntroMsg": "Please set and confirm your new password.",
   "passwordResetRequestSuccessMsg": "An email has been sent with instructions for recovering your password.",
   "passwordResetRequestInfoMsg": "If you do not receive the email with instructions for recovering your password within the next few minutes, check that it has not been sent to the SPAM area of ​​your email.",
+  "passwordResetSendEmail": "Enter your <i>username</i> or <i>email</i> to receive instructions for changing your password.",
   "userRegistrationData": "User data",
   "userRegistrationDataName": "Name",
   "userRegistrationDataEmail": "Email",
   "userRegistrationDataUsername": "Username",
   "userRegistrationDataPassword": "Password",
+  "userRegistrationDataConfirmPassword": "Confirm password",
 
   "suggestions": "Suggestions",
   "weakPasswordLabel": "Weak",
@@ -267,6 +271,8 @@
   "passwordDigitRule": "At least one digit",
   "passwordSizeRule": "At least 8 characters",
   "enterPassword": "Enter password",
+  "confirmPassword": "Confirm password",
+  "newPassword": "New password",
 
   "acceptThe": "I accept the",
   "termsAndConditions": "terms and conditions",
@@ -279,12 +285,15 @@
   "activeUserSession": "There is an active session for the user <i><strong>{{username}}</strong></i>.",
   "clickTo": "Click to",
   "andFinishUserRegistration": "and complete the user creation process",
+  "andChangePassword": "and change password",
   "userRegistrationConfirmation": "User creation confirmation",
   "userRegistrationConfirmationSuccess": "User creation confirmed successfully",
   "userRegistrationInvalid": "Invalid user confirmation",
   "userRegistrationFillEmail": "Enter the email used to create the user so that a new confirmation can be sent",
   "userRegistrationConfirmationSentToEmail": "User creation confirmation sent to email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "There is no user with the email indicated.",
+
+  "changePasswordConfirmationSuccess": "Password was changed successfully",
 
   "layerCompare": "Layer Compare",
   "splitMap": "Dividir mapa",
@@ -299,5 +308,10 @@
   "expand": "Ouvrir",
   "collapse": "Fermer",
   "folderNotFound": "Dossier non trouvé",
-  "emptyFolder": "Dossier vide"
+  "emptyFolder": "Dossier vide",
+
+  "noAccount": "Don't have an account?",
+  "registerHere": "Register here!",
+  "forgotPassword": "Forgot your password?",
+  "noMatchingPasswords": "Passwords do not match"
 }

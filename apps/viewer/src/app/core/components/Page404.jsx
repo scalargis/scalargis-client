@@ -7,7 +7,7 @@ function Page404({ history }) {
 
   const { t } = useTranslation();
 
-  const { navigate } = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="flex justify-content-center" style={{ height: '100%' }}>

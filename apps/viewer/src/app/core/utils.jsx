@@ -139,7 +139,8 @@ export const getAppBaseUrl = () => {
   const root_path = _getAppRootPath();
   let url = root_path + '';
   if (_getAppBaseUrl()) {
-    url = root_path + _getAppBaseUrl();
+    //url = root_path + _getAppBaseUrl();
+    url = _getAppBaseUrl();
   }
   if (!url.endsWith("/")) {
     url += '/';
@@ -149,7 +150,8 @@ export const getAppBaseUrl = () => {
 
 export const getAppClientUrl = () => {
   const root_path = _getAppRootPath();
-  let url = root_path + '/static/viewer/';
+  //let url = root_path + '/static/viewer/';
+  let url = root_path;
   if (import.meta.env.VITE_APP_CLIENT_URL) {
     url = root_path + import.meta.env.VITE_APP_CLIENT_URL;
   }
@@ -176,7 +178,7 @@ export const getAppApiUrl = () => {
 
 export const getAppMapProxyUrl = () => {
   const root_path = _getAppRootPath();
-  let url = root_path + '/map/proxy?url=';
+  let url = root_path + '/proxy?url=';
   if (import.meta.env.VITE_APP_MAP_PROXY) {
     url = root_path + import.meta.env.VITE_APP_MAP_PROXY;
   }
@@ -546,3 +548,17 @@ export const isComponentExcludedForLayer = (viewer, layer, componentClass) => {
 
   return exclude;
 }
+
+export const getFormValidationErrorMessage = (errors, name) => {
+  if (errors && errors[name]) {
+    if (errors[name].type === 'required') {
+      return <small className="p-error">{errors[name].message || 'Campo obrigatório'}</small>
+    } else if (errors[name].type === 'maxLength') {
+       return <small className="p-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
+    } else if (errors[name].type === 'pattern') {
+      return <small className="p-error">{errors[name].message || 'Formato inválido'}</small>
+    } else {
+      return <small className="p-error">{errors[name].message}</small>
+    }
+  }      
+};

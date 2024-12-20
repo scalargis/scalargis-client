@@ -135,6 +135,11 @@ function Core(config, reducers) {
   //this.store = createStore(rootReducer, applyMiddleware(thunk));
 
   /**
+   * Hold Utils functions
+   */
+  this.utils = utils;
+
+  /**
    * Hold app components
    */
   this.__components = {};
@@ -210,7 +215,7 @@ Core.prototype.addComponent = function(core, component, done) {
     
   } else {
     // Add plugin components
-    import(/* @vite-ignore */'./components/' + component.type + '/src/Main').then(c => {
+    import(`./components/${component.type}/src/Main.jsx`).then(c => {
 
       // Add component actions
       if (c.actions && typeof c.actions === 'object') {

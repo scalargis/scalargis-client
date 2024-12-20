@@ -50,7 +50,7 @@ function PasswordResetWidget(props) {
             <React.Fragment>
                 <div className="p-fluid">
 
-                    <div className="p-d-flex p-ai-center p-dir-col p-pt-2 p-px-3">
+                    <div className="flex align-items-center flex-column pt-2 px-3">
                         <h3>{i18nUtils.translateValue("passwordReset", "Recuperação de palavra-passe")}</h3>
                         <p>{i18nUtils.translateValue("passwordResetRequestSuccessMsg", "Foi enviado um email com as instruções para recuperação da palavra-passe.")}</p>
                         <p>{i18nUtils.translateValue("passwordResetRequestInfoMsg", "Caso não receba o email com as instruções para recuperação da palavra-passe durante os próximos minutos, verifique se este não foi direcionado para a área de SPAM do seu correio eletrónico.")}</p>
@@ -59,7 +59,7 @@ function PasswordResetWidget(props) {
 
                 <div className="p-dialog-myfooter">
                     <Button
-                        color='green'
+                        className="p-button-link"
                         label={i18nUtils.translateValue("login", "Login")}
                         onClick={showLogin}
                     />

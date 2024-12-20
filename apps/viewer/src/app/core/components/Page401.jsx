@@ -2,9 +2,13 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 
-function Page401() {
+function Page401(props) {
 
-  const { navigate } = useNavigate()
+  const { core } = props;
+
+  const navigate = useNavigate();
+
+  console.log(props);
 
   return (
     <div className="flex justify-content-center" style={{ height: '100%' }}>

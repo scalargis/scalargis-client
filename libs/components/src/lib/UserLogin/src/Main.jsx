@@ -1,6 +1,8 @@
 import React, {  useRef, useState, useEffect } from 'react'
+import { connect } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { Dialog } from 'primereact/dialog'
-import Cookies from 'universal-cookie'
+//import Cookies from 'universal-cookie'
 import { Menu } from 'primereact/menu'
 
 import { i18n as i18nUtils } from '@scalargis/components'
@@ -11,10 +13,10 @@ import PasswordResetWidget from './PasswordResetWidget'
 import componentMessages from './messages'
 
 
-const cookies = new Cookies();
+//const cookies = new Cookies();
 const appEntityNameAbrev = import.meta.env.VITE_APP_ENTITY_NAME_ABREV || 'ScalarGIS';
 
-export default function Main({ type, region, as, core, config, actions, record }) {
+function Main({ type, region, as, auth, core, config, actions, record }) {
   const { viewer, mainMap, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
@@ -27,7 +29,9 @@ export default function Main({ type, region, as, core, config, actions, record }
 
   const { logout } = actions;
 
-  const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
+  const location = useLocation();
+
+  //const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
   const isMobileSmall = wsize[0] <= 440;
@@ -58,8 +62,10 @@ export default function Main({ type, region, as, core, config, actions, record }
   }, [config]);
 
   // Render user
-  if (cookieData) {
-    const { username } = cookieData;
+  //if (cookieData) {
+  if (auth?.data?.token) {
+    //const { username } = cookieData;
+    const { username } = auth.data;
     const userMenu = [
       {
         label: i18nUtils.translateValue("endSession", "Terminar sessão"),
@@ -125,7 +131,7 @@ export default function Main({ type, region, as, core, config, actions, record }
               dispatch={dispatch}
               actions={actions}
               record={record}
-              redirect={viewer?.name}
+              redirect={location?.pathname || `/${viewer?.name}` }
               onHide={() => {
                 if (record?.config_json?.closable !== false) {
                   setMode(0);
@@ -163,7 +169,7 @@ export default function Main({ type, region, as, core, config, actions, record }
               actions={actions}
               viewer={viewer}
               record={record}
-              redirect={viewer?.name}
+              redirect={location?.pathname || `/${viewer?.name}`}
               showLogin={() => setMode(1)}
             />
         </Dialog>)
@@ -187,7 +193,7 @@ export default function Main({ type, region, as, core, config, actions, record }
               actions={actions}
               viewer={viewer}
               record={record}
-              redirect={viewer?.name}
+              redirect={location?.pathname || `/${viewer?.name}`}
               showLogin={() => setMode(1)}
             />
         </Dialog>)
@@ -197,3 +203,5 @@ export default function Main({ type, region, as, core, config, actions, record }
 
   );
 }
+
+export default connect(state => ({ auth: state.root.auth }))(Main)

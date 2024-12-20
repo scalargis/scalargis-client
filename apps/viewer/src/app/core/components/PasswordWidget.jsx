@@ -1,45 +1,44 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import Cookies from 'universal-cookie';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext'
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
-import { Divider } from 'primereact/divider';
 import { Message } from 'primereact/message';
-import AppContext from '../../AppContext';
 import { classNames } from 'primereact/utils';
 
-const cookies = new Cookies();
+import { i18n as i18nUtils } from '@scalargis/components';
 
-function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
+
+function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect }) {
 
   const [mode, setMode] = useState('set');
 
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState();
   const [password, setPassword] = useState('');
   const [goRedirect, setGoRedirect] = useState(false);
 
   // Enable redux actions
   const dispatch = useDispatch();
-  const { core } = useContext(AppContext);
-  const { login_reset_password, password_reset_validation, password_post, login_post, logout } = core.actions;
 
-  const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
+  const { utils, siteConfig } = core;
+  const { login_reset_password, password_reset_validation, password_post, login_post, logout } = core.actions;
 
   const defaultValues = {
     newPassword: '',
     confirmPassword: ''
   }
-
-  const passwordStrengthLabels = {
-    weakLabel: 'Fraca',
-    mediumLabel: 'Média',
-    strongLabel: 'Forte'
-  }
   
+  const passwordStrengthLabels = useMemo(() => {
+    return {
+      weakLabel: i18nUtils.translateValue("weakPasswordLabel", "Fraca"),
+      mediumLabel: i18nUtils.translateValue("mediumPasswordLabel", "Média"),
+      strongLabel: i18nUtils.translateValue("strongPasswordLabel", "Forte")
+    }
+  }, [i18nUtils.getResolvedLanguage()]);
+
   useEffect(() => {
-    if (cookieData)  return;
+    if (auth?.data?.token)  return;
     
     dispatch(password_reset_validation({ token }, history, redirect));
   }, []);
@@ -50,7 +49,10 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
     }
   }, [auth]);
 
-  const { control, formState: { errors }, getValues, handleSubmit } = useForm({ defaultValues });
+  const logo = utils.buildRelativeUrlPath(siteConfig?.logo || 'assets/images/logo.png');
+
+  const { control, watch, formState: { errors }, handleSubmit } = useForm({ defaultValues });
+  const watchFields = watch(["newPassword"]);
   
 
   const getFormValidationErrorMessage = (errors, name) => {
@@ -67,56 +69,61 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
     }      
   };
 
-  const passwordFooter = (
-      <React.Fragment>
-          <Divider className="mt-2" />
-          <p className="mt-2">Sugestões:</p>
-          <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
-              <li>Pelo menos uma minúscula</li>
-              <li>Pelo menos uma maiúscula</li>
-              <li>Pelo menos um dígito</li>
-              <li>Pelo menos 8 caracteres</li>
-          </ul>
-      </React.Fragment>
-  );
-
-  // Render user
-  if (cookieData) {
-    const { username } = cookieData;
-    return (
-      <div>
-        <p>Existe uma sessão ativa para o utilizador <i><strong>{ username }</strong></i>.</p>
-        <p>
-          Clique para 
-          <Button
-            className="p-button-link"
-            label="terminar sessão"
-            onClick={e => dispatch(logout())}
-          />e fazer a alteração da palavra-passe.
-        </p>
-      </div>
-    )
-  }
-
   const onSubmit = (data) => {
     setPassword(data.newPassword);
     dispatch(password_post({ token, password: data.newPassword }, history, redirect))
   }
 
+  // Render user
+  if (auth?.data?.token) {
+    const { username } = auth.data;
+    return (
+      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
+        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+
+          <div className="text-center mb-5">
+              <img src={logo} alt="hyper" height={50} className="mb-3" />
+              <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
+          </div>
+
+          <p dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("activeUserSession", "Existe uma sessão ativa para o utilizador <i><strong>{ username }</strong></i>.", undefined, undefined, undefined, {username})}} />
+          <p>
+            {i18nUtils.translateValue("clickTo", "Clique para")} 
+            <Button
+              className="p-button-link"
+              label={i18nUtils.translateValue("endSession", "Terminar sessão")}
+              onClick={e => dispatch(logout())}
+            />{i18nUtils.translateValue("andChangePassword", "e fazer a alteração da palavra-passe")}.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (pwd.response && !!pwd.response && !!pwd.response.authenticated) {
     const username = pwd.response.username;
+
     return (
-      <div className="flex align-items-center p-dir-col px-3">
-        <h3>Definição de Palavra-passe</h3>
-        <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
-        <p style={{ lineHeight: 1.5 }}>A Palavra-passe foi alterada com sucesso!</p>
-        <Button label="Continuar" 
-          onClick={ e => {
-            setGoRedirect(true); 
-            dispatch(login_post({ username, password }, history, redirect, urlRedirect));
-          }}
-          icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
-          disabled={goRedirect} />
+      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
+        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+          <div className="text-center mb-5">
+              <img src={logo} alt="logo" height={50} className="mb-3" />
+              <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
+          </div>
+          <div>
+            <div className="p-fluid w-full my-4 text-center">
+              <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
+              <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("changePasswordConfirmationSuccess", "A Palavra-passe foi alterada com sucesso")}!</p>
+              <Button label={i18nUtils.translateValue("continue", "Continuar")}
+                onClick={ e => {
+                  setGoRedirect(true); 
+                  dispatch(login_post({ username, password }, history, redirect, urlRedirect));
+                }}
+                icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
+                disabled={goRedirect} />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -124,151 +131,172 @@ function PasswordWidget({ token, auth, pwd, history, redirect, urlRedirect }) {
   if (mode === 'reset') {
     if (auth?.response?.reset_password) {
       return (
-        <React.Fragment>
-          <div className="p-fluid">
-
-            <div className="field grid">
-              <div className="col-12">
-                <h3>Alteração de Palavra-passe</h3>
+        <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
+          <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+            <div className="text-center mb-5">
+              <img src={logo} alt="logo" height={50} className="mb-3" />
+              <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
+            </div>
+            <div>
+              <div className="p-fluid w-full my-4">
+                <Message severity="info" text={auth.response.message}></Message> 
+              </div>
+              <div className="flex justify-content-end mt-4 mb-4 p-dialog-myfooter">
+                <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+                  onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
+                    {i18nUtils.translateValue("login", "Login")}
+                </a>                         
               </div>
             </div>
-
-            <div className="p-fluid field grid">
-              <div className="col-12 ">
-              <Message severity="info" text={auth.response.message}></Message> 
-              </div>
-            </div>
-
-            <div className="field grid">
-              <div className="col-12">
-                <Button
-                  className="p-button-link"
-                  label = "Login"
-                  onClick={() => {
-                    history.push('login?redirect=' + (redirect|| '/'));
-                  }}
-                />
-              </div>
-            </div>          
           </div>
-
-          <div className="p-dialog-myfooter"></div>
-        </React.Fragment>
+        </div>
       )
     } else {
       return (
-        <React.Fragment>
-          <div className="p-fluid">
-
-            <div className="field grid">
-              <div className="col-12">
-                <h3>Alteração de Palavra-passe</h3>
-                <p>Indique o seu <i>username</i> ou <i>email</i> para receber um email com instruções para alterar a palavra-passe.</p>
+        <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
+          <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+              <div className="text-center mb-5">
+                <img src={logo} alt="logo" height={50} className="mb-3" />
+                <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
+                <span className="text-600 font-medium line-height-3"
+                  dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("passwordResetSendEmail", "Indique o seu <i>username</i> ou <i>email</i> para receber um email com instruções para alterar a palavra-passe.")}} />
               </div>
-            </div>
 
-            <div className="field grid">
-              <label className="col-12 md:col-4">Nome de Utilizador / E-mail</label>
-              <div className="col-12 md:col-8">
+              <div>
+                <label htmlFor="username" className="block text-900 font-medium my-2">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
                 <InputText
+                  className="w-full mb-1"
                   value={username}
-                  placeholder="Nome de Utilizador"
                   onChange={e => setUsername(e.target.value)}
                 />
+                { username == '' && getFormValidationErrorMessage({username: {type: "required", message: "Campo obrigatório"}}, "username") }
+
+                <div className="flex justify-content-end mt-4 mb-4">
+                    <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+                      onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
+                        {i18nUtils.translateValue("login", "Login")}
+                    </a>                         
+                </div>
+
+                { auth.http_error && !auth.response &&
+                    <div className="p-fluid w-full my-4">
+                        <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                    </div>
+                }
+
+                { auth.response && !!auth.response && !!auth.response.message && 
+                  <div className="p-fluid w-full my-4">
+                    <Message severity={auth.http_error ? "error" : "info"} text={auth?.response?.message}></Message>
+                  </div>
+                }
+
+                <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
+                    <Button 
+                        label={i18nUtils.translateValue("send", "Enviar")}
+                        icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
+                        className="w-full"
+                        onClick={(e)=> { 
+                          e.preventDefault();
+                          if (!username) { 
+                            setUsername('');
+                            return;
+                          }
+                          dispatch(login_reset_password({ username }, history, redirect));}
+                        }
+                        disabled={auth.loading}
+                    />                            
+                </div>
               </div>
-            </div>
           </div>
-
-          <div className="p-dialog-myfooter">
-            <Button 
-              color='green'
-              icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-              label={"Enviar" }
-              onClick={(e)=> { e.preventDefault(); dispatch(login_reset_password({ username }, history, redirect));}}
-              disabled={auth.loading}
-            />
-          </div>
-
-          { auth.response && !!auth.response && !!auth.response.message && 
-            <div className="p-fluid">
-              <Message severity={auth.http_error ? "error" : "info"} text={auth?.response?.message}></Message>
-            </div>
-          }
-
-        </React.Fragment>   
+        </div>
       )
     }
   }
 
   if (mode === 'set') {
-    return (        
-      <form onSubmit={handleSubmit(onSubmit)} autoComplete="new-password">
-        <div className="p-fluid">       
 
-          <div className="field grid">
-            <div className="col-12">
-              <h3>Definição de Password</h3>
-              <p>Por favor, defina e confirme a sua nova palavra-passe</p>
+    return (
+      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
+        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+          <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+            <div className="text-center mb-5">
+                <img src={logo} alt="logo" height={50} className="mb-3" />
+                <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
+                <span className="text-600 font-medium line-height-3">{i18nUtils.translateValue("passwordResetIntroMsg", "Por favor, defina e confirme a sua nova palavra-passe.")}</span>
             </div>
-          </div>
-
-          <div className="field grid">
-            <label htmlFor="newPassword" className={classNames({ 'col-12 md:col-4': true,'p-error': errors.newPassword })}>Palavra-passe*</label>
-            <div className="col-12 md:col-8">
-              <Controller name="newPassword" control={control} rules={{ required: 'Preenchimento obrigatório.' }} render={({ field, fieldState }) => (
-                <Password id={field.name} {...field} 
-                  toggleMask
-                  promptLabel="Introduza a palavra-passe"
-                  {...passwordStrengthLabels}
-                  className={classNames({ 'p-invalid': fieldState.invalid })} 
-                  footer={passwordFooter}
-                  autoComplete="off"
-                  aria-autocomplete="none" />
+            <div>
+              <label htmlFor="newPassword" className="block text-900 font-medium my-2">{i18nUtils.translateValue("newPassword", "Nova password")}</label>
+              <Controller name="newPassword" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
+                  <Password id={field.name} {...field} 
+                      toggleMask
+                      promptLabel={i18nUtils.translateValue("enterPassword", "Introduza a password")}
+                      {...passwordStrengthLabels}
+                      className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
+                      inputClassName="w-full"
+                      pt={{ iconField: { root: { className: 'w-full' } } }}
+                      autoComplete="off"
+                      aria-autocomplete="none"
+                      disabled={auth?.response?.success} />                  
               )} />
-              {getFormValidationErrorMessage(errors, 'newPassword')}            
+              {getFormValidationErrorMessage(errors, 'newPassword')}
+
+              <label htmlFor="confirmPassword" className="block text-900 font-medium my-2">{i18nUtils.translateValue("confirmPassword", "Confirmar password")}</label>
+              <Controller name="confirmPassword" control={control} 
+                  rules={{ 
+                      required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
+                      validate: (value) => {
+                          if (value && watchFields[0] && value != watchFields[0]) {
+                              return i18nUtils.translateValue("noMatchingPasswords", "As passwords introduzidas não são iguais");
+                          }
+                          return true;
+                      }
+                  }} 
+                  render={({ field, fieldState }) => (
+                  <Password id={field.name} {...field}
+                      feedback={false}
+                      toggleMask 
+                      promptLabel={i18nUtils.translateValue("confirmPassword", "Confirmar password")}
+                      className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
+                      inputClassName="w-full"
+                      pt={{ iconField: { root: { className: 'w-full' } } }}
+                      autoComplete="off"
+                      aria-autocomplete="none"
+                      disabled={auth?.response?.success} />
+                  )} 
+              />
+              {getFormValidationErrorMessage(errors, 'confirmPassword')}
+
+              <div className="flex justify-content-end mt-4 mb-4">
+                  <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+                    onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
+                      {i18nUtils.translateValue("login", "Login")}
+                  </a>                         
+                </div>
+
+              { pwd.http_error && !pwd.response &&
+                  <div className="p-fluid w-full my-4">
+                  <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                  </div>
+              }
+
+              { pwd.response && !!pwd.response && !pwd.authenticated && !!pwd.response.message &&
+                  <div className="p-fluid w-full my-4">
+                  <Message severity="error" text={auth?.response?.message}></Message>
+                  </div>
+              }                        
+              
+              <div className="flex justify-content-end mt-4 mb-4 p-dialog-myfooter">
+                  <Button 
+                      label={i18nUtils.translateValue("accept", "Aceitar")}
+                      icon={ pwd.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
+                      className="w-full"
+                      disabled={pwd.loading} 
+                  />                            
+              </div>
             </div>
-          </div>
-
-          <div className="field grid">
-            <label htmlFor="confirmPassword" className={classNames({ 'col-12 md:col-4': true,'p-error': errors.confirmPassword })}>Confirmar Palavra-passe*</label>
-            <div className="col-12 md:col-8">
-              <Controller name="confirmPassword" control={control} rules={{ required: 'Preenchimento obrigatório.', validate: ()=>{ if (getValues('newPassword') !== getValues('confirmPassword')) return "As passwords não são iguais." } }} render={({ field, fieldState }) => (
-                <Password id={field.name} {...field} 
-                  toggleMask 
-                  feedback={false} 
-                  className={classNames({ 'p-invalid': fieldState.invalid })}
-                  autoComplete="off"
-                  aria-autocomplete="none" />
-              )} />
-              {getFormValidationErrorMessage(errors, 'confirmPassword')}            
-            </div>
-          </div>      
-
+          </form>
         </div>
-
-        <div className="p-dialog-myfooter">
-          <Button 
-            color='green'
-            icon={ pwd.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-            label="Aceitar" 
-            type="submit"
-            disabled={pwd.loading}
-          />
-        </div>
-        
-        { pwd.http_error && !pwd.response &&
-          <div className="p-fluid">
-            <Message severity="error" text="Serviço Indisponível"></Message>
-          </div>
-        }
-
-        { pwd.response && !!pwd.response && !pwd.authenticated && !!pwd.response.message &&
-          <div className="p-fluid"> 
-            <Message severity="error" text="Dados inválidos"></Message>
-          </div>
-        }
-
-      </form>
+      </div>
     )
   }
 }

@@ -152,6 +152,7 @@
   "printMapScaleOptionMsg": "A planta será emitida em função da escala de visualização do mapa",
   "noPrintMsg": "Este visualizador não tem plantas configuradas.",
   "requiredField": "Campo obrigatório",
+  "invalidEmailFormat": "Email inválido. E.g. exemplo@email.pt",
   "errorCreatingFile": "Ocorreu um erro ao gerar o ficheiro",
   "errorPrinting": "Ocorreu um erro ao gerar a planta",
   "contactForm": "Formulário de Contacto",
@@ -250,13 +251,16 @@
   "wrongUsernamePassword": "Nome de Utilizador ou Palavra-passe inválido",
   "wrongUser": "O Utilizador indicado não é válido",
   "send": "Enviar",
+  "passwordResetIntroMsg": "Por favor, defina e confirme a sua nova palavra-passe.",
   "passwordResetRequestSuccessMsg": "Foi enviado um email com as instruções para recuperação da palavra-passe.",
   "passwordResetRequestInfoMsg": "Caso não receba o email com as instruções para recuperação da palavra-passe durante os próximos minutos, verifique se este não foi direcionado para a área de SPAM do seu correio eletrónico.",
+  "passwordResetSendEmail": "Indique o seu <i>username</i> ou <i>email</i> para receber um email com instruções para alterar a palavra-passe.",
   "userRegistrationData": "Dados de registo",
   "userRegistrationDataName": "Nome",
   "userRegistrationDataEmail": "Email",
   "userRegistrationDataUsername": "Nome de utilizador",
   "userRegistrationDataPassword": "Password",
+  "userRegistrationDataConfirmPassword": "Confirmar password",
 
   "suggestions": "Sugestões",
   "weakPasswordLabel": "Fraca",
@@ -267,6 +271,8 @@
   "passwordDigitRule": "Pelo menos um dígito",
   "passwordSizeRule": "Pelo menos 8 caracteres",
   "enterPassword": "Introduza a password",
+  "confirmPassword": "Confirmar password",
+  "newPassword": "Nova password",
 
   "acceptThe": "Aceito os",
   "termsAndConditions": "termos e condições de utilização",
@@ -279,12 +285,15 @@
   "activeUserSession": "Existe uma sessão ativa para o utilizador <i><strong>{{username}}</strong></i>.",
   "clickTo": "Clique para",
   "andFinishUserRegistration": "e concluir registo de novo utilizador",
+  "andChangePassword": "e fazer a alteração da palavra-passe",
   "userRegistrationConfirmation": "Confirmação de registo de utilizador",
   "userRegistrationConfirmationSuccess": "Registo de utilizador confirmado com sucesso",
   "userRegistrationInvalid": "Confirmação de registo inválida",
   "userRegistrationFillEmail": "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo",
-  "userRegistrationConfirmationSentToEmail": "Enviada confirmação de registo de utilizador para o email {{email}}.",
+  "userRegistrationConfirmationSentToEmail": "A confirmação de registo de utilizador foi enviada para o email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "Não existe nenhum registo de utilizador com o email indicado.",
+
+  "changePasswordConfirmationSuccess": "A Palavra-passe foi alterada com sucesso",
 
   "layerCompare": "Comparar Temas",
   "splitMap": "Dividir mapa",
@@ -299,5 +308,10 @@
   "expand": "Expandir",
   "collapse": "Recolher",
   "folderNotFound": "Pasta não encontrada",
-  "emptyFolder": "Pasta vazia"
+  "emptyFolder": "Pasta vazia",
+
+  "noAccount": "Não tem uma conta?",
+  "registerHere": "Registe-se aqui!",
+  "forgotPassword": "Esqueceu-se da password?",
+  "noMatchingPasswords": "As passwords introduzidas não são iguais"
 }

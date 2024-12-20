@@ -70,8 +70,6 @@ function LoginWidget(props) {
     dispatch(login_post({ username: data.username, password: data.password }, history, redirect));
   }
 
-  console.log(auth?.response?.message);
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <div className="p-fluid">

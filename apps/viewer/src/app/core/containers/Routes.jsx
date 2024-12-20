@@ -4,9 +4,9 @@ import { BrowserRouter as Router, Routes as ReactRoutes, Route, Navigate, useLoc
 import HomePage from '../components/HomePage'
 import Page404 from '../components/Page404'
 import Page401 from '../components/Page401'
-import PageLogin from '../components/PageLogin'
-import PageRegistrationConfirmation from '../components/PageRegistrationConfirmation'
-import PagePassword from '../components/PagePassword'
+import PageLogin from './PageLogin'
+import PageRegistrationConfirmation from './PageRegistrationConfirmation'
+import PagePassword from './PagePassword'
 
 const Routes = ({core, pages}) => {
 
@@ -14,11 +14,11 @@ const Routes = ({core, pages}) => {
 
     return (
         <ReactRoutes>
-            <Route path="/login" element={<PageLogin />} />
-            <Route path="/registration" element={<PageRegistrationConfirmation />} />
-            <Route path="/password" element={<PagePassword/>} />
-            <Route path="/not-found" element={<Page404 />} />
-            <Route path="/not-allowed" element={<Page401 />} />
+            <Route path="/login" element={<PageLogin core={core} />} />
+            <Route path="/registration" element={<PageRegistrationConfirmation core={core} />} />
+            <Route path="/password" element={<PagePassword core={core}/>} />
+            <Route path="/not-found" element={<Page404 core={core} />} />
+            <Route path="/not-allowed" element={<Page401 core={core} />} />
             <Route path="/mapa/session/:id?" element={<Viewer />} />
             <Route path="/map/session/:id?" element={<Viewer />} />
             <Route path="/mapa/:id?" element={<Viewer />} />

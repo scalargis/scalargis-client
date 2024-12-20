@@ -8,17 +8,8 @@ import Routes from './core/containers/Routes';
 import LoadingScreen from './core/components/LoadingScreen';
 import { getAppBaseUrl } from './core/utils';
 
-//import { useTranslation } from 'react-i18next';
-
 
 const App = () => {
-
-  /*
-  const { t } = useTranslation();
-  const s = t('welcome');
-  console.log(s);
-  */
-
   const [pagesLoaded, setPagesLoaded] = useState(false);
   const [pages, setPages] = useState([]);
 
@@ -38,7 +29,7 @@ const App = () => {
       }
       
       let routes = (config?.customComponents || []).map(async item => {
-          return await import(/* @vite-ignore */`./components/${item}/src/Main`)
+          return await import(`./components/${item}/src/Main.jsx`)
             .then(module => _getRoutesInfo(module)).catch((error) => {console.log(error); return null})
       });
 

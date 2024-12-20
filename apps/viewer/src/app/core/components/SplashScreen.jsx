@@ -11,13 +11,12 @@ function SplashScreen(props) {
   const { t } = useTranslation();
 
   const { core } = useContext(AppContext);
+  const { utils } = core;
 
   const location = useLocation();
 
-  const { CLIENT_URL } = core;
-
-  const defaultLogo = CLIENT_URL + 'assets/images/logo-splash.png';
-  const viewerLogo = CLIENT_URL + 'assets/images' + (location.pathname || '') + '/logo-splash.png';
+  const defaultLogo = utils.buildRelativeUrlPath('assets/images/logo-splash.png');
+  const viewerLogo = utils.buildRelativeUrlPath(`assets/images${location.pathname || ''}/logo-splash.png`);
 
   const addDefaultSrc = (ev) => {
     ev.target.src = defaultLogo;

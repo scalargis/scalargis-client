@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { connect } from 'react-redux';
-import Cookies from 'universal-cookie';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
@@ -9,16 +8,12 @@ import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { Message } from 'primereact/message';
-import { Divider } from 'primereact/divider';
 import { FloatLabel } from 'primereact/floatlabel';
 import { classNames } from 'primereact/utils';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
 import { getFormValidationErrorMessage } from './utils';
-
-
-const cookies = new Cookies();
 
 
 function RegistrationWidget(props) {
@@ -28,13 +23,12 @@ function RegistrationWidget(props) {
   // Redux redux actions
   const { login_user_registration , logout } = actions;
 
-  const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
-
   const defaultValues = {
     name: null,
     email: null,
     username: null,
     password: '',
+    confirmPassword: '',
     accept: false
   }
 
@@ -46,15 +40,21 @@ function RegistrationWidget(props) {
     }
   }, [i18nUtils.getResolvedLanguage()]);
 
-  const { control, formState: { errors }, handleSubmit } = useForm({ defaultValues });
-
+  const { control, watch, formState: { errors }, handleSubmit } = useForm({ defaultValues });
+  const watchFields = watch(["password"]);
 
   const TERMS_OF_SERVICE_URL = viewer?.config_json?.terms_of_service_url;
 
   const onSubmit = (data) => {
-    dispatch(login_user_registration({ ...data }, history, redirect));  
+    let {accept, confirmPassword, ...payload} = data;
+    payload = {
+        ...payload,
+        redirect
+    }
+    dispatch(login_user_registration(core, payload, redirect));  
   }
 
+  {/*
   const passwordFooter = (
     <React.Fragment>
         <Divider className="mt-2" />
@@ -67,20 +67,18 @@ function RegistrationWidget(props) {
         </ul>
     </React.Fragment>
   );
+  */}
    
 
   if (auth?.response?.register_user === true && !auth?.response?.error) {
     return (
-      <div className="flex align-items-center p-dir-col pt-6 p-px-3">
-        <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-        <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
-        <p style={{ lineHeight: 1.5 }} dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
-        {/*
-        <Button label="Entrar" onClick={ e=>
-          dispatch(login_post({ username: formData.username, password: formData.password }, history, redirect))
-        } />
-        */}
-<       div className='col-12 md:col-6 p-2 text-center'>
+      <div className="pt-6 px-3">
+        <div className="text-center mb-5">
+          <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
+          <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
+        </div>
+        <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
+<       div className='text-center py-2'>
           <Button
             className="p-button-link"
             style={{width: 'auto'}}
@@ -111,9 +109,9 @@ function RegistrationWidget(props) {
               <IconField iconPosition="right">
                 <InputIcon className="pi pi-envelope" />
                   <Controller name="email" control={control}
-                      rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório"), pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: 'Email inválido. E.g. exemplo@email.pt' }}}
+                      rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório"), pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: i18nUtils.translateValue("invalidEmailFormat", "Email inválido. E.g. exemplo@email.pt") }}}
                       render={({ field, fieldState }) => (
-                          <InputText id={field.name} {...field} disabled={!!cookieData} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                          <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                   )} />
                 </IconField>
               <label htmlFor="email" className={classNames({ 'p-error': !!errors.email })}>{i18nUtils.translateValue("userRegistrationDataEmail", "Email")}*</label>
@@ -138,13 +136,38 @@ function RegistrationWidget(props) {
                     promptLabel={i18nUtils.translateValue("enterPassword", "Introduza a password")}
                     {...passwordStrengthLabels}
                     className={classNames({ 'p-invalid': fieldState.invalid })} 
-                    footer={passwordFooter} 
+                    /*footer={passwordFooter}*/ 
                     autoComplete="off"
                     aria-autocomplete="none" />
               )} />
               <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>{i18nUtils.translateValue("userRegistrationDataPassword", "Password")}*</label>
           </span>
           {getFormValidationErrorMessage(errors, 'password')}
+        </div>
+        <div className="field pt-2">
+          <span className="p-float-label">
+              <Controller name="confirmPassword" control={control} 
+                rules={{ 
+                  required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
+                  validate: (value) => {
+                      if (value && watchFields[0] && value != watchFields[0]) {
+                          return i18nUtils.translateValue("noMatchingPasswords", "As passwords instroduzidas não são iguais");
+                      }
+                      return true;
+                  } 
+                }} 
+                render={({ field, fieldState }) => (
+                  <Password id={field.name} {...field}
+                    feedback={false}
+                    toggleMask
+                    promptLabel={i18nUtils.translateValue("confirmPassword", "Confirmar password")}
+                    className={classNames({ 'p-invalid': fieldState.invalid })} 
+                    autoComplete="off"
+                    aria-autocomplete="none" />
+              )} />
+              <label htmlFor="confirmPassword" className={classNames({ 'p-error': errors.password })}>{i18nUtils.translateValue("userRegistrationDataConfirmPassword", "Confirmar password")}*</label>
+          </span>
+          {getFormValidationErrorMessage(errors, 'confirmPassword')}
         </div>
         <div className="field-checkbox">
             <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
@@ -156,10 +179,10 @@ function RegistrationWidget(props) {
 
       { showLogin && <div className="p-fluid">
           <div className="field grid">
-            <div className="col-12">
+            <div className="col-2 col-offset-5">
               <Button
                 className="p-button-link"
-                label = "Login"
+                label = {i18nUtils.translateValue("login", "Entrar")}
                 onClick={(e) => {
                   e.preventDefault();
                   showLogin();

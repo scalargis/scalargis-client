@@ -2,11 +2,13 @@ import React, { useRef, useEffect, useState } from 'react'
 import { connect } from 'react-redux';
 import ThemeSelector from '../components/ThemeSelector'
 import LayoutComponent from '../components/Layout'
-import { mapStateToProps, isDesktop, buildRelativeUrlPath } from '../utils'
+import { mapStateToProps, isDesktop } from '../utils'
 
 function Layout(props) {
 
   const { core, history, config, viewer, mainOlMap, layout_toggle_menu, layout_wrapper_click } = props;
+
+  const { utils } = core;
 
   const [activeTheme, setActiveTheme] = useState(null);
 
@@ -51,11 +53,9 @@ function Layout(props) {
     }
     setActiveTheme(theme);
 
-    const { CLIENT_URL } = core;
-
     // -- Override document properties --//
     //Set Manifest
-    let manifest_url = CLIENT_URL + 'manifest.json';    
+    let manifest_url = utils.buildRelativeUrlPath('manifest.json');   
     if (config.manifest_json) {
       let manifest = encodeURIComponent(JSON.stringify(config.manifest_json));
       manifest_url = "data:application/manifest+json,"+manifest;
@@ -86,9 +86,9 @@ function Layout(props) {
     }
 
     //Set document icons
-    let icon_url = CLIENT_URL + 'assets/images/logo32.png';
+    let icon_url = utils.buildRelativeUrlPath('assets/images/logo32.png');
     if (config.img_icon) {
-      icon_url = buildRelativeUrlPath(config.img_icon);
+      icon_url = utils.buildRelativeUrlPath(config.img_icon);
     }
     elem = document.querySelector("link[rel='shortcut icon']");
     if (!elem) elem = document.querySelector("link[rel='icon']");
@@ -101,7 +101,7 @@ function Layout(props) {
       document.querySelector('head').appendChild(elem);        
     }
 
-    icon_url = CLIENT_URL + 'assets/images/logo192.png';
+    icon_url = utils.buildRelativeUrlPath('assets/images/logo192.png');
     elem = document.querySelector("link[rel='apple-touch-icon']");
     if (elem) {
       elem.href = icon_url;

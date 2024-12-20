@@ -1,33 +1,31 @@
 /// <reference types='vitest' />
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
+const hostDev = process.env.VITE_APP_HOST_DEV || 'http://localhost:5000';
+const baseUrl = process.env.VITE_APP_BASE_URL || '';
+const proxyUrl = hostDev + baseUrl;
+
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/viewer',
+  base: process.env.BASE,
   server: {
     port: 4200,
     host: 'localhost',
     proxy: {
       '/api': {
-        target: 'http://localhost:5000/geoportal_dev/api',
+        target: proxyUrl + '/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
       "/proxy": {
-        target: 'http://localhost:5000/geoportal_dev/proxy',
+        target: proxyUrl + '/proxy',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy/, ''),
-      },
-
-      '/scalar_event': {
-        target: 'http://localhost:5000/geoportal_dev/scalar_event',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/scalar_event/, ''),
-      },
-
+      }
     },
   },
   preview: {
