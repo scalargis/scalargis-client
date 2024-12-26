@@ -188,18 +188,21 @@ export function login_http_loading() {
   return action;
 }
 
-export function login_post(post, history, redirect, urlRedirect) {
+export function login_post(core, payload, apiUrl=null, history=null, redirect=null, urlRedirect=null) {
   return function (dispatch, getState) {
+
+    const { utils } = core;
+
     dispatch(login_http_loading());
     
     // Login request
     let options = {
       method: 'POST',
-      body: JSON.stringify(post)
+      body: JSON.stringify(payload)
     }
 
     // Auth url. TODO: check for proxy
-    let url = API_URL + '/authentication/authenticate';
+    let url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : API_URL + '/authentication/authenticate';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -391,10 +394,10 @@ export function password_http_error(res) {
   return action;
 }
 
-export function login_user_registration(core, data, redirect) {
+export function login_user_registration(core, data, apiUrl=null, redirect=null) {
   return function (dispatch, getState) {
 
-    const { actions } = core;
+    const { actions, utils } = core;
 
     dispatch(actions.login_http_loading());
 
@@ -403,7 +406,7 @@ export function login_user_registration(core, data, redirect) {
         accept: 'application/json'
       });
 
-    let url = core.API_URL + '/security/register_user';
+    let url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : core.API_URL + '/security/register_user';
     fetchJson(url, { method: 'POST', headers, body: JSON.stringify(data) }).then(res => {
         if (res.status === 200) {
             return res.json;

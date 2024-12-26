@@ -17,6 +17,7 @@ const cookies = new Cookies();
 function LoginWidget(props) {
 
   const { auth, history, redirect, core, dispatch, actions, record, showRegistration, showPasswordReset } = props;
+  const { siteConfig } = core;
 
   const componentCfg = record.config_json || {};
   
@@ -66,8 +67,9 @@ function LoginWidget(props) {
     if (record?.config_json?.actions?.login) {
       core.pubsub.publish(record?.config_json?.actions?.login, null);
       return;
-    }      
-    dispatch(login_post({ username: data.username, password: data.password }, history, redirect));
+    }
+    const apiUrl = siteConfig?.authentication?.endpoints?.login;
+    dispatch(login_post(core, { username: data.username, password: data.password }, apiUrl, history, redirect));
   }
 
   return (

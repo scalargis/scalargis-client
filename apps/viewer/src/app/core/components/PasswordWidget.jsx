@@ -116,8 +116,9 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
               <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("changePasswordConfirmationSuccess", "A Palavra-passe foi alterada com sucesso")}!</p>
               <Button label={i18nUtils.translateValue("continue", "Continuar")}
                 onClick={ e => {
-                  setGoRedirect(true); 
-                  dispatch(login_post({ username, password }, history, redirect, urlRedirect));
+                  setGoRedirect(true);
+                  const apiUrl = siteConfig?.authentication?.endpoints?.login;
+                  dispatch(login_post(core, { username, password }, apiUrl, history, redirect, urlRedirect));
                 }}
                 icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
                 disabled={goRedirect} />

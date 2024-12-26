@@ -13,7 +13,7 @@ function PageLogin(props) {
     const { actions, siteConfig } = core;
 
     // Redux actions
-    const { login_post, login_user_registration, login_reset_password, login_clear_error, logout } = actions;
+    const { login_post, login_user_registration, login_reset_password } = actions;
 
     // Routing
     const location = useLocation();
@@ -43,8 +43,9 @@ function PageLogin(props) {
                         if (siteConfig?.authentication?.actions?.login2) {
                             core.pubsub.publish(siteConfig.authentication.actions.login, null);
                             return;
-                        }      
-                        dispatch(login_post({ username: data.username, password: data.password }, history, redirect));
+                        }
+                        const apiUrl = siteConfig?.authentication?.endpoints?.login;
+                        dispatch(login_post(core, { username: data.username, password: data.password }, apiUrl, history, redirect));
                     }}
                     onShowRegistration={() => setMode(3)}
                     onShowResetPassword={() => setMode(2)}
@@ -88,7 +89,8 @@ function PageLogin(props) {
                             ...data,
                             redirect
                         }
-                        dispatch(login_user_registration(core, payload, redirect));
+                        const apiUrl = siteConfig?.authentication?.endpoints?.registration;
+                        dispatch(login_user_registration(core, payload, apiUrl, redirect));
                     }}
                     onShowLogin={() => setMode(1)}
                 />

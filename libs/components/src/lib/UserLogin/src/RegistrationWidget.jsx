@@ -19,9 +19,10 @@ import { getFormValidationErrorMessage } from './utils';
 function RegistrationWidget(props) {
 
   const { auth, viewer, history, redirect, core, dispatch, actions, record, showLogin } = props;
+  const { siteConfig } = core;
   
   // Redux redux actions
-  const { login_user_registration , logout } = actions;
+  const { login_user_registration, logout } = actions;
 
   const defaultValues = {
     name: null,
@@ -51,7 +52,8 @@ function RegistrationWidget(props) {
         ...payload,
         redirect
     }
-    dispatch(login_user_registration(core, payload, redirect));  
+    const apiUrl = siteConfig?.authentication?.endpoints?.registration;
+    dispatch(login_user_registration(core, payload, apiUrl, redirect));
   }
 
   {/*
