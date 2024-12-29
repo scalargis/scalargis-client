@@ -57,7 +57,7 @@ function PageLogin(props) {
     // Reset Password
     if (mode === 2) {
         return (
-            <div class="flex justify-content-center align-self-center p-6 sm:p-8">
+            <div className="flex justify-content-center align-self-center p-6 sm:p-8">
                 <ResetPasswordWidget
                     core={core}
                     dispatch={dispatch}
@@ -80,7 +80,7 @@ function PageLogin(props) {
     // Create User
     if (mode === 3) {
         return (
-            <div class="flex justify-content-center align-self-center p-6 sm:p-8">
+            <div className="flex justify-content-center align-self-center p-6 sm:p-8">
                 <RegistrationWidget
                     core={core}
                     dispatch={dispatch}
