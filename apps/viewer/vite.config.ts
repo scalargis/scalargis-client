@@ -8,6 +8,10 @@ const hostDev = process.env.VITE_APP_HOST_DEV || 'http://localhost:5000';
 const baseUrl = process.env.VITE_APP_BASE_URL || '';
 const proxyUrl = hostDev + baseUrl;
 
+const sourcemap = process.env.SOURCEMAP === 'true' ? true : false;
+
+console.log(sourcemap);
+
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/viewer',
@@ -44,6 +48,7 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    sourcemap: sourcemap
   },
   resolve: {
     alias: {

@@ -8,7 +8,9 @@ const hostDev = process.env.VITE_APP_HOST_DEV || 'http://localhost:5000';
 const baseUrl = process.env.VITE_APP_BASE_URL || '';
 const proxyUrl = hostDev + baseUrl;
 
-console.log(process.env.BASE);
+const sourcemap = process.env.SOURCEMAP === 'true' ? true : false;
+
+console.log(sourcemap);
 
 export default defineConfig({
   root: __dirname,
@@ -46,6 +48,7 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    sourcemap: sourcemap
   },
   test: {
     watch: false,

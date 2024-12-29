@@ -14,7 +14,6 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/backoffice",
-        "sourcemap": true,
         "outDir": "../../../scalargis-server/scalargis/app/static/backoffice",
         "emptyOutDir": true,
         "command": "vite build"

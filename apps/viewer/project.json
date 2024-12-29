@@ -14,7 +14,6 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/viewer",
-        "sourcemap": true,
         "outDir": "../../../scalargis-server/scalargis/app/static/viewer",
         "emptyOutDir": true,
         "command": "vite build"
