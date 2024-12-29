@@ -151,7 +151,7 @@ class Main extends React.Component {
 
   opacity(e, theme, value) {
     let { layers } = this.props.config.viewer.config_json;
-    const index = layers.indexOf(theme);
+    const index = layers.findIndex(i => i.id === theme.id);
     const update = Object.assign({}, theme);
     update.opacity = value / 100;
     layers.splice(index, 1, update);
