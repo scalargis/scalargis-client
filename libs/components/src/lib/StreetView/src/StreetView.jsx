@@ -187,7 +187,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
               pitch: 10
             }
           };
-          const elem = dialog.current.contentEl;
+          const elem = dialog.current.getContent();
           const pan = new window.google.maps.StreetViewPanorama(elem, panoramaOptions);
           pan.addListener('position_changed', function() {
             const pos = panorama.current.getPosition();

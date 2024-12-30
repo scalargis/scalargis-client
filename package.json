@@ -10,6 +10,7 @@
     "@fullcalendar/daygrid": "4.4.2",
     "@fullcalendar/interaction": "4.4.2",
     "@fullcalendar/timegrid": "4.4.2",
+    "@googlemaps/js-api-loader": "^1.16.8",
     "@jsonforms/core": "^3.4.1",
     "@jsonforms/react": "^3.4.1",
     "@jsonforms/vanilla-renderers": "^3.4.1",
