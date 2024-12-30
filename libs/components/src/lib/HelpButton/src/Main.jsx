@@ -66,16 +66,16 @@ export function MainMenu({ className, config, actions, record }) {
             </div>
           )}
           onShow={() => {
-            const elem = dialog.current.contentEl;
+            const elem = dialog.current.getElement();
             setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
           }}
           onResize={e => {
-            const elem = dialog.current.contentEl;
+            const elem = dialog.current.getElement();
             setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
           }}
           onMaximize={e => {
             setMaximized(e.maximized);
-            const elem = dialog.current.contentEl;
+            const elem = dialog.current.getElement();
             setTimeout(() => {setSize({x: elem.clientWidth, y: elem.clientHeight - 25 }, 200)});
           }}
           onHide={e => setShowPopup(false)}>
@@ -199,16 +199,16 @@ export default function Main({ type, as, config, actions, record }) {
             </div>
           )}
           onShow={() => {
-            const elem = dialog.current.contentEl;
+            const elem = dialog.current.getElement();
             setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
           }}
           onResize={e => {
-            const elem = dialog.current.contentEl;
+            const elem = dialog.current.getElement();
             setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
           }}
           onMaximize={e => {
             setMaximized(e.maximized);
-            const elem = dialog.current.contentEl;
+            const elem = dialog.current.getElement();
             setTimeout(() => {setSize({x: elem.clientWidth, y: elem.clientHeight - 25 }, 200)});
           }}
           onHide={e => setShowPopup(false)}>

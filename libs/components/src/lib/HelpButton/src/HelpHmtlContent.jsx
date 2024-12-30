@@ -19,8 +19,6 @@ export default function HelpHtmlContent({ config }) {
     html = config?.html || "";
   }
 
-  console.log(html);
-
   useEffect(() => {    
     if (config.url) {
       const url = lang ? 
@@ -30,10 +28,9 @@ export default function HelpHtmlContent({ config }) {
       fetch(url).then(res => {
           return res.text();
       }).then(result => {
-          //console.log(result);
           setDialogContent(result);
       }).catch(error => {        
-          //console.log('error', error);
+          console.log('error', error);
           setDialogContent(html);
       })
     } else {
