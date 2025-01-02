@@ -131,7 +131,7 @@ export default function KML(props) {
     const { viewer, loading, data } = props;
     return (
       <React.Fragment>
-        <div className="p-fluid">
+        <div>
 
           <TabView>
             <TabPanel header={t("file", "Ficheiro")}>

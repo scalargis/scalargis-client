@@ -131,7 +131,7 @@ export default function GeoJSON (props) {
     const { viewer, loading, data, editField, winSize } = props;
     return (
       <React.Fragment>
-        <div className="p-fluid">
+        <div>
 
           <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
@@ -139,6 +139,7 @@ export default function GeoJSON (props) {
               placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
               options={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
               value={data.crs || '4326'}
+              className='w-full'
               onChange={(e) => editField('crs', e.value)}
             />
           </div>
