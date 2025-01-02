@@ -677,7 +677,7 @@ export function viewer_load(core, id, history) {
     const options = { headers: {} };
     
     // Add logged user token
-    if (logged) options.headers['X-API-KEY'] = logged.token;
+    if (logged?.token) options.headers['X-API-KEY'] = logged.token;
     
     // Make request
     fetch(url, options).then(res => {
