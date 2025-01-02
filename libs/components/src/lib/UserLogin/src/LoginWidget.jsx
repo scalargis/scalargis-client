@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { connect } from 'react-redux'
-import Cookies from 'universal-cookie'
+import React, { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { InputText } from 'primereact/inputtext'
 import { Password } from 'primereact/password'
@@ -12,7 +10,6 @@ import { i18n as i18nUtils } from '@scalargis/components'
 
 import { getFormValidationErrorMessage } from './utils'
 
-const cookies = new Cookies();
 
 function LoginWidget(props) {
 
@@ -23,8 +20,6 @@ function LoginWidget(props) {
   
   // Redux actions
   const { login_post, login_clear_error, logout } = actions;
-
-  const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
 
   const defaultLoginValues = {
     username: '',
@@ -37,8 +32,8 @@ function LoginWidget(props) {
     dispatch(login_clear_error());
   }, []);
   
-  if (cookieData) {
-    const { username } = cookieData;
+  if (auth?.data?.token) {
+    const { username } = auth.data;
     return (
       <div>
         <p>Olá { username }.</p>
@@ -147,4 +142,4 @@ function LoginWidget(props) {
   )
 }
 
-export default connect(state => ({ auth: state.root.auth }))(LoginWidget)
+export default LoginWidget;

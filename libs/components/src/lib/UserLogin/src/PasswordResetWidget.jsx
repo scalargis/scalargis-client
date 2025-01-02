@@ -126,4 +126,4 @@ function PasswordResetWidget(props) {
 
 }
 
-export default connect(state => ({ auth: state.root.auth }))(PasswordResetWidget)
+export default PasswordResetWidget;

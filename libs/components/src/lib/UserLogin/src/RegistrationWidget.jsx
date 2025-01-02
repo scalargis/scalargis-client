@@ -220,4 +220,4 @@ function RegistrationWidget(props) {
   )
 }
 
-export default connect(state => ({ auth: state.root.auth }))(RegistrationWidget)
+export default RegistrationWidget;

@@ -1,19 +1,17 @@
 import React, {  useRef, useState, useEffect } from 'react'
 import { connect } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { Dialog } from 'primereact/dialog'
-//import Cookies from 'universal-cookie'
-import { Menu } from 'primereact/menu'
+import { Dialog } from 'primereact/dialog';
+import { Menu } from 'primereact/menu';
 
-import { i18n as i18nUtils } from '@scalargis/components'
+import { i18n as i18nUtils } from '@scalargis/components';
 
-import LoginWidget from './LoginWidget'
-import RegistrationWidget from './RegistrationWidget'
-import PasswordResetWidget from './PasswordResetWidget'
-import componentMessages from './messages'
+import LoginWidget from './LoginWidget';
+import RegistrationWidget from './RegistrationWidget';
+import PasswordResetWidget from './PasswordResetWidget';
+import componentMessages from './messages';
 
 
-//const cookies = new Cookies();
 const appEntityNameAbrev = import.meta.env.VITE_APP_ENTITY_NAME_ABREV || 'ScalarGIS';
 
 function Main({ type, region, as, auth, core, config, actions, record }) {
@@ -31,7 +29,6 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
 
   const location = useLocation();
 
-  //const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
   const isMobileSmall = wsize[0] <= 440;
@@ -62,9 +59,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   }, [config]);
 
   // Render user
-  //if (cookieData) {
   if (auth?.data?.token) {
-    //const { username } = cookieData;
     const { username } = auth.data;
     const userMenu = [
       {
@@ -127,6 +122,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
           closable={record?.config_json?.closable === false ? false : true}
           onHide={e => setMode(0)}>
             <LoginWidget
+              auth={auth}
               core={core}
               dispatch={dispatch}
               actions={actions}
@@ -164,6 +160,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
             }
           }}>
             <RegistrationWidget
+              auth={auth}
               core={core}
               dispatch={dispatch}
               actions={actions}
@@ -188,6 +185,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
             }
           }}>
             <PasswordResetWidget
+              auth={auth}
               core={core}
               dispatch={dispatch}
               actions={actions}
@@ -204,4 +202,4 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   );
 }
 
-export default connect(state => ({ auth: state.root.auth }))(Main)
+export default connect(state => ({ auth: state.root.auth }))(Main);
