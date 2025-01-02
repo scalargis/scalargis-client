@@ -23,7 +23,7 @@ const _getAppDefaultLocale = () => {
 }
 
 export function rememberUrl(cookies, type, url) {
-  const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'sniguserurl';
+  const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'scalargis_';
   const cookieName = prefix + type;
   let urlhistory = cookies.get(cookieName) || [];
   if (urlhistory.indexOf(url) === -1) urlhistory.push(url);
