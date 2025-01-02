@@ -29,6 +29,11 @@ export default defineConfig({
         target: proxyUrl + '/proxy',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy/, ''),
+      },
+      '/spatial_toolbox': {
+        target: proxyUrl + '/spatial_toolbox',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/spatial_toolbox/, ''),
       }
     },
   },
