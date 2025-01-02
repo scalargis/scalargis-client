@@ -1,11 +1,10 @@
-//import { transformExtent } from "../model/MapModel"
-import Cookies from 'universal-cookie'
+import Cookies from 'universal-cookie';
 
-import { i18n as i18nUtils } from "@scalargis/components"
-import { loadTranslations } from "../i18n"
-import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from "../utils"
-import { isThemeOnScale as isThemeOnScaleMapModel, transformExtent } from "../model/MapModel"
-import { fetchJson } from "../service/fetch"
+import { i18n as i18nUtils } from "@scalargis/components";
+import { loadTranslations } from "../i18n";
+import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from "../utils";
+import { isThemeOnScale as isThemeOnScaleMapModel, transformExtent } from "../model/MapModel";
+import { fetchJson } from "../service/fetch";
 
 
 export const SITE_LOAD                  = 'SITE_LOAD'
@@ -115,7 +114,7 @@ export function site_load(core, callback) {
 }
 
 
-export function viewer_save_record(record, history, redirect, cb) {
+export function viewer_save_record(core, record, history, redirect, cb) {
   return function (dispatch, getState) {
     dispatch(viewer_save_http_loading());
 
@@ -130,8 +129,7 @@ export function viewer_save_record(record, history, redirect, cb) {
     }
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(cookieAuthName);
+    const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
     // Auth url. TODO: check for proxy
@@ -668,9 +666,8 @@ export function viewer_load(core, id, history) {
   return function (dispatch, getState) {
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(cookieAuthName);
-    
+    const logged = core.getLoggedUser();
+
     // Fetch viewer
     let url = id ? API_URL + '/app/viewer/' + id + (history.location.search || '') : CONFIG_URL;
     if (!url) {
@@ -751,7 +748,6 @@ export function viewer_load(core, id, history) {
         if (!logged) {
           //let redirect = '/login?redirect=/mapa/' + (id || '/');
           let redirect = '/login?redirect=' + history.location.pathname;
-          console.log(history);
           /*
           if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'mapa') > -1) {
             redirect += '&path=/mapa/';

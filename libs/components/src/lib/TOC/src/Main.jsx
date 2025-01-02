@@ -1,16 +1,17 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { withTranslation, useTranslation} from "react-i18next";
-import Cookies from 'universal-cookie';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import Tree from './TOC/Tree';
-import { traverseTree, findAllParents, findAllChildren } from './TOC/Model';
-import './TOC/style.css';
 import { Panel } from 'primereact/panel';
 import { Message } from 'primereact/message';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+
 import { translateValue } from '../../utils/i18n';
+import Tree from './TOC/Tree';
+import { traverseTree, findAllParents, findAllChildren } from './TOC/Model';
+
+import './TOC/style.css';
 
 
 const diffArray = (arr1, arr2) => arr1.concat(arr2)
@@ -53,7 +54,6 @@ class Main extends React.Component {
     const { core } = props;
     const { opened } = props.config.viewer.config_json;
 
-    const cookieAuthName = core.COOKIE_AUTH_NAME;
     const API_URL = core.API_URL;
 
     this.state = {
@@ -62,7 +62,6 @@ class Main extends React.Component {
       config: props.config,
       filter: '',
       opened: opened || [],
-      cookieAuthName: cookieAuthName,
       API_URL: API_URL
     }
   }
@@ -270,7 +269,7 @@ class Main extends React.Component {
     //Get current session viewer config
     const { getViewerSessionConfig } = this.props.config.Models.MapModel;
 
-    let { cookieAuthName, API_URL } = this.state;
+    let { API_URL } = this.state;
 
     const viewer = this.props.config.viewer;
     const newconfig = getViewerSessionConfig(viewer);
@@ -292,9 +291,8 @@ class Main extends React.Component {
     }
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(cookieAuthName);
-    if (logged) options.headers['X-API-KEY'] = logged.token;
+    const logged = this.props.core.getLoggedUser();
+    if (logged?.token) options.headers['X-API-KEY'] = logged.token;
 
     // Auth url. TODO: check for proxy
     let url = API_URL + '/app/viewer/session';
@@ -356,9 +354,7 @@ class Main extends React.Component {
     if (!main) return null;
 
     //User authentication
-    const cookies = new Cookies();
-    const cookieAuthName = core.COOKIE_AUTH_NAME;
-    const cookieData = cookies.get(cookieAuthName);
+    const logged = core.getLoggedUser();
     
     // Filter themes
     this.filterThemes(layers, filter);
@@ -393,7 +389,7 @@ class Main extends React.Component {
 
           { !!withHeading && <h3>{this.props.t("themes","Temas")}</h3> }
 
-          { (!!cookieData && !!config.viewer.allow_user_session) && 
+          { (!!logged?.token && !!config.viewer.allow_user_session) && 
             <Toolbar className="mb-2"
               left={(config.viewer.is_session && 
                 <Button label={this.props.t("session", "Sessão")} className="p-button-sm p-button-rounded p-button-info" 

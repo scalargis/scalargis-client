@@ -107,6 +107,10 @@ export default function COG(props) {
 
       let dataitems = Models.OWSModel.convertCOG2Themes(image, data.url, filename, proxyRequests, options);
       setData({ ...data, options, dataitems });
+
+      // Add to cookies history
+      if (cookies) rememberUrl(cookies, 'cog', data.url);
+      
     }).catch((error) => {
       console.log(error);
       setData({ ...data, dataitems: [] });

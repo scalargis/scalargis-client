@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import Cookies from 'universal-cookie';
 import { FileUpload } from 'primereact/fileupload';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -7,11 +6,11 @@ import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
 //import { Captcha } from 'primereact/captcha';
+
 import ContactInfo from './ContactInfo';
+
 import './style.css';
 
-
-const cookies = new Cookies();
 
 const validateEmail = (email) => {
   return email.match(
@@ -170,9 +169,8 @@ export default function ContactFrom(props) {
     }
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
-    if (logged) options.headers['X-API-KEY'] = logged.token;
+   const logged = core.getLoggedUser();
+   if (logged?.token) options.headers['X-API-KEY'] = logged.token;
 
     setSending(true);
 

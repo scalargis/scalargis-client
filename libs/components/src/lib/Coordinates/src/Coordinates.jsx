@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
-import Cookies from 'universal-cookie';
-import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
+import { v4 as uuidV4 } from 'uuid';
+import { DataView } from 'primereact/dataview';
 import { transform } from 'ol/proj'
 import { Button } from 'primereact/button'
 import {SplitButton} from 'primereact/splitbutton';
@@ -14,10 +14,11 @@ import OlFeature from 'ol/Feature';
 import OlPoint from 'ol/geom/Point'
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import * as OlProj from 'ol/proj';
-import { v4 as uuidV4 } from 'uuid';
 
-import { MAPCONTROL_NAME } from './utils'
-import './style.css'
+import { MAPCONTROL_NAME } from './utils';
+
+import './style.css';
+
 
 export default function Coordinates({ core, config, actions, dispatch, record }) {
 
@@ -42,9 +43,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const [newCoord, setNewCoord] = useState(null);
 
   const userRoles = useMemo(()=>{
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
-  
+    const logged = core.getLoggedUser();
     let user_roles = [];
     if (logged && logged.userroles && logged.userroles.length) {
       user_roles = [...logged.userroles];

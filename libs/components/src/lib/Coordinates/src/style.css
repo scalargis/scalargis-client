@@ -10,6 +10,7 @@
 
 .p-dataview-list div.coordinates-item {
   padding-top: 5px;
+  padding-bottom: 10px;
 }
 
 .coordinates-item table {

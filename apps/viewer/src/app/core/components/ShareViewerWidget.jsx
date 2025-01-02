@@ -1,20 +1,21 @@
-import React, { useContext, useState } from 'react'
-import { useTranslation} from "react-i18next";
-import Cookies from 'universal-cookie'
-import { InputText } from 'primereact/inputtext'
-import { InputTextarea } from 'primereact/inputtextarea'
-import { Button } from 'primereact/button'
+import React, { useState } from 'react';
 import { connect, useDispatch } from 'react-redux'
-import AppContext from '../../AppContext'
-import { Message } from 'primereact/message'
-import { InputSwitch } from 'primereact/inputswitch'
-import { Dialog } from 'primereact/dialog'
-import { getWindowSize, showOnPortal, getViewerPublicUrl } from '../utils'
-import { getViewerSessionConfig } from '../model/MapModel'
+import { useTranslation} from "react-i18next";
+import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { Button } from 'primereact/button';
+import { Message } from 'primereact/message';
+import { InputSwitch } from 'primereact/inputswitch';
+import { Dialog } from 'primereact/dialog';
 
-const cookies = new Cookies();
+import { getViewerSessionConfig } from '../model/MapModel';
 
-function ShareViewerWidget({ type,viewer, record }) {
+
+function ShareViewerWidget({ auth, core, type, viewer, record }) {
+
+  const { utils } = core;
+  const { getWindowSize, showOnPortal, getViewerPublicUrl } = utils;
+
   const [showForm, setShowForm] = useState(false);
   const [id, setId] = useState(null);
   const [name, setName] = useState('');
@@ -32,10 +33,7 @@ function ShareViewerWidget({ type,viewer, record }) {
   
   // Enable redux actions
   const dispatch = useDispatch();
-  const { core } = useContext(AppContext);
   const { viewer_save_record, viewer_save_response } = core.actions;
-
-  const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
 
   let allow_sharing = true;
   if (viewer?.allow_sharing === false) {
@@ -57,7 +55,7 @@ function ShareViewerWidget({ type,viewer, record }) {
     if (record?.config_json?.allow_add_layers === false) {
       setAllowAddLayers(false);
     }
-    if (cookieData) {
+    if (auth?.data?.token) {
       let anonymous = viewer.allow_anonymous == null ? true : viewer.allow_anonymous;
       if (record?.config_json?.allow_anonymous === false) {
         anonymous = false;
@@ -94,7 +92,7 @@ function ShareViewerWidget({ type,viewer, record }) {
       config_json: JSON.stringify(newconfig),
       parent_id: viewer.id
     }
-    dispatch(viewer_save_record(record, null, null))
+    dispatch(viewer_save_record(core, record, null, null))
   }
 
   const copyToClipboard = str => {
@@ -167,7 +165,7 @@ function ShareViewerWidget({ type,viewer, record }) {
                 </div>
               </div> }
 
-              { cookieData && record?.config_json?.show_allow_user_session !== false && <div className="grid field">
+              { auth?.data?.token && record?.config_json?.show_allow_user_session !== false && <div className="grid field">
                 <label className="col-12 md_col-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
                 <div className="col-12 md:col-8">
                   <InputSwitch
@@ -177,7 +175,7 @@ function ShareViewerWidget({ type,viewer, record }) {
                 </div>
               </div> }
 
-              { cookieData && record?.config_json?.show_allow_anonymous !== false && <div className="grid field">
+              { auth?.data?.token && record?.config_json?.show_allow_anonymous !== false && <div className="grid field">
                 <label className="col-12 md:col-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
                 <div className="col-12 md:col-8">
                   <InputSwitch
@@ -235,4 +233,4 @@ function ShareViewerWidget({ type,viewer, record }) {
   )
 }
 
-export default connect(state => ({ viewer: state.root.viewer }))(ShareViewerWidget)
+export default connect(state => ({ auth: state.root.auth, viewer: state.root.viewer }))(ShareViewerWidget)

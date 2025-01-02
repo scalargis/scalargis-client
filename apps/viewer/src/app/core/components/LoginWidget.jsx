@@ -128,4 +128,4 @@ function LoginWidget(props) {
     )
 }
 
-export default connect(state => ({ auth: state.root.auth }))(LoginWidget);
+export default LoginWidget;

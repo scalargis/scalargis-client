@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation} from "react-i18next";
-import Cookies from 'universal-cookie';
-import { Button } from 'primereact/button'
+import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { Toast } from 'primereact/toast';
 
-import './style.css'
+import './style.css';
 
 
 export default function PrintPanel4(props) {
@@ -67,8 +66,7 @@ export default function PrintPanel4(props) {
     }
     
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
+    const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
     let url = API_URL + '/app/viewer/'+ viewer.id + '/print/merge';
@@ -111,8 +109,7 @@ export default function PrintPanel4(props) {
     }
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
+    const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
     // Make a shallow copy of the print items

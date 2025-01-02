@@ -74,7 +74,6 @@ const initialViewer = {
 const cookies = new Cookies();
 const cookieAuthName = getCookieAuthName();
 
-//export default (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, config: null, viewer: initialViewer, components: {} }, action) => {
 const root = (
     state = {
       loading: true,
@@ -89,8 +88,6 @@ const root = (
     }, 
     action
   ) => {
-
-  //console.log('action', action);
   
   switch (action.type) {
 

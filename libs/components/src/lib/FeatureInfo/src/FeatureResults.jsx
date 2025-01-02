@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import { useTranslation } from "react-i18next"
-import Cookies from 'universal-cookie';
-import { Column } from 'primereact/column'
-import { DataTable } from 'primereact/datatable'
-import OlCollection from 'ol/Collection'
-import OlFeature from 'ol/Feature'
-import OlFormatGeoJSON from "ol/format/GeoJSON"
-import { Accordion, AccordionTab } from 'primereact/accordion'
-import { Message } from 'primereact/message'
-import { Button } from 'primereact/button'
-import convert from 'convert'
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { Message } from 'primereact/message';
+import { Button } from 'primereact/button';
+import { Accordion, AccordionTab } from 'primereact/accordion';
+import OlCollection from 'ol/Collection';
+import OlFeature from 'ol/Feature';
+import OlFormatGeoJSON from "ol/format/GeoJSON";
+import convert from 'convert';
 
 import { i18n } from '@scalargis/components';
 
-import componentMessages from './messages'
-import { MAPCONTROL_NAME } from './utils'
+import { MAPCONTROL_NAME } from './utils';
+
 
 export default function FeatureResults({ core, config, features, layers, actions, pubsub, dispatch, mainMap, record }) {
   const { viewer, Models } = config;
@@ -42,9 +41,7 @@ export default function FeatureResults({ core, config, features, layers, actions
 
   //Set Export permissions
   useEffect(() => {
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
-  
+    const logged = core.getLoggedUser();
     let user_roles = [];
     if (logged && logged.userroles && logged.userroles.length) {
       user_roles = [...logged.userroles];

@@ -35,7 +35,8 @@ function PageLogin(props) {
     if (mode === 1) {
         return (
             <div className="flex justify-content-center align-self-center p-6 sm:p-8">
-                <LoginWidget 
+                <LoginWidget
+                    auth={auth}
                     core={core}
                     dispatch={dispatch}
                     onLogin={(data) => {
@@ -59,6 +60,7 @@ function PageLogin(props) {
         return (
             <div className="flex justify-content-center align-self-center p-6 sm:p-8">
                 <ResetPasswordWidget
+                    auth={auth}
                     core={core}
                     dispatch={dispatch}
                     onResetPassword={(data) => {
@@ -82,6 +84,7 @@ function PageLogin(props) {
         return (
             <div className="flex justify-content-center align-self-center p-6 sm:p-8">
                 <RegistrationWidget
+                    auth={auth}
                     core={core}
                     dispatch={dispatch}
                     onRegistration={(data) => {

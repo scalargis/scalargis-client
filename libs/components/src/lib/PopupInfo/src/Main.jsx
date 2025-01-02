@@ -1,14 +1,14 @@
-import React, { Fragment, useState, useEffect } from 'react'
-import { useTranslation } from "react-i18next"
-import { Dialog } from 'primereact/dialog'
-import Cookies from 'universal-cookie'
-import { InputSwitch } from 'primereact/inputswitch'
-import { Button } from 'primereact/button'
+import React, { Fragment, useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
+import Cookies from 'universal-cookie';
+import { Dialog } from 'primereact/dialog';
+import { InputSwitch } from 'primereact/inputswitch';
+import { Button } from 'primereact/button';
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
 import { LocaleSelectorComponent } from'@scalargis/components';
 
-import './index.css'
+import './index.css';
 
 
 const cookiePopupName = import.meta.env.VITE_APP_COOKIE_POPUP_NAME || 'scalargis_popup';

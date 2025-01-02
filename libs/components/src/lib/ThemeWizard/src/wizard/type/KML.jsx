@@ -106,7 +106,7 @@ export default function KML(props) {
               setLoading(false);
               setData(Object.assign({}, data));
               // Add to cookies history
-              //if (cookies) rememberUrl(cookies, 'geojson', data.url);              
+              if (cookies) rememberUrl(cookies, 'kml', data.url);              
             } else {
               throw Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
             }

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { useTranslation} from "react-i18next"
-import Cookies from 'universal-cookie'
-import { Button } from 'primereact/button'
+import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation} from "react-i18next";
+import { v4 as uuidV4 } from 'uuid';
+import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import {InputText} from 'primereact/inputtext';
 import { Message } from 'primereact/message';
@@ -10,10 +10,10 @@ import { Toast } from 'primereact/toast';
 import OlInteractionDraw from "ol/interaction/Draw";
 import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
-import { shiftKeyOnly, singleClick } from "ol/events/condition";
-import { v4 as uuidV4 } from 'uuid'
+import { singleClick } from "ol/events/condition";
 
-import './style.css'
+import './style.css';
+
 
 export default function PrintPanel2(props) {
 
@@ -209,8 +209,7 @@ export default function PrintPanel2(props) {
     }
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
+    const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
     // Auth url. TODO: check for proxy

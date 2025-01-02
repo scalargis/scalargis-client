@@ -5,6 +5,7 @@ import * as local_components from './core/components';
 import * as core_components from '@scalargis/components';
 import * as actions from './core/actions';
 import * as utils from './core/utils';
+import * as services from './core/service';
 import * as pubsub from './core/pubsub';
 
 import { initTranslations } from './core/i18n';
@@ -138,6 +139,11 @@ function Core(config, reducers) {
    * Hold Utils functions
    */
   this.utils = utils;
+
+  /**
+   * Hold Services functions
+   */
+  this.services = services;
 
   /**
    * Hold app components
@@ -471,6 +477,11 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
       </div>
     )
   })
+}
+
+// Get auth from store
+Core.prototype.getLoggedUser = function() {
+  if (this.store) return this.store.getState()?.root?.auth?.data;
 }
 
 export default Core;

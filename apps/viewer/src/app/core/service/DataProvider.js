@@ -1,5 +1,4 @@
-import { fetchJson } from './fetch'
-//import { stringify } from 'query-string';
+import { fetchJson } from './fetch';
 
 const provider = (apiUrl, httpClient = fetchJson) => ({
 
@@ -121,11 +120,6 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
             data: { ...params.data, id: json.id },
         })),
 
-
-
-
-
-    
     // delete: (resource, params) =>
     //     httpClient(`${apiUrl}/${resource}/${params.id}`, {
     //         method: 'DELETE',

@@ -1,5 +1,4 @@
-//import { stringify } from 'query-string';
-import Cookies from 'universal-cookie';
+import { core } from '../../AppContext';
 
 /*
 export interface Options extends RequestInit {
@@ -30,6 +29,7 @@ class HttpError extends Error {
 //export default HttpError;
 
 export const createHeadersFromOptions = (options) => {
+
     const requestHeaders = (options.headers ||
         new Headers({
             Accept: 'application/json',
@@ -44,11 +44,8 @@ export const createHeadersFromOptions = (options) => {
     if (options.user && options.user.authenticated && options.user.token) {
         requestHeaders.set('X-API-KEY', options.user.token);
     } else {
-      const cookies = new Cookies();
-      //const cookieAuthName = process.env.REACT_APP_COOKIE_AUTH_NAME || 'scalargis_webgis';
-      const cookieAuthName = import.meta.env.VITE_APP_COOKIE_AUTH_NAME || 'scalargis_webgis';
-      const logged = cookies.get(cookieAuthName);
-      if (logged && logged.token) {
+     const logged = core.getLoggedUser();
+      if (logged?.token) {
         requestHeaders.set('X-API-KEY', logged.token);
       }
     }

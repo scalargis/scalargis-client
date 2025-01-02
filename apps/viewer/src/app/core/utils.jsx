@@ -1,14 +1,15 @@
-import React from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import Portal from './components/Portal'
-import OLGroupLayer from "ol/layer/Group"
-import OlFormatGeoJSON from "ol/format/GeoJSON"
-import OlStyleStyle from "ol/style/Style"
-import OlStyleCircle from "ol/style/Circle"
-import OlStyleFill from "ol/style/Fill"
-import OlStyleStroke from "ol/style/Stroke"
-import OlStyleText from "ol/style/Text"
-import OlStyleRegularShape from "ol/style/RegularShape"
+import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import OLGroupLayer from "ol/layer/Group";
+import OlFormatGeoJSON from "ol/format/GeoJSON";
+import OlStyleStyle from "ol/style/Style";
+import OlStyleCircle from "ol/style/Circle";
+import OlStyleFill from "ol/style/Fill";
+import OlStyleStroke from "ol/style/Stroke";
+import OlStyleText from "ol/style/Text";
+import OlStyleRegularShape from "ol/style/RegularShape";
+
+import Portal from './components/Portal';
 
 
 const _getAppRootPath = () => {
@@ -42,7 +43,7 @@ export const mapStateToProps = state => {
 };
 
 export function rememberUrl(cookies, type, url) {
-  const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'sniguserurl';
+  const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'scalargis_';
   const cookieName = prefix + type;
   let urlhistory = cookies.get(cookieName) || [];
   if (urlhistory.indexOf(url) === -1) urlhistory.push(url);

@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import Cookies from 'universal-cookie';
 import { Dropdown } from 'primereact/dropdown';
 import { containsCoordinate } from 'ol/extent';
 import { transform } from 'ol/proj';
 import MousePosition from 'ol/control/MousePosition';
-import {createStringXY} from 'ol/coordinate';
-import './index.css'
+import { createStringXY } from 'ol/coordinate';
+
+import './index.css';
+
 
 function parseExtent(extent) {
   if (!extent) return [0,0,1,1];
@@ -32,9 +33,7 @@ export default function Main({ core, config, actions, record }) {
   }
 
   const userRoles = useMemo(()=>{
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
-  
+    const logged = core.getLoggedUser();
     let user_roles = [];
     if (logged && logged.userroles && logged.userroles.length) {
       user_roles = [...logged.userroles];

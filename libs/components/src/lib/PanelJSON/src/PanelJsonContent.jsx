@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Cookies from 'universal-cookie';
-import './style.css';
 
 import RenderComponent from './components/RenderComponent';
+
+import './style.css';
 
 
 export default function PanelJsonContent({ core, config }) {
@@ -20,8 +20,7 @@ export default function PanelJsonContent({ core, config }) {
       }
 
       // Get logged user
-      const cookies = new Cookies();
-      const logged = cookies.get(core.COOKIE_AUTH_NAME);
+      const logged = core.getLoggedUser();
       if (logged) options.headers['X-API-KEY'] = logged.token;
 
       const url = config.url;

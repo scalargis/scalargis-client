@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
-import Cookies from 'universal-cookie';
 import { connect, useDispatch } from 'react-redux';
 import { InputText } from 'primereact/inputtext'
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -9,13 +8,13 @@ import { Message } from 'primereact/message';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Dialog } from 'primereact/dialog';
 
-import AppContext from '../../AppContext';
-import { getWindowSize, showOnPortal } from '../utils';
 import { getViewerSessionConfig } from '../model/MapModel';
 
-const cookies = new Cookies();
 
-function SaveViewerWidget({ type, viewer }) {
+function SaveViewerWidget({ auth, core, type, viewer }) {
+
+  const { utils } = core;
+  const { getWindowSize, showOnPortal } = utils;
 
   const [showForm, setShowForm] = useState(false);
   const [id, setId] = useState(null);
@@ -34,10 +33,7 @@ function SaveViewerWidget({ type, viewer }) {
   
   // Enable redux actions
   const dispatch = useDispatch();
-  const { core } = useContext(AppContext);
   const { viewer_save_record, viewer_add_notification } = core.actions;
-
-  const cookieData = cookies.get(core.COOKIE_AUTH_NAME);
 
   function openForm() {
     setId(viewer.id);
@@ -52,7 +48,7 @@ function SaveViewerWidget({ type, viewer }) {
   }
   
   // Render user
-  if (!cookieData || !viewer.is_owner) return null;
+  if (!auth?.data?.token || !viewer.is_owner) return null;
 
   function submit(e) {
     e.preventDefault();
@@ -75,7 +71,7 @@ function SaveViewerWidget({ type, viewer }) {
       allow_anonymous,
       config_json: JSON.stringify(newconfig)
     }
-    dispatch(viewer_save_record(record, null, null, (res) => {
+    dispatch(viewer_save_record(core, record, null, null, (res) => {
       if (res?.success) {
         const msg = {
           severity: "success",
@@ -210,4 +206,4 @@ function SaveViewerWidget({ type, viewer }) {
   )
 }
 
-export default connect(state => ({ viewer: state.root.viewer }))(SaveViewerWidget)
+export default connect(state => ({ auth: state.root.auth, viewer: state.root.viewer }))(SaveViewerWidget)

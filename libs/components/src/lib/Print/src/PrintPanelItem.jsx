@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { useTranslation} from "react-i18next"
-import Cookies from 'universal-cookie'
-import { Button } from 'primereact/button'
+import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation} from "react-i18next";
+import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { Toolbar } from 'primereact/toolbar';
 import { InputText } from 'primereact/inputtext';
@@ -15,16 +14,15 @@ import OlInteractionDraw from 'ol/interaction/Draw';
 import OlInteractionModify from 'ol/interaction/Modify';
 import OlInteractionSelect from 'ol/interaction/Select';
 import OlInteractionDragPan from "ol/interaction/DragPan";
-
 import VectorLayer from 'ol/layer/Vector';
 import { Vector } from 'ol/source';
 import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
 import { extend, createEmpty } from 'ol/extent';
-
 import { singleClick, platformModifierKeyOnly } from 'ol/events/condition';
-import './style.css'
+
+import './style.css';
 
 
 export default function PrintPanelItem(props) {
@@ -233,8 +231,7 @@ export default function PrintPanelItem(props) {
     }
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
+    const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
     const url = core.API_URL + '/app/viewer/' + viewer.id + '/print/' + printItem.code + '/generate';

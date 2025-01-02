@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import Cookies from 'universal-cookie';
-import { transform } from 'ol/proj'
-import 'ol/ol.css';
+import { connect } from 'react-redux';
+import { v4 as uuidV4 } from 'uuid';
+import { transform } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
 import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-import OLGroupLayer from "ol/layer/Group"
-import { v4 as uuidV4 } from 'uuid'
-import * as utils from '../utils';
+
+import 'ol/ol.css';
+
 import { getProjectionSrid } from '../model/MapModel';
+
 
 const coordinatesStyle = new Style({
   image: new CircleStyle({
@@ -44,7 +45,7 @@ export const actions = {
   coordinates_action1: () => console.log('Called coordinates_helper')
 }
 
-export default function Coordinates({ core, config, actions }) {
+function Coordinates({ auth, core, config, actions }) {
 
   const { viewer, mainMap, dispatch } = config;
   const { coordinates } = viewer;
@@ -55,13 +56,10 @@ export default function Coordinates({ core, config, actions }) {
 
   const coordinatesLayer = useRef();
 
-  const userRoles = useMemo(()=>{
-    const cookies = new Cookies();
-    const logged = cookies.get(core.COOKIE_AUTH_NAME);
-  
+  const userRoles = useMemo(()=>{  
     let user_roles = [];
-    if (logged && logged.userroles && logged.userroles.length) {
-      user_roles = [...logged.userroles];
+    if (auth?.data?.userroles && auth?.data?.userroles.length) {
+      user_roles = [...auth.data.userroles];
     }
     return user_roles;
   }, []);
@@ -190,50 +188,12 @@ export default function Coordinates({ core, config, actions }) {
       selectable: false
     });
 
-    //const parentLayer = utils.findOlLayer(mainMap, 'overlays');
-
     mainMap.addLayer(coordinatesLayer.current); 
-    /*
-    if (parentLayer) {
-      parentLayer.getLayers().getArray().push(coordinatesLayer.current);
-    } else {
-      mainMap.addLayer(coordinatesLayer.current); 
-    }
-    */
-
-      
-    /*
-    setTimeout(() => {
-
-      //Add theme
-      dispatch(actions.viewer_add_themes(
-          "overlays",
-          [
-              {
-              id: "coordinates",
-              title: "Coordinates",
-              description: "Coordinates",
-              active: true,
-              open: false,
-              type: "VECTOR",
-              opacity: 1
-              }
-          ]
-      ));   
-      
-      setTimeout(() => {       
-        coordinatesLayer.current = utils.findOlLayer(mainMap, 'coordinates');
-        coordinatesLayer.current.setStyle(coordinatesStyle);
-
-        // Turn layer on
-        dispatch(actions.layers_set_checked([ ...viewer.config_json.checked, 'coordinates']));        
-      }, 500);
-
-    }, 500);
-    */
 
   }, [mainMap]);
 
   return null;
 
 }
+
+export default connect(state => ({ auth: state.root.auth }))(Coordinates);
