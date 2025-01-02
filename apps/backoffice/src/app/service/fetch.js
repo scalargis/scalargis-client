@@ -1,10 +1,13 @@
-import Cookies from 'universal-cookie';
+import { core } from '../AppContext';
 
 class HttpError extends Error {
   constructor(message, status,body = null) {
       super(message);
       Object.setPrototypeOf(this, HttpError.prototype);
       this.name = this.constructor.name;
+      this.status = status;
+      this.message = message;
+      this.body = body;
       if (typeof Error.captureStackTrace === 'function') {
           Error.captureStackTrace(this, this.constructor);
       } else {
@@ -31,10 +34,8 @@ export const createHeadersFromOptions = (options) => {
     if (options.user && options.user.authenticated && options.user.token) {
         requestHeaders.set('X-API-KEY', options.user.token);
     } else {
-      const cookies = new Cookies();
-      const cookieAuthName = import.meta.env.VITE_APP_COOKIE_AUTH_NAME || 'scalargis_webgis';
-      const logged = cookies.get(cookieAuthName);
-      if (logged && logged.token) {
+      const logged = core.getLoggedUser();
+      if (logged?.token) {
         requestHeaders.set('X-API-KEY', logged.token);
       }
     }

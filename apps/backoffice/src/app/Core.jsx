@@ -255,4 +255,9 @@ Core.prototype.renderComponentManager = function({ id, submodule, action, as = '
   )
 }
 
+// Get auth from store
+Core.prototype.getLoggedUser = function() {
+  if (this.store) return this.store.getState()?.auth?.data;
+}
+
 export default Core;

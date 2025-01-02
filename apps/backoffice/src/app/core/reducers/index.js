@@ -32,8 +32,15 @@ const initialBackoffice = {
 const cookies = new Cookies();
 const cookieAuthName = getCookieAuthName();
 
-
-const reducer = (state = { loading: true, auth: { data: cookies.get(cookieAuthName)}, config: null, backoffice: initialBackoffice, components: {} }, action) => {
+const reducer = (
+  state = { 
+    loading: true,
+    auth: { data: cookies.get(cookieAuthName)},
+    config: null,
+    backoffice: initialBackoffice,
+    components: {} },
+    action
+  ) => {
   
   switch (action.type) {
 

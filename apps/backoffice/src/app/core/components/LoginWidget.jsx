@@ -1,13 +1,12 @@
-import React, { useContext, useState } from 'react'
-import Cookies from 'universal-cookie'
-import { InputText } from 'primereact/inputtext'
-import { Password } from 'primereact/password'
-import { Button } from 'primereact/button'
-import { connect, useDispatch } from 'react-redux'
-import AppContext from '../../AppContext'
-import { Message } from 'primereact/message'
+import React, { useContext, useState } from 'react';
+import { connect, useDispatch } from 'react-redux';
+import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
+import { Button } from 'primereact/button';
+import { Message } from 'primereact/message';
 
-const cookies = new Cookies();
+import AppContext from '../../AppContext';
+
 
 function LoginWidget({ auth, history, redirect }) {
 
@@ -18,14 +17,10 @@ function LoginWidget({ auth, history, redirect }) {
   const dispatch = useDispatch();
   const { core } = useContext(AppContext);
   const { login_post, logout } = core.actions;
-
-  const cookieAuthName = core.COOKIE_AUTH_NAME;
-
-  const cookieData = cookies.get(cookieAuthName);
   
   // Render user
-  if (cookieData) {
-    const { username } = cookieData;
+  if (auth?.data?.token) {
+    const { username } = auth.data;
     return (
       <div>
         <p>Olá { username }.</p>

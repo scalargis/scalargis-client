@@ -217,16 +217,15 @@ export function backoffice_load(core, history) {
   return function (dispatch, getState) {
 
     // Get logged user
-    const cookies = new Cookies();
-    const logged = cookies.get(cookieAuthName);
-    
+    const logged = core.getLoggedUser();
+
     // Fetch backoffice
     let url = CONFIG_URL ? CONFIG_URL : API_URL + '/app/backoffice' + (history.location.search || '');
     
     const options = { headers: {} };
     
     // Add logged user token
-    if (logged) options.headers['X-API-KEY'] = logged.token;
+    if (logged?.token) options.headers['X-API-KEY'] = logged.token;
     
     // Make request
     fetch(url, options).then(res => {
