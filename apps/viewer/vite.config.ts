@@ -10,8 +10,6 @@ const proxyUrl = hostDev + baseUrl;
 
 const sourcemap = process.env.SOURCEMAP === 'true' ? true : false;
 
-console.log(sourcemap);
-
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/viewer',
