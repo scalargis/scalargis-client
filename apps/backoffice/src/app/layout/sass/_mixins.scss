@@ -1,3 +1,5 @@
+@use "../_variables" as v;
+
 @mixin icon-override($icon) {
     &:before {
         content: $icon;
@@ -25,13 +27,13 @@
 @mixin focused() {
     outline: 0 none;
     outline-offset: 0;
-    box-shadow: 0 0 0 0.2em $focusShadowColor;
+    box-shadow: 0 0 0 0.2em v.$focusShadowColor;
 }
 
 @mixin focused-inset() {
     outline: 0 none;
     outline-offset: 0;
-    box-shadow: inset 0 0 0 0.2em $focusShadowColor;
+    box-shadow: inset 0 0 0 0.2em v.$focusShadowColor;
 }
 
 @mixin clearfix {

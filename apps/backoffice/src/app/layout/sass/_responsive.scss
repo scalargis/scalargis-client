@@ -1,3 +1,5 @@
+@use "../_variables" as v;
+
 @media (min-width: 1025px) {
     .layout-wrapper {
         &.layout-overlay {
@@ -63,7 +65,7 @@
         }
 
         .layout-sidebar {
-            transition: left $transitionDuration;
+            transition: left v.$transitionDuration;
             left: -250px;
             margin-top: 50px;
         }

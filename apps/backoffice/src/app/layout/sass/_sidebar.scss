@@ -1,3 +1,5 @@
+@use "../_variables" as v;
+
 .layout-sidebar {
     position: fixed;
     width: 250px;
@@ -13,7 +15,7 @@
 
     &.layout-sidebar-enter-active {
         transform: translateX(0%);
-        transition: transform $transitionDuration;
+        transition: transform v.$transitionDuration;
     }
 
     &.layout-sidebar-enter-done {
@@ -26,7 +28,7 @@
 
     &.layout-sidebar-exit-active {
         transform: translateX(-100%);
-        transition: transform $transitionDuration;
+        transition: transform v.$transitionDuration;
     }
 
     .layout-logo {
@@ -46,8 +48,8 @@
         height: 16px;
         line-height: 16px;
         text-align: center;
-        color: $menuitemBadgeColor;
-        background-color: $menuitemBadgeBgColor;
+        color: v.$menuitemBadgeColor;
+        background-color: v.$menuitemBadgeBgColor;
         border-radius: 50%;
     }
 }

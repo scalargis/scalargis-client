@@ -1,3 +1,5 @@
+@use "../_variables" as v;
+
 .layout-config {
 	position: fixed;
 	top: 50px;
@@ -8,10 +10,10 @@
 	z-index: 998;
 	height: calc(100% - 50px);
 	transform: translate3d(20em, 0px, 0px);
-	transition: transform $transitionDuration;
+	transition: transform v.$transitionDuration;
 	backface-visibility: hidden;
 	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.24);
-	color: $textColor;
+	color: v.$textColor;
 	background-color: #ffffff;
 
 	&.layout-config-active {
@@ -32,15 +34,15 @@
 		width: 52px;
 		height: 52px;
 		line-height: 52px;
-		background-color: $menuitemBadgeBgColor;
+		background-color: v.$menuitemBadgeBgColor;
 		text-align: center;
-		color: $menuitemBadgeColor;
+		color: v.$menuitemBadgeColor;
 		top: 230px;
 		left: -52px;
 		z-index: -1;
 		overflow: hidden;
 		cursor: pointer;
-		transition: background-color $transitionDuration;
+		transition: background-color v.$transitionDuration;
 		box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.24);
 
 		i {
@@ -48,7 +50,7 @@
 			line-height: inherit;
 			cursor: pointer;
 			transform: rotate(0deg);
-			transition: color $transitionDuration, transform 1s;
+			transition: color v.$transitionDuration, transform 1s;
 		}
 	}
 
@@ -62,7 +64,7 @@
 		top: 10px;
 		z-index: 1;
 		background-color: #e54a51;
-		transition: background-color $transitionDuration;
+		transition: background-color v.$transitionDuration;
 		border-radius: 50%;
 
 		i {
@@ -100,13 +102,13 @@
 				position: relative;
 				align-items: center;
 				justify-content: center;
-				transition: transform $transitionDuration;
+				transition: transform v.$transitionDuration;
 				box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
 
 				i {
 					font-size: 1rem;
 					position: absolute;
-					color: $menuitemBadgeColor;
+					color: v.$menuitemBadgeColor;
 					top: 50%;
 					left: 50%;
 					margin-left: -.5rem;
@@ -127,7 +129,7 @@
 	p {
 		line-height: 1.5;
 		margin-top: 0;
-		color: $textSecondaryColor;
+		color: v.$textSecondaryColor;
 	}
 }
 

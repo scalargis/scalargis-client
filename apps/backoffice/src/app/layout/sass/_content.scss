@@ -1,4 +1,6 @@
+@use "../_variables" as v;
+
 .layout-main {
-    transition: margin-left $transitionDuration;
+    transition: margin-left v.$transitionDuration;
     padding: 70px 2rem 2rem 2rem;
 }

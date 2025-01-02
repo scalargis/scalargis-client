@@ -1,6 +1,8 @@
+@use "../_variables" as v;
+
 .layout-footer {
-    transition: margin-left $transitionDuration;
-    background-color: $footerBgColor;
+    transition: margin-left v.$transitionDuration;
+    background-color: v.$footerBgColor;
     padding: 1em 2em;
 
     img {

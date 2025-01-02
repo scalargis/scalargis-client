@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 .layout-topbar {
     position: fixed;
     height: 50px;
@@ -5,9 +8,9 @@
     color: #ffffff;
     z-index: 999;
     right: 0;
-    @include clearfix();
-    @include linear-gradient-left($topbarLeftBgColor,$topbarRightBgColor);
-    @include transition(left $transitionDuration);
+    @include m.clearfix();
+    @include m.linear-gradient-left(v.$topbarLeftBgColor,v.$topbarRightBgColor);
+    @include m.transition(left v.$transitionDuration);
 
     .layout-topbar-icons {
         float: right;
@@ -18,15 +21,15 @@
 
         button {
             position: relative;
-            color: $topbarItemColor;
+            color: v.$topbarItemColor;
             margin-left: 20px;
             display: inline-block;
             text-decoration: none;
-            @include transition(color $transitionDuration);
+            @include m.transition(color v.$transitionDuration);
             overflow: visible;
 
             &:hover {
-                color: $topbarItemHoverColor;
+                color: v.$topbarItemHoverColor;
             }
 
             span {
@@ -48,9 +51,9 @@
                     height: 16px;
                     text-align: center;
                     line-height: 16px;
-                    color: $topbarItemBadgeColor;
-                    background-color: $topbarItemBadgeBgColor;
-                    @include border-radius(50%);
+                    color: v.$topbarItemBadgeColor;
+                    background-color: v.$topbarItemBadgeBgColor;
+                    @include m.border-radius(50%);
                 }
             }
         }
@@ -64,22 +67,22 @@
             input {
                 display: inline-block;
                 border: 0 none;
-                font-size: $fontSize;
+                font-size: v.$fontSize;
                 background: transparent;
-                border-bottom: 2px solid $topbarSearchInputBorderBottomColor;
+                border-bottom: 2px solid v.$topbarSearchInputBorderBottomColor;
                 outline: 0 none;
                 -webkit-box-shadow: none;
                 box-shadow: none;
-                color: $topbarSearchInputColor;
+                color: v.$topbarSearchInputColor;
                 width: 120px;
                 padding: 1px 20px 1px 1px;
                 margin: 0px;
-                @include border-radius(2px);
+                @include m.border-radius(2px);
 
-                &::-webkit-input-placeholder { color:$topbarSearchInputColor; opacity: .7; @include transition(opacity $transitionDuration);}
-                &:-moz-placeholder { color:$topbarSearchInputColor; opacity: .7; @include transition(opacity $transitionDuration);}
-                &::-moz-placeholder { color:$topbarSearchInputColor; opacity: .7; @include transition(opacity $transitionDuration);}
-                &:-ms-input-placeholder { color:$topbarSearchInputColor; opacity: .7; @include transition(opacity $transitionDuration);}
+                &::-webkit-input-placeholder { color:v.$topbarSearchInputColor; opacity: .7; @include m.transition(opacity v.$transitionDuration);}
+                &:-moz-placeholder { color:v.$topbarSearchInputColor; opacity: .7; @include m.transition(opacity v.$transitionDuration);}
+                &::-moz-placeholder { color:v.$topbarSearchInputColor; opacity: .7; @include m.transition(opacity v.$transitionDuration);}
+                &:-ms-input-placeholder { color:v.$topbarSearchInputColor; opacity: .7; @include m.transition(opacity v.$transitionDuration);}
             }
 
             .layout-topbar-search-icon {
@@ -91,7 +94,7 @@
 
             &:hover {
                 input {
-                    border-bottom-color: $topbarItemHoverColor;
+                    border-bottom-color: v.$topbarItemHoverColor;
                     &::-webkit-input-placeholder { opacity: 1 }
                     &:-moz-placeholder {opacity: 1}
                     &::-moz-placeholder {opacity: 1}
@@ -99,7 +102,7 @@
                 }
 
                 .layout-topbar-search-icon {
-                    color: $topbarItemHoverColor;
+                    color: v.$topbarItemHoverColor;
                 }
             }
         }
@@ -109,15 +112,15 @@
         cursor: pointer;
         display: inline-block;
         text-decoration: none;
-        color: $topbarItemColor;
-        @include transition(color $transitionDuration);
+        color: v.$topbarItemColor;
+        @include m.transition(color v.$transitionDuration);
 
         span {
             font-size: 2em;
         }
 
         &:hover {
-            color: $topbarItemHoverColor;
+            color: v.$topbarItemHoverColor;
         }
     }
 

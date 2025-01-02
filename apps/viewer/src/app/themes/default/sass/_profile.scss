@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 .layout-profile {
     text-align: center;
     padding: 20px 0;
@@ -11,7 +14,7 @@
         cursor: pointer;
         display: inline-block;
         margin-bottom: .75em;
-        @include transition(color $transitionDuration);
+        @include m.transition(color v.$transitionDuration);
 
         i {
             display: inline-block;
@@ -26,9 +29,9 @@
         margin: 0;
         max-height: 0;
         overflow: hidden;
-        @include transition-property(max-height);
-        @include transition-duration(0.4s);
-        @include transition-timing-function(cubic-bezier(0.86, 0, 0.07, 1));
+        @include m.transition-property(max-height);
+        @include m.transition-duration(0.4s);
+        @include m.transition-timing-function(cubic-bezier(0.86, 0, 0.07, 1));
        
         &.layout-profile-expanded {
             max-height: 500px;
@@ -41,10 +44,10 @@
                 border: 0 none;
                 border-radius: 0;
                 cursor: pointer;
-                @include transition(color $transitionDuration);
+                @include m.transition(color v.$transitionDuration);
 
                 &:hover {
-                    color: $menuitemHoverColor;
+                    color: v.$menuitemHoverColor;
                 }
 
                 span {
@@ -63,22 +66,22 @@
 .layout-sidebar-light {
     .layout-profile {
         .layout-profile-link {
-            color: $menuitemColor;
+            color: v.$menuitemColor;
     
             &:hover {
-                color: $menuitemHoverColor;
+                color: v.$menuitemHoverColor;
             }
         }
 
         ul {
-            background-color: $menuitemActiveBgColor;
+            background-color: v.$menuitemActiveBgColor;
 
             li {
                 button {
-                    color: $menuitemColor;
+                    color: v.$menuitemColor;
 
                     &:hover {
-                        color: $menuitemHoverColor;
+                        color: v.$menuitemHoverColor;
                     }
                 }
             }
@@ -89,22 +92,22 @@
 .layout-sidebar-dark {
     .layout-profile {
         .layout-profile-link {
-            color: $menuitemDarkColor;
+            color: v.$menuitemDarkColor;
     
             &:hover {
-                color: $menuitemDarkHoverColor;
+                color: v.$menuitemDarkHoverColor;
             }
         }
 
         ul {
-            background-color: $menuitemDarkActiveBgColor;
+            background-color: v.$menuitemDarkActiveBgColor;
 
             li {
                 button {
-                    color: $menuitemDarkColor;
+                    color: v.$menuitemDarkColor;
 
                     &:hover {
-                        color: $menuitemDarkHoverColor;
+                        color: v.$menuitemDarkHoverColor;
                     }
                 }
             }

@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 .layout-sidebar {
     position: fixed;
     width: 400px;
@@ -12,8 +15,8 @@
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
-    @include transition(left $transitionDuration);
-    @include shadow(0 0 6px 0 rgba(0, 0, 0, 0.16));
+    @include m.transition(left v.$transitionDuration);
+    @include m.shadow(0 0 6px 0 rgba(0, 0, 0, 0.16));
 
     .layout-logo {
         text-align: center;
@@ -27,8 +30,8 @@
         height: 16px;
         line-height: 16px;
         text-align: center;
-        color: $menuitemBadgeColor;
-        background-color: $menuitemBadgeBgColor;
-        @include border-radius(50%);
+        color: v.$menuitemBadgeColor;
+        background-color: v.$menuitemBadgeBgColor;
+        @include m.border-radius(50%);
     }
 }

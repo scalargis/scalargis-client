@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 /* Dashboard */
 .dashboard {
 
@@ -9,7 +12,7 @@
         }
 
         .detail {
-            color: $textSecondaryColor;
+            color: v.$textSecondaryColor;
             display: block;
             margin-top: 10px;
         }
@@ -21,7 +24,7 @@
             right: 10px;
             font-size: 18px;
             padding: 7px 14px;
-            border-radius: $borderRadius;
+            border-radius: v.$borderRadius;
 
             &.green {
                 background-color: #20d077;
@@ -44,7 +47,7 @@
     .highlight-box {
         height: 100px;
         display: flex;
-        @include clearfix();
+        @include m.clearfix();
 
         .initials {
             height: 100%;
@@ -70,7 +73,7 @@
             }
 
             .count {
-                color: $textSecondaryColor;
+                color: v.$textSecondaryColor;
                 font-size: 36px;
                 margin-top: 4px;
                 display: block;
@@ -85,8 +88,8 @@
 
         li {
             padding: .5em .25em;
-            border-bottom: 1px solid $dividerColor;
-            @include clearfix();
+            border-bottom: 1px solid v.$dividerColor;
+            @include m.clearfix();
         }
 
         .p-checkbox {
@@ -101,7 +104,7 @@
         i {
             float: right;
             font-size: 24px;
-            color: $textSecondaryColor;
+            color: v.$textSecondaryColor;
         }
 
         .p-panel-content {
@@ -123,7 +126,7 @@
             margin: 0;
 
             li {
-                border-bottom: 1px solid $dividerColor;
+                border-bottom: 1px solid v.$dividerColor;
 
                 button {
                     padding: 9px;
@@ -147,7 +150,7 @@
                         right: 10px;
                         top: 30px;
                         font-size: 14px;
-                        color: $textSecondaryColor;
+                        color: v.$textSecondaryColor;
                     }
 
                     &:hover {
@@ -173,7 +176,7 @@
         margin: 0;
 
         li {
-            border-bottom: 1px solid $dividerColor;
+            border-bottom: 1px solid v.$dividerColor;
             padding: 16px 8px;
 
             .count {
@@ -183,7 +186,7 @@
                 font-weight: 700;
                 padding: .25em .5em;
                 display: inline-block;
-                border-radius: $borderRadius;
+                border-radius: v.$borderRadius;
             }
         }
     }

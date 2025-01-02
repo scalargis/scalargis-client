@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 .layout-menu-container {
     padding-bottom: 120px;
 }
@@ -14,7 +17,7 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            transition: color $transitionDuration;
+            transition: color v.$transitionDuration;
 
             i {
                 font-size: 16px;
@@ -29,14 +32,14 @@
             }
 
             &:focus {
-                @include focused-inset();
+                @include m.focused-inset();
             }
         }
 
         &.active-menuitem {
             > a {
                 .menuitem-toggle-icon {
-                    @include icon-override("\e933");
+                    @include m.icon-override("\e933");
                 }
             }
         }
@@ -47,13 +50,13 @@
             padding: 1em;
 
             span {
-                font-size: $fontSize;
+                font-size: v.$fontSize;
             }
         }
 
         &:last-child {
             > a {
-                border-bottom: 1px solid $menuitemBorderColor;
+                border-bottom: 1px solid v.$menuitemBorderColor;
             }
         }
 
@@ -70,7 +73,7 @@
                     border-top: 0 none;
 
                     span {
-                        font-size: $submenuFontSize;
+                        font-size: v.$submenuFontSize;
                     }
                 }
 
@@ -103,42 +106,42 @@
 }
 
 .layout-sidebar-light {
-    @include linear-gradient($menuBgColorFirst, $menuBgColorLast);
+    @include m.linear-gradient(v.$menuBgColorFirst, v.$menuBgColorLast);
 
     .layout-menu {
         > li {
             > a {
-                border-top: 1px solid $menuitemBorderColor;
+                border-top: 1px solid v.$menuitemBorderColor;
             }
 
             &:last-child {
                 > a {
-                    border-bottom: 1px solid $menuitemBorderColor;
+                    border-bottom: 1px solid v.$menuitemBorderColor;
                 }
             }
 
             ul {
-                background-color: $menuitemActiveBgColor;
+                background-color: v.$menuitemActiveBgColor;
             }
         }
 
         li {
             a {
-                color: $menuitemColor;
+                color: v.$menuitemColor;
 
                 &.active-route {
-                    color: $menuitemActiveRouteColor;
+                    color: v.$menuitemActiveRouteColor;
                 }
 
                 &:hover {
-                    color: $menuitemHoverColor;
+                    color: v.$menuitemHoverColor;
                 }
             }
 
             &.active-menuitem {
                 > a {
-                    background-color: $menuitemActiveBgColor;
-                    color: $menuitemActiveColor;
+                    background-color: v.$menuitemActiveBgColor;
+                    color: v.$menuitemActiveColor;
                 }
             }
         }
@@ -146,42 +149,42 @@
 }
 
 .layout-sidebar-dark {
-    @include linear-gradient($menuDarkBgColorFirst, $menuDarkBgColorLast);
+    @include m.linear-gradient(v.$menuDarkBgColorFirst, v.$menuDarkBgColorLast);
 
     .layout-menu {
         > li {
             > a {
-                border-top: 1px solid $menuitemDarkBorderColor;
+                border-top: 1px solid v.$menuitemDarkBorderColor;
             }
 
             &:last-child {
                 > a {
-                    border-bottom: 1px solid $menuitemDarkBorderColor;
+                    border-bottom: 1px solid v.$menuitemDarkBorderColor;
                 }
             }
 
             ul {
-                background-color: $menuitemDarkActiveBgColor;
+                background-color: v.$menuitemDarkActiveBgColor;
             }
         }
 
         li {
             a {
-                color: $menuitemDarkColor;
+                color: v.$menuitemDarkColor;
 
                 &.active-route {
-                    color: $menuitemActiveRouteColor;
+                    color: v.$menuitemActiveRouteColor;
                 }
 
                 &:hover {
-                    color: $menuitemDarkHoverColor;
+                    color: v.$menuitemDarkHoverColor;
                 }
             }
 
             &.active-menuitem {
                 > a {
-                    background-color: $menuitemDarkActiveBgColor;
-                    color: $menuitemDarkActiveColor;
+                    background-color: v.$menuitemDarkActiveBgColor;
+                    color: v.$menuitemDarkActiveColor;
                 }
             }
         }

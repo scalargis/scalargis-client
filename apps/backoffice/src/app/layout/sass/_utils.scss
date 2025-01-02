@@ -1,9 +1,11 @@
+@use "../_variables" as v;
+
 /* Typography */
 .card {
     background-color: #ffffff;
     padding: 1em;
     margin-bottom: 16px;
-    border-radius: $borderRadius;
+    border-radius: v.$borderRadius;
 
     &.card-w-title {
         padding-bottom: 2em;

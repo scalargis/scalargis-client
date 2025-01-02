@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 @media (min-width: 1025px) {
     .layout-wrapper {
         &.layout-overlay {
@@ -111,8 +114,8 @@
             top: 50px;
             left: 0;
             z-index: 998;
-            background-color: $maskBgColor;
-            @include opacity(0.7);
+            background-color: v.$maskBgColor;
+            @include m.opacity(0.7);
         }
 
         &.layout-mobile-sidebar-active {

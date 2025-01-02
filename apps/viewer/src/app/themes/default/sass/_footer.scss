@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 .layout-footer {
     position: fixed;
     height: 50px;
@@ -7,10 +10,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    @include clearfix();
-    @include linear-gradient-left($topbarLeftBgColor,$topbarRightBgColor);
-    @include transition(margin-left $transitionDuration);
-    background-color: $footerBgColor;
+    @include m.clearfix();
+    @include m.linear-gradient-left(v.$topbarLeftBgColor,v.$topbarRightBgColor);
+    @include m.transition(margin-left v.$transitionDuration);
+    background-color: v.$footerBgColor;
     padding: 1em 2em;
 
     img {

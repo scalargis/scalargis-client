@@ -1,3 +1,6 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 /* Typography */
 h1 {
     font-weight: normal;
@@ -15,7 +18,7 @@ h2 {
     background-color: #ffffff;
     padding: 1em;
     margin-bottom: 16px;
-    @include border-radius($borderRadius);
+    @include m.border-radius(v.$borderRadius);
 
     &.card-w-title {
         padding-bottom: 2em;

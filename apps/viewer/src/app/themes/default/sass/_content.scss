@@ -1,5 +1,8 @@
+@use "../_variables" as v;
+@use "./_mixins" as m;
+
 .layout-main {
-    @include transition(margin-left $transitionDuration);
+    @include m.transition(margin-left v.$transitionDuration);
     padding: 0px 0px 0px 0px;
     height: 100%;
 }
