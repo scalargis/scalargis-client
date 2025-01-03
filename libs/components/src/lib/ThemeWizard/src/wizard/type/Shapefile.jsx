@@ -76,7 +76,7 @@ export default function ArcGISMap(props) {
     const { viewer, loading, data, editField } = props;
     return (
       <React.Fragment>
-        <div>
+        <div className="p-fluid">
 
           <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
@@ -84,7 +84,6 @@ export default function ArcGISMap(props) {
               placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
               options={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
               value={data.crs || '4326'}
-              className='w-full'
               onChange={(e) => editField('crs', e.value)}
             />
           </div>
