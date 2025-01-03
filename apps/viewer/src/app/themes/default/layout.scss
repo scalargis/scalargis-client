@@ -69,6 +69,10 @@ body .p-dropdown {
   border-bottom-right-radius: 0 !important;
 }
 
+#root {
+  overflow-x: auto;
+}
+
 .layout-logo > div {
   float: right;
   margin-left: 10px;
