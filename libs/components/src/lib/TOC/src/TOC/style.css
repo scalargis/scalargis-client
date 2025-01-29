@@ -134,7 +134,7 @@
 }
 
 .p-dialog-content {
-  overflow-y: none;
+  overflow-y: unset;
 }
 
 .p-dialog-myfooter {
