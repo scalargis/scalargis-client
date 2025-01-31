@@ -8,7 +8,7 @@ export default function ThemeSelector(props) {
   if (!theme || theme === 'default') {
     Theme = React.lazy(() => import(/* @vite-ignore */'../../themes/default/main'));
   } else {
-    Theme = React.lazy(() => import(/* @vite-ignore */'../../themes/' + theme + '/src/main'));
+    Theme = React.lazy(() => import(/* @vite-ignore */'../../themes/' + theme + '/main'));
   }
 
   return (

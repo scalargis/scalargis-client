@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { useTranslation} from "react-i18next";
+import React, { useState, useMemo } from 'react';
+//import { useTranslation} from "react-i18next";
 import SplashScreen from './SplashScreen';
 import { withCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
+
+import { i18n as i18nUtils } from '@scalargis/components';
+
 import ThemeSelector from './ThemeSelector';
 
 const cookieName = import.meta.env.VITE_APP_COOKIE_NAME || 'scalargis_rgpd';
@@ -13,7 +16,7 @@ const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS 
 
 function RGPD({ cookies, children }) {
 
-  const { t } = useTranslation();
+  //const { t } = useTranslation();
 
   const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
 
@@ -32,6 +35,8 @@ function RGPD({ cookies, children }) {
     }
   }
 
+  const acceptText = i18nUtils.translateValue("accept", "Aceito");
+
   return (
     <ThemeSelector theme={theme}>
       <React.Fragment>
@@ -39,8 +44,8 @@ function RGPD({ cookies, children }) {
           <SplashScreen>
             <CookieConsent
               location="bottom"
-              buttonText={t("accept", "Aceito")}
-              ariaAcceptLabel={t("accept", "Aceito")}
+              buttonText={acceptText}
+              ariaAcceptLabel={acceptText}
               cookieName={cookieName}
               cookieValue={cookieValue}
               expires={cookieExpiresDays}
