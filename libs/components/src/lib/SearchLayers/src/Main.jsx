@@ -74,11 +74,11 @@ export default function Main(props) {
   });
 
   useEffect(() => {
-    if (!mainMap) return;
-  
+    if (!mainMap || !config?.viewer?.loaded || layer?.current) return;
+
     createLayer(layer, layer_id, mainMap, component_cfg.style);
-    //changeMapLoaded(true)
-  }, [mainMap]);
+
+  }, [mainMap, config?.viewer?.loaded]);
 
   useEffect(() => {
     //if (selected_menu === 'searchlayers') dispatch(actions.viewer_set_exclusive_mapcontrol('SearchLayers'));

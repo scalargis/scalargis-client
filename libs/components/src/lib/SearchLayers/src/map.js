@@ -35,7 +35,13 @@ export function createLayer(layer, layerId, map, style) { // new: vector type
       selectable: false
     });
     
-    map.addLayer(layer.current);
+    const parentLayer = findOlLayer('overlays', map);
+
+    if (parentLayer) {
+      parentLayer.getLayers().getArray().push(eval(layer.current));
+    } else {
+      map.addLayer(layer.current);
+    }
   } 
 }
 
