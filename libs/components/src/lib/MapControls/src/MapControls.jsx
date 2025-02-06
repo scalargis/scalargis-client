@@ -31,14 +31,12 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
   const { t } = useTranslation();
 
-  const [loaded, setLoaded] = useState(false);
-
   const [dragBox, setDragBox] = useState(false);
 
   const [geoLocationSettings, setGeoLocationSettings] = useState(false);
 
   useEffect(() => {
-    setLoaded(true);
+    if (!mainMap || !viewer?.loaded) return;
 
     const elem_zoom = document.createElement('span');
     elem_zoom.classList.add("pi", "pi-window-maximize", "p-c");
@@ -111,7 +109,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
       if (dragBoxInteraction) mainMap.removeInteraction(dragBoxInteraction);
       if (zoomToExtentControl) mainMap.removeControl(zoomToExtentControl);
     }
-  }, []);
+  }, [mainMap, viewer?.loaded]);
 
   // Toggle coordinates control
   function toggleCoordinatesControl() {
@@ -192,23 +190,10 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
   // Apply state
   if (dragBoxInteraction) dragBoxInteraction.setActive(dragBox);
 
-  /*
-  return (
-    <div id="map-controls" className="map-controls">
-
-      {viewer.config_json.map_controls.map(c => {
-        return getComponentMapButton(c.type);
-      })}
-
-
-
-    </div>
-  )
-  */
   return (
     <div id="map-controls" className="map-controls">
       
-      {loaded && viewer.config_json.map_controls.map(c => {
+      {viewer?.loaded && viewer.config_json.map_controls.map(c => {
         return getComponentMapButton(c.type);
       })}
 
