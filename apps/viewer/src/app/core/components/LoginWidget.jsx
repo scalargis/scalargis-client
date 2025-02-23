@@ -57,7 +57,7 @@ function LoginWidget(props) {
             <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
                 <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
                     <div className="text-center mb-5">
-                        <img src={logo} alt="hyper" height={50} className="mb-3" />
+                        <img src={logo} alt="logo" className="mb-3" style={{maxHeight: "180px"}} />
                         <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("welcome", "Bem-vindo")}</div>
                         { showUserRegistration &&
                         <React.Fragment>
