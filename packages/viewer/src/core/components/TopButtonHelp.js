@@ -17,8 +17,8 @@ function TopButtonHelp({ viewer }) {
 
   // Render help button
   return (
-    <button className="p-link" title="Ajuda" onClick={e => { return; }}>
-        <a href={viewer.config_json.help_url} target="_blank" style={{"color": "#ffffff"}}>
+    <button className="p-link" onClick={e => { return; }}>
+        <a href={viewer.config_json.help_url} target="_blank" style={{"color": "#ffffff"}} title="Ajuda">
           <span className="layout-topbar-item-text">Ajuda</span>
           <span className="layout-topbar-icon pi pi-question-circle"/>
         </a>
