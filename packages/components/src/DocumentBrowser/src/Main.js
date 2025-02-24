@@ -56,7 +56,7 @@ export function MainMenu({ className, core, config, actions, record }) {
               title={title}
               className={className}
               icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
-              style={{ margin: '0.5em 1em' }}
+              /*style={{ margin: '0.5em 1em' }}*/
               onClick={e => showPopup() /*setShowPopup(true)*/}
             /> }
       </React.Fragment>
@@ -79,7 +79,7 @@ export function MainMenu({ className, core, config, actions, record }) {
         title={title}
         className={className}
         icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
-        style={{ margin: '0.5em 1em' }}
+        /*style={{ margin: '0.5em 1em' }}*/
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       /> 
     )

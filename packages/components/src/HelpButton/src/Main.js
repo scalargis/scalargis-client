@@ -46,7 +46,7 @@ export function MainMenu({ className, config, actions, record }) {
           title={title}
           className={className}
           icon="far fa-question-circle"
-          style={{ margin: '0.5em 1em' }}
+          /*style={{ margin: '0.5em 1em' }}*/
           onClick={e => setShowPopup(true)}
         />
 
@@ -107,7 +107,7 @@ export function MainMenu({ className, config, actions, record }) {
         title={title}
         className={className}
         icon="far fa-question-circle"
-        style={{ margin: '0.5em 1em' }}
+        /*style={{ margin: '0.5em 1em' }}*/
         onClick={e => window.open(help_url)} />
     )
   }  else {
@@ -116,7 +116,7 @@ export function MainMenu({ className, config, actions, record }) {
         title={title}
         className={className}
         icon="far fa-question-circle"
-        style={{ margin: '0.5em 1em' }}
+        /*style={{ margin: '0.5em 1em' }}*/
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )
@@ -249,13 +249,13 @@ export default function Main({ type, as, config, actions, record }) {
     return (
       <React.Fragment>
       { component_cfg?.elementType === 'link' ?
-        <div title={title} className="p-link">
-          <a href={help_url} target="_blank" className="sg-help-button-link" style={{"color": "#ffffff"}}>
+        <div className="p-link">
+          <a href={help_url} target="_blank" className="sg-help-button-link" style={{"color": "#ffffff"}} title={title}>
             <span class="layout-topbar-icon pi pi-question-circle"></span>
           </a>
         </div> :
-        <button className="p-link" title={title} onClick={e => { return; }}>
-          <a href={help_url} target="_blank" style={{"color": "#ffffff"}}>
+        <button className="p-link" onClick={e => { return; }}>
+          <a href={help_url} target="_blank" style={{"color": "#ffffff"}} title={title}>
             <span className="layout-topbar-item-text">{title}</span>
             <span className="layout-topbar-icon pi pi-question-circle"/>
           </a>
