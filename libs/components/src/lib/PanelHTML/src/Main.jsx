@@ -31,14 +31,13 @@ export function MainMenu({ className, config, actions, record }) {
               title={title}
               className={className ? className + ' main-menu-btn-image' : null}
               icon="pi"
-              style={{ margin: '0.5em 1em', backgroundImage: `url("${component_cfg.btn_image}")` }}
+              style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
               onClick={e => setShowPopup(true)}
             /> :
             <Button
               title={title}
               className={className}
               icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
-              style={{ margin: '0.5em 1em' }}
               onClick={e => setShowPopup(true)}
             /> }
 
@@ -71,7 +70,7 @@ export function MainMenu({ className, config, actions, record }) {
           title={title}
           className={className ? className + ' main-menu-btn-image' : null}
           icon="pi"
-          style={{ margin: '0.5em 1em', backgroundImage: `url("${component_cfg.btn_image}")` }}
+          style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
           onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
         />
       )
@@ -82,7 +81,6 @@ export function MainMenu({ className, config, actions, record }) {
         title={title}
         className={className}
         icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
-        style={{ margin: '0.5em 1em' }}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       /> 
     )

@@ -24,7 +24,6 @@ export function MainMenu({ className, config, actions, record }) {
       title={title}
       className={className}
       icon={icon}
-      style={{ margin: '0.5em 1em' }}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )

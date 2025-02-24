@@ -18,7 +18,6 @@ export function MainMenu({ className, config, actions, record }) {
       title="Ferramentas do Mapa"
       className={className}
       icon="pi pi-sliders-h"
-      style={{ margin: '0.5em 1em' }}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )

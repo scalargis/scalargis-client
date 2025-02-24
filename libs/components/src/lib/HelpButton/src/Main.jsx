@@ -46,7 +46,6 @@ export function MainMenu({ className, config, actions, record }) {
           title={title}
           className={className}
           icon="far fa-question-circle"
-          style={{ margin: '0.5em 1em' }}
           onClick={e => setShowPopup(true)}
         />
 
@@ -107,7 +106,6 @@ export function MainMenu({ className, config, actions, record }) {
         title={title}
         className={className}
         icon="far fa-question-circle"
-        style={{ margin: '0.5em 1em' }}
         onClick={e => window.open(help_url)} />
     )
   }  else {
@@ -116,7 +114,6 @@ export function MainMenu({ className, config, actions, record }) {
         title={title}
         className={className}
         icon="far fa-question-circle"
-        style={{ margin: '0.5em 1em' }}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )

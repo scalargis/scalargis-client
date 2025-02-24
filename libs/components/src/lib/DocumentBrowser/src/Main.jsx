@@ -49,14 +49,13 @@ export function MainMenu({ className, core, config, actions, record }) {
               title={title}
               className={className ? className + ' main-menu-btn-image' : null}
               icon="pi"
-              style={{ margin: '0.5em 1em', backgroundImage: `url("${component_cfg.btn_image}")` }}
+              style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
               onClick={e => showPopup() /*setShowPopup(true)*/}
             /> :
             <Button
               title={title}
               className={className}
               icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
-              style={{ margin: '0.5em 1em' }}
               onClick={e => showPopup() /*setShowPopup(true)*/}
             /> }
       </React.Fragment>
@@ -68,7 +67,7 @@ export function MainMenu({ className, core, config, actions, record }) {
           title={title}
           className={className ? className + ' main-menu-btn-image' : null}
           icon="pi"
-          style={{ margin: '0.5em 1em', backgroundImage: `url("${component_cfg.btn_image}")` }}
+          style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
           onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
         />
       )
@@ -79,7 +78,6 @@ export function MainMenu({ className, core, config, actions, record }) {
         title={title}
         className={className}
         icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
-        style={{ margin: '0.5em 1em' }}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       /> 
     )
