@@ -22,7 +22,7 @@ export function MainMenu({ className, config, actions, record }) {
   */}
 }
 
-export default function Main({ core, as, config, record }) {
+export default function Main({ core, as, config, record, element }) {
 
   const { actions, mainMap, viewer, dispatch } = config;
 
@@ -30,7 +30,6 @@ export default function Main({ core, as, config, record }) {
 
   function renderContent() {
     return (
-      <div title={t("mapTools", "Ferramentas do Mapa")}>
         <MapControls
           core={core}
           viewer={viewer}
@@ -38,8 +37,8 @@ export default function Main({ core, as, config, record }) {
           dispatch={dispatch}
           mainMap={mainMap}
           record={record}
-        />
-      </div>  
+          element={element}
+        /> 
     )  
   }
 

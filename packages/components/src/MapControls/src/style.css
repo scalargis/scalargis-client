@@ -17,10 +17,10 @@
 
 .map-controls-geolocation {
   display: inline-flex;
+  align-items: center;
 } 
 
 .btn-geolocation-options {
-  /*position: relative;*/
   top: -25px; 
   left: 35px;
   background-color: rgba(255, 255, 255, 0.9);
@@ -28,5 +28,6 @@
   width: 140px;
   min-width: 140px;
   height: 30px;
-  line-height: 30px;  
+  line-height: 30px;
+  margin-left: 3px;
 }

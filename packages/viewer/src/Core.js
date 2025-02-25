@@ -328,7 +328,7 @@ Core.prototype.renderComponentById = function({ id, as = '', props, }) {
   )
 }
 
-Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], props, parent, separator = '', style = null, className = '' }) {
+Core.prototype.renderComponents = function({ region, element='', as = '', mobileMenu = [], props, parent, separator = '', style = null, className = '' }) {
   
   // Validate not empty components registry
   const keys = Object.keys(this.__components);
@@ -349,6 +349,25 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
+
+    if (element=='ul') {
+      return (
+        <li key={c.id} className={className} style={style ? style(c) : null }>
+          <PluginComponent
+            record={c}
+            config={{ ...props, ...c.config_json }}
+            core={this}
+            actions={this.actions}
+            region={region}
+            as={c.as || as}
+            element={element}
+            utils={utils}
+          />
+          { separator }
+        </li>
+      );
+    }
+
     return (
       <div key={c.id} className={className} style={style ? style(c) : null }>
         <PluginComponent
@@ -358,6 +377,7 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
           actions={this.actions}
           region={region}
           as={c.as || as}
+          element={element}
           utils={utils}
         />
         { separator }
@@ -416,7 +436,7 @@ Core.prototype.renderComponentsMenu = function({ region, as = '', mobileMenu = [
   })
 }
 
-Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent, separator = '', style = null, className = '' }) {
+Core.prototype.renderComponentsLinks = function({ region, element='', as = '', props, parent, separator = '', style = null, className = '' }) {
   
   // Validate not empty components registry
   const keys = Object.keys(this.__components);
@@ -437,6 +457,26 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
+
+    if (element=='ul') {
+      return (
+        <li key={c.id} className={className} style={style ? style(c) : null }>
+          <PluginComponent
+            type="link"
+            region={region}
+            record={c}
+            config={{ ...props, ...c.config_json }}
+            core={this}
+            actions={this.actions}
+            as={as}
+            element={element}
+            utils={utils}
+          />
+          { separator }
+        </li>
+      )
+    }
+
     return (
       <div key={c.id} className={className} style={style ? style(c) : null }>
         <PluginComponent
@@ -447,6 +487,7 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
           core={this}
           actions={this.actions}
           as={as}
+          element={element}
           utils={utils}
         />
         { separator }

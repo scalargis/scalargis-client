@@ -15,7 +15,7 @@ let mapInteractions;
 let zoomToExtentControl;
 let dragBoxInteraction;
 
-export default function MapControls({ viewer, mainMap, core, dispatch, actions, record }) {
+export default function MapControls({ viewer, mainMap, core, dispatch, actions, record, element }) {
 
   const { exclusive_mapcontrol } = viewer;
   const coordinates_control = viewer.config_json.map_controls.find(c => c.id === 'Coordinates');
@@ -74,8 +74,16 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
     } else {
       mapControls = defaultControls(options).extend([new FullScreen(), zoomToExtentControl]);
     }
+
+    const parentElement = document.getElementById('map-controls');
     mapControls.forEach(c => {
-      c.setTarget(document.getElementById('map-controls'));
+      if (element=='ul') {
+        const elem = document.createElement('li');
+        parentElement.appendChild(elem);
+        c.setTarget(elem);
+      } else {
+        c.setTarget(document.getElementById('map-controls'));
+      }
       mainMap.addControl(c);
     });
 
@@ -192,21 +200,20 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
   // Apply state
   if (dragBoxInteraction) dragBoxInteraction.setActive(dragBox);
 
-  /*
+  if (element=='ul') {
+    return (
+      <ul id="map-controls" className="map-controls" title={t("mapTools", "Ferramentas do Mapa")}>
+
+        {loaded && viewer.config_json.map_controls.map((c, k) => {
+          return <li key={k}>{getComponentMapButton(c.type)}</li>
+        })}
+
+      </ul>
+    )
+  }
+
   return (
-    <div id="map-controls" className="map-controls">
-
-      {viewer.config_json.map_controls.map(c => {
-        return getComponentMapButton(c.type);
-      })}
-
-
-
-    </div>
-  )
-  */
-  return (
-    <div id="map-controls" className="map-controls">
+    <div id="map-controls" className="map-controls" title={t("mapTools", "Ferramentas do Mapa")}>
       
       {loaded && viewer.config_json.map_controls.map(c => {
         return getComponentMapButton(c.type);
