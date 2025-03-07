@@ -76,7 +76,7 @@ export default function SearchLayerResults(props) {
   const zoomActionTemplate = (rowData) => {
     return (
         <React.Fragment>
-            <Button icon="pi pi-search" className="p-button-rounded p-button-text p-mr-2" 
+            <Button icon="pi pi-search" className="p-button-rounded p-button-text" 
               onClick={() => { 
                 layer.current.getSource().clear();
                 if (rowData.geometry == null) {

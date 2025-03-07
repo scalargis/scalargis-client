@@ -50,7 +50,7 @@ class ThemeInfo extends React.Component {
         { (theme.metadata && theme.metadata.url) ?
         <div className="field grid">
             <div className="col-4">{i18next.t("metadata", "Metadados")}</div>
-            <div className="col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><i className="pi pi-external-link p-mr-2"></i>{i18next.t("openMetadataDetails","Abrir Ficha")}</a></div>
+            <div className="col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><i className="pi pi-external-link mr-2"></i>{i18next.t("openMetadataDetails","Abrir Ficha")}</a></div>
         </div> : null }
         { (theme.metadata && theme.metadata.data) ?
             theme.metadata.data.map(d => {
