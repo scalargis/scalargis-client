@@ -58,10 +58,11 @@ export default function SearchLayerResults(props) {
   }, [results]);
 
   // Zoom to layer features
-  function zoomLayerFeatures() {
+  function zoomLayerFeatures(buffer) {
     let extent = layer.current.getSource().getExtent();
     if (extent) {
-      const bufferValue = 500;
+      const _buffer_extent = extent[2] - extent[0] > extent[3] - extent[1] ? extent[2] - extent[0] : extent[3] - extent[1];
+      const bufferValue = buffer != null ? buffer : _buffer_extent;
       extent = [
         extent[0] - bufferValue,
         extent[1] - bufferValue,
@@ -87,7 +88,7 @@ export default function SearchLayerResults(props) {
                     }
                     const features = new OlFormatGeoJSON(options).readFeatures(d);
                     layer.current.getSource().addFeatures(features);                      
-                    zoomLayerFeatures();
+                    zoomLayerFeatures(searchConfig?.zoom_buffer);
                   });
                 } else {
                   const geom = rowData.geometry.clone().transform('EPSG:4326',mainMap.getView().getProjection().getCode());
