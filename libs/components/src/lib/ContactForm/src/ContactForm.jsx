@@ -205,23 +205,23 @@ export default function ContactFrom(props) {
 
   const itemTemplate = (file, props) => {
       return (
-          <div className="p-d-flex p-ai-center p-flex-wrap">
-              <div className="p-d-flex p-ai-center" style={{width: '70%'}}>
-                  <span className="p-d-flex p-dir-col p-text-left p-ml-0 p-mr-1" style={{"wordBreak": "break-all"}}>
+          <div className="flex align-items-center flex-wrap">
+              <div className="flex align-items-center" style={{width: '70%'}}>
+                  <span className="flex p-dir-col p-text-left ml-0 mr-1" style={{"wordBreak": "break-all"}}>
                       {file.name}
                   </span>
               </div>
-              <Tag value={props.formatSize} className="p-px-1 p-py-1" />
-              <Button type="button" icon="pi pi-times" className="p-button-outlined p-button-rounded p-button-danger p-ml-auto" onClick={() => onTemplateRemove(file, props.onRemove)} />
+              <Tag value={props.formatSize} className="px-1 py-1" />
+              <Button type="button" icon="pi pi-times" className="p-button-outlined p-button-rounded p-button-danger ml-auto" onClick={() => onTemplateRemove(file, props.onRemove)} />
           </div>
       )
   }
 
   const emptyTemplate = () => {
       return (
-          <div className="p-d-flex p-ai-center p-dir-col">
-              <i className="pi pi-image p-mt-3 p-p-5" style={{'fontSize': '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)'}}></i>
-              <span style={{'fontSize': '1.2em', color: 'var(--text-color-secondary)'}} className="p-my-5">Drag and Drop Image Here</span>
+          <div className="p-d-flex align-items-center p-dir-col">
+              <i className="pi pi-image mt-3 p-p-5" style={{'fontSize': '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)'}}></i>
+              <span style={{'fontSize': '1.2em', color: 'var(--text-color-secondary)'}} className="my-5">Drag and Drop Image Here</span>
           </div>
       )
   }
@@ -229,7 +229,7 @@ export default function ContactFrom(props) {
   if (isComplete) {
     return (
       <div className="p-fluid">
-        <div className="p-field">
+        <div className="field">
           <label htmlFor="contact_name">Nome</label>
           <InputText
               id="contact_name"
@@ -238,7 +238,7 @@ export default function ContactFrom(props) {
               disabled
             />                                 
         </div>
-        <div className="p-field">
+        <div className="field">
           <label htmlFor="contact_email">Email</label>
           <InputText
               id="contact_email"
@@ -247,7 +247,7 @@ export default function ContactFrom(props) {
               disabled
             />                                  
         </div>
-        <div className="p-field">
+        <div className="field">
           <label htmlFor="contact_description">Descrição</label>
           <InputTextarea rows={3}
               id="contact_description"
@@ -256,8 +256,8 @@ export default function ContactFrom(props) {
               disabled
             />
         </div>      
-        <div className="p-field">    
-          <div className="p-mb-2">
+        <div className="field">    
+          <div className="mb-2">
             { (infoMessage && infoMessage.type) && 
               <Message style={{ width: '100%' }} severity={infoMessage.type} text={infoMessage.message}></Message>
             }
@@ -272,7 +272,7 @@ export default function ContactFrom(props) {
       <form onSubmit={e => submit()}>
 
         <div className="p-fluid">
-          <div className="p-field">
+          <div className="field">
               <label htmlFor="contact_name">Nome</label>
               <InputText
                   id="contact_name"
@@ -285,7 +285,7 @@ export default function ContactFrom(props) {
                 { (!name || name.length === 0) &&
                 <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
           </div>
-          <div className="p-field">
+          <div className="field">
               <label htmlFor="contact_email">Email</label>
               <InputText
                   id="contact_email"
@@ -298,7 +298,7 @@ export default function ContactFrom(props) {
                 { (!email || email.length === 0) &&
                 <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
           </div>
-          <div className="p-field">
+          <div className="field">
               <label htmlFor="contact_description">Descrição</label>
               <InputTextarea rows={3}
                   id="contact_description"
@@ -312,7 +312,7 @@ export default function ContactFrom(props) {
           </div>
 
           { upload_cfg.enabled &&
-          <div className="p-field">
+          <div className="field">
             <label htmlFor="contact_description">Anexos</label>
 
             <FileUpload ref={fileUploadRef} name="files[]"
@@ -354,7 +354,7 @@ export default function ContactFrom(props) {
           config={config} 
         />
                   
-        <div className="p-mb-2">
+        <div className="mb-2">
           { (infoMessage && infoMessage.type) && 
             <Message style={{ width: '100%' }} severity={infoMessage.type} text={infoMessage.message}></Message>
           }
