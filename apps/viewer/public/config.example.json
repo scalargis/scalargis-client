@@ -7,7 +7,8 @@
       "name": "WKT - Sistemas de Informação, lda",
       "url": "https://www.wkt.pt/"
     },
-    "show_entity_info": true,
+    "entity_info_show": true,
+    "entity_info_hidden_mobile": false,
     "attributions": [
       "WKT",
       "|"

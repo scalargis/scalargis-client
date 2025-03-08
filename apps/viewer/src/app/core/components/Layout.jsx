@@ -45,7 +45,7 @@ function Layout(props) {
   if (viewer?.config_json?.entity?.name) entityName = viewer.config_json.entity.name;
   if (viewer?.config_json?.entity?.url)  entityUrl =viewer.config_json.entity.url;
 
-  const showEntityInfo = viewer?.config_json?.show_entity_info === false ? false : true;
+  const showEntityInfo = viewer?.config_json?.entity_info_show === false ? false : true;
 
   const showLogoMobile = viewer?.config_json?.mobile_show_logo === false ? false : true;
 
@@ -104,6 +104,14 @@ function Layout(props) {
       }
     </div> : null
 
+  const entityInfoComponent = <React.Fragment>
+    { (showEntityInfo && entityName) && (
+      entityUrl ? 
+      <span className={ viewer?.config_json?.entity_info_hidden_mobile === true ? "footer-text footer-text-hidden-mobile" : "footer-text"}>&copy; {copyrightYear} <a href={entityUrl} target="_blank" rel="noopener noreferrer" title={entityName}>{size[0] > 870 ? entityName : entityNameShort}</a></span>  
+      : <span className={ viewer?.config_json?.entity_info_hidden_mobile === true ? "footer-text footer-text-hidden-mobile" : "footer-text"}>&copy; {copyrightYear} {size[0] > 870 ? entityName : entityNameShort}</span>
+    )}
+  </React.Fragment>
+
 
   return (
     <div className={wrapperClass} onClick={onWrapperClick}>
@@ -146,11 +154,7 @@ function Layout(props) {
 
         { loaded && <div className="layout-footer">
             <div className="footer-left">
-              { (showEntityInfo && entityName) && (
-                entityUrl ? 
-                <span className="footer-text">&copy; {copyrightYear} <a href={entityUrl} target="_blank" rel="noopener noreferrer" title={entityName}>{entityNameShort}</a></span>  
-                : <span className="footer-text">&copy; {copyrightYear} {entityNameShort}</span>
-              )}
+              {entityInfoComponent}
               <div>
                 { props.footerLeft }
               </div>

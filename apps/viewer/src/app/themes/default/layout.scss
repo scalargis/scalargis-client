@@ -229,10 +229,13 @@ body .p-dropdown {
 
 .layout-footer .footer-text {
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 10px;   
+}
+
+.layout-footer .footer-text.footer-text-hidden-mobile {
   @media screen and (max-width: 667px) {
-      display: none;
-  }    
+    display: none;
+  } 
 }
 
 .layout-footer .footer-text a {
