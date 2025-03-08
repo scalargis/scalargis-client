@@ -4,6 +4,10 @@ body {
     overflow: auto !important;
 }
 
+body > div.p-dialog-mask {
+    overflow-y: auto;
+}
+
 .p-dialog.p-confirm-dialog .p-confirm-dialog-message {
     margin-left: 0.5rem;
 }
