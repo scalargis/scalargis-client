@@ -37,8 +37,15 @@ function Layout(props) {
   }, [config]);
 
   const copyrightYear = new Date().getFullYear();
-  const entityName = import.meta.env.VITE_APP_ENTITY_NAME;
-  const entityUrl = import.meta.env.VITE_APP_ENTITY_URL;
+  let entityNameShort = import.meta.env.VITE_APP_ENTITY_NAME_ABREV;
+  let entityName = import.meta.env.VITE_APP_ENTITY_NAME;
+  let entityUrl = import.meta.env.VITE_APP_ENTITY_URL;
+
+  if (viewer?.config_json?.entity?.name_short) entityNameShort = viewer.config_json.entity.name_short;
+  if (viewer?.config_json?.entity?.name) entityName = viewer.config_json.entity.name;
+  if (viewer?.config_json?.entity?.url)  entityUrl =viewer.config_json.entity.url;
+
+  const showEntityInfo = viewer?.config_json?.show_entity_info === false ? false : true;
 
   const showLogoMobile = viewer?.config_json?.mobile_show_logo === false ? false : true;
 
@@ -139,10 +146,10 @@ function Layout(props) {
 
         { loaded && <div className="layout-footer">
             <div className="footer-left">
-              { entityName && (
+              { (showEntityInfo && entityName) && (
                 entityUrl ? 
-                <span className="footer-text">&copy; {copyrightYear} <a href={entityUrl} target="_blank" rel="noopener noreferrer">{entityName}</a></span>  
-                : <span className="footer-text">&copy; {copyrightYear} {entityName}</span>
+                <span className="footer-text">&copy; {copyrightYear} <a href={entityUrl} target="_blank" rel="noopener noreferrer" title={entityName}>{entityNameShort}</a></span>  
+                : <span className="footer-text">&copy; {copyrightYear} {entityNameShort}</span>
               )}
               <div>
                 { props.footerLeft }

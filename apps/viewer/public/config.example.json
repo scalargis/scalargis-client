@@ -2,6 +2,16 @@
   "id": 1,
   "config_json": {
     "id": "toc",
+    "entity": {
+      "name_short": "WKT",
+      "name": "WKT - Sistemas de Informação, lda",
+      "url": "https://www.wkt.pt/"
+    },
+    "show_entity_info": true,
+    "attributions": [
+      "WKT",
+      "|"
+    ],
     "title": "TOC",
     "state": "TOC_DEFAULT",
     "activeIndex": 0,
