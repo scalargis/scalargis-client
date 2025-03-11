@@ -4,6 +4,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 
 import './style.css';
+import { preventDefault } from 'ol/events/Event';
 
 const defaultMode = 'dropddown';
 
@@ -76,7 +77,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
               );
             })}
           </div> :
-          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" >
+          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e=>preventDefault()} >
             <span className="p-menuitem-icon pi pi-flag"></span>
             <div className={className ? `locale-selector ${className}` : 'locale-selector'}>
               {localesList.map((item, index) => {
@@ -86,7 +87,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
                       key={item.value}
                       label={item.label}
                       className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
-                      onClick={(e) => dispatch(viewer_set_locale(item.value))}
+                      onClick={(e) => {e.preventDefault(); dispatch(viewer_set_locale(item.value))}}
                     />
                     {(index < localesList.length - 1) && <span>|</span>}
                   </React.Fragment>
@@ -102,8 +103,8 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
     <React.Fragment>
       { type != 'menu' ?
       <Dropdown value={locale.toLowerCase()} options={localesList} onChange={handleChange} className={className ? `locale-selector ${className}` : 'locale-selector'} /> :
-      <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" >
-        <span className="p-menuitem-icon pi pi-flag"></span><Dropdown value={locale.toLowerCase()} options={localesList} onChange={handleChange} className={className ? `locale-selector ${className}` : 'locale-selector'} />
+      <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e=>e.preventDefault()}>
+        <span className="p-menuitem-icon pi pi-flag"></span><Dropdown value={locale.toLowerCase()} options={localesList} onChange={(e)=>{e.preventDefault(); handleChange(e)}} className={className ? `locale-selector ${className}` : 'locale-selector'} />
       </a> }
     </React.Fragment>
   );

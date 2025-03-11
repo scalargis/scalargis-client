@@ -15,10 +15,11 @@ const App = () => {
 
   const base_url = getAppBaseUrl();
 
+  const dispatch = core?.store?.dispatch;
+
   useEffect(()=> {
     const {actions} = core;
     const {site_load} = actions;
-    const dispatch = core.store.dispatch;
 
     dispatch(site_load(core, (config) => {
       const _getRoutesInfo = (module) => {
@@ -51,7 +52,7 @@ const App = () => {
     <AppContext.Provider value={{ core, mainMap }}>
       <Provider store={core.store}>
         <Router basename={base_url}>
-          <RGPD>
+          <RGPD core={core} dispatch={dispatch}>
             {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
           </RGPD>
         </Router>

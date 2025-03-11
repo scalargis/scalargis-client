@@ -44,7 +44,7 @@ function Layout(props) {
     if (!config) return;
 
     // Set Theme
-    let theme = import.meta.env.VITE_APP_DEFAULT_THEME || 'default';
+    let theme = core?.siteConfig?.theme || import.meta.env.VITE_APP_DEFAULT_THEME || 'default';
     if (config && config.theme) {
       theme = config.theme;
     }

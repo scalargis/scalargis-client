@@ -494,6 +494,10 @@ body .p-multiselect {
 .splashscreen > div {
   background-color: white;
   padding: 6rem;
+
+  @media screen and (max-width: 380px) {
+    padding: 3rem 2rem;
+  }
 }
 
 .splashscreen h1 {
@@ -542,4 +546,19 @@ body .p-multiselect {
 
 #topbar_right_menu {
   transform: translate(10px, 10px);
+}
+
+.popup-locale-selector.p-dropdown {
+  border: none;
+}
+
+.popup-locale-selector.p-dropdown .p-hidden-accessible.p-dropdown-hidden-select,
+.popup-locale-selector.p-dropdown .p-dropdown.p-dropdown-label,
+.popup-locale-selector.p-dropdown .p-dropdown-label.p-inputtext,
+.popup-locale-selector.p-dropdown .p-dropdown-trigger {
+  color: #2196f3;
+}
+
+.popup-locale-selector.p-dropdown .p-dropdown-trigger {
+  border-left: 1px solid #2196f3;
 }

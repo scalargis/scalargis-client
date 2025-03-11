@@ -117,7 +117,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
           <span className="layout-topbar-item-text">{t("share", "Partilhar")}</span>
           <span className="layout-topbar-icon pi pi-share-alt"/>
         </button> :
-        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => openForm()} >
+        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => {e.preventDefault(); openForm();}} >
           <span className="p-menuitem-icon pi pi-share-alt"></span><span className="p-menuitem-text">{t("share", "Partilhar")}</span>
         </a> }
 

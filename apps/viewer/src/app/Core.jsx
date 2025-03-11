@@ -112,7 +112,9 @@ function Core(config, reducers) {
   /**
    * Hold programatic site config
    */
-  this.siteConfig = {};
+  this.siteConfig = {
+    loaded: false
+  };
 
   /**
    * Hold programatic config
@@ -163,7 +165,12 @@ function Core(config, reducers) {
 
 // Set core site config
 Core.prototype.setSiteConfig = function(config) {
-  this.siteConfig = config;
+  this.siteConfig = {
+    ...this.siteConfig,
+    loaded: true,
+    error: false,
+    ...config
+  }
 }
 
 // Set core config

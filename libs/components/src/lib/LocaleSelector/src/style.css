@@ -1,6 +1,7 @@
 .locale-selector.p-dropdown.p-component.p-inputwrapper {
   margin-top: -10px;
   border: none;
+  overflow-x: clip;
 }
 
 .locale-selector.p-dropdown.p-dropdown-label {

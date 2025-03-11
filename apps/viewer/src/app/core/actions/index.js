@@ -102,12 +102,14 @@ export function site_load(core, callback) {
         })
         .catch(error => {
           console.log(error);
+          core.setSiteConfig({error: true});
           callback && callback({});
         });
     } catch (error) {
       // Timeouts if the request takes
       // longer than 10 seconds
       console.log(error);
+      core.setSiteConfig({error: true});
       callback && callback({});
     }
   }

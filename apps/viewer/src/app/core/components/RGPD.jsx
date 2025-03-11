@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-//import { useTranslation} from "react-i18next";
+import { useTranslation} from "react-i18next";
+import LoadingScreen from './LoadingScreen';
 import SplashScreen from './SplashScreen';
 import { withCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
@@ -14,13 +15,13 @@ const cookieValue = import.meta.env.VITE_APP_COOKIE_VALUE || '2';
 const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || ''; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
-function RGPD({ cookies, children }) {
+function RGPD({ cookies, core, dispatch, children }) {
 
-  //const { t } = useTranslation();
+  const { i18n } = useTranslation();
 
   const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
 
-  let theme = import.meta.env.VITE_APP_DEFAULT_THEME || 'default';
+  let theme = core?.siteConfig?.theme || import.meta.env.VITE_APP_DEFAULT_THEME || 'default';
 
   function accept() {
     setCookiergpd(cookieValue);
@@ -37,33 +38,49 @@ function RGPD({ cookies, children }) {
 
   const acceptText = i18nUtils.translateValue("accept", "Aceito");
 
+  if (!core?.siteConfig?.loaded) {
+    return (
+      <ThemeSelector theme={theme}>
+        <LoadingScreen />
+      </ThemeSelector>
+    );
+  }
+  
+  if (core?.siteConfig?.rgpd != false) {
+    return (
+      <ThemeSelector theme={theme}>
+        <React.Fragment>
+          { String(cookiergpd || '') !== String(cookieValue || '') && (
+            <SplashScreen core={core} dispatch={dispatch} locale={i18n?.resolvedLanguage}>
+              <CookieConsent
+                location="bottom"
+                buttonText={acceptText}
+                ariaAcceptLabel={acceptText}
+                cookieName={cookieName}
+                cookieValue={cookieValue}
+                expires={cookieExpiresDays}
+                onAccept={accept}
+                extraCookieOptions={{ path: cookiePath }}
+                debug={true}
+                cookieSecurity={false}
+                disableStyles={true}
+              >
+              </CookieConsent>
+            </SplashScreen>
+          ) }
+          
+          { cookiergpd ? children : <></> }
+        </React.Fragment>
+      </ThemeSelector> 
+    );
+  }
+
   return (
     <ThemeSelector theme={theme}>
-      <React.Fragment>
-        { String(cookiergpd || '') !== String(cookieValue || '') && (
-          <SplashScreen>
-            <CookieConsent
-              location="bottom"
-              buttonText={acceptText}
-              ariaAcceptLabel={acceptText}
-              cookieName={cookieName}
-              cookieValue={cookieValue}
-              expires={cookieExpiresDays}
-              onAccept={accept}
-              extraCookieOptions={{ path: cookiePath }}
-              debug={true}
-              cookieSecurity={false}
-              disableStyles={true}
-            >
-            </CookieConsent>
-          </SplashScreen>
-        ) }
-        
-        {/* cookiergpd ? children : <SplashScreen /> */}
-        { cookiergpd ? children : <></> }
-      </React.Fragment>
-    </ThemeSelector> 
+      {children}
+    </ThemeSelector>
   );
+
 } 
 
 export default withCookies(RGPD);

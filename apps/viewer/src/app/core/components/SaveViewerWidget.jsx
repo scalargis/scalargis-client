@@ -91,7 +91,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
         <span className="layout-topbar-item-text">{t("save", "Gravar")}</span>
         <span className="layout-topbar-icon pi pi-save"/>
       </button> :
-        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => openForm()} >
+        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => {e.preventDefault(); openForm();}} >
           <span className="p-menuitem-icon pi pi-save"></span><span className="p-menuitem-text">{t("save", "Gravar")}</span>
         </a> }
 

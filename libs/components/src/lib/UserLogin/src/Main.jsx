@@ -89,7 +89,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               {' '}{ !isMobileSmall ? username : '' }
             </button> : null }
           </span> :
-          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => setShowMenu(!showMenu)}>
+          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => {e.preventDefault(); setShowMenu(!showMenu);}}>
             <span className="p-menuitem-icon pi pi-user"></span><span className="p-menuitem-text">{username}</span>
           </a>
         }
@@ -109,7 +109,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
         <span className="layout-topbar-item-text">{i18nUtils.translateValue("user", "Utilizador")}</span>
         <span className="layout-topbar-icon pi pi-unlock"/>
       </button> :
-      <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => setMode(1)} title={config.tooltip_login || ''} >
+      <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => {e.preventDefault(); setMode(1)}} title={config.tooltip_login || ''} >
         <span className="p-menuitem-icon pi pi-unlock"></span><span className="p-menuitem-text">{i18nUtils.translateValue("login", "Entrar")}</span>
       </a> }
 
