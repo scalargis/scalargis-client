@@ -10,8 +10,8 @@ export default function ThemeSelector(props) {
   if (!theme || theme === 'default') {
     Theme = () => <ThemeDefault />
   } else {
-    Theme = React.lazy(() => import(/* @vite-ignore */`../../themes/${theme}/src/main`).catch(error => 
-      import(/* @vite-ignore */`../../core/themes/${theme}/main`).catch(error => {
+    Theme = React.lazy(() => import(`../../themes/${theme}/src/main.jsx`).catch(error =>
+      import(`../../core/themes/${theme}/main.jsx`).catch(error => {
           console.error("Custom Theme Failed Loading:", error);
           return { default: () => <ThemeDefault /> }
         }
