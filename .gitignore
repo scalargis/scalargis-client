@@ -47,5 +47,4 @@ vite.config.*.timestamp*
 apps/viewer/src/app/components/*
 apps/backoffice/src/app/components/*
 apps/viewer/src/app/themes/*
-!apps/viewer/src/app/themes/default/
 vitest.config.*.timestamp*
