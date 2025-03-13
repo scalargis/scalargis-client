@@ -11,7 +11,7 @@ import OlStyleText from 'ol/style/Text';
 import {all as allStrategy, bbox as bboxStrategy} from 'ol/loadingstrategy';
 
 import AppContext from "../../../AppContext";
-import { isUrlAppOrigin, isUrlAppHostname } from '../../utils';
+import { isUrlAppOrigin, isUrlAppHostname, buildRelativeUrlPath } from '../../utils';
 import { transformExtent, getProjectionSrid, getResolutionForScale } from '../../model/MapModel';
 
 const WFSLayer = ({ config, group, checked, viewer }) => {
@@ -102,6 +102,11 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
         let bbox = config.bbox ? config.bbox.split(' ') : null;
         let bbox_crs = config?.bbox_crs || config?.crs;
         let url = (config.url || '');
+
+        if (!url.toLowerCase().startsWith('http')) {
+          url = window.location.origin + url;
+        };
+
         const params = new URL(url.toLowerCase()).searchParams;
 
         url = url.replace(/&$/ig, '')
