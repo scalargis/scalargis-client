@@ -2,7 +2,7 @@ import Cookies from 'universal-cookie';
 
 import { i18n as i18nUtils } from "@scalargis/components";
 import { loadTranslations } from "../i18n";
-import { isUrlAppOrigin, getAppApiUrl, getAppMapProxyUrl, getCookieAuthName } from "../utils";
+import { isUrlAppOrigin, getAppApiUrl, isUrlAppHostname, getAppMapProxyUrl, getCookieAuthName } from "../utils";
 import { isThemeOnScale as isThemeOnScaleMapModel, transformExtent } from "../model/MapModel";
 import { fetchJson } from "../service/fetch";
 
@@ -1026,11 +1026,25 @@ export function viewer_set_translation_namespaces(ns) {
 }
 
 
-export function getThemeLegendUrl(config) {
+export function getThemeLegendUrl(viewer, config, auth) {
+
   let url = config.legend_url;
+
+  if (!url.toLowerCase().startsWith('http')) {
+    url = window.location.origin + url;
+  };
+
   if (!url && config.type === 'WMS') {
-    url = createLegendUrl(config.url, config.wms_layers || config.layers, config.crs)
+    url = createLegendUrl(config.url, config.wms_layers || config.layers, config.crs, auth);
   } else {
+
+    if (isUrlAppHostname(url) && viewer.integrated_authentication) {
+      if (auth && auth.data && auth.data.auth_token) {
+        const authkey = viewer?.integrated_authentication_key || 'authkey';
+        url += '&' + authkey + '=' + auth?.data.auth_token;
+      }
+    }
+
     if (window.location.protocol === 'https:' && !isUrlAppOrigin(url) && navigator.userAgent.indexOf("Firefox") == -1) {
       const turl = new URL(url);
       if (turl.protocol === 'http:') {
@@ -1042,9 +1056,13 @@ export function getThemeLegendUrl(config) {
 }
 
 // TODO: decide where to put this
-const createLegendUrl = (url, layer, srs = 4326) => {
+const createLegendUrl = (url, layer, srs = 4326, auth) => {
   let finalurl = url;
   finalurl += finalurl.indexOf('?') === -1 ? '?' : '';
+
+  if (!finalurl.toLowerCase().startsWith('http')) {
+    finalurl = window.location.origin + finalurl;
+  };
 
   //console.log('SRS=' + (srs.indexOf(':') === -1 ? 'EPSG:' + srs : srs));
 
@@ -1057,6 +1075,14 @@ const createLegendUrl = (url, layer, srs = 4326) => {
         'CRS=' + (String(srs).indexOf(':') === -1 ? 'EPSG:' + srs : srs),
         'LAYER=' + layer
     ].join('&'));
+
+  //Add user authentication token  
+  if (isUrlAppHostname(finalurl) && viewer.integrated_authentication) {
+    if (auth && auth.data && auth.data.auth_token) {
+      const authkey = viewer?.integrated_authentication_key || 'authkey';
+      finalurl+= '&' + authkey + '=' + auth.data.auth_token;
+    }
+  }
 
   if (window.location.protocol == 'https:' && !isUrlAppOrigin(finalurl) && navigator.userAgent.indexOf("Firefox") == -1) {
     const turl = new URL(finalurl);

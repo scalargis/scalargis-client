@@ -428,7 +428,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
   return (
     <div style={{padding: "10px 10px"}}>
-      { showLegend && <div className="p-mb-2"><Legend data={theme} core={core} actions={actions} models={Models}/></div> }
+      { showLegend && <div className="p-mb-2"><Legend viewer={viewer} data={theme} core={core} actions={actions} models={Models}/></div> }
       <div className="p-text-center p-mb-3">
         <Dropdown value={currentPos} options={options} filter={options?.length > 20}
           onChange={(e) => { setCurrentPos(e.value) }} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" />

@@ -133,6 +133,14 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
 
     // Set legend URL
     let legendUrl = createLegendUrl(config.url, config.wms_layers || config.layers, config.crs)
+    //Add user authentication token  
+    if (isUrlAppHostname(legendUrl) && viewer.integrated_authentication) {
+      if (auth && auth.data && auth.data.auth_token) {
+        const authkey = viewer?.integrated_authentication_key || 'authkey';
+        legendUrl += '&' + authkey + '=' + auth.data.auth_token;
+      }
+    }
+
     if (proxy_requests) {
       legendUrl = MAP_PROXY + encodeURIComponent(legendUrl);
     }

@@ -208,7 +208,7 @@ class Node extends React.Component {
                     {!!data.description &&
                       <div className="theme-description" dangerouslySetInnerHTML={{ __html: data.description }}></div>
                     }
-                    <Legend data={data} core={core} actions={actions} models={config.Models} />
+                    <Legend viewer={config.viewer} data={data} core={core} actions={actions} models={config.Models} />
                   </div>
                 </React.Fragment>
               ) : null}

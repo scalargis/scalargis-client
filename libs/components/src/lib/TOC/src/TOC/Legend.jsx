@@ -1,7 +1,7 @@
 import React from 'react'
 import LegendArcGIS from './LegendArcGIS';
 
-export default function Legend({ data, core, actions, models }) {
+export default function Legend({ viewer, data, core, actions, models }) {
 
   const type = data.legend_type || 'image';
   const label = data.legend_label || 'Legenda';
@@ -14,12 +14,14 @@ export default function Legend({ data, core, actions, models }) {
   // Validate legend
   if (!data.legend_url) return null;
 
+  const auth = core.store.getState()['root'].auth;
+
   // Render legend link
   if (type === 'link') return (
     <div className="legend-container">
       <a target="_blank" title="Clique para abrir num separador"
         rel="noopener noreferrer"
-        href={actions.getThemeLegendUrl(data)}>
+        href={actions.getThemeLegendUrl(viewer, data, auth)}>
         { label }
       </a>
     </div>
@@ -30,8 +32,8 @@ export default function Legend({ data, core, actions, models }) {
     <div className="legend-container">
       <a target="_blank" title="Clique para abrir num separador"
         rel="noopener noreferrer"
-        href={actions.getThemeLegendUrl(data)}>
-        <img src={actions.getThemeLegendUrl(data)} alt='' />
+        href={actions.getThemeLegendUrl(viewer, data, auth)}>
+        <img src={actions.getThemeLegendUrl(viewer, data, auth)} alt='' />
       </a>
     </div>
   )
