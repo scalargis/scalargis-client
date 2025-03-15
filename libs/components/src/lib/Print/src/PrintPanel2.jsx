@@ -335,7 +335,7 @@ export default function PrintPanel2(props) {
           icon={opt.icon}
           label={ opt.label ? opt.label : ''}
           tooltip={t(opt.title, opt.defaultTitle)}
-          className={"p-button-sm mr-2 tool" + (opt.value === drawTool ? " active" : "") }
+          className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "") }
           onClick={(e) => selectDrawTool(e, opt.value) }
         />
       )}     
@@ -347,13 +347,13 @@ export default function PrintPanel2(props) {
         <Button 
           icon="pi pi-trash"
           tooltip={t("deleteSelectedElment", "Eliminar elemento selecionado")}
-          className="p-button-sm mr-2 tool"
+          className="p-button-sm mr-1 tool"
           onClick={(e) => deletedSelectedFeature() }
         />
         <Button 
           icon="fas fa-search-plus"
           tooltip={t("viewAllElements", "Ver todos os elementos")}
-          className="p-button-sm mr-2 tool"
+          className="p-button-sm mr-1 tool"
           onClick={(e) => zoomFeaturesExtent() }
         />        
     </React.Fragment>
@@ -368,10 +368,10 @@ export default function PrintPanel2(props) {
       {(printGroup.allow_drawing !== false) && <div className="p-fluid">
         <h4>{t("locationMarking", "Marcação do Local")}</h4>
         <div>
-          <Toolbar left={toolbarLeftContents} right={toolbarRightContents} />
+          <Toolbar start={toolbarLeftContents} end={toolbarRightContents} className="pl-2 pr-2" />
         </div>
         { printGroup.location_marking && 
-          <Message severity={ geometryError === true ? "error" : "info" } text={t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")} />
+          <Message severity={ geometryError === true ? "error" : "info" } className="mt-2" text={t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")} />
         }
       </div>}
 
