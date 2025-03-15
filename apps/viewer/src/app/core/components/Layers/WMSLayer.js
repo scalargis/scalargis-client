@@ -141,6 +141,11 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
       }
     }
 
+    //Set print override
+    if (t && config.print) {
+      t.set("print", config.print);
+    }
+
     if (proxy_requests) {
       legendUrl = MAP_PROXY + encodeURIComponent(legendUrl);
     }
