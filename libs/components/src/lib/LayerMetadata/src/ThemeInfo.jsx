@@ -45,7 +45,7 @@ class ThemeInfo extends React.Component {
         { theme.description ?
         <div className="field grid">
             <div className="col-4">{i18next.t("description", "Descrição")}</div>
-            <div className="col-8">{theme.description}</div>
+            <div className="col-8" dangerouslySetInnerHTML={{ __html: theme.description }}></div>
         </div> : null }
         { (theme.metadata && theme.metadata.url) ?
         <div className="field grid">
