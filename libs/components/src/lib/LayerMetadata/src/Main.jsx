@@ -10,7 +10,7 @@ import ThemeInfo from './ThemeInfo';
 export default function Main({ core, config }) {
 
   const { layer, viewer, mainMap, actions, models } = config;
-  const { getWindowSize, showOnPortal } = models.Utils;  
+  const { getWindowSize, showOnPortal, isComponentExcludedForLayer } = models.Utils;  
 
   const { t } = useTranslation(["common", "custom"]);
 
@@ -19,8 +19,9 @@ export default function Main({ core, config }) {
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  // Use layers.exclude_components prop to exclude component
-  if (layer && layer.exclude_components && layer.exclude_components.includes('LayerMetadata')) return null;  
+  const exclude = isComponentExcludedForLayer(viewer, layer, "LayerMetadata");
+
+  if (exclude) return null;
 
   return (
     <React.Fragment>
