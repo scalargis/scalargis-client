@@ -219,7 +219,8 @@ body .p-dropdown {
 .layout-footer {
   height: 35px;
   padding: 0.4em 0.3em;
-  padding-left: 1em; 
+  padding-left: 1em;
+  align-content: center;
 }
 
 .layout-footer .footer-left {
@@ -270,7 +271,7 @@ body .p-dropdown {
   display: flex;
   right: 3px;
   animation-duration: .5s;
-  margin-top: -3px;
+  margin-top: -8px;
   max-width: 660px;
 }
 
