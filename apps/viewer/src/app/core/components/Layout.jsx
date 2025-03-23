@@ -105,11 +105,11 @@ function Layout(props) {
     </div> : null
 
   const entityInfoComponent = <React.Fragment>
-    { (showEntityInfo && entityName) && (
+    { (showEntityInfo && entityName) ? (
       entityUrl ? 
       <span className={ viewer?.config_json?.entity_info_hidden_mobile === true ? "footer-text footer-text-hidden-mobile" : "footer-text"}>&copy; {copyrightYear} <a href={entityUrl} target="_blank" rel="noopener noreferrer" title={entityName}>{size[0] > 870 ? entityName : entityNameShort}</a></span>  
       : <span className={ viewer?.config_json?.entity_info_hidden_mobile === true ? "footer-text footer-text-hidden-mobile" : "footer-text"}>&copy; {copyrightYear} {size[0] > 870 ? entityName : entityNameShort}</span>
-    )}
+    ) : <span>&nbsp;</span>}
   </React.Fragment>
 
 
