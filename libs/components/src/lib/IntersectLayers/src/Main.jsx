@@ -16,7 +16,9 @@ export function MainMenu({ className, config, actions, record }) {
 
   const { viewer, mainMap, dispatch } = config;
 
-  const title = record?.title || "Interseção de Temas"	
+  const t = i18n.translateValue
+
+  const title = t(record?.title || "Interseção de Temas", record?.title || "Interseção de Temas");
 
   if (record && record.target === 'mainmenu') {
 
@@ -36,7 +38,7 @@ export function MainMenu({ className, config, actions, record }) {
           <Button
             title={title}
             className={className}
-            icon="pi pi-book"
+            icon={record?.config_json?.btn_icon ? record.config_json.btn_icon : "pi pi-objects-column"}
             onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
           />         
       )

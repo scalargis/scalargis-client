@@ -343,7 +343,7 @@ export default function IntersectForm(props) {
       </div>
 
       <div className="p-fluid mt-3">
-        <div class="field">
+        <div className="field">
             <label htmlFor="buffer">{`${t("areaOfInfluence", "Área de influência")} (${t("meters", "Metros").toLowerCase()})`}</label>
             <InputNumber id="buffer"  value={buffer} onValueChange={(e) => setBuffer(e.value)} useGrouping={false} />
         </div>

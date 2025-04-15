@@ -20,6 +20,7 @@
     "convert": "^5.5.1",
     "fig-tree-evaluator": "^2.18.1",
     "file-saver": "^2.0.5",
+    "handlebars": "^4.7.8",
     "i18next": "^23.16.4",
     "i18next-browser-languagedetector": "^8.0.0",
     "jsts": "^2.11.3",
