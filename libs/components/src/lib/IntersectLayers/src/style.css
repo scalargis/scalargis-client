@@ -1,0 +1,34 @@
+/*----*/
+
+.sg-intersect-layers .p-panel-content .p-toolbar button.tool.active {
+    background-color: #004175;
+}
+
+.sg-intersect-layers .p-panel-content h4 {
+    border-bottom: #9e9d9e;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    padding-bottom: 10px;
+    padding-right: 30px;
+    margin-bottom: 5px;
+}
+
+.sg-intersect-layers .p-panel-content .p-card-body {
+    padding: 0.5rem 1rem;
+}
+
+.sg-intersect-layers .p-panel-content .p-card-content {
+    padding: 0.5rem 0;
+}
+
+.sg-intersect-layers .sg-intersect-results-table .p-datatable-header {
+    padding: 0.2rem 0;
+}
+
+.sg-intersect-layers .sg-intersect-results-table .p-datatable-table .p-datatable-thead tr th,
+.sg-intersect-layers .sg-intersect-results-table .p-datatable-table .p-datatable-tbody tr td {
+    padding: 0.2rem;
+    padding-right: 0.3rem;
+}
+
+

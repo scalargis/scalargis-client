@@ -313,5 +313,14 @@
   "noAccount": "Don't have an account?",
   "registerHere": "Register here!",
   "forgotPassword": "Forgot your password?",
-  "noMatchingPasswords": "Passwords do not match"
+  "noMatchingPasswords": "Passwords do not match",
+
+  "showIntersectionGeometry": "Afficher la géométrie d'intersection",
+  "execute": "Exécuter",
+  "analyse": "Analyser",
+  "areaOfInfluence": "Zone d'influence",
+  "meters": "Mètres",
+  "showAll": "Afficher tout",
+  "results": "Résultats",
+  "geometryRequiredMsg": "La géométrie est requise"
 }

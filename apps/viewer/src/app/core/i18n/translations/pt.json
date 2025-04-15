@@ -313,5 +313,14 @@
   "noAccount": "Não tem uma conta?",
   "registerHere": "Registe-se aqui!",
   "forgotPassword": "Esqueceu-se da password?",
-  "noMatchingPasswords": "As passwords introduzidas não são iguais"
+  "noMatchingPasswords": "As passwords introduzidas não são iguais",
+
+  "showIntersectionGeometry": "Ver geometria de confrontação",
+  "execute": "Executar",
+  "analyse": "Analisar",
+  "areaOfInfluence": "Área de influência",
+  "meters": "Metros",
+  "showAll": "Ver todos",
+  "results": "Resultados",
+  "geometryRequiredMsg": "É obrigatório definir a geometria"
 }

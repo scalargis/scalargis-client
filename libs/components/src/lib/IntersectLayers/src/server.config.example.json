@@ -1,0 +1,84 @@
+{
+	"layers": [
+		{
+			"schema": "pdm",
+			"table": "ord_areas",
+			"geom_field": "geom",
+			"title": "Ordenamento - areas",
+			"group": "Ordenamento",
+			"fields": [
+				{
+					"field": "designacao",
+					"alias": "Classe"
+				},
+				{
+					"field": "tema_o",
+					"alias": "Tema"
+				},
+				{
+					"field": "subtema_o",
+					"alias": "Sub-tema"
+				}
+			],
+			"results":[]
+		},
+		{
+			"schema": "pdm",
+			"table": "ord_linhas",
+			"geom_field": "geom",
+			"title": "Ordenamento - linhas",
+			"group": "Ordenamento",
+			"fields": [
+				{
+					"field": "designacao",
+					"alias": "Classe"
+				},
+				{
+					"field": "tema_o",
+					"alias": "Tema"
+				},
+				{
+					"field": "subtema_o",
+					"alias": "Sub-tema"
+				}
+			],
+			"results":[]
+		},
+		{
+			"schema": "pdm",
+			"table": "ord_pnts",
+			"geom_field": "geom",
+			"title": "Ordenamento - pontos",
+			"group": "Ordenamento",
+			"fields": [
+				{
+					"field": "designacao",
+					"alias": "Classe"
+				},
+				{
+					"field": "tema_o",
+					"alias": "Tema"
+				},
+				{
+					"field": "subtema_o",
+					"alias": "Sub-tema"
+				}
+			],
+			"results":[]
+		},
+		{
+			"schema": "pdm",
+			"table": "proposta_de_ran",
+			"geom_field": "geom",
+			"title": "RAN",
+			"group": "Reserva Agrícola Nacional (RAN)",
+			"fields": [
+				{
+					"field": "origem",
+					"alias": "Origem"
+				}
+			],
+			"results":[]
+		}
+	]
+}

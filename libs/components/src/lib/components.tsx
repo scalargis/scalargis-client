@@ -37,6 +37,7 @@ import Legend from './TOC/src/TOC/Legend'
 import * as Timeline from './Timeline/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
 import * as URLparams from './URLparams/src/Main'
+import * as IntersectLayers from './IntersectLayers/src/Main'
 
 import ProgressControl from './ProgressControl'
 
@@ -95,6 +96,7 @@ export {
   Timeline,
   DocumentBrowser,
   DocumentList,
+  IntersectLayers,
 
   Legend,
 

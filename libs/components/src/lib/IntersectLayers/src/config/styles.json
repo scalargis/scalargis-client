@@ -1,0 +1,53 @@
+{
+    "input": [
+      {
+        "filter": ["==", ["get", "_type"], "input"],
+        "style": {
+          "stroke-color": "orange",
+          "stroke-width": 2,
+          "circle-radius": 5,
+          "circle-fill-color": "orange",
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 2
+        }
+      }
+    ],
+    "output": [
+      {
+        "filter": ["==", ["get", "_type"], "output"],
+        "style": {
+          "stroke-color": "red",
+          "stroke-width": 2,
+          "circle-radius": 5,
+          "circle-fill-color": "red",
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 2
+        }
+      }
+    ],
+    "results": [
+      {
+        "filter": ["==", ["get", "_type"], "results"],
+        "style": {
+          "fill-color": "rgba(0, 255, 0, 0.5)",
+          "stroke-color": "green",
+          "stroke-width": 2,
+          "circle-radius": 5,
+          "circle-fill-color": "green",
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 2
+        }
+      }
+    ],
+    "default": {
+      "else": true,
+      "style": {
+        "stroke-color": "cyan",
+        "stroke-width": 2,
+        "circle-radius": 5,
+        "circle-fill-color": "cyan",
+        "circle-stroke-color": "white",
+        "circle-stroke-width": 2
+      }
+    }
+  }

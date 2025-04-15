@@ -1,0 +1,75 @@
+{
+    "id": "IntersectLayers",
+    "type": "IntersectLayers",
+    "target": "mainmenu",
+    "title": "Interseção de Temas",
+    "config_json": {
+      "header": {
+        "pt": "Confrontação do PDM",
+        "en": "sdfsdfsd",
+        "fr": "ddddd",
+        "default": "sss"
+      },
+      "btn_icon": "pi pi-table",
+      "config_id": "teste_intersect",
+      "apiUrl": "/spatial_toolbox/api/intersect",
+      "content": {
+        "title": {
+          "pt": "testettt",
+          "en": "dsddd",
+          "default": "stetetetetetet"
+        },
+        "description": {
+          "pt": "<div>Esta ferramenta permite fazer a confrontação com os temas do Plano Diretor Municipal e obter um relatório das classes de espacço e condicionantes que existentes na área definida pelo utilizador</div>",
+          "en": "<div>Hello! Esta ferramenta permite fazer a confrontação com os temas do Plano Diretor Municipal e obter um relatório das classes de espacço e condicionantes que existentes na área definida pelo utilizador</div>",
+          "default": "Hellho"
+        }
+      },
+      "drawTools": [
+        "Point",
+        "LineString",
+        "Polygon",
+        "Select",
+        "Modify"
+      ],
+      "showExport": false,
+      "showResultGeometries": false,
+      "showResultArea": false,
+      "showResultPercentage": false,
+      "exportFormats": [
+        "xls",
+        "csv",
+        "pdf"
+      ],
+      "export": {
+        "pdf": { 
+          "apiUrl": "/spatial_toolbox/api/intersect/export"
+        }
+      },
+      "styles": {
+        "output": {
+          "filter": ["==", ["get", "_type"], "output"],
+          "style": {
+            "stroke-color": "magenta",
+            "stroke-width": 9,
+            "circle-radius": 5,
+            "circle-fill-color": "magenta",
+            "circle-stroke-color": "white",
+            "circle-stroke-width": 2
+          }
+        },
+        "results": [{
+          "filter": ["all", ["==", ["get", "_type"], "results"], ["==", ["get", "subtema_o"], "Rede elétrica"]],
+          "style": {
+            "fill-color": "rgba(0, 0, 255, 0.5)",
+            "stroke-color": "blue",
+            "stroke-width": 6,
+            "circle-radius": 5,
+            "circle-fill-color": "blue",
+            "circle-stroke-color": "white",
+            "circle-stroke-width": 2
+          }
+        }]
+      }
+    }
+  }
