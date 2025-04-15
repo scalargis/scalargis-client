@@ -3,17 +3,16 @@ import { fetchJson } from './fetch';
 const provider = (apiUrl, httpClient = fetchJson) => ({
 
     getSimpleList: (resource) => {
-        const url = `${apiUrl}/${resource}`;
+        const url = resource ? `${apiUrl}/${resource}` : `${apiUrl}`;
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json
         }));
     },
 
     getSimple: (resource, params) => {
-        //const url = `${apiUrl}/${resource}?${stringify(params)}`;
         const parsed = new URLSearchParams(params);
         const qstring = parsed.toString();
-        const url = `${apiUrl}/${resource}?${qstring}`;
+        const url = resource ? `${apiUrl}/${resource}?${qstring}` : `${apiUrl}?${qstring}`;
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json
         }));
@@ -29,31 +28,29 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
             per_page: perPage,
             filter: JSON.stringify(params.filter),
         };
-        //const url = `${apiUrl}/${resource}?${stringify(query)}`;
         const parsed = new URLSearchParams(query);
         const qstring = parsed.toString();
-        const url = `${apiUrl}/${resource}?${qstring}`;
-
+        const url = resource ? `${apiUrl}/${resource}?${qstring}` : `${apiUrl}?${qstring}`;
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json,
-            //total: parseInt(headers.get('content-range').split('/').pop(), 10),
             total: json.total != null ? json.total : json.length || 0
         }));
     },
 
-    getOne: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`).then(({ json }) => ({
+    getOne: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.id}` : `${apiUrl}/${params.id}`;
+        return httpClient(url).then(({ json }) => ({
             data: json,
-        })),
+        }));
+    },
 
     getMany: (resource, params) => {
         const query = {
             filter: JSON.stringify({ id: params.ids }),
         };
-        //const url = `${apiUrl}/${resource}?${stringify(query)}`;
         const parsed = new URLSearchParams(query);
         const qstring = parsed.toString();
-        const url = `${apiUrl}/${resource}?${qstring}`;
+        const url = resource ? `${apiUrl}/${resource}?${qstring}` : `${apiUrl}?${qstring}`;
         return httpClient(url).then(({ json }) => ({
             data: json.items || json,
             total: json.total != null ? json.total : json.length || 0
@@ -73,22 +70,22 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
                 [params.target]: params.id,
             }),
         };
-        //const url = `${apiUrl}/${resource}?${stringify(query)}`;
         const parsed = new URLSearchParams(query);
         const qstring = parsed.toString();
-        const url = `${apiUrl}/${resource}?${qstring}`;
+        const url = resource ? `${apiUrl}/${resource}?${qstring}` : `${apiUrl}?${qstring}`;
         return httpClient(url).then(({ headers, json }) => ({
             data: json.items || json,
-            //total: parseInt(headers.get('content-range').split('/').pop(), 10),
             total: json.total != null ? json.total : json.length || 0
         }));
     },
 
-    update: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`, {
+    update: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.id}` : `${apiUrl}/${params.id}`;
+        return httpClient(url, {
             method: 'PUT',
             body: JSON.stringify(params.data),
-        }).then(({ json }) => ({ data: json })),
+        }).then(({ json }) => ({ data: json }))
+    },
 
     updateMany: (resource, params) => {
         const query = {
@@ -96,45 +93,47 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
         };
         const parsed = new URLSearchParams(query);
         const qstring = parsed.toString();
-        const url = `${apiUrl}/${resource}?${qstring}`;
-        //return httpClient(`${apiUrl}/${resource}?${stringify(query)}`, {
-            return httpClient(url, {
+        const url = resource ? `${apiUrl}/${resource}?${qstring}` : `${apiUrl}?${qstring}`;
+        return httpClient(url, {
             method: 'PUT',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({ data: json }));
     },
 
 
-    submit: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}`, {
+    submit: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}` : `${apiUrl}`;
+        return httpClient(url, {
             method: 'POST',
             body: JSON.stringify(params.data),
-        }).then(({ json }) => ({ data: json })),
+        }).then(({ json }) => ({ data: json }))
+    },
 
 
-    create: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}`, {
+    create: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}` : `${apiUrl}`;
+        return httpClient(url, {
             method: 'POST',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({
             data: { ...params.data, id: json.id },
-        })),
-
-    // delete: (resource, params) =>
-    //     httpClient(`${apiUrl}/${resource}/${params.id}`, {
-    //         method: 'DELETE',
-    //     }).then(({ json }) => ({ data: json })),
+        }))
+    },
 
     
-    delete: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`, {
+    delete: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.id}` : `${apiUrl}/${params.id}`;
+        return httpClient(url, {
             method: 'DELETE',
-        }).then(({ json }) => ({ data: { "id": params.id } })),
+        }).then(({ json }) => ({ data: { "id": params.id } }))
+    },
 
-    deleteFullResp: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`, {
+    deleteFullResp: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.id}` : `${apiUrl}/${params.id}`;
+        return httpClient(url, {
             method: 'DELETE',
-        }).then(({ json }) => ({ data: json })),
+        }).then(({ json }) => ({ data: json }))
+    },
     
     deleteMany: (resource, params) => {
         const query = {
@@ -142,53 +141,66 @@ const provider = (apiUrl, httpClient = fetchJson) => ({
         };
         const parsed = new URLSearchParams(query);
         const qstring = parsed.toString();
-        const url = `${apiUrl}/${resource}?${qstring}`;
-        //return httpClient(`${apiUrl}/${resource}?${stringify(query)}`, {
+        const url = resource ? `${apiUrl}/${resource}?${qstring}` : `${apiUrl}?${qstring}`;
         return httpClient(url, {
             method: 'DELETE',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({ data: json }));
     },
 
-    getGeometry: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.feature_id}/geometry`).then(({ json }) => ({
+    getGeometry: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.feature_id}/geometry` : `${apiUrl}/${params.feature_id}/geometry`;
+        return httpClient(url).then(({ json }) => ({
             data: json,
-        })),
+        }));
+    },
 
-    saveGeometry: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.feature_id}/geometry`, {
+    saveGeometry: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.feature_id}/geometry` : `${apiUrl}/${params.feature_id}/geometry`;
+        return httpClient(url, {
             method: 'POST',
             body: JSON.stringify(params.data),
         }).then(({ json }) => ({
             data: { ...params.data, id: json.id },
-        })),
+        }));
+    },
 
-    getDocuments: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.resource_id}/docs`).then(({ json }) => ({
+    getDocuments: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.resource_id}/docs` : `${apiUrl}/${params.resource_id}/docs`;
+        return httpClient(url).then(({ json }) => ({
             data: json,
-        })),
+        }));
+    },
 
-    getDocument: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/docs/${params.id}`).then(({ json }) => ({
+    getDocument: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/docs/${params.id}` : `${apiUrl}/docs/${params.id}`;
+        return httpClient(url).then(({ json }) => ({
             data: json,
-        })),
+        }));
+    },
 
-    createDocument: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.resource_id}/docs`, {
+    createDocument: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/${params.resource_id}/docs` : `${apiUrl}/${params.resource_id}/docs`;
+        return httpClient(url, {
             method: 'POST',
             body: JSON.stringify(params.data),
-        }).then(({ json }) => ({ data: json })),
+        }).then(({ json }) => ({ data: json }))
+    },
 
-    updateDocument: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/docs/${params.id}`, {
+    updateDocument: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/docs/${params.id}` : `${apiUrl}/docs/${params.id}`;
+        return httpClient(url, {
             method: 'PUT',
             body: JSON.stringify(params.data),
-        }).then(({ json }) => ({ data: json })),
+        }).then(({ json }) => ({ data: json }))
+    },
 
-    deleteDocument: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/docs/${params.id}`, {
+    deleteDocument: (resource, params) => {
+        const url = resource ? `${apiUrl}/${resource}/docs/${params.id}` : `${apiUrl}/docs/${params.id}`;
+        return httpClient(url, {
             method: 'DELETE',
-        }).then(({ json }) => ({ data: { "id": params.id } })),
+        }).then(({ json }) => ({ data: { "id": params.id } }))
+    },
 });
 
 
