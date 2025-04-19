@@ -322,5 +322,6 @@
   "meters": "Meters",
   "showAll": "Show all",
   "results": "Results",
-  "geometryRequiredMsg": "Geometry is required"
+  "geometryRequiredMsg": "Geometry is required",
+  "geometryMaxAreaMsg": "Geometry exceeds the maximum area allowed: : {{maxArea}}"
 }

@@ -11,6 +11,18 @@ import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
 import { singleClick } from "ol/events/condition";
 import Collection from 'ol/Collection.js';
+import {
+  LineString,
+  LinearRing,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon,
+  GeometryCollection
+} from 'ol/geom';
+import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser';
+import {BufferOp} from 'jsts/org/locationtech/jts/operation/buffer';
 
 import { i18n } from '@scalargis/components';
 
@@ -170,18 +182,63 @@ export default function IntersectForm(props) {
       return;
     }
 
+    const parser = new OL3Parser();
+    parser.inject(
+      Point, 
+      LineString, 
+      LinearRing, 
+      Polygon, 
+      MultiPoint, 
+      MultiLineString, 
+      MultiPolygon, 
+      GeometryCollection
+    );
+
     const geomsWKT = [];
+    let isValid = true;
     geometryCol.current.forEach((f) => {
+      let geom = f.getGeometry().clone();
+
+      if (intersectConfig?.maxArea && (geom.getType().toLowerCase().includes('polygon') || buffer )) {
+        let area;
+
+        if (geom.getType().toLowerCase().includes('polygon')) {
+          area = geom.getArea();
+        }
+        
+        if (intersectConfig.dataSrid) {
+          geom = geom.transform(mainMap.getView().getProjection().getCode(), `EPSG:${intersectConfig.dataSrid}`);
+          area = geom.getArea();
+        }
+
+        if (buffer > 0) {
+          // convert the OpenLayers geometry to a JSTS geometry
+          const jstsGeom = parser.read(geom);
+          const jstsBuffer = BufferOp.bufferOp(jstsGeom, buffer);
+          geom = parser.write(jstsBuffer);
+          area = geom.getArea();
+        }
+
+        if (area > intersectConfig.maxArea) {
+          isValid = false;
+        }
+      }
+
       geomsWKT.push(Models.MapModel.getWKTFromGeometry(f.getGeometry().clone().transform(mainMap.getView().getProjection().getCode(), outProj)));
     });
+
+    if (!isValid) {
+      const msg = t("geometryMaxAreaMsg", "A geometria não pode ultrapassar a área máxima permitida: {{maxArea}}", undefined, undefined, undefined, { maxArea: `${intersectConfig.maxArea} m².` });
+      toastDialog.current.show({ severity: 'warn', summary: t("error", "Error"), detail: msg });
+      return
+    }
 
     const data = {
       'code': intersectConfig?.config_id || null,
       'geom_wkt': geomsWKT.join(';'),
       'geom_srid': getProjectionSrid(outProj),
       'buffer': buffer,
-      //'buffer_srid': getProjectionSrid(mainMap.getView().getProjection()),
-      'buffer_srid': intersectConfig?.bufferSrid ? intersectConfig?.bufferSrid : getProjectionSrid(mainMap.getView().getProjection()),
+      'buffer_srid': intersectConfig?.dataSrid ? intersectConfig?.dataSrid : getProjectionSrid(mainMap.getView().getProjection()),
       'out_srid': getProjectionSrid(outProj)
     };
 
@@ -339,21 +396,21 @@ export default function IntersectForm(props) {
         <div>
           <Toolbar start={toolbarLeftContents} end={toolbarRightContents} className="px-1 py-2" />
         </div>
-        <Message className="mt-2" severity={ geometryError === true ? "warn" : "info" } text={t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")} />
+        <Message className="mt-2" severity={ geometryError === true ? "warn" : "info" } text={`${t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")}.`} />
       </div>
 
-      <div className="p-fluid mt-3">
+      { intersectConfig?.bufferOption !== false && <div className="p-fluid mt-3">
         <div className="field">
             <label htmlFor="buffer">{`${t("areaOfInfluence", "Área de influência")} (${t("meters", "Metros").toLowerCase()})`}</label>
             <InputNumber id="buffer"  value={buffer} onValueChange={(e) => setBuffer(e.value)} useGrouping={false} />
         </div>
-      </div>
+      </div> }
 
       <div className="text-center mt-1">
         
       </div>
 
-      <div className="grid">
+      <div className="grid mt-2">
         <div className="col text-center">
           <Button label={t("clear", "Limpar")} className="p-button-secondary" onClick={(e) => clearAll([])} />
         </div>
@@ -370,6 +427,7 @@ export default function IntersectForm(props) {
           intersectLayer={intersectLayer}
           searchParams={searchParams}
           results={results}
+          groupResults={intersectConfig?.groupResults || false}
           showGeometry={showGeometry}
           setShowGeometry={setShowGeometry}
         /> :

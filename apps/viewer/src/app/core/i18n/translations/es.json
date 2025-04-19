@@ -322,5 +322,6 @@
   "meters": "Metros",
   "showAll": "Mostrar todos",
   "results": "Resultados",
-  "geometryRequiredMsg": "Geometría requerida"
+  "geometryRequiredMsg": "Geometría requerida",
+  "geometryMaxAreaMsg": "Área máxima de geometría excedida:  {{maxArea}}"
 }

@@ -322,5 +322,6 @@
   "meters": "Metros",
   "showAll": "Ver todos",
   "results": "Resultados",
-  "geometryRequiredMsg": "É obrigatório definir a geometria"
+  "geometryRequiredMsg": "É obrigatório definir a geometria",
+  "geometryMaxAreaMsg": "A geometria não pode ultrapassar a área máxima permitida: {{maxArea}}"
 }

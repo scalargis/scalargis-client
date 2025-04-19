@@ -32,6 +32,10 @@
         "Select",
         "Modify"
       ],
+      "bufferOption": true,
+      "maxArea": 1000,
+      "groupResults": true,
+      "dataSrid": 3763,
       "showExport": false,
       "showResultGeometries": false,
       "showResultArea": false,

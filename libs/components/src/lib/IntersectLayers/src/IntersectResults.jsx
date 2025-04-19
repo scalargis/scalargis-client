@@ -12,7 +12,7 @@ import { i18n } from '@scalargis/components';
 
 export default function IntersectForm(props) {
 
-    const { mainMap, componentId, intersectConfig, intersectLayer, searchParams, results } = props;
+    const { mainMap, componentId, intersectConfig, intersectLayer, searchParams, results, groupResults } = props;
 
     const [showGeometry, setShowGeometry] = useState(false);
     const [items, setItems] = useState([]);
@@ -23,31 +23,58 @@ export default function IntersectForm(props) {
     const t = i18n.translateValue;
 
     const fileFormats = {
-        "xls": {
-            "icon": "pi-file-excel",
-        },
-        "csv": {
-            "icon": "pi-file",
-        },
-        "pdf": {
-            "icon": "pi-file-pdf",
-        }
+        "xls": {"icon": "pi-file-excel"},
+        "csv": {"icon": "pi-file"},
+        "pdf": {"icon": "pi-file-pdf"}
     }
     const exportFormats = intersectConfig?.exportFormats?.length ? intersectConfig.exportFormats.map(f => f.toLowerCase()) : ['xls', 'csv', 'pdf'];
 
-    useEffect(() => {
-        const new_data = results?.layers?.map( (l, index) => {
-            return {
-                key: String(index),
-                ...l
+    const groupResultsData = (results) => {
+        const groups = {};
+        results?.layers?.forEach((l, index) => {
+            const group = l.group;
+            if (!groups[l.group]) {
+                groups[l.group] = {
+                    key: String(index),
+                    group: group,
+                    title: group,
+                    results: []
+                }
             }
+            const results = l.results || [];
+            results.forEach((r, index) => {
+                groups[group].results.push(
+                    {
+                        key: String(index),
+                        fields: l.fields,
+                        ...r
+                    }
+                )
+            });
         });
+        return Object.keys(groups).map((key) => groups[key]);
+    }
+
+    useEffect(() => {
+
+        let new_data = [];
+
+        if (groupResults) {
+            new_data = groupResultsData(results);
+        } else {
+            new_data = results?.layers?.map( (l, index) => {
+                return {
+                    key: String(index),
+                    ...l
+                }
+            });
+        }
         setItems(new_data);
 
         setSelectedRows({});
         setSelectAll({});
         setShowGeometry(false);
-    }, [results]);
+    }, [results, groupResults]);
 
     useEffect(() => {
         if (!items?.length) return;
@@ -121,9 +148,7 @@ export default function IntersectForm(props) {
 
     const expandAll = () => {
         let _expandedRows = {};
-
-        items.forEach((p) => (_expandedRows[`${p.table}`] = true));
-
+        items.forEach((p) => (_expandedRows[`${p.key}`] = true));
         setExpandedRows(_expandedRows);
     };
 
@@ -161,13 +186,19 @@ export default function IntersectForm(props) {
 
     const recordBodyTemplate = (rowData, cfg) => {
         const precision = cfg?.precision || 100;
+
+        const fields = rowData?.fields || cfg?.fields || [];
+
         return (
             <table>
-                { cfg?.fields?.length ? cfg.fields.map( (col, index) => { return (
-                    <tr key={index}>
-                        <td><span className='font-bold'>{`${col.alias}: `}</span>{rowData[col.field]}</td>
-                    </tr>
-                )}) : null }
+                { fields?.length ? fields.map( (col, index) => {
+                    const _title = col?.title ? t(col.title, col.title) : col.alias
+                    return (
+                        <tr key={index}>
+                            <td><span className='font-bold'>{`${_title}: `}</span>{rowData[col.field]}</td>
+                        </tr>
+                    )
+                }) : null }
                 { (rowData?.geom + '').toUpperCase().indexOf('POLYGON') > -1 &&
                 <>
                     { intersectConfig?.showResultArea !== false ?
@@ -185,13 +216,19 @@ export default function IntersectForm(props) {
     };
 
     const itemBodyTemplate = (rowData) => {
-        return <label className='font-bold'>{rowData.title}</label>;
+        let title = rowData?.title || rowData?.group;
+        if (results?.groups?.length) {
+            const _group = results.groups.find((g) => g.name === rowData?.group);
+            if (_group?.title) {
+                //title = t(_group.title, title);
+                title = t(_group.title || title, _group.title || title);
+            }
+        }
+        return <label className='font-bold'>{title}</label>;
     };
 
     const rowExpansionTemplate = (data) => {
-
         let header = null;
-
         if (data?.results?.length > 1) {
             header = (
                 <div className="flex justify-content-end mt-2 mr-2 font-normal">
@@ -204,7 +241,7 @@ export default function IntersectForm(props) {
         if (intersectConfig?.showResultGeometries === false) {
             return (
                 <DataTable value={data.results} className='sg-intersect-results-table'>
-                    <Column header="Ver todos" body={(rowData) => recordBodyTemplate(rowData, {...data})} headerStyle={{ display: 'none' }}></Column>
+                    <Column header="Ver todos" body={(rowData) => recordBodyTemplate(rowData, { fields: data?.fields})} headerStyle={{ display: 'none' }}></Column>
                 </DataTable>
             );
         }
@@ -266,7 +303,7 @@ export default function IntersectForm(props) {
             <div className="mt-2">
                 <DataTable value={items} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
                         rowExpansionTemplate={rowExpansionTemplate}
-                        dataKey="table" header={header} className='sg-intersect-results-table' showHeaders={false} >
+                        dataKey="key" header={header} className='sg-intersect-results-table' showHeaders={false} >
                     <Column expander={allowExpansion} style={{ width: '1rem' }} />
                     <Column body={itemBodyTemplate} />
                 </DataTable>
