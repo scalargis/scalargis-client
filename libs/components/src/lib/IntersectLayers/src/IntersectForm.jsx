@@ -355,6 +355,7 @@ export default function IntersectForm(props) {
           icon={opt.icon}
           label={ opt.label ? opt.label : ''}
           title={t(opt.title, opt.defaultTitle)}
+          size="small"
           className={"p-button mr-1 tool" + (opt.value === drawTool ? " active" : "") }
           onClick={(e) => selectDrawTool(e, opt.value) }
         />
@@ -367,12 +368,14 @@ export default function IntersectForm(props) {
         <Button 
           icon="pi pi-trash"
           title={t("deleteSelectedElment", "Eliminar elemento selecionado")}
+          size="small"
           className="p-button mr-1 tool"
           onClick={(e) => deletedSelectedFeature() }
         />
         <Button 
           icon="fas fa-search-plus"
           title={t("viewAllElements", "Ver todos os elementos")}
+          size="small"
           className="p-button tool"
           onClick={(e) => zoomFeaturesExtent() }
         />        

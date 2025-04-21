@@ -31,4 +31,8 @@
     padding-right: 0.3rem;
 }
 
+.sg-intersect-layers .p-panel-content .p-toolbar button.tool.p-button-sm {
+    padding: 0.49rem 0.49rem !important;
+}
+
 
