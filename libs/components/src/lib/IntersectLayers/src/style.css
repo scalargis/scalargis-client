@@ -47,6 +47,7 @@
 .sg-intersect-layers .sg-intersect-results-table-area {
     margin: 0.5rem;
     width: -webkit-fill-available;
+    width: -moz-available;
     table-layout: fixed;
     border-collapse: collapse;
     font-size: .95rem;

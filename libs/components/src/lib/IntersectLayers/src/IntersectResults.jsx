@@ -239,20 +239,22 @@ export default function IntersectForm(props) {
                     }) : null }
                 </table>
                 { showAreaTable &&
-                <table className='sg-intersect-results-table-area'>
-                    <tr>
-                        { intersectConfig?.showResultArea !== false ? <th>Área (m²)</th> : null }
-                        { intersectConfig?.showResultPercentage !== false ? <th>%</th> : null }
-                    </tr>
-                    <tr>
-                    { intersectConfig?.showResultArea !== false ? 
-                        <td>{rowData.area != null ? (Math.round(rowData.area  * precision)  / precision) : rowData.area}</td> 
-                        : null }
-                    { intersectConfig?.showResultPercentage !== false ?
-                        <td>{rowData.percent != null ? (Math.round(rowData.percent * precision)  / precision) : rowData.percent}</td>
-                        : null }
-                    </tr>
-                </table>
+                <div className='mx-1'>
+                    <table className='sg-intersect-results-table-area'>
+                        <tr>
+                            { intersectConfig?.showResultArea !== false ? <th>Área (m²)</th> : null }
+                            { intersectConfig?.showResultPercentage !== false ? <th>%</th> : null }
+                        </tr>
+                        <tr>
+                        { intersectConfig?.showResultArea !== false ? 
+                            <td>{rowData.area != null ? (Math.round(rowData.area  * precision)  / precision) : rowData.area}</td> 
+                            : null }
+                        { intersectConfig?.showResultPercentage !== false ?
+                            <td>{rowData.percent != null ? (Math.round(rowData.percent * precision)  / precision) : rowData.percent}</td>
+                            : null }
+                        </tr>
+                    </table>
+                </div>
                 }
             </>
         )
