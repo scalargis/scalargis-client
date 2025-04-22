@@ -40,6 +40,8 @@
       "showResultGeometries": false,
       "showResultArea": false,
       "showResultPercentage": false,
+      "highlightFeatures": true,
+      "zoomToFeatures": true,
       "exportFormats": [
         "xls",
         "csv",

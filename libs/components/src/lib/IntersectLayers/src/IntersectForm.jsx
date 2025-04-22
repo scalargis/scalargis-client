@@ -424,6 +424,8 @@ export default function IntersectForm(props) {
 
       {results?.layers?.length ?
         <IntersectResults
+          actions={actions}
+          dispatch={dispatch}
           mainMap={mainMap}
           componentId={componentId}
           intersectConfig={intersectConfig}

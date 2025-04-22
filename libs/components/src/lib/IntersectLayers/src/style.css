@@ -31,6 +31,37 @@
     padding-right: 0.3rem;
 }
 
+.sg-intersect-layers .sg-intersect-results-table .p-datatable .p-datatable-tbody > tr.p-highlight {
+    background: None;
+}
+
+.sg-intersect-layers .sg-intersect-results-table .p-datatable .p-datatable-tbody > tr:hover {
+    background: #f5f9fb;
+    color: #495057;
+}
+
+.sg-intersect-layers .sg-intersect-results-table-record {
+    cursor: pointer;
+}
+
+.sg-intersect-layers .sg-intersect-results-table-area {
+    margin: 0.5rem;
+    width: -webkit-fill-available;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: .95rem;
+}
+
+.sg-intersect-layers .sg-intersect-results-table-area th, .sg-intersect-results-table-area td {
+    text-align: center;
+    border: 1px solid #f5f5f5;
+}
+
+.sg-intersect-layers .sg-intersect-results-table-area th {
+    background-color: #c9c9c9;
+    font-weight: normal;
+}
+
 .sg-intersect-layers .p-panel-content .p-toolbar button.tool.p-button-sm {
     padding: 0.49rem 0.49rem !important;
 }

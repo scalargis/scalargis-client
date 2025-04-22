@@ -39,6 +39,20 @@
         }
       }
     ],
+    "selected": [
+      {
+        "filter": ["all", ["==", ["get", "_type"], "results"], ["==", ["get", "_selected"], true]],
+        "style": {
+          "fill-color": "rgba(128, 128 , 128, 0.2)",
+          "stroke-color": "rgba(0,0,139, 1)",
+          "stroke-width": 5,
+          "circle-radius": 9,
+          "circle-fill-color": "rgba(0,0,139, 1)",
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 3
+        }
+      }
+    ],  
     "default": {
       "else": true,
       "style": {
