@@ -239,7 +239,7 @@ export default function IntersectForm(props) {
                     }) : null }
                 </table>
                 { showAreaTable &&
-                <div className='mx-1'>
+                <div className='flex'>
                     <table className='sg-intersect-results-table-area'>
                         <tr>
                             { intersectConfig?.showResultArea !== false ? <th>Área (m²)</th> : null }
