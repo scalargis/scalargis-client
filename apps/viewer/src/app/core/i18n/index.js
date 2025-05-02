@@ -1,11 +1,14 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { addLocale } from 'primereact/api';
 
 import { i18n } from '@scalargis/components';
 
 import { getAppDefaultLocale, getAppApiUrl } from './../utils';
 import resources from './translations';
+import { primereactTranslations as primereactResources } from './translations';
+
 
 export const initTranslations = () => {
   const defaultLocale = getAppDefaultLocale();
@@ -29,6 +32,11 @@ export const initTranslations = () => {
   
   Object.entries(resources).forEach(([lang, translations]) => {
     i18next.addResourceBundle(lang, "common", translations, true, true);
+  });
+
+  //Add primereact translations
+  Object.entries(primereactResources).forEach(([lang, translations]) => {
+    addLocale(lang, translations);
   });
 }
 

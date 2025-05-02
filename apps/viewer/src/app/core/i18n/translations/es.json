@@ -323,5 +323,9 @@
   "showAll": "Mostrar todos",
   "results": "Resultados",
   "geometryRequiredMsg": "Geometría requerida",
-  "geometryMaxAreaMsg": "Área máxima de geometría excedida:  {{maxArea}}"
+  "geometryMaxAreaMsg": "Área máxima de geometría excedida:  {{maxArea}}",
+
+  "group": "Grupo",
+  "groups": "Grupos",
+  "tables": "Tablas"
 }

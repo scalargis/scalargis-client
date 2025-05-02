@@ -323,5 +323,9 @@
   "showAll": "Ver todos",
   "results": "Resultados",
   "geometryRequiredMsg": "É obrigatório definir a geometria",
-  "geometryMaxAreaMsg": "A geometria não pode ultrapassar a área máxima permitida: {{maxArea}}"
+  "geometryMaxAreaMsg": "A geometria não pode ultrapassar a área máxima permitida: {{maxArea}}",
+
+  "group": "Grupo",
+  "groups": "Grupos",
+  "tables": "Tabelas"
 }

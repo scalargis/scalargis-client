@@ -323,5 +323,9 @@
   "showAll": "Show all",
   "results": "Results",
   "geometryRequiredMsg": "Geometry is required",
-  "geometryMaxAreaMsg": "Geometry exceeds the maximum area allowed: : {{maxArea}}"
+  "geometryMaxAreaMsg": "Geometry exceeds the maximum area allowed: : {{maxArea}}",
+
+  "group": "Group",
+  "groups": "Groups",
+  "tables": "Tables"
 }

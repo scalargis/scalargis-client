@@ -323,5 +323,9 @@
   "showAll": "Afficher tout",
   "results": "Résultats",
   "geometryRequiredMsg": "La géométrie est requise",
-  "geometryMaxAreaMsg": "La zone de la géométrie ne doit pas dépasser {{maxArea}}"
+  "geometryMaxAreaMsg": "La zone de la géométrie ne doit pas dépasser {{maxArea}}",
+
+  "group": "Groupe",
+  "groups": "Groupes",
+  "tables": "Tables"
 }

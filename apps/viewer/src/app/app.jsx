@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { useTranslation} from "react-i18next";
+import { locale, addLocale } from 'primereact/api';
 
 import AppContext, { core, mainMap } from './AppContext';
 import RGPD from './core/components/RGPD';
@@ -12,6 +14,8 @@ import { getAppBaseUrl } from './core/utils';
 const App = () => {
   const [pagesLoaded, setPagesLoaded] = useState(false);
   const [pages, setPages] = useState([]);
+
+  const { i18n } = useTranslation();
 
   const base_url = getAppBaseUrl();
 
@@ -47,6 +51,11 @@ const App = () => {
       .finally(()=> {setPagesLoaded(true)});
     }));
   }, []);
+
+  useEffect(() => {
+    if (!i18n.resolvedLanguage) return;
+    locale(i18n.resolvedLanguage);
+  }, [i18n.resolvedLanguage]);
 
   return (
     <AppContext.Provider value={{ core, mainMap }}>
