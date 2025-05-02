@@ -9,7 +9,7 @@ import LayerStyles from './config/styles.json';
 import './style.css';
 
 
-export default function Intersect({core, config, actions, dispatch, record, utils, setBlockedPanel}) {
+export default function Intersect({title, core, config, actions, dispatch, record, utils, setBlockedPanel}) {
 
   const { viewer, mainMap, Models } = config;
 
@@ -99,6 +99,7 @@ export default function Intersect({core, config, actions, dispatch, record, util
     <div style={{ height: '100%' }}>
 
         <IntersectForm
+            title={title}
             core={core}
             config={config}
             control={record}

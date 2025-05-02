@@ -9,10 +9,14 @@ import OlFeature from 'ol/Feature';
 
 import { i18n } from '@scalargis/components';
 
+import ResultsTablesTabs from './components/ResultsTablesTabs';
+
 
 export default function IntersectForm(props) {
 
-    const { actions, dispatch, mainMap, componentId, intersectConfig, intersectLayer, searchParams, results, groupResults } = props;
+    const {viewer, actions, dispatch, mainMap, componentId, intersectConfig, intersectLayer, searchParams, results, groupResults } = props;
+
+    const { viewer_add_dialog_window, viewer_update_dialog_window } = actions;
 
     const [showGeometry, setShowGeometry] = useState(false);
     const [items, setItems] = useState([]);
@@ -28,6 +32,12 @@ export default function IntersectForm(props) {
         "pdf": {"icon": "pi-file-pdf"}
     }
     const exportFormats = intersectConfig?.exportFormats?.length ? intersectConfig.exportFormats.map(f => f.toLowerCase()) : ['xls', 'csv', 'pdf'];
+
+    const showResultArea = intersectConfig?.showResultArea !=null ? intersectConfig?.showResultArea : true;
+    const showResultPercentage = intersectConfig?.showResultPercentage != null ? intersectConfig?.showResultPercentage : true;
+
+    const showTablesButton = !!intersectConfig?.showTables;
+
 
     const groupResultsData = (results) => {
         const groups = {};
@@ -190,6 +200,53 @@ export default function IntersectForm(props) {
         setExpandedRows(null);
     };
 
+    const showTable = () => {
+        const key = `${componentId}-table`;
+
+        let header = intersectConfig.header;
+        header = i18n.translateValue(header, header);
+        header = props?.title && header ? `${props?.title} - ${header}` : props?.title || header || "Interseção de Temas";
+
+        if (viewer?.dialogWindows?.length > 0) {
+            const dw = viewer.dialogWindows.find(w => w.key === key);
+            if (dw) {           
+                const config = { 
+                    ...dw.config,
+                    header: header
+                }
+                
+                const childKey = new Date().getTime();
+                const child = <ResultsTablesTabs 
+                    groups={results?.groups || []}
+                    layers={results?.layers || []}
+                    showResultArea={showResultArea}
+                    showResultPercentage={showResultPercentage}
+                    />
+    
+                dispatch(viewer_update_dialog_window({config: config, child: child, visible: true }));
+                return;
+            }
+        }
+    
+        const data = {};
+
+        const config = Object.assign({}, data?.dialogOptions);
+        config.key = key;
+        config.header = header;
+        config.maximizable = true;
+        config.style={ width: '75vw', height: '75vh' };
+    
+        const childKey = new Date().getTime();
+        const child = <ResultsTablesTabs 
+            groups={results?.groups || []}
+            layers={results?.layers || []}
+            showResultArea={showResultArea}
+            showResultPercentage={showResultPercentage}
+            />;
+    
+        dispatch(viewer_add_dialog_window({config, child, onClose: data?.onClose}));
+    }
+
     const allowExpansion = (rowData) => {
         return rowData.results.length > 0;
     };
@@ -242,14 +299,14 @@ export default function IntersectForm(props) {
                 <div className='flex'>
                     <table className='sg-intersect-results-table-area'>
                         <tr>
-                            { intersectConfig?.showResultArea !== false ? <th>Área (m²)</th> : null }
-                            { intersectConfig?.showResultPercentage !== false ? <th>%</th> : null }
+                            { showResultArea !== false ? <th>{`${t("area", "Área")} (m²)`}</th> : null }
+                            { showResultPercentage !== false ? <th>%</th> : null }
                         </tr>
                         <tr>
-                        { intersectConfig?.showResultArea !== false ? 
+                        { showResultArea !== false ? 
                             <td>{rowData.area != null ? (Math.round(rowData.area  * precision)  / precision) : rowData.area}</td> 
                             : null }
-                        { intersectConfig?.showResultPercentage !== false ?
+                        { showResultPercentage !== false ?
                             <td>{rowData.percent != null ? (Math.round(rowData.percent * precision)  / precision) : rowData.percent}</td>
                             : null }
                         </tr>
@@ -265,7 +322,6 @@ export default function IntersectForm(props) {
         if (results?.groups?.length) {
             const _group = results.groups.find((g) => g.name === rowData?.group);
             if (_group?.title) {
-                //title = t(_group.title, title);
                 title = t(_group.title || title, _group.title || title);
             }
         }
@@ -329,9 +385,14 @@ export default function IntersectForm(props) {
     );
 
     const header = (
-        <div className="flex flex-wrap justify-content-end gap-2 m-1">
-            <Button icon="pi pi-plus" label={t("expand", "Expandir")} onClick={expandAll} text size="small" />
-            <Button icon="pi pi-minus" label={t("collapse", "Recolher")} onClick={collapseAll} text size="small" />
+        <div className="flex justify-content-between flex-wrap">
+            { showTablesButton && <div className="flex flex-wrap justify-content-end gap-2 m-1">
+                <Button icon="pi pi-table" label={t("tables", "Tabelas")} onClick={showTable} text size="small" />
+            </div> }
+            <div className="flex flex-wrap justify-content-end gap-2 m-1">
+                <Button icon="pi pi-plus" label={t("expand", "Expandir")} onClick={expandAll} text size="small" />
+                <Button icon="pi pi-minus" label={t("collapse", "Recolher")} onClick={collapseAll} text size="small" />
+            </div>
         </div>
     )
 

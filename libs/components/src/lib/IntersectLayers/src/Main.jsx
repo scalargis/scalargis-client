@@ -16,7 +16,7 @@ export function MainMenu({ className, config, actions, record }) {
 
   const { viewer, mainMap, dispatch } = config;
 
-  const t = i18n.translateValue
+  const t = i18n.translateValue;
 
   const title = t(record?.title || "Interseção de Temas", record?.title || "Interseção de Temas");
 
@@ -52,8 +52,10 @@ export default function Main(props) {
   const {as, core, config, actions, record, utils} = props;
   const { viewer, mainMap, dispatch } = config;
 
+  const t = i18n.translateValue;
+
   const component_cfg = record.config_json || {};
-  const header = i18n.translateValue(component_cfg.header, component_cfg.header);
+  const header = t(component_cfg.header, component_cfg.header);
 
   const ref = useRef(null);
   const [blockedPanel, setBlockedPanel] = useState(false);
@@ -87,6 +89,7 @@ export default function Main(props) {
   function renderContent() {
     return (
       <Intersect
+        title={t(record?.title || "Interseção de Temas", record?.title || "Interseção de Temas")}
         core={core}
         config={config}
         actions={actions}
