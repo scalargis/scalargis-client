@@ -19,6 +19,7 @@ export default function ResultsTablesTabs(props) {
 
     const t = i18n.translateValue;
 
+
     useEffect(() => {
         const validGroups = layers.filter((layer) => layer?.results?.length > 0).map((layer) => layer.group);
         const _groups = groups.filter(item => validGroups.includes(item.name)).map(item => {
@@ -49,7 +50,6 @@ export default function ResultsTablesTabs(props) {
 
     const _layers = layers.filter((layer) => selectedGroups?.length ? selectedGroups.some((group) => group.code === layer.group) : true);
 
-
     const startContent = (
         <>
             <label className='pr-2'>{t('groups', 'Grupos')}:</label>
@@ -65,17 +65,20 @@ export default function ResultsTablesTabs(props) {
 
             <TabView>
                 { _layers.map((layer, index) => {
+                    // Get the index of the layer in the original layers array
+                    const layerIndex = layers.findIndex(elem => elem === layer) || 0;
+
                     const records = layer?.results || [];
                     const fields = layer?.fields || [];
 
                     let tableFilters;
                     if (filters?.length) {
-                        tableFilters = filters[index];
+                        tableFilters = filters[layerIndex];
                     }
 
                     const onTableFiltersChange = newFilters => {
                         const _filters = [...filters];
-                        _filters[index] = newFilters;
+                        _filters[layerIndex] = newFilters;
                         setFilters(_filters);
                     }
 
