@@ -212,7 +212,8 @@ export default function IntersectForm(props) {
             if (dw) {           
                 const config = { 
                     ...dw.config,
-                    header: header
+                    header: header,
+                    className: 'sg-intersect-layers-results-table-dialog'
                 }
                 
                 const childKey = new Date().getTime();
@@ -235,6 +236,7 @@ export default function IntersectForm(props) {
         config.header = header;
         config.maximizable = true;
         config.style={ width: '75vw', height: '75vh' };
+        config.className ='sg-intersect-layers-results-table-dialog'
     
         const childKey = new Date().getTime();
         const child = <ResultsTablesTabs 

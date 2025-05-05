@@ -67,4 +67,8 @@
     padding: 0.49rem 0.49rem !important;
 }
 
+.sg-intersect-layers-results-table-dialog .p-tabview-nav {
+    overflow: auto;
+    overflow-y: hidden;
+}
 
