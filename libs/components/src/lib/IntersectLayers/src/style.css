@@ -70,5 +70,6 @@
 .sg-intersect-layers-results-table-dialog .p-tabview-nav {
     overflow: auto;
     overflow-y: hidden;
+    padding-bottom: 2px;
 }
 
