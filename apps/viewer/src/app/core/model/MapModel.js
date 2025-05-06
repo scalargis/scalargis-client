@@ -37,7 +37,6 @@ import OlMultiPoint from 'ol/geom/MultiPoint';
 import OlMultiLineString from 'ol/geom/MultiLineString';
 import OlMultiPolygon from 'ol/geom/MultiPolygon';
 import OlGeometryCollection from 'ol/geom/GeometryCollection';
-import { listen } from "ol/events";
 import xml2js from 'xml2js';
 
 import { removeUrlParam } from '../utils';

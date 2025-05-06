@@ -28,8 +28,8 @@ import './style.css';
 export default function PrintPanelItem(props) {
 
   const { core, control, printItem, printLayer, fields, handleFieldChange, standalone, config, actions } = props;
-  const { viewer, mainMap, dispatch, Models } = config;
-  const { showOnPortal, findOLInteraction } = Models.Utils;
+  const { viewer, mainMap, dispatch, Models, auth } = config;
+  const { showOnPortal, findOLInteraction, isUrlAppHostname } = Models.Utils;
   const { getScaleForResolution, getWMSVisibleLayers, getArcGISVisibleLayers } = Models.MapModel;
   const { exclusive_mapcontrol } = viewer;
 
@@ -285,10 +285,18 @@ export default function PrintPanelItem(props) {
     }
 
     //Get WMS and ArGIS Layers
-    const wmsLayers = getWMSVisibleLayers(mainMap) || [];
+    const wmsLayers = getWMSVisibleLayers(mainMap, undefined) || [];
     const arcgisLayers = getArcGISVisibleLayers(mainMap) || [];
+
     const allLayers = [
-      ...wmsLayers.map(l => 'wms' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '') + ';' + (l.params.FORMAT || '')),
+      ...wmsLayers.map(l => {
+        let vals =  'wms' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '') + ';' + (l.params.FORMAT || '');
+        //Add user authentication token  
+        if (isUrlAppHostname(l.url) && auth?.data?.auth_token) {
+            vals += ";" + auth.data.auth_token;
+        }
+        return vals;
+      }),
       ...arcgisLayers.map(l => 'esri_rest' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '')),
     ];
 
