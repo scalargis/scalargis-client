@@ -38,6 +38,7 @@ import * as Timeline from './Timeline/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
 import * as URLparams from './URLparams/src/Main'
 import ProgressControl from './ProgressControl'
+import ScriptHtmlContent from './ScriptHtmlContent'
 
 import { 
   JsonForm, 
@@ -98,6 +99,7 @@ export {
   Legend,
 
   ProgressControl,
+  ScriptHtmlContent,
 
   JsonForm,
   JsonFormContext,
