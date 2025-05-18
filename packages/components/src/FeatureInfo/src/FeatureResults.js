@@ -11,7 +11,7 @@ import { Message } from 'primereact/message'
 import { Button } from 'primereact/button'
 import convert from 'convert'
 
-import { i18n } from '@scalargis/components';
+import { i18n, ScriptHtmlContent } from '@scalargis/components';
 
 import componentMessages from './messages'
 import { MAPCONTROL_NAME } from './utils'
@@ -159,6 +159,11 @@ export default function FeatureResults({ core, config, features, layers, actions
         val = null;
       }
     } else if ((rowData.type || '') === 'html') {
+      if (rowData.value && rowData.value.includes('<script')) {
+        val = <ScriptHtmlContent markup={rowData.value} />
+        return val;
+      }
+
       val = <div
           dangerouslySetInnerHTML={{__html: rowData.value}}
         />
