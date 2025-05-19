@@ -21,8 +21,8 @@ jobs:
 
     - name: Build the Docker image
       id: build_image
-      run: docker build . --tag registry.wkt.pt:5000/wkt/scalargis:latest        
+      run: docker build . --tag registry.wkt.pt/wkt/scalargis:latest
 
     - name: Push to WKT registry
       id: push_image
-      run: docker push registry.wkt.pt:5000/wkt/scalargis:latest
+      run: docker push registry.wkt.pt/wkt/scalargis:latest
