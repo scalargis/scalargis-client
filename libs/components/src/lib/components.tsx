@@ -40,6 +40,7 @@ import * as URLparams from './URLparams/src/Main'
 import * as IntersectLayers from './IntersectLayers/src/Main'
 
 import ProgressControl from './ProgressControl'
+import ScriptHtmlContent from './ScriptHtmlContent'
 
 import { 
   JsonForm, 
@@ -101,6 +102,7 @@ export {
   Legend,
 
   ProgressControl,
+  ScriptHtmlContent,
 
   JsonForm,
   JsonFormContext,
