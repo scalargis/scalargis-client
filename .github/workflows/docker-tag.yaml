@@ -20,12 +20,12 @@ jobs:
 
     - name: Build the Docker image
       id: build_image
-      run: docker build . --tag registry.wkt.pt:5000/wkt/scalargis:${{ steps.get_version.outputs.VERSION }}
+      run: docker build . --tag registry.wkt.pt/wkt/scalargis:${{ steps.get_version.outputs.VERSION }}
 
     - name: Login to WKT registry
       id: login_registry
-      run: docker login -u ${{ secrets.REGISTRY_USER }} -p ${{ secrets.REGISTRY_PASSW }} registry.wkt.pt:5000
+      run: docker login -u ${{ secrets.REGISTRY_USER }} -p ${{ secrets.REGISTRY_PASSW }} registry.wkt.pt
 
     - name: Push to WKT registry
       id: push_image
-      run: docker push registry.wkt.pt:5000/v2/wkt/scalargis:${{ steps.get_version.outputs.VERSION }}
+      run: docker push registry.wkt.pt/v2/wkt/scalargis:${{ steps.get_version.outputs.VERSION }}
