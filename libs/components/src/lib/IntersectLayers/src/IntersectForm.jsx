@@ -202,12 +202,11 @@ export default function IntersectForm(props) {
       if (intersectConfig?.maxArea && (geom.getType().toLowerCase().includes('polygon') || buffer )) {
         let area;
 
-        if (geom.getType().toLowerCase().includes('polygon')) {
-          area = geom.getArea();
-        }
-        
         if (intersectConfig.dataSrid) {
           geom = geom.transform(mainMap.getView().getProjection().getCode(), `EPSG:${intersectConfig.dataSrid}`);
+        }
+
+        if (geom.getType().toLowerCase().includes('polygon')) {
           area = geom.getArea();
         }
 
