@@ -10,9 +10,10 @@ export default function ResultsTable(props) {
 
     const t = i18n.translateValue;
 
-    const showAreaColumns = (records[0].geom + '').toUpperCase().indexOf('POLYGON') > -1 && 
-    (props?.showResultArea !== false || props?.showResultPercentage !== false);
-
+    const showAreaColumn = records.filter(r => r.dimension == 2).length > 0 && 
+        (props?.showResultMeasure !== false || props?.showResultPercentage !== false);
+    const showLengthColumn = records.filter(r => r.dimension == 1).length > 0 && 
+        (props?.showResultMeasure !== false || props?.showResultPercentage !== false);
 
     const numericValueTemplate = (val) => {
         const precision = 100;
@@ -27,10 +28,13 @@ export default function ResultsTable(props) {
                     <Column key={index} field={item.field} header={fieldTitle} filter sortable></Column>
                 );
             })}
-            { showAreaColumns && props?.showResultArea ?
+            { showAreaColumn && props?.showResultMeasure ?
                 <Column key="area" field="area" dataType="numeric" header={`${t("area", "Área")} (m²)`} filter sortable body={rowData => numericValueTemplate(rowData.area)} /> : null
             }
-            { showAreaColumns && props?.showResultPercentage ?
+            { showLengthColumn && props?.showResultMeasure ?
+                <Column key="length" field="length" dataType="numeric" header={`${t("length", "Comprimento")} (m)`} filter sortable body={rowData => numericValueTemplate(rowData.length)} /> : null
+            }
+            { (showAreaColumn || showLengthColumn) && props?.showResultPercentage ?
                 <Column key="percentage" field="percent" dataType="numeric" header="%" filter sortable body={rowData => numericValueTemplate(rowData.percent)} /> : null
             }
         </DataTable>

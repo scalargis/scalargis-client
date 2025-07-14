@@ -38,7 +38,7 @@
       "dataSrid": 3763,
       "showExport": false,
       "showResultGeometries": false,
-      "showResultArea": false,
+      "showResultMeasure": false,
       "showResultPercentage": false,
       "highlightFeatures": true,
       "zoomToFeatures": true,

@@ -93,7 +93,7 @@ export default function ResultsTablesTabs(props) {
                             <div className='text-lg text-gray-600 mt-1 mb-3'>{`${t('group', 'Grupo')}: ${groupTitle}`}</div>
 
                             <ResultsTable records={records} fields={fields} filters={tableFilters}
-                                showResultArea={props?.showResultArea}
+                                showResultMeasure={props?.showResultMeasure}
                                 showResultPercentage={props?.showResultPercentage}
                                 onFiltersChange={onTableFiltersChange}  />
                         </TabPanel>

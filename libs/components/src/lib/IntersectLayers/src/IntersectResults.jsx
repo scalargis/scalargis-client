@@ -33,7 +33,7 @@ export default function IntersectForm(props) {
     }
     const exportFormats = intersectConfig?.exportFormats?.length ? intersectConfig.exportFormats.map(f => f.toLowerCase()) : ['xls', 'csv', 'pdf'];
 
-    const showResultArea = intersectConfig?.showResultArea !=null ? intersectConfig?.showResultArea : true;
+    const showResultMeasure = intersectConfig?.showResultMeasure !=null ? intersectConfig?.showResultMeasure : true;
     const showResultPercentage = intersectConfig?.showResultPercentage != null ? intersectConfig?.showResultPercentage : true;
 
     const showTablesButton = !!intersectConfig?.showTables;
@@ -220,7 +220,7 @@ export default function IntersectForm(props) {
                 const child = <ResultsTablesTabs 
                     groups={results?.groups || []}
                     layers={results?.layers || []}
-                    showResultArea={showResultArea}
+                    showResultMeasure={showResultMeasure}
                     showResultPercentage={showResultPercentage}
                     />
     
@@ -242,7 +242,7 @@ export default function IntersectForm(props) {
         const child = <ResultsTablesTabs 
             groups={results?.groups || []}
             layers={results?.layers || []}
-            showResultArea={showResultArea}
+            showResultMeasure={showResultMeasure}
             showResultPercentage={showResultPercentage}
             />;
     
@@ -282,8 +282,11 @@ export default function IntersectForm(props) {
 
         const fields = rowData?.fields || cfg?.fields || [];
 
-        const showAreaTable = (rowData?.geom + '').toUpperCase().indexOf('POLYGON') > -1 && 
-            (intersectConfig?.showResultArea !== false || intersectConfig?.showResultPercentage !== false);
+        const showAreaTable = rowData?.dimension == 2 && 
+            (intersectConfig?.showResultMeasure !== false || intersectConfig?.showResultPercentage !== false);
+
+        const showLengthTable = rowData?.dimension == 1 && 
+            (intersectConfig?.showResultMeasure !== false || intersectConfig?.showResultPercentage !== false);
 
         return (
             <>
@@ -301,12 +304,30 @@ export default function IntersectForm(props) {
                 <div className='flex'>
                     <table className='sg-intersect-results-table-area'>
                         <tr>
-                            { showResultArea !== false ? <th>{`${t("area", "Área")} (m²)`}</th> : null }
+                            { showResultMeasure !== false ? <th>{`${t("area", "Área")} (m²)`}</th> : null }
                             { showResultPercentage !== false ? <th>%</th> : null }
                         </tr>
                         <tr>
-                        { showResultArea !== false ? 
+                        { showResultMeasure !== false ? 
                             <td>{rowData.area != null ? (Math.round(rowData.area  * precision)  / precision) : rowData.area}</td> 
+                            : null }
+                        { showResultPercentage !== false ?
+                            <td>{rowData.percent != null ? (Math.round(rowData.percent * precision)  / precision) : rowData.percent}</td>
+                            : null }
+                        </tr>
+                    </table>
+                </div>
+                }
+                { showLengthTable &&
+                <div className='flex'>
+                    <table className='sg-intersect-results-table-area'>
+                        <tr>
+                            { showResultMeasure !== false ? <th>{`${t("length", "Comprimento")} (m)`}</th> : null }
+                            { showResultPercentage !== false ? <th>%</th> : null }
+                        </tr>
+                        <tr>
+                        { showResultMeasure !== false ? 
+                            <td>{rowData.length != null ? (Math.round(rowData.length  * precision)  / precision) : rowData.length}</td> 
                             : null }
                         { showResultPercentage !== false ?
                             <td>{rowData.percent != null ? (Math.round(rowData.percent * precision)  / precision) : rowData.percent}</td>
