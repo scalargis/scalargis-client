@@ -316,7 +316,16 @@
         "id": "FeatureInfo",
         "type": "FeatureInfo",
         "exclusive": true,
-        "active": false
+        "active": false,
+        "style": {
+          "fill-color": "rgba(0, 0, 255, 0.5)",
+          "stroke-color": "blue",
+          "stroke-width": 6,
+          "circle-radius": 5,
+          "circle-fill-color": "blue",
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 2
+        }
       },
       {
         "id": "Coordinates",

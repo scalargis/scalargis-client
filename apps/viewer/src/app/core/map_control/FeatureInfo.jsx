@@ -28,11 +28,11 @@ const selectionLayerStyle = new Style({
   image: new Circle({
     radius: 4,
     fill: new Fill({
-    color: '#FF0000',
+      color: '#FF0000',
     }),
     stroke: new Stroke({
-    color: '#fff',
-    width: 2,
+      color: '#fff',
+      width: 2,
     }),
   }),
   stroke: new Stroke({
@@ -46,8 +46,7 @@ export default function FeatureInfo({ core, config, actions }) {
   const { viewer, mainMap, dispatch } = config;
   const { featureinfo } = viewer;
   const feature_info_control = viewer.config_json.map_controls.find(c => c.id === 'FeatureInfo');
-  const feature_info_component = viewer.config_json.components.find(c => c.config_json && 
-                c.config_json.map_control === 'FeatureInfo');
+  const feature_info_component = viewer.config_json.components.find(c => c?.config_json?.map_control === 'FeatureInfo');
   const layers = viewer.config_json.layers;
 
   const { t } = useTranslation();
@@ -420,7 +419,7 @@ export default function FeatureInfo({ core, config, actions }) {
       id: 'featureinfo',
       renderMode: 'vector',
       source: new Vector({}),
-      style: selectionLayerStyle,
+      style: feature_info_control?.style || selectionLayerStyle,
       selectable: false
     });
 
