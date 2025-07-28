@@ -22,7 +22,7 @@ import Feature from 'ol/Feature';
 import { extend, createEmpty } from 'ol/extent';
 import { singleClick, platformModifierKeyOnly } from 'ol/events/condition';
 
-import { MAPCONTROL_NAME } from './utils';
+import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
 
 import './style.css';
 
@@ -66,7 +66,7 @@ export default function PrintPanelItem(props) {
   const [printFile, setPrintFile] = useState(null);
 
   const drawingOptionsTools = useMemo(() => {
-    const _tools = control?.config_json?.drawingOptions?.tools || [];      
+    const _tools = control?.config_json?.drawingOptions?.tools || DEFAULT_DRAWING_TOOLS;      
     return _tools.map(t => t.toLowerCase());
   }, [control?.config_json?.drawingOptions?.tools]);
 

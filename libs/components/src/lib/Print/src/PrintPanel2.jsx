@@ -13,7 +13,7 @@ import OlInteractionSelect from "ol/interaction/Select";
 import Feature from 'ol/Feature';
 import { singleClick } from "ol/events/condition";
 
-import { MAPCONTROL_NAME } from './utils';
+import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
 
 import './style.css';
 
@@ -43,7 +43,7 @@ export default function PrintPanel2(props) {
   const toastDialog = useRef(null);
 
     const drawingOptionsTools = useMemo(() => {
-      const _tools = control?.config_json?.drawingOptions?.tools || [];      
+      const _tools = control?.config_json?.drawingOptions?.tools || DEFAULT_DRAWING_TOOLS;
       return _tools.map(t => t.toLowerCase());
     }, [control?.config_json?.drawingOptions?.tools]);
 
