@@ -1,0 +1,1 @@
+export const DEFAULT_DRAWING_TOOLS = ["Point", "LineString", "Polygon", "Copy", "Modify"];

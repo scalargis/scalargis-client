@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { Message } from 'primereact/message';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { InputNumber } from 'primereact/inputnumber';
 import { Card } from 'primereact/card';
@@ -11,6 +11,7 @@ import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
 import { singleClick } from "ol/events/condition";
 import Collection from 'ol/Collection.js';
+import Feature from 'ol/Feature';
 import {
   LineString,
   LinearRing,
@@ -27,6 +28,8 @@ import {BufferOp} from 'jsts/org/locationtech/jts/operation/buffer';
 import { i18n } from '@scalargis/components';
 
 import IntersectResults from './IntersectResults';
+
+import { DEFAULT_DRAWING_TOOLS } from './utils';
 
 import './style.css';
 
@@ -45,6 +48,7 @@ export default function IntersectForm(props) {
 
   const [drawTool, setDrawTool] = useState(null);
   const [draw , setDraw] = useState(null);
+  const copyGeometry = useRef(null);
   const select = useRef(null);  
   const [modify, setModify] = useState(null);
 
@@ -64,10 +68,16 @@ export default function IntersectForm(props) {
 
   const geometryCol = useRef(new Collection([]));
 
+  const drawingOptionsTools = useMemo(() => {
+    const _tools = intersectConfig?.drawTools || DEFAULT_DRAWING_TOOLS;      
+    return _tools.map(t => t.toLowerCase());
+  }, [intersectConfig?.drawTools]);
+
   let drawTools = [
     { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
     { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
     { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
+    { value: "Copy", title: "copyFeature", "defaultTitle": "Copiar geometria", icon: "pi pi-copy" },
     { value: "Select", title: "selectElement", "defaultTitle": "Selecionar elemento", icon: "fas fa-mouse-pointer" },
     { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: "pi pi-pencil" }     
   ];
@@ -89,6 +99,7 @@ export default function IntersectForm(props) {
 
   function addInteraction(type) {
     if (draw) mainMap.removeInteraction(draw);
+    if (copyGeometry.current) copyGeometry.current.setActive(false);
     if (select.current) select.current.setActive(false);
     if (modify) modify.setActive(false);    
 
@@ -100,26 +111,64 @@ export default function IntersectForm(props) {
       });
       mainMap.addInteraction(di);
       di.on('drawend', (e) => {
-        //if (!printGroup.multi_geom) {
-          if (select.current) select.current.getFeatures().clear();          
-          intersectLayer.current.getSource().getFeatures().forEach((f) => {
-            if (f.get('_componentId') == componentId && f != e.feature) intersectLayer.current.getSource().removeFeature(f);
-          });
-          e.feature.set("_componentId", componentId)
-          e.feature.set("_type", "input");
+        if (select.current) select.current.getFeatures().clear();          
+        intersectLayer.current.getSource().getFeatures().forEach((f) => {
+          if (f.get('_componentId') == componentId && f != e.feature) intersectLayer.current.getSource().removeFeature(f);
+        });
+        e.feature.set("_componentId", componentId)
+        e.feature.set("_type", "input");
 
-          setGeometryIntersection([e.feature.getGeometry().clone()]);
+        setGeometryIntersection([e.feature.getGeometry().clone()]);
 
-          geometryCol.current.clear();
-          geometryCol.current.push(e.feature);
-        //}
+        geometryCol.current.clear();
+        geometryCol.current.push(e.feature);
       });
       setDraw(di);
+    } else if (type === 'Copy') {
+      copyGeometry.current.setActive(true);
     } else if (type === 'Select') {
       select.current.setActive(true);      
     } else if (type === 'Modify') {
       modify.setActive(true);      
     }
+  }
+
+  const confirmCopyFeatureGeometry = (feature) => {
+    confirmDialog({
+      message: ` ${t("copyGeometryConfirmation", "Deseja copiar a geometria selecionada?")}`,
+      header: t("confirmation", "Confirmação"),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: t("yes", "Sim"),
+      rejectLabel: t("no", "Não"),
+      defaultFocus: "reject",
+      accept: () => {       
+        intersectLayer.current.getSource().getFeatures().forEach((f) => {
+          if (f.get('_componentId') == componentId && f != feature) intersectLayer.current.getSource().removeFeature(f);
+        });
+
+        const _feat = new Feature({
+          geometry: feature.getGeometry().clone()
+        });
+
+        _feat.set("_componentId", componentId)
+        _feat.set("_type", "input");
+
+        intersectLayer.current.getSource().addFeature(_feat);
+
+        setGeometryIntersection([_feat.getGeometry().clone()]);
+
+        geometryCol.current.clear();
+        geometryCol.current.push(_feat);
+      },
+      reject: () => { 
+        // do nothing
+      },
+      onHide: () => {
+        // Clear the selection
+        copyGeometry.current.getFeatures().clear();
+        mainMap.render();
+      }
+    });
   }
 
   const confirmDeleteAll = (features) => {
@@ -285,10 +334,23 @@ export default function IntersectForm(props) {
         mainMap.removeInteraction(draw);
         setDraw(null);
       }
+      if (copyGeometry.current) copyGeometry.current.setActive(false);
       if (select.current) select.current.setActive(false);      
       if (modify) modify.setActive(false);
     }    
   }, [drawTool]);
+
+
+  useEffect(() => {
+    if (viewer?.config_json?.selected_menu != componentId) {
+      if (copyGeometry.current) {
+        const _drawTool = drawTool || "";
+        if (_drawTool.toLocaleLowerCase() == "copy") {
+          setDrawTool(null);
+        }
+      }
+    }
+  },  [viewer?.config_json?.selected_menu]);
 
   useEffect(() => {
     if (drawTool && exclusive_mapcontrol != 'Print') {
@@ -297,6 +359,52 @@ export default function IntersectForm(props) {
   }, [exclusive_mapcontrol]);
 
   useEffect(() => {
+    // CopyGeometry interaction
+    const copyGeom = new OlInteractionSelect({
+      condition: singleClick,
+      hitTolerance: 5,
+      wrapX: false,
+      filter: (feature, layer) => {
+        if (!feature || !layer) return false;
+
+        if (intersectLayer.current && layer.get('id') == intersectLayer.current.get('id')) return false;
+        
+        const _tool = drawingOptionsTools.find((opt) => {
+          const geomType = feature.getGeometry().getType().toLowerCase();
+          if (geomType.includes(opt)) {
+            return true;
+          }
+        });
+
+        if (!_tool) {
+
+          // Clear the selection
+          setTimeout(() => {
+            copyGeometry.current.getFeatures().clear();
+            mainMap.render();
+          }, 500);
+
+          toastDialog.current.show({
+            severity: 'warn', summary:  t("copyGeometry", "Copiar geometria"),
+            detail: t("copyGeometryNotSupportedMsg", "O tipo de geometria não é permitido ({{type}}).", undefined, undefined, undefined, { type: feature.getGeometry().getType()}), life: 3000
+          });
+
+          return true;
+        }
+
+        confirmCopyFeatureGeometry(feature);
+        return true;
+      }
+    });
+
+    // Select interaction
+    copyGeom.on('select', function (e) {
+      mainMap.render();
+    });
+    mainMap.addInteraction(copyGeom);
+    copyGeom.setActive(false);
+    copyGeometry.current = copyGeom;
+
     const slct = new OlInteractionSelect({
       condition: singleClick,
       hitTolerance: 5,
@@ -313,6 +421,7 @@ export default function IntersectForm(props) {
     slct.setActive(false);
     select.current = slct;    
 
+    // Modify interaction
     const mdf = new OlInteractionModify({
       features: geometryCol.current
     });
@@ -348,17 +457,18 @@ export default function IntersectForm(props) {
 
   const toolbarLeftContents = (
     <React.Fragment>
-      { drawTools.map(opt =>
-        <Button
+      {drawTools.filter( opt => {
+        if (drawingOptionsTools.length === 0) return true;
+        return drawingOptionsTools.includes(opt.value.toLowerCase());
+       }).map(opt => <Button
           key={opt.value}
           icon={opt.icon}
-          label={ opt.label ? opt.label : ''}
+          label={opt.label ? opt.label : ''}
           title={t(opt.title, opt.defaultTitle)}
-          size="small"
-          className={"p-button mr-1 tool" + (opt.value === drawTool ? " active" : "") }
-          onClick={(e) => selectDrawTool(e, opt.value) }
+          className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "")}
+          onClick={(e) => selectDrawTool(e, opt.value)}
         />
-      )}     
+      )}
     </React.Fragment>
   );
 
@@ -386,6 +496,7 @@ export default function IntersectForm(props) {
   return (
     <div>
       {showOnPortal(<Toast ref={toastDialog} />)}
+      <ConfirmDialog />
 
       { intersectConfig?.content?.title && <h3 className="my-2">{t(intersectConfig.content.title, intersectConfig.content.title)}</h3> }
 
