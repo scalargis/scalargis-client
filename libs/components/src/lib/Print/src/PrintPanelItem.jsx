@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -22,6 +22,8 @@ import Feature from 'ol/Feature';
 import { extend, createEmpty } from 'ol/extent';
 import { singleClick, platformModifierKeyOnly } from 'ol/events/condition';
 
+import { MAPCONTROL_NAME } from './utils';
+
 import './style.css';
 
 
@@ -33,7 +35,7 @@ export default function PrintPanelItem(props) {
   const { getScaleForResolution, getWMSVisibleLayers, getArcGISVisibleLayers } = Models.MapModel;
   const { exclusive_mapcontrol } = viewer;
 
-  const { selected_menu } = viewer.config_json
+  const { selected_menu } = viewer.config_json;
 
   const { i18n, t } = useTranslation();
 
@@ -45,6 +47,7 @@ export default function PrintPanelItem(props) {
 
   const [drawTool, setDrawTool] = useState(null);
   const [draw, setDraw] = useState(null);
+  const copyGeometry = useRef(null);
   const select = useRef(null);
   const modify = useRef();
 
@@ -62,10 +65,16 @@ export default function PrintPanelItem(props) {
 
   const [printFile, setPrintFile] = useState(null);
 
+  const drawingOptionsTools = useMemo(() => {
+    const _tools = control?.config_json?.drawingOptions?.tools || [];      
+    return _tools.map(t => t.toLowerCase());
+  }, [control?.config_json?.drawingOptions?.tools]);
+
   const drawTools = [
     { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
     { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
     { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
+    { value: "Copy", title: "copyFeature", "defaultTitle": "Copiar geometria", icon: "pi pi-copy" },
     { value: "Select", title: "selectElement", "defaultTitle": "Selecionar elemento", icon: "fas fa-mouse-pointer" },
     { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: "pi pi-pencil" }     
   ];
@@ -80,6 +89,7 @@ export default function PrintPanelItem(props) {
 
   function addInteraction(type) {
     if (draw) mainMap.removeInteraction(draw);
+    if (copyGeometry.current) copyGeometry.current.setActive(false);
     if (select.current) select.current.setActive(false);
     if (modify.current) modify.current.setActive(false);
 
@@ -103,12 +113,47 @@ export default function PrintPanelItem(props) {
         }
       });
       setDraw(di);
+    } else if (type === 'Copy') {
+      copyGeometry.current.setActive(true);
     } else if (type === 'Select') {
       select.current.setActive(true);
     } else if (type === 'Modify') {
       findOLInteraction(mainMap, OlInteractionDragPan).setActive(false);
       modify.current.setActive(true);
     }
+  }
+
+  const confirmCopyFeatureGeometry = (feature) => {
+    confirmDialog({
+      message: ` ${t("copyGeometryMsg", "Deseja copiar a geometria selecionada?")}`,
+      header: t("confirmation", "Confirmação"),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: t("yes", "Sim"),
+      rejectLabel: t("no", "Não"),
+      defaultFocus: "reject",
+      accept: () => {
+        // Chek if the print item allows multiple geometries, clear the previous geometries if not
+        if (!printItem.multi_geom) {
+          printLayer.current.getSource().getFeatures().forEach((f) => {
+            printLayer.current.getSource().removeFeature(f);
+          });
+        }
+
+        // Copy the geometry to the print layer
+        const _feat = new Feature({
+          geometry: feature.getGeometry().clone()
+        });
+        printLayer.current.getSource().addFeature(_feat);
+      },
+      reject: () => { 
+        // do nothing
+      },
+      onHide: () => {
+        // Clear the selection
+        copyGeometry.current.getFeatures().clear();
+        mainMap.render();
+      }
+    });
   }
 
   const confirmDeleteAll = (features) => {
@@ -473,7 +518,7 @@ export default function PrintPanelItem(props) {
     paperBoxLayer.current.getSource().clear();
 
     if (!paperBox) { return null }
-    if (selected_menu !== 'print') { return null }
+    if (selected_menu !== control.id) { return null }
     
 
     let scale;
@@ -555,16 +600,27 @@ export default function PrintPanelItem(props) {
     mainMap.getView().calculateExtent()]);
 
 
+  useEffect(() => {
+    if (viewer?.config_json?.selected_menu != control.id) {
+      if (copyGeometry.current) {
+        const _drawTool = drawTool || "";
+        if (_drawTool.toLocaleLowerCase() == "copy") {
+          setDrawTool(null);
+        }
+      }
+    }
+  },  [viewer?.config_json?.selected_menu]);
 
   useEffect(() => {
     if (drawTool) {
-      dispatch(actions.viewer_set_exclusive_mapcontrol('Print'));
+      dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
       addInteraction(drawTool);
     } else {
       if (draw) {
         mainMap.removeInteraction(draw);
         setDraw(null);
       }
+      if (copyGeometry.current) copyGeometry.current.setActive(false);
       if (select.current) select.current.setActive(false);
       if (modify.current) modify.current.setActive(false);
 
@@ -574,18 +630,55 @@ export default function PrintPanelItem(props) {
   }, [drawTool]);
 
   useEffect(() => {
-    if (drawTool && exclusive_mapcontrol !== 'Print') {
+    if (drawTool && exclusive_mapcontrol !== MAPCONTROL_NAME) {
       setDrawTool(null);
     }
   }, [exclusive_mapcontrol]);
 
   useEffect(() => {
+    // CopyGeometry interaction
+    const copyGeom = new OlInteractionSelect({
+      condition: singleClick,
+      hitTolerance: 5,
+      wrapX: false,
+      filter: (feature, layer) => {
+        if (printLayer.current && layer.get('id') == printLayer.current.get('id')) return false;
+
+        if (paperBoxLayer.current && layer.get('id') == paperBoxLayer.current.get('id')) return false;
+        
+        const _tool = drawingOptionsTools.find((opt) => {
+          const geomType = feature.getGeometry().getType().toLowerCase();
+          if (geomType.includes(opt)) {
+            return true;
+          }
+        });
+
+        if (!_tool) {
+          toast.current.show({
+            severity: 'warn', summary:  t("copyGeometry", "Copiar geometria"),
+            detail: t("copyGeometryNotSupported", "O tipo de geometria não é permitido."), life: 3000
+          });
+          return false;
+        }
+
+        confirmCopyFeatureGeometry(feature);
+        return true;
+      }
+    });
+    copyGeom.on('select', function (e) {
+      mainMap.render();
+    });
+    mainMap.addInteraction(copyGeom);
+    copyGeom.setActive(false);
+    copyGeometry.current = copyGeom;
+
+    // Select interaction
     const slct = new OlInteractionSelect({
       condition: singleClick,
       hitTolerance: 5,
       wrapX: false,
       filter: (feature, layer) => {
-        if (layer.get('id') !== 'print') return false;
+        if (layer.get('id') !== printLayer.current.get('id')) return false;
         return true;
       }
     });
@@ -596,6 +689,7 @@ export default function PrintPanelItem(props) {
     slct.setActive(false);
     select.current = slct;
 
+    // Modify interaction
     const mdf = new OlInteractionModify({
       source: printLayer.current.getSource(),
       deleteCondition: (event) => {
@@ -613,6 +707,7 @@ export default function PrintPanelItem(props) {
     });
 
     return () => {
+      if (copyGeom) mainMap.removeInteraction(copyGeom);
       if (slct) mainMap.removeInteraction(slct);
       if (mdf) mainMap.removeInteraction(mdf);
     }
@@ -621,12 +716,14 @@ export default function PrintPanelItem(props) {
 
   const toolbarLeftContents = (
     <React.Fragment>
-      {drawTools.map(opt =>
-        <Button
+      {drawTools.filter( opt => {
+        if (drawingOptionsTools.length === 0) return true;
+        return drawingOptionsTools.includes(opt.value.toLowerCase());
+       }).map(opt => <Button
           key={opt.value}
           icon={opt.icon}
           label={opt.label ? opt.label : ''}
-          tooltip={t(opt.title, opt.defaultTitle)}
+          title={t(opt.title, opt.defaultTitle)}
           className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "")}
           onClick={(e) => selectDrawTool(e, opt.value)}
         />
@@ -638,13 +735,13 @@ export default function PrintPanelItem(props) {
     <React.Fragment>
       <Button
         icon="pi pi-trash"
-        tooltip={t("deleteElement(s)", "Eliminar elemento(s)")}
+        title={t("deleteElement(s)", "Eliminar elemento(s)")}
         className="p-button-sm mr-1 tool"
         onClick={(e) => deletedSelectedFeature()}
       />
       <Button
         icon="fas fa-search-plus"
-        tooltip={t("viewAllElements", "Ver todos os elementos")}
+        title={t("viewAllElements", "Ver todos os elementos")}
         className="p-button-sm mr-1 tool"
         onClick={(e) => zoomFeaturesExtent()}
       />
@@ -702,7 +799,7 @@ export default function PrintPanelItem(props) {
                       {field.showLabel && <label>{field.title}</label>}
                       <InputText id={field_key} className="p-inputtext block"
                         placeholder={!field.header && !field.showLabel ? field.title : ''}
-                        tooltip={!field.header && !field.showLabel ? field.title : ''}
+                        title={!field.header && !field.showLabel ? field.title : ''}
                         value={fields[field_key]} onChange={handleFieldChange} />
                       {(field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small>}
                     </div>
@@ -726,7 +823,7 @@ export default function PrintPanelItem(props) {
                     {field.showLabel && <label>{field.title}</label>}
                     <InputText id={field_key} className="p-inputtext block"
                       placeholder={!field.header && !field.showLabel ? field.title : ''}
-                      tooltip={!field.header && !field.showLabel ? field.title : ''}
+                      title={!field.header && !field.showLabel ? field.title : ''}
                       value={fields[field_key]} onChange={handleFieldChange} />
                     {(field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small>}
                   </div>

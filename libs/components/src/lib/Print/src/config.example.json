@@ -9,7 +9,17 @@
       "closeLabel": "Fechar",
       "defaultScaleSelector": "map",
       "defaultScaleSelectorHelp": "Use key of TabPanel: predefined, freescale and map",      
-      "showPreview": true
+      "showPreview": true,
+      "drawingOptions": {
+        "tools": [
+          "Point",
+          "LineString",
+          "Polygon",
+          "Copy",
+          "Select",
+          "Modify"
+        ]
+      }
   },
   "children": []
 }

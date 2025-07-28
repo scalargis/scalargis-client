@@ -5,6 +5,8 @@ import { Dialog } from 'primereact/dialog'
 import Print from './Print'
 
 import { i18n } from '@scalargis/components';
+
+import { MAPCONTROL_NAME } from './utils';
 import './style.css'
 
 /**
@@ -89,7 +91,7 @@ export default function Main({ type, region, as, core, config, actions, record, 
   const isMobile = wsize[0] <= 768;
 
   useEffect(() => {
-    if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol('Print'));
+    if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
   }, [selected_menu]);  
 
   // Render content
