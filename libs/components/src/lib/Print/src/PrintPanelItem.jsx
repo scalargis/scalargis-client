@@ -40,7 +40,6 @@ export default function PrintPanelItem(props) {
   const { i18n, t } = useTranslation();
 
   const toast = useRef(null);
-  const toastDialog = useRef(null);
 
   const paperBoxLayer = useRef();
   const [paperBox, setPaperBox] = useState(false);
@@ -125,7 +124,7 @@ export default function PrintPanelItem(props) {
 
   const confirmCopyFeatureGeometry = (feature) => {
     confirmDialog({
-      message: ` ${t("copyGeometryMsg", "Deseja copiar a geometria selecionada?")}`,
+      message: ` ${t("copyGeometryConfirmation", "Deseja copiar a geometria selecionada?")}`,
       header: t("confirmation", "Confirmação"),
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: t("yes", "Sim"),
@@ -656,7 +655,7 @@ export default function PrintPanelItem(props) {
         if (!_tool) {
           toast.current.show({
             severity: 'warn', summary:  t("copyGeometry", "Copiar geometria"),
-            detail: t("copyGeometryNotSupported", "O tipo de geometria não é permitido."), life: 3000
+            detail: t("copyGeometryNotSupportedMsg", "O tipo de geometria não é permitido ({{type}}).", { type: feature.getGeometry().getType()}), life: 3000
           });
           return false;
         }
@@ -751,7 +750,6 @@ export default function PrintPanelItem(props) {
   return (
     <div className="print-panel-item">
       {showOnPortal(<Toast ref={toast} position="top-right" />)}
-      {showOnPortal(<Toast ref={toastDialog} />)}
       <ConfirmDialog />
 
       <h3>{props.printItem.title}</h3>

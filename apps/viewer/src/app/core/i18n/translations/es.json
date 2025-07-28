@@ -327,5 +327,9 @@
 
   "group": "Grupo",
   "groups": "Grupos",
-  "tables": "Tablas"
+  "tables": "Tablas",
+
+  "copyGeometry": "Copiar geometría",
+  "copyGeometryConfirmation": "¿Desea copiar la geometría seleccionada?",
+  "copyGeometryNotSupportedMsg": "El tipo de geometría no está permitido ({{type}})."
 }
