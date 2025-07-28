@@ -97,6 +97,7 @@ export default function PrintPanel2(props) {
 
   const confirmCopyFeatureGeometry = (feature) => {
     confirmDialog({
+      group: `${MAPCONTROL_NAME}-${control.id}`,
       message: ` ${t("copyGeometryConfirmation", "Deseja copiar a geometria selecionada?")}`,
       header: t("confirmation", "Confirmação"),
       icon: 'pi pi-exclamation-triangle',
@@ -370,11 +371,18 @@ export default function PrintPanel2(props) {
         });
 
         if (!_tool) {
+          // Clear the selection
+          setTimeout(() => {
+            copyGeometry.current.getFeatures().clear();
+            mainMap.render();
+          }, 500);
+
           toast.current.show({
             severity: 'warn', summary:  t("copyGeometry", "Copiar geometria"),
             detail: t("copyGeometryNotSupportedMsgs", "O tipo de geometria não é permitido ({{type}}).", { type: feature.getGeometry().getType()}), life: 3000
           });
-          return false;
+
+          return true;
         }
 
         confirmCopyFeatureGeometry(feature);
@@ -458,7 +466,7 @@ export default function PrintPanel2(props) {
   return (
     <div className="print-panel2">
       {showOnPortal(<Toast ref={toast} position="top-right" />)}
-      <ConfirmDialog />
+      <ConfirmDialog group={`${MAPCONTROL_NAME}-${control.id}`} />
 
       <h3>{props.printGroup.title}</h3>
 

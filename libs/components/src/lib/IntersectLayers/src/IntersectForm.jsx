@@ -29,7 +29,7 @@ import { i18n } from '@scalargis/components';
 
 import IntersectResults from './IntersectResults';
 
-import { DEFAULT_DRAWING_TOOLS } from './utils';
+import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
 
 import './style.css';
 
@@ -135,6 +135,7 @@ export default function IntersectForm(props) {
 
   const confirmCopyFeatureGeometry = (feature) => {
     confirmDialog({
+      group: `${MAPCONTROL_NAME}-${componentId}`,
       message: ` ${t("copyGeometryConfirmation", "Deseja copiar a geometria selecionada?")}`,
       header: t("confirmation", "Confirmação"),
       icon: 'pi pi-exclamation-triangle',
@@ -377,7 +378,6 @@ export default function IntersectForm(props) {
         });
 
         if (!_tool) {
-
           // Clear the selection
           setTimeout(() => {
             copyGeometry.current.getFeatures().clear();
@@ -496,7 +496,7 @@ export default function IntersectForm(props) {
   return (
     <div>
       {showOnPortal(<Toast ref={toastDialog} />)}
-      <ConfirmDialog />
+      <ConfirmDialog group={`${MAPCONTROL_NAME}-${componentId}`} />
 
       { intersectConfig?.content?.title && <h3 className="my-2">{t(intersectConfig.content.title, intersectConfig.content.title)}</h3> }
 
