@@ -390,17 +390,17 @@ class Main extends React.Component {
 
           { (!!logged?.token && !!config.viewer.allow_user_session) && 
             <Toolbar className="mb-2"
-              left={(config.viewer.is_session && 
+              start={(config.viewer.is_session && 
                 <Button label={this.props.t("session", "Sessão")} className="p-button-sm p-button-rounded p-button-info" 
-                  icon="pi pi-check" tooltip={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}  />)} 
-              right={ 
+                  icon="pi pi-check" title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}  />)} 
+              end={ 
               <React.Fragment>
                 {(config.viewer.session && !config.viewer.is_session) && <Button label={this.props.t("loadSession","Abrir sessão")} 
                   icon="pi pi-folder-open" 
                   className="p-button-text p-button-sm"
                   onClick={e => this.loadSession()}
                   disabled={(config.viewer.save_loading)}
-                  tooltip={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )} />}
+                  title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )} />}
                 <Button label={this.props.t("saveSession", "Gravar sessão")}
                   icon={config.viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-save"}
                   className="p-button-text p-button-sm"

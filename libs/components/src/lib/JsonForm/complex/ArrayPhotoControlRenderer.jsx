@@ -108,7 +108,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                         <td className="col-9" style={{"wordBreak": "break-all", "textAlign": "center"}}>{(f?.original_filename || f?.filename)}</td>
                         <td className="col-1" style={{"verticalAlign": "top", "textAlign": "center"}}>
                           <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined mb-2" 
-                            tooltip={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
+                            title={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
                               setShowPhotoForm(true);
@@ -116,7 +116,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                               setRowData(item);                   
                             }} />                                                                            
                           <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger" 
-                            tooltip={translateMsg("common.deletePhoto", "deletePhoto", "Eliminar fotografia", i18Props)}
+                            title={translateMsg("common.deletePhoto", "deletePhoto", "Eliminar fotografia", i18Props)}
                             onClick={(e) => { 
                               e.preventDefault();
 

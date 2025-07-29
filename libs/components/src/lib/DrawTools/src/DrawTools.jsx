@@ -918,7 +918,7 @@ class DrawTools extends React.Component {
               key={opt.value}
               icon={opt.icon}
               label={opt.label ? opt.label : ''}
-              tooltip={i18next.t(opt.title, opt.defaultTitle)}
+              title={i18next.t(opt.title, opt.defaultTitle)}
               className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "")}
               onClick={(e) => this.startDraw(e, opt.value)}
             />
@@ -930,7 +930,7 @@ class DrawTools extends React.Component {
             <Button
               key={opt.value}
               icon={opt.icon}
-              tooltip={i18next.t(opt.title, opt.defaultTitle)}
+              title={i18next.t(opt.title, opt.defaultTitle)}
               className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "")}
               onClick={(e) => this.startDraw(e, opt.value)}
             />
@@ -942,7 +942,7 @@ class DrawTools extends React.Component {
             <Button
               key={opt.value}
               icon={opt.icon}
-              tooltip={i18next.t(opt.title, opt.defaultTitle)}
+              title={i18next.t(opt.title, opt.defaultTitle)}
               className={"p-button-secondary tool " + (opt.value === selectedTool ? "p-highlight" : "")}
               style={this.getButtonStyle(opt)}
               onClick={(e) => {
@@ -967,7 +967,7 @@ class DrawTools extends React.Component {
 
           <Dropdown
             text={size}
-            tooltip={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
+            title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
             value={size}
             options={this.sizeOptions}
             onChange={opt => this.changeSize(opt)}
@@ -980,7 +980,7 @@ class DrawTools extends React.Component {
             <Button
               key={opt.value}
               icon={opt.icon}
-              tooltip={i18next.t(opt.title, opt.defaultTitle)}
+              title={i18next.t(opt.title, opt.defaultTitle)}
               className={opt.value !== "clear" ? "p-button-info tool" : "p-button-danger tool"}
               onClick={(e) => {
                 switch (opt.value) {
@@ -1003,13 +1003,13 @@ class DrawTools extends React.Component {
                 onClick={e => this.finishEditing()}
                 icon="pi pi-save"
                 label="Aplicar"
-                tooltip="Aplicar alterações"
+                title="Aplicar alterações"
               />
               <Button
                 onClick={e => this.removeFeature()}
                 icon="pi pi-trash"
                 className="p-button-danger"
-                tooltip="Apagar desenho"
+                title="Apagar desenho"
               />
             </div>
           </React.Fragment>
@@ -1020,7 +1020,7 @@ class DrawTools extends React.Component {
             <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
             <Dropdown
               text={symbol_type}
-              tooltip={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
+              title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
               value={symbol_type}
               options={this.symbolOptions.map(o => { return { ...o, "label": i18next.t(o.label, o.labelDefault) } })}
               onChange={this.changeSymbol.bind(this)}
@@ -1033,21 +1033,21 @@ class DrawTools extends React.Component {
           <div>
             <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
             <Dropdown text={text_style}
-              tooltip={i18next.t("textStyle", "Estilo do Texto")}
+              title={i18next.t("textStyle", "Estilo do Texto")}
               value={text_style}
               options={this.textStyleOptions}
               onChange={this.changeTextStyle.bind(this)}
             />
 
             <Dropdown text={text_size}
-              tooltip={i18next.t("textSize", "Tamanho do Texto")}
+              title={i18next.t("textSize", "Tamanho do Texto")}
               value={text_size}
               options={this.textSizeOptions}
               onChange={this.changeTextSize.bind(this)}
             />
 
             <Dropdown text={text_font}
-              tooltip={i18next.t("fontType", "Tipo de Letra")}
+              title={i18next.t("fontType", "Tipo de Letra")}
               value={text_font}
               options={this.textFontOptions}
               onChange={this.changeTextFont.bind(this)}
@@ -1057,7 +1057,7 @@ class DrawTools extends React.Component {
               className="drawtools-text-input"
               value={text_value}
               onChange={this.changeTextValue.bind(this)}
-              tooltip={i18next.t("textLabel", "Texto para a etiqueta")}
+              title={i18next.t("textLabel", "Texto para a etiqueta")}
               placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
               onClick={e => e.target.select()}
             />
@@ -1073,7 +1073,7 @@ class DrawTools extends React.Component {
                 key={opt.value}
                 icon={opt.icon}
                 label={opt.title}
-                tooltip={opt.tooltip}
+                title={opt.tooltip}
                 className="p-button-outlined p-button-sm p-button-info format-tool"
                 onClick={(e) => this.download(opt.value)}
               />
@@ -1114,13 +1114,13 @@ class DrawTools extends React.Component {
                     icon="pi pi-search"
                     className="p-mr-2"
                     onClick={() => this.zoom(row)}
-                    tooltip={i18next.t("locate", "Localizar")}
+                    title={i18next.t("locate", "Localizar")}
                   />
                   <Button
                     icon="pi pi-trash"
                     className="p-button-danger"
                     onClick={() => this.deleteItem(row)}
-                    tooltip={i18next.t("delete", "Eliminar")}
+                    title={i18next.t("delete", "Eliminar")}
                   />
                 </React.Fragment>
               )}

@@ -108,7 +108,7 @@ export const ArrayFileControlRenderer = (props) => {
                         </td>
                         <td className="col-1" style={{"verticalAlign": "middle", "textAlign": "center"}}>
                           <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined mb-2"
-                            tooltip={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
+                            title={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
                               setShowFileForm(true);
@@ -116,7 +116,7 @@ export const ArrayFileControlRenderer = (props) => {
                               setRowData(item);                              
                             }} />                                                                            
                           <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger"
-                            tooltip={translateMsg("common.deleteFile", "deleteFile", "Eliminar ficheiro", i18Props)}
+                            title={translateMsg("common.deleteFile", "deleteFile", "Eliminar ficheiro", i18Props)}
                             onClick={(e) => { 
                               e.preventDefault();
 

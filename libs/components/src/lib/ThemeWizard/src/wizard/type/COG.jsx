@@ -223,7 +223,7 @@ export default function COG(props) {
           />
           <Button
             icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            tooltip={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
+            title={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
             disabled={loading}
             onClick={e => {
               e.preventDefault();
