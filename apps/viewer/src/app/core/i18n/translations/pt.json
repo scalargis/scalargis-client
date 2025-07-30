@@ -331,5 +331,10 @@
 
   "copyGeometry": "Copiar geometria",
   "copyGeometryConfirmation": "Deseja copiar a geometria selecionada?",
-  "copyGeometryNotSupportedMsg": "O tipo de geometria não é permitido ({{type}})."
+  "copyGeometryNotSupportedMsg": "O tipo de geometria não é permitido ({{type}}).",
+
+  "information": "Informação",
+
+  "successFileGenerateMsg": "O ficheiro foi gerado com sucesso",
+  "errorFileGenerateMsg": "Ocorreu um erro ao gerar o ficheiro"
 }

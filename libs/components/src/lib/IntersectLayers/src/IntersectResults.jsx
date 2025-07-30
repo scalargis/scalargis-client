@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
 import OlWKT from "ol/format/WKT";
 import OlFeature from 'ol/Feature';
 
@@ -12,17 +13,23 @@ import { i18n } from '@scalargis/components';
 import ResultsTablesTabs from './components/ResultsTablesTabs';
 
 
-export default function IntersectForm(props) {
+export default function IntersectResults(props) {
 
-    const {viewer, actions, dispatch, mainMap, componentId, intersectConfig, intersectLayer, searchParams, results, groupResults } = props;
+    const {viewer, core, Models, actions, dispatch, mainMap, componentId, intersectConfig, intersectLayer, searchParams, results, groupResults } = props;
 
     const { viewer_add_dialog_window, viewer_update_dialog_window } = actions;
+
+    const { showOnPortal } = Models.Utils;
 
     const [showGeometry, setShowGeometry] = useState(false);
     const [items, setItems] = useState([]);
     const [expandedRows, setExpandedRows] = useState(null);
     const [selectAll, setSelectAll] = useState({});
     const [selectedRows, setSelectedRows] = useState({});
+    const [downloadingFile, setDownloadingFile] = useState(false);
+    const [downloadingFormat, setDownloadingFormat] = useState(false);
+
+    const toastDialog = useRef(null);
 
     const t = i18n.translateValue;
 
@@ -118,6 +125,9 @@ export default function IntersectForm(props) {
         setSelectedRows({});
         setSelectAll({});
         setShowGeometry(false);
+
+        setDownloadingFile(false);
+        setDownloadingFormat(null);
     }, [results, groupResults]);
 
     useEffect(() => {
@@ -388,7 +398,10 @@ export default function IntersectForm(props) {
             { 
                 exportFormats.map((format, index) => {
                     return (
-                        <Button key={index} icon={`pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "p-file" }`} className="mr-2" label={format.toUpperCase()} link
+                        <Button key={index} icon={`pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "p-file" }`} className="mr-2"
+                            label={format.toUpperCase()} link
+                            disabled={downloadingFile}
+                            loading={downloadingFile && downloadingFormat == format}
                             onClick={() =>  {
                                 let url = '/spatial_toolbox/api/intersect';
                                 if (intersectConfig?.apiUrl) {
@@ -397,8 +410,36 @@ export default function IntersectForm(props) {
                                 if (intersectConfig?.export?.[format]?.apiUrl) {
                                     url = intersectConfig.export[format].apiUrl;
                                 }
-                                const query = new URLSearchParams({...searchParams, format});
-                                window.open(`${url}?${query.toString()}`, '_blank')
+
+                                const query = new URLSearchParams({...searchParams, format, viewerId: viewer.id});
+
+                                url = `${url}?${query.toString()}`;
+                                
+                                const headers = new Headers({});
+                                const fetchBlob = core.services.data.fetchAll;
+
+                                setDownloadingFile(true);
+                                setDownloadingFormat(format);
+
+                                fetchBlob(url,{headers}).then(result => {
+                                    setDownloadingFormat(null);
+                                    const url = window.URL.createObjectURL(result);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `intersecao_resultados.${format}`
+                                    document.body.appendChild(a);
+                                    a.click();    
+                                    a.remove();
+
+                                    toastDialog.current.show({ severity: 'success', summary: t("information", "Informação"), detail: `${t("successFileGenerateMsg", "O ficheiro foi gerado com sucesso")}.` });
+                                })
+                                .catch(e => {
+                                    toastDialog.current.show({ severity: 'warn', summary: t("error", "Error"), detail: `${t("errorFileGenerateMsg", "Ocorreu um erro ao gerar o ficheiro")}.` });
+                                })
+                                .finally(d => {
+                                    setDownloadingFile(false);
+                                    setDownloadingFormat(null);
+                                });
                             }
                         }/>
                     );
@@ -421,6 +462,7 @@ export default function IntersectForm(props) {
 
     return (
         <div className="mt-4">
+            {showOnPortal(<Toast ref={toastDialog} />)}
             <h3>{t("results", "Resultados")}</h3>
 
             { intersectConfig?.showExport !== false ? <Toolbar start={exportToolbar} /> : null }

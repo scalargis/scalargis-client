@@ -535,6 +535,8 @@ export default function IntersectForm(props) {
       {results?.layers?.length ?
         <IntersectResults
           title={props?.title}
+          core={core}
+          Models={Models}
           viewer={viewer}
           actions={actions}
           dispatch={dispatch}
