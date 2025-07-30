@@ -53,6 +53,44 @@ export const createHeadersFromOptions = (options) => {
     return requestHeaders;
 };
 
+export const fetchAll = (url, options = {}, responseType = 'auto') => {
+    const requestHeaders = createHeadersFromOptions(options);
+
+    return fetch(url, { ...options, headers: requestHeaders })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type") || '';
+
+            if (responseType === 'auto') {
+                if (contentType.includes("application/json")) {
+                    return response.json();
+                } else if (contentType.includes("text/")) {
+                    return response.text();
+                } else if (contentType.includes("application/octet-stream") ||
+                            contentType.includes("audio/") || contentType.includes("video/")) {
+                    return response.arrayBuffer();
+                } else if (contentType.includes("multipart/form-data")) {
+                    return response.formData();
+                } else {
+                    return response.blob();
+                }
+            } else {
+                switch (responseType) {
+                    case 'json': return response.json();
+                    case 'text': return response.text();
+                    case 'blob': return response.blob();
+                    case 'arrayBuffer': return response.arrayBuffer();
+                    case 'formData': return response.formData();
+                    default: throw new Error(`Unsupported responseType: ${responseType}`);
+                }
+            }
+            //return Promise.resolve({ status, headers, body, json });
+        });
+};
+
 export const fetchJson = (url, options = {}) => {
     const requestHeaders = createHeadersFromOptions(options);
 
