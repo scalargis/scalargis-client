@@ -502,6 +502,23 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     }
 
     setListCRS(list);
+
+    if (record.config_json.selected_crs) {
+      let selectedCRS;
+      
+      if (Number.isInteger(record.config_json.selected_crs)) {
+        selectedCRS = viewer.config_json.crs_list.find( item => item.srid ==  record.config_json.selected_crs);
+      } else {
+        selectedCRS = viewer.config_json.crs_list.find( item => item.code ==  record.config_json.selected_crs);
+      }
+
+      if (selectedCRS) {
+        if (list.find( item => item.value == selectedCRS.code)) {
+          setCRS(selectedCRS.code);
+        }
+      }
+
+    }
   }, []);
 
   useEffect(() => {      
