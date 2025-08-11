@@ -6,6 +6,7 @@
   "config_json": {
     "map_control": "Coordinates",
     "crs_list": [3763, 4326],
+    "selected_crs": 3763,
     "export_crs": 3763,
     "expand_menu": true,
     "expand_menu_mobile": true     
