@@ -46,10 +46,11 @@ function ViewerEdit(props) {
 
     provider.getOne('viewers', params).then(d => {
       setRecord(d.data);
-      setIsLoading(false);
     }).catch(e => {
+      console.error(e);
+      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de visualizadores'});
+    }).finally(() => {
       setIsLoading(false);
-      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de intervenções'});
     });
   }  
 
