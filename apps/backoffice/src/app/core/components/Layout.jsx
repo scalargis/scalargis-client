@@ -79,7 +79,7 @@ function Layout(props) {
   const [inputStyle, setInputStyle] = useState('outlined');
   const [ripple, setRipple] = useState(false);
 
-  const entityName = import.meta.env.VITE_APP_ENTITY_NAME || 'Direção-Geral do Território';
+  const entityName = import.meta.env.VITE_APP_ENTITY_NAME || 'Scalargis';
 
   //const logo = layoutColorMode === 'dark' ? 'assets/layout/images/logo-white.svg' : 'assets/layout/images/logo.svg';
   const logo = backoffice.layoutColorMode === 'dark' ? 
@@ -184,7 +184,7 @@ function Layout(props) {
 
                 <Route path="/account" element={<AccountEdit/>} />
 
-                <Route path="/notifications/edit/:id" element={NotificationEdit} />
+                <Route path="/notifications/edit/:id" element={<NotificationEdit />} />
                 <Route path="/notifications/list" element={<NotificationList />} />
 
                 <Route path="/" exact element={<Dashboard />} />

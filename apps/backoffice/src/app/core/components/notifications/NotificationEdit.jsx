@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { BlockUI } from 'primereact/blockui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -13,8 +14,7 @@ function NotificationEdit(props) {
 
   const { id } = useParams();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [record, setRecord] = useState(null);
 
   const toast = useRef(null);
@@ -25,6 +25,7 @@ function NotificationEdit(props) {
     if (id) {
       loadData();
     } else {
+      setIsLoading(false);
       setRecord({});
     }
   }, []);
@@ -36,31 +37,27 @@ function NotificationEdit(props) {
       id: id
     }
 
-    setLoading(true);  
+    setIsLoading(true);  
 
     provider.getOne('notifications', params).then(d => {
       setRecord(d.data);
-      setLoading(false);
     }).catch(e => {
-      setLoading(false);
-      setError(true);
-      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de intervenções'});
+      console.error(e);
+      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de notificações'});
+    }).finally(() => {
+      setIsLoading(false);
     });
-  }  
+  }
 
   return (
     <React.Fragment>
-    { record ?
-      <NotificationForm data={record} />
-      :
-      ( error ?
-        <NotificationForm data={null} />
-        :
-        <div>loading...</div>
-      )
-    }
+      <BlockUI blocked={isLoading}
+        template={<i className="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
+        { record ? <NotificationForm data={record} /> : <div /> }
+      </BlockUI>
     </React.Fragment>
   );
+
 
 }
 

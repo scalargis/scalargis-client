@@ -15,12 +15,14 @@ import { Toast } from 'primereact/toast';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
+import { first } from 'underscore';
 
 
 const initialSearchParams = {
   filters: {"status": [0]},
   first: 0,
-  rows: 20,
+  //rows: 20,
+  rows: 5,
   page: 0,
   sortField: 'id',
   sortOrder: 1
@@ -140,7 +142,7 @@ function NotificationList(props) {
     provider.getList('notifications', params).then(d => {
       setSelectedRecords(null);
       const data = d.data.map(x => {return {...x, author:{name: x.name, email: x.email}}});
-      setRecords({ ...d, data, page: searchParams.page });
+      setRecords({ ...d, data, page: searchParams.page, first: (searchParams.page + 1) * searchParams.rows });
       setLoading(false);
     }).catch(e => {
       setLoading(false);
@@ -151,12 +153,21 @@ function NotificationList(props) {
   }
 
   const onPage = (event) => {
-    let _searchParams = { ...searchParams, ...event };
+    let _searchParams = {
+      ...searchParams,
+      first: event.first,
+      rows: event.rows,
+      page: event.page
+    };
     setSearchParams(_searchParams);
   }
 
   const onSort = (event) => {
-    let _searchParams = { ...searchParams, ...event };
+    let _searchParams = { 
+      ...searchParams,
+      sortField: event.sortField,
+      sortOrder: event.sortOrder
+    };
     setSearchParams(_searchParams);
   }
 
@@ -185,7 +196,7 @@ function NotificationList(props) {
     const selectedItems = watchAllFields.viewer;
     const length = selectedItems ? selectedItems.length : 0;
     return (
-        <div className="p-py-2 p-px-3">
+        <div className="py-2 px-3">
             <b>{length}</b> selecionado{length > 1 ? 's' : ''}
         </div>
     );
@@ -246,24 +257,23 @@ function NotificationList(props) {
     );
   }
 
-
-
   return (
     <React.Fragment>
-      <div className="p-col-12"><h3>Notificações</h3></div>
+      <div className="col-12"><h3>Notificações</h3></div>
 
-      <div className="p-grid p-fluid notification-list">
+      <div className="grid notification-list">
           <Toast ref={toast} baseZIndex={2000} />
-          <div className="card">
+          <div className="card col-12">
             <Accordion activeIndex={0}>
                 <AccordionTab header="Filtro">
                   <form onSubmit={handleSubmit(onFilterSubmit)}>
-                    <div className="p-fluid p-formgrid p-grid">
-                      <div className="p-field p-col-12 p-md-1">
+
+                    <div className="formgrid grid">
+                      <div className="field col-12 md:col-2">
                           <label htmlFor="id">Id</label>
-                          <InputText id="id" type="text" {...register('id')} />
+                          <InputText id="id" type="text" {...register('id')} className='w-full' />
                       </div>
-                      <div className="p-field p-col-12 p-md-7">
+                      <div className="field col-12 md:col-10">
                           <label htmlFor="viewer">Visualizador</label>
                           <Controller
                               control={control}
@@ -280,12 +290,12 @@ function NotificationList(props) {
                                 display="chip"
                                 onChange={(e) => { field.onChange(e.target.value); }} 
                                 panelFooterTemplate={filterViewersFooterTemplate}
-                                className="filter-multiselect"
+                                className="filter-multiselect w-full"
                                 style={{ minHeight: '2.5rem', maxHeight: '2.5rem'}} />                                                        
                               }} 
                             />
                       </div>
-                      <div className="p-field p-col-12 p-md-2">
+                      <div className="field col-12 md:col-4">
                           <label htmlFor="start_date">Data envio (início)</label>
                           <Controller
                               control={control}
@@ -293,11 +303,12 @@ function NotificationList(props) {
                               render={({ field }) => {
                                 return <Calendar value={field.value} 
                                 onChange={(e) => {field.onChange(e.target.value)}}
-                                dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"/>                                                                                       
-                              }} 
+                                dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"
+                                className='w-full' />                                                                                       
+                              }}
                             />
                       </div>
-                      <div className="p-field p-col-12 p-md-2">
+                      <div className="field col-12 md:col-4">
                           <label htmlFor="end_date">Data envio (fim)</label>
                           <Controller
                               control={control}
@@ -305,19 +316,20 @@ function NotificationList(props) {
                               render={({ field }) => {
                                 return <Calendar value={field.value} 
                                 onChange={(e) => {field.onChange(e.target.value)}}
-                                dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"/>                                                                                       
+                                dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"
+                                className='w-full' />                                                                                       
                               }} 
                             />
                       </div>                    
-                      <div className="p-field p-col-12 p-md-4">
+                      <div className="field col-12 md:col-4">
                           <label htmlFor="author">Autor</label>
-                          <InputText id="author" type="text" {...register('author')} />
+                          <InputText id="author" type="text" {...register('author')} className='w-full' />
                       </div>
-                      <div className="p-field p-col-12 p-md-4">
+                      <div className="field col-12 md:col-4">
                           <label htmlFor="status">Mensagem</label>
-                          <InputText id="message" type="text" {...register('message')} />
+                          <InputText id="message" type="text" {...register('message')} className='w-full' />
                       </div>                      
-                      <div className="p-field p-col-12 p-md-4">
+                      <div className="field col-12 md:col-4">
                           <label htmlFor="status">Estado</label>
                           <Controller
                               control={control}
@@ -332,27 +344,29 @@ function NotificationList(props) {
                                 showSelectAll={false}
                                 display="chip" 
                                 onChange={(e) => field.onChange(e.target.value)}
-                                className="filter-multiselect"
+                                className="filter-multiselect w-full"
                                 style={{ minHeight: '2.5rem', maxHeight: '2.5rem'}} />                                                        
                               }} 
                             />
                       </div>                     
                     </div>
-                    <div className="p-fluid p-formgrid p-grid p-justify-end">
-                      <div className="p-field p-col-12 p-md-2">
-                        <Button type="submit" label="Pesquisar" className="p-mr-2" />  
+
+                    <div className="fluid grid justify-content-end">
+                      <div className="field col-12 md:col-1">
+                        <Button type="submit" label="Pesquisar" className="mr-2 w-full" />  
                       </div>                                  
-                      <div className="p-field p-col-12 p-md-2">
-                        <Button type="button" label="Limpar" className="p-button-secondary p-mr-2" onClick={onFilterClear} />
+                      <div className="field col-12 md:col-1">
+                        <Button type="button" label="Limpar" className="p-button-secondary mr-2 w-full" onClick={onFilterClear} />
                       </div>                   
                     </div>
+
                     </form>
                 </AccordionTab>
             </Accordion>
 
-            <Toolbar className="p-mt-2" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+            <Toolbar className="mt-2" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
-            <DataTable ref={dt} value={records ? records.data : []} lazy
+            <DataTable ref={dt} value={records ? records.data : []} lazy dataKey="id"
                 selectionMode="checkbox"
                 selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
                 paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}

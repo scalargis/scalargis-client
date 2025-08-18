@@ -104,34 +104,34 @@ function NotificationForm(props) {
             type="button" 
             label="Voltar" 
             icon="pi pi-left" 
-            className="p-button-secondary p-mr-4"
+            className="p-button-secondary mr-4"
             disabled={isSaving ? true : false} 
             onClick={goBack} />
           { data?.status?.value === 0 && <Button
             type="button" 
             label="Lida"
-            className="p-mr-2"
+            className="mr-2"
             icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
             disabled={isSaving ? true : false} 
             onClick={onCheck} /> }
           { data?.status?.value !== 2 && <Button
             type="button" 
             label="Encerrar"
-            className="p-mr-2"
+            className="mr-2"
             icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
             disabled={isSaving ? true : false}
             onClick={onClose} /> }
           { data?.status?.value === 2 && <Button
             type="button" 
             label="Reabrir"
-            className="p-mr-2"
+            className="mr-2"
             icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
             disabled={isSaving ? true : false}
             onClick={onReopen} /> }
           <Button
             type="button" 
             label="Gravar"
-            className="p-mr-2"
+            className="mr-2"
             icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
             disabled={isSaving ? true : false}
             onClick={onSave} />
@@ -146,7 +146,7 @@ function NotificationForm(props) {
           type="button" 
           label="Voltar" 
           icon="pi pi-left" 
-          className="p-button-secondary p-mr-4"
+          className="p-button-secondary mr-4"
           onClick={goBack} />
       </React.Fragment>
     )
@@ -159,14 +159,14 @@ function NotificationForm(props) {
 
     return (
       <>
-        <div className="p-col p-md-9">
-          <div className="p-m-2">
+        <div className="col md:col-9">
+          <div className="m-2">
             <a href={file.url} target="_blank" rel="noreferrer" download={file.filename}>{file.filename}</a>
           </div>
         </div>
-        <div className="p-col p-md-3">
-          <div className="p-m-2 p-text-center">
-            {file.size != null && <span className="p-tag p-component p-px-1 p-py-1">
+        <div className="p-col md:col-3">
+          <div className="m-2 p-text-center">
+            {file.size != null && <span className="p-tag p-component px-1 py-1">
               <span className="p-tag-value">{(file.size / 1024).toFixed(2) + " KB"}</span>
             </span>}
           </div>
@@ -183,47 +183,47 @@ function NotificationForm(props) {
         <Toast ref={toast} baseZIndex={2000} />
         { data.id ?
         <React.Fragment>
-          <div className="p-grid p-fluid">
-            <div className="p-col p-md-9">
-              <div className="p-fluid p-formgrid p-grid">
-                <div className="p-field p-col-12 p-md-2">
+          <div className="grid p-fluid">
+            <div className="col-12 md:col-9">
+              <div className="p-fluid formgrid grid">
+                <div className="field col-12 md:col-2">
                     <label htmlFor="id">Id</label>
                     <InputText id="id" type="text" value={data.id} disabled />
                 </div>
-                <div className="p-field p-col-12 p-md-5">
+                <div className="field col-12 md:col-5">
                     <label htmlFor="name">Nome</label>
                     <InputText id="nam" type="text" value={data.name} disabled />
                 </div>
-                <div className="p-field p-col-12 p-md-5">
+                <div className="field col-12 md:col-5">
                     <label htmlFor="email">Email</label>
                     <InputText id="email" type="text" value={data.email} disabled />
                 </div>
-                <div className="p-field p-col-12">
+                <div className="field col-12">
                     <label htmlFor="message">Messagem</label>
                     <InputTextarea id="message" rows={5} value={data.message}  autoResize style={{maxHeight: '250px', opacity: '0.6'}} />
                 </div>
-                <div className="p-field p-col-12">              
+                <div className="field col-12">              
                   <label htmlFor="message">Ficheiros</label>
                   <DataView value={data?.files || []} layout="list" 
                     emptyMessage="Não tem ficheiros" itemTemplate={fileTemplate} />                  
                 </div>                                                                 
               </div>
             </div>
-            <div className="p-col p-md-3">
-              <div className="p-fluid p-formgrid p-grid">
-                <div className="p-field p-col-12">
+            <div className="col-12 md:col-3">
+              <div className="p-fluid formgrid grid">
+                <div className="field col-12">
                     <label htmlFor="viewer">Visualizador</label>
                     <InputText id="viewer" type="text" value={data.viewer} disabled />
                 </div>
-                <div className="p-field p-col-12">
+                <div className="field col-12">
                     <label htmlFor="date">Data</label>
                     <InputText id="date" type="text" value={data.date || ''}  disabled />
                 </div>                                                
               </div>
             </div>
-            <div className="p-col p-md-9">
-              <div className="p-fluid p-formgrid p-grid">
-                <div className="p-field p-col-12">
+            <div className="col-12 md:col-9">
+              <div className="p-fluid formgrid grid">
+                <div className="field col-12">
                   <label htmlFor="notes">Observações</label>
                   <InputTextarea id="notes" rows={5} autoResize value={data.notes} 
                   onChange={(e) => setData({...data, notes: e.target.value})
@@ -231,25 +231,25 @@ function NotificationForm(props) {
                 </div>
               </div>
             </div>
-            <div className="p-col p-md-3">
-              <div className="p-fluid p-formgrid p-grid">
-                  <div className="p-field p-col-12">
+            <div className="col-12 md:col-3">
+              <div className="p-fluid formgrid grid">
+                  <div className="field col-12">
                       <label htmlFor="read_date">Data Leitura</label>
                       <InputText id="read_date" type="text" value={data.checked_date || ''} disabled />
                   </div>
-                  <div className="p-field p-col-12">
+                  <div className="field col-12">
                       <label htmlFor="close_date">Data Encerramento</label>
                       <InputText id="close_date" type="text" value={data.closed_date || ''} disabled />
                   </div>                               
                 </div>              
             </div>
           </div>
-          <Toolbar className="p-mt-2 p-mb-4" right={rightToolbarTemplate}></Toolbar>
+          <Toolbar className="mt-2 mb-4" right={rightToolbarTemplate}></Toolbar>
         </React.Fragment>
         :
         <React.Fragment>
-          <Message severity="error" text="Não foi possível obter os dados da notificação." className="p-col p-md-12" />
-          <Toolbar className="p-mt-2 p-mb-4" right={rightToolbarTemplateNone}></Toolbar>
+          <Message severity="error" text="Não foi possível obter os dados da notificação." className="col md:col-12" />
+          <Toolbar className="mt-2 mb-4" right={rightToolbarTemplateNone}></Toolbar>
         </React.Fragment> }
       </form>
     </React.Fragment>
