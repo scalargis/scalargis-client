@@ -43,6 +43,9 @@ Thumbs.db
 
 vite.config.*.timestamp*
 
+# vite user proxy
+apps/*/user.proxy.config.json
+
 # sources
 apps/viewer/src/app/components/*
 apps/backoffice/src/app/components/*
