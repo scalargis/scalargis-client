@@ -72,13 +72,7 @@ export default defineConfig(() => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/spatial_toolbox/, ''),
         },
-        
-        '/scalar_event': {
-          target: proxyUrl + '/scalar_event',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/scalar_event/, ''),
-        },
-
+      
         ...userProxyRoutes
 
       },
