@@ -86,6 +86,7 @@ export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => 
 
     if (data?.showConfirm) {
         confirmDialog({
+            tagKey: 'viewer',
             message: t("confirmAction", "Tem a certeza que deseja continuar?"),
             header: t("addTheme", "Adicionar Tema"),
             acceptLabel: t("yes", "Sim"),
@@ -131,6 +132,7 @@ export const viewer_remove_theme = ({data, mainMap, viewer, core, dispatch, t}) 
 
     if (data?.showConfirm) {    
         confirmDialog({
+            tagKey: 'viewer',
             message: t("confirmAction", "Tem a certeza que deseja continuar?"),
             header: t("removeTheme", "Remover Tema"),
             acceptLabel: t("yes", "Sim"),

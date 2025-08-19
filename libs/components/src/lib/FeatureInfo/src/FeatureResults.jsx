@@ -274,7 +274,6 @@ export default function FeatureResults({ core, config, features, layers, actions
                       </div>
                       <DataTable
                         value={rows}
-                        groupField="layer"
                         className="p-datatable-striped">
                           {!isText &&
                           <Column
