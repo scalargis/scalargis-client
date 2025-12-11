@@ -10,16 +10,35 @@ export default function ThemeSelector(props) {
   if (!theme || theme === 'default') {
     Theme = () => <ThemeDefault />
   } else {
-    Theme = React.lazy(() => import(`../../themes/${theme}/src/main.jsx`).catch(error =>
-      import(`../../core/themes/${theme}/main.jsx`).catch(error => {
-          console.error("Custom Theme Failed Loading:", error);
+    Theme = React.lazy(async () => {
+        let thm = null;
+        try {
+          thm = await import(`../../themes/${theme}/src/main.jsx`);
+        } catch (e1) {
+          try {
+            thm = await import(`../../core/themes/${theme}/main.jsx`);
+          } catch (e2) {
+            try {
+              thm = await import(`../../themes/${theme}/src/main.tsx`);
+            } catch (e3) {
+              try {
+                thm = await import(`../../core/themes/${theme}/main.tsx`);
+              } catch (e4) {
+                console.error(e4);
+                return null;
+              }
+            }
+          }
+        }
+        
+        if (!thm) {
+          console.error("Standard Theme Failed Loading:", error);
           return { default: () => <ThemeDefault /> }
         }
-      )).catch(error => {
-        console.error("Standard Theme Failed Loading:", error);
-        return { default: () => <ThemeDefault /> }
-      })
-    );
+        
+        return thm;
+      }
+    );   
   }
 
   return (

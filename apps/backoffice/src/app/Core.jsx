@@ -74,8 +74,19 @@ Core.prototype.setConfig = function(config) {
 
 // Add components
 Core.prototype.addComponent = function(core, component, done) {
-  import(`./components/${component.type}/src/Main.jsx`).then(c => {
-
+  (async () => {
+    let c = null;
+    try {
+      c = await import(`./components/${component.type}/src/Main.jsx`);
+    } catch (e1) {
+      try {
+        c = await import(`./components/${component.type}/src/Main.tsx`);
+      } catch (e2) {
+        throw e2;
+      }
+    }
+    return c;
+  })().then(c => {  
     // Basic Decorator Pattern: decorates core with additional functionality
     if (c.decorators && typeof c.decorators === 'object') {
       core.actions = extend(core.actions, omit(c.decorators, this.__secureProps ));

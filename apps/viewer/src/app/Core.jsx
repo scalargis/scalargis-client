@@ -228,8 +228,19 @@ Core.prototype.addComponent = function(core, component, done) {
     
   } else {
     // Add plugin components
-    import(`./components/${component.type}/src/Main.jsx`).then(c => {
-
+    (async () => {
+      let c = null;
+      try {
+        c = await import(`./components/${component.type}/src/Main.jsx`);
+      } catch (e1) {
+        try {
+          c = await import(`./components/${component.type}/src/Main.tsx`);
+        } catch (e2) {
+          throw e2;
+        }
+      }
+      return c;
+    })().then(c => {
       // Add component actions
       if (c.actions && typeof c.actions === 'object') {
         try {
