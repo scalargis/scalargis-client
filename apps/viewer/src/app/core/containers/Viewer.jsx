@@ -78,7 +78,19 @@ function Viewer(props) {
   }, [id]);
 
   useEffect(() => {
-    i18n.changeLanguage(viewer.locale);
+    // Only change language if:
+    // 1. viewer.locale exists AND
+    // 2. There's no user preference in localStorage (OR user preference matches backend default)
+    if (viewer.locale) {
+      const storedLang = localStorage.getItem('i18nextLng');
+
+      // If no stored preference, use backend default
+      // If stored preference matches, no-op (already set by LanguageDetector)
+      // If stored preference differs, respect user's choice (don't override)
+      if (!storedLang) {
+        i18n.changeLanguage(viewer.locale);
+      }
+    }
   }, [viewer?.locale]);
 
   useEffect(() => {

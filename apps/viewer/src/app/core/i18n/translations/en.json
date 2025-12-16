@@ -336,5 +336,8 @@
   "information": "Information",
 
   "successFileGenerateMsg": "The file was successfully created",
-  "errorFileGenerateMsg": "An error occurred when creating the file"  
+  "errorFileGenerateMsg": "An error occurred when creating the file",
+  
+  "pleaseWait": "Please wait...",
+  "anErrorOccurred": "An error occurred" 
 }

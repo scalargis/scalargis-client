@@ -16,8 +16,8 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
   const { i18n } = useTranslation();
 
   const locale = useMemo(() => {
-    return viewer.locale ? viewer.locale : i18n.resolvedLanguage;
-  }, [viewer.locale]);
+    return viewer.locale || i18n.resolvedLanguage || i18n.language;
+  }, [viewer.locale, i18n.language]);
 
   const localesList = useMemo(() => {
     let locales = [];
@@ -50,6 +50,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
   });
 
   const handleChange = (event) => {
+    i18n.changeLanguage(event.value); // Save to localStorage
     dispatch(viewer_set_locale(event.value));
   }
 
@@ -70,7 +71,10 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
                     key={item.value}
                     label={item.label}
                     className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
-                    onClick={(e) => dispatch(viewer_set_locale(item.value))}
+                    onClick={(e) => {
+                      i18n.changeLanguage(item.value);
+                      dispatch(viewer_set_locale(item.value));
+                    }}
                   />
                   {(index < localesList.length - 1) && <span>|</span>}
                 </React.Fragment>
@@ -87,7 +91,11 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
                       key={item.value}
                       label={item.label}
                       className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
-                      onClick={(e) => {e.preventDefault(); dispatch(viewer_set_locale(item.value))}}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        i18n.changeLanguage(item.value);
+                        dispatch(viewer_set_locale(item.value));
+                      }}
                     />
                     {(index < localesList.length - 1) && <span>|</span>}
                   </React.Fragment>

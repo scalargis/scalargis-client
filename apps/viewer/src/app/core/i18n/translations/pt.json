@@ -336,5 +336,8 @@
   "information": "Informação",
 
   "successFileGenerateMsg": "O ficheiro foi gerado com sucesso",
-  "errorFileGenerateMsg": "Ocorreu um erro ao gerar o ficheiro"
+  "errorFileGenerateMsg": "Ocorreu um erro ao gerar o ficheiro",
+
+  "pleaseWait": "Aguarde...",
+  "anErrorOccurred": "Ocorreu um erro"
 }

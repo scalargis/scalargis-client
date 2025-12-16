@@ -241,12 +241,12 @@
   "name": "Nombre",
   "isActive": "Es activo",
 
-  "endSession": "End session",
-  "user": "User",
-  "login": "Login",
-  "userRegistration": "New user",
-  "passwordReset": "Reset password",
-  "password": "Password",
+  "endSession": "Terminar sesión",
+  "user": "Usuario",
+  "login": "Entrar",
+  "userRegistration": "Nuevo usuario",
+  "passwordReset": "Recuperar contraseña",
+  "password": "Contraseña",
   "required": "Required field",
   "wrongUsernamePassword": "Wrong user or password",
   "wrongUser": "Invalid user",
@@ -279,8 +279,8 @@
   
   "userRegistrationSuccess": "User created with success",
   "userRegistrationSuccessMsg": "Your account was created with the <b>{{username}}</b> username, you must activate it within the next 24 hours. Please check the account activation instructions sent to <b>{{email}}</b>.",
-  "userRegistrationErrorAlreadyExists": "A user with the specified username or email already exists",
-  "createUser": "Create user",
+  "userRegistrationErrorAlreadyExists": "Ya existe un usuario con el nombre de usuario o correo electrónico especificado",
+  "createUser": "Crear usuario",
 
   "activeUserSession": "There is an active session for the user <i><strong>{{username}}</strong></i>.",
   "clickTo": "Click to",
@@ -336,5 +336,8 @@
   "information": "Información",
 
   "successFileGenerateMsg": "El archivo se ha creado correctamente",
-  "errorFileGenerateMsg": "Se ha producido un error al crear el archivo"
+  "errorFileGenerateMsg": "Se ha producido un error al crear el archivo",
+
+  "pleaseWait": "Espere...",
+  "anErrorOccurred": "Se produjo un error"
 }

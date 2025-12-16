@@ -241,12 +241,12 @@
   "name": "Nom",
   "isActive": "Est-il actif",
 
-  "endSession": "End session",
-  "user": "User",
-  "login": "Login",
-  "userRegistration": "New user",
-  "passwordReset": "Reset password",
-  "password": "Password",
+  "endSession": "Terminer la session",
+  "user": "Utilisateur",
+  "login": "Connexion",
+  "userRegistration": "Nouvel utilisateur",
+  "passwordReset": "Réinitialiser le mot de passe",
+  "password": "Mot de passe",
   "required": "Required field",
   "wrongUsernamePassword": "Wrong user or password",
   "wrongUser": "Invalid user",
@@ -279,8 +279,8 @@
   
   "userRegistrationSuccess": "User created with success",
   "userRegistrationSuccessMsg": "Your account was created with the <b>{{username}}</b> username, you must activate it within the next 24 hours. Please check the account activation instructions sent to <b>{{email}}</b>.",
-  "userRegistrationErrorAlreadyExists": "A user with the specified username or email already exists",
-  "createUser": "Create user",
+  "userRegistrationErrorAlreadyExists": "Un utilisateur avec le nom d'utilisateur ou l'email spécifié existe déjà",
+  "createUser": "Créer un utilisateur",
 
   "activeUserSession": "There is an active session for the user <i><strong>{{username}}</strong></i>.",
   "clickTo": "Click to",
@@ -336,5 +336,8 @@
   "information": "Information",
 
   "successFileGenerateMsg": "Le fichier a été créé avec succès",
-  "errorFileGenerateMsg": "Une erreur s'est produite lors de la création du fichier"
+  "errorFileGenerateMsg": "Une erreur s'est produite lors de la création du fichier",
+
+  "pleaseWait": "Veuillez patienter...",
+  "anErrorOccurred": "Une erreur s'est produite"
 }

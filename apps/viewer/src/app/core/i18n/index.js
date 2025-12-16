@@ -21,10 +21,24 @@ export const initTranslations = () => {
     //keySeparator: "false", // we do not use keys in form key.text
     interpolation: {
       escapeValue: false // react already safes from xss
+    },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage']
     }
   }
-  if (defaultLocale) options["lng"] = defaultLocale;
-  
+
+  // Read localStorage synchronously to avoid initial render with wrong language
+  const storedLang = localStorage.getItem('i18nextLng');
+  if (storedLang) {
+    // User has a preference - use it immediately
+    options["lng"] = storedLang;
+  } else if (defaultLocale) {
+    // No user preference - use backend default
+    options["lng"] = defaultLocale;
+  }
+  // LanguageDetector will still handle future changes and save to localStorage
+
   i18next
     .use(initReactI18next)
     .use(LanguageDetector)
