@@ -153,6 +153,11 @@ function Core(config, reducers) {
   this.__components = {};
 
   /**
+   * Hold widget components
+   */
+  this.__widgets= {};
+
+  /**
    * Hold menu components
    */
   this.__mainmenu = {};
@@ -160,7 +165,7 @@ function Core(config, reducers) {
   /**
    * Secure app props
    */
-  this.__secureProps = ['config', 'actions', 'store', 'Renderer', '__components', '__mainmenu'];
+  this.__secureProps = ['config', 'actions', 'store', 'Renderer', '__components', '__widgets', '__mainmenu'];
 }
 
 // Set core site config
@@ -224,6 +229,11 @@ Core.prototype.addComponent = function(core, component, done) {
       this.__mainmenu[component.type] = MainMenu;
     }
 
+    // Widgets regsitry
+    if (!!c.widgets && !this.__widgets[component.type]) {
+      this.__widgets[component.type] = c?.widgets;
+    }
+
     done();
     
   } else {
@@ -275,6 +285,11 @@ Core.prototype.addComponent = function(core, component, done) {
       if (!!c.MainMenu && !this.__mainmenu[component.type]) {
         const MainMenu = c.MainMenu;
         this.__mainmenu[component.type] = MainMenu;
+      }
+
+      // Widgets regsitry
+      if (!!c.widgets && !this.__widgets[component.type]) {
+        this.__widgets[component.type] = c?.widgets;
       }
       
       done();
@@ -495,6 +510,16 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
       </div>
     )
   })
+}
+
+Core.prototype.getComponentWidget = function(widgeFullName) {
+  const type = widgeFullName.split(".")[0]
+  const widget = widgeFullName.split(".")[1]
+
+  const Widget = this.__widgets?.[type]?.[widget];
+  if (!Widget) return null;
+
+  return Widget;
 }
 
 // Get auth from store

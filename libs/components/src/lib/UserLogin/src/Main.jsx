@@ -37,6 +37,9 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   const registrationHeader = record?.config_json?.header_registration ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("userRegistration", "Registo de utilizador")} - ${appEntityNameAbrev || "ScalarGIS"}`;
   const passwordHeader = record?.config_json?.header_password ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("passwordReset", "Redefinir password")} - ${appEntityNameAbrev || "ScalarGIS"}`;
 
+  const CompLoginWidget = core.getComponentWidget("AuthAMA.LoginWidget") || LoginWidget;
+  const CompRegistrationWidget = core.getComponentWidget("AuthAMA.RegistrationWidget") || LoginWidget;
+
   useEffect(() => {
     if (!core?.pubsub?.subscribe) return;
 
@@ -121,7 +124,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
           modal
           closable={record?.config_json?.closable === false ? false : true}
           onHide={e => setMode(0)}>
-            <LoginWidget
+            <CompLoginWidget
               auth={auth}
               core={core}
               dispatch={dispatch}
@@ -159,7 +162,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               setMode(0);
             }
           }}>
-            <RegistrationWidget
+            <CompRegistrationWidget
               auth={auth}
               core={core}
               dispatch={dispatch}
