@@ -38,7 +38,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   const passwordHeader = record?.config_json?.header_password ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("passwordReset", "Redefinir password")} - ${appEntityNameAbrev || "ScalarGIS"}`;
 
   const CompLoginWidget = core.getComponentWidget("AuthAMA.LoginWidget") || LoginWidget;
-  const CompRegistrationWidget = core.getComponentWidget("AuthAMA.RegistrationWidget") || LoginWidget;
+  const CompRegistrationWidget = core.getComponentWidget("AuthAMA.RegistrationWidget") || RegistrationWidget;
 
   useEffect(() => {
     if (!core?.pubsub?.subscribe) return;
