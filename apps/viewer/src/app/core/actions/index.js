@@ -748,7 +748,6 @@ export function viewer_load(core, id, history) {
             dispatch(viewer_load_components(pitems));
             // Give time to create viewer and load componentes and layers 
             setTimeout(() => dispatch(viewer_load_done()), 500);
-            //dispatch(viewer_load_done());
           }
         })
       });

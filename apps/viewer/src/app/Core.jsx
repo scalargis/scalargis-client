@@ -229,7 +229,7 @@ Core.prototype.addComponent = function(core, component, done) {
       this.__mainmenu[component.type] = MainMenu;
     }
 
-    // Widgets regsitry
+    // Widgets registry
     if (!!c.widgets && !this.__widgets[component.type]) {
       this.__widgets[component.type] = c?.widgets;
     }
@@ -287,7 +287,7 @@ Core.prototype.addComponent = function(core, component, done) {
         this.__mainmenu[component.type] = MainMenu;
       }
 
-      // Widgets regsitry
+      // Widgets registry
       if (!!c.widgets && !this.__widgets[component.type]) {
         this.__widgets[component.type] = c?.widgets;
       }
@@ -302,6 +302,13 @@ Core.prototype.addComponent = function(core, component, done) {
 
 Core.prototype.unloadComponents = function() {
   this.__components = {}
+}
+
+Core.prototype.registerComponentWidgets = function (componentType, widgets) {
+  // Widgets registry
+  if (!!widgets && !this.__widgets[componentType]) {
+    this.__widgets[componentType] = widgets;
+  }
 }
 
 Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {

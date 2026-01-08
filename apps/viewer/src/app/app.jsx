@@ -33,7 +33,7 @@ const App = () => {
         return [];
       }
       
-      let routes = (config?.customComponents || []).map(async (item) => {
+      let _mods = (config?.customComponents || []).map(async (item) => {
         let mod = null;
         try {
           mod = await import(`./components/${item}/src/Main.jsx`);
@@ -45,20 +45,38 @@ const App = () => {
             return null;
           }
         }
-        return _getRoutesInfo(mod);
+
+        return {
+          type: item,
+          module: mod
+        };
       });
 
-      return Promise.all(routes).then((result) => {
+      return Promise.all(_mods).then((result) => {
         return result.flat();
       }).then(data => {
-        //Filter out invalid elements
-        const validData = (data || []).filter(d => d != null); 
-        setPages(validData);
+        let pgs = [];
+        const elems = (data || []).filter(d => d != null);
+        elems.forEach(d => {
+          // Register component widgets
+          if (d?.module?.widgets) core.registerComponentWidgets(d.type, d.module.widgets);
+          // Load component translations
+          if (d?.module?.translations && typeof d?.module?.translations === 'object') {
+            d?.module?.translations?.load && d?.module?.translations.load();
+          }
+          //Load component page routes
+          if (d?.module?.getPageRoutes) {
+            const _routes = d?.module?.getPageRoutes();
+            if (_routes?.length) pgs.push(..._routes);
+          }
+        });
+        setPages(pgs);
       })
       .catch(error => {
           console.log(error);
       })
       .finally(()=> {setPagesLoaded(true)});
+
     }));
   }, []);
 
