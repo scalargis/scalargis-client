@@ -14,9 +14,9 @@ const defaultLoginValues = {
     username: ''
 }
 
-function PasswordResetWidget(props) {
+function ResetPasswordWidget(props) {
 
-    const { auth, viewer, history, redirect, core, dispatch, actions, record, showLogin } = props;
+    const { auth, viewer, history, redirect, core, dispatch, actions, record, onShowLogin } = props;
 
     // Redux actions
     const { login_clear_error, login_reset_password } = actions;
@@ -61,7 +61,7 @@ function PasswordResetWidget(props) {
                     <Button
                         className="p-button-link"
                         label={i18nUtils.translateValue("login", "Login")}
-                        onClick={showLogin}
+                        onClick={onShowLogin}
                     />
                 </div>
             </React.Fragment>
@@ -85,7 +85,7 @@ function PasswordResetWidget(props) {
                 </div>
             </div>
 
-            { showLogin && <div className="p-fluid">
+            { onShowLogin && <div className="p-fluid">
                 <div className="field grid">
                     <div className="col-12">
                         <Button
@@ -93,7 +93,7 @@ function PasswordResetWidget(props) {
                             label = {i18nUtils.translateValue("login", "Login")}
                             onClick={(e) => {
                                 e.preventDefault();
-                                showLogin();
+                                onShowLogin();
                             }}
                         />
                     </div>
@@ -126,4 +126,4 @@ function PasswordResetWidget(props) {
 
 }
 
-export default PasswordResetWidget;
+export default ResetPasswordWidget;

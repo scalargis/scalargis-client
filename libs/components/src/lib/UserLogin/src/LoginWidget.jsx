@@ -13,7 +13,7 @@ import { getFormValidationErrorMessage } from './utils'
 
 function LoginWidget(props) {
 
-  const { auth, history, redirect, core, dispatch, actions, record, showRegistration, showPasswordReset } = props;
+  const { auth, history, redirect, core, dispatch, actions, record, onShowRegistration, onShowPasswordReset } = props;
   const { siteConfig } = core;
 
   const componentCfg = record.config_json || {};
@@ -103,14 +103,14 @@ function LoginWidget(props) {
             <Button
               className="p-button-link"
               label={i18nUtils.translateValue("passwordReset", "Recuperar password")}
-              onClick={ (e) => { e.preventDefault(); showPasswordReset() }}
+              onClick={ (e) => { e.preventDefault(); onShowPasswordReset() }}
             />
           </div> }
           { componentCfg.user_registration && <div className='col p-2'>
             <Button
               className="p-button-link"
               label={i18nUtils.translateValue("userRegistration", "Novo utilizador")}
-              onClick={ (e) => { e.preventDefault(); showRegistration() }}
+              onClick={ (e) => { e.preventDefault(); onShowRegistration() }}
             />
           </div> }          
         </div> }

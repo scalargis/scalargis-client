@@ -18,7 +18,7 @@ import { getFormValidationErrorMessage } from './utils';
 
 function RegistrationWidget(props) {
 
-  const { auth, viewer, history, redirect, core, dispatch, actions, record, showLogin } = props;
+  const { auth, viewer, history, redirect, core, dispatch, actions, record, onShowLogin } = props;
   const { siteConfig } = core;
   
   // Redux redux actions
@@ -85,7 +85,7 @@ function RegistrationWidget(props) {
             className="p-button-link"
             style={{width: 'auto'}}
             label = "Login"
-            onClick={ (e) => { e.preventDefault(); showLogin() }}
+            onClick={ (e) => { e.preventDefault(); onShowLogin() }}
           />
         </div>        
       </div>      
@@ -179,7 +179,7 @@ function RegistrationWidget(props) {
         </div>        
       </div>
 
-      { showLogin && <div className="p-fluid">
+      { onShowLogin && <div className="p-fluid">
           <div className="field grid">
             <div className="col-2 col-offset-5">
               <Button
@@ -187,7 +187,7 @@ function RegistrationWidget(props) {
                 label = {i18nUtils.translateValue("login", "Entrar")}
                 onClick={(e) => {
                   e.preventDefault();
-                  showLogin();
+                  onShowLogin();
                 }}
               />
             </div>

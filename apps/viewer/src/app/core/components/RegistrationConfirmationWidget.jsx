@@ -18,8 +18,6 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
   const { utils, siteConfig } = core;
   const { registration_confirmation, registration_send_confirmation, login, logout } = core.actions;
 
-  const logo = utils.buildRelativeUrlPath(siteConfig?.logo || 'assets/images/logo.png');
-
   useEffect(() => {
     if (auth?.data?.token) return;
  
@@ -31,11 +29,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
     const { username } = auth.data;
     
     return (
-      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-          <div className="text-center mb-2">
-            <img src={logo} alt="logo" height={50} className="mb-3" />
-          </div>
+        <React.Fragment>
           <div>
             <p dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("activeUserSession", "Existe uma sessão ativa para o utilizador <i><strong>{{username}}</strong></i>", undefined, undefined, undefined, {username: username})}} />
             <p>
@@ -47,8 +41,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
               />{i18nUtils.translateValue("andFinishUserRegistration", "e concluir registo de novo utilizador")}.
             </p>
           </div>
-        </div>
-      </div>
+        </React.Fragment>
     )
   }
 
@@ -58,85 +51,72 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
   if (registration.response && !!registration.response && !!registration.response.authenticated) {
     return (
-      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-          <div className="text-center mb-2">
-            <img src={logo} alt="logo" height={50} className="mb-3" />
-          </div>
-          <div>
-            <div className="flex align-items-center justify-content-center flex-column px-3">
-              <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
-              <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
-              <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
-              <Button className=" my-3" 
-                label={i18nUtils.translateValue("continue", "Continuar")} 
-                onClick={ e => {
-                  setGoRedirect(true);
-                  dispatch(login(registration.response, history, redirect, urlRedirect));
-                }}
-                icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
-                disabled={goRedirect} />
-            </div>
+      <React.Fragment>
+        <div>
+          <div className="flex align-items-center justify-content-center flex-column px-3">
+            <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
+            <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
+            <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
+            <Button className=" my-3" 
+              label={i18nUtils.translateValue("continue", "Continuar")} 
+              onClick={ e => {
+                setGoRedirect(true);
+                dispatch(login(registration.response, history, redirect, urlRedirect));
+              }}
+              icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
+              disabled={goRedirect} />
           </div>
         </div>
-      </div>
+      </React.Fragment>
     )
   }
 
   return (
     <React.Fragment>
-      <div className="_flex-1 _md:flex-auto flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-          <div className="text-center mb-2">
-            <img src={logo} alt="logo" height={50} className="mb-3" />
-            <div className="text-900 text-2xl font-medium mb-3">{i18nUtils.translateValue("userRegistrationConfirmation", "Confirmação de registo de utilizador")}</div>
-            <span className="text-900 font-medium line-height-3">{i18nUtils.translateValue("userRegistrationFillEmail", "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo")}.</span>
+      <div className="text-center mb-2">
+        <div className="text-900 text-2xl font-medium mb-3">{i18nUtils.translateValue("userRegistrationConfirmation", "Confirmação de registo de utilizador")}</div>
+        <span className="text-900 font-medium line-height-3">{i18nUtils.translateValue("userRegistrationFillEmail", "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo")}.</span>
+      </div>
+
+      <div>
+        <label htmlFor="username" className="block text-900 font-medium my-2">{i18nUtils.translateValue("email", "Email")}</label>
+        <InputText value={emailConfirmation} onChange={(e) => setEmailConfirmation(e.target.value)} className="w-full mb-1" />
+
+        <div className="flex justify-content-end mt-4 mb-4">
+            <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+              onClick={() => {
+                history.navigate('/login?redirect=' + (redirect || '/'));
+              }} >
+                {i18nUtils.translateValue("login", "Login")}
+            </a>                         
+        </div>
+
+        { auth.http_error && auth.response && !!auth.response.message &&
+          <div className="p-fluid w-full my-4">
+            <Message style={{ width: '100%' }} severity="error" text={auth.response.message}></Message> 
           </div>
+        }
 
-          <div>
-            <React.Fragment>
-              <label htmlFor="username" className="block text-900 font-medium my-2">{i18nUtils.translateValue("email", "Email")}</label>
-              <InputText value={emailConfirmation} onChange={(e) => setEmailConfirmation(e.target.value)} className="w-full mb-1" />
-
-              <div className="flex justify-content-end mt-4 mb-4">
-                  <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
-                    onClick={() => {
-                      history.navigate('/login?redirect=' + (redirect || '/'));
-                    }} >
-                      {i18nUtils.translateValue("login", "Login")}
-                  </a>                         
-              </div>
-
-              { auth.http_error && auth.response && !!auth.response.message &&
-                <div className="p-fluid w-full my-4">
-                  <Message style={{ width: '100%' }} severity="error" text={auth.response.message}></Message> 
-                </div>
-              }
-
-              { auth.http_error && !auth.response &&
-                <div className="p-fluid w-full my-4">
-                  <Message style={{ width: '100%' }} severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}></Message>
-                </div>
-              }
-
-              { !auth.http_error && auth.response && !!auth.response.message &&
-                <div className="p-fluid w-full my-4">
-                  <Message style={{ width: '100%' }} severity="info" text={auth.response.message}></Message>
-                </div>
-              }
-
-              <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
-                <Button 
-                  icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                  label={i18nUtils.translateValue("send", "Enviar")}
-                  onClick={sendEmailConfirmation}
-                  className="w-full"
-                  disabled={auth.loading}
-                />
-              </div>
-            </React.Fragment>
+        { auth.http_error && !auth.response &&
+          <div className="p-fluid w-full my-4">
+            <Message style={{ width: '100%' }} severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}></Message>
           </div>
+        }
 
+        { !auth.http_error && auth.response && !!auth.response.message &&
+          <div className="p-fluid w-full my-4">
+            <Message style={{ width: '100%' }} severity="info" text={auth.response.message}></Message>
+          </div>
+        }
+
+        <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
+          <Button 
+            icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
+            label={i18nUtils.translateValue("send", "Enviar")}
+            onClick={sendEmailConfirmation}
+            className="w-full"
+            disabled={auth.loading}
+          />
         </div>
       </div>
     </React.Fragment>

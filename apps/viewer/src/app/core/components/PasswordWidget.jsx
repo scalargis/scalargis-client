@@ -78,25 +78,23 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
   if (auth?.data?.token) {
     const { username } = auth.data;
     return (
-      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-
-          <div className="text-center mb-5">
-              <img src={logo} alt="hyper" height={50} className="mb-3" />
-              <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
-          </div>
-
-          <p dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("activeUserSession", "Existe uma sessão ativa para o utilizador <i><strong>{ username }</strong></i>.", undefined, undefined, undefined, {username})}} />
-          <p>
-            {i18nUtils.translateValue("clickTo", "Clique para")} 
-            <Button
-              className="p-button-link"
-              label={i18nUtils.translateValue("endSession", "Terminar sessão")}
-              onClick={e => dispatch(logout())}
-            />{i18nUtils.translateValue("andChangePassword", "e fazer a alteração da palavra-passe")}.
-          </p>
+      <React.Fragment>
+        {/*
+        <div className="text-center mb-5">
+            <img src={logo} alt="hyper" height={50} className="mb-3" />
+            <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
         </div>
-      </div>
+        */}
+        <p dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("activeUserSession", "Existe uma sessão ativa para o utilizador <i><strong>{ username }</strong></i>.", undefined, undefined, undefined, {username})}} />
+        <p>
+          {i18nUtils.translateValue("clickTo", "Clique para")} 
+          <Button
+            className="p-button-link"
+            label={i18nUtils.translateValue("endSession", "Terminar sessão")}
+            onClick={e => dispatch(logout())}
+          />{i18nUtils.translateValue("andChangePassword", "e fazer a alteração da palavra-passe")}.
+        </p>
+      </React.Fragment>
     )
   }
 
@@ -104,112 +102,93 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
     const username = pwd.response.username;
 
     return (
-      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-          <div className="text-center mb-5">
-              <img src={logo} alt="logo" height={50} className="mb-3" />
-              <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
-          </div>
-          <div>
-            <div className="p-fluid w-full my-4 text-center">
-              <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-              <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("changePasswordConfirmationSuccess", "A Palavra-passe foi alterada com sucesso")}!</p>
-              <Button label={i18nUtils.translateValue("continue", "Continuar")}
-                onClick={ e => {
-                  setGoRedirect(true);
-                  const apiUrl = siteConfig?.authentication?.endpoints?.login;
-                  dispatch(login_post(core, { username, password }, apiUrl, history, redirect, urlRedirect));
-                }}
-                icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
-                disabled={goRedirect} />
-            </div>
+        <div>
+          <div className="p-fluid w-full my-4 text-center">
+            <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
+            <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("changePasswordConfirmationSuccess", "A Palavra-passe foi alterada com sucesso")}!</p>
+            <Button label={i18nUtils.translateValue("continue", "Continuar")}
+              onClick={ e => {
+                setGoRedirect(true);
+                const apiUrl = siteConfig?.authentication?.endpoints?.login;
+                dispatch(login_post(core, { username, password }, apiUrl, history, redirect, urlRedirect));
+              }}
+              icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
+              disabled={goRedirect} />
           </div>
         </div>
-      </div>
     )
   }
 
   if (mode === 'reset') {
     if (auth?.response?.reset_password) {
       return (
-        <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-          <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-            <div className="text-center mb-5">
-              <img src={logo} alt="logo" height={50} className="mb-3" />
-              <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
-            </div>
-            <div>
-              <div className="p-fluid w-full my-4">
-                <Message severity="info" text={auth.response.message}></Message> 
-              </div>
-              <div className="flex justify-content-end mt-4 mb-4 p-dialog-myfooter">
-                <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
-                  onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
-                    {i18nUtils.translateValue("login", "Login")}
-                </a>                         
-              </div>
-            </div>
+        <div>
+          <div className="p-fluid w-full my-4">
+            <Message severity="info" text={auth.response.message}></Message> 
+          </div>
+          <div className="flex justify-content-end mt-4 mb-4 p-dialog-myfooter">
+            <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+              onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
+                {i18nUtils.translateValue("login", "Login")}
+            </a>                         
           </div>
         </div>
       )
     } else {
       return (
-        <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-          <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-              <div className="text-center mb-5">
-                <img src={logo} alt="logo" height={50} className="mb-3" />
-                <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
-                <span className="text-600 font-medium line-height-3"
-                  dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("passwordResetSendEmail", "Indique o seu <i>username</i> ou <i>email</i> para receber um email com instruções para alterar a palavra-passe.")}} />
-              </div>
-
-              <div>
-                <label htmlFor="username" className="block text-900 font-medium my-2">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
-                <InputText
-                  className="w-full mb-1"
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                />
-                { username == '' && getFormValidationErrorMessage({username: {type: "required", message: "Campo obrigatório"}}, "username") }
-
-                <div className="flex justify-content-end mt-4 mb-4">
-                    <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
-                      onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
-                        {i18nUtils.translateValue("login", "Login")}
-                    </a>                         
-                </div>
-
-                { auth.http_error && !auth.response &&
-                    <div className="p-fluid w-full my-4">
-                        <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
-                    </div>
-                }
-
-                { auth.response && !!auth.response && !!auth.response.message && 
-                  <div className="p-fluid w-full my-4">
-                    <Message severity={auth.http_error ? "error" : "info"} text={auth?.response?.message}></Message>
-                  </div>
-                }
-
-                <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
-                    <Button 
-                        label={i18nUtils.translateValue("send", "Enviar")}
-                        icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                        className="w-full"
-                        onClick={(e)=> { 
-                          e.preventDefault();
-                          if (!username) { 
-                            setUsername('');
-                            return;
-                          }
-                          dispatch(login_reset_password({ username }, history, redirect));}
-                        }
-                        disabled={auth.loading}
-                    />                            
-                </div>
-              </div>
+        <React.Fragment>
+          <div className="text-center mb-5">
+            <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
+            <span className="text-600 font-medium line-height-3"
+              dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("passwordResetSendEmail", "Indique o seu <i>username</i> ou <i>email</i> para receber um email com instruções para alterar a palavra-passe.")}} />
           </div>
-        </div>
+
+          <div>
+            <label htmlFor="username" className="block text-900 font-medium my-2">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
+            <InputText
+              className="w-full mb-1"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+            />
+            { username == '' && getFormValidationErrorMessage({username: {type: "required", message: "Campo obrigatório"}}, "username") }
+
+            <div className="flex justify-content-end mt-4 mb-4">
+                <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+                  onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
+                    {i18nUtils.translateValue("login", "Login")}
+                </a>                         
+            </div>
+
+            { auth.http_error && !auth.response &&
+                <div className="p-fluid w-full my-4">
+                    <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                </div>
+            }
+
+            { auth.response && !!auth.response && !!auth.response.message && 
+              <div className="p-fluid w-full my-4">
+                <Message severity={auth.http_error ? "error" : "info"} text={auth?.response?.message}></Message>
+              </div>
+            }
+
+            <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
+                <Button 
+                    label={i18nUtils.translateValue("send", "Enviar")}
+                    icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
+                    className="w-full"
+                    onClick={(e)=> { 
+                      e.preventDefault();
+                      if (!username) { 
+                        setUsername('');
+                        return;
+                      }
+                      dispatch(login_reset_password({ username }, history, redirect));}
+                    }
+                    disabled={auth.loading}
+                />                            
+            </div>
+          </div>
+        </React.Fragment>
       )
     }
   }
@@ -217,87 +196,84 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
   if (mode === 'set') {
 
     return (
-      <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
-        <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
-          <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-            <div className="text-center mb-5">
-                <img src={logo} alt="logo" height={50} className="mb-3" />
-                <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
-                <span className="text-600 font-medium line-height-3">{i18nUtils.translateValue("passwordResetIntroMsg", "Por favor, defina e confirme a sua nova palavra-passe.")}</span>
-            </div>
-            <div>
-              <label htmlFor="newPassword" className="block text-900 font-medium my-2">{i18nUtils.translateValue("newPassword", "Nova password")}</label>
-              <Controller name="newPassword" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
-                  <Password id={field.name} {...field} 
-                      toggleMask
-                      promptLabel={i18nUtils.translateValue("enterPassword", "Introduza a password")}
-                      {...passwordStrengthLabels}
-                      className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
-                      inputClassName="w-full"
-                      pt={{ iconField: { root: { className: 'w-full' } } }}
-                      autoComplete="off"
-                      aria-autocomplete="none"
-                      disabled={auth?.response?.success} />                  
-              )} />
-              {getFormValidationErrorMessage(errors, 'newPassword')}
+      <React.Fragment>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+          <div className="text-center mb-5">
+              <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
+              <span className="text-600 font-medium line-height-3">{i18nUtils.translateValue("passwordResetIntroMsg", "Por favor, defina e confirme a sua nova palavra-passe.")}</span>
+          </div>
+          <div>
+            <label htmlFor="newPassword" className="block text-900 font-medium my-2">{i18nUtils.translateValue("newPassword", "Nova password")}</label>
+            <Controller name="newPassword" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
+                <Password id={field.name} {...field} 
+                    toggleMask
+                    promptLabel={i18nUtils.translateValue("enterPassword", "Introduza a password")}
+                    {...passwordStrengthLabels}
+                    className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
+                    inputClassName="w-full"
+                    pt={{ iconField: { root: { className: 'w-full' } } }}
+                    autoComplete="off"
+                    aria-autocomplete="none"
+                    disabled={auth?.response?.success} />                  
+            )} />
+            {getFormValidationErrorMessage(errors, 'newPassword')}
 
-              <label htmlFor="confirmPassword" className="block text-900 font-medium my-2">{i18nUtils.translateValue("confirmPassword", "Confirmar password")}</label>
-              <Controller name="confirmPassword" control={control} 
-                  rules={{ 
-                      required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
-                      validate: (value) => {
-                          if (value && watchFields[0] && value != watchFields[0]) {
-                              return i18nUtils.translateValue("noMatchingPasswords", "As passwords introduzidas não são iguais");
-                          }
-                          return true;
-                      }
-                  }} 
-                  render={({ field, fieldState }) => (
-                  <Password id={field.name} {...field}
-                      feedback={false}
-                      toggleMask 
-                      promptLabel={i18nUtils.translateValue("confirmPassword", "Confirmar password")}
-                      className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
-                      inputClassName="w-full"
-                      pt={{ iconField: { root: { className: 'w-full' } } }}
-                      autoComplete="off"
-                      aria-autocomplete="none"
-                      disabled={auth?.response?.success} />
-                  )} 
-              />
-              {getFormValidationErrorMessage(errors, 'confirmPassword')}
+            <label htmlFor="confirmPassword" className="block text-900 font-medium my-2">{i18nUtils.translateValue("confirmPassword", "Confirmar password")}</label>
+            <Controller name="confirmPassword" control={control} 
+                rules={{ 
+                    required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
+                    validate: (value) => {
+                        if (value && watchFields[0] && value != watchFields[0]) {
+                            return i18nUtils.translateValue("noMatchingPasswords", "As passwords introduzidas não são iguais");
+                        }
+                        return true;
+                    }
+                }} 
+                render={({ field, fieldState }) => (
+                <Password id={field.name} {...field}
+                    feedback={false}
+                    toggleMask 
+                    promptLabel={i18nUtils.translateValue("confirmPassword", "Confirmar password")}
+                    className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
+                    inputClassName="w-full"
+                    pt={{ iconField: { root: { className: 'w-full' } } }}
+                    autoComplete="off"
+                    aria-autocomplete="none"
+                    disabled={auth?.response?.success} />
+                )} 
+            />
+            {getFormValidationErrorMessage(errors, 'confirmPassword')}
 
-              <div className="flex justify-content-end mt-4 mb-4">
-                  <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
-                    onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
-                      {i18nUtils.translateValue("login", "Login")}
-                  </a>                         
-                </div>
-
-              { pwd.http_error && !pwd.response &&
-                  <div className="p-fluid w-full my-4">
-                  <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
-                  </div>
-              }
-
-              { pwd.response && !!pwd.response && !pwd.authenticated && !!pwd.response.message &&
-                  <div className="p-fluid w-full my-4">
-                  <Message severity="error" text={auth?.response?.message}></Message>
-                  </div>
-              }                        
-              
-              <div className="flex justify-content-end mt-4 mb-4 p-dialog-myfooter">
-                  <Button 
-                      label={i18nUtils.translateValue("accept", "Aceitar")}
-                      icon={ pwd.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                      className="w-full"
-                      disabled={pwd.loading} 
-                  />                            
+            <div className="flex justify-content-end mt-4 mb-4">
+                <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+                  onClick={(e) => history.navigate('/login?redirect=' + (redirect || '/'))}>
+                    {i18nUtils.translateValue("login", "Login")}
+                </a>                         
               </div>
+
+            { pwd.http_error && !pwd.response &&
+                <div className="p-fluid w-full my-4">
+                <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                </div>
+            }
+
+            { pwd.response && !!pwd.response && !pwd.authenticated && !!pwd.response.message &&
+                <div className="p-fluid w-full my-4">
+                <Message severity="error" text={auth?.response?.message}></Message>
+                </div>
+            }                        
+            
+            <div className="flex justify-content-end mt-4 mb-4 p-dialog-myfooter">
+                <Button 
+                    label={i18nUtils.translateValue("accept", "Aceitar")}
+                    icon={ pwd.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
+                    className="w-full"
+                    disabled={pwd.loading} 
+                />                            
             </div>
-          </form>
-        </div>
-      </div>
+          </div>
+        </form>
+      </React.Fragment>
     )
   }
 }
