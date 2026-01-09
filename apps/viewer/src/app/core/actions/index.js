@@ -7,73 +7,73 @@ import { isThemeOnScale as isThemeOnScaleMapModel, transformExtent } from "../mo
 import { fetchJson } from "../service/fetch";
 
 
-export const SITE_LOAD = 'SITE_LOAD'
+export const SITE_LOAD                  = 'SITE_LOAD'
 
-export const AUTH_HTTP_LOADING = 'AUTH_HTTP_LOADING'
-export const AUTH_HTTP_ERROR = 'AUTH_HTTP_ERROR'
-export const AUTH_CLEAR_ERROR = 'AUTH_CLEAR_ERROR'
-export const AUTH_RESPONSE = 'AUTH_RESPONSE'
-export const AUTH_LOGIN = 'AUTH_LOGIN'
+export const AUTH_HTTP_LOADING          = 'AUTH_HTTP_LOADING'
+export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
+export const AUTH_CLEAR_ERROR           = 'AUTH_CLEAR_ERROR'
+export const AUTH_RESPONSE              = 'AUTH_RESPONSE'
+export const AUTH_LOGIN                 = 'AUTH_LOGIN'
 
-export const PASSWORD_HTTP_LOADING = 'PASSWORD_HTTP_LOADING'
-export const PASSWORD_HTTP_ERROR = 'PASSWORD_HTTP_ERROR'
-export const PASSWORD_RESPONSE = 'PASSWORD_RESPONSE'
+export const PASSWORD_HTTP_LOADING      = 'PASSWORD_HTTP_LOADING'
+export const PASSWORD_HTTP_ERROR        = 'PASSWORD_HTTP_ERROR'
+export const PASSWORD_RESPONSE          = 'PASSWORD_RESPONSE'
 
-export const REGISTRATION_HTTP_LOADING = 'REGISTRATION_HTTP_LOADING'
-export const REGISTRATION_HTTP_ERROR = 'REGISTRATION_HTTP_ERROR'
-export const REGISTRATION_RESPONSE = 'REGISTRATION_RESPONSE'
+export const REGISTRATION_HTTP_LOADING  = 'REGISTRATION_HTTP_LOADING'
+export const REGISTRATION_HTTP_ERROR    = 'REGISTRATION_HTTP_ERROR'
+export const REGISTRATION_RESPONSE      = 'REGISTRATION_RESPONSE'
 
-export const VIEWER_LOAD = 'VIEWER_LOAD'
-export const VIEWER_LOAD_DONE = 'VIEWER_LOAD_DONE'
-export const VIEWER_SAVE_HTTP_LOADING = 'VIEWER_SAVE_HTTP_LOADING'
-export const VIEWER_SAVE_HTTP_ERROR = 'VIEWER_SAVE_HTTP_ERROR'
-export const VIEWER_SAVE_RESPONSE = 'VIEWER_SAVE_RESPONSE'
+export const VIEWER_LOAD                = 'VIEWER_LOAD'
+export const VIEWER_LOAD_DONE           = 'VIEWER_LOAD_DONE'
+export const VIEWER_SAVE_HTTP_LOADING   = 'VIEWER_SAVE_HTTP_LOADING'
+export const VIEWER_SAVE_HTTP_ERROR     = 'VIEWER_SAVE_HTTP_ERROR'
+export const VIEWER_SAVE_RESPONSE       = 'VIEWER_SAVE_RESPONSE'
 
-export const VIEWER_SESSION_LOAD = 'VIEWER_SESSION_LOAD'
-export const VIEWER_SESSION_SAVED = 'VIEWER_SESSION_SAVED'
+export const VIEWER_SESSION_LOAD        = 'VIEWER_SESSION_LOAD'
+export const VIEWER_SESSION_SAVED       = 'VIEWER_SESSION_SAVED'
 
-export const VIEWER_SET_CONFIG = 'VIEWER_SET_CONFIG'
-export const VIEWER_LOAD_ERROR = 'VIEWER_LOAD_ERROR'
-export const VIEWER_NOT_FOUND = 'VIEWER_NOT_FOUND'
-export const VIEWER_NOT_AUTHORIZED = 'VIEWER_NOT_AUTHORIZED'
-export const VIEWER_LOAD_COMPONENTS = 'VIEWER_LOAD_COMPONENTS'
-export const VIEWER_UNLOAD_COMPONENTS = 'VIEWER_UNLOAD_COMPONENTS'
-export const VIEWER_SET_SELECTEDMENU = 'VIEWER_SET_SELECTEDMENU'
-export const VIEWER_SET_LOCALE = 'VIEWER_SET_LOCALE'
-export const VIEWER_SET_FEATUREINFO = 'VIEWER_SET_FEATUREINFO'
-export const VIEWER_SET_GEOLOCATION = 'VIEWER_SET_GEOLOCATION'
-export const VIEWER_SET_DRAWINGS = 'VIEWER_SET_DRAWINGS'
-export const VIEWER_SET_COORDINATES = 'VIEWER_SET_COORDINATES'
+export const VIEWER_SET_CONFIG          = 'VIEWER_SET_CONFIG'
+export const VIEWER_LOAD_ERROR          = 'VIEWER_LOAD_ERROR'
+export const VIEWER_NOT_FOUND           = 'VIEWER_NOT_FOUND'
+export const VIEWER_NOT_AUTHORIZED      = 'VIEWER_NOT_AUTHORIZED'
+export const VIEWER_LOAD_COMPONENTS     = 'VIEWER_LOAD_COMPONENTS'
+export const VIEWER_UNLOAD_COMPONENTS   = 'VIEWER_UNLOAD_COMPONENTS'
+export const VIEWER_SET_SELECTEDMENU    = 'VIEWER_SET_SELECTEDMENU'
+export const VIEWER_SET_LOCALE          = 'VIEWER_SET_LOCALE'
+export const VIEWER_SET_FEATUREINFO     = 'VIEWER_SET_FEATUREINFO'
+export const VIEWER_SET_GEOLOCATION     = 'VIEWER_SET_GEOLOCATION'
+export const VIEWER_SET_DRAWINGS        = 'VIEWER_SET_DRAWINGS'
+export const VIEWER_SET_COORDINATES     = 'VIEWER_SET_COORDINATES'
 
-export const MAP_SET_EXTENT = 'MAP_SET_EXTENT'
-export const MAP_SET_SIZE = 'MAP_SET_SIZE'
-export const MAP_SET_CLASS = 'MAP_SET_CLASS'
+export const MAP_SET_EXTENT             = 'MAP_SET_EXTENT'
+export const MAP_SET_SIZE               = 'MAP_SET_SIZE'
+export const MAP_SET_CLASS              = 'MAP_SET_CLASS'
 
-export const LAYERS_SET_CHECKED = 'LAYERS_SET_CHECKED'
-export const LAYERS_SET_OPENED = 'LAYERS_SET_OPENED'
-export const LAYERS_UPDATE_THEME = 'LAYERS_UPDATE_THEME'
-export const LAYERS_REMOVE_ITEMS = 'LAYERS_REMOVE_ITEMS'
-export const VIEWER_SET_DISPLAYCRS = 'VIEWER_SET_DISPLAYCRS'
-export const VIEWER_ADD_THEMES = 'VIEWER_ADD_THEMES'
-export const VIEWER_REMOVE_THEMES = 'VIEWER_REMOVE_THEMES'
-export const VIEWER_SET_CONFIGJSON = 'VIEWER_SET_CONFIGJSON'
-export const VIEWER_UPDATE_MAPCONTROL = 'VIEWER_UPDATE_MAPCONTROL'
+export const LAYERS_SET_CHECKED         = 'LAYERS_SET_CHECKED'
+export const LAYERS_SET_OPENED          = 'LAYERS_SET_OPENED'
+export const LAYERS_UPDATE_THEME        = 'LAYERS_UPDATE_THEME'
+export const LAYERS_REMOVE_ITEMS        = 'LAYERS_REMOVE_ITEMS'
+export const VIEWER_SET_DISPLAYCRS      = 'VIEWER_SET_DISPLAYCRS'
+export const VIEWER_ADD_THEMES          = 'VIEWER_ADD_THEMES'
+export const VIEWER_REMOVE_THEMES       = 'VIEWER_REMOVE_THEMES'
+export const VIEWER_SET_CONFIGJSON      = 'VIEWER_SET_CONFIGJSON'
+export const VIEWER_UPDATE_MAPCONTROL   = 'VIEWER_UPDATE_MAPCONTROL'
 export const VIEWER_SET_EXCUSIVE_MAPCONTROL = 'VIEWER_SET_EXCUSIVE_MAPCONTROL'
 
-export const LAYOUT_WRAPPER_CLICK = 'LAYOUT_WRAPPER_CLICK'
-export const LAYOUT_TOGGLE_OVERLAYMENU = 'LAYOUT_TOGGLE_OVERLAYMENU'
-export const LAYOUT_TOGGLE_STATICMENU = 'LAYOUT_TOGGLE_STATICMENU'
-export const LAYOUT_TOGGLE_MOBILEMENU = 'LAYOUT_TOGGLE_MOBILEMENU'
+export const LAYOUT_WRAPPER_CLICK       = 'LAYOUT_WRAPPER_CLICK'
+export const LAYOUT_TOGGLE_OVERLAYMENU  = 'LAYOUT_TOGGLE_OVERLAYMENU'
+export const LAYOUT_TOGGLE_STATICMENU   = 'LAYOUT_TOGGLE_STATICMENU'
+export const LAYOUT_TOGGLE_MOBILEMENU   = 'LAYOUT_TOGGLE_MOBILEMENU'
 
-export const VIEWER_ADD_NOTIFICATION = 'VIEWER_ADD_NOTIFICATION'
+export const VIEWER_ADD_NOTIFICATION    = 'VIEWER_ADD_NOTIFICATION'
 export const VIEWER_CLEAR_NOTIFICATIONS = 'VIEWER_CLEAR_NOTIFICATIONS'
 
-export const VIEWER_ADD_DIALOG_WINDOW = 'VIEWER_ADD_DIALOG_WINDOW '
+export const VIEWER_ADD_DIALOG_WINDOW   = 'VIEWER_ADD_DIALOG_WINDOW '
 export const VIEWER_REMOVE_DIALOG_WINDOW = 'VIEWER_REMOVE_DIALOG_WINDOW'
 export const VIEWER_UPDATE_DIALOG_WINDOW = 'VIEWER_UPDATE_DIALOG_WINDOW'
 export const VIEWER_CLEAR_DIALOG_WINDOWS = 'VIEWER_CLEAR_DIALOG_WINDOWS'
 
-export const VIEWER_SET_TRANSLATION_NAMESPACES = 'VIEWER_SET_TRANSLATION_NAMESPACES'
+export const VIEWER_SET_TRANSLATION_NAMESPACES = 'VIEWER_SET_TRANSLATION_NAMESPACES' 
 
 
 // Get config URL
@@ -81,7 +81,7 @@ const CONFIG_URL = import.meta.env.VITE_APP_CONFIG_URL;
 const API_URL = getAppApiUrl();
 const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
-const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '';
+const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || ''; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
 
@@ -91,10 +91,10 @@ export function site_load(core, callback) {
 
     try {
       await fetch(url, {
-        signal: AbortSignal.timeout(10000)
-      })
-        .then(resp => {
-          return resp.json();
+          signal: AbortSignal.timeout(10000)
+        })
+        .then(resp => { 
+            return resp.json();
         })
         .then(data => {
           core.setSiteConfig(data);
@@ -102,14 +102,14 @@ export function site_load(core, callback) {
         })
         .catch(error => {
           console.log(error);
-          core.setSiteConfig({ error: true });
+          core.setSiteConfig({error: true});
           callback && callback({});
         });
     } catch (error) {
       // Timeouts if the request takes
       // longer than 10 seconds
       console.log(error);
-      core.setSiteConfig({ error: true });
+      core.setSiteConfig({error: true});
       callback && callback({});
     }
   }
@@ -124,7 +124,7 @@ export function viewer_save_record(core, record, history, redirect, cb) {
     let options = {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json'        
       },
       method: record.id ? 'PUT' : 'POST',
       body: JSON.stringify(record)
@@ -140,7 +140,7 @@ export function viewer_save_record(core, record, history, redirect, cb) {
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
-        const save_options = record.id ? {
+        const save_options = record.id ? { 
           name: record.name,
           title: record.title,
           description: record.description,
@@ -188,13 +188,13 @@ export function login_http_loading() {
   return action;
 }
 
-export function login_post(core, payload, apiUrl = null, history = null, redirect = null, urlRedirect = null) {
+export function login_post(core, payload, apiUrl=null, history=null, redirect=null, urlRedirect=null) {
   return function (dispatch, getState) {
 
     const { utils } = core;
 
     dispatch(login_http_loading());
-
+    
     // Login request
     let options = {
       method: 'POST',
@@ -211,20 +211,17 @@ export function login_post(core, payload, apiUrl = null, history = null, redirec
           const cookies = new Cookies();
           let expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-          // Always use '/' as fallback cookie path to ensure it's accessible on all routes
-          cookies.set(cookieAuthName, res, { path: cookiePath || '/', expires: expireDate });
+          cookies.set(cookieAuthName, res, { path: urlRedirect || cookiePath, expires: expireDate });
           dispatch(auth_login(res));
           if (urlRedirect) {
             window.location.assign(urlRedirect);
-          } else if (redirect) {
-            // Use hard redirect instead of React Router navigation
-            // This ensures full page refresh with proper auth state initialization
-            window.location.href = redirect;
+          } else if (redirect && history?.navigate) {
+            history.navigate(redirect);
           } else {
             window.location.reload();
           }
         } else {
-          dispatch(login_http_error({ status: 401, message: i18nUtils.translateValue("wrongUsernamePassword", "Nome de Utilizador ou Palavra-passe inválido") }));
+          dispatch(login_http_error({ status: 401, message: i18nUtils.translateValue("wrongUsernamePassword", "Nome de Utilizador ou Palavra-passe inválido")}));
         }
       }).catch(error => {
         console.log('error', error);
@@ -248,12 +245,12 @@ export function login(auth, history, redirect, urlRedirect) {
         history.navigate(redirect);
       } else {
         window.location.reload();
-      }
+      } 
     }
   }
 }
 
-export function logout(history = null, redirect = null) {
+export function logout(history=null, redirect=null) {
   return function (dispatch, getState) {
     const cookies = new Cookies();
     cookies.remove(cookieAuthName, { path: cookiePath });
@@ -299,10 +296,10 @@ export function auth_login(data) {
 export function login_reset_password(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
-
+    
     let options = {
       method: 'POST',
-      body: JSON.stringify({ ...post, redirect })
+      body: JSON.stringify({...post, redirect})
     }
 
     let url = API_URL + '/security/reset_password';
@@ -310,13 +307,13 @@ export function login_reset_password(post, history, redirect) {
       .then(res => res.json())
       .then(res => {
         if (!res.error) {
-          dispatch(login_response({ reset_password: true, ...res }));
+          dispatch(login_response({reset_password:true, ...res}));
         } else {
           let msg = res.message;
           if (res?.status === 401) {
             msg = i18nUtils.translateValue("wrongUser", "O Utilizador indicado não é válido")
           }
-          dispatch(login_http_error({ status: res.status, message: msg }));
+          dispatch(login_http_error({status: res.status, message: msg}));
         }
       }).catch(error => {
         dispatch(login_http_error());
@@ -334,7 +331,7 @@ export function password_http_loading() {
 export function password_reset_validation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(password_http_loading());
-
+    
     // Login request
     let options = {
       method: 'POST',
@@ -348,10 +345,10 @@ export function password_reset_validation(post, history, redirect) {
         if (!res.error) {
           dispatch(password_response(res));
         } else {
-          dispatch(login_http_error({ status: res.status, valid_token: false, message: res.message }));
+          dispatch(login_http_error({status: res.status, valid_token: false, message: res.message}));
         }
       }).catch(error => {
-        dispatch(login_http_error({ status: 401, valid_token: false, message: 'Serviço indisponível' }));
+        dispatch(login_http_error({status: 401, valid_token: false, message: 'Serviço indisponível'}));
       });
   }
 }
@@ -360,7 +357,7 @@ export function password_reset_validation(post, history, redirect) {
 export function password_post(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(password_http_loading());
-
+    
     let options = {
       method: 'POST',
       body: JSON.stringify(post)
@@ -373,7 +370,7 @@ export function password_post(post, history, redirect) {
         if (!res.error) {
           dispatch(password_response(res));
         } else {
-          dispatch(login_http_error({ status: res.status, message: res.message }));
+          dispatch(login_http_error({ status: res.status, message: res.message}));
         }
       }).catch(error => {
         dispatch(password_http_error());
@@ -397,7 +394,7 @@ export function password_http_error(res) {
   return action;
 }
 
-export function login_user_registration(core, data, apiUrl = null, redirect = null) {
+export function login_user_registration(core, data, apiUrl=null, redirect=null) {
   return function (dispatch, getState) {
 
     const { actions, utils } = core;
@@ -405,39 +402,39 @@ export function login_user_registration(core, data, apiUrl = null, redirect = nu
     dispatch(actions.login_http_loading());
 
     const headers = new Headers({
-      "content-type": 'application/json',
-      accept: 'application/json'
-    });
+        "content-type": 'application/json',
+        accept: 'application/json'
+      });
 
     let url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : core.API_URL + '/security/register_user';
     fetchJson(url, { method: 'POST', headers, body: JSON.stringify(data) }).then(res => {
-      if (res.status === 200) {
-        return res.json;
-      }
+        if (res.status === 200) {
+            return res.json;
+        }      
     }).then(result => {
-      if (!result.error) {
-        dispatch(actions.login_response({ register_user: true, username: data.username, email: data.email, redirect, ...result }));
-      } else {
-        if (result.status === 409) {
-          // 409 = Duplicate username/email
-          dispatch(actions.login_http_error({ status: result.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", result.message) }));
-        } else if (result.status === 422) {
-          // 422 = Use server message directly
-          dispatch(actions.login_http_error({ status: result.status, message: result.message }));
+        if (!result.error) {
+            dispatch(actions.login_response({register_user:true, username: data.username, email:data.email, redirect, ...result}));
         } else {
-          dispatch(actions.login_http_error({ status: result.status, message: result.message }));
+            if (result.status === 409) {
+              // 409 = Duplicate username/email
+              dispatch(actions.login_http_error({status: result.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", result.message)}));
+            } else if (result.status === 422) {
+              // 422 = Use server message directly
+              dispatch(actions.login_http_error({status: result.status, message: result.message}));
+            } else {
+              dispatch(actions.login_http_error({status: result.status, message: result.message}));
+            }
         }
-      }
     }).catch(error => {
-      if (error?.status === 409) {
-        // 409 = Duplicate username/email
-        dispatch(actions.login_http_error({ status: error.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", error.message) }));
-      } else if (error?.status === 422) {
-        // 422 = Use server message directly
-        dispatch(actions.login_http_error({ status: error.status, message: error.message }));
-      } else {
-        dispatch(actions.login_http_error({ status: error.status, message: error.message }));
-      }
+        if (error?.status === 409) {
+            // 409 = Duplicate username/email
+            dispatch(actions.login_http_error({status: error.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", error.message)}));
+        } else if (error?.status === 422) {
+            // 422 = Use server message directly
+            dispatch(actions.login_http_error({status: error.status, message: error.message}));
+        } else {
+            dispatch(actions.login_http_error({status: error.status, message: error.message}));
+        }
     });
   }
 }
@@ -452,7 +449,7 @@ export function registration_http_loading() {
 export function registration_post(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(registration_http_loading());
-
+    
     let options = {
       method: 'POST',
       body: JSON.stringify(post)
@@ -468,7 +465,7 @@ export function registration_post(post, history, redirect) {
           let expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
           cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
-          if (redirect && history?.navigate) history.navigate(redirect);
+          if (redirect && history?.navigate) history.navigate(redirect); 
           else window.location.reload();
         } else {
           //dispatch(registration_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
@@ -482,7 +479,7 @@ export function registration_post(post, history, redirect) {
 export function registration_confirmation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
-
+    
     let options = {
       method: 'POST',
       body: JSON.stringify(post)
@@ -497,9 +494,9 @@ export function registration_confirmation(post, history, redirect) {
         } else {
           if (res.status === 401) {
             console.log(res.message);
-            dispatch(login_http_error({ status: res.status, message: i18nUtils.translateValue("userRegistrationInvalid", res.message) }));
+            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationInvalid", res.message)}));
           } else {
-            dispatch(login_http_error({ status: res.status, valid_token: false, message: res.message }));
+            dispatch(login_http_error({status: res.status, valid_token: false, message: res.message}));
           }
         }
       }).catch(error => {
@@ -512,10 +509,10 @@ export function registration_confirmation(post, history, redirect) {
 export function registration_send_confirmation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
-
+    
     let options = {
       method: 'POST',
-      body: JSON.stringify({ ...post, redirect })
+      body: JSON.stringify({...post, redirect})
     }
 
     let url = API_URL + '/security/registration/send_confirmation';
@@ -524,18 +521,18 @@ export function registration_send_confirmation(post, history, redirect) {
       .then(res => {
         if (!res.error) {
           if (res?.email) {
-            const msg = i18nUtils.translateValue("userRegistrationConfirmationSentToEmail", "A confirmação de registo de utilizador foi enviada para o email {{email}}.", undefined, undefined, undefined, { email: res.email })
-            dispatch(login_response({ ...res, message: msg }));
+            const msg = i18nUtils.translateValue("userRegistrationConfirmationSentToEmail","A confirmação de registo de utilizador foi enviada para o email {{email}}.", undefined, undefined, undefined, {email: res.email})
+            dispatch(login_response({...res, message: msg}));
           } else {
             dispatch(login_response(res));
           }
         } else {
           if (res?.status === 401) {
-            dispatch(login_http_error({ status: res.status, message: i18nUtils.translateValue("userRegistrationConfirmationWrongEmail", res.message) }));
+            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationConfirmationWrongEmail", res.message)}));
           } else {
-            dispatch(login_http_error({ status: res.status, message: res.message }));
+            dispatch(login_http_error({status: res.status, message: res.message}));
           }
-        }
+        }    
       }).catch(error => {
         dispatch(login_http_error());
       });
@@ -635,7 +632,7 @@ export function viewer_error(history) {
 }
 
 export function viewer_not_found(history) {
-  const action = {
+  const action =  {
     type: VIEWER_NOT_FOUND,
     redirect: '/not-found'
   }
@@ -688,10 +685,10 @@ export function viewer_load(core, id, history) {
     }
 
     const options = { headers: {} };
-
+    
     // Add logged user token
     if (logged?.token) options.headers['X-API-KEY'] = logged.token;
-
+    
     // Make request
     fetch(url, options).then(res => {
 
@@ -699,9 +696,9 @@ export function viewer_load(core, id, history) {
       if (res.status === 401) throw new Error('Unauthorized');
       else if (res.status !== 200) throw new Error('Not found');
       return res.json();
-
+      
     }).then(config => {
-
+      
       // Validate config
       if (!config) return dispatch(viewer_not_found(history));
       if (!config.config_json) return dispatch(viewer_not_found(history));
@@ -781,13 +778,13 @@ export function viewer_load(core, id, history) {
 export function viewer_session_load(history) {
   return function (dispatch, getState) {
     if (history?.navigate) {
-      history.navigate({ pathname: history.location.pathname, search: history.location.search ? history.location.search + '&session=true' : '?session=true' });
+      history.navigate({ pathname: history.location.pathname, search: history.location.search ? history.location.search + '&session=true' : '?session=true'});
     }
   }
 }
 
 export function viewer_session_saved(session) {
-  const action = {
+  const action =  {
     type: VIEWER_SESSION_SAVED,
     session: session
   }
@@ -849,11 +846,11 @@ export function layers_update_theme(theme) {
   return action;
 }
 
-export function viewer_add_themes(parentId, themes = [], top, isSession = false) {
+export function viewer_add_themes(parentId, themes = [], top, isSession=false) {
   let action = {
     type: VIEWER_ADD_THEMES,
     parentId,
-    themes,
+    themes, 
     top,
     isSession
   }
@@ -966,7 +963,7 @@ export function layout_show_menu(isDesktop) {
         if (!getState().root.viewer.mobileMenuActive) {
           dispatch(layout_toggle_mobilemenu());
         }
-      }
+      } 
     }
   }
 }
@@ -986,7 +983,7 @@ export function viewer_clear_notifications() {
   return action;
 }
 
-export function viewer_add_dialog_window({ config, child, onClose }) {
+export function viewer_add_dialog_window({config, child, onClose}) {
   const dialogWindow = {
     key: config.key || new Date().getTime(),
     config,
@@ -1010,7 +1007,7 @@ export function viewer_remove_dialog_window(key) {
   return action;
 }
 
-export function viewer_update_dialog_window({ config, child, visible }) {
+export function viewer_update_dialog_window({config, child, visible}) {
   let action = {
     type: VIEWER_UPDATE_DIALOG_WINDOW,
     config,
@@ -1077,20 +1074,20 @@ const createLegendUrl = (url, layer, srs = 4326, auth) => {
   //console.log('SRS=' + (srs.indexOf(':') === -1 ? 'EPSG:' + srs : srs));
 
   finalurl = finalurl + '&' + ([
-    'SERVICE=WMS',
-    'VERSION=1.1.1',
-    'REQUEST=GetLegendGraphic',
-    'FORMAT=image%2Fpng',
-    'SRS=' + (String(srs).indexOf(':') === -1 ? 'EPSG:' + srs : srs),
-    'CRS=' + (String(srs).indexOf(':') === -1 ? 'EPSG:' + srs : srs),
-    'LAYER=' + layer
-  ].join('&'));
+        'SERVICE=WMS',
+        'VERSION=1.1.1',
+        'REQUEST=GetLegendGraphic',
+        'FORMAT=image%2Fpng',
+        'SRS=' + (String(srs).indexOf(':') === -1 ? 'EPSG:' + srs : srs),
+        'CRS=' + (String(srs).indexOf(':') === -1 ? 'EPSG:' + srs : srs),
+        'LAYER=' + layer
+    ].join('&'));
 
   //Add user authentication token  
   if (isUrlAppHostname(finalurl) && viewer.integrated_authentication) {
     if (auth && auth.data && auth.data.auth_token) {
       const authkey = viewer?.integrated_authentication_key || 'authkey';
-      finalurl += '&' + authkey + '=' + auth.data.auth_token;
+      finalurl+= '&' + authkey + '=' + auth.data.auth_token;
     }
   }
 
