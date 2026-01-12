@@ -63,9 +63,11 @@ function PageLogin(props) {
                             </div>
                             <CompLoginWidget
                                 auth={auth}
+                                history={history}
                                 core={core}
                                 dispatch={dispatch}
                                 actions={actions}
+                                redirect={redirect}
                                 onLogin={(data) => {
                                     //TODO
                                     if (siteConfig?.authentication?.actions?.login) {
