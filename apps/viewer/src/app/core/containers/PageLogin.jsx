@@ -84,7 +84,7 @@ function PageLogin(props) {
                     </div>
                     { mode === 1 ?
                         <React.Fragment>
-                            <div className="text-center mb-5">
+                            <div className="text-center mb-3">
                                 <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("welcome", "Bem-vindo")}</div>
                             </div>
                             <CompLoginWidget
@@ -109,7 +109,7 @@ function PageLogin(props) {
                         </React.Fragment>
                     : mode === 2 ?
                         <React.Fragment>
-                            <div className="text-center mb-5">
+                            <div className="text-center mb-3">
                                 <span className="text-600 text-2xl font-medium line-height-3">{i18nUtils.translateValue("passwordReset", "Recuperar password")}</span>
                             </div>
                             <CompResetPasswordWidget
@@ -132,14 +132,16 @@ function PageLogin(props) {
                         </React.Fragment>
                     : mode === 3 ?
                         <React.Fragment>
-                            <div className="text-center mb-5">
+                            <div className="text-center mb-3">
                                 <span className="text-600 text-2xl font-medium line-height-3">{i18nUtils.translateValue("createUser", "Criar utilizador")}</span>
                             </div>
                             <CompRegistrationWidget
                                 auth={auth}
+                                history={history}
                                 core={core}
                                 dispatch={dispatch}
                                 actions={actions}
+                                redirect={redirect}
                                 onRegistration={(data) => {
                                     const payload = {
                                         ...data,
