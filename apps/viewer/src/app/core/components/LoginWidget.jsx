@@ -30,8 +30,7 @@ function LoginWidget(props) {
 
     useEffect(() => {
         dispatch(login_clear_error());
-      }, []);
-
+    }, []);
 
     const checkKeyDown =  async (e) => {
     if (e.code === 'Enter') {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from 'primereact/button';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -15,7 +16,7 @@ function PageLogin(props) {
     const { actions, utils, siteConfig } = core;
 
     // Redux actions
-    const { login_post, login_user_registration, login_reset_password } = actions;
+    const { login_post, login_user_registration, login_reset_password, logout } = actions;
 
     // Routing
     const location = useLocation();
@@ -47,6 +48,31 @@ function PageLogin(props) {
     }
     if (siteConfig?.authentication?.widgets?.password) { 
         CompResetPasswordWidget = core.getComponentWidget(siteConfig?.authentication?.widgets?.password)
+    }
+
+    if (auth?.data?.token) {
+        const { username } = auth.data;
+        return (
+            <div className="flex justify-content-center align-self-center p-6 sm:p-8">
+                <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
+                    <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+                        <div className="text-center mb-3">
+                            <img src={logo} alt="logo" className="mb-3" style={{maxHeight: "180px", maxWidth: "-webkit-fill-available"}} />
+                        </div>
+                        <div>
+                            <p>Olá { username }.</p>
+                            <p>
+                            Clique para 
+                            <Button
+                                className="p-button-link" onClick={e => dispatch(logout())}
+                                label={i18nUtils.translateValue("endSession", "Terminar sessão")}
+                            />.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
     
     return (
