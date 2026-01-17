@@ -2,6 +2,25 @@
     "/geoserver": {
         "target": "http://localhost:8080/geoserver",
         "changeOrigin": true,
-        "rewritePath": ["geoserver/", ""]
+        "rewrite": ""
+    },
+    "/geoserver": {
+        "target": "http://localhost:8080/geoserver",
+        "changeOrigin": true,
+        "rewriteFrom": "/geoserver",
+        "rewriteTo": ""
+    },
+    "/geoserver": {
+        "target": "http://localhost:8080/geoserver",
+        "changeOrigin": true,
+        "rules": [
+            "when": "/geoserver",
+            "rewriteTo": ""
+        ]
+    },
+    "/custom": {
+        "target": "{{proxyUrl}}/custom",
+        "changeOrigin": true,
+        "rewrite": ""
     }
 }

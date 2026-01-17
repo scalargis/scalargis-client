@@ -17,31 +17,40 @@ const sourcemap = process.env.SOURCEMAP === 'true' ? true : false;
 function loadUserProxyConfig() {
   const userConfigPath = path.resolve(__dirname, 'user.proxy.config.json');
   if (fs.existsSync(userConfigPath)) {
-    const data = JSON.parse(fs.readFileSync(userConfigPath, 'utf-8'));
-
-    const retVal = {};
-    
-    for (const key in data) {
-      const elem = data[key];
-      if (data[key]?.rewritePath) {
-        retVal[key] = {
-          target: elem.target,
-          changeOrigin: elem.changeOrigin,
-          rewrite: (path) => {
-            let originalPath = elem.rewritePath[0];
-            originalPath = originalPath.replace("{{hostDev}}", hostDev).replace("{{baseUrl}}", baseUrl).replace("{{proxyUrl}}", proxyUrl);
-            return path.replace(originalPath, elem.rewritePath[1]);
+    const proxyData = JSON.parse(fs.readFileSync(userConfigPath, 'utf-8'));
+    const retVal = Object.fromEntries(
+      Object.entries(proxyData).map(([context, cfg]: [string, any]) => {
+        const target = cfg?.target ? cfg.target.replace("{{hostDev}}", hostDev).replace("{{baseUrl}}", baseUrl).replace("{{proxyUrl}}", proxyUrl) : cfg.target;
+        return [
+          context,
+          {
+            target: target,
+            changeOrigin: cfg.changeOrigin ?? true,
+            secure: cfg.secure ?? false,
+            rewrite: (pathname: string) => {
+              console.log(pathname);
+              // Apply rules if any
+              if (cfg?.rules?.length > 0) {
+                for (const rule of cfg.rules) {
+                  const regex = new RegExp(rule.when)
+                  if (regex.test(pathname)) {
+                    return pathname.replace(regex, rule.rewriteTo ?? "");
+                  }
+                }
+              }
+              // Apply rewriteFrom / rewriteTo if specified
+              if (cfg.rewriteFrom) {
+                return pathname.replace(new RegExp(cfg.rewriteFrom), cfg.rewriteTo ?? "");
+              }
+              // Default rewrite based on context
+              return pathname.replace(new RegExp(`^${context}`), cfg.rewrite ?? "");
+            }
           }
-        }
-      } else {
-        retVal[key] = {
-          ...elem
-        }
-      }
-    };
+        ]
+      })
+    )
     return retVal;
   }
-
   return {};
 }
 
@@ -60,21 +69,19 @@ export default defineConfig(() => {
         '/api': {
           target: proxyUrl + '/api',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          rewrite: (pathname) => pathname.replace(/^\/api/, ''),
         },
         "/proxy": {
           target: proxyUrl + '/proxy',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/proxy/, ''),
+          rewrite: (pathname) => pathname.replace(/^\/proxy/, ''),
         },
         '/spatial_toolbox': {
           target: proxyUrl + '/spatial_toolbox',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/spatial_toolbox/, ''),
+          rewrite: (pathname) => pathname.replace(/^\/spatial_toolbox/, ''),
         },
-      
         ...userProxyRoutes
-
       },
     },
     preview: {
