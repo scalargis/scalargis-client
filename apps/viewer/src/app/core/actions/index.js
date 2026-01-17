@@ -416,14 +416,22 @@ export function login_user_registration(core, data, apiUrl=null, redirect=null) 
             dispatch(actions.login_response({register_user:true, username: data.username, email:data.email, redirect, ...result}));
         } else {
             if (result.status === 409) {
+              // 409 = Duplicate username/email
               dispatch(actions.login_http_error({status: result.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", result.message)}));
+            } else if (result.status === 422) {
+              // 422 = Use server message directly
+              dispatch(actions.login_http_error({status: result.status, message: result.message}));
             } else {
               dispatch(actions.login_http_error({status: result.status, message: result.message}));
             }
         }
     }).catch(error => {
         if (error?.status === 409) {
+            // 409 = Duplicate username/email
             dispatch(actions.login_http_error({status: error.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", error.message)}));
+        } else if (error?.status === 422) {
+            // 422 = Use server message directly
+            dispatch(actions.login_http_error({status: error.status, message: error.message}));
         } else {
             dispatch(actions.login_http_error({status: error.status, message: error.message}));
         }
@@ -740,7 +748,6 @@ export function viewer_load(core, id, history) {
             dispatch(viewer_load_components(pitems));
             // Give time to create viewer and load componentes and layers 
             setTimeout(() => dispatch(viewer_load_done()), 500);
-            //dispatch(viewer_load_done());
           }
         })
       });

@@ -8,7 +8,7 @@ import { i18n as i18nUtils } from '@scalargis/components';
 
 import LoginWidget from './LoginWidget';
 import RegistrationWidget from './RegistrationWidget';
-import PasswordResetWidget from './PasswordResetWidget';
+import ResetPasswordWidget from './ResetPasswordWidget';
 import componentMessages from './messages';
 
 
@@ -16,6 +16,7 @@ const appEntityNameAbrev = import.meta.env.VITE_APP_ENTITY_NAME_ABREV || 'Scalar
 
 function Main({ type, region, as, auth, core, config, actions, record }) {
   const { viewer, mainMap, dispatch, Models } = config;
+  const { siteConfig } = core;
   const { getWindowSize, showOnPortal } = Models.Utils;
 
   const [showLoginButton, setShowLoginButton] = useState(true);
@@ -36,6 +37,21 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   const loginHeader = record?.config_json?.header ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("login", "Entrar")} - ${appEntityNameAbrev || "ScalarGIS"}`;
   const registrationHeader = record?.config_json?.header_registration ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("userRegistration", "Registo de utilizador")} - ${appEntityNameAbrev || "ScalarGIS"}`;
   const passwordHeader = record?.config_json?.header_password ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("passwordReset", "Redefinir password")} - ${appEntityNameAbrev || "ScalarGIS"}`;
+
+
+  let CompLoginWidget = LoginWidget;
+  let CompRegistrationWidget = RegistrationWidget;
+  let CompResetPasswordWidget = ResetPasswordWidget;
+
+  if (record?.config_json?.widgets?.login || siteConfig?.authentication?.widgets?.login) {
+      CompLoginWidget = core.getComponentWidget(record?.config_json?.widgets?.login || siteConfig?.authentication?.widgets?.login)
+  }
+  if (record?.config_json?.widgets?.registration || siteConfig?.authentication?.widgets?.registration) { 
+      CompRegistrationWidget = core.getComponentWidget(record?.config_json?.widgets?.registration || siteConfig?.authentication?.widgets?.registration)
+  }
+  if (record?.config_json?.widgets?.password || siteConfig?.authentication?.widgets?.password) { 
+      CompResetPasswordWidget = core.getComponentWidget(record?.config_json?.widgets?.password || siteConfig?.authentication?.widgets?.password)
+  }
 
   useEffect(() => {
     if (!core?.pubsub?.subscribe) return;
@@ -121,7 +137,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
           modal
           closable={record?.config_json?.closable === false ? false : true}
           onHide={e => setMode(0)}>
-            <LoginWidget
+            <CompLoginWidget
               auth={auth}
               core={core}
               dispatch={dispatch}
@@ -133,14 +149,14 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
                   setMode(0);
                 }
               }}
-              showRegistration={() => {
+              onShowRegistration={() => {
                 if (record?.config_json?.actions?.registration) {
                   core.pubsub.publish(record?.config_json?.actions?.registration, null);
                   return;
                 }
                 setMode(2);
               }}
-              showPasswordReset={() => {
+              onShowResetPassword={() => {
                setMode(3);
               }}
             />
@@ -159,7 +175,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               setMode(0);
             }
           }}>
-            <RegistrationWidget
+            <CompRegistrationWidget
               auth={auth}
               core={core}
               dispatch={dispatch}
@@ -167,7 +183,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               viewer={viewer}
               record={record}
               redirect={location?.pathname || `/${viewer?.name}`}
-              showLogin={() => setMode(1)}
+              onShowLogin={() => setMode(1)}
             />
         </Dialog>)
       }
@@ -184,7 +200,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               setMode(0);
             }
           }}>
-            <PasswordResetWidget
+            <CompResetPasswordWidget
               auth={auth}
               core={core}
               dispatch={dispatch}
@@ -192,7 +208,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               viewer={viewer}
               record={record}
               redirect={location?.pathname || `/${viewer?.name}`}
-              showLogin={() => setMode(1)}
+              onShowLogin={() => setMode(1)}
             />
         </Dialog>)
       }
