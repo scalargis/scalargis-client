@@ -1,5 +1,6 @@
 import React from 'react'
 import Viewer from './Viewer'
+import ViewerEmbedded from './ViewerEmbedded'
 import { BrowserRouter as Router, Routes as ReactRoutes, Route, Navigate, useLocation } from 'react-router-dom'
 import HomePage from '../components/HomePage'
 import Page404 from '../components/Page404'
@@ -19,6 +20,10 @@ const Routes = ({core, pages}) => {
             <Route path="/password" element={<PagePassword core={core}/>} />
             <Route path="/not-found" element={<Page404 core={core} />} />
             <Route path="/not-allowed" element={<Page401 core={core} />} />
+
+            <Route path="/embedded/mapa/:id?" element={<ViewerEmbedded />} />
+            <Route path="/embedded/map/:id?" element={<ViewerEmbedded />} />
+
             <Route path="/mapa/session/:id?" element={<Viewer />} />
             <Route path="/map/session/:id?" element={<Viewer />} />
             <Route path="/mapa/:id?" element={<Viewer />} />

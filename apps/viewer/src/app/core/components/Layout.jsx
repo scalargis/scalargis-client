@@ -2,6 +2,7 @@ import React,  {useState, useEffect} from 'react'
 import { useTranslation } from "react-i18next"
 import classNames from 'classnames'
 import {AppTopbar} from './AppTopbar'
+import {AppTopbarEmbedded} from './AppTopbarEmbedded'
 import 'primereact/resources/primereact.min.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
@@ -14,6 +15,7 @@ import AppNotification from './AppNotification'
 function Layout(props) {
 
   const {
+    mode,
     core,
     config,
     viewer,
@@ -30,7 +32,6 @@ function Layout(props) {
 
   const [loaded, setLoaded] = useState(false);
 
-
   useEffect(() => {
     if (!config) return;
     if (!config.custom_style) setLoaded(true);
@@ -46,18 +47,30 @@ function Layout(props) {
   if (viewer?.config_json?.entity?.url)  entityUrl =viewer.config_json.entity.url;
 
   const showEntityInfo = viewer?.config_json?.entity_info_show === false ? false : true;
-
   const showLogoMobile = viewer?.config_json?.mobile_show_logo === false ? false : true;
+  const showLogoEmbedded = viewer?.config_json?.embedded_show_logo === true ? true : false;
 
-
-  const wrapperClass = classNames('layout-wrapper', {
+  let wrapperClass = classNames('layout-wrapper', {
     'layout-overlay': viewer.layoutMode === 'overlay',
     'layout-static': viewer.layoutMode === 'static',
     'layout-static-sidebar-inactive': viewer.staticMenuInactive && viewer.layoutMode === 'static',
     'layout-overlay-sidebar-active': viewer.overlayMenuActive && viewer.layoutMode === 'overlay',
     'layout-mobile-sidebar-active': viewer.mobileMenuActive,
-    'layout-mobile-sidebar-no-logo': viewer.mobileMenuActive && !showLogoMobile
+    'layout-mobile-sidebar-no-logo': viewer.mobileMenuActive && !showLogoMobile,
+    'layout-embedded-sidebar-no-logo': mode === 'embedded' && !showLogoEmbedded
   }, config?.config_json?.layout_class || config?.layout_class);
+
+  if (mode === 'embedded') {
+    wrapperClass = classNames('layout-wrapper', {
+      'layout-overlay': viewer.layoutMode === 'overlay',
+      'layout-static': viewer.layoutMode === 'static',
+      'layout-embedded': true,
+      'layout-static-sidebar-inactive': viewer.staticMenuInactive && viewer.layoutMode === 'static',
+      'layout-overlay-sidebar-active': viewer.overlayMenuActive && viewer.layoutMode === 'overlay',
+      'layout-mobile-sidebar-active': viewer.mobileMenuActive,
+      'layout-embedded-sidebar-no-logo': mode === 'embedded' && !showLogoEmbedded
+    }, config?.config_json?.layout_class || config?.layout_class);
+  }
 
   const sidebarClassName = classNames("layout-sidebar", {
     'layout-sidebar-dark': viewer.layoutColorMode === 'dark',
@@ -112,7 +125,6 @@ function Layout(props) {
     ) : <span>&nbsp;</span>}
   </React.Fragment>
 
-
   return (
     <div className={wrapperClass} onClick={onWrapperClick}>
 
@@ -128,7 +140,8 @@ function Layout(props) {
           filterGroups={[]}
         />
 
-        { loaded && <AppTopbar onToggleMenu={onToggleMenu} logo={logoComponent} regionComponents={props.topbarRight} /> }
+        { loaded && mode != 'embedded'&& <AppTopbar onToggleMenu={onToggleMenu} logo={logoComponent} regionComponents={props.topbarRight} /> }
+        { loaded && mode == 'embedded'&& <AppTopbarEmbedded onToggleMenu={onToggleMenu} logo={logoComponent} regionComponents={props.topbarRight} /> }
 
         <div ref={(el) => sidebar.current = el} 
           className={sidebarClassName} 

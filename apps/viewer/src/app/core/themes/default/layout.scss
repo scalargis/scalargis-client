@@ -92,6 +92,10 @@ body .p-dropdown {
   font-size: 0;
 }
 
+.layout-embedded.layout-static-sidebar-inactive .layout-topbar .layout-logo {
+  display: none;
+}
+
 .p-formgroup-inline .p-field-checkbox > label, 
 .p-formgroup-inline .p-field-radiobutton > label
 {
@@ -124,11 +128,19 @@ body .p-dropdown {
   height: calc(100% - 50px);
 }
 
+.layout-embedded .layout-sidebar .layout-sidebar-panel {
+  height: 100%;
+}
 
 .layout-sidebar #mainmenu {
   width: 55px;  
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.layout-embedded .layout-sidebar #mainmenu {
+  position: relative;
+  top: 55px;
 }
 
 .layout-sidebar #mainmenu::-webkit-scrollbar {
@@ -285,6 +297,17 @@ body .p-dropdown {
   z-index: 1000; 
 }
 
+.layout-embedded .layout-topbar {
+    position: absolute;
+    top: 0px !important;
+    left: 0px !important;
+    width: 55px;
+    height: 50px;
+    padding: 1.1em 1.5em;
+    background: rgba(33, 150, 243, 0.92);
+    z-index: 1000 !important;
+}
+
 .layout-topbar .layout-menu-button {
   font-size: 9px;
 }
@@ -300,9 +323,17 @@ body .p-dropdown {
   background-color: rgb(237, 240, 245);
 }
 
+.layout-embedded .layout-topbar .layout-logo {
+  height: 50px;
+}
+
 .layout-static-sidebar-inactive .layout-topbar .layout-logo {
   color: unset; 
   background-color: unset;
+}
+
+.layout-embedded.layout-embedded-sidebar-no-logo .layout-topbar .layout-logo {
+  display: none;
 }
 
 .layout-topbar .layout-topbar-icons button span.layout-topbar-icon {
@@ -314,12 +345,22 @@ body .p-dropdown {
   overflow: hidden;
 }
 
+.layout-embedded .layout-main {
+  height: 100%;
+}
+
 .layout-main div#map {
   position: relative;
   width: 100%; 
   height: calc(100% - 27px);
   height: -moz-calc(100% - 27px);
   height: -webkit-calc(100% - 27px);
+}
+
+.layout-embedded .layout-main div#map {
+  height: calc(100% - 35px);
+  height: -moz-calc(100% - 35px);
+  height: -webkit-calc(100% - 35px);
 }
 
 /*

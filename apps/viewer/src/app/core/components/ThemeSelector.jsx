@@ -7,6 +7,8 @@ export default function ThemeSelector(props) {
   
   let Theme = null;
 
+  //const theme = 'mapaspt';
+
   if (!theme || theme === 'default') {
     Theme = () => <ThemeDefault />
   } else {
