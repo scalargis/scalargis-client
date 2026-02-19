@@ -94,6 +94,15 @@ function Viewer(props) {
   }, [viewer?.locale]);
 
   useEffect(() => {
+    // Check for lang query param and change language if present, overriding other settings
+    const query =new URLSearchParams(location.search);
+    const lang = query.get("lang");
+    if (lang) {
+      i18n.changeLanguage(lang);
+    }
+  }, [location]);
+
+  useEffect(() => {
     if (!viewer.config_json) return;
     viewer.config_json.map_controls.filter(c => c.exclusive).forEach(control => {
       if (control.id === exclusive_mapcontrol) {
