@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation} from "react-i18next";
 import LoadingScreen from './LoadingScreen';
 import SplashScreen from './SplashScreen';
@@ -18,6 +19,8 @@ const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS 
 function RGPD({ cookies, core, dispatch, children }) {
 
   const { i18n } = useTranslation();
+
+  const location = useLocation();
 
   const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
 
@@ -45,8 +48,10 @@ function RGPD({ cookies, core, dispatch, children }) {
       </ThemeSelector>
     );
   }
+
+  console.log(location);
   
-  if (core?.siteConfig?.rgpd != false) {
+  if (core?.siteConfig?.rgpd != false && !location.pathname.toLocaleLowerCase().includes('/embedded/map')) {
     return (
       <ThemeSelector theme={theme}>
         <React.Fragment>
