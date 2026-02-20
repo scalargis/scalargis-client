@@ -1,0 +1,10 @@
+{
+  "id": "url_layers",
+  "type": "URLlayers",
+  "title": "URLlayers",
+  "config_json": {},
+  "config_version": "1.0",
+  "regions": [],
+  "target": "mainmenu",
+  "children": []
+}

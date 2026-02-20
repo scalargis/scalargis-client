@@ -38,6 +38,7 @@ import * as Timeline from './Timeline/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
 import * as URLparams from './URLparams/src/Main'
 import * as IntersectLayers from './IntersectLayers/src/Main'
+import * as URLlayers from './URLlayers/src/Main'
 
 import ProgressControl from './ProgressControl'
 import ScriptHtmlContent from './ScriptHtmlContent'
@@ -98,6 +99,7 @@ export {
   DocumentBrowser,
   DocumentList,
   IntersectLayers,
+  URLlayers,
 
   Legend,
 
