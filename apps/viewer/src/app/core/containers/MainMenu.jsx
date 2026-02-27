@@ -9,7 +9,7 @@ function MainMenu(props) {
   const { core, mainMap } = useContext(AppContext);
   const dispatch = useDispatch();
   let [ componentsOrdered, setComponentsOrdered ] = useState([]);
-  const { history, viewer, components, auth, onMenuClick } = props;
+  const { mode, history, viewer, components, auth, onMenuClick } = props;
 
   useEffect(() => {
     let pitems = Object.keys(components)
@@ -20,9 +20,10 @@ function MainMenu(props) {
     setComponentsOrdered(pitems);
 
   }, [components]);
-  
+
   return (
     <MainMenuComponent
+      mode={mode}
       auth={auth}
       history={history}
       core={core}

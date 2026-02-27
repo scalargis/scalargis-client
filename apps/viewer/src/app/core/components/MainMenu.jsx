@@ -5,7 +5,8 @@ import * as Utils from '../utils';
 
 export default function MainMenu(props) {
 
-  const { components, history, core, viewer, dispatch, mainMap, auth, onMenuClick } = props;
+  const { mode, components, history, core, viewer, dispatch, mainMap, auth, onMenuClick } = props;
+  const { layout_show_menu, layout_toggle_staticmenu, layout_toggle_menu, layout_wrapper_click } = core.actions;
   const { selected_menu } = viewer.config_json;
 
   function getStyle(c) {
@@ -18,8 +19,21 @@ export default function MainMenu(props) {
         className="flex flex-column"
         onClick={onMenuClick}
         >
+        { mode === 'embedded' && <div style={{"backgroundColor": "rgba(33, 150, 243, 0.92)", "textAlign": "center", "padding": "15px"}}>
+          <button className="p-link layout-menu-button" style={{"fontSize": "9px", color: "white"}} 
+            onClick={e => {
+              e.preventDefault();
+              console.log("Teste");
+              dispatch(layout_toggle_menu(true));
+              //dispatch(layout_toggle_staticmenu());
+            }}
+          >
+            <span className="pi pi-bars" style={{"fontSize": "2em"}}></span>
+          </button>
+        </div>}
         <div>
           { core.renderMainMenu({
+            mode,
             selected_menu,
             props: { components, history, viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils }, auth }
           })}
