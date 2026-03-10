@@ -157,7 +157,7 @@ function RegistrationWidget(props) {
 
             { onShowLogin && <div className="flex justify-content-end mt-4 mb-4">
                 <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer" onClick={onShowLogin}>
-                    {i18nUtils.translateValue("login", "Login")}
+                    {i18nUtils.translateValue("back", "Back")}
                 </a>                         
             </div> }
 
