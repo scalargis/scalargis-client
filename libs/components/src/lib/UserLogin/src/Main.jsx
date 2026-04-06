@@ -156,7 +156,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
                 }
                 setMode(2);
               }}
-              onShowResetPassword={() => {
+              onShowPasswordReset={() => {
                setMode(3);
               }}
             />
