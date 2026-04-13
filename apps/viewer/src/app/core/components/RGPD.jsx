@@ -48,8 +48,6 @@ function RGPD({ cookies, core, dispatch, children }) {
       </ThemeSelector>
     );
   }
-
-  console.log(location);
   
   if (core?.siteConfig?.rgpd != false && !location.pathname.toLocaleLowerCase().includes('/embedded/map')) {
     return (
