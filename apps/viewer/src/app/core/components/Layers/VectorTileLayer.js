@@ -6,6 +6,7 @@ import { createXYZ } from 'ol/tilegrid';
 import { Fill, Stroke, Style, Circle, Text } from 'ol/style'
 import AppContext from "../../../AppContext";
 import { isUrlAppOrigin } from "../../utils"
+import { getResolutionForScale } from '../../model/MapModel';
 
 const VectorTileLayer = ({ config, group, checked }) => {
 
@@ -67,14 +68,12 @@ const VectorTileLayer = ({ config, group, checked }) => {
 
     };
 
-
-
     let url = config.url;
     if ((config.ignoreProxy != true) && !isUrlAppOrigin(url)) {
       url = MAP_PROXY + url;
     };
 
-    return new VectorLayer({
+    const new_layer = new VectorLayer({
       ...config,
       visible: config.active,
       style: (config.styleType == "native" && config.style != null) ? config.style : getStyle,
@@ -85,7 +84,24 @@ const VectorTileLayer = ({ config, group, checked }) => {
         url: url,
         attributions: config.attributions || []
       })
-    })
+    });
+
+    if (new_layer && config.min_resolution) {
+      new_layer.setMinResolution(config.min_resolution);
+    }
+    if (new_layer && config.max_resolution) {
+      new_layer.setMaxResolution(config.max_resolution);
+    }
+    if (new_layer && config.min_scale) {
+      const res = getResolutionForScale(config.min_scale, mainMap.getView().getProjection().getUnits());
+      new_layer.setMinResolution(res);
+    }    
+    if (new_layer && config.max_scale) {
+      const res = getResolutionForScale(config.max_scale, mainMap.getView().getProjection().getUnits());
+      new_layer.setMaxResolution(res);
+    }
+
+    return new_layer;
   }
 
   useEffect(() => {
