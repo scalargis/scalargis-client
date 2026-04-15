@@ -14,7 +14,7 @@ export default function Main({ config, actions }) {
         const isURLparams = new URLSearchParams(url_parameters).get('urlparams');
 
         if (isURLparams !== "true") { // need urlparams=true to parse
-            return null
+            return
         }
 
         const urlExtent = new URLSearchParams(url_parameters).get('extent');
