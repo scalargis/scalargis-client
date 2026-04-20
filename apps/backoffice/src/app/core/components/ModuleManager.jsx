@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Utils from '../utils';
 import dataProvider from '../../service/DataProvider';
@@ -9,6 +9,23 @@ export default function ModuleManager(props) {
   const { history, core, backoffice, dispatch } = props;
 
   const { module, submodule, action } = useParams();
+
+  // Plugin managers are registered via async import in Core.addComponent; the registry
+  // can also be wiped + rebuilt mid-flight (StrictMode double-invokes Backoffice's
+  // mount effect, dispatching backoffice_load twice). Tick for ~30s after mount so we
+  // re-render when the registry becomes populated.
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const start = Date.now();
+    const id = setInterval(() => {
+      if (Date.now() - start > 30000) clearInterval(id);
+      tick(t => t + 1);
+    }, 200);
+    return () => clearInterval(id);
+  }, [module]);
+
+  const c = core?.config?.config_json?.components?.find(x => x.id === module);
+  if (!c || !core?.__managers?.[c.type]) return <div />;
 
   return (
     <div>
