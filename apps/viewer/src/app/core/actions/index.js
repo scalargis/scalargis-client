@@ -211,7 +211,7 @@ export function login_post(core, payload, apiUrl=null, history=null, redirect=nu
           const cookies = new Cookies();
           let expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-          cookies.set(cookieAuthName, res, { path: urlRedirect || cookiePath, expires: expireDate });
+          cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
           dispatch(auth_login(res));
           if (urlRedirect) {
             window.location.assign(urlRedirect);
@@ -237,7 +237,7 @@ export function login(auth, history, redirect, urlRedirect) {
       const cookies = new Cookies();
       let expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-      cookies.set(cookieAuthName, auth, { path: urlRedirect || cookiePath, expires: expireDate });
+      cookies.set(cookieAuthName, auth, { path: cookiePath, expires: expireDate });
       dispatch(auth_login(auth));
       if (urlRedirect) {
         window.location.assign(urlRedirect);
