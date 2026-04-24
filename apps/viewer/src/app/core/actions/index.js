@@ -81,7 +81,7 @@ const CONFIG_URL = import.meta.env.VITE_APP_CONFIG_URL;
 const API_URL = getAppApiUrl();
 const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
-const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || ''; 
+const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/'; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
 
@@ -703,11 +703,10 @@ export function viewer_load(core, id, history) {
       if (!config) return dispatch(viewer_not_found(history));
       if (!config.config_json) return dispatch(viewer_not_found(history));
 
-      //Clears authentication cookie if user is not valid
-      if (!config?.user_info?.username) {
-        const cookies = new Cookies();
-        cookies.remove(cookieAuthName, { path: cookiePath });
-      }
+      // Note: Previously this code cleared the auth cookie when config lacked user_info.username.
+      // This was too aggressive - it would clear valid sessions when loading public viewers
+      // or during redirect flows. The server already returns 401 for actual auth failures,
+      // which is handled in the catch block below. Removing this cookie-clearing logic.
 
       // Unload components
       dispatch(viewer_unload_components(core));
