@@ -12,7 +12,7 @@ import './index.css';
 
 
 const cookiePopupName = import.meta.env.VITE_APP_COOKIE_POPUP_NAME || 'scalargis_popup';
-const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/';
+const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '';
 
 /**
  * Component Translations

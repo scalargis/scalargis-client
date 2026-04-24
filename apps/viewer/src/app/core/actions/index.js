@@ -81,7 +81,7 @@ const CONFIG_URL = import.meta.env.VITE_APP_CONFIG_URL;
 const API_URL = getAppApiUrl();
 const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
-const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/'; 
+const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || ''; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
 
@@ -211,7 +211,7 @@ export function login_post(core, payload, apiUrl=null, history=null, redirect=nu
           const cookies = new Cookies();
           let expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-          cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
+          cookies.set(cookieAuthName, res, { path: urlRedirect || cookiePath, expires: expireDate });
           dispatch(auth_login(res));
           if (urlRedirect) {
             window.location.assign(urlRedirect);
@@ -237,7 +237,7 @@ export function login(auth, history, redirect, urlRedirect) {
       const cookies = new Cookies();
       let expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-      cookies.set(cookieAuthName, auth, { path: cookiePath, expires: expireDate });
+      cookies.set(cookieAuthName, auth, { path: urlRedirect || cookiePath, expires: expireDate });
       dispatch(auth_login(auth));
       if (urlRedirect) {
         window.location.assign(urlRedirect);

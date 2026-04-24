@@ -13,7 +13,7 @@ import ThemeSelector from './ThemeSelector';
 
 const cookieName = import.meta.env.VITE_APP_COOKIE_NAME || 'scalargis_rgpd';
 const cookieValue = import.meta.env.VITE_APP_COOKIE_VALUE || '2';
-const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/'; 
+const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || ''; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
 function RGPD({ cookies, core, dispatch, children }) {
