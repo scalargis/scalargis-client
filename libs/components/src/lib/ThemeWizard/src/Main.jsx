@@ -46,7 +46,9 @@ const initialData = {
   wmsTiled: true,
   wmsVersion: "1.3.0",
   wmtsIgnoreServiceUrl: true,
-  wmtsVersion: "1.0.0"
+  wmtsVersion: "1.0.0",
+  wfsVersion: "2.0.0",
+  wfsIgnoreServiceUrl: true
 };
 
 

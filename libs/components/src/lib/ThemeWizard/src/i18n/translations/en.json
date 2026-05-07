@@ -64,5 +64,8 @@
   "cogCoordinateSystemInfo": "Dinamically loaded by COG image ({{epsg}})",
   "cogCoordinateSystemUnsupported": "Could not load unsupported coordinate reference system ({{epsg}})",
 
-  "groupName": "Grupo name"
+  "groupName": "Grupo name",
+
+  "wfsDataCRS": "Data CRS"
+
 }

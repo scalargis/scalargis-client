@@ -64,5 +64,8 @@
   "cogCoordinateSystemInfo": "Chargé dynamiquement par l'image COG ({{epsg}})",
   "cogCoordinateSystemUnsupported": "Impossible de charger un système de référence de coordonnées non pris en charge ({{epsg}})",
 
-  "groupName": "Nom du Groupe"
+  "groupName": "Nom du Groupe",
+
+  "wfsDataCRS": "CRS des données"
+
 }

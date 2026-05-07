@@ -4,7 +4,7 @@ import OlFormatKML from "ol/format/KML";
 import OlFormatGML2 from "ol/format/GML2";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import * as OlExtent from 'ol/extent';
-import { generateRGBA, removeUrlParam } from '../utils';
+import { generateRGBA, removeUrlParam, addUrlParam } from '../utils';
 import FileSaver from 'file-saver';
 import proj4 from 'proj4';
 
@@ -129,6 +129,7 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
   let result = [];
   let types = [];
   let bbox;
+  let bbox_srid = options.srid;
 
   // Set default extent from extent options
   if (options.extent) bbox = parseBBOX(options.extent);
@@ -145,28 +146,49 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
   // Get feature types
   types = wfs[wfsns+'WFS_Capabilities'][ns+'FeatureTypeList'][0][ns+'FeatureType'];
 
-
+  const queryString = originUrl.split("?")[1] || "";
+  const queryObject = Object.fromEntries(new URLSearchParams(queryString));
 
   // Loop through feature types
   types.map((l, i) => {
 
     // Use default map CRS
-    let crs = [null, ''+options.srid];
+    let crs = options?.srid ? [options.srid] : [];
+    let bbox_srs = options.srid;
 
     // Find WFS version
     let version = wfs[wfsns+'WFS_Capabilities']['$']['version'];
 
-    // Get URL
-    let url = originUrl ? originUrl.replace('request=GetCapabilities', '')+'&' : 'wfs_features.xml';
-    url = url.replace(/request=getcapabilities/i, '');
-
-    if (url.indexOf('?') < 0) {
-      url = url.replace(/&+$/gm,'');
-      url += '?';
-    }
+    let url = removeUrlParam(originUrl, 'request'); 
 
     // Parse feature for versions 1.0.0 and 1.1.0
     if (['1.0.0', '1.1.0'].indexOf(version) > -1) {
+      // URL
+      let _url = url;
+
+      // Get GetFeature URL from GetCapabilities
+      if (!options?.ignore_url) {
+        const _url_val = wfs?.[wfsns + 'WFS_Capabilities']
+          ?.[wfsns + 'Capability']?.[0]
+          ?.[wfsns + 'Request']?.[0]
+          ?.[wfsns + 'GetFeature']?.[0]
+          ?.[wfsns + 'DCPType']?.[0]
+          ?.[wfsns + 'HTTP']?.[0]
+          ?.[wfsns + 'Get']?.[0]
+          ?.$?.onlineResource ?? null;
+
+        if (_url_val) _url = _url_val;
+
+        // Add query params from original URL
+        for (const param in queryObject) {
+          if (['service', 'request', 'version'].indexOf(param.toLowerCase()) > -1) continue;
+          _url = addUrlParam(_url, param, queryObject[param]);
+        }
+      }
+
+      // Some services publish wrong URL from GetCapabilities
+      if (_url.indexOf('localhost') > -1) _url = url; // Wrong on some services
+      url = _url;
 
       // Update CRS
       if (l.SRS) crs = getCRSCode(l.SRS[0]) ? parseInt(getCRSCode(l.SRS[0]), 10) : crs; //parseInt(/EPSG:(\d+)/g.exec(l.SRS[0])[1], 10);
@@ -180,18 +202,20 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
       }
 
       // Find lat/lon bounding box
-      if (l.LatLongBoundingBox) {
+      if (l[wfsns+'LatLongBoundingBox']) {
+        bbox_srs = 4326;
         bbox = [
-          l.LatLongBoundingBox[0]['$']['minx'],
-          l.LatLongBoundingBox[0]['$']['miny'],
-          l.LatLongBoundingBox[0]['$']['maxx'],
-          l.LatLongBoundingBox[0]['$']['maxx']
+          l[wfsns+'LatLongBoundingBox'][0]['$']['minx'],
+          l[wfsns+'LatLongBoundingBox'][0]['$']['miny'],
+          l[wfsns+'LatLongBoundingBox'][0]['$']['maxx'],
+          l[wfsns+'LatLongBoundingBox'][0]['$']['maxy']
         ];
         bbox = parseBBOX(bbox);
       }
 
       // Use WGS84 boundging box if exists
       if (l[owsns+'WGS84BoundingBox']) {
+        bbox_srs = 4326;
         bbox = [
           l[owsns+'WGS84BoundingBox'][0][owsns+'LowerCorner'][0].split(' ')[0],
           l[owsns+'WGS84BoundingBox'][0][owsns+'LowerCorner'][0].split(' ')[1],
@@ -200,30 +224,49 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
         ];
         bbox = parseBBOX(bbox);
       }
-
-      // Transform BBOX if CRS different that 3857
-      /*
-      if (crs !== 3857) {
-        bbox = parseBBOX(bbox, 'EPSG:' + crs, 'EPSG:3857');
-      }
-      */
     }
 
     // Parse feature for versions 2.0.0
     if (version === '2.0.0') {
 
+      // URL
+      let _url = url;
+
+      // Get GetFeature URL from GetCapabilities
+      if (!options?.ignore_url) {
+        const ops = wfs?.[wfsns + 'WFS_Capabilities']?.['ows:OperationsMetadata']?.[0]?.['ows:Operation'];
+
+        if (ops?.length) {
+          ops.map(v => {
+            if (v['$'].name === 'GetFeature') {
+              if (v[owsns + 'DCP']?.[0]?.[owsns + 'HTTP']?.[0]?.[owsns + 'Get']?.[0]?.['$']?.['xlink:href']) {
+                _url = v[owsns + 'DCP'][0][owsns + 'HTTP'][0][owsns + 'Get'][0]['$']['xlink:href'];
+              }             
+            }
+          });
+        }
+
+        // Add query params from original URL
+        for (const param in queryObject) {
+          if (['service', 'request', 'version'].indexOf(param.toLowerCase()) > -1) continue;
+          _url = addUrlParam(_url, param, queryObject[param]);
+        }
+      }
+
+      // Some services publish wrong URL from GetCapabilities
+      if (_url.indexOf('localhost') > -1) _url = url; // Wrong on some services
+      url = _url;    
+
       // Get CRS from DefaultCRS
       if (l[wfsns+'DefaultCRS']) {
-        //crs = /:(\d+)$/g.exec(l[wfsns+'DefaultCRS'][0]) ? parseInt(/:(\d+)$/g.exec(l[wfsns+'DefaultCRS'][0])[1], 10) : crs;
         crs = getCRSCode(l[wfsns+'DefaultCRS'][0]) ? parseInt(getCRSCode(l[wfsns+'DefaultCRS'][0]), 10) : crs;
       } else if (l['DefaultCRS']) {
-        //crs = /:(\d+)$/g.exec(l['DefaultCRS'][0]) ? parseInt(/:(\d+)$/g.exec(l['DefaultCRS'][0])[1], 10) : crs;
         crs =  getCRSCode(l['DefaultCRS'][0]) ? parseInt(getCRSCode(l['DefaultCRS'][0]), 10) : crs;
       }
 
       // Get bounding box from WGS84 bounding box
       if (l[owsns+'WGS84BoundingBox']) {
-        crs = 4326;
+        bbox_srs = 4326;
         bbox = [
           l[owsns+'WGS84BoundingBox'][0][owsns+'LowerCorner'][0].split(' ')[0],
           l[owsns+'WGS84BoundingBox'][0][owsns+'LowerCorner'][0].split(' ')[1],
@@ -232,12 +275,15 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
         ];
         bbox = parseBBOX(bbox);
       }
+    }
 
-      // Transform BBOX if CRS different that 4326
-      if (crs !== 4326) {
-        bbox = parseBBOX(bbox, 'EPSG:'+crs, 'EPSG:4326');
-        crs = 4326;
-      }
+    if (options?.data_crs) {
+      crs = options.data_crs;
+    }
+
+    // Transform BBOX if CRS different that 4326
+    if (bbox_srs != crs) {
+      bbox = parseBBOX(bbox, 'EPSG:' + bbox_srs, 'EPSG:'+crs);
     }
 
     // Create theme object
@@ -251,7 +297,7 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
       type: "WFS",
       url: url,
       layers: l[ns+'Name'][0],
-      servertype: 'mapserver',
+      servertype: options?.servertype ||'mapserver',
       crs,
       tiled: true,
       version: version,

@@ -96,6 +96,9 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
         featureProjection: crs
       }
       srsname = "urn:ogc:def:crs:EPSG::" + config.crs
+      if (config.servertype === 'arcgisserver') {
+        srsname = config.crs == 4326 ? 'CRS:84' : "urn:ogc:def:crs:EPSG::" + config.crs
+      }
     }
     const vectorSource = new OlSourceVector({
       loader: (extent, resolution, projection, success, failure) => {
