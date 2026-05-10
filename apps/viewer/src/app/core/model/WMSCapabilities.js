@@ -1,6 +1,6 @@
 import _ol_ from 'ol/index.js';
 import _ol_format_XLink_ from 'ol/format/xlink.js';
-import _ol_format_XML_ from 'ol/format/xml.js';
+import _ol_format_XML_ from 'ol/format/XML.js';
 import _ol_format_XSD_ from 'ol/format/xsd.js';
 import _ol_xml_ from 'ol/xml.js';
 
