@@ -6,8 +6,6 @@ import {
   ArrayTranslations,
 } from '@jsonforms/core';
 /*
-import { IconButton, TableRow, Tooltip, Grid, Typography } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 */
 import ValidationIcon from './ValidationIcon';
 import NoBorderTableCell from './NoBorderTableCell';

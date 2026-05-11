@@ -5,7 +5,6 @@ import {
   isDescriptionHidden,
 } from '@jsonforms/core';
 
-//import { Hidden, InputLabel, FormControl, FormHelperText } from '@mui/material';
 import merge from 'lodash/merge';
 import { useFocus } from '../util';
 

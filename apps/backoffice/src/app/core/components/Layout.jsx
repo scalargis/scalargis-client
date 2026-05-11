@@ -187,8 +187,8 @@ function Layout(props) {
                 <Route path="/notifications/edit/:id" element={<NotificationEdit />} />
                 <Route path="/notifications/list" element={<NotificationList />} />
 
-                <Route path="/" exact element={<Dashboard />} />
-                <Route path="/dashboard" exact element={<div>Teste</div>} />
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<div>Teste</div>} />
                 
                 <Route path="/viewers/create" element={<ViewerEdit />} />
                 <Route path="/viewers/edit/:id" element={<ViewerEdit />} />

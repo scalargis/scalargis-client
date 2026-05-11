@@ -1,6 +1,5 @@
 import React from 'react';
 import { CellProps, WithClassname } from '@jsonforms/core';
-//import { Checkbox, InputProps } from '@mui/material';
 import {Checkbox} from 'primereact/checkbox';
 import merge from 'lodash/merge';
 

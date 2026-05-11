@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from '@mui/material';
 */
 
 export interface DeleteDialogProps {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { CellProps, WithClassname } from '@jsonforms/core';
-//import { Input } from '@mui/material';
 import { InputNumber } from 'primereact/inputnumber';
 import merge from 'lodash/merge';
 //import { useDebouncedChange } from '../util';
@@ -65,7 +64,6 @@ export const PrimereactInputInteger = React.memo(function MuiInputInteger(
 /*
 import React from 'react';
 import { CellProps, WithClassname } from '@jsonforms/core';
-//import { Input } from '@mui/material';
 import { InputNumber } from 'primereact/inputnumber';
 import merge from 'lodash/merge';
 import { useDebouncedChange } from '../util';

@@ -1,5 +1,4 @@
 import { fetchJson } from  './fetch'
-//import queryString from 'query-string';
 
 const provider = (apiUrl, httpClient = fetchJson) => ({
 

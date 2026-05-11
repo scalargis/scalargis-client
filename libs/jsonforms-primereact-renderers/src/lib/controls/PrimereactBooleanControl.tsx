@@ -15,7 +15,6 @@ import {
   FormHelperText,
   Tooltip,
   Hidden,
-} from '@mui/material';
 import { MuiCheckbox } from '../mui-controls/MuiCheckbox';
 */
 import { PrimereactCheckbox } from '../primereact-controls/PrimereactCheckbox';

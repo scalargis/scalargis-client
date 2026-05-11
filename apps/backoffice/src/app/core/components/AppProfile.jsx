@@ -38,12 +38,12 @@ export const AppProfile = (props) => {
             <CSSTransition classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={expanded} unmountOnExit>
                 <ul className={classNames({ 'layout-profile-expanded': expanded })}>
                     <li>
-                        <NavLink activeClassName="active-route" to={'/account'} exact target={null}>
+                        <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to={'/account'} target={null}>
                             <button type="button" className="p-link"><i className="pi pi-fw pi-user" /><span>Conta</span></button>
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink activeClassName="active-route" to={'/notifications/list'} exact target={null}>
+                        <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to={'/notifications/list'} target={null}>
                             <button type="button" className="p-link"><i className="pi pi-fw pi-inbox" /><span>Notificações</span><span className="menuitem-badge">{cfg?.notifications?.total || 0}</span></button>
                         </NavLink>
                     </li>

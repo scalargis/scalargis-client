@@ -10,7 +10,6 @@ import {
   OwnPropsOfRenderer,
 } from '@jsonforms/core';
 import { JsonFormsDispatch, useJsonForms } from '@jsonforms/react';
-//import { Grid, Hidden } from '@mui/material';
 
 export const renderLayoutElements = (
   elements: UISchemaElement[],

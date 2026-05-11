@@ -1,6 +1,5 @@
 import React from 'react';
 import { CellProps, WithClassname } from '@jsonforms/core';
-//import { Switch, InputProps } from '@mui/material';
 import {InputSwitch} from 'primereact/inputswitch';
 import merge from 'lodash/merge';
 
