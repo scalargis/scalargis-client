@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import Intersect from './Intersect';
 

@@ -3,7 +3,7 @@ import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 
-import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '@scalargis/components';
+import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '../../components';
 
 import { translateMsg } from './../util/i18n';
 

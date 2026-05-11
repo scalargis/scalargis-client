@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import './style.css';
 

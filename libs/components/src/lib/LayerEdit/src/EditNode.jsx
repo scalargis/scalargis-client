@@ -7,7 +7,7 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import COG from './type/COG';
 

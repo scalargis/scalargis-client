@@ -10,7 +10,7 @@ import {
   JsonFormContext, 
   JsonFormDefaultRenderers,
   JsonFormValidationMode
-} from '@scalargis/components';
+} from '../../components';
 
 import { getFeatures } from './service';
 import SearchLayerResults from './SearchLayerResults';

@@ -6,7 +6,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { Button } from 'primereact/button';
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
-import { LocaleSelectorComponent } from'@scalargis/components';
+import { LocaleSelectorComponent } from '../../components';
 
 import './index.css';
 

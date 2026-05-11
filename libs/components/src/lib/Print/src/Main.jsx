@@ -4,7 +4,7 @@ import { Panel } from 'primereact/panel'
 import { Dialog } from 'primereact/dialog'
 import Print from './Print'
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
 import './style.css'

@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { Dialog } from 'primereact/dialog';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import HelpHtmlContent from './HelpHmtlContent';
 

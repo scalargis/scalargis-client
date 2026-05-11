@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { getRenderPixel } from 'ol/render';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import LayerCompare from './LayerCompare';
 

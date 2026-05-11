@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { Slider } from 'primereact/slider';
 import { Message } from 'primereact/message';
 
-import { Legend } from '@scalargis/components';
+import { Legend } from '../../components';
 
 import './style.css';
 

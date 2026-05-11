@@ -7,7 +7,7 @@ import { Button } from 'primereact/button';
 import DraggableItem from './DraggableItem';
 import Legend from "./Legend";
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../../components';
 
 class Node extends React.Component {
 

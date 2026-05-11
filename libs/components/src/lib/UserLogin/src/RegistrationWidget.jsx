@@ -11,7 +11,7 @@ import { Message } from 'primereact/message';
 import { FloatLabel } from 'primereact/floatlabel';
 import { classNames } from 'primereact/utils';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import { getFormValidationErrorMessage } from './utils';
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import DocumentList from './DocumentList';
 

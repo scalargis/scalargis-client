@@ -8,7 +8,7 @@ import { Toast } from 'primereact/toast';
 import OlWKT from "ol/format/WKT";
 import OlFeature from 'ol/Feature';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import ResultsTablesTabs from './components/ResultsTablesTabs';
 

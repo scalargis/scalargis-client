@@ -9,9 +9,7 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { Button } from 'primereact/button';
 
-import { i18n } from '@scalargis/components';
-import { utils } from '@scalargis/components';
-import { ProgressControl } from '@scalargis/components';
+import { i18n, utils, ProgressControl } from '../../components';
 
 import './style.css';
 

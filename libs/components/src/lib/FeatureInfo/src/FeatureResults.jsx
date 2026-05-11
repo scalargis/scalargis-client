@@ -10,7 +10,7 @@ import OlFeature from 'ol/Feature';
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import convert from 'convert';
 
-import { i18n, ScriptHtmlContent } from '@scalargis/components';
+import { i18n, ScriptHtmlContent } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
 

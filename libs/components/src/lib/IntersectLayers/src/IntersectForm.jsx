@@ -25,7 +25,7 @@ import {
 import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser';
 import {BufferOp} from 'jsts/org/locationtech/jts/operation/buffer';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import IntersectResults from './IntersectResults';
 

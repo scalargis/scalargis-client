@@ -8,7 +8,7 @@ import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import OlFeature from 'ol/Feature';
 import {getCenter as olGetCenter} from 'ol/extent';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import { getFeatureById } from './service';
 

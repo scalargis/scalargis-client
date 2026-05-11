@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Dialog } from 'primereact/dialog';
 import { Menu } from 'primereact/menu';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import LoginWidget from './LoginWidget';
 import RegistrationWidget from './RegistrationWidget';

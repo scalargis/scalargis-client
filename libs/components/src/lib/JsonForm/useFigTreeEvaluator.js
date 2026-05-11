@@ -3,7 +3,7 @@ import { FigTreeEvaluator } from 'fig-tree-evaluator';
 import extractProperty from 'object-property-extractor';
 import assign from 'object-property-assigner';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../components';
 
 import { checkDate, getAsOneOfObjects } from './util/customFunctions';
 

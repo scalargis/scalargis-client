@@ -4,7 +4,7 @@ import { SelectButton } from 'primereact/selectbutton';
 import { Slider } from 'primereact/slider'
 import { Chip } from 'primereact/chip';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import './style.css';
 
