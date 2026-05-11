@@ -121,7 +121,7 @@ export function viewer_save_record(core, record, history, redirect, cb) {
     dispatch(viewer_save_http_loading());
 
     // Save request
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'        
@@ -196,20 +196,20 @@ export function login_post(core, payload, apiUrl=null, history=null, redirect=nu
     dispatch(login_http_loading());
     
     // Login request
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify(payload)
     }
 
     // Auth url. TODO: check for proxy
-    let url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : API_URL + '/authentication/authenticate';
+    const url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : API_URL + '/authentication/authenticate';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
         //dispatch(login_response(res));
         if (res.authenticated) {
           const cookies = new Cookies();
-          let expireDate = new Date();
+          const expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
           cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
           dispatch(auth_login(res));
@@ -235,7 +235,7 @@ export function login(auth, history, redirect, urlRedirect) {
     dispatch(login_response(auth));
     if (auth.authenticated) {
       const cookies = new Cookies();
-      let expireDate = new Date();
+      const expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
       cookies.set(cookieAuthName, auth, { path: cookiePath, expires: expireDate });
       dispatch(auth_login(auth));
@@ -297,12 +297,12 @@ export function login_reset_password(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
     
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify({...post, redirect})
     }
 
-    let url = API_URL + '/security/reset_password';
+    const url = API_URL + '/security/reset_password';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -333,12 +333,12 @@ export function password_reset_validation(post, history, redirect) {
     dispatch(password_http_loading());
     
     // Login request
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify(post)
     }
 
-    let url = API_URL + '/security/reset_password_validation';
+    const url = API_URL + '/security/reset_password_validation';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -358,12 +358,12 @@ export function password_post(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(password_http_loading());
     
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify(post)
     }
 
-    let url = API_URL + '/security/set_password';
+    const url = API_URL + '/security/set_password';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -406,7 +406,7 @@ export function login_user_registration(core, data, apiUrl=null, redirect=null) 
         accept: 'application/json'
       });
 
-    let url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : core.API_URL + '/security/register_user';
+    const url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : core.API_URL + '/security/register_user';
     fetchJson(url, { method: 'POST', headers, body: JSON.stringify(data) }).then(res => {
         if (res.status === 200) {
             return res.json;
@@ -450,19 +450,19 @@ export function registration_post(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(registration_http_loading());
     
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify(post)
     }
 
-    let url = API_URL + '/security/registration/confirmation';
+    const url = API_URL + '/security/registration/confirmation';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
         dispatch(registration_response(res));
         if (res.authenticated) {
           const cookies = new Cookies();
-          let expireDate = new Date();
+          const expireDate = new Date();
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
           cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
           if (redirect && history?.navigate) history.navigate(redirect); 
@@ -480,12 +480,12 @@ export function registration_confirmation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
     
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify(post)
     }
 
-    let url = API_URL + '/security/registration/confirmation';
+    const url = API_URL + '/security/registration/confirmation';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -510,12 +510,12 @@ export function registration_send_confirmation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
     
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify({...post, redirect})
     }
 
-    let url = API_URL + '/security/registration/send_confirmation';
+    const url = API_URL + '/security/registration/send_confirmation';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -733,14 +733,14 @@ export function viewer_load(core, id, history) {
 
       // Load components
       let count = 0;
-      let { components } = config.config_json;
+      const { components } = config.config_json;
       components.forEach(component => {
         core.addComponent(core, component, () => {
           count++;
           if (count === components.length) {
 
             // Index by id
-            let pitems = {};
+            const pitems = {};
             components.forEach(c => pitems[c.id] = c);
 
             // Finally, load into redux store
@@ -755,7 +755,7 @@ export function viewer_load(core, id, history) {
       if (error.message === 'Unauthorized') {
         if (!logged) {
           //let redirect = '/login?redirect=/mapa/' + (id || '/');
-          let redirect = '/login?redirect=' + history.location.pathname;
+          const redirect = '/login?redirect=' + history.location.pathname;
           /*
           if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'mapa') > -1) {
             redirect += '&path=/mapa/';
@@ -796,7 +796,7 @@ export function isThemeOnScale(olmap, layer) {
 }
 
 export function map_set_extent(center, extent, srid) {
-  let action = {
+  const action = {
     type: MAP_SET_EXTENT,
     center,
     extent,
@@ -806,7 +806,7 @@ export function map_set_extent(center, extent, srid) {
 }
 
 export function map_set_size(size) {
-  let action = {
+  const action = {
     type: MAP_SET_SIZE,
     size
   }
@@ -814,7 +814,7 @@ export function map_set_size(size) {
 }
 
 export function map_set_class(className) {
-  let action = {
+  const action = {
     type: MAP_SET_CLASS,
     className
   }
@@ -822,7 +822,7 @@ export function map_set_class(className) {
 }
 
 export function layers_set_checked(checked) {
-  let action = {
+  const action = {
     type: LAYERS_SET_CHECKED,
     checked
   }
@@ -830,7 +830,7 @@ export function layers_set_checked(checked) {
 }
 
 export function layers_set_opened(opened) {
-  let action = {
+  const action = {
     type: LAYERS_SET_OPENED,
     opened
   }
@@ -838,7 +838,7 @@ export function layers_set_opened(opened) {
 }
 
 export function layers_update_theme(theme) {
-  let action = {
+  const action = {
     type: LAYERS_UPDATE_THEME,
     theme
   }
@@ -846,7 +846,7 @@ export function layers_update_theme(theme) {
 }
 
 export function viewer_add_themes(parentId, themes = [], top, isSession=false) {
-  let action = {
+  const action = {
     type: VIEWER_ADD_THEMES,
     parentId,
     themes, 
@@ -857,7 +857,7 @@ export function viewer_add_themes(parentId, themes = [], top, isSession=false) {
 }
 
 export function layers_remove_items(ids) {
-  let action = {
+  const action = {
     type: LAYERS_REMOVE_ITEMS,
     ids
   }
@@ -865,7 +865,7 @@ export function layers_remove_items(ids) {
 }
 
 export function viewer_remove_themes(ids) {
-  let action = {
+  const action = {
     type: VIEWER_REMOVE_THEMES,
     ids
   }
@@ -873,7 +873,7 @@ export function viewer_remove_themes(ids) {
 }
 
 export function viewer_set_configjson(config_json) {
-  let action = {
+  const action = {
     type: VIEWER_SET_CONFIGJSON,
     config_json
   }
@@ -881,7 +881,7 @@ export function viewer_set_configjson(config_json) {
 }
 
 export function viewer_update_mapcontrol(control) {
-  let action = {
+  const action = {
     type: VIEWER_UPDATE_MAPCONTROL,
     control
   }
@@ -889,7 +889,7 @@ export function viewer_update_mapcontrol(control) {
 }
 
 export function viewer_set_displaycrs(crs) {
-  let action = {
+  const action = {
     type: VIEWER_SET_DISPLAYCRS,
     crs
   }
@@ -968,7 +968,7 @@ export function layout_show_menu(isDesktop) {
 }
 
 export function viewer_add_notification(notification) {
-  let action = {
+  const action = {
     type: VIEWER_ADD_NOTIFICATION,
     notification
   }
@@ -976,7 +976,7 @@ export function viewer_add_notification(notification) {
 }
 
 export function viewer_clear_notifications() {
-  let action = {
+  const action = {
     type: VIEWER_CLEAR_NOTIFICATIONS
   }
   return action;
@@ -991,7 +991,7 @@ export function viewer_add_dialog_window({config, child, onClose}) {
     onClose
   }
 
-  let action = {
+  const action = {
     type: VIEWER_ADD_DIALOG_WINDOW,
     dialogWindow: dialogWindow
   }
@@ -999,7 +999,7 @@ export function viewer_add_dialog_window({config, child, onClose}) {
 }
 
 export function viewer_remove_dialog_window(key) {
-  let action = {
+  const action = {
     type: VIEWER_REMOVE_DIALOG_WINDOW,
     key
   }
@@ -1007,7 +1007,7 @@ export function viewer_remove_dialog_window(key) {
 }
 
 export function viewer_update_dialog_window({config, child, visible}) {
-  let action = {
+  const action = {
     type: VIEWER_UPDATE_DIALOG_WINDOW,
     config,
     child,
@@ -1017,14 +1017,14 @@ export function viewer_update_dialog_window({config, child, visible}) {
 }
 
 export function viewer_clear_dialog_windows() {
-  let action = {
+  const action = {
     type: VIEWER_CLEAR_DIALOG_WINDOWS
   }
   return action;
 }
 
 export function viewer_set_translation_namespaces(ns) {
-  let action = {
+  const action = {
     type: VIEWER_SET_TRANSLATION_NAMESPACES,
     ns
   }

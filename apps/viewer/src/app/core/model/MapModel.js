@@ -140,7 +140,7 @@ export const getViewerSessionConfig = (viewer) => {
 
   viewer.config_json.layers.forEach((l) => {
     if (!viewer.removed.includes(l.id) && l.id != 'featureinfo') {
-      let newl = {...l};
+      const newl = {...l};
       if (l.children) {
         newl.children = l.children.slice();
       }
@@ -173,8 +173,8 @@ export const transformExtent = (sourceProj, targetProj, extent, fallback) => {
   let re = Object.assign([], extent);
   if (!isFinite(re[0])) re = fallback;
   re = [parseFloat(re[0]), parseFloat(re[1]), parseFloat(re[2]), parseFloat(re[3])];
-  let sourceCrs = (String(sourceProj).indexOf(':') === -1 ? 'EPSG:' + sourceProj : sourceProj);
-  let targetCrs = (String(targetProj).indexOf(':') === -1 ? 'EPSG:' + targetProj : targetProj);
+  const sourceCrs = (String(sourceProj).indexOf(':') === -1 ? 'EPSG:' + sourceProj : sourceProj);
+  const targetCrs = (String(targetProj).indexOf(':') === -1 ? 'EPSG:' + targetProj : targetProj);
   re = OlProj.transformExtent(re, sourceCrs, targetCrs);
   return re;
 }
@@ -202,15 +202,15 @@ export const createStyle = (config) => {
 
 
 const createLayer = (config, map, all) => {
-  var layer;
+  let layer;
   if (!config) return;
 
   // Default style
   const defaultStyle = (feature) => {
     let style_color = config.style_color ? `rgba(${config.style_color})` : 'black';
-    let style_stroke_color = config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'rgba(0, 0, 255, 1.0)';
-    let style_stroke_width = typeof config.style_stroke_width === 'undefined' ? 2 : Number(config.style_stroke_width);
-    let style_image_radius = typeof config.style_image_radius === 'undefined' ? 8 : Number(config.style_image_radius);
+    const style_stroke_color = config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'rgba(0, 0, 255, 1.0)';
+    const style_stroke_width = typeof config.style_stroke_width === 'undefined' ? 2 : Number(config.style_stroke_width);
+    const style_image_radius = typeof config.style_image_radius === 'undefined' ? 8 : Number(config.style_image_radius);
 
     if (feature.ollayer) {
       const layerProps = feature.ollayer.getProperties();
@@ -231,7 +231,7 @@ const createLayer = (config, map, all) => {
     });
   }
 
-  let crs = map.getView().getProjection().getCode();
+  const crs = map.getView().getProjection().getCode();
 
   switch (config.type) {
 
@@ -256,7 +256,7 @@ const createLayer = (config, map, all) => {
         source: new OlSourceXYZ({
             tileUrlFunction: function(coordinate) {
               let wmts_url = config.url;
-              let z = ('0' + coordinate[0]).slice(-2);
+              const z = ('0' + coordinate[0]).slice(-2);
               wmts_url = wmts_url.replace('{z}', z);
               wmts_url = wmts_url.replace('{x}', coordinate[1]);
               wmts_url = wmts_url.replace('{y}', coordinate[2]);
@@ -313,7 +313,7 @@ const createLayer = (config, map, all) => {
       url = removeUrlParam(url, 'version');
       url = removeUrlParam(url, 'request');
 
-      let sourceConfig = {
+      const sourceConfig = {
         url: url,
         hidpi: false,
         //serverType: config.servertype,
@@ -404,7 +404,7 @@ const createLayer = (config, map, all) => {
       }
       const vectorSource = new OlSourceVector({
         loader: (extent) => {
-          let bbox = config.bbox.split(' ');
+          const bbox = config.bbox.split(' ');
           let url = config.url
           url = url.replace(/&$/ig, '')
           url = url + (url.indexOf('?') > -1 ? '' : '?')
@@ -493,12 +493,12 @@ const createLayer = (config, map, all) => {
       layer = new OlGroup({
         visible: config.active
       });
-      let children = new OlCollection();
+      const children = new OlCollection();
       if (Array.isArray(config.children)) {
-        let inverted = Object.assign([], all.filter(i => config.children.includes(i.id)));
+        const inverted = Object.assign([], all.filter(i => config.children.includes(i.id)));
         inverted.reverse();
         inverted.map(config2 => {
-          let sub = createLayer(config2, map, all);
+          const sub = createLayer(config2, map, all);
           children.push(sub);
           return true;
         });
@@ -541,11 +541,11 @@ const createLayer = (config, map, all) => {
   layer.setProperties(config, true);
 
   if (config.max_scale && config.max_scale > 0) {
-    let maxres  = getResolutionForScale(config.max_scale, map.getView().getProjection().getUnits());
+    const maxres  = getResolutionForScale(config.max_scale, map.getView().getProjection().getUnits());
     layer.setMaxResolution(maxres);
   }
   if (config.min_scale && config.min_scale > 0) {
-    let minres  = getResolutionForScale(config.min_scale, map.getView().getProjection().getUnits());
+    const minres  = getResolutionForScale(config.min_scale, map.getView().getProjection().getUnits());
     layer.setMinResolution(minres);
   } 
 
@@ -558,7 +558,7 @@ const createLayer = (config, map, all) => {
 
 export const zoomTheme = (theme, olmap = null) => {
   let bbox = null;
-  let crs = olmap.getView().getProjection().getCode();
+  const crs = olmap.getView().getProjection().getCode();
   if (theme.crs !== crs && theme.bbox) {
     bbox = transformExtent(
       'EPSG:'+theme.crs,
@@ -585,7 +585,7 @@ const checkLoading = (signal) => {
 }
 
 const addBaseLayers = (olMap, layers) => {
-  var layer;
+  let layer;
   if (!olMap) return;
   if (!layers) return;
   layers.map(config => {
@@ -596,7 +596,7 @@ const addBaseLayers = (olMap, layers) => {
 }
 
 const addLayers = (olMap, layers) => {
-  var layer;
+  let layer;
   if (!olMap) return;
   if (!layers) return;
   const inverted = Object.assign([], layers);
@@ -609,7 +609,7 @@ const addLayers = (olMap, layers) => {
 }
 
 const createLegendUrl = (url, layer, srs) => {
-    var finalurl = url;
+    let finalurl = url;
     finalurl += finalurl.indexOf('?') === -1 ? '?' : '';
 
     //console.log('SRS=' + (srs.indexOf(':') === -1 ? 'EPSG:' + srs : srs));
@@ -626,7 +626,7 @@ const createLegendUrl = (url, layer, srs) => {
 };
 
 const findActiveWMSLayer = (layers) => {
-  let result = [];
+  const result = [];
   layers.forEach(l => {
     if (l.getVisible() 
       && l.getSource 
@@ -635,7 +635,7 @@ const findActiveWMSLayer = (layers) => {
       result.push(l);
     }
     if ((l instanceof OlGroup) && l.getVisible()) {
-      let temp = findActiveWMSLayer(l.getLayers());
+      const temp = findActiveWMSLayer(l.getLayers());
       temp.forEach(t => result.push(t));
     }
   });
@@ -749,15 +749,15 @@ const getFeatureInfoXML = (l, viewResolution, coordinate, resolve, reject) => {
   .then(xml => {
 
     // Found features
-    let features = [];
+    const features = [];
 
     // Try GML format (in some services)
-    let parser = new OlFormatGML();
-    let parseOptions = {
+    const parser = new OlFormatGML();
+    const parseOptions = {
       dataProjection: 'EPSG:3857',
       featureProjection: 'EPSG:3857'
     };
-    let gmlFeatures = parser.readFeatures(xml, parseOptions);
+    const gmlFeatures = parser.readFeatures(xml, parseOptions);
     if (gmlFeatures && gmlFeatures.length) return resolve(gmlFeatures[0]);
 
     // Load raw XML with field "FeatureInfoResponse"
@@ -782,7 +782,7 @@ const getFeatureInfoXML = (l, viewResolution, coordinate, resolve, reject) => {
 }
 
 const getFeatureInfoGML = (l, viewResolution, coordinate, resolve, reject) => {
-  let layerProps = l.getProperties();
+  const layerProps = l.getProperties();
   const proxy = import.meta.env.VITE_APP_PROXY_URL || import.meta.env.VITE_APP_PUBLIC_URL;
   const url = l.getSource().getGetFeatureInfoUrl(
     coordinate,
@@ -983,7 +983,7 @@ export const getResolutionForScale = (scale, units) => {
 
 export const getScaleForResolution = (resolution, units) => {
   const scale = INCHES_PER_UNIT[units] * DOTS_PER_INCH * resolution;
-  let value = Math.round(scale);
+  const value = Math.round(scale);
   return value
 }
 
@@ -1000,7 +1000,7 @@ export const getCurrentScale = (map) => {
     const view = map.getView(); ;
     const resolution = view.getResolution();
     const units = map.getView().getProjection().getUnits();   
-    let value = getScaleForResolution(resolution, units);
+    const value = getScaleForResolution(resolution, units);
     return value;
 }
 
@@ -1028,7 +1028,7 @@ export const isThemeOnScale = (olmap, theme) => {
 
 export const getThemeLegendUrl = (theme) => {
   let url = theme.legend_url;
-  let style = theme.wms_style;
+  const style = theme.wms_style;
   if (style) {
     if (/style=/i.test(url)) url = url.replace(/style=(.*)&?/i, 'style=' + style + '&');
     else url += '&style=' + style;
@@ -1057,7 +1057,7 @@ export const getPolygonFromExtent = (extent, separator) => {
       [parseFloat(v[0]), parseFloat(v[3])]
   ];
 
-  let poly = new OlGeom.Polygon(new Array(coords));
+  const poly = new OlGeom.Polygon(new Array(coords));
 
   return poly;
 };
@@ -1065,7 +1065,7 @@ export const getPolygonFromExtent = (extent, separator) => {
 export const getWKTFromGeometry = function (geom) {
   const format = new OlWKT();
 
-  let wkt = format.writeGeometry(geom);
+  const wkt = format.writeGeometry(geom);
 
   return wkt;
 };
@@ -1073,7 +1073,7 @@ export const getWKTFromGeometry = function (geom) {
 export const getGeometryFromWKT = function (wkt, options) {
   const format = new OlWKT();
 
-  let geom = options ? format.readGeometry(wkt, options) : format.readGeometry(wkt);
+  const geom = options ? format.readGeometry(wkt, options) : format.readGeometry(wkt);
 
   return geom;
 };
@@ -1144,7 +1144,7 @@ export const getWMSVisibleLayers = function (map, scale) {
 
             const params = {};
             const p = source.getParams()
-            for (let key in p) {
+            for (const key in p) {
                 params[key] = p[key];
             }
 
@@ -1243,7 +1243,7 @@ export const getArcGISVisibleLayers = function (map, scale) {
 
           const params = {};
           const p = source.getParams()
-          for (let key in p) {
+          for (const key in p) {
               params[key] = p[key];
           }
 

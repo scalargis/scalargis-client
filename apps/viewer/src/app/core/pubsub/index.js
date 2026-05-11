@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 const topics = {};
 
 export function subscribe(topic, fn, override=true) {
-  let id = uuid();
+  const id = uuid();
 
   if (!topics[topic]) {
     topics[topic] = fn;

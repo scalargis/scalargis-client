@@ -192,7 +192,7 @@ export default function SearchLayerResults(props) {
 
     if (action.show_null === true || new_value != null) {
 
-      let data = {...action.data}
+      const data = {...action.data}
       Object.entries(data).forEach(([key, value]) => {
         data[key] = formatTemplateValue(rowData, value);
       });

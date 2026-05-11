@@ -196,8 +196,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
   if (mode === 'set') {
 
     return (
-      <React.Fragment>
-        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+      <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <div className="text-center mb-5">
               <div className="text-900 text-3xl font-medium mb-3">{i18nUtils.translateValue("passwordReset", "Recuperação de password")}</div>
               <span className="text-600 font-medium line-height-3">{i18nUtils.translateValue("passwordResetIntroMsg", "Por favor, defina e confirme a sua nova palavra-passe.")}</span>
@@ -273,7 +272,6 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
             </div>
           </div>
         </form>
-      </React.Fragment>
     )
   }
 }

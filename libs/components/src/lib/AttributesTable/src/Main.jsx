@@ -19,8 +19,7 @@ export default function Main({ open, as, onOpen, onClose, data, fields }) {
   )
 
   return (
-      <React.Fragment>
-        <Dialog
+      <Dialog
           header="Tabela de Attributos"
           visible={open}
           style={{width: '50vw'}} 
@@ -58,6 +57,5 @@ export default function Main({ open, as, onOpen, onClose, data, fields }) {
 
             </DataTable>
           </Dialog>
-      </React.Fragment>
   )
 }

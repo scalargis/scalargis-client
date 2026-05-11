@@ -135,11 +135,11 @@ Core.prototype.renderMainMenu = function({ selected_menu, props }) {
   if (keys.length === 0) return null;
 
   // From all components
-  let { components } = this.config.config_json;
+  const { components } = this.config.config_json;
   
   // Render components
   return components.map(c => {
-    let PluginComponent = this.__mainmenu[c.type];
+    const PluginComponent = this.__mainmenu[c.type];
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
@@ -173,13 +173,13 @@ Core.prototype.renderComponentById = function({ id, as = '', props, }) {
   if (keys.length === 0) return null;
 
   // From all components
-  let { components } = this.config.config_json;
+  const { components } = this.config.config_json;
   
   // Filter by id
-  let c = components.find(c => c.id === id);
+  const c = components.find(c => c.id === id);
 
   // Render components
-  let PluginComponent = this.__components[c.type];
+  const PluginComponent = this.__components[c.type];
 
   // Validate dynamic import is loaded
   if (!PluginComponent) return null;
@@ -212,7 +212,7 @@ Core.prototype.renderComponents = function({ region, as = '', props, parent, sep
 
   // Render components
   return regionComponents.map(c => {
-    let PluginComponent = this.__components[c.type];
+    const PluginComponent = this.__components[c.type];
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
@@ -242,13 +242,13 @@ Core.prototype.renderComponentManager = function({ id, submodule, action, as = '
   if (keys.length === 0) return null;
 
   // From all components
-  let { components } = this.config.config_json;
+  const { components } = this.config.config_json;
   
   // Filter by id
-  let c = components.find(c => c.id === id);
+  const c = components.find(c => c.id === id);
 
   // Render components
-  let PluginComponent = this.__managers[c.type];
+  const PluginComponent = this.__managers[c.type];
 
   // Validate dynamic import is loaded
   if (!PluginComponent) return null;

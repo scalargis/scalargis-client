@@ -27,10 +27,10 @@ export default function ArcGISMap(props) {
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
-    let srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
-    let bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
+    const srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
+    const bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
 
-    let options = {
+    const options = {
       srid: srid,
       bbox: bbox,
       tiled: data.wmsTiled
@@ -60,7 +60,7 @@ export default function ArcGISMap(props) {
       }
       return capabilities;
     }).then((capabilities) => {
-      let dataitems = Models.OWSModel.convertArcGISMap2Themes(capabilities, data.url, options);
+      const dataitems = Models.OWSModel.convertArcGISMap2Themes(capabilities, data.url, options);
       setData({ ...data, dataitems });        
 
       // Add to cookies history

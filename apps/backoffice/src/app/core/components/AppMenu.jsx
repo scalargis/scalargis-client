@@ -44,8 +44,8 @@ const AppSubmenu = (props) => {
     }
 
     const renderLinkContent = (item) => {
-        let submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
-        let badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
+        const submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
+        const badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
 
         return (
             <React.Fragment>
@@ -58,7 +58,7 @@ const AppSubmenu = (props) => {
     }
 
     const renderLink = (item, i) => {
-        let content = renderLinkContent(item);
+        const content = renderLinkContent(item);
 
         if (item.to) {
             return (
@@ -76,9 +76,9 @@ const AppSubmenu = (props) => {
         }
     }
 
-    let items = props.items && props.items.map((item, i) => {
-        let active = activeIndex === i;
-        let styleClass = classNames(item.badgeStyleClass, { 'active-menuitem': active && !item.to });
+    const items = props.items && props.items.map((item, i) => {
+        const active = activeIndex === i;
+        const styleClass = classNames(item.badgeStyleClass, { 'active-menuitem': active && !item.to });
 
         return (
             <li className={styleClass} key={i}>

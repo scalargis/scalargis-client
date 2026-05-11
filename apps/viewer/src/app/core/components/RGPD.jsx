@@ -24,14 +24,14 @@ function RGPD({ cookies, core, dispatch, children }) {
 
   const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
 
-  let theme = core?.siteConfig?.theme || import.meta.env.VITE_APP_DEFAULT_THEME || 'default';
+  const theme = core?.siteConfig?.theme || import.meta.env.VITE_APP_DEFAULT_THEME || 'default';
 
   function accept() {
     setCookiergpd(cookieValue);
 
     // Manually save cookie if using http access
     if (window.location.protocol === 'http:') {
-      let expireDate = new Date();
+      const expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
       const cookies = new Cookies();
       cookies.set(cookieName, cookieValue, { path: cookiePath, expires: expireDate,

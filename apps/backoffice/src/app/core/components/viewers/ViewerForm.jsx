@@ -307,9 +307,7 @@ function ViewerForm(props) {
   }  
  
   return (
-    <React.Fragment>   
-
-      <BlockUI blocked={isLoading}
+    <BlockUI blocked={isLoading}
         template={<i className="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
 
         <TabMenu model={tabItems} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
@@ -678,8 +676,6 @@ function ViewerForm(props) {
         </form>
       
       </BlockUI>
-
-    </React.Fragment>
 
   );
 

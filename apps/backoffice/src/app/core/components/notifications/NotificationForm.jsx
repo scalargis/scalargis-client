@@ -141,14 +141,12 @@ function NotificationForm(props) {
   
   const rightToolbarTemplateNone = () => {
     return (
-      <React.Fragment>
-        <Button
+      <Button
           type="button" 
           label="Voltar" 
           icon="pi pi-left" 
           className="p-button-secondary mr-4"
           onClick={goBack} />
-      </React.Fragment>
     )
   }
 

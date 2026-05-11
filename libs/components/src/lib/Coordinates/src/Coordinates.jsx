@@ -189,7 +189,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     //Build values
     const rows = [];
     list.forEach(item => {
-      let values = [];     
+      const values = [];     
       keys.forEach(key => {
         let found = true;            
         if (listCRS && listCRS.length) {
@@ -256,7 +256,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         srid: crs.srid, precision: precision, coordinates: coords }
     }); 
 
-    let item = { id: uuidV4(), coordinates: new_coords, crs: mainMap.getView().getProjection().getCode(), results: trans_coords };
+    const item = { id: uuidV4(), coordinates: new_coords, crs: mainMap.getView().getProjection().getCode(), results: trans_coords };
     setNewCoord(item);
     zoomItem(item);
   }
@@ -282,7 +282,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
 
     const url = core.API_URL + '/app/utils/transcoord';
 
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'        
@@ -326,9 +326,9 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   }   
   
 	function convertDMS2DD (dms) {
-    var val = null;
+    let val = null;
 
-    var parts = dms.replace("º", "").replace("''","").replace("'","").split(" ");
+    const parts = dms.replace("º", "").replace("''","").replace("'","").split(" ");
 
     parts[1] = parseInt(parts[1]);
     parts[2] = parseInt(parts[2]);
@@ -342,13 +342,13 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   }
 
   function convertDD2DMS (deg, is_lon) {
-      var val = null;
+      let val = null;
 
-      var d = Math.floor(Math.abs(deg));
-      var minfloat = (Math.abs(deg)-d)*60;
-      var m = Math.floor(minfloat);
-      var secfloat = (minfloat-m)*60;
-      var s = parseFloat(Math.round(secfloat * 100) / 100).toFixed(2);
+      const d = Math.floor(Math.abs(deg));
+      const minfloat = (Math.abs(deg)-d)*60;
+      const m = Math.floor(minfloat);
+      const secfloat = (minfloat-m)*60;
+      const s = parseFloat(Math.round(secfloat * 100) / 100).toFixed(2);
 
       if (is_lon) {
           val = ("000" + Math.abs(d)).slice(-3) + "º " + ("00" + m).slice(-2) + "' " + ("0000" + s).slice(-5) + "''";
@@ -420,9 +420,9 @@ export default function Coordinates({ core, config, actions, dispatch, record })
 
   // Remove one item
   function removeItem(item) {
-    let index = coordinates.findIndex(c => c.id === item.id);
+    const index = coordinates.findIndex(c => c.id === item.id);
     if (index === -1) return;
-    let updated = [...coordinates];
+    const updated = [...coordinates];
     updated.splice(index, 1);
     dispatch(actions.viewer_set_coordinates(updated));
   }   
@@ -585,8 +585,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         </div> : null }
 
       {(showDegrees &&
-      <React.Fragment>
-        <div className="grid formgrid mt-2">
+      <div className="grid formgrid mt-2">
           <div className="field col-12">
             <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
             <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")} className="w-full"/>
@@ -639,12 +638,10 @@ export default function Coordinates({ core, config, actions, dispatch, record })
             </div>
           }
           </div>
-        </div>
-      </React.Fragment>      
+        </div>      
       )}
       {(!showDegrees &&
-      <React.Fragment>
-        <div className="grid formgrid mt-2">
+      <div className="grid formgrid mt-2">
             <div className="field col-12">
               <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
               <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")} className="w-full" />
@@ -657,8 +654,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                 <label htmlFor="coordY">Y</label>              
                 <InputNumber id="coordY" value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
             </div>
-        </div>      
-      </React.Fragment>)}
+        </div>)}
       <div className="card text-center">
         <Button
             label={t("locate","Localizar")}

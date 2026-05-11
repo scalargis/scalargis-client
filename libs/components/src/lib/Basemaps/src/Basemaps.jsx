@@ -14,7 +14,7 @@ export default function Basemaps({ core, viewer, mainMap, config, actions, recor
   const layersIds = layers.map(l => l.id);
 
   function selectLayer (layer) {
-    let checked = viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
+    const checked = viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
     if (layer) {
       checked.push(layer);
     }

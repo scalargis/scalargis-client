@@ -648,7 +648,7 @@ class FormFieldsEditor extends Component {
   }
 
   onGroupFieldsChange(groupId, fields) {
-    let new_data = {...this.state.data.groups};
+    const new_data = {...this.state.data.groups};
     if (new_data[groupId]) {
       new_data[groupId].fields = fields;
       this.onChange({...this.state.data, groups: new_data});
@@ -676,7 +676,7 @@ class FormFieldsEditor extends Component {
       //Check key already exists
       if (this.fieldEdition.key !== key && this.state.data.groups[groupId].fields[key]) return;
 
-      let new_data = {...this.state.data.groups};
+      const new_data = {...this.state.data.groups};
       if (new_data[groupId].fields[key]) delete new_data[groupId].fields[key];
       new_data[groupId].fields = {[key]: (({ active, title, header, showLabel, required }) => ({ active, title, header, showLabel, required }))(field), ...new_data[groupId].fields};
 

@@ -18,7 +18,7 @@ function RGPD({ cookies, children }) {
 
     // Manually save cookie if using http access
     if (window.location.protocol === 'http:') {
-      let expireDate = new Date();
+      const expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
       const cookies = new Cookies();
       cookies.set(cookieName, cookieValue, { path: cookiePath, expires: expireDate, secure: false, httpOnly: false });

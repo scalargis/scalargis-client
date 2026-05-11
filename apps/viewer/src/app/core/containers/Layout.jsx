@@ -12,8 +12,8 @@ function Layout(props) {
 
   const [activeTheme, setActiveTheme] = useState(null);
 
-  let sidebar = useRef(null);
-  let menuClick = useRef(false);
+  const sidebar = useRef(null);
+  const menuClick = useRef(false);
 
   function addClass(element, className) {
     if (element.classList) element.classList.add(className);
@@ -57,7 +57,7 @@ function Layout(props) {
     //Set Manifest
     let manifest_url = utils.buildRelativeUrlPath('manifest.json');   
     if (config.manifest_json) {
-      let manifest = encodeURIComponent(JSON.stringify(config.manifest_json));
+      const manifest = encodeURIComponent(JSON.stringify(config.manifest_json));
       manifest_url = "data:application/manifest+json,"+manifest;
     }
     let elem = document.querySelector("link[rel='manifest']");

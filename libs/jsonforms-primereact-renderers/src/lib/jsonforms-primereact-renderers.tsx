@@ -121,6 +121,11 @@ import PrimereactCategorizationStepperLayout, {
   primereactCategorizationStepperTester,
 } from './layouts/PrimereactCategorizationStepperLayout';
 
+import { UnwrappedAdditional } from './additional/unwrapped';
+import { UnwrappedComplex } from './complex/unwrapped';
+import { UnwrappedControls } from './controls/unwrapped';
+import { UnwrappedLayouts } from './layouts/unwrapped';
+
 export * from './additional';
 //export * from './cells';
 export * from './complex';
@@ -210,11 +215,6 @@ export const primereactLayouts = {
   PrimereactArrayLayout,
   primereactArrayLayoutTester,
 };
-
-import { UnwrappedAdditional } from './additional/unwrapped';
-import { UnwrappedComplex } from './complex/unwrapped';
-import { UnwrappedControls } from './controls/unwrapped';
-import { UnwrappedLayouts } from './layouts/unwrapped';
 
 export const Unwrapped = {
   ...UnwrappedAdditional,

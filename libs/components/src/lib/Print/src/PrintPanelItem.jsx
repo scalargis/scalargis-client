@@ -199,7 +199,7 @@ export default function PrintPanelItem(props) {
     if (printLayer && printLayer.current && printLayer.current.getSource().getFeatures().length > 0) {
       let extent = printLayer.current.getSource().getExtent();
       if (!extent) return;
-      let center = [extent[0] + (extent[2] - extent[0]) / 2, extent[1] + (extent[3] - extent[1]) / 2];
+      const center = [extent[0] + (extent[2] - extent[0]) / 2, extent[1] + (extent[3] - extent[1]) / 2];
 
       if ((extent[2] - extent[0]) < 500 || (extent[3] - extent[1]) < 500) {
         extent = [center[0] - 250, center[1] - 250, center[0] + 250, center[1] + 250];
@@ -266,7 +266,7 @@ export default function PrintPanelItem(props) {
     setIsPrinting(true);
 
     // Set fetch options
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -349,7 +349,7 @@ export default function PrintPanelItem(props) {
       data += '&' + allLayers.map(l => 'layers[]=' + l).join('&');
     }
 
-    let opts = {
+    const opts = {
       ...options,
       body: data
     }
@@ -487,7 +487,7 @@ export default function PrintPanelItem(props) {
   }, []);
 
   useEffect(()=> {
-    let fn_change = printLayer.current.getSource().on('change', () => {      
+    const fn_change = printLayer.current.getSource().on('change', () => {      
       if (printItem.location_marking) {
         const ft = printLayer.current.getSource().getFeatures();
         if (ft.length == 0) {
@@ -822,8 +822,7 @@ export default function PrintPanelItem(props) {
           {Object.entries(printItem.form_fields.fields).map(([fieldKey, field]) => {
             const field_key = fieldKey;
             if (field.active) {
-              return <React.Fragment>
-                <div key={field_key} className="p-fluid">
+              return <div key={field_key} className="p-fluid">
                   {field.header && <h4>{field.header}</h4>}
                   <div className="field">
                     {field.showLabel && <label>{field.title}</label>}
@@ -834,7 +833,6 @@ export default function PrintPanelItem(props) {
                     {(field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small>}
                   </div>
                 </div>
-              </React.Fragment>
             }
           })}
         </div>
@@ -847,7 +845,7 @@ export default function PrintPanelItem(props) {
       }
       {!isPrinting && printFile ?
         <div className="card text-center mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
-          <a href={printFile.url} target="_blank">
+          <a href={printFile.url} target="_blank" rel="noreferrer">
             <i className="pi pi-external-link pl-2 mr-1"></i>{t("openPrintPdf", "Abrir PDF da planta")}
           </a>
         </div> : null

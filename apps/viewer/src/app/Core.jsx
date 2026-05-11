@@ -34,7 +34,7 @@ export function createReducerManager(initialReducers) {
       // If any reducers have been removed, clean up their state first
       if (keysToRemove.length > 0) {
         state = { ...state }
-        for (let key of keysToRemove) {
+        for (const key of keysToRemove) {
           delete state[key]
         }
         keysToRemove = []
@@ -318,7 +318,7 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
   if (keys.length === 0) return null;
 
   // From all components
-  let { components } = this.config.config_json;
+  const { components } = this.config.config_json;
 
   // Filter by mainmenu components (main section)
   let mainmenuComponents = components.filter(c => c.target === 'mainmenu' && !c.section);
@@ -333,7 +333,7 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
     <nav aria-label="Menu principal">
       <ul>
         { mainmenuComponents.map(c => {
-          let PluginComponent = this.__mainmenu[c.type];
+          const PluginComponent = this.__mainmenu[c.type];
 
           // Validate dynamic import is loaded
           if (!PluginComponent) return null;
@@ -370,13 +370,13 @@ Core.prototype.renderComponentById = function({ id, as = '', props, }) {
   if (keys.length === 0) return null;
 
   // From all components
-  let { components } = this.config.config_json;
+  const { components } = this.config.config_json;
   
   // Filter by id
-  let c = components.find(c => c.id === id);
+  const c = components.find(c => c.id === id);
 
   // Render components
-  let PluginComponent = this.__components[c.type];
+  const PluginComponent = this.__components[c.type];
 
   // Validate dynamic import is loaded
   if (!PluginComponent) return null;
@@ -409,7 +409,7 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
 
   // Render components
   return regionComponents.map(c => {
-    let PluginComponent = this.__components[c.type];
+    const PluginComponent = this.__components[c.type];
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
@@ -458,7 +458,7 @@ Core.prototype.renderComponentsMenu = function({ region, as = '', mobileMenu = [
   // Render components
   //return regionComponents.map(c => {
   return menuComponents.map(c => {
-    let PluginComponent = this.__components[c.type];
+    const PluginComponent = this.__components[c.type];
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
@@ -497,7 +497,7 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
 
   // Render components
   return regionComponents.map(c => {
-    let PluginComponent = this.__components[c.type];
+    const PluginComponent = this.__components[c.type];
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;

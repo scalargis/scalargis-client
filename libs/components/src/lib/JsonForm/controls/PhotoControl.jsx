@@ -77,7 +77,7 @@ export const PhotoControl = (props) => {
     if (file_upload.current && file_upload.current.files && file_upload.current.files.length) {
       const reader = new FileReader();
       reader.onload = async function() {
-        let data = reader.result;
+        const data = reader.result;
 
         try {
           const image = await resizeFile(file_upload.current.files[0]);
@@ -153,7 +153,7 @@ export const PhotoControl = (props) => {
             </div>
             :
             <div>
-              <div><strong>{labels.file}: </strong><a href={`${file.file_url}`} target="_blank">{file.original_filename}</a></div>
+              <div><strong>{labels.file}: </strong><a href={`${file.file_url}`} target="_blank" rel="noreferrer">{file.original_filename}</a></div>
               <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             }

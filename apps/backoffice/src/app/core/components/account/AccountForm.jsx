@@ -128,13 +128,11 @@ function AccountForm(props) {
     }
 
     return (
-      <React.Fragment>
-        <Button
+      <Button
           type="button"
           label="Editar"
           icon="pi pi pi-pencil"
           onClick={e => { e.preventDefault(); setIsEditMode(true)} } />
-      </React.Fragment>
     )
 
   }

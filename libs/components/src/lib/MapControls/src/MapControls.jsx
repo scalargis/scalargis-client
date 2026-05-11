@@ -85,7 +85,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         mapInteractions = mapInteractions.extend([
           new DragRotate({
             condition: (evt) => {
-              var browserEvent = evt.originalEvent;
+              const browserEvent = evt.originalEvent;
               return browserEvent.ctrlKey;
             }
           })

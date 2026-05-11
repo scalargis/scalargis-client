@@ -52,14 +52,13 @@ function RegistrationWidget(props) {
     }, []);
 
     const onSubmit = (data) => {
-        let {accept, confirmPassword, ...payload} = data;
+        const {accept, confirmPassword, ...payload} = data;
         onRegistration(payload);
     }
 
     if (auth?.response?.register_user === true && !auth?.response?.error) {
         return (
-            <React.Fragment>
-                <div>
+            <div>
                     <div className="text-center mb-4">
                         <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
                         <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
@@ -72,8 +71,7 @@ function RegistrationWidget(props) {
                             {i18nUtils.translateValue("login", "Login")}
                         </a>                         
                     </div> }
-                </div>  
-            </React.Fragment>
+                </div>
         );
     }
 

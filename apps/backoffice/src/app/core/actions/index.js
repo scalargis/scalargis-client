@@ -76,13 +76,13 @@ export function login_post(post, history, redirect) {
     dispatch(login_http_loading());
     
     // Login request
-    let options = {
+    const options = {
       method: 'POST',
       body: JSON.stringify(post)
     }
 
     // Auth url. TODO: check for proxy
-    let url = API_URL + '/authentication/authenticate';
+    const url = API_URL + '/authentication/authenticate';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -220,7 +220,7 @@ export function backoffice_load(core, history) {
     const logged = core.getLoggedUser();
 
     // Fetch backoffice
-    let url = CONFIG_URL ? CONFIG_URL : API_URL + '/app/backoffice' + (history.location.search || '');
+    const url = CONFIG_URL ? CONFIG_URL : API_URL + '/app/backoffice' + (history.location.search || '');
     
     const options = { headers: {} };
     
@@ -252,14 +252,14 @@ export function backoffice_load(core, history) {
 
       // Load components
       let count = 0;
-      let { components } = config.config_json;
+      const { components } = config.config_json;
       components.forEach(component => {
         core.addComponent(core, component, () => {
           count++;
           if (count === components.length) {
 
             // Index by id
-            let pitems = {};
+            const pitems = {};
             components.forEach(c => pitems[c.id] = c);
 
             // Finally, load into redux store
@@ -334,7 +334,7 @@ export function layout_toggle_menu(isDesktop) {
 }
 
 export function layout_set_mode(layoutMode) {
-  let action = {
+  const action = {
     type: LAYOUT_SET_MODE,
     layoutMode
   }
@@ -342,7 +342,7 @@ export function layout_set_mode(layoutMode) {
 }
 
 export function layout_set_colormode(layoutColorMode) {
-  let action = {
+  const action = {
     type: LAYOUT_SET_COLORMODE,
     layoutColorMode
   }

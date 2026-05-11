@@ -15,6 +15,8 @@ import PrimereactEnumArrayRenderer, {
 import PrimereactEnumArraySelectRenderer, {
   primereactEnumArraySelectRendererTester
 } from './PrimereactEnumArraySelectRenderer';
+
+import NoBorderTableCell from './NoBorderTableCell';
 /*
 import MaterialObjectRenderer, {
   materialObjectControlTester,
@@ -50,6 +52,4 @@ export * from './DeleteDialog';
 export * from './PrimereactTableControl';
 export * from './TableToolbar';
 export * from './ValidationIcon';
-
-import NoBorderTableCell from './NoBorderTableCell';
 export { NoBorderTableCell };

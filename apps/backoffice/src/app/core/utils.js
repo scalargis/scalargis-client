@@ -25,7 +25,7 @@ const _getAppDefaultLocale = () => {
 export function rememberUrl(cookies, type, url) {
   const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'scalargis_';
   const cookieName = prefix + type;
-  let urlhistory = cookies.get(cookieName) || [];
+  const urlhistory = cookies.get(cookieName) || [];
   if (urlhistory.indexOf(url) === -1) urlhistory.push(url);
   cookies.set(cookieName, urlhistory);
 }
@@ -45,9 +45,9 @@ export const removeUrlParam = (sourceURL, key) => {
     queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
   if (queryString !== "") {
     params_arr = queryString.split("&");
-    for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+    for (let i = params_arr.length - 1; i >= 0; i -= 1) {
       param = params_arr[i].split("=")[0];
-      let regex = new RegExp(key, "ig");
+      const regex = new RegExp(key, "ig");
       if (!regex.test(param)) {
         new_params.push(params_arr[i]);
       }
@@ -58,7 +58,7 @@ export const removeUrlParam = (sourceURL, key) => {
 }
 
 export const getWindowSize = () => {
-  var w = window,
+  const w = window,
   d = document,
   e = d.documentElement,
   g = d.getElementsByTagName('body')[0],

@@ -65,7 +65,7 @@ export default function Main({ core, config, record }) {
   }
 
   function getWFSFeatures(request) {
-    let params = [
+    const params = [
       "SERVICE=WFS",
       "REQUEST=GetFeature",
       "VERSION=" + (request.version || "2.0.0"), //1.1.0
@@ -95,7 +95,7 @@ export default function Main({ core, config, record }) {
     };
 
     // Set headers
-    let headers = {
+    const headers = {
       "accept": "application/json, text/javascript, */*; q=0.01",
       "accept-language": "pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6",
       "cache-control": "no-cache",
@@ -215,7 +215,7 @@ export default function Main({ core, config, record }) {
       crs = 'EPSG:' + crs;
     }
 
-    let params = [
+    const params = [
       "SERVICE=WFS",
       "REQUEST=GetFeature",
       "VERSION=" + (datasourceDownload.version || "2.0.0"),
@@ -233,7 +233,7 @@ export default function Main({ core, config, record }) {
     if (datasourceDownload.propertyName) params.push("propertyName=" + datasourceDownload.propertyName)
     
     // Build final URL
-    let url = datasourceDownload.url + params.join('&');    
+    const url = datasourceDownload.url + params.join('&');    
 
     window.open(url, "_blank");
   }

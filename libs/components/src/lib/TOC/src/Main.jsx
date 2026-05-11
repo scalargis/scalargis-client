@@ -75,8 +75,8 @@ class Main extends React.Component {
   };
 
   openTheme(e, id) {
-    let { opened } = this.state;
-    let index = opened.indexOf(id);
+    const { opened } = this.state;
+    const index = opened.indexOf(id);
     if (index === -1) opened.push(id);
     else opened.splice(index, 1);
     this.setState({ ...this.state, opened });
@@ -92,14 +92,14 @@ class Main extends React.Component {
     const checked = Object.assign([], viewer.config_json.checked);
     
     // Toggle selected
-    let index = checked.indexOf(id);
+    const index = checked.indexOf(id);
     if (index === -1) checked.push(id);
     else checked.splice(index, 1);
 
     //Uncheck other nodes (parent with exclusive == true)
     if (items && items.length) {
       items.forEach(child => {
-        let index = checked.indexOf(child.id);
+        const index = checked.indexOf(child.id);
         if (child.id !== id && index > -1) checked.splice(index, 1);
       });
     }
@@ -107,9 +107,9 @@ class Main extends React.Component {
     // If checked, activate all parents
     if (index === -1 && ((activate_parents && layer_data?.activate_parents !== false)
       || layer_data?.activate_parents === true)) {
-      let parents = findAllParents(layers, id).filter(i => !!i);
+      const parents = findAllParents(layers, id).filter(i => !!i);
       parents.forEach(p => {
-        let index = checked.indexOf(p);
+        const index = checked.indexOf(p);
         if (index === -1) checked.push(p);
       });
     }
@@ -117,9 +117,9 @@ class Main extends React.Component {
     // If unchecked deactivate all children
     if (index > -1 && ((deactivate_children && layer_data?.deactivate_children !== false) 
       || layer_data?.deactivate_children === true)) {
-      let children = findAllChildren(layers, [id]);
+      const children = findAllChildren(layers, [id]);
       children.forEach(p => {
-        let index = checked.indexOf(p);
+        const index = checked.indexOf(p);
         if (p !== id && index > -1) checked.splice(index, 1);
       });
     }
@@ -133,8 +133,8 @@ class Main extends React.Component {
     // Open direct children if checked
     if ((open_children && layer_data?.open_children !== false) || layer_data?.open_children) {
       if (checked.includes(id) && layer_data.type === 'GROUP') {
-        let { opened } = this.state;
-        let index = opened.indexOf(id);
+        const { opened } = this.state;
+        const index = opened.indexOf(id);
         if (index === -1) {
           opened.push(id);
           this.setState({ ...this.state, opened });
@@ -148,7 +148,7 @@ class Main extends React.Component {
   }
 
   opacity(e, theme, value) {
-    let { layers } = this.props.config.viewer.config_json;
+    const { layers } = this.props.config.viewer.config_json;
     const index = layers.findIndex(i => i.id === theme.id);
     const update = Object.assign({}, theme);
     update.opacity = value / 100;
@@ -167,7 +167,7 @@ class Main extends React.Component {
   }
 
   applyThemeChanges(theme) {
-    let { layers } = this.props.config.viewer.config_json;
+    const { layers } = this.props.config.viewer.config_json;
     const index = layers.findIndex(i => i.id === theme.id);
     const update = Object.assign({}, theme);
     layers.splice(index, 1, update);
@@ -178,8 +178,8 @@ class Main extends React.Component {
   }
 
   moveTheme(fromIndex, fromParent, toIndex, toParent) {
-    let { layers } = this.props.config.viewer.config_json;
-    let updated = Object.assign([], layers);
+    const { layers } = this.props.config.viewer.config_json;
+    const updated = Object.assign([], layers);
     
     const parentIndex = updated.findIndex(i => i.id === fromParent);
     const targetIndex = updated.findIndex(i => i.id === toParent);
@@ -215,9 +215,9 @@ class Main extends React.Component {
     // Dispatch zoom to theme action
     if (theme.crs && theme.bbox && transform_extent && map_set_extent && dispatch) {
       try {
-        let target_proj = this.props.config.mainMap.getView().getProjection().getCode();
-        let extent = transform_extent(theme.crs, target_proj, theme.bbox.split(' '));
-        let center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
+        const target_proj = this.props.config.mainMap.getView().getProjection().getCode();
+        const extent = transform_extent(theme.crs, target_proj, theme.bbox.split(' '));
+        const center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
         dispatch(map_set_extent(center, extent));
       } catch (e) {
           console.log(e);
@@ -227,7 +227,7 @@ class Main extends React.Component {
 
   filterThemes(themes, filter) {
     const filterDone = [];
-    let filterRegEx = new RegExp(filter, "i");
+    const filterRegEx = new RegExp(filter, "i");
     themes.forEach(n => {
       if (filterDone.includes(n.id)) return;
       if (!filter) {
@@ -237,7 +237,7 @@ class Main extends React.Component {
       }
       filterDone.push(n.id);
       if (!n.filtered) {
-        let parents = findAllParents(themes, n.id);
+        const parents = findAllParents(themes, n.id);
         themes.forEach(p => {
           if (filterDone.includes(p.id)) return;
           if (parents.includes(p.id)) {
@@ -268,19 +268,19 @@ class Main extends React.Component {
     //Get current session viewer config
     const { getViewerSessionConfig } = this.props.config.Models.MapModel;
 
-    let { API_URL } = this.state;
+    const { API_URL } = this.state;
 
     const viewer = this.props.config.viewer;
     const newconfig = getViewerSessionConfig(viewer);
 
-    let record = {
+    const record = {
       id: viewer.id,
       session_layers: Object.assign([], viewer?.session_layers),
       config_json: JSON.stringify(newconfig)
     }
 
     // Save request
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'        
@@ -409,7 +409,7 @@ class Main extends React.Component {
               </React.Fragment> } />
           }
 
-          { !!tree.length ? (
+          { tree.length ? (
             <>
             { component_cfg.show_filter !== false ? (
               <div className="p-inputgroup">

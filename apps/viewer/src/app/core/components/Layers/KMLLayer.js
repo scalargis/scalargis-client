@@ -50,7 +50,7 @@ const KMLLayer = ({ config, group, checked }) => {
     };
     */
     //let format = new OlFormatKML(formatOptions);  
-    let format = new OlFormatKML();
+    const format = new OlFormatKML();
 
     let url = config.url
     // Use map proxy

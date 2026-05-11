@@ -26,7 +26,7 @@ const AppNotification = (props) => {
     }, [props?.notifications]);
 
     return (
-        <><Toast ref={toast} position={position} /></>
+        <Toast ref={toast} position={position} />
     );
 };
 

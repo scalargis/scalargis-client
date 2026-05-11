@@ -176,7 +176,7 @@ function PrintGroupList(props) {
   }
 
   const onSort = (event) => {
-    let _searchParams = { ...searchParams, ...event };
+    const _searchParams = { ...searchParams, ...event };
     setSearchParams({ ...searchParams, ...event });
   }
 

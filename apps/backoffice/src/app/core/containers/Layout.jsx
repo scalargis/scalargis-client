@@ -6,8 +6,8 @@ function Layout(props) {
 
   const { history, backoffice, layout_toggle_menu, layout_wrapper_click, layout_set_mode, layout_set_colormode } = props;
   
-  let sidebar = useRef(null);
-  let menuClick = useRef(false);
+  const sidebar = useRef(null);
+  const menuClick = useRef(false);
 
   const addClass = (element, className) => {
     if (element.classList)

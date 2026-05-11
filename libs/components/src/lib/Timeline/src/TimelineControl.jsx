@@ -26,8 +26,8 @@ function parseTimeValues (data) {
 
 function isoDateWithoutTimeZone(date) {
   if (date == null) return date;
-  var timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
-  var correctDate = new Date(timestamp);
+  const timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
+  const correctDate = new Date(timestamp);
   // correctDate.setUTCHours(0, 0, 0, 0); // uncomment this if you want to remove the time
   return correctDate.toISOString();
 }
@@ -54,7 +54,7 @@ function addDurationToDate(date, duration) {
   ] = match.map(num => parseFloat(num) || 0);
 
   // Create a new Date instance from the input date to avoid mutating the original date
-  let resultDate = new Date(date);
+  const resultDate = new Date(date);
 
   // Add duration components to the date
   resultDate.setFullYear(resultDate.getFullYear() + years);
@@ -89,7 +89,7 @@ function subtractDurationToDate(date, duration) {
   ] = match.map(num => parseFloat(num) || 0);
 
   // Create a new Date instance from the input date to avoid mutating the original date
-  let resultDate = new Date(date);
+  const resultDate = new Date(date);
 
   // Add duration components to the date
   resultDate.setFullYear(resultDate.getFullYear() - years);
@@ -336,7 +336,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
       setCurrentPos(0);
     }
 
-    let newIntervalId = setInterval(() => {
+    const newIntervalId = setInterval(() => {
       setCurrentPos((val) => {
         if (val + 1 >= timeData.length) {
           if (record?.config_json?.loop === true) {

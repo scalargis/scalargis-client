@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import  { addProjections, transformExtent } from '../model/MapModel'
 
 function MainMap(props) {
-  let { olMap, config, viewer, mainMapEl, core, dispatch, auth } = props;
+  const { olMap, config, viewer, mainMapEl, core, dispatch, auth } = props;
 
   useEffect(() => {
     if (!config) return;
@@ -84,11 +84,9 @@ function MainMap(props) {
   if (viewer?.size?.height != null) map_style = {...map_style, height : viewer.size.height}; 
 
   return (
-    <React.Fragment>
-      <div id="map" ref={mainMapEl} style={{...map_style}} className={viewer?.className}>
+    <div id="map" ref={mainMapEl} style={{...map_style}} className={viewer?.className}>
         { props.children }
       </div>
-    </React.Fragment>
   )
 }
 

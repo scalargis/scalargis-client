@@ -19,7 +19,7 @@ const ArcGISMapLayer = ({ config, group, checked, viewer }) => {
   const MAP_PROXY = core.MAP_PROXY_URL;
 
   function createLayer(config) {
-    let url = config.url;
+    const url = config.url;
 
     let proxy_requests = false;
     if (viewer && viewer.config_json && viewer.config_json.proxy_http_image_requests) {
@@ -29,7 +29,7 @@ const ArcGISMapLayer = ({ config, group, checked, viewer }) => {
       proxy_requests = config.proxy_http_image_requests;
     }
 
-    let sourceConfig = {
+    const sourceConfig = {
       url: url,
       //hidpi: false,
       params: {
@@ -69,7 +69,7 @@ const ArcGISMapLayer = ({ config, group, checked, viewer }) => {
     }
 
     // Check theme has map CRS
-    let crs = mainMap.getView().getProjection().getCode();
+    const crs = mainMap.getView().getProjection().getCode();
     if (config.crs_options && config.crs_options.indexOf(crs) === -1) {
       sourceConfig['projection'] = 'EPSG:4326';
     }
@@ -147,7 +147,7 @@ const ArcGISMapLayer = ({ config, group, checked, viewer }) => {
   
   // Changed config
   useEffect(() => {
-    let params = {
+    const params = {
       'LAYERS': config.layers
     }
     layer.current.getSource().updateParams(params);

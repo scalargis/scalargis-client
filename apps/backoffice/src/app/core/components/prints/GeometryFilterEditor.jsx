@@ -67,7 +67,7 @@ const getGeometryFromWKT = function (wkt, options) {
 
 const getWKTFromGeometry = function (geom) {
   const format = new OlWKT();
-  let wkt = format.writeGeometry(geom);
+  const wkt = format.writeGeometry(geom);
   return wkt;
 };
 

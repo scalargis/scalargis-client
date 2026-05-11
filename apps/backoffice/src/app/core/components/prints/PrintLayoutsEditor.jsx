@@ -156,7 +156,7 @@ const PrintLayoutsEditor = props => {
 
   const createKey = () => {
       let key = '';
-      let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       for (let i = 0; i < 5; i++) {
           key += chars.charAt(Math.floor(Math.random() * chars.length));
       }

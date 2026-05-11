@@ -45,11 +45,11 @@ const GeoJSONLayer = ({ config, group, checked }) => {
   }
 
   function createLayer(config) {
-    let formatOptions = {
+    const formatOptions = {
       dataProjection: 'EPSG:' + config.crs,
       featureProjection: mainMap.getView().getProjection().getCode()
     };
-    let format = new OlFormatGeoJSON(formatOptions);
+    const format = new OlFormatGeoJSON(formatOptions);
     
     const vectorSource = new OlSourceVector({
       //url: config.url,

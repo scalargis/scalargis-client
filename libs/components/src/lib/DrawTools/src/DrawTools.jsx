@@ -160,8 +160,8 @@ class DrawTools extends React.Component {
     });
     const oldSelect = new OlCollection();
     this.select.on('select', (e) => {
-      let selected = e.selected;
-      let deselected = e.deselected;
+      const selected = e.selected;
+      const deselected = e.deselected;
       if (selected) {
         selected.forEach((feature) => {
           if (feature.get('state')) {
@@ -391,7 +391,7 @@ class DrawTools extends React.Component {
       dispatch(actions.viewer_set_drawings(drawings_update));
 
       setTimeout(() => {
-        let history_item = [];
+        const history_item = [];
         drawings_update.forEach(function (item) {
           history_item.push(Object.assign({}, item));
         });
@@ -833,7 +833,7 @@ class DrawTools extends React.Component {
   // TODO: get better BBOX for points
   zoom(item) {
     const { mainMap } = this.props;
-    let features = parseOlFeatures(JSON.stringify(item), mainMap.getView().getProjection().getCode());
+    const features = parseOlFeatures(JSON.stringify(item), mainMap.getView().getProjection().getCode());
     if (features.length) {
       mainMap.getView().fit(features[0].getGeometry());
     }
@@ -854,7 +854,7 @@ class DrawTools extends React.Component {
       draw_text: false,
       editing: null
     }, () => {
-      let drawings = viewer.config_json.drawings.filter(d => d.id !== item.id);
+      const drawings = viewer.config_json.drawings.filter(d => d.id !== item.id);
       dispatch(actions.viewer_set_drawings(drawings));
     });
   }

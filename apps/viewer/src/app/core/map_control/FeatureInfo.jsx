@@ -65,7 +65,7 @@ export default function FeatureInfo({ core, config, actions }) {
   function searchAll(coordinate, pixel) {
 
     const acc = [];
-    let features = [];
+    const features = [];
 
     // Display vector feature
     const displayFeature = (feature, l) => {
@@ -79,7 +79,7 @@ export default function FeatureInfo({ core, config, actions }) {
             layerId: l ? l.get('id') : null
           };
         } else {
-          let data = {};
+          const data = {};
           Object.keys(feature)
             .filter(k => typeof feature[k] !== 'object')
             .forEach(k => data[k] = feature[k]);
@@ -89,7 +89,7 @@ export default function FeatureInfo({ core, config, actions }) {
     }
 
     //List o vector tile features for remote query
-    let fvt_remote = [];
+    const fvt_remote = [];
 
     const layers_selected = [];
 
@@ -99,8 +99,8 @@ export default function FeatureInfo({ core, config, actions }) {
       if (l == selectionLayer.current) return;
       if (l.get('selectable') == false) return;
       if (l instanceof OlVectorTileLayer) {
-        let fvt = new OlFeature();
-        let props = f.getProperties();
+        const fvt = new OlFeature();
+        const props = f.getProperties();
         Object.keys(props).forEach(k => {
           fvt.set(k, props[k]);;
         });
@@ -135,7 +135,7 @@ export default function FeatureInfo({ core, config, actions }) {
     fvt_remote.forEach(item => {
 
       let filter = item.layer.get("datasource").cql_filter || "";
-      let fields = item.layer.get("datasource").cql_fields || [];
+      const fields = item.layer.get("datasource").cql_fields || [];
       fields.forEach((f, index) => {
         //replace based on field names
         filter = filter.replaceAll('{' + f + '}', item.feature.get(f));
@@ -271,9 +271,9 @@ export default function FeatureInfo({ core, config, actions }) {
           })
           .catch(err => console.log(err));
         } else {
-          let buffer = 2;
-          let nativeCRS = l.get("datasource").crs || 'EPSG:4326';
-          let bbox = [coordinate[0]-buffer, coordinate[1]-buffer, coordinate[0]+buffer, coordinate[1]+buffer];
+          const buffer = 2;
+          const nativeCRS = l.get("datasource").crs || 'EPSG:4326';
+          const bbox = [coordinate[0]-buffer, coordinate[1]-buffer, coordinate[0]+buffer, coordinate[1]+buffer];
           const nativeBBOX = transformExtent(bbox, mapCRS, nativeCRS);
           utils.getWFSFeaturesFilterByGeom(
             l.get("datasource").url, 
@@ -389,7 +389,7 @@ export default function FeatureInfo({ core, config, actions }) {
     // No layers found, disable GetFeatureInfo
     //if (features.length === 0 && lrs.length === 0) {
       if (features.length === 0 && fvt_remote.length === 0) {
-      let emptyResults = [{
+      const emptyResults = [{
         id: uuidV4(),
         type: 'text',
         data: `<p>${t("noResultsFound", "Não foram encontrados resultados")}</p>`
@@ -573,7 +573,7 @@ class FeatureInfoUtils  {
    * @param {String} serviceUrl Url of wfs service to query
    */
   getWFSFeaturesFilterByGeom(serviceUrl, typeNames, srsName, count, bbox, cql_filter) {
-    let params = [
+    const params = [
       "SERVICE=wfs",
       "REQUEST=GetFeature",
       "VERSION=1.1.0",
@@ -598,7 +598,7 @@ class FeatureInfoUtils  {
     };
 
     // Set headers
-    let headers = {
+    const headers = {
       "accept": "application/json, text/javascript, */*; q=0.01",
       "accept-language": "pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6",
       "cache-control": "no-cache",
@@ -626,7 +626,7 @@ class FeatureInfoUtils  {
 
   
   getFeatureInfoGeoJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/geojson');
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/geojson');
     fetch(url)
     .then(res => res.json())
     .then(geojson => {
@@ -658,7 +658,7 @@ class FeatureInfoUtils  {
   }
   
   getFeatureInfoJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/json'); 
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/json'); 
     fetch(url)
     .then(res => res.json())
     .then(json => {
@@ -689,21 +689,21 @@ class FeatureInfoUtils  {
   }
   
   getFeatureInfoXML(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/xml');  
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/xml');  
     fetch(url)
     .then(res => res.text())
     .then(xml => {
   
       // Found features
-      let features = [];
+      const features = [];
   
       // Try GML format (in some services)
-      let parser = new OlFormatGML();
-      let parseOptions = {
+      const parser = new OlFormatGML();
+      const parseOptions = {
         dataProjection: crs,
         featureProjection: crs
       };
-      let gmlFeatures = parser.readFeatures(xml, parseOptions);
+      const gmlFeatures = parser.readFeatures(xml, parseOptions);
       if (gmlFeatures && gmlFeatures.length) return resolve(gmlFeatures[0]);
   
       // Load raw XML with field "FeatureInfoResponse"
@@ -728,8 +728,8 @@ class FeatureInfoUtils  {
   }
   
   getFeatureInfoGML(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject) {
-    let layerProps = l.getProperties();
-    let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, format || 'application/vnd.ogc.gml');
+    const layerProps = l.getProperties();
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, format || 'application/vnd.ogc.gml');
     fetch(url)
     .then(res => res.text())
     .then(gmlt => {
@@ -805,7 +805,7 @@ class FeatureInfoUtils  {
   }
   
   getFeatureInfoHtml(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/html');  
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/html');  
     fetch(url)
     .then(res => res.text())
     .then(text => {
@@ -817,7 +817,7 @@ class FeatureInfoUtils  {
   }
   
   getFeatureInfoText(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/plain');
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/plain');
     fetch(url)
     .then(res => res.text())
     .then(text => {
@@ -829,12 +829,12 @@ class FeatureInfoUtils  {
   }
   
   getFeatureInfoEsriJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    let url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/json'); 
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/json'); 
     fetch(url)
     .then(res => res.json())
     .then(json => {
       const parser = new OlFormatEsriJSON();
-      let data_crs = 'EPSG:4326' //crs;
+      const data_crs = 'EPSG:4326' //crs;
       /*
       if (json.crs && json.crs.properties && json.crs.properties.name) {
         if (json.crs.properties.name.indexOf('EPSG::4326') !== -1) {
@@ -915,7 +915,7 @@ class FeatureInfoUtils  {
     const callFormat = (format) => {
       return new Promise((resolve, reject) => {
         //let requestBuilder = l.getSource() instanceof OlSourceWMTS ? buildFeatureInfoWMTSUrl : buildFeatureInfoArcGISUrl;
-        let requestBuilder = this.buildFeatureInfoArcGISUrl;
+        const requestBuilder = this.buildFeatureInfoArcGISUrl;
         if (/json/ig.test(format)) {
           this.getFeatureInfoEsriJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject);
         }
@@ -936,7 +936,7 @@ class FeatureInfoUtils  {
   }
   
   findActiveWMSLayer(layers) {
-    let result = [];
+    const result = [];
     layers.forEach(l => {
       if (l.getVisible() 
         && l.getSource 
@@ -952,7 +952,7 @@ class FeatureInfoUtils  {
       }
   
       if ((l instanceof OlGroup) && l.getVisible()) {
-        let temp = this.findActiveWMSLayer(l.getLayers());
+        const temp = this.findActiveWMSLayer(l.getLayers());
         temp.forEach(t => result.push(t));
       }
     });
@@ -1111,7 +1111,7 @@ class FeatureInfoUtils  {
     const mapSize = map.getSize();
     const mapExtent = transformExtent(map.getView().calculateExtent(mapSize), crs, 'EPSG:4326');
   
-    let params = [
+    const params = [
       `geometry=${transform(coordinate, crs, 'EPSG:4326').join(',')}`,
       `geometryType=${geometryType}`,
       `layers=${layer.get('get_feature_info_layers') || 'visible'}`,
@@ -1132,7 +1132,7 @@ class FeatureInfoUtils  {
   }
   
   findActiveArcGISMapLayer(layers) {
-    let result = [];
+    const result = [];
     layers.forEach(l => {
       if (l.getVisible() 
         && l.getSource 
@@ -1141,7 +1141,7 @@ class FeatureInfoUtils  {
         result.push(l);
       }
       if ((l instanceof OlGroup) && l.getVisible()) {
-        let temp = this.findActiveArcGISMapLayer(l.getLayers());
+        const temp = this.findActiveArcGISMapLayer(l.getLayers());
         temp.forEach(t => result.push(t));
       }
     });

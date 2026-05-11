@@ -31,10 +31,10 @@ export default function WMS(props) {
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
-    let srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
-    let bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
+    const srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
+    const bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
 
-    let options = {
+    const options = {
       srid: srid,
       bbox: bbox,
       servertype: data.wmsServerType,
@@ -75,7 +75,7 @@ export default function WMS(props) {
       try {
         const parser = new WMSCapabilities();
         const wms = parser.read(r);
-        let dataitems = Models.OWSModel.convertWMS2Themes(wms, data.url, options);
+        const dataitems = Models.OWSModel.convertWMS2Themes(wms, data.url, options);
         setData({ ...data, dataType: undefined, dataitems });
 
         // Add to cookies history
@@ -108,7 +108,7 @@ export default function WMS(props) {
       { key: '1.3.0', value: '1.3.0', label: '1.3.0' }
     ];
 
-    let wmsServerTypeOtions = [
+    const wmsServerTypeOtions = [
       { key: 999, value: '', label: t("notDefined", "Não Especificado") },
       { key: "geoserver", value: "geoserver", label: "Geoserver"},
       { key: "mapserver", value: "mapserver", label: "Mapserver"},

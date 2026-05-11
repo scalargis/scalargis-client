@@ -29,13 +29,13 @@ const App = () => {
 
     dispatch(site_load(core, (config) => {
       const _getRoutesInfo = (module) => {
-        if (!!module["getBackOfficePageRoutes"]) {
+        if (module["getBackOfficePageRoutes"]) {
           return module.getBackOfficePageRoutes();
         }
         return [];
       }
       
-      let routes = (config?.customComponents || []).map(async (item) => {
+      const routes = (config?.customComponents || []).map(async (item) => {
         let mod = null;
         try {
           mod = await import(`./components/${item}/src/Main.jsx`);

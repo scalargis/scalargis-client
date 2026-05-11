@@ -144,7 +144,7 @@ export default function ContactFrom(props) {
       setInfoMessage(null);
     }
       
-    let record = {
+    const record = {
       name,
       email,
       description
@@ -159,7 +159,7 @@ export default function ContactFrom(props) {
     }
 
     // Save request
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'        
@@ -175,7 +175,7 @@ export default function ContactFrom(props) {
     setSending(true);
 
     // Auth url. TODO: check for proxy
-    let url = core.API_URL + '/app/viewer/' + viewer.id + '/contact_message';
+    const url = core.API_URL + '/app/viewer/' + viewer.id + '/contact_message';
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -268,8 +268,7 @@ export default function ContactFrom(props) {
   }
 
   return (
-    <React.Fragment>
-      <form onSubmit={e => submit()}>
+    <form onSubmit={e => submit()}>
 
         <div className="p-fluid">
           <div className="field">
@@ -370,6 +369,5 @@ export default function ContactFrom(props) {
           />
         </div>         
       </form>
-    </React.Fragment>
   )
 }

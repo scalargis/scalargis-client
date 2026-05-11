@@ -46,7 +46,7 @@ export default function GeoJSON (props) {
           return setLoading(false);
         }
 
-        let orginal_url = core.API_URL + res.Data.url;
+        const orginal_url = core.API_URL + res.Data.url;
         let url = orginal_url;
         if (!isUrlAppOrigin(url)) {
           url = core.MAP_PROXY_URL + encodeURIComponent(url);
@@ -74,15 +74,15 @@ export default function GeoJSON (props) {
   }
 
   const changeURL = (value) => {
-    let { data, setData } = props;
+    const { data, setData } = props;
     data.url = value.trim();
     setData(Object.assign({}, data));
   }
 
   const loadFromUserURL = () => {
-    let { core, data, setData, setSelected, setError, cookies, setLoading, Models } = props;
-    let { isUrlAppOrigin } = Models.Utils;
-    let name = 'GeoJSON';
+    const { core, data, setData, setSelected, setError, cookies, setLoading, Models } = props;
+    const { isUrlAppOrigin } = Models.Utils;
+    const name = 'GeoJSON';
     let url = data.url || '';
 
     if (!url.trim()) return;
@@ -130,8 +130,7 @@ export default function GeoJSON (props) {
   const render = () => {
     const { viewer, loading, data, editField, winSize } = props;
     return (
-      <React.Fragment>
-        <div className="p-fluid">
+      <div className="p-fluid">
 
           <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
@@ -193,8 +192,6 @@ export default function GeoJSON (props) {
 
           
         </div>
-
-      </React.Fragment>
     )
   }
 

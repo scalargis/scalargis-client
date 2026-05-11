@@ -25,16 +25,16 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
 
   // Default style
   function defaultStyle(config) {
-    let style_color = config.style_color === null ? null : (config.style_color ? `rgba(${config.style_color})` : 'black');
+    const style_color = config.style_color === null ? null : (config.style_color ? `rgba(${config.style_color})` : 'black');
     
-    let style_stroke_color = config.style_stroke_color === null ? null : (config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'black');
-    let style_stroke_width = config.style_stroke_width === null ? null : (typeof config.style_stroke_width === 'undefined' ? 1 : Number(config.style_stroke_width));
+    const style_stroke_color = config.style_stroke_color === null ? null : (config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'black');
+    const style_stroke_width = config.style_stroke_width === null ? null : (typeof config.style_stroke_width === 'undefined' ? 1 : Number(config.style_stroke_width));
     
-    let style_text_font = config.style_text_font ? config.style_text_font : '12px Calibri,sans-serif';
-    let style_text_fill_color = config.style_text_fill_color ? `rgba(${config.style_text_fill_color})` : '#000';
-    let style_text_stroke_color = config.style_text_stroke_color === null ? null : (config.style_text_stroke_color ? `rgba(${config.style_text_stroke_color})` : '#fff');
-    let style_text_stroke_width = config.style_text_stroke_width === null ? null : (typeof config.style_text_stroke_width === 'undefined' ? 2 : Number(config.style_text_stroke_width));
-    let style_text_value = config.style_text_value;
+    const style_text_font = config.style_text_font ? config.style_text_font : '12px Calibri,sans-serif';
+    const style_text_fill_color = config.style_text_fill_color ? `rgba(${config.style_text_fill_color})` : '#000';
+    const style_text_stroke_color = config.style_text_stroke_color === null ? null : (config.style_text_stroke_color ? `rgba(${config.style_text_stroke_color})` : '#fff');
+    const style_text_stroke_width = config.style_text_stroke_width === null ? null : (typeof config.style_text_stroke_width === 'undefined' ? 2 : Number(config.style_text_stroke_width));
+    const style_text_value = config.style_text_value;
 
     const style_objs = {
       image: new OlStyleCircle({
@@ -72,7 +72,7 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
   }
 
   function createLayer(config) {
-    let crs = mainMap.getView().getProjection().getCode();
+    const crs = mainMap.getView().getProjection().getCode();
     let wfsFormatOptions = {
       srsName: 'EPSG:' + config.crs,
       dataProjection: 'EPSG:' + config.crs
@@ -103,7 +103,7 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
     const vectorSource = new OlSourceVector({
       loader: (extent, resolution, projection, success, failure) => {
         let bbox = config.bbox ? config.bbox.split(' ') : null;
-        let bbox_crs = config?.bbox_crs || config?.crs;
+        const bbox_crs = config?.bbox_crs || config?.crs;
         let url = (config.url || '');
 
         if (!url.toLowerCase().startsWith('http')) {

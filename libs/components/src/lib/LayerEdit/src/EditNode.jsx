@@ -33,7 +33,7 @@ class EditNode extends React.Component {
   }
 
   editField(field, value) {
-    let { edit } = this.state;
+    const { edit } = this.state;
     edit[field] = value;
     this.setState({ ...this.state, edit });
   }
@@ -63,7 +63,7 @@ class EditNode extends React.Component {
 
     const TypeComponent = this.typeComponent;
 
-    let wmsServerTypeOtions = [
+    const wmsServerTypeOtions = [
       { key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") },
       { key: "geoserver", value: "geoserver", label: "Geoserver"},
       { key: "mapserver", value: "mapserver", label: "Mapserver"},
@@ -71,16 +71,16 @@ class EditNode extends React.Component {
     ];
     let wmsFormatOptions = [];
     let wmsFeatureFormatOptions = [];
-    let wmsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }];
+    const wmsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }];
 
     let wmtsFormatOptions = [];
     let wmtsFeatureFormatOptions = [];
-    let wmtsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }]; 
+    const wmtsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }]; 
 
     if (edit.type === 'WMS') {
-      let map_formats = edit.get_map_formats || '';
-      let finfo_formats = edit.get_feature_info_formats || '';
-      let wstyles = edit.wms_styles || '';
+      const map_formats = edit.get_map_formats || '';
+      const finfo_formats = edit.get_feature_info_formats || '';
+      const wstyles = edit.wms_styles || '';
       wmsFormatOptions = map_formats.split(',').map((i, j) => {
         return { key: j, value: i, label: i};
       });
@@ -94,9 +94,9 @@ class EditNode extends React.Component {
     }
 
     if (['WMTS', 'WMTSXYZ'].includes(edit.type)) {
-      let tile_formats = edit.wmts_formats || '';
-      let wmts_finfo_formats = edit.get_feature_info_formats || '';
-      let wstyles = edit.wmts_styles || '';
+      const tile_formats = edit.wmts_formats || '';
+      const wmts_finfo_formats = edit.get_feature_info_formats || '';
+      const wstyles = edit.wmts_styles || '';
       wmtsFormatOptions = tile_formats.split(',')
       .filter(v => v && v.toLowerCase().indexOf('image/') !== -1)
       .map((i, j) => {

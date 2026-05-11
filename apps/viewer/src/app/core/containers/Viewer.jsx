@@ -53,7 +53,7 @@ function Viewer(props) {
   const { i18n } = useTranslation();
 
   // Main map
-  let mainMapEl = useRef(null);
+  const mainMapEl = useRef(null);
   
   // Enable redux actions
   const dispatch = useDispatch();

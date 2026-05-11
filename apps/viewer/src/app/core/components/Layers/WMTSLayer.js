@@ -12,7 +12,7 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
   const auth = core.store.getState().root.auth;
 
   function createLayer(config) {
-    let url = config.url;
+    const url = config.url;
 
     let proxy_requests = false;
     if (viewer && viewer.config_json && viewer.config_json.proxy_http_image_requests) {

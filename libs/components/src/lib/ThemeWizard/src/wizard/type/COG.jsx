@@ -58,7 +58,7 @@ export default function COG(props) {
 
     GeoTIFFLib.fromUrl(url)
     .catch(error => {
-      if (isUrlAppOrigin(url)) throw new error;
+      if (isUrlAppOrigin(url)) throw new error();
 
       proxyRequests = true;
 
@@ -105,7 +105,7 @@ export default function COG(props) {
       const [...parts] = baseUrl.split('/');
       const filename = parts.pop();
 
-      let dataitems = Models.OWSModel.convertCOG2Themes(image, data.url, filename, proxyRequests, options);
+      const dataitems = Models.OWSModel.convertCOG2Themes(image, data.url, filename, proxyRequests, options);
       setData({ ...data, options, dataitems });
 
       // Add to cookies history

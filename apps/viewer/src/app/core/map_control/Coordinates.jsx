@@ -90,7 +90,7 @@ function Coordinates({ auth, core, config, actions }) {
 
     const srid = getProjectionSrid(mainMap.getView().getProjection());
 
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'        

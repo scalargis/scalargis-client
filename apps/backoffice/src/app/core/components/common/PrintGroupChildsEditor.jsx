@@ -44,8 +44,7 @@ function RecordSelector(props) {
   }
 
   return (
-    <React.Fragment>
-      <div className="card p-2">
+    <div className="card p-2">
         <div className="field col-12 pl-0">
           <MultiSelect value={selectedRecords || []} 
             options={(availableRecords || []).filter(p => !(records || []).map(f=>f.id).includes(p.id))} 
@@ -66,7 +65,6 @@ function RecordSelector(props) {
           <div className="col"></div>
         </div>
       </div>
-    </React.Fragment>
   );
 }
 
@@ -90,7 +88,7 @@ const ListChilds = props => {
           if (!result.destination) return;
     
           const new_list = [...list];
-          var element = new_list[result.source.index];
+          const element = new_list[result.source.index];
           new_list.splice(result.source.index, 1);
           new_list.splice(result.destination.index, 0, element);
     

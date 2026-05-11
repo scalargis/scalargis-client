@@ -7,7 +7,7 @@ export const loadTranslations = (ns, resources, deep=true, overwrite=true) => {
 }
 
 export const loadBackendTranslations = (url, deep=true, overwrite=true, callback=undefined) => { 
-  let options = {
+  const options = {
     headers: {
       'Accept': 'application/json'
     },

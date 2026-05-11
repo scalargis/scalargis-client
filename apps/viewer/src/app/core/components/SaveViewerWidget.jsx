@@ -60,7 +60,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
     //Get current session viewer config
     const newconfig = getViewerSessionConfig(viewer);
 
-    let record = {
+    const record = {
       id,
       name,
       title,

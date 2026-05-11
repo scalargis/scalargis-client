@@ -31,10 +31,10 @@ export default function WMTS(props) {
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
-    let srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
-    let bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
+    const srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
+    const bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
 
-    let options = {
+    const options = {
       srid: srid,
       bbox: bbox,
       ignore_url: data.wmtsIgnoreServiceUrl,
@@ -73,7 +73,7 @@ export default function WMTS(props) {
       try {
         const parser = new WMTSCapabilities();
         const wmts = parser.read(r);
-        let dataitems = Models.OWSModel.convertWMTS2Themes(wmts, data.url, options);
+        const dataitems = Models.OWSModel.convertWMTS2Themes(wmts, data.url, options);
         data.wmtsTileMatrixSet = [];
         if (wmts.Contents && wmts.Contents.TileMatrixSet) {
           data.wmtsTileMatrixSet = wmts.Contents.TileMatrixSet.map(m => ({ Identifier: m.Identifier, SupportedCRS: m.SupportedCRS }));

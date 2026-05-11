@@ -22,9 +22,9 @@ export default function Main({ config, actions }) {
     if (key !== 13) return;
 
     let value = '' + scale;
-    let current_scale = '' + scale;
+    const current_scale = '' + scale;
     if (current_scale.indexOf(':')) value = value.substr(current_scale.indexOf(':')+1);
-    if (!!/\D/.test(value)) return;
+    if (/\D/.test(value)) return;
     value = parseInt(value, 10);
     if (isNaN(value)) return;
     const resolution = getResolutionForScale(value, 'm');

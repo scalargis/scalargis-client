@@ -62,7 +62,7 @@ export default function Intersect({title, core, config, actions, dispatch, recor
       });
 
       // Set custom styles
-      let configStyles = {...LayerStyles};
+      const configStyles = {...LayerStyles};
       const customStyles = record?.config_json?.styles;
       for (const k in customStyles) {
         if (Array.isArray(customStyles?.[k])) {

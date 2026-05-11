@@ -191,7 +191,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
     if (mainMap && layers) { // set layer visible for all subcomponents
       const layersIds = layers.map(e => e.code)
-      let checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
+      const checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
       if (selectedLayer) {
         checked.push(selectedLayer.code)
         leftMapSide.current = utils.findOlLayer(mainMap, selectedLayer.code)
@@ -244,7 +244,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
     if (mainMap && layers) {
       const layersIds = layers.map(e => e.code)
-      let checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
+      const checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
       if (selectedSliderLayer) {
         checked.push(selectedSliderLayer.code)
         rightMapSide.current = utils.findOlLayer(mainMap, selectedSliderLayer.code)

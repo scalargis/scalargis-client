@@ -17,7 +17,7 @@ import './style.css';
 
 
 const buildTree = (items, level = 0) => {
-  let tree = [];
+  const tree = [];
   items.forEach((item, index) => {
     const obj = {
       key: `${level}-${index}`,
@@ -29,7 +29,7 @@ const buildTree = (items, level = 0) => {
     };
     if (item.type === 'folder') {
         // Recursively build the children of the current item
-        let children = buildTree(item.children || [], level + 1);
+        const children = buildTree(item.children || [], level + 1);
         obj.children = children;
     }
     tree.push(obj);

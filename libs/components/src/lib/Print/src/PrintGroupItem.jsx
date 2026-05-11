@@ -10,7 +10,7 @@ export default function PrintGroupItem(props) {
   const { viewer, mainMap, dispatch, Models } = config;
 
   const onSelectedPrintChange = (e) => {
-    let prints = [...selectedPrints];
+    const prints = [...selectedPrints];
 
     if (e.checked)
       prints.push(e.value);

@@ -99,7 +99,7 @@ export default function Main({ core, config, actions, utils, record }) {
   }  
 
   function selectPlace(e) {
-    let item = e.value || selectedPlace;
+    const item = e.value || selectedPlace;
 
     if (item?.geom_wkt) {
       const geom = MapModel.getGeometryFromWKT(item.geom_wkt);
@@ -216,7 +216,7 @@ export default function Main({ core, config, actions, utils, record }) {
   }
 
   useEffect(() => {
-    let sources_ids = [];
+    const sources_ids = [];
     if (config.sources && config.sources.length > 0) {      
       config.sources.forEach(src => {
         if (src.active) {

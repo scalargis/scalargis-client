@@ -39,7 +39,7 @@ export default function Main({as, core, config, actions, record, utils}) {
   const title = record.title || t("basemaps", "Mapas de Base");
   const header = component_cfg.header ? t(component_cfg.header, component_cfg.header) : title;  
 
-  let layers = [];
+  const layers = [];
   let selectedLayer = null;
 
   //Get list of basemap layers
@@ -63,7 +63,7 @@ export default function Main({as, core, config, actions, record, utils}) {
   }
 
   //Basemap selectedLayer is the first checked layer
-  for (var l of layers) {
+  for (const l of layers) {
     if (viewer.config_json.checked.includes(l.id)) {
       selectedLayer = l.id;
       break;

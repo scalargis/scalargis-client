@@ -12,7 +12,7 @@ import _ol_xml_ from 'ol/xml.js';
  * @extends {ol.format.XML}
  * @api
  */
-var _ol_format_WMSCapabilities_ = function() {
+const _ol_format_WMSCapabilities_ = function() {
 
   _ol_format_XML_.call(this);
 
@@ -40,7 +40,7 @@ _ol_format_WMSCapabilities_.prototype.read;
  * @inheritDoc
  */
 _ol_format_WMSCapabilities_.prototype.readFromDocument = function(doc) {
-  for (var n = doc.firstChild; n; n = n.nextSibling) {
+  for (let n = doc.firstChild; n; n = n.nextSibling) {
     if (n.nodeType === Node.ELEMENT_NODE) {
       return this.readFromNode(n);
     }
@@ -54,7 +54,7 @@ _ol_format_WMSCapabilities_.prototype.readFromDocument = function(doc) {
  */
 _ol_format_WMSCapabilities_.prototype.readFromNode = function(node) {
   this.version = node.getAttribute('version').trim();
-  var wmsCapabilityObject = _ol_xml_.pushParseAndPop({
+  const wmsCapabilityObject = _ol_xml_.pushParseAndPop({
     'version': this.version
   }, _ol_format_WMSCapabilities_.PARSERS_, node, []);
   return wmsCapabilityObject ? wmsCapabilityObject : null;
@@ -80,14 +80,14 @@ _ol_format_WMSCapabilities_.readAttribution_ = function(node, objectStack) {
  * @return {Object} Bounding box object.
  */
 _ol_format_WMSCapabilities_.readBoundingBox_ = function(node, objectStack) {
-  var extent = [
+  const extent = [
     _ol_format_XSD_.readDecimalString(node.getAttribute('minx')),
     _ol_format_XSD_.readDecimalString(node.getAttribute('miny')),
     _ol_format_XSD_.readDecimalString(node.getAttribute('maxx')),
     _ol_format_XSD_.readDecimalString(node.getAttribute('maxy'))
   ];
 
-  var resolutions = [
+  const resolutions = [
     _ol_format_XSD_.readDecimalString(node.getAttribute('resx')),
     _ol_format_XSD_.readDecimalString(node.getAttribute('resy'))
   ];
@@ -107,20 +107,20 @@ _ol_format_WMSCapabilities_.readBoundingBox_ = function(node, objectStack) {
  * @return {ol.Extent|undefined} Bounding box object.
  */
 _ol_format_WMSCapabilities_.readEXGeographicBoundingBox_ = function(node, objectStack) {
-  var geographicBoundingBox = _ol_xml_.pushParseAndPop(
+  const geographicBoundingBox = _ol_xml_.pushParseAndPop(
       {},
       _ol_format_WMSCapabilities_.EX_GEOGRAPHIC_BOUNDING_BOX_PARSERS_,
       node, objectStack);
   if (!geographicBoundingBox) {
     return undefined;
   }
-  var westBoundLongitude = /** @type {number|undefined} */
+  const westBoundLongitude = /** @type {number|undefined} */
         (geographicBoundingBox['westBoundLongitude']);
-  var southBoundLatitude = /** @type {number|undefined} */
+  const southBoundLatitude = /** @type {number|undefined} */
         (geographicBoundingBox['southBoundLatitude']);
-  var eastBoundLongitude = /** @type {number|undefined} */
+  const eastBoundLongitude = /** @type {number|undefined} */
         (geographicBoundingBox['eastBoundLongitude']);
-  var northBoundLatitude = /** @type {number|undefined} */
+  const northBoundLatitude = /** @type {number|undefined} */
         (geographicBoundingBox['northBoundLatitude']);
   if (westBoundLongitude === undefined || southBoundLatitude === undefined ||
         eastBoundLongitude === undefined || northBoundLatitude === undefined) {
@@ -140,7 +140,7 @@ _ol_format_WMSCapabilities_.readEXGeographicBoundingBox_ = function(node, object
  * @return {ol.Extent|undefined} Bounding box object.
  */
 _ol_format_WMSCapabilities_.readLatLonBoundingBox_ = function(node, objectStack) {
-  var geographicBoundingBox = [
+  const geographicBoundingBox = [
         _ol_format_XSD_.readDecimalString(node.getAttribute('minx')),
         _ol_format_XSD_.readDecimalString(node.getAttribute('miny')),
         _ol_format_XSD_.readDecimalString(node.getAttribute('maxx')),
@@ -260,50 +260,50 @@ _ol_format_WMSCapabilities_.readCapabilityLayer_ = function(node, objectStack) {
  * @return {Object|undefined} Layer object.
  */
 _ol_format_WMSCapabilities_.readLayer_ = function(node, objectStack) {
-  var parentLayerObject = /**  @type {Object.<string,*>} */
+  const parentLayerObject = /**  @type {Object.<string,*>} */
         (objectStack[objectStack.length - 1]);
 
-  var layerObject = _ol_xml_.pushParseAndPop(
+  const layerObject = _ol_xml_.pushParseAndPop(
       {}, _ol_format_WMSCapabilities_.LAYER_PARSERS_, node, objectStack);
 
   if (!layerObject) {
     return undefined;
   }
-  var queryable =
+  let queryable =
         _ol_format_XSD_.readBooleanString(node.getAttribute('queryable'));
   if (queryable === undefined) {
     queryable = parentLayerObject['queryable'];
   }
   layerObject['queryable'] = queryable !== undefined ? queryable : false;
 
-  var cascaded = _ol_format_XSD_.readNonNegativeIntegerString(
+  let cascaded = _ol_format_XSD_.readNonNegativeIntegerString(
       node.getAttribute('cascaded'));
   if (cascaded === undefined) {
     cascaded = parentLayerObject['cascaded'];
   }
   layerObject['cascaded'] = cascaded;
 
-  var opaque = _ol_format_XSD_.readBooleanString(node.getAttribute('opaque'));
+  let opaque = _ol_format_XSD_.readBooleanString(node.getAttribute('opaque'));
   if (opaque === undefined) {
     opaque = parentLayerObject['opaque'];
   }
   layerObject['opaque'] = opaque !== undefined ? opaque : false;
 
-  var noSubsets =
+  let noSubsets =
         _ol_format_XSD_.readBooleanString(node.getAttribute('noSubsets'));
   if (noSubsets === undefined) {
     noSubsets = parentLayerObject['noSubsets'];
   }
   layerObject['noSubsets'] = noSubsets !== undefined ? noSubsets : false;
 
-  var fixedWidth =
+  let fixedWidth =
         _ol_format_XSD_.readDecimalString(node.getAttribute('fixedWidth'));
   if (!fixedWidth) {
     fixedWidth = parentLayerObject['fixedWidth'];
   }
   layerObject['fixedWidth'] = fixedWidth;
 
-  var fixedHeight =
+  let fixedHeight =
         _ol_format_XSD_.readDecimalString(node.getAttribute('fixedHeight'));
   if (!fixedHeight) {
     fixedHeight = parentLayerObject['fixedHeight'];
@@ -312,19 +312,19 @@ _ol_format_WMSCapabilities_.readLayer_ = function(node, objectStack) {
 
   // See 7.2.4.8
   //var addKeys = ['Style', 'CRS', 'AuthorityURL'];
-  var addKeys = ['CRS', 'AuthorityURL'];
+  const addKeys = ['CRS', 'AuthorityURL'];
   addKeys.forEach(function(key) {
     if (key in parentLayerObject) {
-      var childValue = layerObject[key] || [];
+      const childValue = layerObject[key] || [];
       layerObject[key] = childValue.concat(parentLayerObject[key]);
     }
   });
 
-  var replaceKeys = ['EX_GeographicBoundingBox', 'BoundingBox', 'Dimension',
+  const replaceKeys = ['EX_GeographicBoundingBox', 'BoundingBox', 'Dimension',
     'Attribution', 'MinScaleDenominator', 'MaxScaleDenominator'];
   replaceKeys.forEach(function(key) {
     if (!(key in layerObject)) {
-      var parentValue = parentLayerObject[key];
+      const parentValue = parentLayerObject[key];
       layerObject[key] = parentValue;
     }
   });
@@ -340,7 +340,7 @@ _ol_format_WMSCapabilities_.readLayer_ = function(node, objectStack) {
  * @return {Object} Dimension object.
  */
 _ol_format_WMSCapabilities_.readDimension_ = function(node, objectStack) {
-  var dimensionObject = {
+  const dimensionObject = {
     'name': node.getAttribute('name'),
     'units': node.getAttribute('units'),
     'unitSymbol': node.getAttribute('unitSymbol'),
@@ -424,10 +424,10 @@ _ol_format_WMSCapabilities_.readOperationType_ = function(node, objectStack) {
  * @return {Object|undefined} Online resource object.
  */
 _ol_format_WMSCapabilities_.readSizedFormatOnlineresource_ = function(node, objectStack) {
-  var formatOnlineresource =
+  const formatOnlineresource =
         _ol_format_WMSCapabilities_.readFormatOnlineresource_(node, objectStack);
   if (formatOnlineresource) {
-    var size = [
+    const size = [
       _ol_format_XSD_.readNonNegativeIntegerString(node.getAttribute('width')),
       _ol_format_XSD_.readNonNegativeIntegerString(node.getAttribute('height'))
     ];
@@ -445,7 +445,7 @@ _ol_format_WMSCapabilities_.readSizedFormatOnlineresource_ = function(node, obje
  * @return {Object|undefined} Authority URL object.
  */
 _ol_format_WMSCapabilities_.readAuthorityURL_ = function(node, objectStack) {
-  var authorityObject =
+  const authorityObject =
         _ol_format_WMSCapabilities_.readFormatOnlineresource_(node, objectStack);
   if (authorityObject) {
     authorityObject['name'] = node.getAttribute('name');
@@ -462,7 +462,7 @@ _ol_format_WMSCapabilities_.readAuthorityURL_ = function(node, objectStack) {
  * @return {Object|undefined} Metadata URL object.
  */
 _ol_format_WMSCapabilities_.readMetadataURL_ = function(node, objectStack) {
-  var metadataObject =
+  const metadataObject =
         _ol_format_WMSCapabilities_.readFormatOnlineresource_(node, objectStack);
   if (metadataObject) {
     metadataObject['type'] = node.getAttribute('type');

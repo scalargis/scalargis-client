@@ -64,9 +64,9 @@ export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => 
             // Dispatch zoom to theme action
             if (theme.crs && theme.bbox && transform_extent && map_set_extent && dispatch) {
                 try {
-                let target_proj = mainMap.getView().getProjection().getCode();
-                let extent = transform_extent(theme.crs, target_proj, theme.bbox.split(' '));
-                let center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
+                const target_proj = mainMap.getView().getProjection().getCode();
+                const extent = transform_extent(theme.crs, target_proj, theme.bbox.split(' '));
+                const center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
                 dispatch(map_set_extent(center, extent));
                 } catch (e) {
                     console.log(e);

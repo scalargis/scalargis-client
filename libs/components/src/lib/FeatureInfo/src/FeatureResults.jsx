@@ -67,7 +67,7 @@ export default function FeatureResults({ core, config, features, layers, actions
 
   // Update accordion active items
   useEffect(() => {
-    let active = Object.keys(grouped).map((layerId, i) => i);
+    const active = Object.keys(grouped).map((layerId, i) => i);
     if (active && active.length) {
       setActiveIndex(active);
     } else {
@@ -84,7 +84,7 @@ export default function FeatureResults({ core, config, features, layers, actions
       if (!extent.length) return;
       if (extent[0] === Infinity) return;
       //zoom to extent
-      let center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
+      const center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
       dispatch(actions.map_set_extent(center, extent));
     }
   }
@@ -98,7 +98,7 @@ export default function FeatureResults({ core, config, features, layers, actions
       index = features.findIndex(f => f.id === item.id);
     }
     if (index === -1) return;
-    let updated = [...features];
+    const updated = [...features];
     updated.splice(index, 1);
     dispatch(actions.viewer_set_featureinfo(updated));
   }
@@ -115,8 +115,8 @@ export default function FeatureResults({ core, config, features, layers, actions
       outCRS = record.config_json.export_crs;
     }
 
-    let results = [item];
-    let text = serializeFeatures(results, mainMap, viewer, outCRS);
+    const results = [item];
+    const text = serializeFeatures(results, mainMap, viewer, outCRS);
     download('selecao.geojson', text);
   }
 
@@ -135,7 +135,7 @@ export default function FeatureResults({ core, config, features, layers, actions
         }
       }
     });
-    let text = serializeFeatures(results, mainMap, viewer, outCRS);
+    const text = serializeFeatures(results, mainMap, viewer, outCRS);
     download('selecao.geojson', text);
   }
 
@@ -320,7 +320,7 @@ function getFeatureRows(feat, layer) {
       const feat_properties = JSON.parse(JSON.stringify(feat.getProperties()));
       if (feature_tpl) {
         feature_tpl.fields.forEach((field, i) => {
-          let key = field.name;
+          const key = field.name;
             if (typeof feat_properties[key] != 'object') {
 
             //let new_value = feat.get(field.name);
@@ -333,7 +333,7 @@ function getFeatureRows(feat, layer) {
             new_value = formatTemplateValue(feat_properties, new_value);
 
             if (field.action) {              
-              let action = {...field.action, data: feat_properties};
+              const action = {...field.action, data: feat_properties};
               delete action.data.feature_tpl;
 
               if (field.action.data) {
@@ -363,7 +363,7 @@ function getFeatureRows(feat, layer) {
           }
         })
       } else {
-        let geometryName = feat.getGeometryName() || 'geometry';
+        const geometryName = feat.getGeometryName() || 'geometry';
         feat.getKeys().forEach((key, i) => {
           if ((typeof feat.get(key) !='object') && (![geometryName, 'st_union', 'boundedBy', 'resultId'].includes(key))) {
             rows.push({ key, name: key, value: feat.get(key) });
@@ -373,7 +373,7 @@ function getFeatureRows(feat, layer) {
     } else {
       if (feature_tpl) {
         feature_tpl.fields.forEach((field, i) => {
-          let key = field.name;
+          const key = field.name;
           if (typeof feat.get(key) != 'object') {
 
             let new_value = feat.data[field.name];
@@ -418,7 +418,7 @@ function groupResults(features, map) {
 
       if (!grouped[layerId]) grouped[layerId] = {layerId, layerName, features: []};
       if (feat.type === 'ol') {
-        let items = parseOlFeatures(feat.data, map);
+        const items = parseOlFeatures(feat.data, map);
         items.forEach(f => {
           f.set('layerId', layerId);
           f.set('resultId', feat.id);

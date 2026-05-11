@@ -251,7 +251,7 @@ const root = (
 
     // Set save viewer last response
     case VIEWER_SAVE_RESPONSE:
-      let save_options = {
+      const save_options = {
         name: action.save_options ? action.save_options.name : state.viewer.name,
         title: action.save_options ? action.save_options.title : state.viewer.title,
         description: action.save_options ? action.save_options.description : state.viewer.description,
@@ -425,8 +425,8 @@ const root = (
 
     // Update theme
     case LAYERS_UPDATE_THEME:
-      let { layers } = state.viewer.config_json;
-      let index = layers.findIndex(i => i.id === action.theme.id);
+      const { layers } = state.viewer.config_json;
+      const index = layers.findIndex(i => i.id === action.theme.id);
       layers.splice(index, 1, action.theme);
       return {
         ...state,
@@ -441,7 +441,7 @@ const root = (
 
     // Remove layers
     case LAYERS_REMOVE_ITEMS:
-      let updated = Object.assign([], state.viewer.config_json.layers);
+      const updated = Object.assign([], state.viewer.config_json.layers);
       
       // Update session layers list
       let removedLayers = [];
@@ -500,8 +500,8 @@ const root = (
       })));
 
       // Find parent index
-      let parentId = action.parentId || 'main';
-      let parentIndex = newlayers.findIndex(i => i.id === parentId);
+      const parentId = action.parentId || 'main';
+      const parentIndex = newlayers.findIndex(i => i.id === parentId);
       const parent = Object.assign({}, newlayers[parentIndex]);
       if (action.top) {
         parent.children = action.themes.map(t => t.id).concat(parent.children);
@@ -575,8 +575,8 @@ const root = (
 
     // Update map control
     case VIEWER_UPDATE_MAPCONTROL:
-      let { map_controls } = state.viewer.config_json;
-      let mindex = map_controls.findIndex(i => i.id === action.control.id);
+      const { map_controls } = state.viewer.config_json;
+      const mindex = map_controls.findIndex(i => i.id === action.control.id);
       map_controls.splice(mindex, 1, action.control);
       return {
         ...state,
