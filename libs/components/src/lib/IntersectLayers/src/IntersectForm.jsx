@@ -182,7 +182,7 @@ export default function IntersectForm(props) {
         accept: () => {
           setGeometryIntersection([]);
         },
-        reject: () =>  { }      
+        reject: () =>  { /* noop */ }      
     });
   }  
 

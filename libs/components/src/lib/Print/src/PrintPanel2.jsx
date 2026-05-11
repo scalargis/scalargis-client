@@ -143,7 +143,7 @@ export default function PrintPanel2(props) {
 
           mainMap.render();          
         },
-        reject: () =>  { }      
+        reject: () =>  { /* noop */ }      
     });
   }  
 

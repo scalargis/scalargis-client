@@ -553,7 +553,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
   const result = [];
 
   // Set default CRS
-  let crs = 4326, bbox, inspire_service_metadata;
+  const crs = 4326; let bbox, inspire_service_metadata;
 
   // Set prefered getTile format
   const get_tile_format_preference = [
@@ -987,7 +987,7 @@ export const downloadTheme = (theme, format) => {
   }
 
   // Set default CRS
-  let crs = 4326, bbox;
+  const crs = 4326; let bbox;
 
   try {
     // Get bbox from extent options

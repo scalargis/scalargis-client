@@ -250,7 +250,7 @@ const root = (
       }
 
     // Set save viewer last response
-    case VIEWER_SAVE_RESPONSE:
+    case VIEWER_SAVE_RESPONSE: {
       const save_options = {
         name: action.save_options ? action.save_options.name : state.viewer.name,
         title: action.save_options ? action.save_options.title : state.viewer.title,
@@ -265,9 +265,10 @@ const root = (
           ...state.viewer,
           ...save_options,
           save_loading: false,
-          save_response: action.res          
+          save_response: action.res
         }
-      }     
+      }
+    }     
 
     case VIEWER_LOAD_COMPONENTS:
       return {
@@ -396,7 +397,7 @@ const root = (
       }       
     
       // Set checked themes
-    case LAYERS_SET_CHECKED:
+    case LAYERS_SET_CHECKED: {
       const checked = [ ...action.checked ]
       return {
         ...state,
@@ -408,9 +409,10 @@ const root = (
           }
         }
       }
+    }
 
       // Set opened themes
-      case LAYERS_SET_OPENED:
+      case LAYERS_SET_OPENED: {
         const opened = [ ...action.opened ]
         return {
           ...state,
@@ -421,10 +423,11 @@ const root = (
               opened
             }
           }
-        }      
+        }
+      }      
 
     // Update theme
-    case LAYERS_UPDATE_THEME:
+    case LAYERS_UPDATE_THEME: {
       const { layers } = state.viewer.config_json;
       const index = layers.findIndex(i => i.id === action.theme.id);
       layers.splice(index, 1, action.theme);
@@ -438,11 +441,12 @@ const root = (
           }
         }
       }
+    }
 
     // Remove layers
-    case LAYERS_REMOVE_ITEMS:
+    case LAYERS_REMOVE_ITEMS: {
       const updated = Object.assign([], state.viewer.config_json.layers);
-      
+
       // Update session layers list
       let removedLayers = [];
       traverseLayersTree(updated.filter(l => action.ids.includes(l.id)), null, (l, i) => {
@@ -474,6 +478,7 @@ const root = (
           }
         }
       }
+    }
 
     case VIEWER_SET_DISPLAYCRS:
       return {
@@ -488,7 +493,7 @@ const root = (
       }
 
     // Add themes
-    case VIEWER_ADD_THEMES:
+    case VIEWER_ADD_THEMES: {
       const tlayers = state.viewer.config_json.layers;
 
       // Add themes
@@ -530,6 +535,7 @@ const root = (
           }
         }
       }
+    }
 
     // Remove themes from ids
     case VIEWER_REMOVE_THEMES:
@@ -574,7 +580,7 @@ const root = (
       }());
 
     // Update map control
-    case VIEWER_UPDATE_MAPCONTROL:
+    case VIEWER_UPDATE_MAPCONTROL: {
       const { map_controls } = state.viewer.config_json;
       const mindex = map_controls.findIndex(i => i.id === action.control.id);
       map_controls.splice(mindex, 1, action.control);
@@ -588,6 +594,7 @@ const root = (
           }
         }
       }
+    }
 
     // Set viewer configjson
     case VIEWER_SET_CONFIGJSON:
@@ -669,7 +676,7 @@ const root = (
       }
 
     // Add dialog window
-    case VIEWER_ADD_DIALOG_WINDOW:
+    case VIEWER_ADD_DIALOG_WINDOW: {
       const arr = Object.assign([], state.viewer.dialogWindows);
       return {
         ...state,
@@ -678,6 +685,7 @@ const root = (
           dialogWindows: [...arr, action.dialogWindow]
         }
       }
+    }
 
     // Remove dialog window
     case VIEWER_REMOVE_DIALOG_WINDOW:
@@ -689,7 +697,7 @@ const root = (
         }
       }
 
-    case VIEWER_UPDATE_DIALOG_WINDOW:
+    case VIEWER_UPDATE_DIALOG_WINDOW: {
       const dw = state.viewer.dialogWindows.find(p => p.key === action?.config?.key);
       if (dw) {
         dw.visible = action.visible;
@@ -703,6 +711,7 @@ const root = (
           dialogWindows: [...state.viewer.dialogWindows]
         }
       }
+    }
 
     // Remove all dialog window
     case VIEWER_CLEAR_DIALOG_WINDOWS:

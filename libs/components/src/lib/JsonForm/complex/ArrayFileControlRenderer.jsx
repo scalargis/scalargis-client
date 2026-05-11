@@ -129,7 +129,7 @@ export const ArrayFileControlRenderer = (props) => {
                                 accept: () => {
                                   deleteConfirm(index);
                                 },
-                                reject: () =>  { }      
+                                reject: () =>  { /* noop */ }      
                               });
 
                           } } />                    

@@ -40,8 +40,8 @@ export const  generateRGBA = () => {
 export const removeUrlParam = (sourceURL, key) => {
   let rtn = sourceURL.split("?")[0],
     param,
-    params_arr = [],
-    new_params = [],
+    params_arr = [];
+  const new_params = [],
     queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
   if (queryString !== "") {
     params_arr = queryString.split("&");

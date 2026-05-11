@@ -307,7 +307,7 @@ const createLayer = (config, map, all) => {
     /**
      * WMS layer type
      */
-    case "WMS":
+    case "WMS": {
       let url = config.url;
       url = removeUrlParam(url, 'service');
       url = removeUrlParam(url, 'version');
@@ -328,14 +328,14 @@ const createLayer = (config, map, all) => {
         }
       };
 
-      // Check theme has map CRS      
+      // Check theme has map CRS
       if (config.crs_options && config.crs_options.indexOf(crs) === -1) {
         if (config.crs_options.indexOf('EPSG:4326') != -1) {
           sourceConfig['projection'] = 'EPSG:4326';
         } else {
           sourceConfig['projection'] = 'CRS:84';
         }
-      }      
+      }
 
       // Create layer
       if (config.tiled) {
@@ -357,16 +357,17 @@ const createLayer = (config, map, all) => {
       layer.set('legendURL', legendUrl);
 
       break;
+    }
 
     /**
      * WMTS layer type
      */
-    case "WMTS":
-     var wmts_options = OlSourceWMTS.optionsFromCapabilities(config.wmts_capabilities, {
+    case "WMTS": {
+     const wmts_options = OlSourceWMTS.optionsFromCapabilities(config.wmts_capabilities, {
         layer: config.layer,
         matrixSet: 'EPSG:3857'
       });
-      
+
       layer = new OlLayerTile({
         visible: config.active,
         opacity: config.opacity ? config.opacity : 1,
@@ -374,10 +375,11 @@ const createLayer = (config, map, all) => {
       });
 
       break;
+    }
     /**
      * WFS layer type
      */
-    case "WFS":
+    case "WFS": {
       let wfsFormatOptions = {
         srsName: 'EPSG:' + config.crs,
         dataProjection: 'EPSG:' + config.crs
@@ -437,6 +439,7 @@ const createLayer = (config, map, all) => {
         style: defaultStyle
       });
       break;
+    }
 
     /**
      * KML layer type
@@ -471,7 +474,7 @@ const createLayer = (config, map, all) => {
     /**
      * GML layer type
      */
-    case 'GML':
+    case 'GML': {
       const gmlOptions = {
         srsName: 'EPSG:3763',
         defaultDataProjection: 'EPSG:3763'
@@ -485,11 +488,12 @@ const createLayer = (config, map, all) => {
         style: defaultStyle
       });
       break;
+    }
 
     /**
      * Group layer type
      */
-    case "GROUP":
+    case "GROUP": {
       layer = new OlGroup({
         visible: config.active
       });
@@ -505,6 +509,7 @@ const createLayer = (config, map, all) => {
         layer.setLayers(children);
       }
       break;
+    }
     default:;
   }
 

@@ -104,10 +104,9 @@ function UserList(props) {
           loadData();          
         }).catch(e => {
           toast.current.show({life: 3000, severity: 'error', summary: 'Eliminar Registo(s)', detail: 'Ocorreu um erro ao eliminar o(s) registo(s)'}); 
-        }).finally(() => {
-        });
+        }).finally(() => { /* noop */ });
       },
-      reject: () =>  { }      
+      reject: () =>  { /* noop */ }      
     });
   }
   
@@ -133,7 +132,7 @@ function UserList(props) {
           //console.log('finally');
         });
       },
-      reject: () =>  { }      
+      reject: () =>  { /* noop */ }      
     });
   }  
 

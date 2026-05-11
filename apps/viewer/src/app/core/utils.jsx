@@ -60,8 +60,8 @@ export const  generateRGBA = () => {
 export const removeUrlParam = (sourceURL, key) => {
   let rtn = sourceURL.split("?")[0],
     param,
-    params_arr = [],
-    new_params = [],
+    params_arr = [];
+  const new_params = [],
     queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
   if (queryString !== "") {
     params_arr = queryString.split("&");
@@ -79,8 +79,8 @@ export const removeUrlParam = (sourceURL, key) => {
 
 export const addUrlParam = (sourceURL, key, value) => {
   let rtn = sourceURL.split("?")[0],
-    params_arr = [],
-    queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+    params_arr = [];
+  const queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
   if (queryString !== "") {
     params_arr = queryString.split("&");
   }
@@ -304,8 +304,8 @@ export const serializeDrawing = (feature, state, crs) => {
 }
 
 export const createStyle = (feature, drawing, altStroke) => {
-  let { symbol_type, size, fill, stroke, text_style, text_size, text_font, text_value } = drawing;
-  stroke = altStroke ? altStroke : stroke;
+  const { symbol_type, size, fill, text_style, text_size, text_font, text_value } = drawing;
+  const stroke = altStroke ? altStroke : drawing.stroke;
   let style = createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke);
   if (feature.get('type') === 'Symbol') {
       style = createDrawingSymbol(symbol_type, size, fill, stroke);

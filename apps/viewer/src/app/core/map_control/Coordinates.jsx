@@ -137,8 +137,7 @@ function Coordinates({ auth, core, config, actions }) {
     transformCoordinatesByApi(e.coordinate[0], e.coordinate[1]);
   }
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => { /* noop */ }, []);
 
   useEffect(() => {      
     if (!coordinatesLayer.current) return;

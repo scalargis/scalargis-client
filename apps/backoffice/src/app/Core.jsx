@@ -79,11 +79,7 @@ Core.prototype.addComponent = function(core, component, done) {
     try {
       c = await import(`./components/${component.type}/src/Main.jsx`);
     } catch (e1) {
-      try {
-        c = await import(`./components/${component.type}/src/Main.tsx`);
-      } catch (e2) {
-        throw e2;
-      }
+      c = await import(`./components/${component.type}/src/Main.tsx`);
     }
     return c;
   })().then(c => {  

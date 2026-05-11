@@ -580,7 +580,8 @@ class DrawTools extends React.Component {
       editing: null
     }, () => {
       const drawings = [];
-      let { hist, history_now } = this.state;
+      const { hist } = this.state;
+      let { history_now } = this.state;
       if (history_now > 0) {
         history_now--;
         hist[history_now].forEach(item => {
@@ -612,7 +613,8 @@ class DrawTools extends React.Component {
       editing: null
     }, () => {
       const drawings = [];
-      let { hist, history_now } = this.state;
+      const { hist } = this.state;
+      let { history_now } = this.state;
       if (history_now + 1 < hist.length) {
         history_now++;
         hist[history_now].forEach(item => {

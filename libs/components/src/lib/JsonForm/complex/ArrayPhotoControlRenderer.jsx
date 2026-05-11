@@ -129,7 +129,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                                 accept: () => {
                                   deleteConfirm(index);
                                 },
-                                reject: () =>  { }      
+                                reject: () =>  { /* noop */ }      
                               });
 
                           } } />                    

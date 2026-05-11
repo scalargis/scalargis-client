@@ -171,7 +171,7 @@ export default function PrintPanelItem(props) {
         drawPaperBox();
         mainMap.render();
       },
-      reject: () => { }
+      reject: () => { /* noop */ }
     });
   }
 

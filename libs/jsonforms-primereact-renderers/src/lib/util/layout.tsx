@@ -126,9 +126,7 @@ export interface AjvProps {
   ajv: any;
 }
 
-// TODO fix @typescript-eslint/ban-types
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const withAjvProps = <P extends {}>(
+export const withAjvProps = <P extends Record<string, unknown>>(
   Component: ComponentType<AjvProps & P>
 ) =>
   function WithAjvProps(props: P) {

@@ -175,19 +175,19 @@ function parseDateTimeList(inputString) {
 }
 
 function formatDate(val, format) { 
-  let day, month, year, hour, minute, second;
+  let day, month;
 
   const inputDate = new Date(val);
 
   day = inputDate.getDate();
   month = inputDate.getMonth() + 1;
-  year = inputDate.getFullYear();
+  const year = inputDate.getFullYear();
   day = day.toString().padStart(2, '0');
   month = month.toString().padStart(2, '0');
 
-  hour = inputDate.getHours().toString().padStart(2, '0');
-  minute = inputDate.getMinutes().toString().padStart(2, '0');
-  second = inputDate.getSeconds().toString().padStart(2, '0');
+  const hour = inputDate.getHours().toString().padStart(2, '0');
+  const minute = inputDate.getMinutes().toString().padStart(2, '0');
+  const second = inputDate.getSeconds().toString().padStart(2, '0');
 
   if (format) {
     const val = format.replace("{dd}", day).replace("{mm}", month).replace("{yyyy}", year).replace("{h}", hour).replace("{m}", minute).replace("{s}", second);
