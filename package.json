@@ -19,6 +19,7 @@
     "chart.js": "^4.4.6",
     "classnames": "^2.5.1",
     "convert": "^5.5.1",
+    "d3": "^7.9.0",
     "fig-tree-evaluator": "^2.18.1",
     "file-saver": "^2.0.5",
     "handlebars": "^4.7.8",
