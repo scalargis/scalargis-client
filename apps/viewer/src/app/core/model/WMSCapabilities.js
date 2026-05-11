@@ -33,7 +33,7 @@ _ol_.inherits(_ol_format_WMSCapabilities_, _ol_format_XML_);
  * @return {Object} An object representing the WMS capabilities.
  * @api
  */
-_ol_format_WMSCapabilities_.prototype.read;
+
 
 
 /**

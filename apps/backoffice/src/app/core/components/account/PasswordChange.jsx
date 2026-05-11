@@ -14,8 +14,8 @@ import dataProvider from '../../../service/DataProvider';
 export default function PasswordChange(props) {
 
     const { core } = props;
-    const { refresh_auth } = core?.actions;
-    const { dispatch } = core?.store;
+    const { refresh_auth } = core?.actions ?? {};
+    const { dispatch } = core?.store ?? {};
 
     const [showPasswordDialog, setShowPasswordDialog] = useState(false);
     const [isSaving, setIsSaving] = useState(false);

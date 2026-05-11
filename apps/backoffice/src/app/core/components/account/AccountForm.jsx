@@ -23,7 +23,7 @@ function AccountForm(props) {
 
   const { core } = useContext(AppContext);
 
-  const { auth_update, logout } = core?.actions;
+  const { auth_update, logout } = core?.actions ?? {};
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);

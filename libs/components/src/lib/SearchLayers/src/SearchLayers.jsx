@@ -59,7 +59,7 @@ export default function SearchLayers(props) {
             ...data,
             uischema: {
               type: 'VerticalLayout',
-              elements: [...data?.uischema?.elements],
+              elements: [...(data?.uischema?.elements ?? [])],
               ...active?.uischema
             }
           });

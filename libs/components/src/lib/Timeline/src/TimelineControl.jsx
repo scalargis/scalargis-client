@@ -320,7 +320,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
   const { exclusive_mapcontrol, checked } = viewer;
 
-  const [timeData, setTimeData] = useState();
+  const [timeData, setTimeData] = useState([]);
 
   const [frameRate, setFrameRate] = useState(record?.config_json?.speed ? record?.config_json?.speed : 0.5);
 
@@ -331,6 +331,8 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
   // Start the interval
   const startIntervalHandler = () => {
+    if (!timeData?.length) return;
+
     //Start interval condition
     if (currentPos >= timeData?.length - 1) {
       setCurrentPos(0);
@@ -338,7 +340,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
     const newIntervalId = setInterval(() => {
       setCurrentPos((val) => {
-        if (val + 1 >= timeData.length) {
+        if (val + 1 >= (timeData?.length ?? 0)) {
           if (record?.config_json?.loop === true) {
             setCurrentPos(0);
           } else {
@@ -363,9 +365,10 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
 
   useEffect(() => {
+    controlLayer.current = null;
+
     if (!mainMap) return;
-    if (!theme) return;
-    if (controlLayer.current) return;
+    if (!theme?.id) return;
 
     const layerId = theme?.id;
 
@@ -373,23 +376,27 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
     
     if (layerId) layer = utils.findOlLayer(mainMap, layerId);
     if (layer) controlLayer.current = layer;
-  }, [theme]);
+  }, [mainMap, theme]);
 
   useEffect(() => {
     if (!mainMap) return;
-    if (!dimension) return;
+    if (!dimension?.values) {
+      setTimeData([]);
+      setCurrentPos(0);
+      return;
+    }
 
     const [values, defaultPos] = calculateDates(record?.config_json, dimension?.values);;
 
-    setTimeData(values);
+    setTimeData(values || []);
     setCurrentPos(defaultPos);
-  }, [dimension]);
+  }, [mainMap, dimension]);
 
   useEffect(() => {
     if (!intervalId) return;
 
     if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
-      stop();
+      stopIntervalHandler();
     }
   }, [viewer?.config_json?.checked]);
 
@@ -404,15 +411,23 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   }, [intervalId])
 
   useEffect(() => {
-    if (timeData?.length && controlLayer != null) {
-      controlLayer.current.getSource().updateParams({'TIME': timeData[currentPos]});
+    if (!timeData?.length) return;
+
+    if (!controlLayer.current && mainMap && theme?.id) {
+      controlLayer.current = utils.findOlLayer(mainMap, theme.id);
     }
-  }, [currentPos]);
+
+    const selectedTime = timeData[currentPos];
+    if (selectedTime && controlLayer.current) {
+      controlLayer.current.getSource().updateParams({'TIME': selectedTime});
+    }
+  }, [currentPos, timeData, mainMap, theme]);
 
   const options = (timeData || []).map((v, idx) => { 
     const format = record?.config_json?.displayFormat;
     return { value: idx, label: formatDate(v, format) }
   });
+  const hasTimeData = !!timeData?.length;
 
   if(!opened) return <React.Fragment></React.Fragment>
 
@@ -431,20 +446,21 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
       { showLegend && <div className="p-mb-2"><Legend viewer={viewer} data={theme} core={core} actions={actions} models={Models}/></div> }
       <div className="p-text-center p-mb-3">
         <Dropdown value={currentPos} options={options} filter={options?.length > 20}
-          onChange={(e) => { setCurrentPos(e.value) }} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" />
+          onChange={(e) => { setCurrentPos(e.value) }} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" disabled={!hasTimeData} />
       </div>
-      <Slider className="p-mb-3" value={currentPos} onChange={(e) => { setCurrentPos(e.value) }} max={timeData?.length ? timeData?.length - 1 : 100} disabled={!timeData?.length} />
+      <Slider className="p-mb-3" value={currentPos} onChange={(e) => { setCurrentPos(e.value) }} max={hasTimeData ? timeData.length - 1 : 100} disabled={!hasTimeData} />
       <div className="scalargis-timeline p-text-center">
         <div className="p-inputgroup scalargis-timeline">
-          <Button icon="pi pi-angle-double-left" onClick={(e) => { setCurrentPos(0); }}></Button>
+          <Button icon="pi pi-angle-double-left" onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}></Button>
           <Button icon="pi pi-angle-left" 
             onClick={(e) => { 
               if (currentPos) setCurrentPos(currentPos - 1);
             }}
+            disabled={!hasTimeData}
           />
           { intervalId ? 
             <Button icon="pi pi-pause" onClick={(e) => { stopIntervalHandler(); }}></Button> :
-            <Button icon="pi pi-play" onClick={(e) => { startIntervalHandler(); }}></Button>
+            <Button icon="pi pi-play" onClick={(e) => { startIntervalHandler(); }} disabled={!hasTimeData}></Button>
           }
           <Button icon="pi pi-angle-right" 
             onClick={(e) => { 
@@ -456,8 +472,9 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
                 }
               }
             }}
+            disabled={!hasTimeData}
           />
-          <Button icon="pi pi-angle-double-right" onClick={(e) => { setCurrentPos(timeData.length - 1) }}></Button>
+          <Button icon="pi pi-angle-double-right" onClick={(e) => { if (timeData?.length) setCurrentPos(timeData.length - 1); }} disabled={!hasTimeData}></Button>
         </div>
       </div>
     </div>

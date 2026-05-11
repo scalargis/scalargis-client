@@ -51,8 +51,6 @@ export default function COG(props) {
     let selectedBands = [1, 2, 3];
     if (data?.options?.bands?.length) {
         selectedBands = data.options.bands;
-    } else if (data?.options?.bands?.length) {
-        selectedBands = data.options.bands;
     }
     const convertToRGB = data?.options?.convertToRGB != null ? data.options.convertToRGB : false;
     const nodata = data.options?.nodata != null ? data.options?.nodata : undefined;

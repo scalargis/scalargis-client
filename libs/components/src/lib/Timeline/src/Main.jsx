@@ -31,7 +31,7 @@ export default function Main(props) {
   const [dimension, setDimension] = useState();
 
   useEffect(() => {
-    if (!mainMap) return;
+    if (!viewer?.config_json?.layers) return;
 
     let _theme;
 
@@ -55,7 +55,7 @@ export default function Main(props) {
       }
     }
 
-  }, [mainMap]);
+  }, [viewer?.config_json?.layers, viewer?.config_json?.layers?.length, component_cfg?.datasource?.layer_id, component_cfg?.datasource?.layer]);
 
   useEffect(() => {
 
@@ -63,13 +63,13 @@ export default function Main(props) {
     if (!theme) return;
 
     let dimension;
-    let dimension_name;
+    let dimension_name = component_cfg?.dimension?.name;
       
     if (theme) {
       if (theme.dimension_name) dimension_name = theme.dimension_name;
 
       if (theme?.dimensions?.length) {
-        dimension = theme.dimensions.find(d => d.name === dimension_name);
+        dimension = dimension_name ? theme.dimensions.find(d => d.name === dimension_name) : theme.dimensions[0];
       }
 
       if (dimension) {
@@ -118,7 +118,7 @@ export default function Main(props) {
 
             if (layer) {
               if (layer?.Dimension?.length) {
-                dimension = layer.Dimension.find(d => d.name === theme.dimension_name);
+                dimension = dimension_name ? layer.Dimension.find(d => d.name === dimension_name) : layer.Dimension[0];
               } else if (layer.Dimension) {
                 dimension = layer.Dimension || null;
               }
@@ -132,14 +132,14 @@ export default function Main(props) {
             console.log(e);
           }
         }).catch((error) => {
-            console.log(e);
+            console.log(error);
         });
       }
     } else {
       //TODO
     }
 
-  }, [theme]);
+  }, [mainMap, theme, component_cfg?.dimension?.name]);
 
   useEffect(() => {
     if (!mainMap) return;

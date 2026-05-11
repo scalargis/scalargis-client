@@ -185,7 +185,7 @@ export const getWindowSize = () => {
     }
 
     let baseUrl = _getAppBaseUrl();
-    baseUrl = ("" ? baseUrl.startsWith("/") : "/") + baseUrl;  
+    baseUrl = (baseUrl.startsWith("/") ? "" : "/") + baseUrl;  
     url = baseUrl + url;
     
     return url;
