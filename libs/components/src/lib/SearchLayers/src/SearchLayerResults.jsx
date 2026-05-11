@@ -225,7 +225,7 @@ export default function SearchLayerResults(props) {
     const _isPureObject = (input) => {
       return null !== input && 
         typeof input === 'object' &&
-        Object.getPrototypeOf(input).isPrototypeOf(Object);
+        Object.prototype.isPrototypeOf.call(Object.getPrototypeOf(input), Object);
     }
   
     const _formatValue = (data, value) => {

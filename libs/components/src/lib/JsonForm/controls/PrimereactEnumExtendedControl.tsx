@@ -35,7 +35,7 @@ export const PrimereactEnumExtendedControl = (
 
 export const primereactEnumExtendedControlTester: RankedTester = rankWith(
   3,
-  and(isEnumControl, schemaMatches((schema) => schema.hasOwnProperty('dependent_controls'))),
+  and(isEnumControl, schemaMatches((schema) => Object.prototype.hasOwnProperty.call(schema, 'dependent_controls'))),
 );
 
 // HOC order can be reversed with https://github.com/eclipsesource/jsonforms/issues/1987
