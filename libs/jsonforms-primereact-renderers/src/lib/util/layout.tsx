@@ -126,7 +126,7 @@ export interface AjvProps {
   ajv: any;
 }
 
-export const withAjvProps = <P extends Record<string, unknown>>(
+export const withAjvProps = <P extends object>(
   Component: ComponentType<AjvProps & P>
 ) =>
   function WithAjvProps(props: P) {
