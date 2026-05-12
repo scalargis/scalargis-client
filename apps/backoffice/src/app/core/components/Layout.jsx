@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import classNames from 'classnames';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router';
 import { CSSTransition } from 'react-transition-group';
 
 import { AppTopbar } from './AppTopbar';

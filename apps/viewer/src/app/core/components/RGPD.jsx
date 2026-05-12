@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { useTranslation} from "react-i18next";
 import LoadingScreen from './LoadingScreen';
 import SplashScreen from './SplashScreen';
-import { withCookies } from 'react-cookie';
+import { useCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
 
@@ -16,13 +16,14 @@ const cookieValue = import.meta.env.VITE_APP_COOKIE_VALUE || '2';
 const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/'; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
-function RGPD({ cookies, core, dispatch, children }) {
+function RGPD({ core, dispatch, children }) {
 
   const { i18n } = useTranslation();
 
   const location = useLocation();
 
-  const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
+  const [cookies] = useCookies([cookieName]);
+  const [cookiergpd, setCookiergpd] = useState(cookies[cookieName]);
 
   const theme = core?.siteConfig?.theme || import.meta.env.VITE_APP_DEFAULT_THEME || 'default';
 
@@ -86,4 +87,4 @@ function RGPD({ cookies, core, dispatch, children }) {
 
 } 
 
-export default withCookies(RGPD);
+export default RGPD;

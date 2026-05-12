@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SplashScreen from './SplashScreen';
-import { withCookies } from 'react-cookie';
+import { useCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
 
@@ -9,9 +9,10 @@ const cookieValue = import.meta.env.VITE_APP_COOKIE_VALUE || '2';
 const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/';
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
-function RGPD({ cookies, children }) {
+function RGPD({ children }) {
 
-  const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
+  const [cookies] = useCookies([cookieName]);
+  const [cookiergpd, setCookiergpd] = useState(cookies[cookieName]);
 
   function accept() {
     setCookiergpd(cookieValue);
@@ -53,4 +54,4 @@ function RGPD({ cookies, children }) {
   );
 } 
 
-export default withCookies(RGPD);
+export default RGPD;

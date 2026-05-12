@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import * as Utils from '../utils';
 import dataProvider from '../../service/DataProvider';
 

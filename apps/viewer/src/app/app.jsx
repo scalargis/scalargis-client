@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { useTranslation} from "react-i18next";
 import { locale, addLocale } from 'primereact/api';

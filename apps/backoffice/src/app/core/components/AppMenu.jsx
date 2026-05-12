@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { MultiSelect } from 'primereact/multiselect';

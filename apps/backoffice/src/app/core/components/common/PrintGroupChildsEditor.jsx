@@ -4,7 +4,7 @@ import { ConfirmPopup, confirmPopup  } from 'primereact/confirmpopup';
 import { Panel } from 'primereact/panel';
 import { Message } from 'primereact/message';
 import { MultiSelect } from 'primereact/multiselect';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { getItemStyle, getFieldListStyle } from "./utils";
 
 
@@ -194,14 +194,12 @@ class PrintGroupChildsEditor extends Component {
     this.onGroupsChange = this.onGroupsChange.bind(this); 
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ data: props.data });
+  static getDerivedStateFromProps(props, state) {
+    if (props.data !== state.data) {
+      return { data: props.data };
+    }
+    return null;
   }
-
-  /*
-  componentDidUpdate() {
-  }
-  */
 
   onGroupsChange(groups) {
     console.log(groups);

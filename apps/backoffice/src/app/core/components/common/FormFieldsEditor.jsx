@@ -8,7 +8,7 @@ import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import { Panel } from 'primereact/panel';
 import { Message } from 'primereact/message';
 import { classNames } from 'primereact/utils';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useForm, Controller } from 'react-hook-form';
 import { utils } from '@scalargis/components';
 import { ReorderGroups, ReorderFields, getItemStyle, getGroupListStyle, getFieldListStyle } from "./utils";
@@ -576,14 +576,12 @@ class FormFieldsEditor extends Component {
     this.onFieldFormSave = this.onFieldFormSave.bind(this);    
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ data: props.data });
+  static getDerivedStateFromProps(props, state) {
+    if (props.data !== state.data) {
+      return { data: props.data };
+    }
+    return null;
   }
-
-  /*
-  componentDidUpdate() {
-  }
-  */
 
   onDragEnd(result) {
     // dropped outside the list
