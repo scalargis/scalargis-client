@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation } from 'react-router';
-import { useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import LoadingScreen from './LoadingScreen';
 import SplashScreen from './SplashScreen';
-import { useCookies } from 'react-cookie';
+import { CookiesProvider, useCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
 
@@ -13,11 +13,12 @@ import ThemeSelector from './ThemeSelector';
 
 const cookieName = import.meta.env.VITE_APP_COOKIE_NAME || 'scalargis_rgpd';
 const cookieValue = import.meta.env.VITE_APP_COOKIE_VALUE || '2';
-const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/'; 
+const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/';
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
-function RGPD({ core, dispatch, children }) {
+const cookieStore = new Cookies();
 
+function RGPDInner({ core, dispatch, children }) {
   const { i18n } = useTranslation();
 
   const location = useLocation();
@@ -33,10 +34,13 @@ function RGPD({ core, dispatch, children }) {
     // Manually save cookie if using http access
     if (window.location.protocol === 'http:') {
       const expireDate = new Date();
-      expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-      const cookies = new Cookies();
-      cookies.set(cookieName, cookieValue, { path: cookiePath, expires: expireDate,
-        secure: false, httpOnly: false });
+      expireDate.setDate(expireDate.getDate() + cookieExpiresDays);
+
+      cookieStore.set(cookieName, cookieValue, {
+        path: cookiePath,
+        expires: expireDate,
+        secure: false
+      });
     }
   }
 
@@ -49,12 +53,12 @@ function RGPD({ core, dispatch, children }) {
       </ThemeSelector>
     );
   }
-  
+
   if (core?.siteConfig?.rgpd != false && !location.pathname.toLocaleLowerCase().includes('/embedded/map')) {
     return (
       <ThemeSelector theme={theme}>
         <React.Fragment>
-          { String(cookiergpd || '') !== String(cookieValue || '') && (
+          {String(cookiergpd || '') !== String(cookieValue || '') && (
             <SplashScreen core={core} dispatch={dispatch} locale={i18n?.resolvedLanguage}>
               <CookieConsent
                 location="bottom"
@@ -71,11 +75,11 @@ function RGPD({ core, dispatch, children }) {
               >
               </CookieConsent>
             </SplashScreen>
-          ) }
-          
-          { cookiergpd ? children : <></> }
+          )}
+
+          {cookiergpd ? children : <></>}
         </React.Fragment>
-      </ThemeSelector> 
+      </ThemeSelector>
     );
   }
 
@@ -84,7 +88,14 @@ function RGPD({ core, dispatch, children }) {
       {children}
     </ThemeSelector>
   );
+}
 
-} 
+function RGPD(props) {
+  return (
+    <CookiesProvider cookies={cookieStore}>
+      <RGPDInner {...props} />
+    </CookiesProvider>
+  );
+}
 
 export default RGPD;

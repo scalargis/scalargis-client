@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { NavLink } from 'react-router';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-const AppSubmenu = (props) => {
+const AppSubmenu = React.forwardRef((props, ref) => {
 
     const [activeIndex, setActiveIndex] = useState(null)
+    const submenuRefs = useRef({});
 
     const onMenuItemClick = (event, item, index) => {
         //avoid processing disabled items
@@ -79,20 +80,21 @@ const AppSubmenu = (props) => {
     const items = props.items && props.items.map((item, i) => {
         const active = activeIndex === i;
         const styleClass = classNames(item.badgeStyleClass, { 'active-menuitem': active && !item.to });
+        const nodeRef = submenuRefs.current[i] || (submenuRefs.current[i] = React.createRef());
 
         return (
             <li className={styleClass} key={i}>
                 {item.items && props.root === true && <div className='arrow'></div>}
                 {renderLink(item, i)}
-                <CSSTransition classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={active} unmountOnExit>
-                    <AppSubmenu items={item.items} onMenuItemClick={props.onMenuItemClick} />
+                <CSSTransition nodeRef={nodeRef} classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={active} unmountOnExit>
+                    <AppSubmenu ref={nodeRef} items={item.items} onMenuItemClick={props.onMenuItemClick} />
                 </CSSTransition>
             </li>
         );
     });
 
-    return items ? <ul className={props.className}>{items}</ul> : null;
-}
+    return items ? <ul ref={ref} className={props.className}>{items}</ul> : null;
+});
 
 export const AppMenu = (props) => {
     return (

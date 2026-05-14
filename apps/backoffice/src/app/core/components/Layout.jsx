@@ -165,7 +165,7 @@ function Layout(props) {
     <div className={wrapperClass} onClick={onWrapperClick}>
         <AppTopbar onToggleMenu={onToggleMenu} />
 
-        <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
+        <CSSTransition nodeRef={sidebar} classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
             <div ref={sidebar} className={sidebarClassName} onClick={onSidebarClick}>
                 <div className="layout-logo" style={{cursor: 'pointer'}} onClick={() => history.navigate('/')}>
                     <img alt="Logo" src={logo} />

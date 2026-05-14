@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { NavLink } from 'react-router';
 import classNames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
@@ -15,6 +15,7 @@ export const AppProfile = (props) => {
     const cfg = core?.config?.config_json;
 
     const [expanded, setExpanded] = useState(false);
+    const profileMenuRef = useRef(null);
 
     /*
     const cookieAuthName = core.COOKIE_AUTH_NAME;
@@ -35,8 +36,8 @@ export const AppProfile = (props) => {
                 <span className="username">{name || username || ''}</span>
                 <i className="pi pi-fw pi-cog" />
             </button>
-            <CSSTransition classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={expanded} unmountOnExit>
-                <ul className={classNames({ 'layout-profile-expanded': expanded })}>
+            <CSSTransition nodeRef={profileMenuRef} classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={expanded} unmountOnExit>
+                <ul ref={profileMenuRef} className={classNames({ 'layout-profile-expanded': expanded })}>
                     <li>
                         <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to={'/account'} target={null}>
                             <button type="button" className="p-link"><i className="pi pi-fw pi-user" /><span>Conta</span></button>

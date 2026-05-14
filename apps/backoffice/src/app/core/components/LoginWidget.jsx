@@ -45,7 +45,7 @@ function LoginWidget({ auth, history, redirect }) {
       
       <div className="flex flex-column">
         <div className="field">
-          <label for="username">Nome de Utilizador / E-mail</label>
+          <label htmlFor="username">Nome de Utilizador / E-mail</label>
           <InputText
             id="username"
             className="block w-full"
@@ -56,7 +56,7 @@ function LoginWidget({ auth, history, redirect }) {
         </div>
 
         <div className="field">
-          <label for="password">Palavra-passe</label>
+          <label htmlFor="password">Palavra-passe</label>
           <Password
             id="password"
             className="block"
