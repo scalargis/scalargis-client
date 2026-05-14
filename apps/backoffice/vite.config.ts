@@ -65,10 +65,6 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: {
-      'stream': 'stream-browserify',
-      'timers': 'timers-browserify'
-    },
     preserveSymlinks: true
   }
 });

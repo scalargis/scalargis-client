@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "@fontsource/noto-sans": "^5.2.10",
+    "@fontsource/saira": "^5.2.11",
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@fullcalendar/core": "4.4.2",
     "@fullcalendar/daygrid": "4.4.2",
@@ -101,8 +102,6 @@
     "nx": "22.7.1",
     "prettier": "^3.8.3",
     "sass": "^1.99.0",
-    "stream-browserify": "^3.0.0",
-    "timers-browserify": "^2.0.12",
     "ts-node": "^10.9.2",
     "tslib": "^2.3.0",
     "typescript": "5.9.3",
