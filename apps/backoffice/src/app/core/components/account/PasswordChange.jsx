@@ -67,7 +67,7 @@ export default function PasswordChange(props) {
         return (
             <div>
                 <Button label="Cancelar" icon="pi pi-times" onClick={() => setShowPasswordDialog(false)} 
-                    className="p-button-text" disabled={isSaving} />
+                    text disabled={isSaving} />
                 <Button label="Aceitar"
                     onClick={(e) => {
                         formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); 
@@ -121,7 +121,7 @@ export default function PasswordChange(props) {
         <React.Fragment>
             <Toast ref={toast} baseZIndex={2000} />
 
-            <Button label="Alterar password" icon="pi pi-user-edit" className="p-button-outlined p-d-block" onClick={e => {
+            <Button label="Alterar password" icon="pi pi-user-edit" outlined className="block" onClick={e => {
                 e.preventDefault();
                 reset();
                 setShowPasswordDialog(true);

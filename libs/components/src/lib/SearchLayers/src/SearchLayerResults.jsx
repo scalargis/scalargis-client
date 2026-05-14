@@ -76,7 +76,7 @@ export default function SearchLayerResults(props) {
   const zoomActionTemplate = (rowData) => {
     return (
         <React.Fragment>
-            <Button icon="pi pi-search" className="p-button-rounded p-button-text" 
+            <Button icon="pi pi-search" rounded text
               onClick={() => { 
                 layer.current.getSource().clear();
                 if (rowData.geometry == null) {
@@ -113,7 +113,7 @@ export default function SearchLayerResults(props) {
 
         return (
           <>
-              <span className="p-mx-1" style={{ color: 'var(--text-color)', userSelect: 'none' }}>Registos: </span>
+              <span className="mx-1" style={{ color: 'var(--text-color)', userSelect: 'none' }}>Registos: </span>
               <Dropdown value={results.maxFeatures} options={dropdownOptions} onChange={(e) => doSearch(0, e.value, results.filter, results.sort)} />
           </>
         );
@@ -314,7 +314,7 @@ export default function SearchLayerResults(props) {
           new_sort[e.sortField] = e.sortOrder === 1 ? 'ASC' : 'DESC'
           doSearch(0, results.maxFeatures, results.filter, new_sort);
         }}
-        paginatorClassName="p-jc-end" className="mt-4"> 
+        paginatorClassName="justify-content-end" className="mt-4"> 
         {(columns && columns.length > 0) && <Column key={0} body={zoomActionTemplate} style={{width: '30px'}} />}
         {buildColumns(searchConfig, columns).map(c => c)}
       </DataTable>

@@ -69,7 +69,7 @@ const PrimereactLayoutRendererComponent = ({
   } else {
     if (direction === 'row') {
       return (
-        <div className="p-fluid p-formgrid p-grid p-jsonform"> 
+        <div className="p-fluid formgrid grid p-jsonform"> 
           {renderLayoutElements(
             elements,
             schema,

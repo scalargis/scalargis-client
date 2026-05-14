@@ -29,7 +29,7 @@ export const AppProfile = (props) => {
 
     return (
         <div className="layout-profile">
-            <div className="p-mb-2">
+            <div className="mb-2">
                 <i className="fas fa-user-circle" style={{fontSize: "3rem"}}></i>                
             </div>
             <button className="p-link layout-profile-link" onClick={onClick}>

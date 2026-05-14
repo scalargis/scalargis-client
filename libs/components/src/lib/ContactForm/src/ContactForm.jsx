@@ -207,20 +207,20 @@ export default function ContactFrom(props) {
       return (
           <div className="flex align-items-center flex-wrap">
               <div className="flex align-items-center" style={{width: '70%'}}>
-                  <span className="flex p-dir-col p-text-left ml-0 mr-1" style={{"wordBreak": "break-all"}}>
+                  <span className="flex flex-column text-left ml-0 mr-1" style={{"wordBreak": "break-all"}}>
                       {file.name}
                   </span>
               </div>
               <Tag value={props.formatSize} className="px-1 py-1" />
-              <Button type="button" icon="pi pi-times" className="p-button-outlined p-button-rounded p-button-danger ml-auto" onClick={() => onTemplateRemove(file, props.onRemove)} />
+              <Button type="button" icon="pi pi-times" outlined rounded severity="danger" className="ml-auto" onClick={() => onTemplateRemove(file, props.onRemove)} />
           </div>
       )
   }
 
   const emptyTemplate = () => {
       return (
-          <div className="p-d-flex align-items-center p-dir-col">
-              <i className="pi pi-image mt-3 p-p-5" style={{'fontSize': '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)'}}></i>
+          <div className="flex align-items-center flex-column">
+              <i className="pi pi-image mt-3 p-5" style={{'fontSize': '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)'}}></i>
               <span style={{'fontSize': '1.2em', color: 'var(--text-color-secondary)'}} className="my-5">Drag and Drop Image Here</span>
           </div>
       )
@@ -361,7 +361,7 @@ export default function ContactFrom(props) {
 
         <div className="p-dialog-myfooter">
           <Button
-            className='p-button-secondary'
+            severity="secondary"
             icon={ sending ? "pi pi-spin pi-spinner": "pi pi-check" }
             label="Enviar" 
             onClick={submit}

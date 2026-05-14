@@ -52,7 +52,7 @@ const FieldFormEditor = props => {
             <Button 
               label="Fechar"
               icon="pi pi-times"
-              onClick={() => props.onHide()} className="p-button-text" />
+              onClick={() => props.onHide()} text />
             <Button 
               label="Gravar"
               icon={"pi pi-check"}
@@ -78,7 +78,7 @@ const FieldFormEditor = props => {
                       </span>
                   </div>
               </Tooltip>
-              <Button type="text" icon="pi pi-info-circle" className="tooltip-form-field-key p-button-rounded p-button-text" onClick={(e)=>e.preventDefault()} />
+              <Button type="text" icon="pi pi-info-circle" rounded text className="tooltip-form-field-key" onClick={(e)=>e.preventDefault()} />
             </div>
             {getFormErrorMessage(errors, 'key')}
           </div>
@@ -165,7 +165,7 @@ const GroupFormEditor = props => {
             <Button 
               label="Fechar"
               icon="pi pi-times"
-              onClick={() => props.onHide()} className="p-button-text" />
+              onClick={() => props.onHide()} text />
             <Button 
               label="Gravar"
               icon={"pi pi-check"}
@@ -191,7 +191,7 @@ const GroupFormEditor = props => {
                     </span>
                 </div>
             </Tooltip>
-            <Button type="text" icon="pi pi-info-circle" className="tooltip-form-field-key p-button-rounded p-button-text" onClick={(e)=>e.preventDefault()} />
+            <Button type="text" icon="pi pi-info-circle" rounded text className="tooltip-form-field-key" onClick={(e)=>e.preventDefault()} />
           </div>
           {getFormErrorMessage(errors, 'key')}
         </div>
@@ -291,8 +291,8 @@ const GroupFields = props => {
                           </span>
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <Button type="text" icon="pi pi-trash" 
-                            className="p-button-rounded p-button-text p-button-danger"
+                          <Button type="text" icon="pi pi-trash"
+                            rounded text severity="danger"
                             tooltip="Eliminar campo"
                             tooltipOptions={{position: 'bottom'}}                            
                             onClick={ (e) => {
@@ -311,8 +311,8 @@ const GroupFields = props => {
                                   }
                               });
                             }} />
-                            <Button type="text" icon="pi pi-pencil" 
-                              className="p-button-rounded p-button-text p-button-warning"
+                            <Button type="text" icon="pi pi-pencil"
+                              rounded text severity="warning"
                               tooltip="Editar campo"
                               tooltipOptions={{position: 'bottom'}}                              
                               onClick={ (e) => {
@@ -459,8 +459,8 @@ const Fields = props => {
                       </span>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <Button type="text" icon="pi pi-trash" 
-                        className="p-button-rounded p-button-text p-button-danger"
+                      <Button type="text" icon="pi pi-trash"
+                        rounded text severity="danger"
                         tooltip="Eliminar campo"
                         tooltipOptions={{position: 'bottom'}}                            
                         onClick={ (e) => {
@@ -479,8 +479,8 @@ const Fields = props => {
                               }
                           });
                         }} />
-                        <Button type="text" icon="pi pi-pencil" 
-                          className="p-button-rounded p-button-text p-button-warning"
+                        <Button type="text" icon="pi pi-pencil"
+                          rounded text severity="warning"
                           tooltip="Editar campo"
                           tooltipOptions={{position: 'bottom'}}                              
                           onClick={ (e) => {
@@ -726,8 +726,8 @@ class FormFieldsEditor extends Component {
                     <Button
                       type="button"
                       label="Novo Campo"
-                      icon="pi pi-list" 
-                      className="p-button-outlined"
+                      icon="pi pi-list"
+                      outlined
                       onClick={()=> {
                         this.fieldEdition = { key: null, active: true, title: null, header: null, showLabel: false};
                         this.setState({
@@ -765,7 +765,7 @@ class FormFieldsEditor extends Component {
                     type="button"
                     label="Novo Grupo"
                     icon="pi pi-list" 
-                    className="p-button-outlined"
+                    outlined
                     onClick={()=> {
                       this.groupEdition = { key: null, active: true, title: null, fields: {}};
                       this.setState({
@@ -820,8 +820,8 @@ class FormFieldsEditor extends Component {
                                 </div>
                               </div>
                               <div style={{ textAlign: "right"}}>
-                                <Button type="text" icon="pi pi-plus-circle" 
-                                  className="p-button-rounded p-button-text p-button-warning p-mr-2"
+                                <Button type="text" icon="pi pi-plus-circle"
+                                  rounded text severity="warning" className="mr-2"
                                   tooltip="Adicionar campo"
                                   tooltipOptions={{position: 'bottom'}}
                                   onClick={ (e) => {
@@ -833,8 +833,8 @@ class FormFieldsEditor extends Component {
                                     });
                                   }} />
 
-                                <Button type="text" icon="pi pi-trash" 
-                                  className="p-button-rounded p-button-text p-button-danger"
+                                <Button type="text" icon="pi pi-trash"
+                                  rounded text severity="danger"
                                   tooltip="Eliminar grupo"
                                   tooltipOptions={{position: 'bottom'}}
                                   onClick={ (e) => {
@@ -853,8 +853,8 @@ class FormFieldsEditor extends Component {
                                         }
                                     });
                                   }} />                            
-                                <Button type="text" icon="pi pi-pencil" 
-                                  className="p-button-rounded p-button-text p-button-warning"
+                                <Button type="text" icon="pi pi-pencil"
+                                  rounded text severity="warning"
                                   tooltip="Editar grupo"
                                   tooltipOptions={{position: 'bottom'}}
                                   onClick={ (e) => {

@@ -434,7 +434,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
     return (
       <div style={{width: "100%"}}> 
-        <Message severity="info" text={`O tema "${theme?.title}" não está visível`} className="p-mt-2" style={{width: "100%" }} />
+        <Message severity="info" text={`O tema "${theme?.title}" não está visível`} className="mt-2" style={{width: "100%" }} />
       </div>
     )
   }
@@ -443,13 +443,13 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
   return (
     <div style={{padding: "10px 10px"}}>
-      { showLegend && <div className="p-mb-2"><Legend viewer={viewer} data={theme} core={core} actions={actions} models={Models}/></div> }
-      <div className="p-text-center p-mb-3">
+      { showLegend && <div className="mb-2"><Legend viewer={viewer} data={theme} core={core} actions={actions} models={Models}/></div> }
+      <div className="text-center mb-3">
         <Dropdown value={currentPos} options={options} filter={options?.length > 20}
           onChange={(e) => { setCurrentPos(e.value) }} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" disabled={!hasTimeData} />
       </div>
-      <Slider className="p-mb-3" value={currentPos} onChange={(e) => { setCurrentPos(e.value) }} max={hasTimeData ? timeData.length - 1 : 100} disabled={!hasTimeData} />
-      <div className="scalargis-timeline p-text-center">
+      <Slider className="mb-3" value={currentPos} onChange={(e) => { setCurrentPos(e.value) }} max={hasTimeData ? timeData.length - 1 : 100} disabled={!hasTimeData} />
+      <div className="scalargis-timeline text-center">
         <div className="p-inputgroup scalargis-timeline">
           <Button icon="pi pi-angle-double-left" onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}></Button>
           <Button icon="pi pi-angle-left" 

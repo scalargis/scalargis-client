@@ -79,8 +79,8 @@ export const PrimereactInputControl = (props: ControlProps & WithInput) => {
         isValid={isValid}
         visible={visible}
       />
-      <small id={`${id}-input-help1`} className={`p-d-block ${!showDescription && !isValid ? 'p-error' : ''}`}>{firstFormHelperText}</small>
-      <small id={`${id}-input-help2`} className="p-d-block p-error">{secondFormHelperText}</small>
+      <small id={`${id}-input-help1`} className={`block ${!showDescription && !isValid ? 'p-error' : ''}`}>{firstFormHelperText}</small>
+      <small id={`${id}-input-help2`} className="block p-error">{secondFormHelperText}</small>
       {/*
       <div className={divClassNames}>
         first{firstFormHelperText}

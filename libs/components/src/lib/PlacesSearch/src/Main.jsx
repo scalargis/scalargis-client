@@ -137,7 +137,7 @@ export default function Main({ core, config, actions, utils, record }) {
     let elem = null;
   
     if (iconClass) {
-      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.designacao} ({option.concelho})</span></div>;
+      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} mr-2`}></i> <span>{option.designacao} ({option.concelho})</span></div>;
       if (option.designacao === option.concelho) {
         elem = <div>{option.concelho}</div>
       }
@@ -157,7 +157,7 @@ export default function Main({ core, config, actions, utils, record }) {
     const admin_level = option.admin_level4 || option.admin_level3 || option.admin_level2 || option.admin_level1 || '';
   
     if (iconClass) {      
-      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.name} {admin_level ? `(${admin_level})` : ''}</span></div>;
+      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} mr-2`}></i> <span>{option.name} {admin_level ? `(${admin_level})` : ''}</span></div>;
       if (option.name === admin_level) {
         elem = <div>{admin_level}</div>
       }

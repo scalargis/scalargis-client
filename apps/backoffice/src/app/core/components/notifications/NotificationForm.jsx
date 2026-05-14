@@ -104,8 +104,8 @@ function NotificationForm(props) {
             type="button" 
             label="Voltar" 
             icon="pi pi-left" 
-            className="p-button-secondary mr-4"
-            disabled={isSaving ? true : false} 
+            severity="secondary" className="mr-4"
+            disabled={isSaving ? true : false}
             onClick={goBack} />
           { data?.status?.value === 0 && <Button
             type="button" 
@@ -145,7 +145,7 @@ function NotificationForm(props) {
           type="button" 
           label="Voltar" 
           icon="pi pi-left" 
-          className="p-button-secondary mr-4"
+          severity="secondary" className="mr-4"
           onClick={goBack} />
     )
   }
@@ -162,8 +162,8 @@ function NotificationForm(props) {
             <a href={file.url} target="_blank" rel="noreferrer" download={file.filename}>{file.filename}</a>
           </div>
         </div>
-        <div className="p-col md:col-3">
-          <div className="m-2 p-text-center">
+        <div className="col md:col-3">
+          <div className="m-2 text-center">
             {file.size != null && <span className="p-tag p-component px-1 py-1">
               <span className="p-tag-value">{(file.size / 1024).toFixed(2) + " KB"}</span>
             </span>}

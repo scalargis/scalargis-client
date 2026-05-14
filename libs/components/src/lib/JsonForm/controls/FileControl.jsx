@@ -103,7 +103,7 @@ export const FileControl = (props) => {
           <div className="field">
             { (file && file.data && file.original_filename) ?
             <div>
-              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" style={{color:"var(--primary-color)"}} /></div>
+              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="ml-2" style={{color:"var(--primary-color)"}} /></div>
               <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             :

@@ -85,7 +85,7 @@ export const JsonForm = (props) => {
   const defaultLoadingElement = useMemo(() => {  
     return {
       type: 'VerticalLayout',
-      elements: [{ type: 'Html', text: `<div class="p-mb-4"><i class="pi pi-spin pi-spinner p-mr-2" style={{'fontSize': '2em'}}></i><span>${_i18n.translate("common.loading", "A carregar ...")}</span></div>` }],
+      elements: [{ type: 'Html', text: `<div class="mb-4"><i class="pi pi-spin pi-spinner mr-2" style={{'fontSize': '2em'}}></i><span>${_i18n.translate("common.loading", "A carregar ...")}</span></div>` }],
     }
   }, [i18next.resolvedLanguage]);
 

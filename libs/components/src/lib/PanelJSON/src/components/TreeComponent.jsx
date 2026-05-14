@@ -99,9 +99,9 @@ export const TreeComponent = (props) => {
 
     return (
         <div>
-            {props?.options?.showExpandButtons && <div className="p-mb-3 p-text-center">
-                <Button type="button" icon="pi pi-plus" label="Abrir todos" onClick={expandAll} className="p-button-sm p-button-outlined p-mr-2" />
-                <Button type="button" icon="pi pi-minus" label="Fechar todos" onClick={collapseAll} className="p-button-sm p-button-outlined p-mr-2" />
+            {props?.options?.showExpandButtons && <div className="mb-3 text-center">
+                <Button type="button" icon="pi pi-plus" label="Abrir todos" onClick={expandAll} size="small" outlined className="mr-2" />
+                <Button type="button" icon="pi pi-minus" label="Fechar todos" onClick={collapseAll} size="small" outlined className="mr-2" />
             </div>}
             <Tree 
                 value={props.value}

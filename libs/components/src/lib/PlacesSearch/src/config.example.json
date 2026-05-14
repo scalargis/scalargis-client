@@ -25,19 +25,19 @@
         {
           "id": "populatedPlace",
           "iconClass": "pi-chevron-right",
-          "html": "<div class='p-text-left'><i class='pi pi-chevron-right p-mr-2'></i> <span>{name} ({admin_level4})</span></div>",
+          "html": "<div class='text-left'><i class='pi pi-chevron-right mr-2'></i> <span>{name} ({admin_level4})</span></div>",
           "drawGeometry": false
         },
         {
           "id": "streets",
           "iconClass": "pi-chevron-right",
-          "html": "<div class='p-text-left'><i class='pi pi-chevron-right p-mr-2'></i> <span>{name} ({admin_level4})</span></div>",
+          "html": "<div class='text-left'><i class='pi pi-chevron-right mr-2'></i> <span>{name} ({admin_level4})</span></div>",
           "drawGeometry": true
         }            
       ],
       "default": {
         "iconClass": "pi-circle-on",
-        "html": "<div class='p-text-left'><i class='pi pi-circle-on p-mr-2'></i> <span>{name} ({admin_level4})</span></div>",
+        "html": "<div class='text-left'><i class='pi pi-circle-on mr-2'></i> <span>{name} ({admin_level4})</span></div>",
         "drawGeometry": true
       }
     },

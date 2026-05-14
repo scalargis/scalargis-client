@@ -241,13 +241,13 @@ function NotificationList(props) {
 
   const rightToolbarTemplate = () => {
       return (
-          <Button label="Exportar" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} disabled={records?.total ? false : true } />
+          <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={exportCSV} disabled={records?.total ? false : true } />
       )
   }
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-button-secondary p-mr-2" title="Editar" onClick={() => editRecord(rowData)} />
+      <Button icon="pi pi-pencil" rounded outlined severity="secondary" className="mr-2" title="Editar" onClick={() => editRecord(rowData)} />
     );
   }
 
@@ -350,7 +350,7 @@ function NotificationList(props) {
                         <Button type="submit" label="Pesquisar" className="mr-2 w-full" />  
                       </div>                                  
                       <div className="field col-12 md:col-1">
-                        <Button type="button" label="Limpar" className="p-button-secondary mr-2 w-full" onClick={onFilterClear} />
+                        <Button type="button" label="Limpar" severity="secondary" className="mr-2 w-full" onClick={onFilterClear} />
                       </div>                   
                     </div>
 
