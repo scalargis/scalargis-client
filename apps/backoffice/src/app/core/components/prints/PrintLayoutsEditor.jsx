@@ -50,7 +50,7 @@ const LayoutEditor = props => {
             <Button 
               label="Fechar"
               icon="pi pi-times"
-              onClick={() => props.onHide()} className="p-button-text" />
+              onClick={() => props.onHide()} text />
             <Button 
               label="Gravar"
               icon={"pi pi-check"}
@@ -233,12 +233,12 @@ const PrintLayoutsEditor = props => {
   const rightToolbarTemplate = () => {
     return (
       <React.Fragment>
-          <Button type="button" label="Novo" icon="pi pi-plus" className="p-button-success mr-2" 
+          <Button type="button" label="Novo" icon="pi pi-plus" severity="success" className="mr-2"
             onClick={() => {
               editRecord({ key: '' });
             }}
           />
-          <Button type="button"  label="Eliminar" icon="pi pi-trash" className="p-button-danger" 
+          <Button type="button"  label="Eliminar" icon="pi pi-trash" severity="danger"
             disabled={!selectedRecords || !selectedRecords.length} 
             onClick={(e) => {
               deleteSelectedRecords(e);
@@ -251,10 +251,10 @@ const PrintLayoutsEditor = props => {
   const actionBodyTemplate = (rowData) => {
     return (
       <div style={{textAlign: "right"}}>
-          <Button type="button" icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={(e) => {
+          <Button type="button" icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={(e) => {
             editRecord(rowData);
           }} />
-          <Button type="button" icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={(e) => {
+          <Button type="button" icon="pi pi-trash" rounded severity="warning" onClick={(e) => {
             deleteRecord(e, rowData);
           }} />
       </div>
