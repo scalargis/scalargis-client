@@ -97,8 +97,7 @@ export const PrimereactCategorizationStepperLayoutRenderer = (
     () =>
       //categorization.elements.filter((category: Category) =>
       categorization.elements.filter((category: any) =>
-        //isVisible(category, data, undefined, ajv)
-        isVisible(category, data, '', ajv)
+        isVisible(category, data, '', ajv, undefined)
       ),
     [categorization, data, ajv]
   );

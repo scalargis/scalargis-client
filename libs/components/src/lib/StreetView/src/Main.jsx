@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
-import { Loader } from "@googlemaps/js-api-loader"
+import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 
 import StreetView from './StreetView';
 
@@ -45,18 +45,13 @@ export default function Main(props) {
         return;
       }
 
-      const options = {
-        apiKey,
-        version: "3",
-      };
-
-      const loader = new Loader({
-        ...options,
-        ...siteConfig?.gooleMaps
+      setOptions({
+        key: apiKey,
+        v: "3",
+        ...siteConfig?.googleMaps
       });
 
-      loader
-      .load()
+      importLibrary('streetView')
       .catch(e => {
         console.log('Error loading Google Maps API', e);
       });
