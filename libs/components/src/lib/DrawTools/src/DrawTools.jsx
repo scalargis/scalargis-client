@@ -921,7 +921,7 @@ class DrawTools extends React.Component {
               icon={opt.icon}
               label={opt.label ? opt.label : ''}
               title={i18next.t(opt.title, opt.defaultTitle)}
-              className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "")}
+              severity="secondary" className={"tool " + (opt.value === selectedTool ? "active" : "")}
               onClick={(e) => this.startDraw(e, opt.value)}
             />
           )}
@@ -933,7 +933,7 @@ class DrawTools extends React.Component {
               key={opt.value}
               icon={opt.icon}
               title={i18next.t(opt.title, opt.defaultTitle)}
-              className={"p-button-secondary tool " + (opt.value === selectedTool ? "active" : "")}
+              severity="secondary" className={"tool " + (opt.value === selectedTool ? "active" : "")}
               onClick={(e) => this.startDraw(e, opt.value)}
             />
           )}
@@ -945,7 +945,7 @@ class DrawTools extends React.Component {
               key={opt.value}
               icon={opt.icon}
               title={i18next.t(opt.title, opt.defaultTitle)}
-              className={"p-button-secondary tool " + (opt.value === selectedTool ? "p-highlight" : "")}
+              severity="secondary" className={"tool " + (opt.value === selectedTool ? "p-highlight" : "")}
               style={this.getButtonStyle(opt)}
               onClick={(e) => {
                 switch (opt.value) {
@@ -983,7 +983,7 @@ class DrawTools extends React.Component {
               key={opt.value}
               icon={opt.icon}
               title={i18next.t(opt.title, opt.defaultTitle)}
-              className={opt.value !== "clear" ? "p-button-info tool" : "p-button-danger tool"}
+              severity={opt.value !== "clear" ? "info" : "danger"} className="tool"
               onClick={(e) => {
                 switch (opt.value) {
                   case 'undo': this.clickUndo(e); break;
@@ -1010,7 +1010,7 @@ class DrawTools extends React.Component {
               <Button
                 onClick={e => this.removeFeature()}
                 icon="pi pi-trash"
-                className="p-button-danger"
+                severity="danger"
                 title="Apagar desenho"
               />
             </div>
@@ -1076,7 +1076,8 @@ class DrawTools extends React.Component {
                 icon={opt.icon}
                 label={opt.title}
                 title={opt.tooltip}
-                className="p-button-outlined p-button-sm p-button-info format-tool"
+                outlined size="small" severity="info"
+                className="format-tool"
                 onClick={(e) => this.download(opt.value)}
               />
             )
@@ -1114,13 +1115,13 @@ class DrawTools extends React.Component {
                 <React.Fragment>
                   <Button
                     icon="pi pi-search"
-                    className="p-mr-2"
+                    className="mr-2"
                     onClick={() => this.zoom(row)}
                     title={i18next.t("locate", "Localizar")}
                   />
                   <Button
                     icon="pi pi-trash"
-                    className="p-button-danger"
+                    severity="danger"
                     onClick={() => this.deleteItem(row)}
                     title={i18next.t("delete", "Eliminar")}
                   />

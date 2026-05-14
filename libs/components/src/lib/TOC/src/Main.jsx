@@ -391,20 +391,20 @@ class Main extends React.Component {
           { (!!logged?.token && !!config.viewer.allow_user_session) && 
             <Toolbar className="mb-2"
               start={(config.viewer.is_session && 
-                <Button label={this.props.t("session", "Sessão")} className="p-button-sm p-button-rounded p-button-info" 
+                <Button label={this.props.t("session", "Sessão")} size="small" rounded severity="info"
                   icon="pi pi-check" title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}  />)} 
               end={ 
               <React.Fragment>
                 {(config.viewer.session && !config.viewer.is_session) && <Button label={this.props.t("loadSession","Abrir sessão")} 
                   icon="pi pi-folder-open" 
-                  className="p-button-text p-button-sm"
+                  text size="small"
                   onClick={e => this.loadSession()}
                   disabled={(config.viewer.save_loading)}
                   title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )} />}
                 <Button label={this.props.t("saveSession", "Gravar sessão")}
                   icon={config.viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-save"}
-                  className="p-button-text p-button-sm"
-                  onClick={e => this.saveSession(toastEl)} 
+                  text size="small"
+                  onClick={e => this.saveSession(toastEl)}
                   disabled={(config.viewer.save_loading)} />                                    
               </React.Fragment> } />
           }
@@ -422,7 +422,7 @@ class Main extends React.Component {
                 <Button
                   icon="pi pi-times"
                   label={this.props.t('clear', "Limpar")}
-                  className="p-button-sm mb-2"
+                  size="small" className="mb-2"
                   onClick={this.clearFilter.bind(this)}
                 />
               </div>

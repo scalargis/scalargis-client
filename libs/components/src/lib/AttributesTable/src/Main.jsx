@@ -4,8 +4,8 @@ import { Column } from 'primereact/column'
 import { Button } from 'primereact/button'
 import { Dialog } from 'primereact/dialog';
 
-const paginatorLeft = <Button type="button" icon="pi pi-refresh" className="p-button-text" />;
-const paginatorRight = <Button type="button" icon="pi pi-cloud" className="p-button-text" />;
+const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
+const paginatorRight = <Button type="button" icon="pi pi-cloud" text />;
 
 export default function Main({ open, as, onOpen, onClose, data, fields }) {
 
@@ -13,7 +13,8 @@ export default function Main({ open, as, onOpen, onClose, data, fields }) {
     <Button icon="pi pi-table"
       title="Tabela de atributos"
       color="blue"
-      className="p-button-sm p-button-rounded p-button-text tool"
+      size="small" rounded text
+      className="tool"
       onClick={e => onOpen(true)}
     />
   )

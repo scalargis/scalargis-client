@@ -115,7 +115,8 @@ export default function Main({ type, region, as, core, config, actions, record, 
     return <Button
       title={title}
       icon="pi pi-print"
-      className="p-button-rounded p-button-raised"
+      rounded
+      className="p-button-raised"
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));

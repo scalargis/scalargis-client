@@ -439,7 +439,8 @@ export default function PrintPanel2(props) {
           icon={opt.icon}
           label={opt.label ? opt.label : ''}
           title={t(opt.title, opt.defaultTitle)}
-          className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "")}
+          size="small"
+          className={"mr-1 tool" + (opt.value === drawTool ? " active" : "")}
           onClick={(e) => selectDrawTool(e, opt.value)}
         />
       )}
@@ -451,13 +452,15 @@ export default function PrintPanel2(props) {
         <Button 
           icon="pi pi-trash"
           title={t("deleteSelectedElment", "Eliminar elemento selecionado")}
-          className="p-button-sm mr-1 tool"
+          size="small"
+          className="mr-1 tool"
           onClick={(e) => deletedSelectedFeature() }
         />
         <Button 
           icon="fas fa-search-plus"
           title={t("viewAllElements", "Ver todos os elementos")}
-          className="p-button-sm mr-1 tool"
+          size="small"
+          className="mr-1 tool"
           onClick={(e) => zoomFeaturesExtent() }
         />        
     </React.Fragment>
@@ -534,7 +537,7 @@ export default function PrintPanel2(props) {
             <Button
                 label={t("back", "Voltar")}
                 icon="pi pi-chevron-left"
-                className="p-button-sm"
+                size="small"
                 onClick={e => { goPanelPrintPrev(); }}
             />
             }
@@ -543,7 +546,7 @@ export default function PrintPanel2(props) {
             <Button
                 label={t("continue", "Continuar")}
                 icon={isLoading ? "pi pi-spin pi-spinner": ""}
-                className="p-button-sm"
+                size="small"
                 onClick={e => { goPanelPrintNext(); }}
                 disabled={isLoading} 
             />

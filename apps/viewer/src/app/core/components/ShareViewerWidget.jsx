@@ -197,7 +197,8 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
                     <Button
                         style={{marginLeft:"0px", color: "#2196F"}} 
                         icon="pi pi-copy"
-                        className="p-button p-component p-button-rounded p-button-outlined p-button-help p-button-icon-only"
+                        rounded outlined severity="help"
+                        className="p-button p-component p-button-icon-only"
                         onClick={(e) => { e.preventDefault(); e.currentTarget.blur(); copyToClipboard(getViewerPublicUrl(viewer.save_response.uuid)) }}
                         title={t("copyUrl", "Copiar Url")} tooltipOptions={{position: 'top'}}
                     />

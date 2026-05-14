@@ -264,8 +264,9 @@ export default function Main({ core, config, record }) {
             <div className="col-8">
               { linkDownload &&
                 <Button
-                  className="p-button-sm mr-2 mb-2"
-                  icon={(isDownloading && downloadFormat=='link') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"} 
+                  size="small"
+                  className="mr-2 mb-2"
+                  icon={(isDownloading && downloadFormat=='link') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"}
                   label={linkDownload.label || t("open", "Abrir")}
                   onClick={e => downloadLink(linkDownload.filename, linkDownload.url)}
                   disabled={isDownloading}
@@ -273,8 +274,9 @@ export default function Main({ core, config, record }) {
               }
               { externalDownload &&
                 <Button
-                  className="p-button-sm mr-2 mb-2"
-                  icon={(isDownloading && downloadFormat=='external') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"} 
+                  size="small"
+                  className="mr-2 mb-2"
+                  icon={(isDownloading && downloadFormat=='external') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"}
                   label={externalDownload.label || t("open", "Abrir")}
                   onClick={e => window.open(externalDownload.url, "_blank")}
                   disabled={isDownloading}
@@ -283,16 +285,18 @@ export default function Main({ core, config, record }) {
               { datasourceDownload ?
                 exportFormats.map(opt =>
                   <Button
-                      className="p-button-sm mr-2 mb-2"
-                      icon={(isDownloading && downloadFormat==opt.value) ? "pi pi-spin pi-spinner" : "pi pi-file pi"} 
+                      size="small"
+                      className="mr-2 mb-2"
+                      icon={(isDownloading && downloadFormat==opt.value) ? "pi pi-spin pi-spinner" : "pi pi-file pi"}
                       label={opt.title}
                       onClick={e => downloadDatasource(layer, opt.outputFormat)}
                       disabled={isDownloading}
                   />) 
                 : exportFormats.map(opt =>
                 <Button
-                    className="p-button-sm mr-2 mb-2"
-                    icon={(isDownloading && downloadFormat==opt.value) ? "pi pi-spin pi-spinner" : "pi pi-file pi"} 
+                    size="small"
+                    className="mr-2 mb-2"
+                    icon={(isDownloading && downloadFormat==opt.value) ? "pi pi-spin pi-spinner" : "pi pi-file pi"}
                     label={opt.title}
                     onClick={e => downloadTheme(layer, opt.value)}
                     disabled={isDownloading}

@@ -33,7 +33,8 @@ export default function Basemaps({ core, viewer, mainMap, config, actions, recor
     <div className="basemaps map-controls">
       <Button 
         icon="pi pi-image"
-        className={opened ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised" } 
+        rounded
+        className={opened ? "p-button-raised active" : "p-button-raised" }
         onClick={(e) => { e.currentTarget.blur(); setOpened(!opened) } } 
       />
       <div className={`basemaps-control${record?.config_json?.vertical === true ? " basemaps-control-vertical": ""}`} style={{ visibility: opened ? "visible": "hidden" }}>

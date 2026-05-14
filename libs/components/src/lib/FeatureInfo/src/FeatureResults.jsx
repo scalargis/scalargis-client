@@ -194,7 +194,7 @@ export default function FeatureResults({ core, config, features, layers, actions
           title={t("clearResults", "Limpar resultados")}
           label={t("clear", "Limpar")}
           icon="pi pi-times"
-          className="p-button-outlined p-button-sm"
+          outlined size="small"
           onClick={e => removeAll()}
         />
         { (showExport && showExportAll && showExportAllFeatures) ?
@@ -202,7 +202,8 @@ export default function FeatureResults({ core, config, features, layers, actions
           title={t("exportResults", "Exportar resultados")}
           label={t("export", "Exportar")}
           icon="pi pi-download"
-          className="p-button-outlined p-button-sm ml-2"
+          outlined size="small"
+          className="ml-2"
           onClick={e => exportAll()}
         /> : null }
       </div>

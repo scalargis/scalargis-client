@@ -673,21 +673,23 @@ export default function Coordinates({ core, config, actions, dispatch, record })
               title={t("clearResults", "Limpar resultados")}
               label={t("clear", "Limpar")}
               icon="pi pi-times"
-              className="p-button-outlined p-button-sm"
+              outlined size="small"
               onClick={e => removeAll()}
             />
             <Button
               title={t("exportResults", "Exportar resultados")}
               label="CSV"
               icon="pi pi-download"
-              className="p-button-outlined p-button-sm ml-2"
+              outlined size="small"
+              className="ml-2"
               onClick={e => exportAll('csv')}
             />
             <Button
               title={t("exportResults", "Exportar resultados")}
               label="GeoJSON"
               icon="pi pi-download"
-              className="p-button-outlined p-button-sm ml-2"
+              outlined size="small"
+              className="ml-2"
               onClick={e => exportAll('geojson')}
             />                       
           </div>         

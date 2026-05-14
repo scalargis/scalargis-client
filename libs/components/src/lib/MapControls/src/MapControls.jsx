@@ -153,7 +153,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         <Button key={type}
           title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
           icon="fas fa-bullseye"
-          className={exclusive_mapcontrol === 'Coordinates' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
+          rounded
+          className={exclusive_mapcontrol === 'Coordinates' ? "p-button-raised active" : "p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}
         /> : null;
     } else if (type === 'FeatureInfo') {
@@ -161,7 +162,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         <Button key={type}
           title={feature_info_control.title || t("identifyElements", "Identificar elementos")}
           icon="pi pi-info-circle"
-          className={exclusive_mapcontrol === 'FeatureInfo' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
+          rounded
+          className={exclusive_mapcontrol === 'FeatureInfo' ? "p-button-raised active" : "p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleFeatureInfoControl() }}
         /> : null;
     } else if (type === 'GeoLocation') {
@@ -172,7 +174,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
           <Button 
             title={geo_location_control.title || t("myLocation", "A minha localização")}
             icon="pi pi-globe"
-            className={geoLocationActive ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
+            rounded
+            className={geoLocationActive ? "p-button-raised active" : "p-button-raised"}
             onClick={e => { e.currentTarget.blur(); toggleGeoLocationControl() }}
           />
           <div className="btn-geolocation-options" style={!geoLocationActive || !geoLocationSettings ? { display: "none" } : {}}

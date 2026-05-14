@@ -27,7 +27,8 @@ export default function Main(props) {
       <Button icon="pi pi-pencil"
         title={t("personalizarTema", "Personalizar Tema")}
         color="green"
-        className="p-button-sm p-button-rounded p-button-text tool"
+        size="small" rounded text
+        className="tool"
         onClick={e => setModalEditOpen({...layer})}
       />
 

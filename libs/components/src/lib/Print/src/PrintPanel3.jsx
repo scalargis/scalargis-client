@@ -124,14 +124,14 @@ export default function PrintPanel3(props) {
         {(printDetails.allow_selection && (printDetails.children.length + printDetails.prints.length > 1)) ?
           <div className="flex">
             <Button label={t("none", "Nenhuma")}
-              className="p-button-sm p-button-warning p-button-text"
+              size="small" severity="warning" text
               onClick={() => {
                 setSelectedPrints([])
               }}
             />
             <Button label={t("all", "Todas")}
               style={{ float: 'right' }}
-              className="p-button-sm p-button-warning p-button-text"
+              size="small" severity="warning" text
               onClick={() => {
                 getAllPrints()
               }}
@@ -146,7 +146,7 @@ export default function PrintPanel3(props) {
             <Button
               label={t("back", "Voltar")}
               icon="pi pi-chevron-left"
-              className="p-button-sm"
+              size="small"
               onClick={e => { goPanelPrintPrev(); }}
             />
           </div>
@@ -154,7 +154,7 @@ export default function PrintPanel3(props) {
             <Button
               label={t("continue", "Continuar")}
               icon={isLoading ? "pi pi-spin pi-spinner" : ""}
-              className="p-button-sm"
+              size="small"
               onClick={e => { goPanelPrintNext(); }}
               disabled={isLoading || selectedPrints.length === 0}
             />

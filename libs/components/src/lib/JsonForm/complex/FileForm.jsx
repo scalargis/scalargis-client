@@ -68,7 +68,7 @@ export default function FileForm(props) {
               label={labels.close}
               icon="pi pi-times"
               disabled={isSaving ? true : false}
-              onClick={() => close()} className="p-button-text" />
+              onClick={() => close()} text />
             <Button 
               label={labels.save}
               icon={isSaving ? "pi pi-check pi-spinner" : "pi pi-check" }

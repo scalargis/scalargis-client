@@ -91,7 +91,8 @@ export default function Main(props) {
     return <Button
       title={title}
       icon="fas fa-ruler"
-      className={ classname ? "p-button-rounded p-button-raised " + classname : "p-button-rounded p-button-raised" }
+      rounded
+      className={classname ? "p-button-raised " + classname : "p-button-raised"}
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));

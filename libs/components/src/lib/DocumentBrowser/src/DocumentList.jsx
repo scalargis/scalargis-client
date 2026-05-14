@@ -148,13 +148,13 @@ export default function DocumentList({ core, documentList }) {
       </div>}
       {documentList?.showExpandButtons && <div className="col-12">
         <div className="p-buttonset" style={{"display": "inline-flex"}}>
-          <Button label={translatedText.expand} icon="pi pi-plus-circle" className="p-button-outlined p-button-sm"
+          <Button label={translatedText.expand} icon="pi pi-plus-circle" outlined size="small"
             onClick={() => {
               const _expandedKeys = {};
               allKeys.forEach(v => _expandedKeys[v] = true);
               setExpandedKeys(_expandedKeys);    
             }} />
-          <Button label={translatedText.collapse} icon="pi pi-minus-circle" className="p-button-outlined p-button-sm"
+          <Button label={translatedText.collapse} icon="pi pi-minus-circle" outlined size="small"
             onClick={() => {
               setExpandedKeys({});
             }}

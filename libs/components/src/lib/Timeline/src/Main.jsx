@@ -162,7 +162,7 @@ export default function Main(props) {
 
       <Button
           style={{ width: '100%' }}
-          className="p-button-warning"
+          severity="warning"
           label={theme?.title || title}
           iconPos="right"
           icon={opened ? "pi pi-angle-up" : "pi pi-angle-down"}

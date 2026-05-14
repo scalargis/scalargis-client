@@ -44,7 +44,8 @@ export default function Main(props) {
       <Button icon="pi pi-table"
         title="Tabela de atributos"
         color="blue"
-        className="p-button-sm p-button-rounded p-button-text tool"
+        size="small" rounded text
+        className="tool"
         onClick={e => {
           dispatch(actions.searchlayers_set_layer(target, layer));
           dispatch(actions.viewer_set_selectedmenu(target));

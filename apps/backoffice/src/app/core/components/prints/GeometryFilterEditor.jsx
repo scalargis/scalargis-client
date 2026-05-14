@@ -231,7 +231,7 @@ const GeometryFilterEditor = props => {
             <Button 
               label="Fechar"
               icon="pi pi-times"
-              onClick={onHide} className="p-button-text" />
+              onClick={onHide} text />
             <Button 
               label="Gravar"
               icon={"pi pi-check"}
@@ -259,12 +259,12 @@ const GeometryFilterEditor = props => {
         <div class="flex align-items-center justify-content-center m-2"></div>
         <div class="flex align-items-center justify-content-center m-2">
           { data.geometryWKT &&      
-          <Button type="text" label="Remover" icon="pi pi-trash" className="p-button-danger p-button-outlined"
+          <Button type="text" label="Remover" icon="pi pi-trash" severity="danger" outlined
            onClick={(e)=> {e.preventDefault(); onRemove();}} />
           }
         </div>
         <div class="flex align-items-center justify-content-center m-2">
-          <Button type="text" label="Editar" icon="pi pi-times" className="p-button-outlined"
+          <Button type="text" label="Editar" icon="pi pi-times" outlined
             onClick={(e)=> {e.preventDefault(); setShowForm(true)}} /> 
         </div>
       </div>

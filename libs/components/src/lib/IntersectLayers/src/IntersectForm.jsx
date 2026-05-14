@@ -465,7 +465,7 @@ export default function IntersectForm(props) {
           icon={opt.icon}
           label={opt.label ? opt.label : ''}
           title={t(opt.title, opt.defaultTitle)}
-          className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "")}
+          size="small" className={"mr-1 tool" + (opt.value === drawTool ? " active" : "")}
           onClick={(e) => selectDrawTool(e, opt.value)}
         />
       )}
@@ -525,7 +525,7 @@ export default function IntersectForm(props) {
 
       <div className="grid mt-2">
         <div className="col text-center">
-          <Button label={t("clear", "Limpar")} className="p-button-secondary" onClick={(e) => clearAll([])} />
+          <Button label={t("clear", "Limpar")} severity="secondary" onClick={(e) => clearAll([])} />
         </div>
         <div className="col text-center">
           <Button label={t("execute", "Executar")} className="p-button-primary" onClick={(e) => doSearch({"buffer": buffer })} />

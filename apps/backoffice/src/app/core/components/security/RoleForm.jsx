@@ -102,8 +102,8 @@ function RoleForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary mr-4"
-              disabled={isSaving ? true : false} 
+              severity="secondary" className="mr-4"
+              disabled={isSaving ? true : false}
               onClick={goBack} />
             <Button
               type="submit" 

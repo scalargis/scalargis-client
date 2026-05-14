@@ -191,8 +191,8 @@ function PrintElementList(props) {
   const leftToolbarTemplate = () => {
     return (
         <React.Fragment>
-            <Button label="Novo" icon="pi pi-plus" className="p-button-success mr-2" onClick={newRecord} />
-            <Button label="Eliminar" icon="pi pi-trash" className="p-button-danger" onClick={deleteSelectedRecords} disabled={!selectedRecords || !selectedRecords.length} />
+            <Button label="Novo" icon="pi pi-plus" severity="success" className="mr-2" onClick={newRecord} />
+            <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={deleteSelectedRecords} disabled={!selectedRecords || !selectedRecords.length} />
         </React.Fragment>
     )
   }
@@ -200,8 +200,8 @@ function PrintElementList(props) {
   const rightToolbarTemplate = () => {
       return (
           <React.Fragment>              
-              <Button label="Limpar" icon="pi pi-times" className="p-button-help mr-2" onClick={onFilterClear} />
-              {/*<Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />*/}
+              <Button label="Limpar" icon="pi pi-times" severity="help" className="mr-2" onClick={onFilterClear} />
+              {/*<Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />*/}
           </React.Fragment>
       )
   }
@@ -209,8 +209,8 @@ function PrintElementList(props) {
   const actionBodyTemplate = (rowData) => {
     return (
         <div style={{textAlign: "right"}}>
-            <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editRecord(rowData)} />
-            <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => deleteRecord(rowData)} />
+            <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editRecord(rowData)} />
+            <Button icon="pi pi-trash" rounded severity="warning" onClick={() => deleteRecord(rowData)} />
         </div>
     );
   }

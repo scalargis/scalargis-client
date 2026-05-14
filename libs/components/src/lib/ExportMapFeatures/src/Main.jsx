@@ -94,7 +94,7 @@ export default function Main({ config }) {
           <tr>
             <td>Ponto</td>
             <td>
-              <Button className="p-button-sm" onClick={exportCoord} label="Exportar" icon="pi pi-arrow-circle-down" />
+              <Button size="small" onClick={exportCoord} label="Exportar" icon="pi pi-arrow-circle-down" />
             </td>
           </tr>
           ) }
@@ -103,7 +103,7 @@ export default function Main({ config }) {
           <tr>
             <td>Geometria</td>
             <td>
-              <Button className="p-button-sm" onClick={exportSelected} label="Exportar" icon="pi pi-arrow-circle-down" />
+              <Button size="small" onClick={exportSelected} label="Exportar" icon="pi pi-arrow-circle-down" />
             </td>
           </tr>
           )) }

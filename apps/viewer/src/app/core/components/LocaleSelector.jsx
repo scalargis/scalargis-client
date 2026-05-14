@@ -64,7 +64,8 @@ export default function LocaleSelector({ type, core, dispatch,  actions, compone
                   <Button
                     key={item.value}
                     label={item.label}
-                    className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                    text
+                    className={i18n.resolvedLanguage === item.value ? 'locale-selected' : undefined}
                     onClick={(e) => handleChange(item.value)}
                   />
                   {(index < localesList.length - 1) && <span>|</span>}
@@ -81,7 +82,8 @@ export default function LocaleSelector({ type, core, dispatch,  actions, compone
                     <Button
                       key={item.value}
                       label={item.label}
-                      className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                      text
+                      className={i18n.resolvedLanguage === item.value ? 'locale-selected' : undefined}
                       onClick={(e) => {
                         e.preventDefault();
                         handleChange(item.value);

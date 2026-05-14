@@ -107,7 +107,7 @@ export const ArrayFileControlRenderer = (props) => {
                           <div className="file-description" style={{"fontSize": "0.9rem","color": "#b7bdbb"}}>{(item?.description)}</div>
                         </td>
                         <td className="col-1" style={{"verticalAlign": "middle", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined mb-2"
+                          <Button icon="pi pi-pencil" rounded outlined className="mb-2"
                             title={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
@@ -115,7 +115,7 @@ export const ArrayFileControlRenderer = (props) => {
                               setRowIndex(index);
                               setRowData(item);                              
                             }} />                                                                            
-                          <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger"
+                          <Button icon="pi pi-trash" rounded outlined severity="danger"
                             title={translateMsg("common.deleteFile", "deleteFile", "Eliminar ficheiro", i18Props)}
                             onClick={(e) => { 
                               e.preventDefault();
@@ -149,7 +149,7 @@ export const ArrayFileControlRenderer = (props) => {
       </div>
 
       <div className="col-12 text-center">
-        <Button label={translateMsg("addFile", null, "Adicionar Ficheiro", i18Props)} className="p-button-text" style={buttonAddStyle} 
+        <Button label={translateMsg("addFile", null, "Adicionar Ficheiro", i18Props)} text style={buttonAddStyle}
           onClick={(e) => {
             e.preventDefault();
             setShowFileForm(true);

@@ -326,7 +326,7 @@ export default function PrintPanel4(props) {
             <Button
                 label={t("back", "Voltar")}
                 icon="pi pi-chevron-left"
-                className="p-button-sm"
+                size="small"
                 onClick={e => { goPanelPrintPrev(); }}
             />
           </div>

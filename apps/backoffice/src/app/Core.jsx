@@ -141,12 +141,15 @@ Core.prototype.renderMainMenu = function({ selected_menu, props }) {
     if (!PluginComponent) return null;
 
     const className = selected_menu === c.id ?
-    "p-button-rounded p-button-raised p-button-sm" :
-    "p-button-rounded p-button-raised p-button-sm p-button-outlined";
+    "p-button-raised" :
+    "p-button-raised";
 
     return (
       <React.Fragment key={c.id}>
         <PluginComponent
+          rounded
+          size="small"
+          outlined={selected_menu !== c.id}
           className={className}
           record={c}
           config={{ className, ...props, ...c.config_json }}

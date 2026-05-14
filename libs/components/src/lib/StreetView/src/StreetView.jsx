@@ -168,7 +168,8 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
           <Button
             title={title}
             icon="fas fa-street-view"
-            className={exclusive_mapcontrol === 'StreetView' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised" }
+            rounded
+            className={exclusive_mapcontrol === 'StreetView' ? "p-button-raised active" : "p-button-raised"}
             onClick={e => { e.currentTarget.blur(); toggleStreetViewControl() } }
           />
       </div>       

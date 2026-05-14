@@ -366,7 +366,7 @@ export default function ViewerVisitsChart(props) {
 
                 <div className="col-12 text-right">
                     <Button label="Exportar CSV" 
-                        className="p-button-outlined"
+                        outlined
                         icon="pi pi-download"
                         onClick={exportCSV}
                         disabled={!data_values?.length} />

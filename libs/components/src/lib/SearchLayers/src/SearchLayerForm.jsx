@@ -84,7 +84,7 @@ export default function SearchLayerForm(props) {
             <Button
                 label="Voltar"
                 icon="pi pi-chevron-left"
-                className="p-button-sm"
+                size="small"
                 onClick={e => { goPanelSearchPrev(); }}
             />
           </div>

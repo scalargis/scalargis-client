@@ -320,7 +320,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
               className="card layercompare-main-control"
               style={opened ? { opacity: '0', visibility: 'hidden' } : { opacity: '1', visibility: 'visible' }}>
               <Button
-                className="p-button-rounded p-button-warning"
+                rounded severity="warning"
                 label="Layer Compare"
                 iconPos="right"
                 icon="pi pi-angle-down"
@@ -333,7 +333,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
               <Button
                 style={{ width: '100%' }}
-                className="p-button-warning"
+                severity="warning"
                 label="Layer Compare"
                 iconPos="right"
                 icon="pi pi-angle-up"

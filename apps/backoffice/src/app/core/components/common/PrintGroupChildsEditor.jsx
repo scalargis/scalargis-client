@@ -129,7 +129,7 @@ const ListChilds = props => {
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <Button type="text" icon="pi pi-times" 
-                          className="p-button-rounded p-button-text p-button-danger"
+                          rounded text severity="danger"
                           tooltip="Remover"
                           tooltipOptions={{position: 'bottom'}}                            
                           onClick={ (e) => {

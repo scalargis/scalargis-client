@@ -94,7 +94,7 @@ function AccountForm(props) {
         type="button"
         label="Sair"
         icon="pi pi-power-off"
-        className="p-button-danger"
+        severity="danger"
         onClick={e => { e.preventDefault(); dispatch(logout()); }} />
     );
   }
@@ -180,7 +180,7 @@ function AccountForm(props) {
           <div className="p-inputgroup">
               <Button type="button" label="Gerar" icon="pi pi-check" className="p-button-primary" onClick={(e) => {setValue('auth_token', String(uuidV4()));}} disabled={!isEditMode} />
               <InputText id="auth_token" name="auth_token" {...register('auth_token')} placeholder="Token não definido" disabled={!isEditMode} />
-              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => {setValue('auth_token', null); setValue('auth_token_expire', null);}} disabled={!isEditMode} />                
+              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => {setValue('auth_token', null); setValue('auth_token_expire', null);}} disabled={!isEditMode} />
           </div>
         </div>
         <div className="field col-12 md:col-3">
@@ -197,7 +197,7 @@ function AccountForm(props) {
                     disabled={!isEditMode} />
                 }} 
               />                    
-              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => setValue('auth_token_expire', null)} disabled={!isEditMode} />
+              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => setValue('auth_token_expire', null)} disabled={!isEditMode} />
           </div>
         </div>
 
