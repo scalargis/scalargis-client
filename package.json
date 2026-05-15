@@ -19,6 +19,7 @@
     "@jsonforms/vanilla-renderers": "^3.7.0",
     "ace-builds": "^1.43.6",
     "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "chart.js": "^4.5.1",
     "classnames": "^2.5.1",
     "convert": "^7.0.0",

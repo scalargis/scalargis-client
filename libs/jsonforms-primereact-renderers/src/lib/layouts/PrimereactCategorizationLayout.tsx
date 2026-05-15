@@ -90,8 +90,11 @@ export const PrimereactCategorizationLayoutRenderer = (
     t,
   } = props;
   const categorization = uischema as Categorization;
-  const [previousCategorization, setPreviousCategorization] =
-    useState<Categorization>(uischema as Categorization);
+  const categorizationKey = JSON.stringify(categorization?.elements?.map(
+    (e: any) => ({ type: e.type, label: e.label })
+  ));
+  const [previousCategorizationKey, setPreviousCategorizationKey] =
+    useState<string>(categorizationKey);
   const [activeCategory, setActiveCategory] = useState<number>(selected ?? 0);
   const categories = useMemo(
     () =>
@@ -102,9 +105,9 @@ export const PrimereactCategorizationLayoutRenderer = (
     [categorization, data, ajv]
   );
 
-  if (categorization !== previousCategorization) {
+  if (categorizationKey !== previousCategorizationKey) {
     setActiveCategory(0);
-    setPreviousCategorization(categorization);
+    setPreviousCategorizationKey(categorizationKey);
   }
 
   const safeCategory =

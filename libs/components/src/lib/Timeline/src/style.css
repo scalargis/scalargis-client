@@ -1,3 +1,7 @@
+.scalargis-timeline-dropdown .p-dropdown .p-dropdown-label {
+    padding-right: 1.75rem;
+}
+
 .scalargis-timeline.p-inputgroup {
     justify-content: center;
 }

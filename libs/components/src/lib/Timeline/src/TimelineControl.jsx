@@ -444,7 +444,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   return (
     <div style={{padding: "10px 10px"}}>
       { showLegend && <div className="mb-2"><Legend viewer={viewer} data={theme} core={core} actions={actions} models={Models}/></div> }
-      <div className="text-center mb-3">
+      <div className="scalargis-timeline-dropdown text-center mb-3">
         <Dropdown value={currentPos} options={options} filter={options?.length > 20}
           onChange={(e) => { setCurrentPos(e.value) }} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" disabled={!hasTimeData} />
       </div>
