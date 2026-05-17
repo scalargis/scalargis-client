@@ -21,7 +21,7 @@ export function MainMenu({ className, config, actions, record }) {
   const { t } = useTranslation();
 
   const component_cfg = record.config_json || {}; 
-  const title = record.title || t("searchByCoordinates", "Pesquisa por Coordenadas");
+  const title = record.title || t("searchByCoordinates", "Pesquisa de Coordenadas");
 
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
@@ -52,7 +52,7 @@ export default function Main({ as, core, config, actions, record }) {
 
   const { t } = useTranslation();
 
-  const title = record.title || t("searchByCoordinates", "Pesquisa por Coordenadas");
+  const title = record.title || t("searchByCoordinates", "Pesquisa de Coordenadas");
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
