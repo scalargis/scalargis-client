@@ -40,26 +40,23 @@ export default function Main(props) {
     if (!window?.google?.maps) {
       const apiKey = siteConfig?.googleMaps?.apiKey || import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY;
 
-      if (!apiKey) {
-        console.error('Google Maps API key not found in site configuration');
-        return;
+      if (apiKey) {
+        const options = {
+          apiKey,
+          version: "3",
+        };
+
+        const loader = new Loader({
+          ...options,
+          ...siteConfig?.gooleMaps
+        });
+
+        loader
+          .load()
+          .catch(e => {
+            console.log('Error loading Google Maps API', e);
+          });
       }
-
-      const options = {
-        apiKey,
-        version: "3",
-      };
-
-      const loader = new Loader({
-        ...options,
-        ...siteConfig?.gooleMaps
-      });
-
-      loader
-      .load()
-      .catch(e => {
-        console.log('Error loading Google Maps API', e);
-      });
     }
   }, []);
 
@@ -75,13 +72,13 @@ export default function Main(props) {
           record={record}
           utils={utils}
         />
-      </div>  
-    )  
+      </div>
+    )
   }
 
   if (as === 'panel') return (
     <Panel header={header}>
-      { renderContent() }
+      {renderContent()}
     </Panel>
   )
 
