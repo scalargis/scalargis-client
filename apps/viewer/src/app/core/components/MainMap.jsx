@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View } from 'ol'
 import 'ol/ol.css'
 import './mainmap.css'
 import { connect } from 'react-redux'
 import  { addProjections, transformExtent } from '../model/MapModel'
+import actions from '../../../../../../libs/components/src/lib/SearchLayers/src/actions'
 
 function MainMap(props) {
+
   let { olMap, config, viewer, mainMapEl, core, dispatch, auth } = props;
 
   useEffect(() => {
@@ -27,6 +29,11 @@ function MainMap(props) {
     // Load Projections
     if (viewer.config_json.crs_list && Array.isArray(viewer.config_json.crs_list)) {
       addProjections(viewer.config_json.crs_list);
+    }
+
+    dispatch(core.actions.map_add_class('teste'));
+    if (viewer?.config_json?.className) {
+      dispatch(core.actions.map_add_class('teste'));
     }
 
     return () => {

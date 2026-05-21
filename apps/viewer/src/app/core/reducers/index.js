@@ -21,6 +21,8 @@ import {
   MAP_SET_EXTENT,
   MAP_SET_SIZE,
   MAP_SET_CLASS,
+  MAP_ADD_CLASS,
+  MAP_REMOVE_CLASS,
   VIEWER_SET_DISPLAYCRS,
   AUTH_HTTP_ERROR,
   AUTH_CLEAR_ERROR,
@@ -393,7 +395,32 @@ const root = (
           ...state.viewer,
           className: action.className
         }
-      }       
+      }
+
+    // Map set class
+    case MAP_ADD_CLASS: {
+      const newArray = [...new Set([...(state?.viewer?.className || '').split(' '), ... action.className.split(' ')])];
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          className: newArray.filter(c => !!c).join(' ')
+        }
+      }
+    }
+
+    // Map set class
+    case MAP_REMOVE_CLASS: {
+      const newArray = (state?.viewer?.className || '').split(' ');
+      const removeArray = action.className.split(' ');
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          className: newArray.filter(c => !removeArray.includes(c)).filter(c => !!c).join(' ')
+        }
+      }
+    }
     
       // Set checked themes
     case LAYERS_SET_CHECKED:

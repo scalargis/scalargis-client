@@ -48,6 +48,8 @@ export const VIEWER_SET_COORDINATES     = 'VIEWER_SET_COORDINATES'
 export const MAP_SET_EXTENT             = 'MAP_SET_EXTENT'
 export const MAP_SET_SIZE               = 'MAP_SET_SIZE'
 export const MAP_SET_CLASS              = 'MAP_SET_CLASS'
+export const MAP_ADD_CLASS              = 'MAP_ADD_CLASS'
+export const MAP_REMOVE_CLASS           = 'MAP_REMOVE_CLASS'
 
 export const LAYERS_SET_CHECKED         = 'LAYERS_SET_CHECKED'
 export const LAYERS_SET_OPENED          = 'LAYERS_SET_OPENED'
@@ -821,6 +823,22 @@ export function map_set_class(className) {
   return action;
 }
 
+export function map_add_class(className) {
+  let action = {
+    type: MAP_ADD_CLASS,
+    className
+  }
+  return action;
+}
+
+export function map_remove_class(className) {
+  let action = {
+    type: MAP_REMOVE_CLASS,
+    className
+  }
+  return action;
+}
+
 export function layers_set_checked(checked) {
   let action = {
     type: LAYERS_SET_CHECKED,
@@ -1030,7 +1048,6 @@ export function viewer_set_translation_namespaces(ns) {
   }
   return action;
 }
-
 
 export function getThemeLegendUrl(viewer, config, auth) {
 

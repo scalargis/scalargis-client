@@ -413,8 +413,12 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
+
+    const classNameType = c.type ? `sg-type-${c.type.toLowerCase()}` : '';
+    const classNameId = c.id ? `sg-id-${c.id}` : '';
+
     return (
-      <div key={c.id} className={className} style={style ? style(c) : null }>
+      <div key={c.id} className={`${className} ${classNameType} ${classNameId}`} style={style ? style(c) : null }>
         <PluginComponent
           record={c}
           config={{ ...props, ...c.config_json }}
