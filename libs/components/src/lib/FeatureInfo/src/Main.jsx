@@ -34,6 +34,8 @@ export function MainMenu({ className, config, actions, record }) {
 
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
+  if (record?.showMainButton === false) return null;
+
   return (
     <Button
       title={title}
@@ -51,12 +53,12 @@ export function MainMenu({ className, config, actions, record }) {
   )
 }
 
-export default function Main({ as, core, config, actions, record }) {
+export default function Main({type, region, as, core, config, actions, record, utils}) {
 
   const { viewer, dispatch, Models, mainMap } = config;
   //const { publish, subscribe } = core.pubsub ? core.pubsub : {}
   const { featureinfo, exclusive_mapcontrol } = viewer;
-  const { getWindowSize, showOnPortal } = Models.Utils;
+  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;//Models.Utils;
   const { selected_menu, layers } = viewer.config_json;
 
   const component_cfg = record.config_json || {};
@@ -88,7 +90,6 @@ export default function Main({ as, core, config, actions, record }) {
   function renderContent() {
     return (
       <div className="feature-info">
-
         <FeatureResults
           core={core}
           config={config}
@@ -100,10 +101,25 @@ export default function Main({ as, core, config, actions, record }) {
           mainMap={mainMap}
           record={record}
         />
-        
       </div>
     )
-    
+  }
+
+  if (type === 'link' && region === record.links) {
+    return <Button
+      title={title}
+      icon="pi pi-info-circle"
+      className={`p-button-rounded p-button-raised ${exclusive_mapcontrol == MAPCONTROL_NAME ? "active" : ""}`}
+      onClick={e => {
+        if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
+        if (exclusive_mapcontrol !== MAPCONTROL_NAME) {
+          config.dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
+        } else {
+          config.dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+        }
+        dispatch(actions.layout_show_menu(!isMobile));
+      }}
+    />
   }
 
   if (as === 'panel') return (
