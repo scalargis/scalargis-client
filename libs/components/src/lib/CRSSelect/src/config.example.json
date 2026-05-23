@@ -3,6 +3,14 @@
   "type": "CRSSelect", 
   "target": "footer_right", 
   "order": 3,
-  "config_json": { "crs_list": [3763, 4326] },
+  "config_json": {
+    "crs_list": [3763, 4326],
+    "auto_crs_change": false,
+    "valid_extent": true,
+    "invalid_extent_message": {
+      "en": "Outside valid extent",
+      "pt": "Fora da extensão válida"
+    }
+  },
   "children": []
 }
