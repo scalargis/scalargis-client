@@ -1,35 +1,35 @@
 # ScalarGIS Client
 
-Frontend for the ScalarGIS platform. Built as an Nx monorepo with two React applications — a public **Viewer** (map viewer) and an admin **Backoffice** — plus shared libraries and a plugin-based component system.
+Frontend for the ScalarGIS platform. Built as an Nx monorepo with two React applications -- a public **Viewer** (map viewer) and an admin **Backoffice** -- plus shared libraries and a plugin-based component system.
 
-## Tech Stack
+## Two-Repo Setup
 
-| Category | Key Packages |
-| --- | --- |
-| Framework | React 19, React Router 7, Redux 5 |
-| UI | PrimeReact 10, PrimeFlex 4, PrimeIcons 7, Font Awesome 7 |
-| Mapping / GIS | OpenLayers 10, proj4, GeoTIFF 3, Google Maps JS API Loader 2 |
-| Forms | JSON Forms 3.7, React Hook Form 7, AJV 8 |
-| i18n | i18next 26, react-i18next 17 |
-| Editors | Ace Editor 14, Chart.js 4, Quill 2 |
-| Build | Nx 22, Vite 7, TypeScript 5.9, SWC |
-| Test | Vitest 4, Cypress 15, Testing Library |
-| Lint / Format | ESLint 9, Prettier 3 |
+ScalarGIS is split into two repositories that work together:
+
+| Repo | Role | README |
+| --- | --- | --- |
+| **scalargis-server** | Python backend -- API, database, serves production builds | [scalargis-server README](../scalargis-server/README.md) |
+| **scalargis-client** (this repo) | React frontend -- viewer and backoffice apps | You are here |
+
+**Setup order:** Install and run the server first (see the server README), then come back here to set up the client. The frontend dev server proxies all API calls to the backend, so **the server must be running before the client dev server can work**.
 
 ## Prerequisites
 
-- **Node.js 24** (currently used: v24.11.0). Vite 7 requires `^20.19.0 || >=22.12.0`.
-- **npm** (ships with Node).
-- [NVM for Windows](https://github.com/coreybutler/nvm-windows) is recommended to manage Node versions.
-- A running **scalargis-server** instance for API proxying during development (default: `http://localhost:5000`).
+| Requirement | Version | Notes |
+| --- | --- | --- |
+| **Node.js** | 20.11+ or 22.12+ or 24+ | Vite 7 requires `^20.19.0 \|\| >=22.12.0` |
+| **npm** | (ships with Node) | |
+| **scalargis-server** | running locally | Default: `http://localhost:5000` |
 
-### Setting up Node with NVM (Windows)
+### Installing Node with NVM (recommended)
+
+[NVM for Windows](https://github.com/coreybutler/nvm-windows) lets you switch between Node versions easily:
 
 ```powershell
-# Install a Node version
+# Install a version
 nvm install 24
 
-# Use it
+# Activate it
 nvm use 24
 
 # Verify
@@ -37,29 +37,161 @@ node --version
 npm --version
 ```
 
-## Getting Started
+## Setup
+
+### 1. Clone the repository
 
 ```powershell
-# Install dependencies
-npm install
+git clone <scalargis-client-repo-url> scalargis-client
+cd scalargis-client
+```
 
-# Start the viewer dev server (http://localhost:4200)
+> The client repository is hosted on GitLab. Contact the project maintainers for access.
+
+### 2. Install dependencies
+
+```powershell
+npm install
+```
+
+### 3. Start the backend
+
+Make sure the scalargis-server is running on `http://localhost:5000` (see the [server README](../scalargis-server/README.md)).
+
+### 4. Start the dev server
+
+```powershell
+# Viewer (http://localhost:4200)
 npx nx serve viewer
 
-# Start the backoffice dev server (http://localhost:4201)
+# Backoffice (http://localhost:4201)
 npx nx serve backoffice
 ```
 
-The dev server proxies API requests (`/api`, `/proxy`, `/spatial_toolbox`) to the backend at `http://localhost:5000` by default. Override this with the `VITE_APP_HOST_DEV` environment variable:
+The dev server proxies `/api`, `/proxy`, and `/spatial_toolbox` requests to the backend automatically.
+
+### Verify it works
+
+| URL | Description |
+| --- | --- |
+| http://localhost:4200 | Viewer dev server (hot-reload) |
+| http://localhost:4201 | Backoffice dev server (hot-reload) |
+
+> The viewer shows the same content as `http://localhost:5000/mapa/demo` but with hot-reload. The backoffice proxies to the same backend as `http://localhost:5000/backoffice`.
+
+## Build & Deploy to Server
+
+Build the frontend and copy the output directly into the scalargis-server's static folder (for production-style serving without a separate frontend server):
 
 ```powershell
-$env:VITE_APP_HOST_DEV = "http://localhost:5000"
-npx nx serve viewer
+npx nx run viewer:build-deploy-server
+npx nx run backoffice:build-deploy-server
 ```
 
-### Custom Proxy Routes
+Output goes to:
+- `../scalargis-server/scalargis/app/static/viewer/`
+- `../scalargis-server/scalargis/app/static/backoffice/`
 
-Create a `apps/viewer/user.proxy.config.json` file (not committed) to add project-specific proxy routes. This is useful when working with backend extensions that expose their own API paths (e.g., `/snic_cart`).
+After deploying, access the apps directly from the backend:
+- http://localhost:5000/mapa/demo (viewer)
+- http://localhost:5000/backoffice (backoffice)
+
+### Development build (local output only)
+
+```powershell
+npx nx build viewer       # -> dist/apps/viewer
+npx nx build backoffice   # -> dist/apps/backoffice
+```
+
+## Components (Frontend Plugins)
+
+Components extend the viewer and backoffice with custom UI, routes, and state. They live in separate Git repositories and are linked into the apps via **symlinks**.
+
+### Installing components
+
+Clone each component repository into the app's `components/` directory. **Folder names are case-sensitive.**
+
+**Viewer components:**
+
+```powershell
+cd apps/viewer/src/app/components
+
+git clone <authama-component-url> AuthAMA
+git clone <keycloaksso-component-url> KeycloakSSO
+git clone <mapaspt-component-url> MapasPT
+git clone <catalogosnig-component-url> CatalogoSNIG
+```
+
+**Backoffice components** (only components with a `Manager` export):
+
+```powershell
+cd apps/backoffice/src/app/components
+
+git clone <mapaspt-component-url> MapasPT
+```
+
+> Component repositories are hosted on GitLab. Contact the project maintainers for access.
+
+### Using link_module.ps1 (alternative)
+
+Instead of manually cloning into the apps, you can keep component sources in a central `components/` directory and use the `link_module.ps1` script (at the repo root) to create symlinks:
+
+```powershell
+# Run from the repo root
+.\link_module.ps1
+```
+
+The script will scan for target directories and prompt you to select the link type (Components, Themes, or Extensions) and the source folder to link.
+
+> **Windows Developer Mode** must be enabled for symlinks to work without admin privileges. Enable it in **Settings > For developers > Developer Mode**.
+
+### After adding components
+
+Whenever you add a new component or make code changes, rebuild and deploy to the server:
+
+```powershell
+npx nx run viewer:build-deploy-server
+npx nx run backoffice:build-deploy-server
+```
+
+In dev mode (`npx nx serve viewer`), Vite picks up changes automatically via hot-reload.
+
+## Custom Proxy Routes
+
+For extensions that expose their own API paths (e.g., `/snic_cart`, `/mapaspt`), create a `apps/viewer/user.proxy.config.json` file:
+
+```json
+{
+  "/snic_cart": {
+    "target": "{{proxyUrl}}/snic_cart",
+    "changeOrigin": true,
+    "rewriteFrom": "^/snic_cart"
+  },
+  "/mapaspt": {
+    "target": "{{proxyUrl}}/mapaspt",
+    "changeOrigin": true,
+    "rewriteFrom": "^/mapaspt"
+  }
+}
+```
+
+The `{{proxyUrl}}` placeholder resolves to the backend URL (`http://localhost:5000` by default). This file is not committed to Git.
+
+## Environment Variables
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `VITE_APP_HOST_DEV` | `http://localhost:5000` | Backend server URL for dev proxy |
+| `VITE_APP_BASE_URL` | `""` | Base URL prefix for backend proxy |
+| `BASE` | (none) | Vite base path for production builds |
+| `SOURCEMAP` | `false` | Set to `"true"` to enable source maps |
+
+Override the backend URL:
+
+```powershell
+$env:VITE_APP_HOST_DEV = "http://192.168.1.100:5000"
+npx nx serve viewer
+```
 
 ## Project Structure
 
@@ -68,53 +200,21 @@ scalargis-client/
   package.json              Workspace root dependencies
   nx.json                   Nx workspace configuration
   apps/
-    viewer/                 Public-facing map viewer (port 4200)
-      vite.config.ts        Vite config with API proxy and symlink support
-      project.json          Nx project config with build-deploy-server target
+    viewer/                 Public map viewer (port 4200)
+      vite.config.ts        Vite config with proxy and symlink support
+      project.json          Nx targets (build-deploy-server, etc.)
+      user.proxy.config.json  Custom proxy routes (not committed)
       src/app/
-        app.jsx             Startup — loads custom components via SITE_CONFIG
-        Core.jsx            Viewer shell — mounts per-viewer config_json.components[]
+        app.jsx             Startup - loads SITE_CONFIG.customComponents
+        Core.jsx            Viewer shell - mounts config_json.components[]
         components/         Symlinks to component sources
     backoffice/             Admin application (port 4201)
       src/app/
         components/         Symlinks to component sources (subset)
-    viewer-e2e/             Cypress E2E tests for viewer
-    backoffice-e2e/         Cypress E2E tests for backoffice
   libs/
     components/             Shared component library
-    jsonforms-primereact-renderers/   Custom JSON Forms renderers for PrimeReact
+    jsonforms-primereact-renderers/   Custom JSON Forms renderers
 ```
-
-## Build
-
-### Development Build
-
-```powershell
-npx nx build viewer
-npx nx build backoffice
-```
-
-Output goes to `dist/apps/viewer` and `dist/apps/backoffice`.
-
-### Deploy to Server
-
-Builds the apps and copies the output directly into the scalargis-server static folder, ready for production serving:
-
-```powershell
-npx nx run viewer:build-deploy-server
-npx nx run backoffice:build-deploy-server
-```
-
-Output goes to `../scalargis-server/scalargis/app/static/viewer` and `.../backoffice`.
-
-### Environment Variables
-
-| Variable | Default | Description |
-| --- | --- |--- |
-| `VITE_APP_HOST_DEV` | `http://localhost:5000` | Backend server URL for dev proxy |
-| `VITE_APP_BASE_URL` | `""` | Base URL prefix for backend proxy |
-| `BASE` | (none) | Vite base path for production builds |
-| `SOURCEMAP` | `false` | Set to `"true"` to enable source maps in builds |
 
 ## Testing & Quality
 
@@ -128,99 +228,43 @@ npx nx run-many -t lint
 # Unit tests
 npx nx run-many -t test
 
-# E2E tests
-npx nx run-many -t e2e
-
-# Run all checks
+# All checks
 npx nx run-many -t typecheck,lint,test
 ```
 
-## Components (Frontend Plugins)
+## Tech Stack
 
-Components are the plugin system for extending the viewer and backoffice. Each component is a self-contained module that can provide UI elements, routes, Redux state, translations, and more.
-
-### How Components Work
-
-Components live outside this repository as **git submodules** (or separate repos). They are made available to the apps via **symlinks** in each app's `components/` directory. Vite's `resolve.preserveSymlinks: true` setting ensures these resolve correctly during development and builds.
-
-There are two registration paths for a component:
-
-1. **Viewer record** (`config_json.components[]`) — the component's `default` export is mounted at a target slot (topbar, main menu, widget). Handled by `Core.jsx`.
-2. **Site config** (`SITE_CONFIG.customComponents[]`) — the component is dynamically imported and its `getPageRoutes()` function registers React Router routes. Handled by `app.jsx`.
-
-A component that uses both paths must appear in both arrays.
-
-### Component Export Contract
-
-All exports are optional. A component's `src/Main.jsx` (or `.tsx`) can export:
-
-| Export | Purpose |
+| Category | Key Packages |
 | --- | --- |
-| `default` | React component rendered in viewer slots |
-| `actions` | Redux action creators |
-| `reducers` | Redux reducers to register |
-| `translations` | i18next translation resources |
-| `widgets` | Widget definitions |
-| `MainMenu` | Main menu entry component |
-| `Manager` | Backoffice management panel |
-| `getPageRoutes` | Function returning React Router route definitions |
+| Framework | React 19, React Router 7, Redux 5 |
+| UI | PrimeReact 10, PrimeFlex 4, PrimeIcons 7, Font Awesome 7 |
+| Mapping | OpenLayers 10, proj4, GeoTIFF 3 |
+| Build | Nx 22, Vite 7, TypeScript 5.9, SWC |
+| Test | Vitest 4, Cypress 15, Testing Library |
 
-### Adding a New Component
-
-1. **Create the component** — write `src/Main.jsx` in a new directory (e.g., `MyComponent/src/Main.jsx`).
-2. **Create symlinks** — symlink the component directory into the app's `components/` folder:
-   ```powershell
-   # For viewer
-   New-Item -ItemType SymbolicLink `
-     -Path "apps\viewer\src\app\components\MyComponent" `
-     -Target "..\..\..\..\..\..\..\components\MyComponent"
-
-   # For backoffice (if the component has a Manager export)
-   New-Item -ItemType SymbolicLink `
-     -Path "apps\backoffice\src\app\components\MyComponent" `
-     -Target "..\..\..\..\..\..\..\components\MyComponent"
-   ```
-3. **Register in viewer DB record** — add to the viewer's `config_json.components[]` if it renders in-viewer.
-4. **Register in site config** — add the folder name to `SITE_CONFIG.customComponents[]` if it exports `getPageRoutes`.
-5. **Create backend extension** (if needed) — add a matching extension in the scalargis-server.
-
-### Obtaining Components and Extensions
-
-Components and backend extensions are maintained in separate Git repositories. Contact the project maintainers to obtain access to the relevant GitLab/GitHub repositories for:
-
-- **Frontend components** (e.g., AuthAMA, KeycloakSSO, MapasPT, CatalogoSNIG)
-- **Backend extensions** (e.g., authama, keycloaksso, mapaspt)
-
-Component folder names are **case-sensitive** (e.g., `AuthAMA`, `KeycloakSSO`, `MapasPT`).
-
-## Vite Configuration Notes
-
-- `resolve.preserveSymlinks: true` — required for component symlinks to resolve correctly.
-- Browser polyfills for `stream`, `timers`, and `util` are aliased in `resolve.alias` (needed by the xml2js transitive dependency chain).
-- The `user.proxy.config.json` file allows adding custom proxy routes without modifying `vite.config.ts`.
-
-## Working with the Monorepo
-
-### Useful Nx Commands
+## Useful Nx Commands
 
 ```powershell
-# Visualize the project graph
-npx nx graph
-
-# See all targets for a project
-npx nx show project viewer
-
-# List installed Nx plugins
-npx nx list
-
-# Run a specific target for a specific project
-npx nx run viewer:build
+npx nx graph                      # Visualize the project graph
+npx nx show project viewer        # See all targets for a project
+npx nx list                       # List installed Nx plugins
 ```
 
-### Submodule Notes
+## Quick Start (TL;DR)
 
-The `components/` directories in the apps contain **symlinks** pointing to git submodules in the parent repository. When working with submodules:
+```powershell
+# Prerequisites: Node 24+, scalargis-server running on :5000
 
-- Run `git` commands **inside the submodule directory**, not from the parent repo.
-- `git checkout -- components/SomeComponent` from the parent does nothing to the submodule's working tree.
-- Untracked files inside a submodule need explicit removal (`Remove-Item` / `git clean`).
+# Clone & install
+git clone <scalargis-client-repo-url> scalargis-client
+cd scalargis-client
+npm install
+
+# Dev server
+npx nx serve viewer       # http://localhost:4200
+npx nx serve backoffice   # http://localhost:4201
+
+# Build & deploy to server
+npx nx run viewer:build-deploy-server
+npx nx run backoffice:build-deploy-server
+```
