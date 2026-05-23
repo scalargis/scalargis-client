@@ -45,24 +45,21 @@ export default function Main(props) {
 
     const apiKey = siteConfig?.googleMaps?.apiKey || import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY;
 
-    if (!apiKey) {
-      console.error('Google Maps API key not found in site configuration');
-      return;
+    if (apiKey) {
+      setOptions({
+        key: apiKey,
+        v: "3",
+        ...siteConfig?.googleMaps
+      });
+
+      importLibrary('streetView')
+        .then(() => {
+          setApiLoaded(true);
+        })
+        .catch(e => {
+          console.log('Error loading Google Maps API', e);
+        });
     }
-
-    setOptions({
-      key: apiKey,
-      v: "3",
-      ...siteConfig?.googleMaps
-    });
-
-    importLibrary('streetView')
-    .then(() => {
-      setApiLoaded(true);
-    })
-    .catch(e => {
-      console.log('Error loading Google Maps API', e);
-    });
   }, []);
 
   function renderContent() {
@@ -77,13 +74,13 @@ export default function Main(props) {
           record={record}
           utils={utils}
         />
-      </div>  
-    )  
+      </div>
+    )
   }
 
   if (as === 'panel') return (
     <Panel header={header}>
-      { renderContent() }
+      {renderContent()}
     </Panel>
   )
 
