@@ -1,7 +1,7 @@
 import React from 'react'
 import LegendArcGIS from './LegendArcGIS';
 
-export default function Legend({ viewer, data, core, actions, models }) {
+export default function Legend({ viewer, tocConfig, data, core, actions, models }) {
 
   const type = data.legend_type || 'image';
   const label = data.legend_label || 'Legenda';
@@ -27,6 +27,14 @@ export default function Legend({ viewer, data, core, actions, models }) {
     </div>
   );
 
+  console.log(tocConfig);
+
+  if (tocConfig?.open_legend_image === false) return (
+    <div className="legend-container">
+        <img src={actions.getThemeLegendUrl(viewer, data, auth)} alt='' />
+    </div>
+  );
+
   // Render legend image
   return (
     <div className="legend-container">
@@ -36,5 +44,5 @@ export default function Legend({ viewer, data, core, actions, models }) {
         <img src={actions.getThemeLegendUrl(viewer, data, auth)} alt='' />
       </a>
     </div>
-  )
+  );
 }
