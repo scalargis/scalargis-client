@@ -5,6 +5,8 @@ import { transform } from 'ol/proj';
 import MousePosition from 'ol/control/MousePosition';
 import { createStringXY } from 'ol/coordinate';
 
+import { i18n } from '../../components';
+
 import './index.css';
 
 
@@ -16,7 +18,7 @@ function parseExtent(extent) {
 function isCoordInExtent(coords, proj_coords, extent) {
   if (!coords) return false;
   const wgsCoords = transform(coords, proj_coords, 'EPSG:4326');
-  return containsCoordinate(parseExtent(extent), wgsCoords) === false
+  return containsCoordinate(parseExtent(extent), wgsCoords);
 }
 
 export default function Main({ core, config, actions, record }) {
@@ -26,7 +28,12 @@ export default function Main({ core, config, actions, record }) {
   
   const [listCRS, setListCRS] = useState(viewer.config_json.crs_list || []);
 
-  const cursorRef = useRef()
+  const t = i18n.translateValue;
+
+  const mousePositionControlRef = useRef();
+  const cursorRef = useRef();
+
+  const invalid_extent_message = t(record?.config_json?.invalid_extent_message) || '';
 
   const handleChange = (event) => {
     dispatch(viewer_set_displaycrs(event.value));
@@ -63,13 +70,33 @@ export default function Main({ core, config, actions, record }) {
       }
     }
 
+    if (mousePositionControlRef.current) {
+      mainMap.removeControl(mousePositionControlRef.current);
+    }
+    
     const mousePosition = new MousePosition({
       target:  cursorRef.current,
-      coordinateFormat: createStringXY(precision),
+      coordinateFormat: function(coordinate) {
+        const proj_code = mainMap.getView().getProjection().getCode();
+        const selected = listCRS.find(v => v.srid === display_crs);
+        const extent = selected?.extent;
+        const precision = String(selected.precision).length-1;
+
+        if (!extent || !record?.config_json?.valid_extent) return createStringXY(precision)(coordinate);
+        
+        const inExtent = isCoordInExtent(coordinate, `EPSG:${display_crs}`, extent);
+        if (inExtent) {
+          return createStringXY(precision)(coordinate);
+        } else {
+          return invalid_extent_message;
+        }
+      },
       className: 'viewer-mouse-position',
       projection: 'EPSG:' + display_crs
     });
     mainMap.addControl(mousePosition);
+
+    mousePositionControlRef.current = mousePosition;
 
     // Cleanup on dismount
     return () => {
@@ -81,10 +108,10 @@ export default function Main({ core, config, actions, record }) {
   useEffect(() => {
     let changeCRS = false;
     const proj_code = mainMap.getView().getProjection().getCode();
-    if (display_crs && center) {
+    if (display_crs && center && record?.config_json?.auto_crs_change !== false) {
       listCRS.map(i => {
-        const disabled = isCoordInExtent(center, proj_code, i.extent)
-        if ((i.srid === display_crs) && disabled) changeCRS = true;
+        const inExtent = isCoordInExtent(center, proj_code, i.extent)
+        if ((i.srid === display_crs) && !inExtent) changeCRS = true;
         return i;
       });
       if (changeCRS) dispatch(viewer_set_displaycrs(4326));
@@ -103,6 +130,7 @@ export default function Main({ core, config, actions, record }) {
   } catch (e) {
     console.log(e);
   }
+
   return (
     <div className="crsselect">
       <div id="cursor_coords" ref={cursorRef}></div>
@@ -113,7 +141,7 @@ export default function Main({ core, config, actions, record }) {
             ...i,
             value: i.srid,
             label: i.label || i.title,
-            disabled: isCoordInExtent(center, proj_code, i.extent)
+            disabled: !isCoordInExtent(center, proj_code, i.extent)
           }
         })} 
         onChange={handleChange} 
