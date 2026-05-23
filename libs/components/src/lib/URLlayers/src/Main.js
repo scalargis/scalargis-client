@@ -54,11 +54,6 @@ export default function Main({ config, actions }) {
     const {MapModel} = Models;
     const  { transformExtent } = MapModel;
 
-
-    console.log(MapModel);
-    console.log(config);
-    console.log(viewer);
-
     useEffect(() => {
         if (!mainMap) return;
         
@@ -71,8 +66,6 @@ export default function Main({ config, actions }) {
             acc[key.toLowerCase()] = obj[key];
             return acc;
         }, {});
-
-        console.log(data);
 
         addLayer(data, dispatch, actions, viewer);
 
