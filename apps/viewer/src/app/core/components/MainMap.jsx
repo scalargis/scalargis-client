@@ -29,6 +29,10 @@ function MainMap(props) {
       addProjections(viewer.config_json.crs_list);
     }
 
+    if (viewer?.config_json?.className) {
+      dispatch(core.actions.map_add_class(viewer.config_json.className));
+    }
+
     return () => {
       olMap.un('moveend', onMoveEnd);
     }

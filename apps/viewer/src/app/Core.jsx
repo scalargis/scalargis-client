@@ -389,14 +389,14 @@ Core.prototype.renderComponentById = function({ id, as = '', props, }) {
 }
 
 Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], props, parent, separator = '', style = null, className = '' }) {
-  
+
   // Validate not empty components registry
   const keys = Object.keys(this.__components);
   if (keys.length === 0) return null;
 
   // From all components
   let { components } = this.config.config_json;
-  
+
   // Filter by parent
   if (parent) components = components.filter(c => parent.children.includes(c.id));
 
@@ -409,8 +409,12 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
+
+    const classNameType = c.type ? `sg-type-${c.type.toLowerCase()}` : '';
+    const classNameId = c.id ? `sg-id-${c.id}` : '';
+
     return (
-      <div key={c.id} className={className} style={style ? style(c) : null }>
+      <div key={c.id} className={`${className} ${classNameType} ${classNameId}`} style={style ? style(c) : null }>
         <PluginComponent
           record={c}
           config={{ ...props, ...c.config_json }}
