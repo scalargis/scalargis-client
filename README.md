@@ -10,7 +10,7 @@ React frontend (Nx monorepo) — public **Viewer** (map viewer, port 4200) and a
 
 | | Version | Notes |
 |---|---|---|
-| Node.js | 20.19+ or 22.12+ | Use [NVM for Windows](https://github.com/coreybutler/nvm-windows): `nvm install 24` then `nvm use 24` |
+| Node.js | 24.x (recommended), 22.12+, or 20.19+ | Use [NVM for Windows](https://github.com/coreybutler/nvm-windows): `nvm install 24` then `nvm use 24` |
 | scalargis-server | running | Default: `http://localhost:5000` |
 
 ---
