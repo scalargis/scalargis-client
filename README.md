@@ -10,7 +10,7 @@ React frontend (Nx monorepo) — public **Viewer** (map viewer, port 4200) and a
 
 | | Version | Notes |
 |---|---|---|
-| Node.js | 20.19+ or 22.12+ | Use [NVM for Windows](https://github.com/coreybutler/nvm-windows): `nvm install 24 && nvm use 24` |
+| Node.js | 20.19+ or 22.12+ | Use [NVM for Windows](https://github.com/coreybutler/nvm-windows): `nvm install 24` then `nvm use 24` |
 | scalargis-server | running | Default: `http://localhost:5000` |
 
 ---
@@ -56,15 +56,13 @@ Components extend the viewer and backoffice with custom UI, routes, and state. C
 
 **Viewer** (`apps/viewer/src/app/components`):
 ```powershell
-git clone <authama-url>     AuthAMA
-git clone <keycloaksso-url> KeycloakSSO
-git clone <mapaspt-url>     MapasPT
-git clone <catalogosnig-url> CatalogoSNIG
+git clone <component-url> ComponentName
+git clone <component-url> AnotherComponent
 ```
 
-**Backoffice** (`apps/backoffice/src/app/components`):
+**Backoffice** (`apps/backoffice/src/app/components`, only components with a `Manager` export):
 ```powershell
-git clone <mapaspt-url> MapasPT
+git clone <component-url> ComponentName
 ```
 
 After adding components, rebuild and redeploy to the server. Component repos are on GitLab — contact maintainers for access.
