@@ -32,6 +32,8 @@
   "heading": "Direção",
   "speed": "Speed",
   "showTotalExtent": "Show full extent",
+  "toggleFullscreen": "Toggle full-screen",
+  "attributions": "Attributions",
   "getCoordinates":"Get coordinates",
   "searchByCoordinates": "Search by Coordinates",
   "searchByCoordinateInfo": "Click on the map to obtain the coordinates or enter their values ​​using the following form.",

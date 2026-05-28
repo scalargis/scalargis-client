@@ -449,10 +449,11 @@ export default function PrintPanel2(props) {
 
   const toolbarRightContents = (
     <React.Fragment>
-        <Button 
+        <Button
           icon="pi pi-trash"
           title={t("deleteSelectedElment", "Eliminar elemento selecionado")}
           size="small"
+          severity="danger"
           className="mr-1 tool"
           onClick={(e) => deletedSelectedFeature() }
         />

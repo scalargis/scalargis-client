@@ -32,6 +32,8 @@
   "heading": "Direction",
   "speed": "Vitesse",
   "showTotalExtent": "Voir toute l'étendue",
+  "toggleFullscreen": "Basculer en plein écran",
+  "attributions": "Attributions",
   "getCoordinates":"Obtenir les coordonnées",
   "searchByCoordinates": "Rechercher par coordonnées",
   "searchByCoordinateInfo": "Cliquez sur la carte pour obtenir les coordonnées ou indiquez leurs valeurs à l'aide du formulaire suivant.",

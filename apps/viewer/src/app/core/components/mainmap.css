@@ -87,6 +87,9 @@
 .ol-attribution.ol-collapsed button {
     padding-bottom: .2rem;
 }
+.ol-attribution.ol-collapsed ul {
+    display: none;
+}
 
 #map .p-button:hover, #map .p-button:focus {
     color: #ffffff;

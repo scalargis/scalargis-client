@@ -1,4 +1,5 @@
 import React, { useState,useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'primereact/button'
 import { Panel } from 'primereact/panel'
 import { Dialog } from 'primereact/dialog'
@@ -16,6 +17,7 @@ export function MainMenu({ className, core, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
+  useTranslation();
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -80,7 +82,8 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   const { viewer, dispatch, Models } = config;
   const { selected_menu } = viewer.config_json;
-  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;  
+  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;
+  useTranslation();
 
   const component_cfg = record.config_json || {};
 

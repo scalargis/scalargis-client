@@ -32,6 +32,8 @@
   "heading": "Dirección",
   "speed": "Velocidad",
   "showTotalExtent": "Ver toda la extensión",
+  "toggleFullscreen": "Activar/desactivar pantalla completa",
+  "attributions": "Atribuciones",
   "getCoordinates":"Obter coordenadas",
   "searchByCoordinates": "Obtener coordenadas",
   "searchByCoordinateInfo": "Haga clic en el mapa para obtener las coordenadas o introduzca sus valores mediante el siguiente formulario.",

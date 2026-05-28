@@ -745,6 +745,7 @@ export default function PrintPanelItem(props) {
         icon="pi pi-trash"
         title={t("deleteElement(s)", "Eliminar elemento(s)")}
         size="small"
+        severity="danger"
         className="mr-1 tool"
         onClick={(e) => deletedSelectedFeature()}
       />
