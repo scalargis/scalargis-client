@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import OLAttribution from 'ol/control/Attribution';
 import VectorLayer from 'ol/layer/Vector'
@@ -11,7 +11,6 @@ export default function Attribution({ config, actions, record }) {
   const {mainMap, viewer} = config;
   const { t, i18n } = useTranslation();
 
-  const [controlLoaded, setControlLoaded] = useState(false);
   const controlRef = useRef(null);
 
   // Add attribution control
@@ -19,9 +18,7 @@ export default function Attribution({ config, actions, record }) {
     let layer;
 
     if (!mainMap) return;
-    if (controlLoaded) return;
-
-    setControlLoaded(true);
+    if (controlRef.current) return;
 
     const mobile = isMobile();
 
@@ -55,6 +52,10 @@ export default function Attribution({ config, actions, record }) {
 
     return () => {
       if (mainMap && layer) mainMap.removeLayer(layer);
+      if (mainMap && controlRef.current) {
+        mainMap.removeControl(controlRef.current);
+        controlRef.current = null;
+      }
     }
 
   }, [mainMap]);

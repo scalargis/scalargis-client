@@ -22,13 +22,16 @@ export function MainMenu({ className, core, config, actions, record }) {
   const [showPopup, setShowPopup] = useState(false);
 
   const component_cfg = record.config_json || {};
-  const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir");
-  const header = component_cfg?.header ? i18n.translateValue(component_cfg.header, component_cfg.header) : title;
+  const headerCfg = component_cfg?.header;
+  const title = headerCfg
+    ? i18n.translateValue(headerCfg, headerCfg)
+    : (record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir"));
+  const header = headerCfg ? i18n.translateValue(headerCfg, headerCfg) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  if (record.as === 'popup') {    
+  if (record.as === 'popup') {
     const closeLabel = component_cfg.closeLabel || i18n.translateValue("close", "Fechar");
     return (
       <React.Fragment>
@@ -87,8 +90,11 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   const component_cfg = record.config_json || {};
 
-  const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir");
-  const header = component_cfg?.header ? i18n.translateValue(component_cfg.header, component_cfg.header) : title;
+  const headerCfg = component_cfg?.header;
+  const title = headerCfg
+    ? i18n.translateValue(headerCfg, headerCfg)
+    : (record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir"));
+  const header = headerCfg ? i18n.translateValue(headerCfg, headerCfg) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
