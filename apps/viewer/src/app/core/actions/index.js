@@ -824,7 +824,7 @@ export function map_set_class(className) {
 }
 
 export function map_add_class(className) {
-  const action = {
+  let action = {
     type: MAP_ADD_CLASS,
     className
   }
@@ -832,7 +832,7 @@ export function map_add_class(className) {
 }
 
 export function map_remove_class(className) {
-  const action = {
+  let action = {
     type: MAP_REMOVE_CLASS,
     className
   }
@@ -1048,7 +1048,6 @@ export function viewer_set_translation_namespaces(ns) {
   }
   return action;
 }
-
 
 export function getThemeLegendUrl(viewer, config, auth) {
 

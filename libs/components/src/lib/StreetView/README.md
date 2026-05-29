@@ -8,4 +8,3 @@ No Google Maps API key required.
     "openNewWindow": true
   }
 }
-```

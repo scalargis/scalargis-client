@@ -58,7 +58,7 @@
     "title": "StreetView",
     "target": "map_controls_top_right",
     "config_json": {
-      "openNewWindow": true,
+    "openNewWindow": true,  
       "header": "Google Street View",
       "show_options": true,
       "tracking": "extent",

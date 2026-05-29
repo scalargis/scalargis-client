@@ -3,7 +3,7 @@
   "type": "CRSSelect", 
   "target": "footer_right", 
   "order": 3,
-  "config_json": {
+  "config_json": { 
     "crs_list": [3763, 4326],
     "auto_crs_change": false,
     "valid_extent": true,

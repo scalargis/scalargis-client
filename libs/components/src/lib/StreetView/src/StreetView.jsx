@@ -137,10 +137,13 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
     const lonlat = transform(e.coordinate, mainMap.getView().getProjection().getCode(), 'EPSG:4326');
 
     if (openNewWindow) {
+      // Open in new window using Google Maps URL scheme, no api key needed
       const url_params = { lat: lonlat[1], lng: lonlat[0], heading: 34, pitch: 10, fov: 80 };
-      const browser_url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${url_params.lat},${url_params.lng}&heading=${url_params.heading}&pitch=${url_params.pitch}&fov=${url_params.fov}`;
+      const browser_url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=
+          ${url_params.lat},${url_params.lng}&heading=${url_params.heading}&pitch=${url_params.pitch}&fov=${url_params.fov}`;
       window.open(browser_url, "_blank", "noopener,noreferrer");
     } else {
+      // Handle opening in portal dialog with embedded StreetView
       if (streetviewLayer?.current) {
         const source = streetviewLayer.current.getSource();
 
@@ -167,7 +170,8 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
       }
     }
   }
-  
+
+  //Exit if google maps script is not loaded, and component is not configured to open in a new window
   if (!(window.google && window.google.maps) && !openNewWindow) return null;
 
   return (
@@ -176,8 +180,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
         <Button
           title={title}
           icon="fas fa-street-view"
-          rounded
-          className={exclusive_mapcontrol === 'StreetView' ? "p-button-raised active" : "p-button-raised"}
+          className={exclusive_mapcontrol === 'StreetView' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleStreetViewControl() }}
         />
       </div>

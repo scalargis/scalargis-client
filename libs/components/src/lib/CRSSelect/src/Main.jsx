@@ -5,7 +5,7 @@ import { transform } from 'ol/proj';
 import MousePosition from 'ol/control/MousePosition';
 import { createStringXY } from 'ol/coordinate';
 
-import { i18n } from '../../components';
+import { i18n } from '@scalargis/components';
 
 import './index.css';
 
@@ -80,7 +80,7 @@ export default function Main({ core, config, actions, record }) {
         const proj_code = mainMap.getView().getProjection().getCode();
         const selected = listCRS.find(v => v.srid === display_crs);
         const extent = selected?.extent;
-        const precision = String(selected.precision).length-1;
+        let precision = String(selected.precision).length-1;
 
         if (!extent || !record?.config_json?.valid_extent) return createStringXY(precision)(coordinate);
         

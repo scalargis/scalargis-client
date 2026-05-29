@@ -27,6 +27,8 @@ export default function Legend({ viewer, tocConfig, data, core, actions, models 
     </div>
   );
 
+  console.log(tocConfig);
+
   if (tocConfig?.open_legend_image === false) return (
     <div className="legend-container">
         <img src={actions.getThemeLegendUrl(viewer, data, auth)} alt='' />

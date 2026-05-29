@@ -58,7 +58,7 @@ export default function Main({type, region, as, core, config, actions, record, u
   const { viewer, dispatch, Models, mainMap } = config;
   //const { publish, subscribe } = core.pubsub ? core.pubsub : {}
   const { featureinfo, exclusive_mapcontrol } = viewer;
-  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;
+  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;//Models.Utils;
   const { selected_menu, layers } = viewer.config_json;
 
   const component_cfg = record.config_json || {};
@@ -109,9 +109,7 @@ export default function Main({type, region, as, core, config, actions, record, u
     return <Button
       title={title}
       icon="pi pi-info-circle"
-      rounded
-      raised
-      className={exclusive_mapcontrol === MAPCONTROL_NAME ? "active" : ""}
+      className={`p-button-rounded p-button-raised ${exclusive_mapcontrol == MAPCONTROL_NAME ? "active" : ""}`}
       onClick={e => {
         if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
         if (exclusive_mapcontrol !== MAPCONTROL_NAME) {

@@ -398,9 +398,9 @@ const root = (
         }
       }
 
-    // Map add class
+    // Map set class
     case MAP_ADD_CLASS: {
-      const newArray = [...new Set([...(state?.viewer?.className || '').split(' '), ...action.className.split(' ')])];
+      const newArray = [...new Set([...(state?.viewer?.className || '').split(' '), ... action.className.split(' ')])];
       return {
         ...state,
         viewer: {
@@ -410,7 +410,7 @@ const root = (
       }
     }
 
-    // Map remove class
+    // Map set class
     case MAP_REMOVE_CLASS: {
       const newArray = (state?.viewer?.className || '').split(' ');
       const removeArray = action.className.split(' ');
@@ -422,7 +422,7 @@ const root = (
         }
       }
     }
-
+    
       // Set checked themes
     case LAYERS_SET_CHECKED: {
       const checked = [ ...action.checked ]
