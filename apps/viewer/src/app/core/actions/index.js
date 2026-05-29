@@ -824,7 +824,7 @@ export function map_set_class(className) {
 }
 
 export function map_add_class(className) {
-  let action = {
+  const action = {
     type: MAP_ADD_CLASS,
     className
   }
@@ -832,7 +832,7 @@ export function map_add_class(className) {
 }
 
 export function map_remove_class(className) {
-  let action = {
+  const action = {
     type: MAP_REMOVE_CLASS,
     className
   }
