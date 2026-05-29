@@ -4,15 +4,10 @@ import 'ol/ol.css'
 import './mainmap.css'
 import { connect } from 'react-redux'
 import  { addProjections, transformExtent } from '../model/MapModel'
-import actions from '../../../../../../libs/components/src/lib/SearchLayers/src/actions'
+
 
 function MainMap(props) {
-<<<<<<< HEAD
   const { olMap, config, viewer, mainMapEl, core, dispatch, auth } = props;
-=======
-
-  let { olMap, config, viewer, mainMapEl, core, dispatch, auth } = props;
->>>>>>> main
 
   useEffect(() => {
     if (!config) return;
