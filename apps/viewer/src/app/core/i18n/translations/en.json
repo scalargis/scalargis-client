@@ -271,7 +271,7 @@
   "passwordLowerRule": "At least a lower case letter",
   "passwordUpperRule": "At least an upper case letter",
   "passwordDigitRule": "At least one digit",
-  "passwordSizeRule": "At least 8 characters",
+  "passwordSizeRule": "At least 12 characters",
   "enterPassword": "Enter password",
   "confirmPassword": "Confirm password",
   "newPassword": "New password",

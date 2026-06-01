@@ -57,7 +57,8 @@ export default function PasswordChange(props) {
                     <li>Pelo menos uma minúscula</li>
                     <li>Pelo menos uma maiúscula</li>
                     <li>Pelo menos um dígito</li>
-                    <li>Pelo menos 8 caracteres"</li>
+                    <li>Pelo menos um caractere especial</li>
+                    <li>Pelo menos 12 caracteres</li>
                 </ul>
             </React.Fragment>
         );
@@ -109,7 +110,7 @@ export default function PasswordChange(props) {
 
             setShowPasswordDialog(false);
         }).catch(e => {
-            toast.current.show({life: 3000, severity: 'error', summary: 'Alterar Password', detail: 'Ocorreu um erro ao alterar a password'});        
+            toast.current.show({life: 5000, severity: 'error', summary: 'Alterar Password', detail: e.body?.message || e.message || 'Ocorreu um erro ao alterar a password'});        
         }).finally(() => {
             setIsSaving(false);
         });

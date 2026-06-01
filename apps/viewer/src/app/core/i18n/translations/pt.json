@@ -271,7 +271,7 @@
   "passwordLowerRule": "Pelo menos uma minúscula",
   "passwordUpperRule": "Pelo menos uma maiúscula",
   "passwordDigitRule": "Pelo menos um dígito",
-  "passwordSizeRule": "Pelo menos 8 caracteres",
+  "passwordSizeRule": "Pelo menos 12 caracteres",
   "enterPassword": "Introduza a password",
   "confirmPassword": "Confirmar password",
   "newPassword": "Nova password",

@@ -372,7 +372,7 @@ export function password_post(post, history, redirect) {
         if (!res.error) {
           dispatch(password_response(res));
         } else {
-          dispatch(login_http_error({ status: res.status, message: res.message}));
+          dispatch(password_http_error({ status: res.status, message: res.message}));
         }
       }).catch(error => {
         dispatch(password_http_error());

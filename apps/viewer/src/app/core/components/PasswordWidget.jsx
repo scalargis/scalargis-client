@@ -258,7 +258,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
 
             { pwd.response && !!pwd.response && !pwd.authenticated && !!pwd.response.message &&
                 <div className="p-fluid w-full my-4">
-                <Message severity="error" text={auth?.response?.message}></Message>
+                <Message severity="error" text={pwd?.response?.message}></Message>
                 </div>
             }                        
             
