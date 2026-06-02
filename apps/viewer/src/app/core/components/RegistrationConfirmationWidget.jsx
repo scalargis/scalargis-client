@@ -3,6 +3,7 @@ import { connect, useDispatch } from 'react-redux';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -11,6 +12,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
   const [emailConfirmation, setEmailConfirmation] = useState('');
   const [goRedirect, setGoRedirect] = useState(false);
+  const [validating, setValidating] = useState(!!token);
 
   // Enable redux actions
   const dispatch = useDispatch();
@@ -20,9 +22,15 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
   useEffect(() => {
     if (auth?.data?.token) return;
- 
+
     dispatch(registration_confirmation({ token }, history, redirect));
   }, []);
+
+  useEffect(() => {
+    if (validating && (registration.response || auth.http_error)) {
+      setValidating(false);
+    }
+  }, [registration.response, auth.http_error]);
 
   // Render user
   if (auth?.data?.token) {
@@ -45,6 +53,15 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
   const sendEmailConfirmation = () => {    
     dispatch(registration_send_confirmation({ email: emailConfirmation }, history, redirect));
+  }
+
+  if (validating) {
+    return (
+      <div className="flex align-items-center justify-content-center flex-column px-3 py-5">
+        <ProgressSpinner style={{ width: '50px', height: '50px' }} />
+        <p className="mt-3" style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("validatingRegistration", "A validar registo")}...</p>
+      </div>
+    );
   }
 
   if (registration.response && !!registration.response && !!registration.response.authenticated) {
