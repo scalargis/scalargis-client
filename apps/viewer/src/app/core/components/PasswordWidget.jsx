@@ -6,6 +6,7 @@ import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { classNames } from 'primereact/utils';
+import { Divider } from 'primereact/divider';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -36,6 +37,20 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
       strongLabel: i18nUtils.translateValue("strongPasswordLabel", "Forte")
     }
   }, [i18nUtils.getResolvedLanguage()]);
+
+  const passwordFooter = useMemo(() => (
+    <React.Fragment>
+      <Divider className="mt-2" />
+      <p className="mt-2">{i18nUtils.translateValue("suggestions", "Sugestões")}:</p>
+      <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
+        <li>{i18nUtils.translateValue("passwordLowerRule", "Pelo menos uma minúscula")}</li>
+        <li>{i18nUtils.translateValue("passwordUpperRule", "Pelo menos uma maiúscula")}</li>
+        <li>{i18nUtils.translateValue("passwordDigitRule", "Pelo menos um dígito")}</li>
+        <li>{i18nUtils.translateValue("passwordSpecialRule", "Pelo menos um caractere especial")}</li>
+        <li>{i18nUtils.translateValue("passwordSizeRule", "Pelo menos 12 caracteres")}</li>
+      </ul>
+    </React.Fragment>
+  ), [i18nUtils.getResolvedLanguage()]);
 
   useEffect(() => {
     if (auth?.data?.token)  return;
@@ -204,10 +219,11 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
           <div>
             <label htmlFor="newPassword" className="block text-900 font-medium my-2">{i18nUtils.translateValue("newPassword", "Nova password")}</label>
             <Controller name="newPassword" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
-                <Password id={field.name} {...field} 
+                <Password id={field.name} {...field}
                     toggleMask
                     promptLabel={i18nUtils.translateValue("enterPassword", "Introduza a password")}
                     {...passwordStrengthLabels}
+                    footer={passwordFooter}
                     className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
                     inputClassName="w-full"
                     pt={{ iconField: { root: { className: 'w-full' } } }}
