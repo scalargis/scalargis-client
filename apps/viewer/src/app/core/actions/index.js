@@ -298,10 +298,11 @@ export function auth_login(data) {
 export function login_reset_password(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
-    
+
+    const locale = i18nUtils.getResolvedLanguage();
     const options = {
       method: 'POST',
-      body: JSON.stringify({...post, redirect})
+      body: JSON.stringify({...post, redirect, locale})
     }
 
     const url = API_URL + '/security/reset_password';
@@ -309,9 +310,9 @@ export function login_reset_password(post, history, redirect) {
       .then(res => res.json())
       .then(res => {
         if (!res.error) {
-          dispatch(login_response({reset_password:true, ...res}));
+          dispatch(login_response({reset_password:true, ...res, message: i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res)}));
         } else {
-          let msg = res.message;
+          let msg = i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res);
           if (res?.status === 401) {
             msg = i18nUtils.translateValue("wrongUser", "O Utilizador indicado não é válido")
           }
@@ -333,8 +334,7 @@ export function password_http_loading() {
 export function password_reset_validation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(password_http_loading());
-    
-    // Login request
+
     const options = {
       method: 'POST',
       body: JSON.stringify(post)
@@ -347,10 +347,10 @@ export function password_reset_validation(post, history, redirect) {
         if (!res.error) {
           dispatch(password_response(res));
         } else {
-          dispatch(login_http_error({status: res.status, valid_token: false, message: res.message}));
+          dispatch(login_http_error({status: res.status, valid_token: false, message: i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res)}));
         }
       }).catch(error => {
-        dispatch(login_http_error({status: 401, valid_token: false, message: 'Serviço indisponível'}));
+        dispatch(login_http_error({status: 401, valid_token: false, message: i18nUtils.translateValue("unavailableService", "Serviço indisponível")}));
       });
   }
 }
@@ -359,7 +359,7 @@ export function password_reset_validation(post, history, redirect) {
 export function password_post(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(password_http_loading());
-    
+
     const options = {
       method: 'POST',
       body: JSON.stringify(post)
@@ -372,7 +372,7 @@ export function password_post(post, history, redirect) {
         if (!res.error) {
           dispatch(password_response(res));
         } else {
-          dispatch(password_http_error({ status: res.status, message: res.message}));
+          dispatch(password_http_error({ status: res.status, message: i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res), failed_rules: res.failed_rules}));
         }
       }).catch(error => {
         dispatch(password_http_error());
@@ -403,40 +403,27 @@ export function login_user_registration(core, data, apiUrl=null, redirect=null) 
 
     dispatch(actions.login_http_loading());
 
+    const locale = i18nUtils.getResolvedLanguage();
     const headers = new Headers({
         "content-type": 'application/json',
         accept: 'application/json'
       });
 
     const url = apiUrl ? utils.buildRelativeUrlPath(apiUrl) : core.API_URL + '/security/register_user';
-    fetchJson(url, { method: 'POST', headers, body: JSON.stringify(data) }).then(res => {
+    fetchJson(url, { method: 'POST', headers, body: JSON.stringify({...data, locale}) }).then(res => {
         if (res.status === 200) {
             return res.json;
-        }      
+        }
     }).then(result => {
         if (!result.error) {
-            dispatch(actions.login_response({register_user:true, username: data.username, email:data.email, redirect, ...result}));
+            dispatch(actions.login_response({register_user:true, username: data.username, email:data.email, redirect, ...result, message: i18nUtils.translateValue(result.message, result.message, undefined, undefined, undefined, {...result, username: data.username, email: data.email})}));
         } else {
-            if (result.status === 409) {
-              // 409 = Duplicate username/email
-              dispatch(actions.login_http_error({status: result.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", result.message)}));
-            } else if (result.status === 422) {
-              // 422 = Use server message directly
-              dispatch(actions.login_http_error({status: result.status, message: result.message}));
-            } else {
-              dispatch(actions.login_http_error({status: result.status, message: result.message}));
-            }
+            const msg = i18nUtils.translateValue(result.message, result.message, undefined, undefined, undefined, result);
+            dispatch(actions.login_http_error({status: result.status, message: msg}));
         }
     }).catch(error => {
-        if (error?.status === 409) {
-            // 409 = Duplicate username/email
-            dispatch(actions.login_http_error({status: error.status, message: i18nUtils.translateValue("userRegistrationErrorAlreadyExists", error.message)}));
-        } else if (error?.status === 422) {
-            // 422 = Use server message directly
-            dispatch(actions.login_http_error({status: error.status, message: error.message}));
-        } else {
-            dispatch(actions.login_http_error({status: error.status, message: error.message}));
-        }
+        const msg = error?.message ? i18nUtils.translateValue(error.message, error.message, undefined, undefined, undefined, error) : undefined;
+        dispatch(actions.login_http_error({status: error?.status, message: msg, failed_rules: error?.body?.failed_rules}));
     });
   }
 }
@@ -481,7 +468,7 @@ export function registration_post(post, history, redirect) {
 export function registration_confirmation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
-    
+
     const options = {
       method: 'POST',
       body: JSON.stringify(post)
@@ -494,11 +481,11 @@ export function registration_confirmation(post, history, redirect) {
         if (!res.error) {
           dispatch(registration_response(res));
         } else {
+          const msg = i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res);
           if (res.status === 401) {
-            console.log(res.message);
-            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationInvalid", res.message)}));
+            dispatch(login_http_error({status: res.status, message: msg}));
           } else {
-            dispatch(login_http_error({status: res.status, valid_token: false, message: res.message}));
+            dispatch(login_http_error({status: res.status, valid_token: false, message: msg}));
           }
         }
       }).catch(error => {
@@ -511,10 +498,11 @@ export function registration_confirmation(post, history, redirect) {
 export function registration_send_confirmation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());
-    
+
+    const locale = i18nUtils.getResolvedLanguage();
     const options = {
       method: 'POST',
-      body: JSON.stringify({...post, redirect})
+      body: JSON.stringify({...post, redirect, locale})
     }
 
     const url = API_URL + '/security/registration/send_confirmation';
@@ -526,15 +514,12 @@ export function registration_send_confirmation(post, history, redirect) {
             const msg = i18nUtils.translateValue("userRegistrationConfirmationSentToEmail","A confirmação de registo de utilizador foi enviada para o email {{email}}.", undefined, undefined, undefined, {email: res.email})
             dispatch(login_response({...res, message: msg}));
           } else {
-            dispatch(login_response(res));
+            dispatch(login_response({...res, message: i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res)}));
           }
         } else {
-          if (res?.status === 401) {
-            dispatch(login_http_error({status: res.status, message: i18nUtils.translateValue("userRegistrationConfirmationWrongEmail", res.message)}));
-          } else {
-            dispatch(login_http_error({status: res.status, message: res.message}));
-          }
-        }    
+          const msg = i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res);
+          dispatch(login_http_error({status: res.status, message: msg}));
+        }
       }).catch(error => {
         dispatch(login_http_error());
       });

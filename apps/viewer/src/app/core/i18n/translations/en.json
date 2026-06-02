@@ -342,5 +342,21 @@
   "errorFileGenerateMsg": "An error occurred when creating the file",
   
   "pleaseWait": "Please wait...",
-  "anErrorOccurred": "An error occurred" 
+  "anErrorOccurred": "An error occurred",
+
+  "hello_user": "Hello {{username}}",
+
+  "registration_user_exists": "A user with the specified username or email already exists.",
+  "registration_email_sent": "An email has been sent to {{email}} with instructions to confirm and complete registration.",
+  "registration_confirmation_sent_if_exists": "If the email is associated with an account, a registration confirmation will be sent.",
+  "registration_confirmation_invalid": "Invalid registration confirmation.",
+  "registration_confirmation_expired": "Registration confirmation expired.",
+  "password_reset_email_sent_if_exists": "If an associated account exists, an email will be sent with instructions for password recovery.",
+  "password_reset_validation_invalid": "Invalid password change confirmation.",
+  "password_reset_validation_expired": "Password change confirmation expired.",
+  "password_set_invalid": "Invalid password change confirmation.",
+  "password_set_expired": "Password change confirmation expired.",
+  "password_update_success": "Password changed successfully.",
+  "account_update_error": "An error occurred while updating the record.",
+  "password_policy_violation": "The password does not meet the security requirements."
 }

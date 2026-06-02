@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router';
 
+import LocaleSelector from './../components/LocaleSelector';
 import PasswordWidget from './../components/PasswordWidget';
 
 function PagePassword(props) {
@@ -31,6 +32,9 @@ function PagePassword(props) {
     <div className="flex justify-content-center align-self-center p-6 sm:p-8">
       <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
         <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+          <div className="flex justify-content-end">
+            <LocaleSelector core={core} componentConfig={siteConfig} />
+          </div>
           <div className="text-center mb-2">
             <img src={logo} alt="logo" height={50} className="mb-3" />
           </div>

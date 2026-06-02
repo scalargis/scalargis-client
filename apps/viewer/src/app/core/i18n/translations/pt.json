@@ -342,5 +342,21 @@
   "errorFileGenerateMsg": "Ocorreu um erro ao gerar o ficheiro",
 
   "pleaseWait": "Aguarde...",
-  "anErrorOccurred": "Ocorreu um erro"
+  "anErrorOccurred": "Ocorreu um erro",
+
+  "hello_user": "Olá {{username}}",
+
+  "registration_user_exists": "Já existe um utilizador com o username ou email indicado.",
+  "registration_email_sent": "Foi enviado um email para {{email}} com as instruções para confirmação e conclusão do registo.",
+  "registration_confirmation_sent_if_exists": "Caso o email indicado esteja associado a uma conta, será enviada uma confirmação de registo.",
+  "registration_confirmation_invalid": "Confirmação de registo inválida.",
+  "registration_confirmation_expired": "Confirmação de registo expirada.",
+  "password_reset_email_sent_if_exists": "Caso exista uma conta associada, será enviado um email com as instruções para recuperação da palavra-passe.",
+  "password_reset_validation_invalid": "Confirmação de alteração de palavra-passe inválida.",
+  "password_reset_validation_expired": "Confirmação de alteração de palavra-passe expirada.",
+  "password_set_invalid": "Confirmação de alteração de palavra-passe inválida.",
+  "password_set_expired": "Confirmação de alteração de palavra-passe expirada.",
+  "password_update_success": "Palavra-passe alterada com sucesso.",
+  "account_update_error": "Ocorreu um erro ao alterar o registo.",
+  "password_policy_violation": "A palavra-passe não cumpre os requisitos de segurança."
 }
