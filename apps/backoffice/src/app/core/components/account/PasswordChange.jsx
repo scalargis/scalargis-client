@@ -14,8 +14,8 @@ import dataProvider from '../../../service/DataProvider';
 export default function PasswordChange(props) {
 
     const { core } = props;
-    const { refresh_auth } = core?.actions;
-    const { dispatch } = core?.store;
+    const { refresh_auth } = core?.actions ?? {};
+    const { dispatch } = core?.store ?? {};
 
     const [showPasswordDialog, setShowPasswordDialog] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -57,7 +57,8 @@ export default function PasswordChange(props) {
                     <li>Pelo menos uma minúscula</li>
                     <li>Pelo menos uma maiúscula</li>
                     <li>Pelo menos um dígito</li>
-                    <li>Pelo menos 8 caracteres"</li>
+                    <li>Pelo menos um caractere especial</li>
+                    <li>Pelo menos 12 caracteres</li>
                 </ul>
             </React.Fragment>
         );
@@ -67,7 +68,7 @@ export default function PasswordChange(props) {
         return (
             <div>
                 <Button label="Cancelar" icon="pi pi-times" onClick={() => setShowPasswordDialog(false)} 
-                    className="p-button-text" disabled={isSaving} />
+                    text disabled={isSaving} />
                 <Button label="Aceitar"
                     onClick={(e) => {
                         formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); 
@@ -109,7 +110,7 @@ export default function PasswordChange(props) {
 
             setShowPasswordDialog(false);
         }).catch(e => {
-            toast.current.show({life: 3000, severity: 'error', summary: 'Alterar Password', detail: 'Ocorreu um erro ao alterar a password'});        
+            toast.current.show({life: 5000, severity: 'error', summary: 'Alterar Password', detail: e.body?.message || e.message || 'Ocorreu um erro ao alterar a password'});        
         }).finally(() => {
             setIsSaving(false);
         });
@@ -121,7 +122,7 @@ export default function PasswordChange(props) {
         <React.Fragment>
             <Toast ref={toast} baseZIndex={2000} />
 
-            <Button label="Alterar password" icon="pi pi-user-edit" className="p-button-outlined p-d-block" onClick={e => {
+            <Button label="Alterar password" icon="pi pi-user-edit" outlined className="block" onClick={e => {
                 e.preventDefault();
                 reset();
                 setShowPasswordDialog(true);

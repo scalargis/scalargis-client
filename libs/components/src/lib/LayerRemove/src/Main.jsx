@@ -22,7 +22,8 @@ export default function Main(props) {
       <Button icon="pi pi-times-circle"
         title={t("removeTheme", "Remover Tema")}
         color="red"
-        className="p-button-sm p-button-rounded p-button-text tool"
+        size="small" rounded text
+        className="tool"
         onClick={e => setConfirmDeleteTheme([layer.id])}
       />
 
@@ -36,8 +37,8 @@ export default function Main(props) {
               <Button 
                 label={t("no", "Não" )}
                 icon="pi pi-times" 
-                onClick={() => setConfirmDeleteTheme(false)} 
-                className="p-button-text"
+                onClick={() => setConfirmDeleteTheme(false)}
+                text
               />
               <Button 
                 label={t("yes", "Sim" )}

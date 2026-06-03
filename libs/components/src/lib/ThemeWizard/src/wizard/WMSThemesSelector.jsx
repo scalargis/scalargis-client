@@ -15,10 +15,10 @@ const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllG
   const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   function expandNode(node) {
-    let newExpandedKeys = { ...expandedKeys };
+    const newExpandedKeys = { ...expandedKeys };
     if (node.children && node.children.length) {
       newExpandedKeys[node.key] = true;
-      for (let child of node.children) {
+      for (const child of node.children) {
         expandNode(child);
       }
     }
@@ -47,21 +47,21 @@ const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, expandAllG
   // Expand all on
   useEffect(() => {
     if (expandAllGroups) {
-      let newExpandedKeys = {};
+      const newExpandedKeys = {};
       const getGroupsKeys =  function (node) {
         if (node.children && node.children.length) {
           newExpandedKeys[node.key] = true;
-          for (let child of node.children) {
+          for (const child of node.children) {
             getGroupsKeys(child);
           }
         }
       }
-      for (let node of nodes) {
+      for (const node of nodes) {
         getGroupsKeys(node);
       }      
       setExpandedKeys(newExpandedKeys);
     } else {
-      for (let node of nodes) {
+      for (const node of nodes) {
         expandNode(node);
       }
     }

@@ -59,7 +59,7 @@ export default function SearchLayers(props) {
             ...data,
             uischema: {
               type: 'VerticalLayout',
-              elements: [...data?.uischema?.elements],
+              elements: [...(data?.uischema?.elements ?? [])],
               ...active?.uischema
             }
           });
@@ -142,7 +142,7 @@ export default function SearchLayers(props) {
 
           return <Card key={i} header={show_icon && icon} title={title} subTitle={l.subtitle && l.subtitle} style={{ marginBottom: '2em' }} 
             onClick={e => console.log(e)}>
-              <div className="p-m-0" dangerouslySetInnerHTML={{__html: l.description || ''}}></div>
+              <div className="m-0" dangerouslySetInnerHTML={{__html: l.description || ''}}></div>
             </Card>
         })}
       </div>

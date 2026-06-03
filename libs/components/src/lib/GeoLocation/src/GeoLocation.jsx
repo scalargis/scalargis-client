@@ -141,7 +141,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
             />
             {' '}
             <label htmlFor="geolocationSwitch">
-              <span className="p-text-bold">{t("myLocationViewPosition", "Ver Posição")}</span>
+              <span className="font-bold">{t("myLocationViewPosition", "Ver Posição")}</span>
             </label>
           </div>
         </div>
@@ -154,7 +154,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
             <Button
               label={t("locate", "Localizar")}
               icon="pi pi-search"
-              className="p-button-sm"
+              size="small"
               onClick={e => { zoomGeoLocation(geolocation); }}
               disabled={!geoLocationActive}
             />

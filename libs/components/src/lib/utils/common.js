@@ -15,7 +15,7 @@ const _getAppBaseUrl = () => {
 }
 
 export const getWindowSize = () => {
-    var w = window,
+    const w = window,
     d = document,
     e = d.documentElement,
     g = d.getElementsByTagName('body')[0],
@@ -185,7 +185,7 @@ export const getWindowSize = () => {
     }
 
     let baseUrl = _getAppBaseUrl();
-    baseUrl = ("" ? baseUrl.startsWith("/") : "/") + baseUrl;  
+    baseUrl = (baseUrl.startsWith("/") ? "" : "/") + baseUrl;  
     url = baseUrl + url;
     
     return url;

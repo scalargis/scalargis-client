@@ -1,4 +1,4 @@
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../../components';
 
 import pt from './translations/pt.json';
 import en from './translations/en.json';

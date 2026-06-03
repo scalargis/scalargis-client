@@ -70,7 +70,8 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
                   <Button
                     key={item.value}
                     label={item.label}
-                    className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                    text
+                    className={i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}
                     onClick={(e) => {
                       i18n.changeLanguage(item.value);
                       dispatch(viewer_set_locale(item.value));
@@ -90,7 +91,8 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
                     <Button
                       key={item.value}
                       label={item.label}
-                      className={`p-button-text ${i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}`}
+                      text
+                      className={i18n.resolvedLanguage === item.value ? 'locale-selected' : ''}
                       onClick={(e) => {
                         e.preventDefault();
                         i18n.changeLanguage(item.value);

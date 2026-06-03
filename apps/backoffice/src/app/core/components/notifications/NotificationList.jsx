@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { MultiSelect } from 'primereact/multiselect';
@@ -153,7 +153,7 @@ function NotificationList(props) {
   }
 
   const onPage = (event) => {
-    let _searchParams = {
+    const _searchParams = {
       ...searchParams,
       first: event.first,
       rows: event.rows,
@@ -163,7 +163,7 @@ function NotificationList(props) {
   }
 
   const onSort = (event) => {
-    let _searchParams = { 
+    const _searchParams = { 
       ...searchParams,
       sortField: event.sortField,
       sortOrder: event.sortOrder
@@ -172,7 +172,7 @@ function NotificationList(props) {
   }
 
   const onFilterSubmit = (formData) => {
-    let _searchParams = { ...searchParams };
+    const _searchParams = { ...searchParams };
     _searchParams.filters = {...formData};
     setSearchParams(_searchParams);
   }
@@ -186,7 +186,7 @@ function NotificationList(props) {
     setValue('message', null);
     setValue('status', null);
     
-    let _searchParams = { ...searchParams };
+    const _searchParams = { ...searchParams };
     _searchParams['filters'] = {};
     _searchParams['first'] = 0;
     setSearchParams(_searchParams);
@@ -235,25 +235,19 @@ function NotificationList(props) {
 
   const leftToolbarTemplate = () => {
     return (
-        (records.total !== null) && <React.Fragment>              
-            <span><b>Total:</b> {records.total}</span>
-        </React.Fragment>
+        (records.total !== null) && <span><b>Total:</b> {records.total}</span>
     )
   }
 
   const rightToolbarTemplate = () => {
       return (
-          <React.Fragment>              
-              <Button label="Exportar" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} disabled={records?.total ? false : true } />
-          </React.Fragment>
+          <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={exportCSV} disabled={records?.total ? false : true } />
       )
   }
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <React.Fragment> 
-        <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined p-button-secondary p-mr-2" title="Editar" onClick={() => editRecord(rowData)} />
-      </React.Fragment>
+      <Button icon="pi pi-pencil" rounded outlined severity="secondary" className="mr-2" title="Editar" onClick={() => editRecord(rowData)} />
     );
   }
 
@@ -356,7 +350,7 @@ function NotificationList(props) {
                         <Button type="submit" label="Pesquisar" className="mr-2 w-full" />  
                       </div>                                  
                       <div className="field col-12 md:col-1">
-                        <Button type="button" label="Limpar" className="p-button-secondary mr-2 w-full" onClick={onFilterClear} />
+                        <Button type="button" label="Limpar" severity="secondary" className="mr-2 w-full" onClick={onFilterClear} />
                       </div>                   
                     </div>
 

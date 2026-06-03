@@ -37,8 +37,8 @@ export const TreeComponent = (props) => {
     const [expandedKeys, setExpandedKeys] = useState({});
 
     const expandAll = () => {
-        let _expandedKeys = {};
-        for (let node of props?.value || []) {
+        const _expandedKeys = {};
+        for (const node of props?.value || []) {
             expandNode(node, _expandedKeys);
         }
 
@@ -53,14 +53,14 @@ export const TreeComponent = (props) => {
         if (node.children && node.children.length) {
             _expandedKeys[node.key] = true;
 
-            for (let child of node.children) {
+            for (const child of node.children) {
                 expandNode(child, _expandedKeys);
             }
         }
     }    
 
     useEffect(() => {
-        if (!!props?.options?.expandAll) {
+        if (props?.options?.expandAll) {
             expandAll();
             return;
         }
@@ -99,9 +99,9 @@ export const TreeComponent = (props) => {
 
     return (
         <div>
-            {props?.options?.showExpandButtons && <div className="p-mb-3 p-text-center">
-                <Button type="button" icon="pi pi-plus" label="Abrir todos" onClick={expandAll} className="p-button-sm p-button-outlined p-mr-2" />
-                <Button type="button" icon="pi pi-minus" label="Fechar todos" onClick={collapseAll} className="p-button-sm p-button-outlined p-mr-2" />
+            {props?.options?.showExpandButtons && <div className="mb-3 text-center">
+                <Button type="button" icon="pi pi-plus" label="Abrir todos" onClick={expandAll} size="small" outlined className="mr-2" />
+                <Button type="button" icon="pi pi-minus" label="Fechar todos" onClick={collapseAll} size="small" outlined className="mr-2" />
             </div>}
             <Tree 
                 value={props.value}

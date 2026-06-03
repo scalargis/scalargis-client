@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import Intersect from './Intersect';
 
@@ -81,7 +81,7 @@ export default function Main(props) {
       height = oDiv.offsetHeight;
       oDiv.style.height = sOriginalHeight;
       oDiv.style.overflow = sOriginalOverflow;
-    } catch {}
+    } catch { /* empty */ }
         
     return clientHeight > height ? clientHeight : height;
   }

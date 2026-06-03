@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import merge from 'lodash/merge';
-//import { Button, Hidden, Step, StepButton, Stepper } from '@mui/material';
 import {Steps} from 'primereact/steps';
 import { Button } from 'primereact/button';
 import {
@@ -98,8 +97,7 @@ export const PrimereactCategorizationStepperLayoutRenderer = (
     () =>
       //categorization.elements.filter((category: Category) =>
       categorization.elements.filter((category: any) =>
-        //isVisible(category, data, undefined, ajv)
-        isVisible(category, data, '', ajv)
+        isVisible(category, data, '', ajv, undefined)
       ),
     [categorization, data, ajv]
   );

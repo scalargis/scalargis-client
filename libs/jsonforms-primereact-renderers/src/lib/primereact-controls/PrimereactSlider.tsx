@@ -36,7 +36,7 @@ export const PrimereactSlider = React.memo(function PrimereactSlider(
       id={id}
       disabled={!enabled}
       onChange={(e) => handleChange(path, e.value)}
-      className={`${className} p-m-3`}
+      className={`${className} m-3`}
       {...sliderProps}
     />
   );

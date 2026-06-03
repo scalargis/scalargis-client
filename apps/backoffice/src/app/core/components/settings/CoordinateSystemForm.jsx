@@ -1,6 +1,6 @@
 import React, { useContext, useState, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
@@ -120,8 +120,8 @@ function CoordinateSystemForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary mr-4"
-              disabled={isSaving ? true : false} 
+              severity="secondary" className="mr-4"
+              disabled={isSaving ? true : false}
               onClick={goBack} />
             <Button
               type="submit" 

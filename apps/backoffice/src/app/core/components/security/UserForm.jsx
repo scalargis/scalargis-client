@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
@@ -196,7 +196,7 @@ function UserForm(props) {
           shouldDirty: true
         });
       }).catch(e => {
-        toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});        
+        toast.current.show({life: 5000, severity: 'error', summary: 'Editar Registo', detail: e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo'});        
       }).finally(() => {
         setIsSaving(false);
       });
@@ -208,7 +208,7 @@ function UserForm(props) {
         setData({...data, id: d.data.id});
         toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: 'Ocorreu um erro ao criar o registo'});
+        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: e.body?.message || e.message || 'Ocorreu um erro ao criar o registo'});
       }).finally(() => {
         setIsSaving(false);
       });       
@@ -236,8 +236,8 @@ function UserForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary mr-4"
-              disabled={isSaving ? true : false} 
+              severity="secondary" className="mr-4"
+              disabled={isSaving ? true : false}
               onClick={goBack} />
             <Button
               type="submit" 
@@ -254,15 +254,15 @@ function UserForm(props) {
       <Toast ref={toast} baseZIndex={2000} />
 
       <div className="p-fluid formgrid grid">
-        <div className="field p-col-12 md:col-3">
+        <div className="field col-12 md:col-3">
           <label htmlFor="first_name">Primeiro Nome</label>
           <InputText id="first_name" name="first_name" {...register('first_name')} autoFocus />
         </div>            
-        <div className="field p-col-12 md:col-3">
+        <div className="field col-12 md:col-3">
           <label htmlFor="last_name">Último Nome</label>
           <InputText id="last_name" name="last_name" {...register('last_name')} />
         </div>
-        <div className="field p-col-12 md:col-6">
+        <div className="field col-12 md:col-6">
           <label htmlFor="name">Nome</label>
           <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.name })} />
           {getFormErrorMessage(errors, 'name')}
@@ -309,7 +309,7 @@ function UserForm(props) {
           <div className="p-inputgroup">
               <Button type="button" label="Gerar" icon="pi pi-check" className="p-button-primary" onClick={(e) => { setValue('auth_token', String(uuidV4())); } } />
               <InputText id="auth_token" name="auth_token" {...register('auth_token')} placeholder="Token não definido" />
-              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => { setValue('auth_token', null); setValue('auth_token_expire', null); } } />                
+              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => { setValue('auth_token', null); setValue('auth_token_expire', null); } } />
           </div>
         </div>
         <div className="field col-12 md:col-3">
@@ -325,7 +325,7 @@ function UserForm(props) {
                     showIcon showTime showSeconds />
                 }} 
               />                    
-              <Button type="button" icon="pi pi-times" className="p-button-danger" onClick={(e) => setValue('auth_token_expire', null) } />
+              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => setValue('auth_token_expire', null) } />
           </div>
         </div>          
 

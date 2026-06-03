@@ -56,7 +56,7 @@ export default function PrintPanel4(props) {
       files
     }
 
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -69,7 +69,7 @@ export default function PrintPanel4(props) {
     const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
-    let url = API_URL + '/app/viewer/'+ viewer.id + '/print/merge';
+    const url = API_URL + '/app/viewer/'+ viewer.id + '/print/merge';
 
     setIsMergingFiles(true);
 
@@ -99,7 +99,7 @@ export default function PrintPanel4(props) {
 
   useEffect(() => {
     // Set fetch options
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',       
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -113,7 +113,7 @@ export default function PrintPanel4(props) {
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
     // Make a shallow copy of the print items
-    let newFinalPrints = [...finalPrints];
+    const newFinalPrints = [...finalPrints];
 
     const promises = finalPrints.map(async (print) => {
 
@@ -160,7 +160,7 @@ export default function PrintPanel4(props) {
         data += '&' + geomWKT.map(wkt => 'geomWKT[]=' + wkt).join('&');
       }
 
-      let opts = {
+      const opts = {
         ...options,
         body: data
       }     
@@ -169,7 +169,7 @@ export default function PrintPanel4(props) {
         .then(res => res.json())
         .then(res => {
           // Make a shallow copy of the item we want to mutate
-          let item = {...print};
+          const item = {...print};
           if (res.Success) {            
             // 1. Get print array index
             const index = finalPrints.findIndex(p => p.uuid == print.uuid);
@@ -194,7 +194,7 @@ export default function PrintPanel4(props) {
         }).catch(error => {
           const index = finalPrints.findIndex(p => p.uuid == print.uuid);
           
-          let item = {...print};
+          const item = {...print};
           item.processed = false;
           item.processing = false;
           item.error = t("printError", "Não foi possível gerar a planta");
@@ -288,7 +288,7 @@ export default function PrintPanel4(props) {
                   <div className="col">
                     { print.processed ?
                       <a href={print.url} target="_blank" title={t("openPrint", "Abrir planta")}
-                        style={ { textDecoration: "none", color: "#2196f3"} }>
+                        style={ { textDecoration: "none", color: "#2196f3"} } rel="noreferrer">
                         <i className="pi pi-external-link pl-2"></i>
                       </a> : null
                     }
@@ -302,7 +302,7 @@ export default function PrintPanel4(props) {
 
       { mergedFile ?
         <div className="card text-center">
-          <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "#2196f3"} }>
+          <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "#2196f3"} } rel="noreferrer">
             <i className="pi pi-external-link pl-2"></i> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
           </a>          
         </div> :
@@ -326,7 +326,7 @@ export default function PrintPanel4(props) {
             <Button
                 label={t("back", "Voltar")}
                 icon="pi pi-chevron-left"
-                className="p-button-sm"
+                size="small"
                 onClick={e => { goPanelPrintPrev(); }}
             />
           </div>

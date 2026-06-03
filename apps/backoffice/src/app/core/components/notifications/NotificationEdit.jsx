@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { BlockUI } from 'primereact/blockui';
 
 import AppContext from '../../../AppContext';
@@ -50,12 +50,10 @@ function NotificationEdit(props) {
   }
 
   return (
-    <React.Fragment>
-      <BlockUI blocked={isLoading}
+    <BlockUI blocked={isLoading}
         template={<i className="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
         { record ? <NotificationForm data={record} /> : <div /> }
       </BlockUI>
-    </React.Fragment>
   );
 
 

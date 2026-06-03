@@ -8,7 +8,9 @@ import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import OlFeature from 'ol/Feature';
 import {getCenter as olGetCenter} from 'ol/extent';
 
-import { i18n } from '@scalargis/components';
+import parse from 'html-react-parser';
+
+import { i18n } from '../../components';
 
 import { getFeatureById } from './service';
 
@@ -76,7 +78,7 @@ export default function SearchLayerResults(props) {
   const zoomActionTemplate = (rowData) => {
     return (
         <React.Fragment>
-            <Button icon="pi pi-search" className="p-button-rounded p-button-text" 
+            <Button icon="pi pi-search" rounded text
               onClick={() => { 
                 layer.current.getSource().clear();
                 if (rowData.geometry == null) {
@@ -113,7 +115,7 @@ export default function SearchLayerResults(props) {
 
         return (
           <>
-              <span className="p-mx-1" style={{ color: 'var(--text-color)', userSelect: 'none' }}>Registos: </span>
+              <span className="mx-1" style={{ color: 'var(--text-color)', userSelect: 'none' }}>Registos: </span>
               <Dropdown value={results.maxFeatures} options={dropdownOptions} onChange={(e) => doSearch(0, e.value, results.filter, results.sort)} />
           </>
         );
@@ -161,7 +163,7 @@ export default function SearchLayerResults(props) {
         new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');      
       });                 
     }    
-    return <div dangerouslySetInnerHTML={{__html: new_value}} />;
+    return <div>{parse(new_value)}</div>;
   }
 
 
@@ -192,7 +194,7 @@ export default function SearchLayerResults(props) {
 
     if (action.show_null === true || new_value != null) {
 
-      let data = {...action.data}
+      const data = {...action.data}
       Object.entries(data).forEach(([key, value]) => {
         data[key] = formatTemplateValue(rowData, value);
       });
@@ -225,7 +227,7 @@ export default function SearchLayerResults(props) {
     const _isPureObject = (input) => {
       return null !== input && 
         typeof input === 'object' &&
-        Object.getPrototypeOf(input).isPrototypeOf(Object);
+        Object.prototype.isPrototypeOf.call(Object.getPrototypeOf(input), Object);
     }
   
     const _formatValue = (data, value) => {
@@ -314,7 +316,7 @@ export default function SearchLayerResults(props) {
           new_sort[e.sortField] = e.sortOrder === 1 ? 'ASC' : 'DESC'
           doSearch(0, results.maxFeatures, results.filter, new_sort);
         }}
-        paginatorClassName="p-jc-end" className="mt-4"> 
+        paginatorClassName="justify-content-end" className="mt-4"> 
         {(columns && columns.length > 0) && <Column key={0} body={zoomActionTemplate} style={{width: '30px'}} />}
         {buildColumns(searchConfig, columns).map(c => c)}
       </DataTable>

@@ -33,7 +33,7 @@ export const core = new Core({
   COOKIE_AUTH_NAME
 }, rootReducer);
 
-let options = {
+const options = {
   controls: new OlCollection(),
   interactions: new OlCollection(),
   view: new View({

@@ -11,7 +11,7 @@ import { Message } from 'primereact/message';
 import { FloatLabel } from 'primereact/floatlabel';
 import { classNames } from 'primereact/utils';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import { getFormValidationErrorMessage } from './utils';
 
@@ -47,9 +47,9 @@ function RegistrationWidget(props) {
   const TERMS_OF_SERVICE_URL = viewer?.config_json?.terms_of_service_url;
 
   const onSubmit = (data) => {
-    let {accept, confirmPassword, ...payload} = data;
-    payload = {
-        ...payload,
+    const {accept, confirmPassword, ...rest} = data;
+    const payload = {
+        ...rest,
         redirect
     }
     const apiUrl = siteConfig?.authentication?.endpoints?.registration;

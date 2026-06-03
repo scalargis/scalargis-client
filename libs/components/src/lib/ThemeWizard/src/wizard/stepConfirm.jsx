@@ -12,7 +12,7 @@ export default function WizardStepConfirm(props) {
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
-  let data = props.wizardData;
+  const data = props.wizardData;
   return (
     <div>
       

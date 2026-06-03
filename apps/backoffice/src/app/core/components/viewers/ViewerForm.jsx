@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { TabMenu } from 'primereact/tabmenu';
@@ -294,11 +294,11 @@ function ViewerForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary mr-4"
-              disabled={isSaving ? true : false} 
+              severity="secondary" className="mr-4"
+              disabled={isSaving ? true : false}
               onClick={goBack} />
             <Button
-              type="submit" 
+              type="submit"
               label="Gravar"
               icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
               disabled={isSaving ? true : false} />
@@ -307,9 +307,7 @@ function ViewerForm(props) {
   }  
  
   return (
-    <React.Fragment>   
-
-      <BlockUI blocked={isLoading}
+    <BlockUI blocked={isLoading}
         template={<i className="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
 
         <TabMenu model={tabItems} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
@@ -359,7 +357,7 @@ function ViewerForm(props) {
                       onClick={(e) => { op.current.toggle(e); }}/>
                     
                     { (selectedOwner?.id > 0) &&
-                      <Button type="button" icon="pi pi-times" className="p-button-danger" 
+                      <Button type="button" icon="pi pi-times" severity="danger"
                         onClick={(e) => { setSelectedOwner(null); }} />
                     }
 
@@ -535,7 +533,7 @@ function ViewerForm(props) {
                         }
                         setCustomStyleEditorSearchText(e.target.value)
                         }} />
-                    <Button icon="pi pi-search" className="p-button-warning"
+                    <Button icon="pi pi-search" severity="warning"
                       title="Pesquisar texto"
                       onClick={e=>{
                         e.preventDefault();
@@ -611,7 +609,7 @@ function ViewerForm(props) {
                         }
                         setJsonConfigEditorSearchText(e.target.value)
                         }} />
-                    <Button icon="pi pi-search" className="p-button-warning"
+                    <Button icon="pi pi-search" severity="warning"
                       title="Pesquisar texto"
                       onClick={e=>{
                         e.preventDefault();
@@ -678,8 +676,6 @@ function ViewerForm(props) {
         </form>
       
       </BlockUI>
-
-    </React.Fragment>
 
   );
 

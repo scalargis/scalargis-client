@@ -25,7 +25,7 @@ import {
 import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser';
 import {BufferOp} from 'jsts/org/locationtech/jts/operation/buffer';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import IntersectResults from './IntersectResults';
 
@@ -182,7 +182,7 @@ export default function IntersectForm(props) {
         accept: () => {
           setGeometryIntersection([]);
         },
-        reject: () =>  { }      
+        reject: () =>  { /* noop */ }      
     });
   }  
 
@@ -204,7 +204,7 @@ export default function IntersectForm(props) {
       }
 
       if (extent) {
-        let center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2];
+        const center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2];
 
         if ((extent[2] - extent[0]) < 500 || (extent[3] - extent[1]) < 500) {
           extent = [center[0] - 250, center[1] - 250, center[0] + 250, center[1] + 250];
@@ -465,7 +465,7 @@ export default function IntersectForm(props) {
           icon={opt.icon}
           label={opt.label ? opt.label : ''}
           title={t(opt.title, opt.defaultTitle)}
-          className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "")}
+          size="small" className={"mr-1 tool" + (opt.value === drawTool ? " active" : "")}
           onClick={(e) => selectDrawTool(e, opt.value)}
         />
       )}
@@ -525,7 +525,7 @@ export default function IntersectForm(props) {
 
       <div className="grid mt-2">
         <div className="col text-center">
-          <Button label={t("clear", "Limpar")} className="p-button-secondary" onClick={(e) => clearAll([])} />
+          <Button label={t("clear", "Limpar")} severity="secondary" onClick={(e) => clearAll([])} />
         </div>
         <div className="col text-center">
           <Button label={t("execute", "Executar")} className="p-button-primary" onClick={(e) => doSearch({"buffer": buffer })} />

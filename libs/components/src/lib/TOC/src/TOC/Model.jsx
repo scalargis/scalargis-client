@@ -56,7 +56,7 @@ export const findAllParents = (layers, id, level = 0) => {
   for (let i = 0; i < layers.length; i++) {
     if (Array.isArray(layers[i].children) && layers[i].children.includes(id)) {
       result.push(layers[i].id);
-      let result2 = findAllParents(layers, layers[i].id, level+1);
+      const result2 = findAllParents(layers, layers[i].id, level+1);
       result = result.concat(result2);
     }
   }
@@ -67,7 +67,7 @@ export const findAllChildren = (layers, ids, level = 0) => {
   let result = Object.assign([], ids);
   for (let i = 0; i < layers.length; i++) {
     if (ids.includes(layers[i].id) && Array.isArray(layers[i].children)) {
-      let result2 = findAllChildren(layers, layers[i].children, level+1);
+      const result2 = findAllChildren(layers, layers[i].children, level+1);
       if (Array.isArray(result2)) result = result.concat(result2);
     }
   }

@@ -45,7 +45,7 @@ export const mapStateToProps = state => {
 export function rememberUrl(cookies, type, url) {
   const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'scalargis_';
   const cookieName = prefix + type;
-  let urlhistory = cookies.get(cookieName) || [];
+  const urlhistory = cookies.get(cookieName) || [];
   if (urlhistory.indexOf(url) === -1) urlhistory.push(url);
   cookies.set(cookieName, urlhistory);
 }
@@ -60,14 +60,14 @@ export const  generateRGBA = () => {
 export const removeUrlParam = (sourceURL, key) => {
   let rtn = sourceURL.split("?")[0],
     param,
-    params_arr = [],
-    new_params = [],
+    params_arr = [];
+  const new_params = [],
     queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
   if (queryString !== "") {
     params_arr = queryString.split("&");
-    for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+    for (let i = params_arr.length - 1; i >= 0; i -= 1) {
       param = params_arr[i].split("=")[0];
-      let regex = new RegExp(key, "ig");
+      const regex = new RegExp(key, "ig");
       if (!regex.test(param)) {
         new_params.push(params_arr[i]);
       }
@@ -79,8 +79,8 @@ export const removeUrlParam = (sourceURL, key) => {
 
 export const addUrlParam = (sourceURL, key, value) => {
   let rtn = sourceURL.split("?")[0],
-    params_arr = [],
-    queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+    params_arr = [];
+  const queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
   if (queryString !== "") {
     params_arr = queryString.split("&");
   }
@@ -90,7 +90,7 @@ export const addUrlParam = (sourceURL, key, value) => {
 }
 
 export const getWindowSize = () => {
-  var w = window,
+  const w = window,
   d = document,
   e = d.documentElement,
   g = d.getElementsByTagName('body')[0],
@@ -304,8 +304,8 @@ export const serializeDrawing = (feature, state, crs) => {
 }
 
 export const createStyle = (feature, drawing, altStroke) => {
-  let { symbol_type, size, fill, stroke, text_style, text_size, text_font, text_value } = drawing;
-  stroke = altStroke ? altStroke : stroke;
+  const { symbol_type, size, fill, text_style, text_size, text_font, text_value } = drawing;
+  const stroke = altStroke ? altStroke : drawing.stroke;
   let style = createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke);
   if (feature.get('type') === 'Symbol') {
       style = createDrawingSymbol(symbol_type, size, fill, stroke);
@@ -327,7 +327,7 @@ export const deserializeDrawing = (drawing, crs) => {
     decimals: 6
   }
   const feature = serializer.readFeature(drawing, serializeOptions);
-  let style = createStyle(feature, drawing.properties.state);
+  const style = createStyle(feature, drawing.properties.state);
   feature.setStyle(style);
   feature.set('state', {
     draw_geom,
@@ -409,10 +409,10 @@ export const createDrawingText = (feature, size, fill, stroke, text_style, text_
   const fillStr = `rgba(${ fill.r }, ${ fill.g }, ${ fill.b }, ${ fill.a })`;
   const strokeStr = `rgba(${ stroke.r }, ${ stroke.g }, ${ stroke.b }, ${ stroke.a })`;
   
-  let label = text_value;
-  let fontStr = [text_style, text_size, text_font].join(' ');
+  const label = text_value;
+  const fontStr = [text_style, text_size, text_font].join(' ');
 
-  let style = new OlStyleStyle({
+  const style = new OlStyleStyle({
     text: new OlStyleText({
       font: fontStr,
       textAlign: "left",
@@ -507,7 +507,7 @@ export const showOnPortal = (children) => {
 }
 
 export const traverseLayersTree = (layers, parent, cb) => {
-  let items = parent ? layers.filter(l => l.id === parent) : layers;
+  const items = parent ? layers.filter(l => l.id === parent) : layers;
   items.forEach((l, i) => {
     if (l.children) {
       l.children.forEach(cid => {

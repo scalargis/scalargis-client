@@ -8,11 +8,11 @@ function MainMenu(props) {
 
   const { core, mainMap } = useContext(AppContext);
   const dispatch = useDispatch();
-  let [ componentsOrdered, setComponentsOrdered ] = useState([]);
+  const [ componentsOrdered, setComponentsOrdered ] = useState([]);
   const { mode, history, viewer, components, auth, onMenuClick } = props;
 
   useEffect(() => {
-    let pitems = Object.keys(components)
+    const pitems = Object.keys(components)
       .filter(k => components[k].target === 'mainmenu')
       //.sort((a, b) => components[a].order > components[b].order ? 1 : -1 )
       .map(id => components[id]);

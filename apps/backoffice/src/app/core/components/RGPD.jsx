@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SplashScreen from './SplashScreen';
-import { withCookies } from 'react-cookie';
+import { CookiesProvider, useCookies } from 'react-cookie';
 import CookieConsent from "react-cookie-consent";
 import Cookies from 'universal-cookie';
 
@@ -9,28 +9,33 @@ const cookieValue = import.meta.env.VITE_APP_COOKIE_VALUE || '2';
 const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/';
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
 
-function RGPD({ cookies, children }) {
+const cookieStore = new Cookies();
 
-  const [cookiergpd, setCookiergpd] = useState(cookies.get(cookieName));
+function RGPDInner({ children }) {
+  const [cookies] = useCookies([cookieName]);
+  const [cookiergpd, setCookiergpd] = useState(cookies[cookieName]);
 
   function accept() {
     setCookiergpd(cookieValue);
 
     // Manually save cookie if using http access
     if (window.location.protocol === 'http:') {
-      let expireDate = new Date();
-      expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-      const cookies = new Cookies();
-      cookies.set(cookieName, cookieValue, { path: cookiePath, expires: expireDate, secure: false, httpOnly: false });
+      const expireDate = new Date();
+      expireDate.setDate(expireDate.getDate() + cookieExpiresDays);
+
+      cookieStore.set(cookieName, cookieValue, {
+        path: cookiePath,
+        expires: expireDate,
+        secure: false
+      });
     }
   }
 
-  console.log({cookiergpd,cookieValue});
+  console.log({ cookiergpd, cookieValue });
 
   return (
     <React.Fragment>
-
-      { String(cookiergpd || '') !== String(cookieValue || '') && (
+      {String(cookiergpd || '') !== String(cookieValue || '') && (
         <CookieConsent
           location="bottom"
           buttonText="Aceito"
@@ -46,11 +51,19 @@ function RGPD({ cookies, children }) {
         >
           Este website usa cookies para melhorar a experiência do utilizador
         </CookieConsent>
-      ) }
-      
-      { cookiergpd ? children : <SplashScreen /> }
-    </React.Fragment> 
-  );
-} 
+      )}
 
-export default withCookies(RGPD);
+      {cookiergpd ? children : <SplashScreen />}
+    </React.Fragment>
+  );
+}
+
+function RGPD(props) {
+  return (
+    <CookiesProvider cookies={cookieStore}>
+      <RGPDInner {...props} />
+    </CookiesProvider>
+  );
+}
+
+export default RGPD;

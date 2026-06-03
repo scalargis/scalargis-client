@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import './style.css';
 

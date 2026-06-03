@@ -20,7 +20,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from '@mui/material';
 */
 import {
   ArrayLayoutProps,
@@ -36,9 +35,6 @@ import {
   ArrayTranslations,
 } from '@jsonforms/core';
 /*
-import DeleteIcon from '@mui/icons-material/Delete';
-import ArrowDownward from '@mui/icons-material/ArrowDownward';
-import ArrowUpward from '@mui/icons-material/ArrowUpward';
 */
 
 import { WithDeleteDialogSupport } from './DeleteDialog';

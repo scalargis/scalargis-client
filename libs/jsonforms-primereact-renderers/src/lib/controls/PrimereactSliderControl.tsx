@@ -19,7 +19,6 @@ import {
   Hidden,
   Slider,
   Typography,
-} from '@mui/material';
 */
 import merge from 'lodash/merge';
 import { useFocus } from '../util';

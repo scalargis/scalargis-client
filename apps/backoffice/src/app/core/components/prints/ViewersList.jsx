@@ -163,7 +163,7 @@ function ViewersList(props) {
     <React.Fragment>
       <Toast ref={toast} />
 
-      <Button icon="pi pi-bars" className="p-button-rounded p-button-outlined"
+      <Button icon="pi pi-bars" rounded outlined
         onClick={(e) => { onButtonClick(e); }} loading={loading}></Button>
 
       <Dialog header={props.header || ''} visible={visible}
@@ -179,8 +179,8 @@ function ViewersList(props) {
             bodyStyle={{"wordBreak": "break-word"}} style={{width: '100px'}} />
           <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} bodyStyle={{"wordBreak": "break-word"}} />
           <Column field="title" header="Título" filter filterPlaceholder="Título" showFilterMenu={false} sortable bodyStyle={{"wordBreak": "break-word"}} />
-          <Column field="is_active" header="Ativo" body={isActiveTemplate} filter filterElement={statusFilter} showFilterMenu={false} style={{width: '140px'}} className="p-text-center" />
-          <Column field="is_shared" header="Tipo" body={isSharedTemplate} filter filterElement={sharedFilter} showFilterMenu={false} style={{width: '150px'}} className="p-text-center" />
+          <Column field="is_active" header="Ativo" body={isActiveTemplate} filter filterElement={statusFilter} showFilterMenu={false} style={{width: '140px'}} className="text-center" />
+          <Column field="is_shared" header="Tipo" body={isSharedTemplate} filter filterElement={sharedFilter} showFilterMenu={false} style={{width: '150px'}} className="text-center" />
         </DataTable>
       </Dialog>
     </React.Fragment>

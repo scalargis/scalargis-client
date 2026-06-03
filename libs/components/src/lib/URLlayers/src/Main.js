@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { v4 as uuid } from 'uuid';
 
 
@@ -89,9 +89,9 @@ export default function Main({ config, actions }) {
                 console.log(crs);
 
                 try {
-                    let target_proj = mainMap.getView().getProjection().getCode();
-                    let extent = transformExtent(crs, target_proj, data.extent.split(' '));
-                    let center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
+                    const target_proj = mainMap.getView().getProjection().getCode();
+                    const extent = transformExtent(crs, target_proj, data.extent.split(' '));
+                    const center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2]
                     dispatch(map_set_extent(center, extent));
                 } catch (e) {
                     console.log(e);

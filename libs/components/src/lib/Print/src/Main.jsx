@@ -1,10 +1,11 @@
 import React, { useState,useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'primereact/button'
 import { Panel } from 'primereact/panel'
 import { Dialog } from 'primereact/dialog'
 import Print from './Print'
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
 import './style.css'
@@ -16,17 +17,21 @@ export function MainMenu({ className, core, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
+  useTranslation();
 
   const [showPopup, setShowPopup] = useState(false);
 
   const component_cfg = record.config_json || {};
-  const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir");
-  const header = component_cfg?.header ? i18n.translateValue(component_cfg.header, component_cfg.header) : title;
+  const headerCfg = component_cfg?.header;
+  const title = headerCfg
+    ? i18n.translateValue(headerCfg, headerCfg)
+    : (record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir"));
+  const header = headerCfg ? i18n.translateValue(headerCfg, headerCfg) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  if (record.as === 'popup') {    
+  if (record.as === 'popup') {
     const closeLabel = component_cfg.closeLabel || i18n.translateValue("close", "Fechar");
     return (
       <React.Fragment>
@@ -80,12 +85,16 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   const { viewer, dispatch, Models } = config;
   const { selected_menu } = viewer.config_json;
-  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;  
+  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;
+  useTranslation();
 
   const component_cfg = record.config_json || {};
 
-  const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir");
-  const header = component_cfg?.header ? i18n.translateValue(component_cfg.header, component_cfg.header) : title;
+  const headerCfg = component_cfg?.header;
+  const title = headerCfg
+    ? i18n.translateValue(headerCfg, headerCfg)
+    : (record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("print", "Imprimir"));
+  const header = headerCfg ? i18n.translateValue(headerCfg, headerCfg) : title;
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
@@ -115,7 +124,8 @@ export default function Main({ type, region, as, core, config, actions, record, 
     return <Button
       title={title}
       icon="pi pi-print"
-      className="p-button-rounded p-button-raised"
+      rounded
+      className="p-button-raised"
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));

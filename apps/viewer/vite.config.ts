@@ -27,6 +27,7 @@ function loadUserProxyConfig() {
             target: target,
             changeOrigin: cfg.changeOrigin ?? true,
             secure: cfg.secure ?? false,
+            headers: cfg.headers,
             rewrite: (pathname: string) => {
               console.log(pathname);
               // Apply rules if any
@@ -102,10 +103,22 @@ export default defineConfig(() => {
       },
       sourcemap: sourcemap
     },
+    test: {
+      watch: false,
+      globals: true,
+      environment: 'jsdom',
+      include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+      reporters: ['default'],
+      coverage: {
+        reportsDirectory: '../../coverage/apps/viewer',
+        provider: 'v8',
+      },
+    },
     resolve: {
       alias: {
         'stream': 'stream-browserify',
-        'timers': 'timers-browserify'
+        'timers': 'timers-browserify',
+        'util': 'util/'
       },
       preserveSymlinks: true
     }

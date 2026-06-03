@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toolbar } from 'primereact/toolbar';
@@ -99,10 +99,9 @@ function RoleList(props) {
           loadData();          
         }).catch(e => {
           toast.current.show({life: 3000, severity: 'error', summary: 'Eliminar Registo(s)', detail: 'Ocorreu um erro ao eliminar o(s) registo(s)'}); 
-        }).finally(() => {
-        });
+        }).finally(() => { /* noop */ });
       },
-      reject: () =>  { }      
+      reject: () =>  { /* noop */ }      
     });
   }
   
@@ -128,7 +127,7 @@ function RoleList(props) {
           //console.log('finally');
         });
       },
-      reject: () =>  { }      
+      reject: () =>  { /* noop */ }      
     });
   }  
 
@@ -195,8 +194,8 @@ function RoleList(props) {
   const leftToolbarTemplate = () => {
     return (
         <React.Fragment>
-            <Button label="Novo" icon="pi pi-plus" className="p-button-success mr-2" onClick={newRecord} />
-            <Button label="Eliminar" icon="pi pi-trash" className="p-button-danger" onClick={deleteSelectedRecords} disabled={!selectedRecords || !selectedRecords.length} />
+            <Button label="Novo" icon="pi pi-plus" severity="success" className="mr-2" onClick={newRecord} />
+            <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={deleteSelectedRecords} disabled={!selectedRecords || !selectedRecords.length} />
         </React.Fragment>
     );
   }
@@ -204,20 +203,20 @@ function RoleList(props) {
   const rightToolbarTemplate = () => {
     return (
       <React.Fragment>
-          <Button label="Limpar" icon="pi pi-times" className="p-button-help p-mr-2" onClick={onFilterClear} />
-          {/*<Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />*/}
+          <Button label="Limpar" icon="pi pi-times" severity="help" className="mr-2" onClick={onFilterClear} />
+          {/*<Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />*/}
       </React.Fragment>
     );
   }
 
   const actionBodyTemplate = (rowData) => {
     if (rowData.read_only) {
-      return (<Button icon="fas fa-lock" className="p-button-rounded p-button-secondary" disabled />);
+      return (<Button icon="fas fa-lock" rounded severity="secondary" disabled />);
     } else {
       return (
           <React.Fragment>
-              <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editRecord(rowData)} />
-              <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => deleteRecord(rowData)} />
+              <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editRecord(rowData)} />
+              <Button icon="pi pi-trash" rounded severity="warning" onClick={() => deleteRecord(rowData)} />
           </React.Fragment>
       );
     }

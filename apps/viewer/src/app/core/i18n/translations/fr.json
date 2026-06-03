@@ -32,6 +32,8 @@
   "heading": "Direction",
   "speed": "Vitesse",
   "showTotalExtent": "Voir toute l'étendue",
+  "toggleFullscreen": "Basculer en plein écran",
+  "attributions": "Attributions",
   "getCoordinates":"Obtenir les coordonnées",
   "searchByCoordinates": "Rechercher par coordonnées",
   "searchByCoordinateInfo": "Cliquez sur la carte pour obtenir les coordonnées ou indiquez leurs valeurs à l'aide du formulaire suivant.",
@@ -269,7 +271,8 @@
   "passwordLowerRule": "At least a lower case letter",
   "passwordUpperRule": "At least an upper case letter",
   "passwordDigitRule": "At least one digit",
-  "passwordSizeRule": "At least 8 characters",
+  "passwordSpecialRule": "At least one special character",
+  "passwordSizeRule": "At least 12 characters",
   "enterPassword": "Enter password",
   "confirmPassword": "Confirm password",
   "newPassword": "New password",
@@ -339,5 +342,21 @@
   "errorFileGenerateMsg": "Une erreur s'est produite lors de la création du fichier",
 
   "pleaseWait": "Veuillez patienter...",
-  "anErrorOccurred": "Une erreur s'est produite"
+  "anErrorOccurred": "Une erreur s'est produite",
+
+  "hello_user": "Bonjour {{username}}",
+
+  "registration_user_exists": "Un utilisateur avec le nom d'utilisateur ou l'email spécifié existe déjà.",
+  "registration_email_sent": "Un email a été envoyé à {{email}} avec les instructions pour confirmer et terminer l'inscription.",
+  "registration_confirmation_sent_if_exists": "Si l'email est associé à un compte, une confirmation d'inscription sera envoyée.",
+  "registration_confirmation_invalid": "Confirmation d'inscription invalide.",
+  "registration_confirmation_expired": "La confirmation d'inscription a expiré.",
+  "password_reset_email_sent_if_exists": "Si un compte associé existe, un email sera envoyé avec les instructions pour la récupération du mot de passe.",
+  "password_reset_validation_invalid": "Confirmation de changement de mot de passe invalide.",
+  "password_reset_validation_expired": "La confirmation de changement de mot de passe a expiré.",
+  "password_set_invalid": "Confirmation de changement de mot de passe invalide.",
+  "password_set_expired": "La confirmation de changement de mot de passe a expiré.",
+  "password_update_success": "Mot de passe modifié avec succès.",
+  "account_update_error": "Une erreur s'est produite lors de la mise à jour de l'enregistrement.",
+  "password_policy_violation": "Le mot de passe ne répond pas aux exigences de sécurité."
 }

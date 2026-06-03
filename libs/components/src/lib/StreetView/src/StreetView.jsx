@@ -205,7 +205,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
             const pos = panorama.current.getPosition();
             const pov = panorama.current.getPov();
 
-            var coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
+            const coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
 
             if (streetviewLayer?.current) {
               const source = streetviewLayer.current.getSource();
@@ -247,7 +247,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
             const pos = panorama.current.getPosition();
             const pov = panorama.current.getPov();
 
-            var coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
+            const coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
             if (streetviewLayer?.current) {
               const source = streetviewLayer.current.getSource();
 

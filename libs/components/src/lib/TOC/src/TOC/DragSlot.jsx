@@ -21,7 +21,7 @@ export default function DragSlot({ i, parent, action, deep }) {
     setOver(false);
     let from = ev.dataTransfer.getData("index");
     from = from.split(',');
-    let to = [a, parent];
+    const to = [a, parent];
     action(from[0], from[1], parseInt(to[0], 10), to[1]);
   };
 

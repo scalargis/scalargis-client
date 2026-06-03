@@ -29,7 +29,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
     c.config_json.map_control === 'GeoLocation') : null;
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, viewer_set_exclusive_mapcontrol } = actions;
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [dragBox, setDragBox] = useState(false);
 
@@ -60,17 +60,21 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
       });
     }
 
-    //mapControls = defaultControls(options).extend([new FullScreen(), zoomToExtentControl]);
+    const fullScreenControl = new FullScreen({
+      tipLabel: t("toggleFullscreen", "Ativar/desativar ecrã inteiro")
+    });
+
+    //mapControls = defaultControls(options).extend([fullScreenControl, zoomToExtentControl]);
     mapControls = defaultControls(options);
     if (viewer.config_json.exclude_map_controls && viewer.config_json.exclude_map_controls.length > 0) {
       if (!viewer.config_json.exclude_map_controls.includes('fullscreen')) {
-        mapControls = mapControls.extend([new FullScreen()]);
+        mapControls = mapControls.extend([fullScreenControl]);
       }
       if (!viewer.config_json.exclude_map_controls.includes('zoomtoextent')) {
         mapControls = mapControls.extend([zoomToExtentControl]);
       }
     } else {
-      mapControls = defaultControls(options).extend([new FullScreen(), zoomToExtentControl]);
+      mapControls = defaultControls(options).extend([fullScreenControl, zoomToExtentControl]);
     }
     mapControls.forEach(c => {
       c.setTarget(document.getElementById('map-controls'));
@@ -85,7 +89,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         mapInteractions = mapInteractions.extend([
           new DragRotate({
             condition: (evt) => {
-              var browserEvent = evt.originalEvent;
+              const browserEvent = evt.originalEvent;
               return browserEvent.ctrlKey;
             }
           })
@@ -110,6 +114,19 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
       if (zoomToExtentControl) mainMap.removeControl(zoomToExtentControl);
     }
   }, [mainMap, viewer?.loaded]);
+
+  useEffect(() => {
+    if (!mainMap) return;
+    mainMap.getControls().forEach(c => {
+      if (c instanceof ZoomToExtent) {
+        const btn = c.element.querySelector('button');
+        if (btn) btn.title = t("showTotalExtent", "Ver extensão total");
+      } else if (c instanceof FullScreen) {
+        const btn = c.element.querySelector('button');
+        if (btn) btn.title = t("toggleFullscreen", "Ativar/desativar ecrã inteiro");
+      }
+    });
+  }, [i18n.language, mainMap]);
 
   // Toggle coordinates control
   function toggleCoordinatesControl() {
@@ -153,7 +170,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         <Button key={type}
           title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
           icon="fas fa-bullseye"
-          className={exclusive_mapcontrol === 'Coordinates' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
+          rounded
+          className={exclusive_mapcontrol === 'Coordinates' ? "p-button-raised active" : "p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}
         /> : null;
     } else if (type === 'FeatureInfo') {
@@ -161,7 +179,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         <Button key={type}
           title={feature_info_control.title || t("identifyElements", "Identificar elementos")}
           icon="pi pi-info-circle"
-          className={exclusive_mapcontrol === 'FeatureInfo' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
+          rounded
+          className={exclusive_mapcontrol === 'FeatureInfo' ? "p-button-raised active" : "p-button-raised"}
           onClick={e => { e.currentTarget.blur(); toggleFeatureInfoControl() }}
         /> : null;
     } else if (type === 'GeoLocation') {
@@ -172,7 +191,8 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
           <Button 
             title={geo_location_control.title || t("myLocation", "A minha localização")}
             icon="pi pi-globe"
-            className={geoLocationActive ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
+            rounded
+            className={geoLocationActive ? "p-button-raised active" : "p-button-raised"}
             onClick={e => { e.currentTarget.blur(); toggleGeoLocationControl() }}
           />
           <div className="btn-geolocation-options" style={!geoLocationActive || !geoLocationSettings ? { display: "none" } : {}}

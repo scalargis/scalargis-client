@@ -563,7 +563,7 @@
       border-radius: 4px;
   }
 
-  .nested-grid .p-col-4 {
+  .nested-grid .col-4 {
       padding-bottom: 1rem;
   }
 
@@ -585,7 +585,7 @@
 }
 
 .flexbox-demo {
-  .p-d-flex > div,
+  .flex > div,
 .box {
   background-color: #ffffff;
   text-align: center;
@@ -594,7 +594,7 @@
   box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
 }
 
-.p-d-flex > div {
+.flex > div {
   width: 8rem;
 }
 }

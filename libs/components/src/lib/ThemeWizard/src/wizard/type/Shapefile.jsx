@@ -42,7 +42,7 @@ export default function ArcGISMap(props) {
           return setLoading(false);
         }
 
-        let orginal_url = core.API_URL + res.Data.url;
+        const orginal_url = core.API_URL + res.Data.url;
         let url = orginal_url;
         if (!isUrlAppOrigin(url)) {
           url = core.MAP_PROXY_URL + encodeURIComponent(url);
@@ -75,8 +75,7 @@ export default function ArcGISMap(props) {
   const render = () => {
     const { viewer, loading, data, editField } = props;
     return (
-      <React.Fragment>
-        <div className="p-fluid">
+      <div className="p-fluid">
 
           <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
@@ -109,8 +108,6 @@ export default function ArcGISMap(props) {
             : null }            
           </div>
         </div>
-
-      </React.Fragment>
     )
   }
 

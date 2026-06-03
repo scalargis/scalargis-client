@@ -1,6 +1,5 @@
 import React from 'react';
 import { CellProps, WithClassname } from '@jsonforms/core';
-//import { Checkbox, InputProps } from '@mui/material';
 import {Checkbox} from 'primereact/checkbox';
 import merge from 'lodash/merge';
 
@@ -41,7 +40,7 @@ export const PrimereactCheckbox = React.memo(function PrimereactCheckbox(
       inputId={id}
       disabled={!enabled}
       onChange={e => handleChange(path, e.checked)}      
-      className={`p-mr-1 ${className}`}
+      className={`mr-1 ${className}`}
       //inputProps={inputPropsMerged}
     />
   );

@@ -37,7 +37,7 @@ function SplashScreen(props) {
       _mode: "inline",
       show_always: true,
       locales: [
-        ... core.siteConfig.locales
+        ...core.siteConfig.locales
       ]
     }
   }

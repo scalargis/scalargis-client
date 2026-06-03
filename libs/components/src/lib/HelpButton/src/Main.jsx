@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { Dialog } from 'primereact/dialog';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import HelpHtmlContent from './HelpHmtlContent';
 
@@ -35,7 +35,7 @@ export function MainMenu({ className, config, actions, record }) {
   if (record.as === 'popup') {
     const closeLabel = component_cfg.closeLabel ? i18nUtils.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18nUtils.translateValue("close", "Fechar");
 
-    let url = lang ? 
+    const url = lang ? 
       component_cfg.url.replace("{lang}", lang).replace("{language}", lang)
       : component_cfg.url;
 

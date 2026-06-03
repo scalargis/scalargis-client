@@ -1,7 +1,7 @@
 import React from 'react';
 import i18next from 'i18next';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 
 const formatMetadataValue = (element) => {

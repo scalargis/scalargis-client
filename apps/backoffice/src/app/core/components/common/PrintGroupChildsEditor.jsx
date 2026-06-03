@@ -4,7 +4,7 @@ import { ConfirmPopup, confirmPopup  } from 'primereact/confirmpopup';
 import { Panel } from 'primereact/panel';
 import { Message } from 'primereact/message';
 import { MultiSelect } from 'primereact/multiselect';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { getItemStyle, getFieldListStyle } from "./utils";
 
 
@@ -44,8 +44,7 @@ function RecordSelector(props) {
   }
 
   return (
-    <React.Fragment>
-      <div className="card p-2">
+    <div className="card p-2">
         <div className="field col-12 pl-0">
           <MultiSelect value={selectedRecords || []} 
             options={(availableRecords || []).filter(p => !(records || []).map(f=>f.id).includes(p.id))} 
@@ -66,7 +65,6 @@ function RecordSelector(props) {
           <div className="col"></div>
         </div>
       </div>
-    </React.Fragment>
   );
 }
 
@@ -90,7 +88,7 @@ const ListChilds = props => {
           if (!result.destination) return;
     
           const new_list = [...list];
-          var element = new_list[result.source.index];
+          const element = new_list[result.source.index];
           new_list.splice(result.source.index, 1);
           new_list.splice(result.destination.index, 0, element);
     
@@ -131,7 +129,7 @@ const ListChilds = props => {
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <Button type="text" icon="pi pi-times" 
-                          className="p-button-rounded p-button-text p-button-danger"
+                          rounded text severity="danger"
                           tooltip="Remover"
                           tooltipOptions={{position: 'bottom'}}                            
                           onClick={ (e) => {
@@ -196,14 +194,12 @@ class PrintGroupChildsEditor extends Component {
     this.onGroupsChange = this.onGroupsChange.bind(this); 
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ data: props.data });
+  static getDerivedStateFromProps(props, state) {
+    if (props.data !== state.data) {
+      return { data: props.data };
+    }
+    return null;
   }
-
-  /*
-  componentDidUpdate() {
-  }
-  */
 
   onGroupsChange(groups) {
     console.log(groups);

@@ -7,6 +7,7 @@ import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
 import Feature from 'ol/Feature';
 import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
+import parse from 'html-react-parser';
 
 import './style.css'
 import useOutsideClick from './useOutsideClick';
@@ -99,7 +100,7 @@ export default function Main({ core, config, actions, utils, record }) {
   }  
 
   function selectPlace(e) {
-    let item = e.value || selectedPlace;
+    const item = e.value || selectedPlace;
 
     if (item?.geom_wkt) {
       const geom = MapModel.getGeometryFromWKT(item.geom_wkt);
@@ -137,7 +138,7 @@ export default function Main({ core, config, actions, utils, record }) {
     let elem = null;
   
     if (iconClass) {
-      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.designacao} ({option.concelho})</span></div>;
+      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} mr-2`}></i> <span>{option.designacao} ({option.concelho})</span></div>;
       if (option.designacao === option.concelho) {
         elem = <div>{option.concelho}</div>
       }
@@ -157,7 +158,7 @@ export default function Main({ core, config, actions, utils, record }) {
     const admin_level = option.admin_level4 || option.admin_level3 || option.admin_level2 || option.admin_level1 || '';
   
     if (iconClass) {      
-      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} p-mr-2`}></i> <span>{option.name} {admin_level ? `(${admin_level})` : ''}</span></div>;
+      elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} mr-2`}></i> <span>{option.name} {admin_level ? `(${admin_level})` : ''}</span></div>;
       if (option.name === admin_level) {
         elem = <div>{admin_level}</div>
       }
@@ -190,7 +191,7 @@ export default function Main({ core, config, actions, utils, record }) {
             html = html.replace(`{${fld}}`, option[fld] || '');      
           });
         }
-        elem = <div dangerouslySetInnerHTML={{__html: html}} />;
+        elem = <div>{parse(html)}</div>;
       }
     }
 
@@ -205,7 +206,7 @@ export default function Main({ core, config, actions, utils, record }) {
               html = html.replace(`{${fld}}`, option[fld] || '');      
             });
           }
-          elem = <div dangerouslySetInnerHTML={{__html: html}} />;
+          elem = <div>{parse(html)}</div>;
         } else if (tpl.iconClass) {
           elem = buildDefaultItem(option, tpl.iconClass);
         }       
@@ -216,7 +217,7 @@ export default function Main({ core, config, actions, utils, record }) {
   }
 
   useEffect(() => {
-    let sources_ids = [];
+    const sources_ids = [];
     if (config.sources && config.sources.length > 0) {      
       config.sources.forEach(src => {
         if (src.active) {
@@ -338,4 +339,3 @@ export default function Main({ core, config, actions, utils, record }) {
     </div>
   );
 }
-

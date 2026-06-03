@@ -116,7 +116,7 @@ export default function Main(props) {
       height = oDiv.offsetHeight;
       oDiv.style.height = sOriginalHeight;
       oDiv.style.overflow = sOriginalOverflow;
-    } catch {}
+    } catch { /* empty */ }
         
     return clientHeight > height ? clientHeight : height;
   }

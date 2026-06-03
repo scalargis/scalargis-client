@@ -9,15 +9,13 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { Button } from 'primereact/button';
 
-import { i18n } from '@scalargis/components';
-import { utils } from '@scalargis/components';
-import { ProgressControl } from '@scalargis/components';
+import { i18n, utils, ProgressControl } from '../../components';
 
 import './style.css';
 
 
 const buildTree = (items, level = 0) => {
-  let tree = [];
+  const tree = [];
   items.forEach((item, index) => {
     const obj = {
       key: `${level}-${index}`,
@@ -29,7 +27,7 @@ const buildTree = (items, level = 0) => {
     };
     if (item.type === 'folder') {
         // Recursively build the children of the current item
-        let children = buildTree(item.children || [], level + 1);
+        const children = buildTree(item.children || [], level + 1);
         obj.children = children;
     }
     tree.push(obj);
@@ -150,13 +148,13 @@ export default function DocumentList({ core, documentList }) {
       </div>}
       {documentList?.showExpandButtons && <div className="col-12">
         <div className="p-buttonset" style={{"display": "inline-flex"}}>
-          <Button label={translatedText.expand} icon="pi pi-plus-circle" className="p-button-outlined p-button-sm"
+          <Button label={translatedText.expand} icon="pi pi-plus-circle" outlined size="small"
             onClick={() => {
               const _expandedKeys = {};
               allKeys.forEach(v => _expandedKeys[v] = true);
               setExpandedKeys(_expandedKeys);    
             }} />
-          <Button label={translatedText.collapse} icon="pi pi-minus-circle" className="p-button-outlined p-button-sm"
+          <Button label={translatedText.collapse} icon="pi pi-minus-circle" outlined size="small"
             onClick={() => {
               setExpandedKeys({});
             }}

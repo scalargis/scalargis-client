@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes as ReactRoutes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes as ReactRoutes, Route, Navigate, useLocation } from 'react-router';
 import Page404 from '../components/Page404';
 import Page401 from '../components/Page401';
 import PageLogin from '../components/PageLogin';

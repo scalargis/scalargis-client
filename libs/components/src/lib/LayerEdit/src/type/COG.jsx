@@ -49,15 +49,11 @@ export default function COG(props) {
     }
 
     let selectedBands = [1, 2, 3];
-    let convertToRGB;
-    let nodata;
     if (data?.options?.bands?.length) {
         selectedBands = data.options.bands;
-    } else if (data?.options?.bands?.length) {
-        selectedBands = data.options.bands;
     }
-    convertToRGB = data?.options?.convertToRGB != null ? data.options.convertToRGB : false;
-    nodata = data.options?.nodata != null ? data.options?.nodata : undefined;
+    const convertToRGB = data?.options?.convertToRGB != null ? data.options.convertToRGB : false;
+    const nodata = data.options?.nodata != null ? data.options?.nodata : undefined;
 
     // Don't show if advancedOptions equals False
     if (data?.advancedOptions === false) return null;

@@ -40,7 +40,7 @@
 }
 
 @media only screen and (max-width: 768px) {
-    .map-slider-layers-control .p-grid>.p-col, .map-slider-layers-control .p-grid>[class*=p-col] {
+    .map-slider-layers-control .grid>.col, .map-slider-layers-control .grid>[class*=col] {
         max-width: 50%;
     }
 }

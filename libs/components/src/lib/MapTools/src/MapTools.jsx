@@ -444,7 +444,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
           modal
           footer={(
             <Button 
-              className="p-button-info"
+              severity="info"
               icon="pi pi-check"
               label="OK"
               onClick={closeHelp}

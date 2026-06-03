@@ -3,7 +3,7 @@ import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from 'primereact/confirmdialog'
 import Layout from './Layout'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router'
 import AppContext from '../../AppContext'
 import MainMap from '../components/MainMap'
 import MainMenu from './MainMenu'
@@ -53,7 +53,7 @@ function Viewer(props) {
   const { i18n } = useTranslation();
 
   // Main map
-  let mainMapEl = useRef(null);
+  const mainMapEl = useRef(null);
   
   // Enable redux actions
   const dispatch = useDispatch();

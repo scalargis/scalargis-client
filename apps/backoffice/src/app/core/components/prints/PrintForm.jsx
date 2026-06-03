@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Toast } from 'primereact/toast';
 import { TabMenu } from 'primereact/tabmenu';
@@ -263,8 +263,8 @@ function PrintForm(props) {
               type="button" 
               label="Voltar" 
               icon="pi pi-left" 
-              className="p-button-secondary mr-4"
-              disabled={isSaving ? true : false} 
+              severity="secondary" className="mr-4"
+              disabled={isSaving ? true : false}
               onClick={goBack} />
             <Button
               type="submit" 
@@ -281,7 +281,7 @@ function PrintForm(props) {
       <TabMenu model={tabItems} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
 
       <OverlayPanel ref={op} showCloseIcon dismissable>
-          <div className="p-fluid p-grid">
+          <div className="p-fluid grid">
             <label>Adicionar escala</label>
             <InputMask id="addScale" 
               onChange={(e) => { 
@@ -430,7 +430,7 @@ function PrintForm(props) {
                     <div className="field col-12 md:col-6 mt-2">
                       <Controller name="free_scale" control={control}
                         render={({ field }) => {                      
-                          return <Checkbox id="free_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="free_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}                    
                       />                            
                       <label htmlFor="map_scale" className="p-checkbox-label pl-2" style={{display: "inline"}}>Escala livre</label>
@@ -438,7 +438,7 @@ function PrintForm(props) {
                     <div className=" field col-12 md:col-6 mt-2">
                       <Controller name="map_scale" control={control}
                         render={({ field }) => {                      
-                          return <Checkbox id="map_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="map_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}                    
                       />                            
                       <label htmlFor="map_scale" className="p-checkbox-label pl-2" style={{display: "inline"}}>Escala do mapa</label>
@@ -448,7 +448,7 @@ function PrintForm(props) {
                     <div className="field col-12 md:col-6 mt-2">
                       <Controller name="restrict_scales" control={control}
                         render={({ field }) => {                      
-                          return <Checkbox id="restrict_scales" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="restrict_scales" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}                    
                       />
                       <label htmlFor="cb1" className="p-checkbox-label pl-2" style={{display: "inline"}}>Escalas restritas</label>
@@ -482,7 +482,7 @@ function PrintForm(props) {
                     <div className="field col-12 md:col-6 mt-2">
                       <Controller name="free_printing" control={control}
                         render={({ field }) => {
-                          return <Checkbox id="free_printing" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="free_printing" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}
                       />
                       <label htmlFor="free_printing" className="p-checkbox-label pl-2" style={{display: "inline"}}>Emissão livre</label>
@@ -497,7 +497,7 @@ function PrintForm(props) {
                     <div className="field col-12 md:col-6 mt-2">
                       <Controller name="allow_drawing" control={control}
                         render={({ field }) => {
-                          return <Checkbox id="allow_drawing" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="allow_drawing" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}
                       />
                       <label htmlFor="allow_drawing" className="p-checkbox-label pl-2" style={{display: "inline"}}>Permitir desenhar</label>
@@ -505,7 +505,7 @@ function PrintForm(props) {
                     <div className="field col-12 md:col-6 mt-2">
                       <Controller name="location_marking" control={control}
                         render={({ field }) => {                      
-                          return <Checkbox id="location_marking" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="location_marking" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}                    
                       />                            
                       <label htmlFor="location_marking" className="p-checkbox-label pl-2" style={{display: "inline"}}>Obrigatório marcar local</label>
@@ -515,7 +515,7 @@ function PrintForm(props) {
                     <div className="field col-12 md:col-6 mt-2">
                       <Controller name="draw_location" control={control}
                         render={({ field }) => {                      
-                          return <Checkbox id="draw_location" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="draw_location" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}                    
                       />
                       <label htmlFor="cb1" className="p-checkbox-label pl-2" style={{display: "inline"}}>Desenhar local</label>
@@ -523,7 +523,7 @@ function PrintForm(props) {
                     <div className="field col-12 md:col-6 mt-2">
                       <Controller name="multi_geom" control={control}
                         render={({ field }) => {                      
-                          return <Checkbox id="multi_geom" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="p-mr-2" style={{float: "left"}} />
+                          return <Checkbox id="multi_geom" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
                         }}                    
                       />
                       <label htmlFor="cb1" className="p-checkbox-label pl-2" style={{display: "inline"}}>Múltiplas geometrias</label>

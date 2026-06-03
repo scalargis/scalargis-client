@@ -143,7 +143,7 @@ export default function PrintPanel2(props) {
 
           mainMap.render();          
         },
-        reject: () =>  { }      
+        reject: () =>  { /* noop */ }      
     });
   }  
 
@@ -170,7 +170,7 @@ export default function PrintPanel2(props) {
     if (printLayer && printLayer.current && printLayer.current.getSource().getFeatures().length > 0) {
       let extent = printLayer.current.getSource().getExtent();
       if (!extent) return;
-      let center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2];
+      const center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2];
 
       if ((extent[2] - extent[0]) < 500 || (extent[3] - extent[1]) < 500) {
         extent = [center[0] - 250, center[1] - 250, center[0] + 250, center[1] + 250];
@@ -240,13 +240,13 @@ export default function PrintPanel2(props) {
     });
     setGeometries(geoms);
 
-    let record = {
+    const record = {
       geom_filter: geoms.map(g => {return Models.MapModel.getWKTFromGeometry(g);}),
       geom_srid: Models.MapModel.getProjectionSrid(mainMap.getView().getProjection().getCode())
     }
 
     // Save request
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'        
@@ -260,7 +260,7 @@ export default function PrintPanel2(props) {
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
     // Auth url. TODO: check for proxy
-    let url = printGroup.resource_url;
+    const url = printGroup.resource_url;
     fetch(url, options)
       .then(res => res.json())
       .then(res => {
@@ -304,7 +304,7 @@ export default function PrintPanel2(props) {
 
 
   useEffect(()=> {
-    let fn_change = printLayer.current.getSource().on('change', () => {      
+    const fn_change = printLayer.current.getSource().on('change', () => {      
       if (printGroup.location_marking) {
         const ft = printLayer.current.getSource().getFeatures();
         if (ft.length == 0) {
@@ -439,7 +439,8 @@ export default function PrintPanel2(props) {
           icon={opt.icon}
           label={opt.label ? opt.label : ''}
           title={t(opt.title, opt.defaultTitle)}
-          className={"p-button-sm mr-1 tool" + (opt.value === drawTool ? " active" : "")}
+          size="small"
+          className={"mr-1 tool" + (opt.value === drawTool ? " active" : "")}
           onClick={(e) => selectDrawTool(e, opt.value)}
         />
       )}
@@ -448,16 +449,19 @@ export default function PrintPanel2(props) {
 
   const toolbarRightContents = (
     <React.Fragment>
-        <Button 
+        <Button
           icon="pi pi-trash"
           title={t("deleteSelectedElment", "Eliminar elemento selecionado")}
-          className="p-button-sm mr-1 tool"
+          size="small"
+          severity="danger"
+          className="mr-1 tool"
           onClick={(e) => deletedSelectedFeature() }
         />
         <Button 
           icon="fas fa-search-plus"
           title={t("viewAllElements", "Ver todos os elementos")}
-          className="p-button-sm mr-1 tool"
+          size="small"
+          className="mr-1 tool"
           onClick={(e) => zoomFeaturesExtent() }
         />        
     </React.Fragment>
@@ -511,8 +515,7 @@ export default function PrintPanel2(props) {
           { Object.entries(printGroup.form_fields.fields).map(([fieldKey, field]) => {
             const field_key = fieldKey;
             if (field.active) {
-              return <React.Fragment>
-                <div key={field_key} className="p-fluid">
+              return <div key={field_key} className="p-fluid">
                   { field.header && <h4>{field.header}</h4> }
                   <div className="field">
                     { field.showLabel && <label>{field.title}</label> }
@@ -523,7 +526,6 @@ export default function PrintPanel2(props) {
                       { (field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small> }
                   </div>
                 </div>
-                </React.Fragment>
               }
           }) }
         </div>
@@ -536,7 +538,7 @@ export default function PrintPanel2(props) {
             <Button
                 label={t("back", "Voltar")}
                 icon="pi pi-chevron-left"
-                className="p-button-sm"
+                size="small"
                 onClick={e => { goPanelPrintPrev(); }}
             />
             }
@@ -545,7 +547,7 @@ export default function PrintPanel2(props) {
             <Button
                 label={t("continue", "Continuar")}
                 icon={isLoading ? "pi pi-spin pi-spinner": ""}
-                className="p-button-sm"
+                size="small"
                 onClick={e => { goPanelPrintNext(); }}
                 disabled={isLoading} 
             />

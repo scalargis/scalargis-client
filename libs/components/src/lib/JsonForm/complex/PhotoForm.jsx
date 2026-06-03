@@ -3,7 +3,7 @@ import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 
-import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '@scalargis/components';
+import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '../../components';
 
 import { translateMsg } from './../util/i18n';
 
@@ -68,7 +68,7 @@ export default function PhotoForm(props) {
               label={labels.close}
               icon="pi pi-times"
               disabled={isSaving ? true : false}
-              onClick={() => close()} className="p-button-text" />
+              onClick={() => close()} text />
             <Button 
               label={labels.save}
               icon={isSaving ? "pi pi-check pi-spinner" : "pi pi-check" }

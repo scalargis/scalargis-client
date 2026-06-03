@@ -4,7 +4,7 @@ import { FilterMatchMode } from 'primereact/api';
 import { MultiSelect } from 'primereact/multiselect';
 import { Toolbar } from 'primereact/toolbar';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../../components';
 
 import ResultsTable from './ResultsTable';
 

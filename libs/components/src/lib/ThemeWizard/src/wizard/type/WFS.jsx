@@ -29,10 +29,10 @@ export default function WFS(props) {
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
-    let srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
-    let bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
+    const srid = Models.MapModel.getProjectionSrid(mainMap.getView().getProjection());
+    const bbox = viewer.config_json.full_extent || viewer.config_json.restricted_extent || mainMap.getView().calculateExtent();
 
-    let options = {
+    const options = {
       srid: srid,
       bbox: bbox,
       servertype: data.wfsServerType,
@@ -79,7 +79,7 @@ export default function WFS(props) {
           setLoading(false);
           return;
         }
-        let dataitems = Models.OWSModel.convertWFS2Themes(capabilities, data.url, options);
+        const dataitems = Models.OWSModel.convertWFS2Themes(capabilities, data.url, options);
         setData({ ...data, dataType: undefined, dataitems });
 
         // Add to cookies history
@@ -108,12 +108,12 @@ export default function WFS(props) {
       { key: '2.0.0', value: '2.0.0', label: '2.0.0' }
     ];
 
-    let wfsServerTypeOtions = [
+    const wfsServerTypeOtions = [
       { key: 999, value: '', label: t("notDefined", "Não Especificado") },
       { key: "arcgisserver", value: "arcgisserver", label: "ArcGIS Server"}
     ];
 
-    let wfsDataCRSOptions = [
+    const wfsDataCRSOptions = [
       { key: 0, value: 0, label: t("specifiedByService", "Especificado pelo Serviço") },
       { key: 4326, value: 4326, label: 'EPSG:4326' },
       { key: 3857, value: 3857, label: 'EPSG:3857' }

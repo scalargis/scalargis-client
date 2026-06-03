@@ -1,82 +1,96 @@
-# Scalargis
+# ScalarGIS Client
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+React frontend (Nx monorepo) — public **Viewer** (map viewer, port 4200) and admin **Backoffice** (port 4201).
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+> **Setup order:** the server must be running before the client dev server can work. → [scalargis-server README](../scalargis-server/README.md)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+---
 
-## Finish your CI setup
+## Prerequisites
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/t758PaSKnY)
+| | Version | Notes |
+|---|---|---|
+| Node.js | 24.x (recommended), 22.12+, or 20.19+ | Use [NVM for Windows](https://github.com/coreybutler/nvm-windows): `nvm install 24` then `nvm use 24` |
+| scalargis-server | running | Default: `http://localhost:5000` |
 
+---
 
-## Run tasks
+## Windows Development
 
-To run the dev server for your app, use:
+```powershell
+git clone <scalargis-client-repo-url> scalargis-client
+cd scalargis-client
+npm install
 
-```sh
+npx nx serve viewer       # http://localhost:4200
+npx nx serve backoffice   # http://localhost:4201
+```
+
+The dev server proxies `/api`, `/proxy`, and `/spatial_toolbox` to `http://localhost:5000` automatically.
+
+**Custom backend URL:**
+```powershell
+$env:VITE_APP_HOST_DEV = "http://192.168.1.100:5000"
 npx nx serve viewer
 ```
 
-To create a production bundle:
+---
 
-```sh
-npx nx build viewer
+## Build & Deploy to Server
+
+Builds the frontend and copies output directly into the server's static folder (no separate frontend server needed in production):
+
+```powershell
+npx nx run viewer:build-deploy-server
+npx nx run backoffice:build-deploy-server
 ```
 
-To see all available targets to run for a project, run:
+Output lands at `../scalargis-server/scalargis/app/static/viewer/` and `.../backoffice/`.  
+Access via the server: `http://localhost:5000/mapa/demo` and `http://localhost:5000/backoffice`.
 
-```sh
-npx nx show project viewer
+---
+
+## Components (Frontend Plugins)
+
+Components extend the viewer and backoffice with custom UI, routes, and state. Clone directly into the app's `components/` folder — **folder names are case-sensitive**.
+
+**Viewer** (`apps/viewer/src/app/components`):
+```powershell
+git clone <component-url> ComponentName
+git clone <component-url> AnotherComponent
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/react:app demo
+**Backoffice** (`apps/backoffice/src/app/components`, only components with a `Manager` export):
+```powershell
+git clone <component-url> ComponentName
 ```
 
-To generate a new library, use:
+After adding components, rebuild and redeploy to the server. Component repos are on GitLab — contact maintainers for access.
 
-```sh
-npx nx g @nx/react:lib mylib
+> **Windows symlinks:** if using `link_module.ps1` instead of direct cloning, enable **Developer Mode** (Settings → For developers) for symlinks without admin privileges.
+
+---
+
+## Custom Proxy Routes
+
+For extension-specific API paths (e.g. `/snic_cart`, `/mapaspt`), create `apps/viewer/user.proxy.config.json` (not committed):
+
+```json
+{
+  "/snic_cart": { "target": "{{proxyUrl}}/snic_cart", "changeOrigin": true, "rewriteFrom": "^/snic_cart" },
+  "/mapaspt":   { "target": "{{proxyUrl}}/mapaspt",   "changeOrigin": true, "rewriteFrom": "^/mapaspt" }
+}
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+`{{proxyUrl}}` resolves to the backend URL (`http://localhost:5000` by default).
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
+## Environment Variables
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+| Variable | Default | Description |
+|---|---|---|
+| `VITE_APP_HOST_DEV` | `http://localhost:5000` | Backend URL for dev proxy |
+| `VITE_APP_BASE_URL` | `""` | Base URL prefix for backend proxy |
+| `BASE` | *(none)* | Vite base path for production builds |
+| `SOURCEMAP` | `false` | Set `"true"` to enable source maps |

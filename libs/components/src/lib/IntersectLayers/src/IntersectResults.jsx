@@ -8,7 +8,7 @@ import { Toast } from 'primereact/toast';
 import OlWKT from "ol/format/WKT";
 import OlFeature from 'ol/Feature';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 
 import ResultsTablesTabs from './components/ResultsTablesTabs';
 
@@ -96,7 +96,7 @@ export default function IntersectResults(props) {
                     let extent = geom.getExtent();
                     if (extent) {
                         extent = [extent[0] - 250, extent[1] - 250, extent[2] + 250, extent[3] + 250];
-                        let center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2];
+                        const center = [extent[0] + (extent[2] - extent[0])/2, extent[1] + (extent[3] - extent[1])/2];
                         dispatch(actions.map_set_extent(center, extent));
                     }
                 }
@@ -156,7 +156,7 @@ export default function IntersectResults(props) {
                     dataProjection: `EPSG:${srid}`,
                     featureProjection: mainMap.getView().getProjection().getCode()
                 }
-                let geom = options ? format.readGeometry(wkt, options) : format.readGeometry(wkt);
+                const geom = options ? format.readGeometry(wkt, options) : format.readGeometry(wkt);
 
                 const feature = new OlFeature({_componentId: componentId, _type: 'output', geometry: geom});
                 intersectLayer.current.getSource().addFeature(feature);
@@ -188,7 +188,7 @@ export default function IntersectResults(props) {
                         dataProjection: `EPSG:${srid}`,
                         featureProjection: mainMap.getView().getProjection().getCode()
                     }
-                    let geom = options ? format.readGeometry(wkt, options) : format.readGeometry(wkt);
+                    const geom = options ? format.readGeometry(wkt, options) : format.readGeometry(wkt);
 
                     const feature = new OlFeature({...rec, _layerKey: key, _componentId: componentId, _type: 'results', geometry: geom});
                     intersectLayer.current.getSource().addFeature(feature);
@@ -201,7 +201,7 @@ export default function IntersectResults(props) {
     }, [selectedRows]);
 
     const expandAll = () => {
-        let _expandedRows = {};
+        const _expandedRows = {};
         items.forEach((p) => (_expandedRows[`${p.key}`] = true));
         setExpandedRows(_expandedRows);
     };

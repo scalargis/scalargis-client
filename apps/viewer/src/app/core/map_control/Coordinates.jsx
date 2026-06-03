@@ -90,7 +90,7 @@ function Coordinates({ auth, core, config, actions }) {
 
     const srid = getProjectionSrid(mainMap.getView().getProjection());
 
-    let options = {
+    const options = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'        
@@ -137,8 +137,7 @@ function Coordinates({ auth, core, config, actions }) {
     transformCoordinatesByApi(e.coordinate[0], e.coordinate[1]);
   }
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => { /* noop */ }, []);
 
   useEffect(() => {      
     if (!coordinatesLayer.current) return;

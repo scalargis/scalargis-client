@@ -7,7 +7,7 @@ export const loadTranslations = (ns, resources, deep=true, overwrite=true) => {
 }
 
 export const loadBackendTranslations = (url, deep=true, overwrite=true, callback=undefined) => { 
-  let options = {
+  const options = {
     headers: {
       'Accept': 'application/json'
     },
@@ -32,6 +32,15 @@ export const getTranslations = () => {
   return i18next.options.resources;
 }
 
+/**
+ * @param {any} value
+ * @param {string | null | undefined} [defaultString]
+ * @param {string | undefined} [lang]
+ * @param {((value: string, defaultString?: string | null, options?: Record<string, any>) => string) | undefined} [t]
+ * @param {string | string[] | readonly string[] | undefined} [namespaces]
+ * @param {Record<string, any>} [variables]
+ * @returns {string}
+ */
 export const translateValue = (value, defaultString=null, lang=i18next.resolvedLanguage, t=i18next?.t, namespaces=i18next?.options?.ns, variables={}) => {
   let translatedValue = defaultString;
   if (typeof value === 'object') {

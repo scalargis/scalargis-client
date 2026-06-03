@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { getRenderPixel } from 'ol/render';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import LayerCompare from './LayerCompare';
 
@@ -191,7 +191,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
     if (mainMap && layers) { // set layer visible for all subcomponents
       const layersIds = layers.map(e => e.code)
-      let checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
+      const checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
       if (selectedLayer) {
         checked.push(selectedLayer.code)
         leftMapSide.current = utils.findOlLayer(mainMap, selectedLayer.code)
@@ -244,7 +244,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
     if (mainMap && layers) {
       const layersIds = layers.map(e => e.code)
-      let checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
+      const checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
       if (selectedSliderLayer) {
         checked.push(selectedSliderLayer.code)
         rightMapSide.current = utils.findOlLayer(mainMap, selectedSliderLayer.code)
@@ -320,7 +320,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
               className="card layercompare-main-control"
               style={opened ? { opacity: '0', visibility: 'hidden' } : { opacity: '1', visibility: 'visible' }}>
               <Button
-                className="p-button-rounded p-button-warning"
+                rounded severity="warning"
                 label="Layer Compare"
                 iconPos="right"
                 icon="pi pi-angle-down"
@@ -333,7 +333,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
               <Button
                 style={{ width: '100%' }}
-                className="p-button-warning"
+                severity="warning"
                 label="Layer Compare"
                 iconPos="right"
                 icon="pi pi-angle-up"

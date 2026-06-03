@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
-import { Loader } from "@googlemaps/js-api-loader"
+import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 
 import StreetView from './StreetView';
 
@@ -35,28 +35,30 @@ export default function Main(props) {
   const title = record.title || 'Google StreetView';
   const header = component_cfg.header || title;
 
+  const [apiLoaded, setApiLoaded] = useState(!!window?.google?.maps);
+
   useEffect(() => {
-    // Load Google Maps API
-    if (!window?.google?.maps) {
-      const apiKey = siteConfig?.googleMaps?.apiKey || import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY;
+    if (window?.google?.maps) {
+      setApiLoaded(true);
+      return;
+    }
 
-      if (apiKey) {
-        const options = {
-          apiKey,
-          version: "3",
-        };
+    const apiKey = siteConfig?.googleMaps?.apiKey || import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY;
 
-        const loader = new Loader({
-          ...options,
-          ...siteConfig?.gooleMaps
+    if (apiKey) {
+      setOptions({
+        key: apiKey,
+        v: "3",
+        ...siteConfig?.googleMaps
+      });
+
+      importLibrary('streetView')
+        .then(() => {
+          setApiLoaded(true);
+        })
+        .catch(e => {
+          console.log('Error loading Google Maps API', e);
         });
-
-        loader
-          .load()
-          .catch(e => {
-            console.log('Error loading Google Maps API', e);
-          });
-      }
     }
   }, []);
 

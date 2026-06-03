@@ -126,22 +126,22 @@ const parseInspireMetadata = (metadata) => {
  * @param {Object} options
  */
 export const convertWFS2Themes = (wfs, originUrl, options) => {
-  let result = [];
+  const result = [];
   let types = [];
   let bbox;
-  let bbox_srid = options.srid;
+  const bbox_srid = options.srid;
 
   // Set default extent from extent options
   if (options.extent) bbox = parseBBOX(options.extent);
 
   // Find wfs namespace
-  let wfsns = wfs['wfs:WFS_Capabilities'] ? 'wfs:' : '';
+  const wfsns = wfs['wfs:WFS_Capabilities'] ? 'wfs:' : '';
 
   // Find ows namespace
-  let owsns = wfs[wfsns+'WFS_Capabilities']['ows:ServiceProvider'] ? 'ows:' : '';
+  const owsns = wfs[wfsns+'WFS_Capabilities']['ows:ServiceProvider'] ? 'ows:' : '';
 
   // Find default namespace
-  let ns = wfs[wfsns+'WFS_Capabilities'][wfsns+'FeatureTypeList'] ? wfsns : '';
+  const ns = wfs[wfsns+'WFS_Capabilities'][wfsns+'FeatureTypeList'] ? wfsns : '';
 
   // Get feature types
   types = wfs[wfsns+'WFS_Capabilities'][ns+'FeatureTypeList'][0][ns+'FeatureType'];
@@ -157,7 +157,7 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
     let bbox_srs = options.srid;
 
     // Find WFS version
-    let version = wfs[wfsns+'WFS_Capabilities']['$']['version'];
+    const version = wfs[wfsns+'WFS_Capabilities']['$']['version'];
 
     let url = removeUrlParam(originUrl, 'request'); 
 
@@ -346,12 +346,12 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
  * Parse WMS to Theme
  */
 export const convertWMS2Themes = (wms, originUrl, options) => {
-  let result = [];
+  const result = [];
 
   // Get formats for GetMap request
-  let get_map_formats =  Array.isArray(wms?.Capability?.Request?.GetMap?.Format) ? wms.Capability.Request.GetMap.Format.join(',') : '';
+  const get_map_formats =  Array.isArray(wms?.Capability?.Request?.GetMap?.Format) ? wms.Capability.Request.GetMap.Format.join(',') : '';
   // Set prefered getMap format
-  let get_map_format_preference = [
+  const get_map_format_preference = [
     'image/png',
     'image/png8',
     'image/png24',
@@ -364,7 +364,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
   ];
   let get_map_format = '';
   if (get_map_formats) {
-    let tmformats = get_map_formats.split(',');
+    const tmformats = get_map_formats.split(',');
     get_map_format_preference.forEach(gmf => {
       if (get_map_format) return;
       if (tmformats.includes(gmf)) get_map_format = gmf;
@@ -372,9 +372,9 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
   }
 
   // Get formats for GetFeatureInfo request
-  let get_feature_info_formats = Array.isArray(wms?.Capability?.Request?.GetFeatureInfo?.Format) ? wms.Capability.Request.GetFeatureInfo.Format.join(',') : '';
+  const get_feature_info_formats = Array.isArray(wms?.Capability?.Request?.GetFeatureInfo?.Format) ? wms.Capability.Request.GetFeatureInfo.Format.join(',') : '';
   // Set prefered getFeatureInfo format
-  let get_feature_info_format_preference = [
+  const get_feature_info_format_preference = [
     'application/json',
     'application/geojson',
     'application/vnd.ogc.gml',
@@ -386,7 +386,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
   ];
   let get_feature_info_format = '';
   if (get_feature_info_formats) {
-    let tformats = get_feature_info_formats.split(',');
+    const tformats = get_feature_info_formats.split(',');
     get_feature_info_format_preference.forEach(gfif => {
       if (get_feature_info_format) return;
       if (tformats.includes(gfif)) get_feature_info_format = gfif;
@@ -412,7 +412,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
     throw new Error('O serviço respondeu com a versão ' + wms.version);
   }
 
-  let createThemeFromLayer = (wms, layer, themes) => {
+  const createThemeFromLayer = (wms, layer, themes) => {
 
       // Get CRS options
       let crs_options = [];
@@ -424,7 +424,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
       }
 
       // Get legend URL
-      let wms_styles = [];
+      const wms_styles = [];
       let legend_url = '';
       if (layer.Style) {
         if (typeof layer.Style === 'object' && layer.Style.length) {
@@ -550,13 +550,13 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
  * Parse WMTS to Theme
  */
 export const convertWMTS2Themes = (wmts, originUrl, options) => {
-  let result = [];
+  const result = [];
 
   // Set default CRS
-  let crs = 4326, bbox, inspire_service_metadata;
+  const crs = 4326; let bbox, inspire_service_metadata;
 
   // Set prefered getTile format
-  let get_tile_format_preference = [
+  const get_tile_format_preference = [
     'image/png',
     'image/png8',
     'image/png24',
@@ -569,7 +569,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
   ];
 
   // Set prefered getFeatureInfo format
-  let get_feature_info_format_preference = [
+  const get_feature_info_format_preference = [
     'application/json',
     'application/geojson',
     'application/vnd.ogc.gml',
@@ -640,7 +640,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
     }
 
     // Get legend URL
-    let wmts_styles = [];
+    const wmts_styles = [];
     let legend_url = '';
     if (l.Style) {
       if (typeof l.Style === 'object' && l.Style.length) {
@@ -655,7 +655,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
     }
 
     //Get FeatureInfo Url
-    let get_feature_info_url = finalUrl;
+    const get_feature_info_url = finalUrl;
 
     //Get FeatureInfo formats
     let get_feature_info_format = '';
@@ -723,7 +723,7 @@ export const convertKML2Themes = (kml, url, raw, crs) => {
     featureProjection: 'EPSG:' + crs
   };
   const features = parser.readFeatures(raw, parseOptions);
-  let extent = OlExtent.createEmpty();
+  const extent = OlExtent.createEmpty();
   features.map(f => {
     if (f.getGeometry()) OlExtent.extend(extent, f.getGeometry().getExtent());
     return f;
@@ -810,7 +810,7 @@ export const convertGeoJSON2Themes = (geojson, url, name, crs) => {
   };
 
   const features = parser.readFeatures(geojson, parseOptions);
-  let extent = OlExtent.createEmpty();
+  const extent = OlExtent.createEmpty();
   features.map(f => {
     if (f.getGeometry()) OlExtent.extend(extent, f.getGeometry().getExtent());
     return f;
@@ -849,7 +849,7 @@ export const convertGML2Themes = (gml, url, name, crs) => {
     featureProjection: 'EPSG:' + crs
   };
   const features = parser.readFeatures(gml, parseOptions);
-  let extent = OlExtent.createEmpty();
+  const extent = OlExtent.createEmpty();
   features.map(f => {
     if (f.getGeometry()) OlExtent.extend(extent, f.getGeometry().getExtent());
     return f;
@@ -954,15 +954,15 @@ export const downloadTheme = (theme, format) => {
  * Parse WMS to Theme
  */
  export const convertArcGISMap2Themes = (capabilities, originUrl, options) => {
-  let result = [];
+  const result = [];
 
   const service = capabilities.service;
   const layers = capabilities.layers;
 
   // Get formats for GetMap request
-  let get_map_formats = service.supportedImageFormatTypes;
+  const get_map_formats = service.supportedImageFormatTypes;
   // Set prefered getMap format
-  let get_map_format_preference = [
+  const get_map_format_preference = [
     'PNG32',
     'PNG24',
     'PNG',
@@ -979,7 +979,7 @@ export const downloadTheme = (theme, format) => {
   ];
   let get_map_format = '';
   if (get_map_formats) {
-    let tmformats = get_map_formats.split(',');
+    const tmformats = get_map_formats.split(',');
     get_map_format_preference.forEach(gmf => {
       if (get_map_format) return;
       if (tmformats.includes(gmf)) get_map_format = gmf;
@@ -987,7 +987,7 @@ export const downloadTheme = (theme, format) => {
   }
 
   // Set default CRS
-  let crs = 4326, bbox;
+  const crs = 4326; let bbox;
 
   try {
     // Get bbox from extent options
@@ -1007,7 +1007,7 @@ export const downloadTheme = (theme, format) => {
   }
 
 
-  let createThemeFromLayer = (capabilities, layer, themes) => {
+  const createThemeFromLayer = (capabilities, layer, themes) => {
 
       // Get CRS options
       const crs_options = ['EPSG:4326', 'EPSG:3857'];
@@ -1019,9 +1019,9 @@ export const downloadTheme = (theme, format) => {
       }
 
       // Parse URL
-      let finalUrl = originUrl;
+      const finalUrl = originUrl;
 
-      let layer_crs = crs;
+      const layer_crs = crs;
       let layer_bbox = bbox;
 
       try {
@@ -1095,7 +1095,7 @@ export const downloadTheme = (theme, format) => {
  * Parse COG to Theme
  */
 export const convertCOG2Themes = (image, url, name, proxyRequests, options) => {
-  let result = [];
+  const result = [];
 
   const bbox = image.getBoundingBox();
   const bands = image.getSamplesPerPixel();

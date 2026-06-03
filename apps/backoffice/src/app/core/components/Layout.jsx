@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import classNames from 'classnames';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router';
 import { CSSTransition } from 'react-transition-group';
 
 import { AppTopbar } from './AppTopbar';
@@ -165,7 +165,7 @@ function Layout(props) {
     <div className={wrapperClass} onClick={onWrapperClick}>
         <AppTopbar onToggleMenu={onToggleMenu} />
 
-        <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
+        <CSSTransition nodeRef={sidebar} classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
             <div ref={sidebar} className={sidebarClassName} onClick={onSidebarClick}>
                 <div className="layout-logo" style={{cursor: 'pointer'}} onClick={() => history.navigate('/')}>
                     <img alt="Logo" src={logo} />
@@ -187,8 +187,8 @@ function Layout(props) {
                 <Route path="/notifications/edit/:id" element={<NotificationEdit />} />
                 <Route path="/notifications/list" element={<NotificationList />} />
 
-                <Route path="/" exact element={<Dashboard />} />
-                <Route path="/dashboard" exact element={<div>Teste</div>} />
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<div>Teste</div>} />
                 
                 <Route path="/viewers/create" element={<ViewerEdit />} />
                 <Route path="/viewers/edit/:id" element={<ViewerEdit />} />

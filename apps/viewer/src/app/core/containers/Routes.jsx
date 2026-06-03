@@ -1,7 +1,7 @@
 import React from 'react'
 import Viewer from './Viewer'
 import ViewerEmbedded from './ViewerEmbedded'
-import { BrowserRouter as Router, Routes as ReactRoutes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes as ReactRoutes, Route, Navigate, useLocation } from 'react-router'
 import HomePage from '../components/HomePage'
 import Page404 from '../components/Page404'
 import Page401 from '../components/Page401'

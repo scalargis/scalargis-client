@@ -9,9 +9,6 @@ import {
 } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 /*
-import { FormHelperText, Hidden } from '@mui/material';
-import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 */
 import { PrimereactInputDateTime } from '../primereact-controls/PrimereactInputDateTime';
 import { PrimereactInputControl } from './PrimereactInputControl';

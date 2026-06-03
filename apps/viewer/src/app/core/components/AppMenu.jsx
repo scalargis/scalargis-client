@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {NavLink} from 'react-router-dom'
+import {NavLink} from 'react-router'
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -50,8 +50,8 @@ class AppSubmenu extends Component {
     }
 
 	renderLinkContent(item) {
-		let submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
-		let badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
+		const submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
+		const badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
 
 		return (
 			<React.Fragment>
@@ -64,11 +64,11 @@ class AppSubmenu extends Component {
 	}
 
 	renderLink(item, i) {
-		let content = this.renderLinkContent(item);
+		const content = this.renderLinkContent(item);
 
 		if (item.to) {
 			return (
-				<NavLink activeClassName="active-route" to={item.to} onClick={(e) => this.onMenuItemClick(e, item, i)} exact target={item.target}>
+				<NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to={item.to} onClick={(e) => this.onMenuItemClick(e, item, i)} target={item.target}>
                     {content}
                 </NavLink>
 			)
@@ -84,9 +84,9 @@ class AppSubmenu extends Component {
 	}
     
     render() {
-        let items = this.props.items && this.props.items.map((item, i) => {
-            let active = this.state.activeIndex === i;
-            let styleClass = classNames(item.badgeStyleClass, {'active-menuitem': active && !item.to});
+        const items = this.props.items && this.props.items.map((item, i) => {
+            const active = this.state.activeIndex === i;
+            const styleClass = classNames(item.badgeStyleClass, {'active-menuitem': active && !item.to});
 
             return (
                 <li className={styleClass} key={i}>

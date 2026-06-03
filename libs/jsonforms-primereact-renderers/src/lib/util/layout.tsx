@@ -10,7 +10,6 @@ import {
   OwnPropsOfRenderer,
 } from '@jsonforms/core';
 import { JsonFormsDispatch, useJsonForms } from '@jsonforms/react';
-//import { Grid, Hidden } from '@mui/material';
 
 export const renderLayoutElements = (
   elements: UISchemaElement[],
@@ -70,7 +69,7 @@ const PrimereactLayoutRendererComponent = ({
   } else {
     if (direction === 'row') {
       return (
-        <div className="p-fluid p-formgrid p-grid p-jsonform"> 
+        <div className="p-fluid formgrid grid p-jsonform"> 
           {renderLayoutElements(
             elements,
             schema,
@@ -126,9 +125,7 @@ export interface AjvProps {
   ajv: any;
 }
 
-// TODO fix @typescript-eslint/ban-types
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const withAjvProps = <P extends {}>(
+export const withAjvProps = <P extends object>(
   Component: ComponentType<AjvProps & P>
 ) =>
   function WithAjvProps(props: P) {

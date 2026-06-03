@@ -29,7 +29,8 @@ export default function Main({ core, config }) {
       <Button icon="pi pi-info-circle"
         title={t("metadataInfo", "Informação de Metadados")}
         color="blue"
-        className="p-button-sm p-button-rounded p-button-text tool"
+        size="small" rounded text
+        className="tool"
         onClick={e => setModalThemeInfoOpen(layer)}
       />
 

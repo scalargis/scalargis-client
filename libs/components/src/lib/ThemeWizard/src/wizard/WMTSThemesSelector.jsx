@@ -18,10 +18,10 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
   const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   function expandNode(node) {
-    let newExpandedKeys = { ...expandedKeys };
+    const newExpandedKeys = { ...expandedKeys };
     if (node.children && node.children.length) {
       newExpandedKeys[node.key] = true;
-      for (let child of node.children) {
+      for (const child of node.children) {
         expandNode(child);
       }
     }
@@ -55,7 +55,7 @@ const WMTSThemesSelector = ({ themes, tileMatrixSet, data, setData, selected, se
 
   // Expand all on
   useEffect(() => {
-    for (let node of nodes) {
+    for (const node of nodes) {
       expandNode(node);
     }
   }, []);

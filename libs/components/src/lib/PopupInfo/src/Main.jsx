@@ -6,7 +6,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { Button } from 'primereact/button';
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
-import { LocaleSelectorComponent } from'@scalargis/components';
+import { LocaleSelectorComponent } from '../../components';
 
 import './index.css';
 
@@ -45,7 +45,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
     const cookies = new Cookies();
     const cookieData = cookies.get(config.cookieName || cookiePopupName);
     if (typeof cookieData !== 'undefined') {
-      let data = JSON.parse(cookieData);
+      const data = JSON.parse(cookieData);
       state = data === 0 ? false : true;
     }
     
@@ -64,7 +64,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
 
   function hidePopup() {
     setShowPopup(false);
-    let data = JSON.stringify(0);
+    const data = JSON.stringify(0);
     const cookies = new Cookies();
     let maxAge = 1;
     if (permanent) maxAge = config.maxAge || (maxAge * 365 * 24 * 60 * 60);
@@ -76,7 +76,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
   }
 
   useEffect(() => {
-    let state = getInitialState();
+    const state = getInitialState();
     setShowPopup(state);
 
     if (!state) {

@@ -12,7 +12,7 @@ export default function PanelJsonContent({ core, config }) {
   useEffect(() => {    
     if (config.url) {
       // Set request headers
-      let options = {
+      const options = {
         headers: {
           'Accept': 'application/json'       
         },

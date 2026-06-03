@@ -4,7 +4,7 @@ import { SelectButton } from 'primereact/selectbutton';
 import { Slider } from 'primereact/slider'
 import { Chip } from 'primereact/chip';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils } from '../../components';
 
 import './style.css';
 
@@ -27,7 +27,7 @@ export default function SliderPanel({
 
     const toolOptionTemplate = (option) => {
         return (
-            <div className='p-px-1'>
+            <div className='px-1'>
                 <span>{option.name}</span>
                 <i className={option.icon} style={{ margin: '2px' }}></i>
             </div>
@@ -68,7 +68,7 @@ export default function SliderPanel({
                             : i18nUtils.translateValue("selectTopTheme", "Selecionar tema de topo")}
                     />
                     { compareTool === 2 && selectedLayer ?
-                        <Chip label={String(opacitySliderValue.toFixed()) + ' %'} className="p-ml-2"></Chip>
+                        <Chip label={String(opacitySliderValue.toFixed()) + ' %'} className="ml-2"></Chip>
                         : null }
                 </div>
 
@@ -89,7 +89,7 @@ export default function SliderPanel({
                             i18nUtils.translateValue("selectBottomTheme", "Selecionar tema de baixo")}
                     />
                     {compareTool === 2 && selectedSliderLayer ?
-                        <Chip label={String(100 - opacitySliderValue.toFixed()) + ' %'} className="p-ml-2"></Chip>
+                        <Chip label={String(100 - opacitySliderValue.toFixed()) + ' %'} className="ml-2"></Chip>
                         : null}
                 </div>
 

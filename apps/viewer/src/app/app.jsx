@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { useTranslation} from "react-i18next";
 import { locale, addLocale } from 'primereact/api';
@@ -27,13 +27,13 @@ const App = () => {
 
     dispatch(site_load(core, (config) => {
       const _getRoutesInfo = (module) => {
-        if (!!module["getPageRoutes"]) {
+        if (module["getPageRoutes"]) {
           return module.getPageRoutes();
         }
         return [];
       }
       
-      let _mods = (config?.customComponents || []).map(async (item) => {
+      const _mods = (config?.customComponents || []).map(async (item) => {
         let mod = null;
         try {
           mod = await import(`./components/${item}/src/Main.jsx`);
@@ -55,7 +55,7 @@ const App = () => {
       return Promise.all(_mods).then((result) => {
         return result.flat();
       }).then(data => {
-        let pgs = [];
+        const pgs = [];
         const elems = (data || []).filter(d => d != null);
         elems.forEach(d => {
           // Register component widgets

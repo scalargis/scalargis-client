@@ -3,6 +3,7 @@ import { connect, useDispatch } from 'react-redux';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -11,6 +12,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
   const [emailConfirmation, setEmailConfirmation] = useState('');
   const [goRedirect, setGoRedirect] = useState(false);
+  const [validating, setValidating] = useState(!!token);
 
   // Enable redux actions
   const dispatch = useDispatch();
@@ -20,17 +22,22 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
   useEffect(() => {
     if (auth?.data?.token) return;
- 
+
     dispatch(registration_confirmation({ token }, history, redirect));
   }, []);
+
+  useEffect(() => {
+    if (validating && (registration.response || auth.http_error)) {
+      setValidating(false);
+    }
+  }, [registration.response, auth.http_error]);
 
   // Render user
   if (auth?.data?.token) {
     const { username } = auth.data;
     
     return (
-        <React.Fragment>
-          <div>
+        <div>
             <p dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("activeUserSession", "Existe uma sessão ativa para o utilizador <i><strong>{{username}}</strong></i>", undefined, undefined, undefined, {username: username})}} />
             <p>
               {i18nUtils.translateValue("clickTo", "Clique para ")}
@@ -41,7 +48,6 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
               />{i18nUtils.translateValue("andFinishUserRegistration", "e concluir registo de novo utilizador")}.
             </p>
           </div>
-        </React.Fragment>
     )
   }
 
@@ -49,10 +55,18 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
     dispatch(registration_send_confirmation({ email: emailConfirmation }, history, redirect));
   }
 
+  if (validating) {
+    return (
+      <div className="flex align-items-center justify-content-center flex-column px-3 py-5">
+        <ProgressSpinner style={{ width: '50px', height: '50px' }} />
+        <p className="mt-3" style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("validatingRegistration", "A validar registo")}...</p>
+      </div>
+    );
+  }
+
   if (registration.response && !!registration.response && !!registration.response.authenticated) {
     return (
-      <React.Fragment>
-        <div>
+      <div>
           <div className="flex align-items-center justify-content-center flex-column px-3">
             <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
             <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
@@ -67,7 +81,6 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
               disabled={goRedirect} />
           </div>
         </div>
-      </React.Fragment>
     )
   }
 

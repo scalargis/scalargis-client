@@ -6,7 +6,7 @@ import { Button } from 'primereact/button'
 import { Message } from 'primereact/message'
 import { classNames } from 'primereact/utils'
 
-import { i18n as i18nUtils } from '@scalargis/components'
+import { i18n as i18nUtils } from '../../components'
 
 import { getFormValidationErrorMessage } from './utils'
 
@@ -36,9 +36,9 @@ function LoginWidget(props) {
     const { username } = auth.data;
     return (
       <div>
-        <p>Olá { username }.</p>
+        <p>{i18nUtils.translateValue("hello_user", "Olá {{username}}", undefined, undefined, undefined, {username})}.</p>
         <p>
-          Clique para 
+          {i18nUtils.translateValue("clickTo", "Clique para")}
           <Button
             className="p-button-link" onClick={e => dispatch(logout())}
             label={i18nUtils.translateValue("endSession", "Terminar sessão")}

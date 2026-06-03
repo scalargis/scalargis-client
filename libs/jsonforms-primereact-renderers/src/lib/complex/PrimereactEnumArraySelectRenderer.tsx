@@ -58,7 +58,7 @@ export const PrimereactEnumArraySelectRenderer = (
     .concat(isValid ? 'input-description' : 'validation_error')
     .join(' ');
 
-  let newProps = {
+  const newProps = {
     ...props,
     handleChange: (_childPath: any, newValue: any) => {
       _handleChange(path, newValue);

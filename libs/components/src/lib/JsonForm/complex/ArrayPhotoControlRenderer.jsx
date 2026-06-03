@@ -89,7 +89,7 @@ export const ArrayPhotoControlRenderer = (props) => {
       <div className="field col-12 mb-0 pb-0">
         { (props?.data?.length) ? 
           <div className="col-12">
-            <div className="card p-text-center mb-1 p-0">
+            <div className="card text-center mb-1 p-0">
               <Tag severity="info" rounded style={{width:'80%'}} 
                 value={props.data.length + " " + (props.data.length > 1 ? 
                   translateMsg("common.photos", "photos", "Fotografias", i18Props) : 
@@ -107,7 +107,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                         </td>
                         <td className="col-9" style={{"wordBreak": "break-all", "textAlign": "center"}}>{(f?.original_filename || f?.filename)}</td>
                         <td className="col-1" style={{"verticalAlign": "top", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" className="p-button-rounded p-button-outlined mb-2" 
+                          <Button icon="pi pi-pencil" rounded outlined className="mb-2"
                             title={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
@@ -115,7 +115,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                               setRowIndex(index);
                               setRowData(item);                   
                             }} />                                                                            
-                          <Button icon="pi pi-trash" className="p-button-rounded p-button-outlined p-button-danger" 
+                          <Button icon="pi pi-trash" rounded outlined severity="danger"
                             title={translateMsg("common.deletePhoto", "deletePhoto", "Eliminar fotografia", i18Props)}
                             onClick={(e) => { 
                               e.preventDefault();
@@ -123,13 +123,13 @@ export const ArrayPhotoControlRenderer = (props) => {
                               confirmDialog({
                                 message: `${translateMsg("common.deleteFileConfirmation", "deleteFileConfirmation", "Deseja remover a ficheiro", i18Props)} "${f.original_filename || f.filename}"?`,
                                 header:  translateMsg("common.confirmation", "confirmation", "Confirmação", i18Props),
-                                icon: 'pi pi-exclamation-triangle p-mr-1',
+                                icon: 'pi pi-exclamation-triangle mr-1',
                                 acceptLabel: translateMsg("yes", null, "Sim", i18Props),
                                 rejectLabel: translateMsg("no", null, "Não", i18Props),
                                 accept: () => {
                                   deleteConfirm(index);
                                 },
-                                reject: () =>  { }      
+                                reject: () =>  { /* noop */ }      
                               });
 
                           } } />                    
@@ -148,7 +148,7 @@ export const ArrayPhotoControlRenderer = (props) => {
       </div>
 
       <div className="col-12 text-center">
-        <Button label={translateMsg("addPhoto", null, "Adicionar Fotografia", i18Props)} className="p-button-text" style={buttonAddStyle}
+        <Button label={translateMsg("addPhoto", null, "Adicionar Fotografia", i18Props)} text style={buttonAddStyle}
           onClick={(e) => {
             e.preventDefault();
             setShowPhotoForm(true);

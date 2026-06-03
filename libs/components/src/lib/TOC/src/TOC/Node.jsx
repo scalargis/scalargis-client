@@ -7,7 +7,7 @@ import { Button } from 'primereact/button';
 import DraggableItem from './DraggableItem';
 import Legend from "./Legend";
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../../components';
 
 class Node extends React.Component {
 
@@ -113,7 +113,7 @@ class Node extends React.Component {
                 {isGroup && (
                   <div className="group-button">
                     <Button
-                      className="p-button-sm p-button-text"
+                      size="small" text
                       style={!isChildrenVisible ? { visibility: "hidden" } : null}
                       title={this.props.t("showHideChildThemes", "Mostrar/esconder subtemas")}
                       icon={this.isOpen() ? "pi pi-chevron-down" : "pi pi-chevron-right"}
@@ -156,7 +156,7 @@ class Node extends React.Component {
                       <div className="buttons">
                         {data.show_details !== false ?
                           <Button
-                            className={"p-button-sm" + (detailsOpen ? "" : " p-button-text")}
+                            size="small" text={!detailsOpen}
                             title={this.props.t("showHideDetails", "Mostrar/esconder detalhes")}
                             icon={this.isOpen() ? "pi pi-cog" : "pi pi-cog"}
                             onClick={e => this.setState({ ...this.state, detailsOpen: !detailsOpen })}
@@ -164,7 +164,7 @@ class Node extends React.Component {
                         {' '}
                         {data.bbox && data.show_zoom_extent !== false ? (
                           <Button
-                            className="p-button-sm p-button-text"
+                            size="small" text
                             title={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
                             icon="pi pi-search"
                             onClick={e => this.onClickZoom(e, data)}

@@ -11,7 +11,7 @@ export default function Group(props) {
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
   useEffect(() => {
-    let { data, setData, setSelected } = props;
+    const { data, setData, setSelected } = props;
     
     // Create theme
     let theme = {
@@ -35,7 +35,7 @@ export default function Group(props) {
 
 
   const changeName = (value) => {
-    let { data, editField, setSelected } = props;
+    const { data, editField, setSelected } = props;
     if (value.trim()) {
       const title = value;
       let theme = data.dataitems[0];
@@ -55,7 +55,7 @@ export default function Group(props) {
         };
         editField('dataitems', Object.assign([], [theme]));      
       }
-      let selection = {};
+      const selection = {};
       selection[theme.id] = { checked: true, partialChecked: false };
       setSelected(selection);
     } else {
@@ -72,13 +72,11 @@ export default function Group(props) {
     const theme = data.dataitems.length ? data.dataitems[0] : null;
 
     return (
-      <React.Fragment>
-        <InputText placeholder={`${t("groupName", "Nome do Grupo")}...`}
+      <InputText placeholder={`${t("groupName", "Nome do Grupo")}...`}
           value={theme ? theme.title : ''}
           onChange={e => changeName(e.target.value)}
           style={{ width: '100%' }}
         />
-      </React.Fragment>
     )
   }
 

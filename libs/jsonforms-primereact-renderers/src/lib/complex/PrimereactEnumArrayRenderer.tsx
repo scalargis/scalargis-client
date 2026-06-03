@@ -28,7 +28,6 @@ import {
   FormGroup,
   FormHelperText,
   Hidden,
-} from '@mui/material';
 */
 import isEmpty from 'lodash/isEmpty';
 import React from 'react';
@@ -143,7 +142,7 @@ export const PrimereactEnumArrayRenderer = ({
                 uischema={uischema}
                 visible={visible}
                 enabled={enabled}
-                className="p-mr-1"
+                className="mr-1"
                 {...otherProps}
               />
               <label htmlFor={`${id}-${option.value}-input`}>{option.label}</label>
@@ -152,8 +151,8 @@ export const PrimereactEnumArrayRenderer = ({
           );
         })}        
       </div>
-      <small id={`${id}-input-help1`} className={`p-d-block ${!showDescription && !isValid ? 'p-error' : ''}`}>{firstFormHelperText}</small>
-      <small id={`${id}-input-help2`} className="p-d-block p-error">{secondFormHelperText}</small>
+      <small id={`${id}-input-help1`} className={`block ${!showDescription && !isValid ? 'p-error' : ''}`}>{firstFormHelperText}</small>
+      <small id={`${id}-input-help2`} className="block p-error">{secondFormHelperText}</small>
     </div>
   ); 
 

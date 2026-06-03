@@ -1,5 +1,5 @@
 export default function layerNode(layer, selected) {
-  let node = {
+  const node = {
     key: layer.id,
     label: layer.title,
     data: layer,

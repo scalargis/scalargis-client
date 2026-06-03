@@ -7,7 +7,7 @@ export const AppConfig = (props) => {
 
     const [active, setActive] = useState(false);
     const config = useRef(null);
-    let outsideClickListener = useRef(null);
+    const outsideClickListener = useRef(null);
 
     const unbindOutsideClickListener = useCallback(() => {
         if (outsideClickListener.current) {

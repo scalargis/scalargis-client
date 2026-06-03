@@ -44,7 +44,7 @@ export const FileControl = (props) => {
     if (file_upload.current && file_upload.current.files && file_upload.current.files.length) {
       const reader = new FileReader();
       reader.onload = async function() {
-        let file_data = reader.result;
+        const file_data = reader.result;
 
         try {
           const data = {
@@ -103,12 +103,12 @@ export const FileControl = (props) => {
           <div className="field">
             { (file && file.data && file.original_filename) ?
             <div>
-              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="p-ml-2" style={{color:"var(--primary-color)"}} /></div>
+              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="ml-2" style={{color:"var(--primary-color)"}} /></div>
               <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             :
             <div>
-              <div><strong>{labels.file}: </strong><a href={`${file.file_url}`} target="_blank">{file.original_filename}</a></div>
+              <div><strong>{labels.file}: </strong><a href={`${file.file_url}`} target="_blank" rel="noreferrer">{file.original_filename}</a></div>
               <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
             </div>
             }

@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-//import { AppBar, Hidden, Tab, Tabs } from '@mui/material';
 import { TabView,TabPanel } from 'primereact/tabview';
 import {
   and,
@@ -91,22 +90,24 @@ export const PrimereactCategorizationLayoutRenderer = (
     t,
   } = props;
   const categorization = uischema as Categorization;
-  const [previousCategorization, setPreviousCategorization] =
-    useState<Categorization>(uischema as Categorization);
+  const categorizationKey = JSON.stringify(categorization?.elements?.map(
+    (e: any) => ({ type: e.type, label: e.label })
+  ));
+  const [previousCategorizationKey, setPreviousCategorizationKey] =
+    useState<string>(categorizationKey);
   const [activeCategory, setActiveCategory] = useState<number>(selected ?? 0);
   const categories = useMemo(
     () =>
       //categorization.elements.filter((category: Category) =>
       (categorization?.elements || []).filter((category: any) =>
-        //isVisible(category, data, undefined, ajv)
-        isVisible(category, data, '', ajv)
+        isVisible(category, data, '', ajv, undefined)
       ),
     [categorization, data, ajv]
   );
 
-  if (categorization !== previousCategorization) {
+  if (categorizationKey !== previousCategorizationKey) {
     setActiveCategory(0);
-    setPreviousCategorization(categorization);
+    setPreviousCategorizationKey(categorizationKey);
   }
 
   const safeCategory =

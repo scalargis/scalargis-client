@@ -5,7 +5,7 @@ import { Panel } from 'primereact/panel';
 import {Steps} from 'primereact/steps';
 import { v4 as uuidV4 } from 'uuid';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../components';
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index';
 import WizardStepType from './wizard/stepType';
 import WizardStepData from './wizard/stepData';

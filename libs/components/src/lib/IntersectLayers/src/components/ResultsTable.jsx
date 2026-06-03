@@ -1,7 +1,7 @@
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../../../components';
 
 
 export default function ResultsTable(props) {

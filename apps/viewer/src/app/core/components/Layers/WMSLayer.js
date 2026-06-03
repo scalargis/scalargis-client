@@ -31,7 +31,7 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
       proxy_requests = config.proxy_http_image_requests;
     }
 
-    let sourceConfig = {
+    const sourceConfig = {
       url: url,
       hidpi: false,
       //serverType: config.servertype,
@@ -76,7 +76,7 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
     }
 
     // Check theme has map CRS
-    let crs = mainMap.getView().getProjection().getCode();
+    const crs = mainMap.getView().getProjection().getCode();
     if (config.crs_options && config.crs_options.indexOf(crs) === -1) {
       if (config.crs_options.indexOf('EPSG:4326') !== -1) {
         sourceConfig['projection'] = 'EPSG:4326';
@@ -172,7 +172,7 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
   
   // Changed config
   useEffect(() => {
-    let params = {
+    const params = {
       'LAYERS': config.layers,
       'TILED': config.tiled,
       'VERSION': config.version,
@@ -190,7 +190,7 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
 };
 
 const createLegendUrl = (url, layer, srs = 4326) => {
-  var finalurl = url;
+  let finalurl = url;
   finalurl += finalurl.indexOf('?') === -1 ? '?' : '';
 
   //console.log('SRS=' + (srs.indexOf(':') === -1 ? 'EPSG:' + srs : srs));

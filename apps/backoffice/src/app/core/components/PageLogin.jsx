@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import LoginWidget from './LoginWidget';
 import AppContext from '../../AppContext';
 

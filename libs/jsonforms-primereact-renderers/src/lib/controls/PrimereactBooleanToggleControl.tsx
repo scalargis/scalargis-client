@@ -17,7 +17,6 @@ import {
   FormHelperText,
   Tooltip,
   Hidden,
-} from '@mui/material';
 import { MuiToggle } from '../mui-controls/MuiToggle';
 */
 import { PrimereactToggle } from '../primereact-controls/PrimereactToggle';

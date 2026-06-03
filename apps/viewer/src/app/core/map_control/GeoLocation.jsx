@@ -42,7 +42,7 @@ export default function GeoLocation({ config, actions }) {
 
 
     function getGeoLocation (cb) {
-        let coordinates = olgeolocation ? olgeolocation.getPosition() : null;
+        const coordinates = olgeolocation ? olgeolocation.getPosition() : null;
         if (coordinates) {
             const pos = {
                 coordinates: coordinates,
@@ -116,7 +116,7 @@ export default function GeoLocation({ config, actions }) {
 
         olgeolocation && olgeolocation.setTracking(!!geo_location_control.tracking);
         if (loaded) {
-            if (!!geo_location_control.zoom) {
+            if (geo_location_control.zoom) {
                 getGeoLocation(pos => zoomGeoLocation(pos));
             } else {
                 getGeoLocation();
@@ -166,7 +166,7 @@ export default function GeoLocation({ config, actions }) {
          setLoaded(true);
          
          if (geo_location_control.active) {
-             if (!!geo_location_control.zoom_init) {
+             if (geo_location_control.zoom_init) {
                  getGeoLocation(pos => zoomGeoLocation(pos));
              } else {
                  getGeoLocation();

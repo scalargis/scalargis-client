@@ -3,7 +3,7 @@ import { FigTreeEvaluator } from 'fig-tree-evaluator';
 import extractProperty from 'object-property-extractor';
 import assign from 'object-property-assigner';
 
-import { i18n } from '@scalargis/components';
+import { i18n } from '../components';
 
 import { checkDate, getAsOneOfObjects } from './util/customFunctions';
 
@@ -15,7 +15,7 @@ export const useFigTreeEvaluator = (data, schema, uischema, figOptions, loadingE
   const [evaluatedSchema, setEvaluatedSchema] = useState();
   const [evaluatedUiSchema, setEvaluatedUiSchema] = useState(loadingElement ? loadingElement : {
     type: 'VerticalLayout',
-    elements: [{ type: 'Html', text: `<div class="p-mb-4"><i class="pi pi-spin pi-spinner p-mr-2" style={{'fontSize': '2em'}}></i><span>${i18n.translateValue("loading", "A carregar ...")}</span></div>` }],
+    elements: [{ type: 'Html', text: `<div class="mb-4"><i class="pi pi-spin pi-spinner mr-2" style={{'fontSize': '2em'}}></i><span>${i18n.translateValue("loading", "A carregar ...")}</span></div>` }],
   });
   // This value prevents the form rendering with an empty schema on first load, otherwise it's just full of "no applicable renderer" errors
   const [schemaEvaluated, setSchemaEvaluated] = useState(false);

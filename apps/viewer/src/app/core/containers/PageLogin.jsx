@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { Button } from 'primereact/button';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
+import LocaleSelector from './../components/LocaleSelector';
 import LoginWidget from './../components/LoginWidget';
 import ResetPasswordWidget from './../components/ResetPasswordWidget';
 import RegistrationWidget from './../components/RegistrationWidget';
@@ -56,13 +57,16 @@ function PageLogin(props) {
             <div className="flex justify-content-center align-self-center p-6 sm:p-8">
                 <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
                     <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+                        <div className="flex justify-content-end">
+                            <LocaleSelector core={core} componentConfig={siteConfig} />
+                        </div>
                         <div className="text-center mb-3">
                             <img src={logo} alt="logo" className="mb-3" style={{maxHeight: "180px", maxWidth: "-webkit-fill-available"}} />
                         </div>
                         <div>
-                            <p>Olá { username }.</p>
+                            <p>{i18nUtils.translateValue("hello_user", "Olá {{username}}", undefined, undefined, undefined, {username})}.</p>
                             <p>
-                            Clique para 
+                            {i18nUtils.translateValue("clickTo", "Clique para")}
                             <Button
                                 className="p-button-link" onClick={e => dispatch(logout())}
                                 label={i18nUtils.translateValue("endSession", "Terminar sessão")}
@@ -79,6 +83,9 @@ function PageLogin(props) {
         <div className="flex justify-content-center align-self-center p-6 sm:p-8">
             <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
                 <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
+                    <div className="flex justify-content-end">
+                        <LocaleSelector core={core} componentConfig={siteConfig} />
+                    </div>
                     <div className="text-center mb-3">
                         <img src={logo} alt="logo" className="mb-3" style={{maxHeight: "180px", maxWidth: "-webkit-fill-available"}} />
                     </div>
