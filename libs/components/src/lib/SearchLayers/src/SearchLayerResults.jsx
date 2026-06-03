@@ -8,6 +8,8 @@ import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import OlFeature from 'ol/Feature';
 import {getCenter as olGetCenter} from 'ol/extent';
 
+import parse from 'html-react-parser';
+
 import { i18n } from '../../components';
 
 import { getFeatureById } from './service';
@@ -161,7 +163,7 @@ export default function SearchLayerResults(props) {
         new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');      
       });                 
     }    
-    return <div dangerouslySetInnerHTML={{__html: new_value}} />;
+    return <div>{parse(new_value)}</div>;
   }
 
 
