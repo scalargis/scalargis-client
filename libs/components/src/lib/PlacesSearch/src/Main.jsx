@@ -7,6 +7,7 @@ import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
 import Feature from 'ol/Feature';
 import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
+import parse from 'html-react-parser';
 
 import './style.css'
 import useOutsideClick from './useOutsideClick';
@@ -190,7 +191,7 @@ export default function Main({ core, config, actions, utils, record }) {
             html = html.replace(`{${fld}}`, option[fld] || '');      
           });
         }
-        elem = <div dangerouslySetInnerHTML={{__html: html}} />;
+        elem = <div>{parse(html)}</div>;
       }
     }
 
@@ -205,7 +206,7 @@ export default function Main({ core, config, actions, utils, record }) {
               html = html.replace(`{${fld}}`, option[fld] || '');      
             });
           }
-          elem = <div dangerouslySetInnerHTML={{__html: html}} />;
+          elem = <div>{parse(html)}</div>;
         } else if (tpl.iconClass) {
           elem = buildDefaultItem(option, tpl.iconClass);
         }       
@@ -338,4 +339,3 @@ export default function Main({ core, config, actions, utils, record }) {
     </div>
   );
 }
-
