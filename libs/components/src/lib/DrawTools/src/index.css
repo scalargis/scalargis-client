@@ -5,6 +5,17 @@
   margin-bottom: 1px;
 }
 
+#drawtools .p-button.tool:has(.draw-tool-icon) {
+  background: #F1F3F8 !important;
+  border: 1px solid #BAC0CC !important;
+  color: #475164 !important;
+}
+
+#drawtools .p-button.tool:has(.draw-tool-icon):enabled:hover {
+  background: #E1E4EA !important;
+  border-color: #9CA6B8 !important;
+}
+
 #drawtools .toolbar {
   padding: 1em;
 }
@@ -33,4 +44,10 @@
 #drawtools .p-button.tool.active:focus-visible,
 #drawtools .p-button.tool.active:enabled {
   background: #673AB7 !important;
+}
+
+#drawtools .draw-tool-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
 }

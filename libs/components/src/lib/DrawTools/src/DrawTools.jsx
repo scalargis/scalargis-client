@@ -18,17 +18,23 @@ import OlCollection from "ol/Collection";
 import { SketchPicker as CompactPicker } from 'react-color';
 import FileSaver from 'file-saver';
 import './index.css';
+import addSymbolIcon from './add-symbol.svg';
+import addTextIcon from './add-text.svg';
+import addPointIcon from './add-point.svg';
+import addLineIcon from './add-line.svg';
+import addPolygonIcon from './add-polygon.svg';
+import selectFeatureIcon from './select-feature.svg';
 
 const drawElementsOptions = [
-  { value: "symbol", title: "drawingAddSymbol", defaultTitle: "Adicionar símbolo", icon: "pi pi-star" },
-  { value: "text", title: "drawingAddText", defaultTitle: "Adicionar texto", icon: "pi pi-info-circle" },
-  { value: "point", title: "drawingAddPoint", defaultTitle: "Adicionar ponto", icon: "pi pi-circle-on" },
-  { value: "line", title: "drawingAddLine", defaultTitle: "Adicionar linha", icon: "pi pi-minus" },
-  { value: "polygon", title: "drawingAddPoligon", defaultTitle: "Adicionar polígono", icon: "pi pi-th-large" }
+  { value: "symbol", title: "drawingAddSymbol", defaultTitle: "Adicionar símbolo", icon: () => <img src={addSymbolIcon} alt="" className="draw-tool-icon" /> },
+  { value: "text", title: "drawingAddText", defaultTitle: "Adicionar texto", icon: () => <img src={addTextIcon} alt="" className="draw-tool-icon" /> },
+  { value: "point", title: "drawingAddPoint", defaultTitle: "Adicionar ponto", icon: () => <img src={addPointIcon} alt="" className="draw-tool-icon" /> },
+  { value: "line", title: "drawingAddLine", defaultTitle: "Adicionar linha", icon: () => <img src={addLineIcon} alt="" className="draw-tool-icon" /> },
+  { value: "polygon", title: "drawingAddPoligon", defaultTitle: "Adicionar polígono", icon: () => <img src={addPolygonIcon} alt="" className="draw-tool-icon" /> }
 ];
 
 const selectTools = [
-  { value: "select", title: "select", defaultTitle: "Selecionar", icon: "pi pi-pencil" }
+  { value: "select", title: "select", defaultTitle: "Selecionar", icon: () => <img src={selectFeatureIcon} alt="" className="draw-tool-icon" /> }
 ]
 
 const historyTools = [
