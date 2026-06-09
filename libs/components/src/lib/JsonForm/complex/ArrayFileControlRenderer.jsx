@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useCallback, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Image } from 'primereact/image';
 
 import {
@@ -57,6 +57,7 @@ export const ArrayFileControlRenderer = (props) => {
   
   return(    
     <div className="grid">
+      <ConfirmDialog />
       {showFileForm && showOnPortal(
         <FileForm
           schema={schema}

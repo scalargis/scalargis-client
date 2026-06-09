@@ -74,14 +74,14 @@ export const PhotoControl = (props) => {
   const file = props?.data ? {...props?.data}  : {...fileDefaultValues};
 
   function selectFile(e) {
-    if (file_upload.current && file_upload.current.files && file_upload.current.files.length) {
+    if (file_upload.current && e.files.length) {
       const reader = new FileReader();
       reader.onload = async function() {
         const data = reader.result;
 
         try {
-          const image = await resizeFile(file_upload.current.files[0]);
-          const imageThumb = await resizeThumbFile(file_upload.current.files[0]);
+          const image = await resizeFile(e.files[0]);
+          const imageThumb = await resizeThumbFile(e.files[0]);
 
           const stringLength = image.length - 'data:image/jpg;base64,'.length;
           const sizeInBytes = 4 * Math.ceil((stringLength / 3))*0.5624896334383812;
@@ -91,8 +91,8 @@ export const PhotoControl = (props) => {
             ...file,
             file_url: null,
             thumb_url: null,
-            original_filename: file_upload.current.files[0].name,
-            filename: file_upload.current.files[0].name,            
+            original_filename: e.files[0].name,
+            filename: e.files[0].name,
             file_size: sizeInBytes,
             data: image,
             data_thumb: imageThumb
@@ -104,9 +104,9 @@ export const PhotoControl = (props) => {
             ...file,
             file_url: null,
             thumb_url: null,
-            original_filename: file_upload.current.files[0].name,            
-            filename: file_upload.current.files[0].name,
-            size: file_upload.current.files[0].size, 
+            original_filename: e.files[0].name,
+            filename: e.files[0].name,
+            size: e.files[0].size,
             data: data,
             data_thumb: null
           };
@@ -114,9 +114,9 @@ export const PhotoControl = (props) => {
         }
 
         file_upload.current.clear();
-        file_upload.current.files = []; 
+        file_upload.current.setFiles([]);
       };
-      reader.readAsDataURL(file_upload.current.files[0]);    
+      reader.readAsDataURL(e.files[0]);
 
     }
   }

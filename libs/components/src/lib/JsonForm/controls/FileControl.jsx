@@ -41,7 +41,7 @@ export const FileControl = (props) => {
   const file = props?.data ? {...props?.data}  : {...fileDefaultValues};
 
   function selectFile(e) {
-    if (file_upload.current && file_upload.current.files && file_upload.current.files.length) {
+    if (file_upload.current && e.files.length) {
       const reader = new FileReader();
       reader.onload = async function() {
         const file_data = reader.result;
@@ -50,9 +50,9 @@ export const FileControl = (props) => {
           const data = {
             ...file,
             file_url: null,
-            original_filename: file_upload.current.files[0].name,
-            filename: file_upload.current.files[0].name,            
-            file_size: file_upload.current.files[0].size,
+            original_filename: e.files[0].name,
+            filename: e.files[0].name,
+            file_size: e.files[0].size,
             data: file_data
           };
           props.handleChange(props.path, data);
@@ -61,18 +61,18 @@ export const FileControl = (props) => {
           const data = {
             ...file,
             file_url: null,
-            original_filename: file_upload.current.files[0].name,            
-            filename: file_upload.current.files[0].name,
-            size: file_upload.current.files[0].size,            
+            original_filename: e.files[0].name,
+            filename: e.files[0].name,
+            size: e.files[0].size,
             data: file_data
           };
           props.handleChange(props.path, data);
         }
 
         file_upload.current.clear();
-        file_upload.current.files = []; 
+        file_upload.current.setFiles([]);
       };
-      reader.readAsDataURL(file_upload.current.files[0]);
+      reader.readAsDataURL(e.files[0]);
     }
   }
 
