@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 
 import { transform } from 'ol/proj';
 import 'ol/ol.css';
+import Overlay from 'ol/Overlay';
 import VectorLayer from 'ol/layer/Vector';
 import { Vector } from 'ol/source';
 import { containsXY } from 'ol/extent';
@@ -14,6 +16,7 @@ import {
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 
+import { I18N_NAMESPACE } from './i18n/index';
 import './style.css';
 
 
@@ -34,6 +37,10 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
   const streetviewLayer = useRef();
   const panorama = useRef();
 
+  // Tooltip refs
+  const helpTooltipElement = useRef();
+  const helpTooltip = useRef(null);
+
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
@@ -41,6 +48,8 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
   const title = record.title || 'Google StreetView';
   const header = component_cfg.header || title;
   const openNewWindow = component_cfg.openNewWindow || false;
+
+  const { t } = useTranslation([I18N_NAMESPACE, 'custom']);
 
   const streetviewStyle = new OlStyle({
     fill: new OlStyleFill({
@@ -126,6 +135,72 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
       mainMap.un('singleclick', streetviewSingleClick);
     }
   }, [exclusive_mapcontrol]);
+
+
+  // Tooltip — show a cursor-following hint when the StreetView tool is first activated
+
+  const pointerMoveHandler = useRef((evt) => {
+    if (evt.dragging) return;
+    helpTooltipElement.current.innerHTML = t('streetViewTooltip', 'Click a point on the map to view it in Google Street View');
+    helpTooltip.current.setPosition(evt.coordinate);
+    helpTooltipElement.current.classList.remove('hidden');
+  });
+
+  const onMouseOutViewport = () => {
+    if (helpTooltipElement.current) helpTooltipElement.current.classList.add('hidden');
+  };
+
+  const createHelpTooltip = () => {
+    if (helpTooltipElement.current) {
+      helpTooltipElement?.current?.parentNode && helpTooltipElement.current.parentNode.removeChild(helpTooltipElement.current);
+    }
+    helpTooltipElement.current = document.createElement('div');
+    helpTooltipElement.current.className = 'streetview-tooltip hidden';
+    helpTooltip.current = new Overlay({
+      element: helpTooltipElement.current,
+      offset: [15, 0],
+      positioning: 'center-left',
+    });
+    mainMap.addOverlay(helpTooltip.current);
+  };
+
+  const clearHelpTooltip = () => {
+    if (helpTooltipElement.current) {
+      helpTooltipElement?.current?.parentNode && helpTooltipElement.current.parentNode.removeChild(helpTooltipElement.current);
+    }
+    if (helpTooltip.current) {
+      helpTooltip.current.setPosition(null);
+      mainMap.removeOverlay(helpTooltip.current);
+    }
+  };
+
+  useEffect(() => {
+    if (!mainMap) return;
+    if (!viewer?.loaded) return;
+
+    let tooltipTimer;
+
+    if (exclusive_mapcontrol === 'StreetView') {
+      createHelpTooltip();
+      mainMap.on('pointermove', pointerMoveHandler.current);
+      mainMap.getViewport().addEventListener('mouseout', onMouseOutViewport);
+
+      tooltipTimer = setTimeout(() => {
+        clearHelpTooltip();
+        mainMap.un('pointermove', pointerMoveHandler.current);
+        mainMap.getViewport().removeEventListener('mouseout', onMouseOutViewport);
+      }, 3000);
+    }
+
+    return () => {
+      if (tooltipTimer) clearTimeout(tooltipTimer);
+      if (exclusive_mapcontrol === 'StreetView') {
+        mainMap.un('pointermove', pointerMoveHandler.current);
+        mainMap.getViewport().removeEventListener('mouseout', onMouseOutViewport);
+      }
+      clearHelpTooltip();
+    }
+  }, [exclusive_mapcontrol, viewer?.loaded, mainMap]);
 
 
   // Toggle StreetView control

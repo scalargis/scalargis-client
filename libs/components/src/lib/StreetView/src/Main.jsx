@@ -3,7 +3,15 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 
+import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
 import StreetView from './StreetView';
+
+/**
+ * Component Translations
+ */
+export const translations = {
+  load: loadTranslations
+};
 
 
 /**
