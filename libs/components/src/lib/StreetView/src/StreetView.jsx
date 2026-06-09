@@ -22,7 +22,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
   const { exclusive_mapcontrol } = viewer;
 
   const streetview_control = record;
-  const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol } = actions;
+  const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol, viewer_add_notification } = actions;
   const { getWindowSize, showOnPortal } = utils;
 
   const [modalStreetViewOpen, setModalStreetViewOpen] = useState(false);
@@ -130,7 +130,27 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
 
   // Toggle StreetView control
   function toggleStreetViewControl() {
-    dispatch(viewer_set_exclusive_mapcontrol('StreetView'));
+    if (exclusive_mapcontrol !== 'StreetView') {
+      dispatch(viewer_set_exclusive_mapcontrol('StreetView'));
+      dispatch(viewer_add_notification({
+        group: "viewer",
+        message: {
+          severity: "info",
+          summary: title,
+          detail: "Ferramenta Street View ativada - clique no mapa para usar"
+        }
+      }));
+    } else {
+      dispatch(viewer_set_exclusive_mapcontrol(null));
+      dispatch(viewer_add_notification({
+        group: "viewer",
+        message: {
+          severity: "info",
+          summary: title,
+          detail: "Ferramenta Street View desativada"
+        }
+      }));
+    }
   }
 
   function streetviewSingleClick(e) {
