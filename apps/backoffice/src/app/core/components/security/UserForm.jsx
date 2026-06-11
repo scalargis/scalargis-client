@@ -9,6 +9,7 @@ import { ToggleButton } from 'primereact/togglebutton';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
+import { InputNumber } from 'primereact/inputnumber';
 import { MultiSelect } from 'primereact/multiselect';
 import { ListBox } from 'primereact/listbox';
 import { Message } from 'primereact/message';
@@ -17,6 +18,61 @@ import { v4 as uuidV4 } from 'uuid'
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+
+const PASSWORD_MIN_LENGTH = 12;
+const PASSWORD_MAX_LENGTH = 32;
+const PASSWORD_DEFAULT_LENGTH = 16;
+
+const PASSWORD_LOWER = 'abcdefghijklmnopqrstuvwxyz';
+const PASSWORD_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const PASSWORD_DIGITS = '0123456789';
+const PASSWORD_SPECIAL = '!@#$%^&*()-_=+[]{}';
+
+// Returns true when the password satisfies all platform complexity rules,
+// otherwise a pt-PT message naming the first failing rule.
+const validatePassword = (value) => {
+  if (!value) return true; // 'required' rule handles the empty case
+  if (!/[a-z]/.test(value)) return 'A password deve conter pelo menos uma minúscula.';
+  if (!/[A-Z]/.test(value)) return 'A password deve conter pelo menos uma maiúscula.';
+  if (!/[0-9]/.test(value)) return 'A password deve conter pelo menos um dígito.';
+  if (!/[^A-Za-z0-9]/.test(value)) return 'A password deve conter pelo menos um caractere especial.';
+  if (value.length < PASSWORD_MIN_LENGTH) return `A password deve ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`;
+  return true;
+};
+
+// Picks a random character from a set using crypto for unbiased selection.
+const randomChar = (set) => {
+  const arr = new Uint32Array(1);
+  window.crypto.getRandomValues(arr);
+  return set[arr[0] % set.length];
+};
+
+// Generates a password that is guaranteed to contain at least one character of
+// each required class, padded to `length` from the full pool, then shuffled.
+const generatePassword = (length) => {
+  const size = Math.max(PASSWORD_MIN_LENGTH, Math.min(PASSWORD_MAX_LENGTH, length || PASSWORD_DEFAULT_LENGTH));
+  const pool = PASSWORD_LOWER + PASSWORD_UPPER + PASSWORD_DIGITS + PASSWORD_SPECIAL;
+
+  const chars = [
+    randomChar(PASSWORD_LOWER),
+    randomChar(PASSWORD_UPPER),
+    randomChar(PASSWORD_DIGITS),
+    randomChar(PASSWORD_SPECIAL)
+  ];
+  while (chars.length < size) {
+    chars.push(randomChar(pool));
+  }
+
+  // Fisher-Yates shuffle so the guaranteed chars aren't always in front.
+  for (let i = chars.length - 1; i > 0; i--) {
+    const r = new Uint32Array(1);
+    window.crypto.getRandomValues(r);
+    const j = r[0] % (i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+
+  return chars.join('');
+};
 
 const sortRolesArray = (data) => {
   if (!data) return data;
@@ -52,6 +108,10 @@ function UserForm(props) {
   const [isSaving, setIsSaving] = useState(false);
 
   const [data, setData] = useState(props.data || {});
+
+  const isCreate = !data.id;
+  const [passwordLength, setPasswordLength] = useState(PASSWORD_DEFAULT_LENGTH);
+  const [revealPassword, setRevealPassword] = useState(false);
 
   const [roles, setRoles] = useState(props?.data?.roles ? sortRolesArray([...props.data.roles]) : []);
   const [availableRoles, setAvailableRoles] = useState(null);
@@ -278,15 +338,62 @@ function UserForm(props) {
           <InputText id="email" name="email" {...register('email', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.email })} />
           {getFormErrorMessage(errors, 'email')}
         </div>
-        <div className="field col-12 md:col-4">
+        <div className={classNames('field col-12', isCreate ? 'md:col-5' : 'md:col-4')}>
           <label htmlFor="password">Password</label>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => {
-              return <Password {...field} feedback={false}  onChange={(e) => field.onChange(e.target.value)} />
-            }} 
-          />
+          { isCreate ?
+            <>
+              <div className="p-inputgroup">
+                <Controller
+                  control={control}
+                  name="password"
+                  rules={{ required: 'Campo obrigatório.', validate: validatePassword }}
+                  render={({ field }) => {
+                    return revealPassword
+                      ? <InputText id="password" {...field}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          className={classNames({ 'p-invalid': errors.password })} />
+                      : <Password {...field} feedback={false}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          className={classNames({ 'p-invalid': errors.password })} />
+                  }}
+                />
+                <Button type="button"
+                  icon={revealPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}
+                  severity="secondary"
+                  onClick={() => setRevealPassword(v => !v)} />
+              </div>
+              {getFormErrorMessage(errors, 'password')}
+              <div className="flex align-items-center flex-wrap mt-2" style={{ gap: '0.5rem 1rem' }}>
+                <small className="text-500 line-height-3" style={{ maxWidth: '15rem' }}>
+                  Mínimo 12 caracteres, com maiúsculas, minúsculas, dígitos e símbolos.
+                </small>
+                <div className="flex align-items-center ml-auto" style={{ gap: '0.5rem' }}>
+                  <label htmlFor="passwordLength" className="m-0 text-500 white-space-nowrap">Tamanho</label>
+                  <InputNumber inputId="passwordLength" value={passwordLength}
+                    onValueChange={(e) => setPasswordLength(e.value)}
+                    showButtons buttonLayout="horizontal"
+                    decrementButtonIcon="pi pi-minus" incrementButtonIcon="pi pi-plus"
+                    min={PASSWORD_MIN_LENGTH} max={PASSWORD_MAX_LENGTH}
+                    style={{ width: 'auto', flex: '0 0 auto' }}
+                    inputStyle={{ width: '3rem', textAlign: 'center' }} />
+                  <Button type="button" label="Gerar" icon="pi pi-key" className="p-button-primary"
+                    onClick={() => {
+                      const pwd = generatePassword(passwordLength);
+                      setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
+                      setRevealPassword(true);
+                    }} />
+                </div>
+              </div>
+            </>
+            :
+            <Controller
+              control={control}
+              name="password"
+              render={({ field }) => {
+                return <Password {...field} feedback={false} toggleMask onChange={(e) => field.onChange(e.target.value)} />
+              }}
+            />
+          }
         </div>
 
         <div className="field col-12">
