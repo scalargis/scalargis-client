@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import LegendHTML from './LegendHTML';
 import LegendArcGIS from './LegendArcGIS';
 
 export default function Legend({ viewer, tocConfig, data, core, actions, models }) {
@@ -7,9 +8,13 @@ export default function Legend({ viewer, tocConfig, data, core, actions, models 
   const label = data.legend_label || 'Legenda';
 
   //Return ArcGIS Legend for arcgis source
-  if (data.type === 'ArcGISMap' && !data.legend_url) return (
+  if (data.type === 'ArcGISMap' && (!data.legend_url || !data.legend_html)) return (
     <LegendArcGIS data={data} core={core} actions={actions} models={models} />
   )
+
+  if(data.legend_html) return (
+    <LegendHTML data={data} core={core} actions={actions} models={models} />
+  );
 
   // Validate legend
   if (!data.legend_url) return null;
@@ -26,8 +31,6 @@ export default function Legend({ viewer, tocConfig, data, core, actions, models 
       </a>
     </div>
   );
-
-  console.log(tocConfig);
 
   if (tocConfig?.open_legend_image === false) return (
     <div className="legend-container">
