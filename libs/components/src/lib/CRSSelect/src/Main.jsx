@@ -133,7 +133,7 @@ export default function Main({ core, config, actions, record }) {
 
   return (
     <div className="crsselect">
-      <div id="cursor_coords" ref={cursorRef}></div>
+      <div id="cursor_coords" ref={cursorRef} className="cursor-coords"></div>
       <Dropdown 
         value={display_crs} 
         options={listCRS.map(i => {

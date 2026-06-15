@@ -1,5 +1,6 @@
 .footer-right .crsselect {
   display: inline-flex;
+  align-items: center;
 }
 
 @media screen and (max-width: 768px) {
@@ -8,17 +9,17 @@
 
 .footer-right .crsselect .p-dropdown.p-component  {
   height: 30px;
+  align-items: center;
 }
 
 .footer-right .crsselect .p-dropdown.p-component .p-dropdown-label.p-inputtext {
-  max-width: 200px;
-  padding-top: 5px;
+  max-width: 250px;
 }
 
-.footer-right .viewer-mouse-position {
+.footer-right .crsselect .cursor-coords .viewer-mouse-position {
   width: 200px;
-  padding: 0.5em;
+  min-width: 190px;
+  padding-left: .5em;
   background: rgb(198 204 212 / 10%);
-  height: 30px;
   white-space: nowrap;
 }
