@@ -229,10 +229,12 @@ body .p-dropdown {
 }
 
 .layout-footer {
+  display: flex;
   height: 35px;
   padding: 0.4em 0.3em;
   padding-left: 1em;
   align-content: center;
+  align-items: center;
 }
 
 .layout-footer .footer-left {
@@ -269,22 +271,14 @@ body .p-dropdown {
   color: white;
 }
 
-/*
-.footer-right {
-  float: right;
-  display: flex;
-  animation-duration: .5s;
-  margin-top: -3px;
-  text-align: right;
-}
-*/
 .footer-right {
   position: absolute;
   display: flex;
   right: 3px;
   animation-duration: .5s;
-  margin-top: -8px;
   max-width: 660px;
+  align-items: center;
+  justify-content: right;
 }
 
 .footer-right .p-button {
