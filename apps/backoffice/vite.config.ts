@@ -61,7 +61,7 @@ export default defineConfig(() => {
 
   return {
     root: __dirname,
-    cacheDir: '../../node_modules/.vite/apps/viewer',
+    cacheDir: '../../node_modules/.vite/apps/backoffice',
     base: process.env.BASE,
     server: {
       port: 4200,
@@ -95,7 +95,7 @@ export default defineConfig(() => {
     //  plugins: [ nxViteTsPaths() ],
     // },
     build: {
-      outDir: '../../dist/apps/viewer',
+      outDir: '../../dist/apps/backoffice',
       emptyOutDir: true,
       reportCompressedSize: true,
       commonjsOptions: {
@@ -110,7 +110,7 @@ export default defineConfig(() => {
       include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
       reporters: ['default'],
       coverage: {
-        reportsDirectory: '../../coverage/apps/viewer',
+        reportsDirectory: '../../coverage/apps/backoffice',
         provider: 'v8',
       },
     },
