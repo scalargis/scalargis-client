@@ -47,6 +47,7 @@
         "csv",
         "pdf"
       ],
+      "export_crs": 3763,
       "export": {
         "pdf": { 
           "apiUrl": "/spatial_toolbox/api/intersect/export"

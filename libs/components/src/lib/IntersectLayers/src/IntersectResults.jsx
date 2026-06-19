@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
+import { SplitButton } from 'primereact/splitbutton';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
@@ -34,11 +35,12 @@ export default function IntersectResults(props) {
     const t = i18n.translateValue;
 
     const fileFormats = {
-        "xls": {"icon": "pi-file-excel"},
-        "csv": {"icon": "pi-file"},
-        "pdf": {"icon": "pi-file-pdf"}
+        "xls": {"icon": "pi-file-excel", label: "Excel"},
+        "csv": {"icon": "pi-file", label: "CSV"},
+        "pdf": {"icon": "pi-file-pdf", label: "PDF"},
+        "gpkg": {"icon": "pi-file", label: "GeoPackage"}
     }
-    const exportFormats = intersectConfig?.exportFormats?.length ? intersectConfig.exportFormats.map(f => f.toLowerCase()) : ['xls', 'csv', 'pdf'];
+    const exportFormats = intersectConfig?.exportFormats?.length ? intersectConfig.exportFormats.map(f => f.toLowerCase()) : ['xls', 'csv', 'pdf', 'gpkg'];
 
     const showResultMeasure = intersectConfig?.showResultMeasure !=null ? intersectConfig?.showResultMeasure : true;
     const showResultPercentage = intersectConfig?.showResultPercentage != null ? intersectConfig?.showResultPercentage : true;
@@ -104,6 +106,49 @@ export default function IntersectResults(props) {
         }
 
         mainMap.getView().changed();
+    }
+
+    const exportResults = (format) => {
+        let url = '/spatial_toolbox/api/intersect';
+        if (intersectConfig?.apiUrl) {
+            url = intersectConfig.apiUrl;
+        }
+        if (intersectConfig?.export?.[format]?.apiUrl) {
+            url = intersectConfig.export[format].apiUrl;
+        }
+
+        const export_srid = intersectConfig?.export_crs || viewer?.config_json?.export_crs || viewer?.config_json?.display_crs;
+
+        const query = new URLSearchParams({...searchParams, format, export_srid: export_srid, viewerId: viewer.id});
+
+        url = `${url}?${query.toString()}`;
+        
+        const headers = new Headers({});
+        const fetchBlob = core.services.data.fetchAll;
+
+        setDownloadingFile(true);
+        setDownloadingFormat(format);
+
+        fetchBlob(url,{headers}).then(result => {
+            setDownloadingFormat(null);
+            const blob = result instanceof ArrayBuffer ? new Blob([result]) : result;
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `intersecao_resultados.${format == "csv" ? "zip" : format}`
+            document.body.appendChild(a);
+            a.click();    
+            a.remove();
+
+            toastDialog.current.show({ severity: 'success', summary: t("information", "Informação"), detail: `${t("successFileGenerateMsg", "O ficheiro foi gerado com sucesso")}.` });
+        })
+        .catch(e => {
+            toastDialog.current.show({ severity: 'warn', summary: t("error", "Error"), detail: `${t("errorFileGenerateMsg", "Ocorreu um erro ao gerar o ficheiro")}.` });
+        })
+        .finally(d => {
+            setDownloadingFile(false);
+            setDownloadingFormat(null);
+        });
     }
 
     useEffect(() => {
@@ -393,7 +438,21 @@ export default function IntersectResults(props) {
 
     };
 
-    const exportToolbar = (
+    const exportToolbar = exportFormats?.length > 3 ? (
+        <SplitButton label={t("export", "Exportar")} icon="pi pi-upload" size="small" outlined 
+            disabled={downloadingFile}
+            loading={downloadingFile}            
+            model={exportFormats.map((format) => {
+                return {
+                    label: fileFormats?.[format]?.label || format.toUpperCase(),
+                    icon: `pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "p-file" }`,
+                    command: () => {
+                        exportResults(format);
+                    }
+                }
+            })}
+         />
+    ) : (
         <React.Fragment>
             { 
                 exportFormats.map((format, index) => {
@@ -403,43 +462,7 @@ export default function IntersectResults(props) {
                             disabled={downloadingFile}
                             loading={downloadingFile && downloadingFormat == format}
                             onClick={() =>  {
-                                let url = '/spatial_toolbox/api/intersect';
-                                if (intersectConfig?.apiUrl) {
-                                    url = intersectConfig.apiUrl;
-                                }
-                                if (intersectConfig?.export?.[format]?.apiUrl) {
-                                    url = intersectConfig.export[format].apiUrl;
-                                }
-
-                                const query = new URLSearchParams({...searchParams, format, viewerId: viewer.id});
-
-                                url = `${url}?${query.toString()}`;
-                                
-                                const headers = new Headers({});
-                                const fetchBlob = core.services.data.fetchAll;
-
-                                setDownloadingFile(true);
-                                setDownloadingFormat(format);
-
-                                fetchBlob(url,{headers}).then(result => {
-                                    setDownloadingFormat(null);
-                                    const url = window.URL.createObjectURL(result);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = `intersecao_resultados.${format}`
-                                    document.body.appendChild(a);
-                                    a.click();    
-                                    a.remove();
-
-                                    toastDialog.current.show({ severity: 'success', summary: t("information", "Informação"), detail: `${t("successFileGenerateMsg", "O ficheiro foi gerado com sucesso")}.` });
-                                })
-                                .catch(e => {
-                                    toastDialog.current.show({ severity: 'warn', summary: t("error", "Error"), detail: `${t("errorFileGenerateMsg", "Ocorreu um erro ao gerar o ficheiro")}.` });
-                                })
-                                .finally(d => {
-                                    setDownloadingFile(false);
-                                    setDownloadingFormat(null);
-                                });
+                                exportResults(format);
                             }
                         }/>
                     );
@@ -450,10 +473,10 @@ export default function IntersectResults(props) {
 
     const header = (
         <div className="flex justify-content-between flex-wrap">
-            { showTablesButton && <div className="flex flex-wrap justify-content-end gap-2 m-1">
+            { showTablesButton && <div className="flex flex-wrap justify-content-end gap-2 my-1">
                 <Button icon="pi pi-table" label={t("tables", "Tabelas")} onClick={showTable} text size="small" />
             </div> }
-            <div className="flex flex-wrap justify-content-end gap-2 m-1">
+            <div className="flex flex-wrap justify-content-end gap-2 my-1">
                 <Button icon="pi pi-plus" label={t("expand", "Expandir")} onClick={expandAll} text size="small" />
                 <Button icon="pi pi-minus" label={t("collapse", "Recolher")} onClick={collapseAll} text size="small" />
             </div>
@@ -465,7 +488,11 @@ export default function IntersectResults(props) {
             {showOnPortal(<Toast ref={toastDialog} />)}
             <h3>{t("results", "Resultados")}</h3>
 
-            { intersectConfig?.showExport !== false ? <Toolbar start={exportToolbar} /> : null }
+            { intersectConfig?.showExport !== false ? <Toolbar end={exportToolbar} /> : null }
+
+            <div className="text-right mb-2">
+
+            </div>
 
             <div className="flex align-items-center my-3">
                 <Checkbox name="showGeometry" value={showGeometry} onChange={(e) => setShowGeometry(!e.value)} checked={showGeometry} />
