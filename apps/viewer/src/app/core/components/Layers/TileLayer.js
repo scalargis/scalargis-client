@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 import OLTileLayer from "ol/layer/Tile";
 import AppContext from "../../../AppContext";
+import { getResolutionForScale } from '../../model/MapModel';
 
 const TileLayer = ({ config, source, group, checked }) => {
 
