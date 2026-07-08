@@ -58,7 +58,6 @@ export default function ContactFrom(props) {
 
   const showCaptcha = (!viewer?.user_info?.name && viewer.captcha_key) ? true : false;
 
-  //const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState(viewer?.user_info?.name ? viewer.user_info.name : null);
   const [email, setEmail] = useState(viewer?.user_info?.email  ? viewer.user_info.email : null);
   const [captchaResponse, setCaptchaResponse] = useState(null);
@@ -73,7 +72,7 @@ export default function ContactFrom(props) {
   const fileUploadRef = useRef(null);
 
   const onFileSelect = (e) => {
-    const upload_files = Array.from(e.files).filter(f => fileUploadRef.current.isFileSelected(f)).map(f=>f);
+    const upload_files = Array.from(e.files).filter(f => !fileUploadRef.current.getFiles().includes(f)).map(f=>f);
     const promises = Array.from(upload_files).map(file => handleUpload(file));
     if (promises && promises.length) setIsProcessingFiles(true);
     Promise.all(promises).then((values) => {;
@@ -112,9 +111,7 @@ export default function ContactFrom(props) {
   function submit(e) {
     e.preventDefault();
 
-    const final_files = fileUploadRef.current && fileUploadRef.current.files ? 
-      fileUploadRef.current.files.filter(f=>fileUploadRef.current.isFileSelected(f)).map(f=>f.name) 
-      :[];    
+    const final_files = fileUploadRef.current ? fileUploadRef.current.getFiles().map(f=>f.name) : [];
 
     if (!name || !email || !description) {
       setInfoMessage({

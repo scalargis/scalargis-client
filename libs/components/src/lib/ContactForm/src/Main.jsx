@@ -41,7 +41,7 @@ export function MainMenu({ className, core, config, actions, record }) {
         {showOnPortal(<Dialog
           header={header}
           visible={showPopup}
-          style={{width: isMobile ? '90%' : '45vw' }} 
+          style={{width: isMobile ? '90%' : '45vw', overflowY: "auto" }} 
           modal
           footer={(
             <div className="grid">
@@ -142,7 +142,7 @@ export default function Main({ region, as, core, config, actions, record }) {
           {showOnPortal(<Dialog
             header={header}
             visible={showForm}
-            style={{width: isMobile ? '90%' : '45vw' }} 
+            style={{width: isMobile ? '90%' : '45vw', overflowY: "auto" }} 
             modal
             footer={(
               <div className="grid">
