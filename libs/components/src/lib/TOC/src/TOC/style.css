@@ -133,10 +133,6 @@
   align-items: center;
 }
 
-.p-dialog-content {
-  overflow-y: unset;
-}
-
 .p-dialog-myfooter {
   border-top: 1px solid #c8c8c8;
   background: #ffffff;
