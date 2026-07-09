@@ -41,7 +41,8 @@ export function MainMenu({ className, core, config, actions, record }) {
         {showOnPortal(<Dialog
           header={header}
           visible={showPopup}
-          style={{width: isMobile ? '90%' : '45vw', overflowY: "auto" }} 
+          style={{width: isMobile ? '90%' : '45vw', overflowY: "auto" }}
+          contentClassName='sg-contact-form-dialog' 
           modal
           footer={(
             <div className="grid">
@@ -142,7 +143,8 @@ export default function Main({ region, as, core, config, actions, record }) {
           {showOnPortal(<Dialog
             header={header}
             visible={showForm}
-            style={{width: isMobile ? '90%' : '45vw', overflowY: "auto" }} 
+            style={{width: isMobile ? '90%' : '45vw', overflowY: "auto" }}
+            contentClassName='sg-contact-form-dialog' 
             modal
             footer={(
               <div className="grid">

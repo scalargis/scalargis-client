@@ -1,3 +1,7 @@
+.p-dialog .p-dialog-content.sg-contact-form-dialog {
+  overflow-y: unset;
+}
+
 .contact-form-upload-file.p-fileupload .p-fileupload-content {
   padding: 1rem 1rem;   
 }
