@@ -1,3 +1,13 @@
+// CSS order rule (migration2/mantine plan, kit 05): Prime globals first,
+// then the Mantine block (@scalargis/ui: Mantine core → ads-tokens → ads-globals).
+// These lines own that order for the whole backoffice — keep them at the top.
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
+
+import { AdsProviders } from '@scalargis/ui';
+
 import React, {useState, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router';
 import { Provider } from 'react-redux';
@@ -67,17 +77,19 @@ const App = () => {
   }, []);
 
   return (
-    <AppContext.Provider value={{ core }}>
-        <Provider store={core.store}>           
-            <Router basename={base_url}>
-                <ScrollToTop>
-                    <RGPD>
-                        {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
-                    </RGPD>
-                </ScrollToTop>
-            </Router>
-        </Provider>
-    </AppContext.Provider>
+    <AdsProviders>
+      <AppContext.Provider value={{ core }}>
+          <Provider store={core.store}>
+              <Router basename={base_url}>
+                  <ScrollToTop>
+                      <RGPD>
+                          {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
+                      </RGPD>
+                  </ScrollToTop>
+              </Router>
+          </Provider>
+      </AppContext.Provider>
+    </AdsProviders>
   );
 }
 

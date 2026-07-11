@@ -3,9 +3,8 @@ import { useTranslation } from "react-i18next"
 import classNames from 'classnames'
 import {AppTopbar} from './AppTopbar'
 import {AppTopbarEmbedded} from './AppTopbarEmbedded'
-import 'primereact/resources/primereact.min.css'
-import 'primeicons/primeicons.css'
-import 'primeflex/primeflex.css'
+// Prime global CSS moved to app.jsx (shell) so the Prime→Mantine import
+// order is owned in one place (Phase 1 CSS order rule).
 import Script, {ScriptWithProps, ScriptHtml} from './Script'
 import Style, {StyleHtml} from './Style'
 import LoadingScreen from './LoadingScreen'

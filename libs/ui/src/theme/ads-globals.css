@@ -1,0 +1,84 @@
+/* =====================================================================
+   ADS global rules (LIVING COPY) — the accessibility restrictions
+   Mantine's theme object cannot express.
+
+   Spec: references/projects/client/migration2/ads-adherence-restrictions/
+   theme/ads-globals.css. Load AFTER Mantine core styles and after
+   ads-tokens.css:
+     Prime globals → @mantine/core styles → ads-tokens.css → ads-globals.css
+   (matches the Phase 1 CSS import-order rule.)
+
+   COEXISTENCE-WINDOW NOTE (Phase 1, 2026-07-09): the kit file also carries
+   a base-document block (html/body font + colours) and a global <a>
+   underline fallback. Both restyle UNMIGRATED Prime screens, and the
+   Phase 1 gate sanctions exactly one global change — the magenta focus
+   ring. They are therefore DEFERRED below (commented out) and activate
+   with the shell passes: backoffice shell in Phase 2, viewer shell in
+   Phase 3. Do not delete them.
+   ===================================================================== */
+
+/* ─── FOCUS RING (WCAG 2.4.7) — SHIPS NOW, GLOBAL BY DESIGN ────────────
+   ADS spec: 2px solid magenta (#F408FC), 2px offset — deliberately OFF the
+   brand hue so it stays visible on any coloured control. Mantine's
+   focusRing:'auto' renders a ring using the primary colour; we keep its
+   width/offset but force the ADS colour. `!important` overrides both
+   Mantine's and Prime's focus outlines during the coexistence window.
+   -------------------------------------------------------------------- */
+:where(*):focus-visible {
+  outline: 2px solid var(--ads-focus, #F408FC) !important;
+  outline-offset: 2px !important;
+}
+
+/* Mantine sets a data attribute on its ring elements; align its CSS var too
+   so components that read it (rather than :focus-visible) also go magenta. */
+:root {
+  --mantine-focus-ring-offset: 2px;
+}
+
+/* Never allow focus to be removed with no replacement. If a component sets
+   outline:none, the ring above still applies on :focus-visible. Do NOT add
+   rules that blanket-remove outlines. */
+
+/* ─── REDUCED MOTION (WCAG 2.3.3 / user preference) ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── BASE DOCUMENT — DEFERRED (activates with the shell passes) ───────
+   Kit rule: html/body on Noto Sans + ADS text/background colours so the
+   whole app reads as one system. Restyles unmigrated screens, so it stays
+   off during the coexistence window (see header note). Activation:
+   backoffice → Phase 2 shell pass; viewer → Phase 3 shell pass.
+
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--font-base-size);
+  color: var(--color-text-primary);
+  background-color: var(--color-page-bg);
+}
+   -------------------------------------------------------------------- */
+
+/* ─── OPT-IN TOUCH TARGET (WCAG 2.5.5 good practice) ───────────────────
+   NOT a global default — a global 44px min-height distorts dense backoffice
+   tables. Add this class (or the CSS var) to primary/touch/mobile controls.
+   -------------------------------------------------------------------- */
+.ads-touch-target {
+  min-height: var(--ads-control-min-touch, 44px);
+  min-width: var(--ads-control-min-touch, 44px);
+}
+
+/* ─── LINK UNDERLINE FALLBACK (WCAG 1.4.1) — DEFERRED ──────────────────
+   Kit rule: plain <a> outside Mantine must be underlined so links are
+   never colour-only. Global, so it restyles unmigrated screens — same
+   deferral and activation schedule as the base-document block above.
+   (Mantine's own Anchor is already underline:'always' via the theme.)
+
+a:where(:not([class*="mantine-"])) {
+  text-decoration-line: underline;
+}
+   -------------------------------------------------------------------- */

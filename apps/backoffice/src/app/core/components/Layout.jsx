@@ -47,10 +47,8 @@ import CoordinateSystemEdit from './settings/CoordinateSystemEdit';
 
 import PrimeReact from 'primereact/api';
 
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css';
+// Prime global CSS moved to app.jsx (shell) so the Prime→Mantine import
+// order is owned in one place (Phase 1 CSS order rule).
 import 'prismjs/themes/prism-coy.css';
 import '../../layout/flags/flags.css';
 import '../../layout/layout.scss';

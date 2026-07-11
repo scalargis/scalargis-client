@@ -1,0 +1,235 @@
+/* =====================================================================
+   ADS token layer — CSS custom properties
+   Source: @ama-pt/agora-design-system v3.5.3
+   Copied from references/projects/ads/agora-tokens.css (good as-is),
+   with the @font-face blocks omitted — see the FONTS note below.
+
+   Purpose: the raw ADS tokens for hand-written CSS that Mantine's theme
+   scales don't cover (space-56..256, top/center/inner shadows, the GIS
+   z-index band, sidebar width). The Mantine-consumed subset also lives in
+   ads-mantine-theme.ts — keep the two in sync; this file is authoritative
+   for the raw --* names used directly in stylesheets.
+   ===================================================================== */
+
+/* ─── FONTS ────────────────────────────────────────────────────────────
+   Noto Sans is the sole ADS family. Load the @font-face set from the
+   canonical copy that ships the .ttf files:
+     references/projects/ads/agora-design-system/fonts/*.ttf
+     references/projects/ads/agora-tokens.css   (the @font-face blocks)
+   In the client, load Noto Sans however the shells already load fonts
+   (self-host the .ttf, or Google Fonts). Do NOT substitute another family.
+   -------------------------------------------------------------------- */
+
+:root {
+
+  /* ─── FONT FAMILY ─────────────────────────────────── */
+  --font-sans: "Noto Sans", sans-serif;
+  --font-base-size: 16px;
+
+  /* ─── SPECIAL COLORS ──────────────────────────────── */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  --color-focus: #F408FC;
+  --color-backdrop: rgba(43, 54, 60, 0.96);
+  --color-mask-image: rgba(43, 54, 60, 0.80);
+  --color-mask-neutral-900: rgba(43, 54, 60, 0.80);
+  --color-mask-primary-900: rgba(2, 28, 81, 0.80);
+  --color-mask-secondary-900: rgba(13, 76, 117, 0.80);
+
+  /* ─── PRIMARY (Blue) — BRANDABLE ──────────────────── */
+  --color-primary-50:  #FAFCFF;
+  --color-primary-100: #F2F6FF;
+  --color-primary-200: #E5EEFF;
+  --color-primary-300: #BBD1FD;
+  --color-primary-400: #5F93FC;
+  --color-primary-500: #1A65FA;
+  --color-primary-600: #034AD8;
+  --color-primary-700: #0338A2;
+  --color-primary-800: #002B82;
+  --color-primary-900: #021C51;
+
+  /* ─── SECONDARY (Cyan) — BRANDABLE ────────────────── */
+  --color-secondary-50:  #F5FBFF;
+  --color-secondary-100: #EBF6FF;
+  --color-secondary-200: #E3F4FF;
+  --color-secondary-300: #CCEAFF;
+  --color-secondary-400: #A0D8FE;
+  --color-secondary-500: #1CA3FC;
+  --color-secondary-600: #1993E3;
+  --color-secondary-700: #1682CA;
+  --color-secondary-800: #12669E;
+  --color-secondary-900: #0D4C75;
+
+  /* ─── NEUTRAL (Gray/Slate) — IMMUTABLE ────────────── */
+  --color-neutral-50:  #F7F8FA;
+  --color-neutral-100: #F1F3F8;
+  --color-neutral-200: #E1E4EA;
+  --color-neutral-300: #CDD2DC;
+  --color-neutral-400: #BAC0CC;
+  --color-neutral-500: #9CA6B8;
+  --color-neutral-600: #8893AA;
+  --color-neutral-700: #64718B;
+  --color-neutral-800: #475164;
+  --color-neutral-900: #2B363C;
+
+  /* ─── INFORMATIVE (Blue) — IMMUTABLE ──────────────── */
+  --color-informative-50:  #F0FAFF;
+  --color-informative-100: #E5F6FF;
+  --color-informative-200: #A5DEFF;
+  --color-informative-300: #77CEFF;
+  --color-informative-400: #49BCFF;
+  --color-informative-500: #0079BF;
+  --color-informative-600: #00598C;
+  --color-informative-700: #0B486B;
+  --color-informative-800: #083752;
+  --color-informative-900: #00121C;
+
+  /* ─── SUCCESS (Green) — IMMUTABLE ─────────────────── */
+  --color-success-50:  #E5FFF6;
+  --color-success-100: #C2F2E2;
+  --color-success-200: #7ACCB1;
+  --color-success-300: #36B289;
+  --color-success-400: #1F9970;
+  --color-success-500: #008558;
+  --color-success-600: #00724C;
+  --color-success-700: #005539;
+  --color-success-800: #013926;
+  --color-success-900: #001C13;
+
+  /* ─── WARNING (Amber) — IMMUTABLE — dark text only! ─ */
+  --color-warning-50:  #FFF9E5;
+  --color-warning-100: #FFF2CC;
+  --color-warning-200: #FFED99;
+  --color-warning-300: #FFE699;
+  --color-warning-400: #FFD966;
+  --color-warning-500: #FBCB3C;
+  --color-warning-600: #FBBB3C;
+  --color-warning-700: #F2A222;
+  --color-warning-800: #B06112;
+  --color-warning-900: #80460D;
+
+  /* ─── DANGER (Red) — IMMUTABLE ────────────────────── */
+  --color-danger-50:  #FEF1F2;
+  --color-danger-100: #FEE1E3;
+  --color-danger-200: #FEC8CC;
+  --color-danger-300: #FCA6AD;
+  --color-danger-400: #F8727D;
+  --color-danger-500: #DE2D3B;
+  --color-danger-600: #D12332;
+  --color-danger-700: #C41826;
+  --color-danger-800: #B20917;
+  --color-danger-900: #86131D;
+
+  /* ─── SEMANTIC ALIASES ────────────────────────────── */
+  --color-page-bg:         var(--color-neutral-50);
+  --color-surface:         var(--color-white);
+  --color-text-primary:    var(--color-neutral-900); /* AAA on white */
+  --color-text-secondary:  var(--color-neutral-700); /* AA  on white */
+  --color-text-disabled:   var(--color-neutral-500); /* contrast-exempt only */
+  --color-text-inverse:    var(--color-white);
+  --color-text-link:       var(--color-primary-500);
+  --color-text-link-hover: var(--color-primary-600);
+  --color-border:          var(--color-neutral-200);
+  --color-border-strong:   var(--color-neutral-300);
+  --color-border-essential:var(--color-neutral-600); /* lightest that clears 3:1 */
+  --color-action-primary:  var(--color-primary-500);
+  --color-action-hover:    var(--color-primary-600);
+  --color-action-active:   var(--color-primary-700);
+
+  /* ─── SPACING (8px base unit) ─────────────────────── */
+  --space-0:   0px;
+  --space-8:   8px;
+  --space-16:  16px;
+  --space-24:  24px;
+  --space-32:  32px;
+  --space-40:  40px;
+  --space-48:  48px;
+  --space-56:  56px;
+  --space-64:  64px;
+  --space-72:  72px;
+  --space-80:  80px;
+  --space-88:  88px;
+  --space-96:  96px;
+  --space-104: 104px;
+  --space-112: 112px;
+  --space-120: 120px;
+  --space-128: 128px;
+  --space-256: 256px;
+
+  /* ─── BORDER RADIUS ───────────────────────────────── */
+  --radius-none: 0px;
+  --radius-4:    4px;
+  --radius-8:    8px;
+  --radius-16:   16px;
+  --radius-24:   24px;
+  --radius-32:   32px;
+  --radius-full: 9999px;
+
+  /* ─── SHADOWS ─────────────────────────────────────── */
+  --shadow-top-lower:     0px -4px 4px 0px rgba(0, 0, 0, 0.16);
+  --shadow-top-low:       0px -8px 8px 0px rgba(0, 0, 0, 0.08);
+  --shadow-top-medium:    0px -16px 16px 0px rgba(0, 0, 0, 0.08);
+  --shadow-top-high:      0px -16px 16px 0px rgba(0, 0, 0, 0.16);
+  --shadow-top-higher:    0px -16px 16px 0px rgba(0, 0, 0, 0.32);
+
+  --shadow-center-lower:  0px 0px 4px 0px rgba(0, 0, 0, 0.32);
+  --shadow-center-low:    0px 0px 8px 0px rgba(0, 0, 0, 0.08);
+  --shadow-center-medium: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
+  --shadow-center-high:   0px 0px 16px 0px rgba(0, 0, 0, 0.16);
+  --shadow-center-higher: 0px 0px 16px 0px rgba(0, 0, 0, 0.32);
+
+  --shadow-bottom-lower:  0px 4px 4px 0px rgba(0, 0, 0, 0.16);
+  --shadow-bottom-low:    0px 8px 8px 0px rgba(0, 0, 0, 0.08);
+  --shadow-bottom-medium: 0px 16px 16px 0px rgba(0, 0, 0, 0.08);
+  --shadow-bottom-high:   0px 16px 16px 0px rgba(0, 0, 0, 0.16);
+  --shadow-bottom-higher: 0px 16px 16px 0px rgba(0, 0, 0, 0.32);
+  --shadow-inner:         0px 4px 4px 0px rgba(0, 0, 0, 0.32) inset;
+
+  /* ─── TRANSITIONS ─────────────────────────────────── */
+  --transition-duration: 200ms;
+  --transition-easing:   ease-in-out;
+  --transition-default:  all var(--transition-duration) var(--transition-easing);
+
+  /* ─── Z-INDEX (ADS ladder — see ../03 §8) ─────────── */
+  --z-dropdown:  1000;
+  --z-backdrop:  2000;
+  --z-sticky:    3000;
+  --z-fixed:     4000;
+  --z-drawer:    5000;
+  --z-dialog:    6000;
+  --z-toast:     7000;
+  --z-tooltip:   8000;
+
+  /* ─── BREAKPOINTS (only xs/md/xl are ADS-sanctioned) ─ */
+  --bp-xs: 360px;
+  --bp-md: 768px;
+  --bp-xl: 1280px;
+
+  /* ─── LAYOUT ──────────────────────────────────────── */
+  --container-max-width: 1280px;
+  --container-padding-mobile: 32px;
+  --container-padding-tablet: 64px;
+  --container-padding-desktop: 0px;
+
+  /* ─── TYPE SCALE ──────────────────────────────────── */
+  --text-s-size:   0.875rem; --text-s-lh:   1.5rem;
+  --text-m-size:   1rem;     --text-m-lh:   1.75rem;
+  --text-l-size:   1.25rem;  --text-l-lh:   2rem;
+  --text-xl-size:  1.5rem;   --text-xl-lh:  2.25rem;
+  --text-2xl-size: 2rem;     --text-2xl-lh: 3rem;
+  --text-3xl-size: 2.5rem;   --text-3xl-lh: 3.75rem;
+
+  /* ─── ACCESSIBILITY TOKENS ────────────────────────── */
+  --ads-focus: var(--color-focus);       /* magenta focus ring */
+  --ads-control-min-touch: 44px;         /* opt-in touch target floor */
+
+  /* ─── GIS APPLICATION TOKENS (scalargis, not ADS) ─── */
+  --sidebar-width: 288px;
+  --map-footer-height: 28px;
+  --z-map-controls: 20;
+  --z-draw-toolbar: 20;
+  --z-sidebar: 10;
+  --font-condensed: "Noto Sans Condensed", var(--font-sans);
+  --font-semi-condensed: "Noto Sans SemiCondensed", var(--font-sans);
+  --text-xs-size: 0.6875rem; --text-xs-lh: 1rem;
+}

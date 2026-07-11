@@ -19,7 +19,8 @@
       "@scalargis/components": ["libs/components/src/index.ts"],
       "@scalargis/jsonforms-primereact-renderers": [
         "libs/jsonforms-primereact-renderers/src/index.ts"
-      ]
+      ],
+      "@scalargis/ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
