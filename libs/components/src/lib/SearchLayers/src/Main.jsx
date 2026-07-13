@@ -63,12 +63,11 @@ export default function Main(props) {
   const layer_id = component_cfg.exclusive_layer === true ? record.id : 'searchlayers';
   const layer = useRef();
 
-  const ref = useRef(null);
-  const [blockedPanel, setBlockedPanel] = useState(false);
-  const [layers, setLayers] = useState(() => {
+  const buildLayersList = (new_layers) => {
     if (component_cfg?.use_layers_datatables === true) {
       return (viewer?.config_json?.layers || []).filter(l => l.datatable).map(l => {
         return {
+          id: l.id,
           title: l.title,
           description: l.description,
           ...l.datatable
@@ -76,6 +75,12 @@ export default function Main(props) {
       });
     }
     return component_cfg.layers || [];
+  }
+
+  const ref = useRef(null);
+  const [blockedPanel, setBlockedPanel] = useState(false);
+  const [layers, setLayers] = useState(() => {
+    return buildLayersList();
   });
 
   const component_store_state = useSelector((state) => {
@@ -94,7 +99,6 @@ export default function Main(props) {
   }, [selected_menu]);
 
   useEffect(() => {
-    console.log('component_store_state', component_store_state);
     if (component_store_state && component_store_state[record.id]) {
       const new_layers = component_store_state[record.id].layers.map(l=>{
         return {
@@ -141,7 +145,9 @@ export default function Main(props) {
           config={config}
           layer={layer}
           layers={layers}
-          setLayers={setLayers}
+          setLayersList={() => {
+            setLayers(buildLayersList());
+          }}
           actions={actions}
           pubsub={core.pubsub}
           dispatch={dispatch}

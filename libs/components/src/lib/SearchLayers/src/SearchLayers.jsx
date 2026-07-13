@@ -7,7 +7,7 @@ import { getDescribeFeatureType } from './service';
 import SearchLayerForm from './SearchLayerForm';
 
 export default function SearchLayers(props) {
-  const { core, config, layer, layers, setLayers, actions, pubsub, dispatch, mainMap, Models, record } = props;
+  const { core, config, layer, layers, setLayersList, actions, pubsub, dispatch, mainMap, Models, record } = props;
   const { viewer, auth } = config;
   const component_cfg = record.config_json ? { show_icon: true, ...record.config_json } : { show_icon: true};
   const { show_icon } = component_cfg;
@@ -18,6 +18,7 @@ export default function SearchLayers(props) {
   const [schemas, setSchemas] = useState({});
 
   const [errorSchema, setErrorSchema] = useState(null);
+
 
   const schemaConfig = useMemo(() => {
     if (!active) return null;
@@ -71,7 +72,7 @@ export default function SearchLayers(props) {
         return Promise.reject(err);
       }
       setLoaded(true);
-    }).catch(error => {      
+    }).catch(error => {
       console.log(error);
       setErrorSchema({message:'Não foi possível obter informação do tema'});
     }).finally(()=> {
@@ -135,18 +136,7 @@ export default function SearchLayers(props) {
         {
           layer.current.getSource().clear();
           setActive(null);
-
-          if (component_cfg?.use_layers_datatables === true) {
-            setLayers((viewer?.config_json?.layers || []).filter(l => l.datatable).map(l => {
-              return {
-                title: l.title,
-                description: l.description,
-                ...l.datatable
-              }
-            }));
-          } else {
-            setLayers(component_cfg.layers || []);
-          }
+          setLayersList();
         }
       )}
       errorSchema={errorSchema}
@@ -154,15 +144,15 @@ export default function SearchLayers(props) {
     />
   }
 
-    const listTemplate = (items) => {
-        if (!items || items.length === 0) return null;
+  const listTemplate = (items) => {
+      if (!items || items.length === 0) return null;
 
-        let list = items.map((item, index) => {
-            return itemTemplate(item, index);
-        });
+      let list = items.map((item, index) => {
+          return itemTemplate(item, index);
+      });
 
-        return <div className="grid grid-nogutter">{list}</div>;
-    };
+      return <div className="grid grid-nogutter">{list}</div>;
+  };
 
   if (component_cfg?.layers?.length > 1 || component_cfg.show_main === true) {
     return (
