@@ -82,7 +82,7 @@ export default function SearchLayerForm(props) {
         <div className="grid">
           <div className="col text-left">
             <Button
-                label="Voltar"
+                label={ i18n.translateValue("back", "Voltar")}
                 icon="pi pi-chevron-left"
                 size="small"
                 onClick={e => { goPanelSearchPrev(); }}
@@ -145,7 +145,7 @@ export default function SearchLayerForm(props) {
             }}
             className="mr-2"
             color='primary'>
-            Limpar
+            {i18n.translateValue("clear", "Limpar")}
           </Button>
           <Button onClick={async (e) => {
               if (formErrors[id]?.length) return;
@@ -225,7 +225,7 @@ export default function SearchLayerForm(props) {
               doSearch(0, null, data, sort);
 
           }} color='primary'>
-            Pesquisar
+            {i18n.translateValue("search", "Pesquisar")}
           </Button> 
         </div>
 
@@ -233,7 +233,7 @@ export default function SearchLayerForm(props) {
           <div className="mt-4" style={{textAlign: 'center'}}>
             <Message
               severity="info"
-              text='Pesquisa sem resultados'
+              text={i18n.translateValue("noResultsFound", "Pesquisa sem resultados")}
             />
           </div>
         }

@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { Card } from 'primereact/card';
+import React, { useState, useEffect, useMemo } from 'react';
+import { DataView } from 'primereact/dataview';
+import { Button } from 'primereact/button';
 import classNames from 'classnames';
 
 import { getDescribeFeatureType } from './service';
 import SearchLayerForm from './SearchLayerForm';
 
 export default function SearchLayers(props) {
-  const { core, config, layer, layers, actions, pubsub, dispatch, mainMap, Models, record } = props;
+  const { core, config, layer, layers, setLayers, actions, pubsub, dispatch, mainMap, Models, record } = props;
   const { viewer, auth } = config;
   const component_cfg = record.config_json ? { show_icon: true, ...record.config_json } : { show_icon: true};
   const { show_icon } = component_cfg;
@@ -90,10 +91,32 @@ export default function SearchLayers(props) {
     setSchemas(sch);
   }
 
+  const itemTemplate = (item, index) => {
+
+    const iconClass = {
+      "pi": !item.icon
+    }
+    iconClass[item.icon] = item.icon ? true : false;
+    iconClass['pi-bars'] = item.icon ? false : true;
+
+    return (
+      <div className={classNames('card col-12 pt-2', { 'border-top-1 surface-border pt-2': index !== 0 })} key={index}>
+          <div class="flex flex-row p-1 pt-2 gap-3" key={index} style={{cursor: 'pointer'}} title={item.tooltip || 'Pesquisar'} onClick={e => setActive(item)}>
+            <div class="flex-none flex align-items-center justify-content-center">
+              <i className={classNames(iconClass)} style={{fontSize: '2.5em'}}></i>
+            </div>
+            <div class="flex-grow-1 flex align-items-center justify-content-left">{item.title}</div>
+            <div class="flex-none flex align-items-center justify-content-center">
+              <Button icon="pi pi-chevron-right" size="small" rounded text title={item.tooltip || 'Pesquisar'} onClick={e => setActive(item)}></Button>
+            </div>
+          </div>
+          {item?.description && <div className="col-12"><small className="text-color-secondary italic">{item.description}</small></div>}
+      </div>
+    );
+  }
+
   if (loaded && active) {
-    const showPanelPrev = (
-      (component_cfg.layers && component_cfg.layers.length > 1) || component_cfg.show_main === true
-      ) ? true : false;
+    const showPanelPrev = component_cfg?.layers?.length > 1 || component_cfg.show_main === true;
 
     return <SearchLayerForm
       core={core}
@@ -112,6 +135,18 @@ export default function SearchLayers(props) {
         {
           layer.current.getSource().clear();
           setActive(null);
+
+          if (component_cfg?.use_layers_datatables === true) {
+            setLayers((viewer?.config_json?.layers || []).filter(l => l.datatable).map(l => {
+              return {
+                title: l.title,
+                description: l.description,
+                ...l.datatable
+              }
+            }));
+          } else {
+            setLayers(component_cfg.layers || []);
+          }
         }
       )}
       errorSchema={errorSchema}
@@ -119,34 +154,20 @@ export default function SearchLayers(props) {
     />
   }
 
-  if ((component_cfg.layers && component_cfg.layers.length > 1) || component_cfg.show_main === true) {
+    const listTemplate = (items) => {
+        if (!items || items.length === 0) return null;
+
+        let list = items.map((item, index) => {
+            return itemTemplate(item, index);
+        });
+
+        return <div className="grid grid-nogutter">{list}</div>;
+    };
+
+  if (component_cfg?.layers?.length > 1 || component_cfg.show_main === true) {
     return (
-      <div>
-        {component_cfg.layers.map((l, i) => {
-
-          const iconClass = {
-            "pi": !l.icon,
-            "mt-3": true
-          }
-          iconClass[l.icon] = l.icon ? true : false;
-          iconClass['pi-bars'] = l.icon ? false : true;
-          
-          const icon = <div style={{ cursor: 'pointer'}} title={l.tooltip} 
-            onClick={e => setActive(l)}>
-            <i className={classNames(iconClass)} style={{fontSize: '3em'}}></i>
-          </div>
-          const title = <div style={{ cursor: 'pointer'}} title={l.tooltip} 
-            onClick={e => setActive(l)}>
-            {l.title}
-          </div>
-
-          return <Card key={i} header={show_icon && icon} title={title} subTitle={l.subtitle && l.subtitle} style={{ marginBottom: '2em' }} 
-            onClick={e => console.log(e)}>
-              <div className="m-0" dangerouslySetInnerHTML={{__html: l.description || ''}}></div>
-            </Card>
-        })}
-      </div>
-    )
+      <DataView value={layers} listTemplate={listTemplate} />    
+    );
   }
 
   return (

@@ -19,14 +19,14 @@ export function MainMenu({ className, config, actions, record }) {
   const icon = record.icon || "pi pi-search";
 
   if (record.mode !== 'child') {
-  return (
-    <Button
-      title={title}
-      className={className}
-      icon={icon}
-      onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
-    />
-  )
+    return (
+      <Button
+        title={title}
+        className={className}
+        icon={icon}
+        onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+      />
+    );
   } else {
     return null;
   }
@@ -65,8 +65,18 @@ export default function Main(props) {
 
   const ref = useRef(null);
   const [blockedPanel, setBlockedPanel] = useState(false);
-  const [layers, setLayers] = useState(component_cfg.layers || []);
-
+  const [layers, setLayers] = useState(() => {
+    if (component_cfg?.use_layers_datatables === true) {
+      return (viewer?.config_json?.layers || []).filter(l => l.datatable).map(l => {
+        return {
+          title: l.title,
+          description: l.description,
+          ...l.datatable
+        }
+      });
+    }
+    return component_cfg.layers || [];
+  });
 
   const component_store_state = useSelector((state) => {
     return state?.searchlayers;
@@ -84,6 +94,7 @@ export default function Main(props) {
   }, [selected_menu]);
 
   useEffect(() => {
+    console.log('component_store_state', component_store_state);
     if (component_store_state && component_store_state[record.id]) {
       const new_layers = component_store_state[record.id].layers.map(l=>{
         return {
@@ -130,6 +141,7 @@ export default function Main(props) {
           config={config}
           layer={layer}
           layers={layers}
+          setLayers={setLayers}
           actions={actions}
           pubsub={core.pubsub}
           dispatch={dispatch}
