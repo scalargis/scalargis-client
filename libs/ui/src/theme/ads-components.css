@@ -1,0 +1,132 @@
+/* =====================================================================
+   ADS recipe styles — the visual rules the recipes in src/recipes/ need
+   and that neither createTheme() nor a Mantine prop can express.
+
+   Loaded by AdsProviders, last in the CSS order:
+     Prime globals → @mantine/core → ads-tokens → ads-globals → THIS
+
+   RULE: every value here is an ADS token (var(--mantine-*) resolved from
+   the theme, or var(--*) from ads-tokens.css). No raw hexes, no off-grid
+   pixels — if a value isn't on the 8px grid or in a palette, it's wrong.
+   Sizes that must track the root-font-size compensation go through
+   calc(... * var(--mantine-scale)), the same way Mantine's rem() does.
+   ===================================================================== */
+
+/* ─── DataGrid ─────────────────────────────────────────────────────────
+   Prime's DataTable gives the header a tinted band; Mantine's table gives
+   `th` nothing but `font-weight: bold`, so header and body read as one
+   undifferentiated block. Restore the band on ADS neutrals, and drop the
+   header to the ADS "medium" weight (600) rather than the browser's 700.
+   -------------------------------------------------------------------- */
+.ads-datagrid__header th {
+  background-color: var(--mantine-color-neutral-1);
+  color: var(--mantine-color-neutral-9);
+  font-weight: 600;
+  font-size: var(--mantine-font-size-sm);
+  border-bottom: 1px solid var(--mantine-color-neutral-3);
+}
+
+/* mantine-datatable makes the sortable header an ARIA button (role=button +
+   tabIndex + onKeyDown) rather than a real <button>, so it is keyboard-
+   operable but gets no focus styling of its own. The global magenta ring in
+   ads-globals.css covers :focus-visible; this only restores the pointer
+   affordance the role implies. */
+.ads-datagrid__header th [role='button'] {
+  cursor: pointer;
+}
+
+.ads-datagrid__pagination {
+  background-color: var(--mantine-color-neutral-0);
+  border-top: 1px solid var(--mantine-color-neutral-2);
+  font-size: var(--mantine-font-size-sm);
+}
+
+/* ─── TreeView ─────────────────────────────────────────────────────────
+   Mantine's Tree renders bare labels: no chevron affordance, no hover
+   target, no surface. Prime's Tree is a bordered card whose rows are
+   hoverable hit areas. Rebuild that on ADS tokens.
+   -------------------------------------------------------------------- */
+.ads-tree__node {
+  padding-block: calc(0.25rem * var(--mantine-scale)); /* 4px, half-step */
+  /* Mantine's Tree indents by level with padding-inline-start:
+     var(--label-offset) on this same element (the var is set per-node on
+     the <li> and inherited). ADD the hit-area padding to that offset —
+     the padding-inline SHORTHAND here used to override it (same
+     specificity, later in the cascade) and flattened the whole tree. */
+  padding-inline-start: calc(var(--label-offset, 0px) + var(--mantine-spacing-xs));
+  padding-inline-end: var(--mantine-spacing-xs);
+  border-radius: var(--mantine-radius-xs);
+  cursor: pointer;
+}
+
+.ads-tree__node:hover {
+  background-color: var(--mantine-color-neutral-1);
+}
+
+/* Selected row: colour alone must never be the signal (WCAG 1.4.1) —
+   Mantine's Tree sets aria-selected on the treeitem; this tint is the
+   redundant visual cue. */
+.ads-tree__node[data-selected] {
+  background-color: var(--mantine-color-primary-1);
+  color: var(--mantine-color-primary-8);
+}
+
+/* ─── Disclosure chevron (shared by TreeView and CollapsiblePanel) ─────
+   Rotates rather than swapping glyphs, so it animates on the ADS duration
+   and collapses to nothing under prefers-reduced-motion (ads-globals.css).
+   The two consumers start from different glyphs and so rotate differently.
+   -------------------------------------------------------------------- */
+.ads-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: calc(1.25rem * var(--mantine-scale)); /* 20px */
+  height: calc(1.25rem * var(--mantine-scale));
+  color: var(--mantine-color-neutral-7);
+  transition: transform var(--transition-duration) var(--transition-easing);
+}
+
+/* Tree: chevron-right → points down when open. */
+.ads-tree__chevron[data-expanded] {
+  transform: rotate(90deg);
+}
+
+/* Leaf nodes keep the chevron's footprint so labels stay aligned. */
+.ads-tree__chevron[data-leaf] {
+  visibility: hidden;
+}
+
+/* Panel: chevron-down → points up when open. */
+.ads-panel__chevron[data-expanded] {
+  transform: rotate(180deg);
+}
+
+/* ─── TreeSelect ───────────────────────────────────────────────────────
+   The target is an InputBase rendered as a <button>; left-align its text
+   like a real input value instead of centring it like a button label. */
+.ads-treeselect__target {
+  text-align: start;
+}
+
+.ads-treeselect__placeholder {
+  color: var(--mantine-color-placeholder);
+}
+
+/* ─── FileUpload ───────────────────────────────────────────────────────
+   Prime's FileUpload is an action bar over a drop area. @mantine/dropzone
+   is only the drop area, so the recipe adds the bar; this styles the seam.
+   -------------------------------------------------------------------- */
+.ads-fileupload__toolbar {
+  border: 1px solid var(--mantine-color-neutral-2);
+  border-bottom: 0;
+  border-start-start-radius: var(--mantine-radius-sm);
+  border-start-end-radius: var(--mantine-radius-sm);
+  background-color: var(--mantine-color-neutral-0);
+  padding: var(--mantine-spacing-xs);
+}
+
+.ads-fileupload__dropzone {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}

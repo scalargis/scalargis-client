@@ -19,7 +19,32 @@
    override contract in the kit's 05-mantine-mapping.md.
    ===================================================================== */
 
-import { createTheme, type MantineColorsTuple } from '@mantine/core';
+import {
+  createTheme,
+  rem,
+  type CSSVariablesResolver,
+  type MantineColorsTuple,
+} from '@mantine/core';
+
+/* ─── ROOT FONT-SIZE COMPENSATION ──────────────────────────────────
+   The viewer/backoffice shells pin `html { font-size: 14px }` (viewer
+   apps/viewer/src/app/core/themes/default/layout.scss, loaded on every
+   route via app.jsx → RGPD → ThemeSelector). Mantine expresses every
+   size in rem, so without compensation the whole ADS scale renders at
+   87.5%: the 8px spacing grid becomes a 7px grid and `size="md"`
+   controls come out 36.75px instead of 42px.
+
+   `scale` is Mantine's hook for exactly this: it multiplies every rem()
+   value via --mantine-scale. Raising html to 16px instead would reflow
+   every unmigrated Prime screen, so we scale rather than move the root.
+
+   CONSEQUENCE: every size below must go through rem(). A literal
+   '1rem' string is emitted verbatim and silently escapes the scale.
+   Absolute px (shadow offsets) and em (breakpoints, which resolve
+   against the initial 16px font-size, not html's) are unaffected.
+   ------------------------------------------------------------------ */
+const ROOT_FONT_SIZE = 14;
+const ADS_BASE_FONT_SIZE = 16;
 
 /* ─── PALETTES (ADS 50→900 == Mantine tuple index 0→9) ─────────────── */
 
@@ -61,7 +86,16 @@ const danger: MantineColorsTuple = [
 ];
 
 export const adsBaseTheme = createTheme({
+  scale: ADS_BASE_FONT_SIZE / ROOT_FONT_SIZE,
+
   /* ─── COLOUR ────────────────────────────────────────────────────── */
+  // Mantine derives --mantine-color-text from `black` and --mantine-color-body
+  // from `white`. Left unset they default to #000/#fff; ADS body text is
+  // neutral-900 (12.4:1 on white, kit 02 §text on white), never pure black.
+  // `black` is also what autoContrast puts on light fills — so this is the
+  // colour that lands on warning-500 (8.1:1, the pairing the kit verified).
+  black: '#2B363C', // neutral-900
+  white: '#FFFFFF',
   colors: {
     primary,
     secondary,
@@ -87,11 +121,11 @@ export const adsBaseTheme = createTheme({
   fontFamilyMonospace:
     'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   fontSizes: {
-    xs: '0.6875rem', // 11px — GIS map/toolbar chrome ONLY (not ADS body)
-    sm: '0.875rem',  // 14px — ADS "s"
-    md: '1rem',      // 16px — ADS "m" (base)
-    lg: '1.25rem',   // 20px — ADS "l"
-    xl: '1.5rem',    // 24px — ADS "xl"
+    xs: rem(11), // GIS map/toolbar chrome ONLY (not ADS body)
+    sm: rem(14), // ADS "s"
+    md: rem(16), // ADS "m" (base)
+    lg: rem(20), // ADS "l"
+    xl: rem(24), // ADS "xl"
   },
   lineHeights: {
     xs: '1.45',
@@ -103,31 +137,31 @@ export const adsBaseTheme = createTheme({
   headings: {
     fontFamily: '"Noto Sans", sans-serif',
     sizes: {
-      h1: { fontSize: '2.5rem',  lineHeight: '1.5',    fontWeight: '700' }, // 3xl
-      h2: { fontSize: '2rem',    lineHeight: '1.5',    fontWeight: '700' }, // 2xl
-      h3: { fontSize: '1.5rem',  lineHeight: '1.5',    fontWeight: '600' }, // xl
-      h4: { fontSize: '1.25rem', lineHeight: '1.6',    fontWeight: '600' }, // l
-      h5: { fontSize: '1rem',    lineHeight: '1.75',   fontWeight: '600' }, // m
-      h6: { fontSize: '0.875rem',lineHeight: '1.7143', fontWeight: '600' }, // s
+      h1: { fontSize: rem(40), lineHeight: '1.5',    fontWeight: '700' }, // 3xl
+      h2: { fontSize: rem(32), lineHeight: '1.5',    fontWeight: '700' }, // 2xl
+      h3: { fontSize: rem(24), lineHeight: '1.5',    fontWeight: '600' }, // xl
+      h4: { fontSize: rem(20), lineHeight: '1.6',    fontWeight: '600' }, // l
+      h5: { fontSize: rem(16), lineHeight: '1.75',   fontWeight: '600' }, // m
+      h6: { fontSize: rem(14), lineHeight: '1.7143', fontWeight: '600' }, // s
     },
   },
 
   /* ─── SPACING (8px grid) ────────────────────────────────────────── */
   spacing: {
-    xs: '0.5rem', // 8
-    sm: '1rem',   // 16
-    md: '1.5rem', // 24
-    lg: '2rem',   // 32
-    xl: '3rem',   // 48
+    xs: rem(8),
+    sm: rem(16),
+    md: rem(24),
+    lg: rem(32),
+    xl: rem(48),
   },
 
   /* ─── RADIUS ────────────────────────────────────────────────────── */
   radius: {
-    xs: '0.25rem', // 4
-    sm: '0.5rem',  // 8
-    md: '1rem',    // 16
-    lg: '1.5rem',  // 24
-    xl: '2rem',    // 32
+    xs: rem(4),
+    sm: rem(8),
+    md: rem(16),
+    lg: rem(24),
+    xl: rem(32),
   },
   defaultRadius: 'sm', // 8px — ADS default for buttons/inputs/cards
 
@@ -157,22 +191,60 @@ export const adsBaseTheme = createTheme({
 
   /* ─── COMPONENT DEFAULTS (thin, pattern-level only) ─────────────── */
   components: {
-    // ~42px control-height baseline on interactive controls.
-    Button:      { defaultProps: { size: 'md' } },
-    TextInput:   { defaultProps: { size: 'md' } },
-    Textarea:    { defaultProps: { size: 'md' } },
-    NumberInput: { defaultProps: { size: 'md' } },
-    PasswordInput: { defaultProps: { size: 'md' } },
-    Select:      { defaultProps: { size: 'md' } },
-    MultiSelect: { defaultProps: { size: 'md' } },
+    /* ~42px control-height baseline (kit 03 §6). This must cover EVERY
+       control that renders an Input shell, not just the common few —
+       any component left out silently falls back to Mantine's `sm` and
+       renders visibly shorter than the field next to it. */
+    ...Object.fromEntries(
+      [
+        'Button',
+        'TextInput',
+        'Textarea',
+        'NumberInput',
+        'PasswordInput',
+        'Select',
+        'MultiSelect',
+        'Autocomplete',
+        'TagsInput',
+        'NativeSelect',
+        'JsonInput',
+        'FileInput',
+        'PinInput',
+        'ColorInput',
+        'InputBase',
+        // @mantine/dates — same Input shell, same baseline.
+        'DateInput',
+        'DatePickerInput',
+        'DateTimePicker',
+        'TimeInput',
+        'MonthPickerInput',
+        'YearPickerInput',
+      ].map((name) => [name, { defaultProps: { size: 'md' } }])
+    ),
+
     // Don't signal links by colour alone (WCAG 1.4.1).
-    Anchor:      { defaultProps: { underline: 'always' } },
+    Anchor: { defaultProps: { underline: 'always' } },
     // Bigger hit area for icon-only controls. Callers MUST pass aria-label.
-    ActionIcon:  { defaultProps: { size: 'lg' } },
-    // ADS z-index ladder — overlays must clear app chrome (kit 03 §8).
-    Modal:   { defaultProps: { zIndex: 6000 } },
-    Drawer:  { defaultProps: { zIndex: 5000 } },
+    ActionIcon: { defaultProps: { size: 'lg' } },
+
+    /* ─── ADS z-index ladder (kit 03 §8) ───────────────────────────
+       Mantine's own defaults (popover 300, modal 200) sit far below the
+       ladder and would render under app chrome — and, during the
+       coexistence window, under Prime's own overlays (~1100). */
+    Modal: {
+      defaultProps: {
+        zIndex: 6000,
+        // Prime's Dialog is viewport-centred; Mantine's Modal is top-anchored.
+        centered: true,
+      },
+    },
+    Drawer: { defaultProps: { zIndex: 5000 } },
     Tooltip: { defaultProps: { zIndex: 8000 } },
+    // Dropdown rung (1000): Menu/Select/Combobox panels and every Popover.
+    Popover: { defaultProps: { zIndex: 1000 } },
+    Menu: { defaultProps: { zIndex: 1000 } },
+    Combobox: { defaultProps: { zIndex: 1000 } },
+    HoverCard: { defaultProps: { zIndex: 1000 } },
   },
 
   /* ─── ESCAPE HATCH: raw ADS tokens for hand-written CSS ─────────── */
@@ -191,3 +263,27 @@ export const adsBaseTheme = createTheme({
 });
 
 export type AdsBaseTheme = typeof adsBaseTheme;
+
+/* ─── SEMANTIC CSS VARIABLES ────────────────────────────────────────
+   A few Mantine semantic colours are derived from its built-in `gray`
+   scale at indices the ADS pairing table rejects. Aliasing gray→neutral
+   (above) fixes the hue but not the index, so correct them here — this
+   is the supported hook, and it keeps the fix in one place instead of
+   in a `c=` prop on every call site.
+
+   Passed to <MantineProvider cssVariablesResolver={...}> in AdsProviders.
+   ------------------------------------------------------------------ */
+export const adsCssVariablesResolver: CSSVariablesResolver = () => ({
+  variables: {},
+  light: {
+    // Mantine default: gray-6 (#8893AA) = 3.1:1 on white. The kit rates that
+    // "AA large/UI only — never body text" (02 §verified pairings), yet it is
+    // what every <Text c="dimmed"> renders. neutral-7 (#64718B) = 4.9:1.
+    '--mantine-color-dimmed': 'var(--mantine-color-neutral-7)',
+    // ADS --color-border-strong (neutral-300). Decorative framing: it is the
+    // label + focus ring that carry perceivable information, not the border.
+    '--mantine-color-default-border': 'var(--mantine-color-neutral-3)',
+  },
+  // ADS is a light-only system; AdsProviders forces the light scheme.
+  dark: {},
+});

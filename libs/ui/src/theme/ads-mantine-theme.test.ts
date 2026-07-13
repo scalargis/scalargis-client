@@ -1,0 +1,149 @@
+/* =====================================================================
+   Regression locks for the ADS base theme.
+
+   Each test below corresponds to a defect observed on /demo-ext/mantine
+   (2026-07-09) whose cause was a missing line in this theme. They assert
+   the restriction, not the implementation — see the adherence kit at
+   references/projects/client/migration2/ads-adherence-restrictions/.
+   ===================================================================== */
+
+import { DEFAULT_THEME, mergeThemeOverrides, type MantineTheme } from '@mantine/core';
+import { describe, expect, it } from 'vitest';
+
+import { adsBaseTheme } from './ads-mantine-theme';
+
+/** The theme as MantineProvider will actually see it. */
+const theme = mergeThemeOverrides(DEFAULT_THEME, adsBaseTheme) as MantineTheme;
+
+/** The px a `rem()` token resolves to, given the shells' 14px root. */
+const ROOT_FONT_SIZE = 14;
+function resolvePx(token: string): number {
+  // rem() emits `calc(<n>rem * var(--mantine-scale))`.
+  const match = /calc\(([\d.]+)rem \* var\(--mantine-scale\)\)/.exec(token);
+  if (!match) throw new Error(`"${token}" is not a scaled rem token`);
+  return Number(match[1]) * ROOT_FONT_SIZE * theme.scale;
+}
+
+describe('root font-size compensation', () => {
+  it('scales rem tokens back to the ADS 16px base', () => {
+    expect(theme.scale).toBeCloseTo(16 / 14, 10);
+  });
+
+  it('keeps spacing on the ADS 8px grid despite html{font-size:14px}', () => {
+    // The bug: literal '0.5rem' escaped the scale and rendered 7px.
+    expect(resolvePx(theme.spacing.xs)).toBeCloseTo(8);
+    expect(resolvePx(theme.spacing.sm)).toBeCloseTo(16);
+    expect(resolvePx(theme.spacing.md)).toBeCloseTo(24);
+    expect(resolvePx(theme.spacing.lg)).toBeCloseTo(32);
+    expect(resolvePx(theme.spacing.xl)).toBeCloseTo(48);
+  });
+
+  it('renders the ADS type scale at its stated pixel sizes', () => {
+    expect(resolvePx(theme.fontSizes.xs)).toBeCloseTo(11); // GIS chrome only
+    expect(resolvePx(theme.fontSizes.sm)).toBeCloseTo(14);
+    expect(resolvePx(theme.fontSizes.md)).toBeCloseTo(16);
+    expect(resolvePx(theme.fontSizes.lg)).toBeCloseTo(20);
+    expect(resolvePx(theme.fontSizes.xl)).toBeCloseTo(24);
+  });
+
+  it('runs every heading size through the scale', () => {
+    // resolvePx throws on a literal rem string, so a future '2.5rem' that
+    // silently escapes --mantine-scale fails here, not in production.
+    const expected = [
+      ['h1', 40],
+      ['h2', 32],
+      ['h3', 24],
+      ['h4', 20],
+      ['h5', 16],
+      ['h6', 14],
+    ] as const;
+    for (const [heading, px] of expected) {
+      expect(resolvePx(theme.headings.sizes[heading].fontSize as string)).toBeCloseTo(px);
+    }
+  });
+
+  it('keeps radius on the ADS fixed set', () => {
+    expect(resolvePx(theme.radius.xs)).toBeCloseTo(4);
+    expect(resolvePx(theme.radius.sm)).toBeCloseTo(8);
+    expect(resolvePx(theme.radius.md)).toBeCloseTo(16);
+    expect(resolvePx(theme.radius.lg)).toBeCloseTo(24);
+    expect(resolvePx(theme.radius.xl)).toBeCloseTo(32);
+  });
+
+  it('leaves breakpoints in em — media queries resolve against the initial 16px', () => {
+    expect(theme.breakpoints.xs).toBe('22.5em');
+    expect(theme.breakpoints.md).toBe('48em');
+    expect(theme.breakpoints.xl).toBe('80em');
+  });
+});
+
+describe('colour restrictions (kit 02)', () => {
+  it('uses ADS neutral-900 for body text, not pure black', () => {
+    // Mantine derives --mantine-color-text from `black`. Left unset it is
+    // #000, which is what made every string read as bold.
+    expect(theme.black).toBe('#2B363C');
+    expect(theme.black).toBe(theme.colors.neutral[9]);
+  });
+
+  it('puts ADS main (shade 500) at the primary index', () => {
+    expect(theme.primaryShade).toBe(5);
+    expect(theme.colors.primary[5]).toBe('#1A65FA');
+  });
+
+  it('aliases gray onto neutral so Mantine defaults pick up ADS greys', () => {
+    expect(theme.colors.gray).toEqual(theme.colors.neutral);
+  });
+
+  it('enables autoContrast so white never lands on the light warning fill', () => {
+    expect(theme.autoContrast).toBe(true);
+    expect(theme.colors.warning[5]).toBe('#FBCB3C');
+  });
+});
+
+describe('control defaults (kit 03 §6)', () => {
+  /**
+   * The bug: only six components carried size 'md', so DatePickerInput and
+   * TagsInput fell back to Mantine's 'sm' and rendered visibly shorter than
+   * the field beside them. Every Input-shelled control must share a baseline.
+   */
+  const CONTROLS = [
+    'TextInput',
+    'Textarea',
+    'NumberInput',
+    'PasswordInput',
+    'Select',
+    'MultiSelect',
+    'Autocomplete',
+    'TagsInput',
+    'NativeSelect',
+    'JsonInput',
+    'FileInput',
+    'PinInput',
+    'DatePickerInput',
+    'DateInput',
+    'DateTimePicker',
+    'TimeInput',
+  ] as const;
+
+  it.each(CONTROLS)('%s shares the md control-height baseline', (name) => {
+    expect(theme.components[name]?.defaultProps).toMatchObject({ size: 'md' });
+  });
+});
+
+describe('overlay ladder (kit 03 §8)', () => {
+  it.each([
+    ['Popover', 1000],
+    ['Menu', 1000],
+    ['Combobox', 1000],
+    ['HoverCard', 1000],
+    ['Drawer', 5000],
+    ['Modal', 6000],
+    ['Tooltip', 8000],
+  ])('%s sits on the ADS z-%d rung', (name, zIndex) => {
+    expect(theme.components[name]?.defaultProps).toMatchObject({ zIndex });
+  });
+
+  it('centres modals, as Prime dialogs are', () => {
+    expect(theme.components.Modal?.defaultProps).toMatchObject({ centered: true });
+  });
+});
