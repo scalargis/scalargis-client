@@ -309,4 +309,60 @@
     "target": "mainmenu",
     "order": 10,
     "children": []
+  },
+    {
+    "id": "searchlayers3",
+    "type": "SearchLayers",
+    "title": "Pesquisa de Cadastro",
+    "icon": "pi pi-id-card",
+    "config_json": {
+        "header": "Cadastro",
+        "show_icon": true,
+        "show_main": true,
+        "exclusive_layer": true,
+        "use_layers_datatables": true,
+        "include_layers": [
+          "dd9a6e29-90ea-42d0-b6d1-cfdfae3f6f44",
+          "b98ea54f-ae81-4357-80aa-c5d8a3319235"
+        ],
+        "include_datatables": [
+          "search-cadastro-predial",
+          "search-loteamentos"
+        ],
+        "exclude_layers": [
+          "dd9a6e29-90ea-42d0-b6d1-cfdfae3f6f44"
+        ],
+        "exclude_datatables": [
+          "search-cadastro-predial"
+        ],
+        "style": {
+            "fill": {
+                "color": "rgba(255, 0, 0, 0.5)"
+            },
+            "stroke": {
+                "color": "rgba(126, 211, 33, 1)",
+                "width": 4,
+                "lineCap": "square",
+                "lineJoin": "miter",
+                "lineDash": [10, 5, 10],
+                "lineDashOffset": 3,
+                "miterLimit": 2
+            },
+            "image2": {
+                "radius": 10,
+                "fill": {
+                    "color": "rgba(255, 0, 0, 0)"
+                },
+                "stroke": { 
+                    "color": "rgba(126, 211, 33, 1)",
+                    "width": 2 
+                }
+            }           
+        },
+    },
+    "config_version": "1.0",
+    "regions": [],
+    "target": "mainmenu",
+    "order": 10,
+    "children": []
   }
