@@ -12,9 +12,22 @@
    a base-document block (html/body font + colours) and a global <a>
    underline fallback. Both restyle UNMIGRATED Prime screens, and the
    Phase 1 gate sanctions exactly one global change — the magenta focus
-   ring. They are therefore DEFERRED below (commented out) and activate
-   with the shell passes: backoffice shell in Phase 2, viewer shell in
-   Phase 3. Do not delete them.
+   ring. They are therefore DEFERRED below (commented out). Do not
+   delete them.
+
+   ACTIVATION (corrected 2026-07-10, audit pass — the original note said
+   "backoffice → Phase 2, viewer → Phase 3", which cannot work): this
+   file is loaded by AdsProviders in BOTH apps, so nothing here can
+   activate "for backoffice only" — uncommenting reaches the viewer too.
+   The base-document block is also interlocked with the theme:
+   `font-size: var(--font-base-size)` moves the root to 16px, while
+   `adsBaseTheme.scale = 16/14` compensates for the shells' current 14px
+   root — flip one without the other and every Mantine surface renders
+   ~14% off. Activation is therefore ONE atomic, app-global commit at the
+   END of Phase 3 (both shells migrated): root to 16px + `scale` removed
+   (theme AND ads-mantine-theme.test.ts) + these blocks uncommented,
+   together. If Phase 2 wants ADS body colours in the backoffice alone,
+   that is app-local CSS in the backoffice shell pass — not this file.
    ===================================================================== */
 
 /* ─── FOCUS RING (WCAG 2.4.7) — SHIPS NOW, GLOBAL BY DESIGN ────────────
@@ -49,11 +62,11 @@
   }
 }
 
-/* ─── BASE DOCUMENT — DEFERRED (activates with the shell passes) ───────
+/* ─── BASE DOCUMENT — DEFERRED (see ACTIVATION in the header note) ─────
    Kit rule: html/body on Noto Sans + ADS text/background colours so the
-   whole app reads as one system. Restyles unmigrated screens, so it stays
-   off during the coexistence window (see header note). Activation:
-   backoffice → Phase 2 shell pass; viewer → Phase 3 shell pass.
+   whole app reads as one system. Restyles unmigrated screens AND moves
+   the root font-size, so it activates only in the atomic end-of-Phase-3
+   commit described above (with the theme `scale` removal) — never alone.
 
 html, body {
   font-family: var(--font-sans);
@@ -74,8 +87,9 @@ html, body {
 
 /* ─── LINK UNDERLINE FALLBACK (WCAG 1.4.1) — DEFERRED ──────────────────
    Kit rule: plain <a> outside Mantine must be underlined so links are
-   never colour-only. Global, so it restyles unmigrated screens — same
-   deferral and activation schedule as the base-document block above.
+   never colour-only. Global, so it restyles unmigrated screens — it
+   rides the same atomic end-of-Phase-3 activation as the base-document
+   block (this file is shared by both apps; see the header note).
    (Mantine's own Anchor is already underline:'always' via the theme.)
 
 a:where(:not([class*="mantine-"])) {

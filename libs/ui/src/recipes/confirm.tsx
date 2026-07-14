@@ -67,8 +67,11 @@ export function confirm({
   header,
   severity = 'primary',
   // Default params re-evaluate per call, so these follow the app language.
-  acceptLabel = uiText('confirm.ok', 'OK'),
-  rejectLabel = uiText('confirm.cancel', 'Cancel'),
+  // Yes/No, not OK/Cancel: Prime's confirmDialog falls back to
+  // localeOption('accept'/'reject') — en Yes/No, pt Sim/Não — and call
+  // sites that rely on the defaults must not change wording mid-migration.
+  acceptLabel = uiText('confirm.yes', 'Yes'),
+  rejectLabel = uiText('confirm.no', 'No'),
   accept,
   reject,
   onHide,

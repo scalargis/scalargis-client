@@ -4,6 +4,9 @@ export type { AdsProvidersProps } from './AdsProviders';
 export { adsBaseTheme, adsCssVariablesResolver } from './theme/ads-mantine-theme';
 export type { AdsBaseTheme } from './theme/ads-mantine-theme';
 
+export { createClientTheme } from './theme/client-theme';
+export type { ClientThemeOverride } from './theme/client-theme';
+
 /* ─── Recipes (plan §1c) ─────────────────────────────────────────────── */
 export { DataGrid, exportGridCSV } from './recipes/DataGrid';
 export type { DataGridColumn, DataGridProps } from './recipes/DataGrid';

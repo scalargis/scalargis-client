@@ -211,13 +211,19 @@
   --container-padding-tablet: 64px;
   --container-padding-desktop: 0px;
 
-  /* ─── TYPE SCALE ──────────────────────────────────── */
-  --text-s-size:   0.875rem; --text-s-lh:   1.5rem;
-  --text-m-size:   1rem;     --text-m-lh:   1.75rem;
-  --text-l-size:   1.25rem;  --text-l-lh:   2rem;
-  --text-xl-size:  1.5rem;   --text-xl-lh:  2.25rem;
-  --text-2xl-size: 2rem;     --text-2xl-lh: 3rem;
-  --text-3xl-size: 2.5rem;   --text-3xl-lh: 3.75rem;
+  /* ─── TYPE SCALE ──────────────────────────────────────────────────
+     rem × --mantine-scale, the same shape Mantine's rem() emits: rem
+     resolves against the document root, which the shells pin to 14px
+     during the coexistence window (kit 03 §the root font-size trap) —
+     raw rem here would render the whole scale 12.5% small. The fallback
+     1 keeps the values correct with no Mantine on the page and once the
+     root moves to 16px (scale drops to 1 in the same commit). */
+  --text-s-size:   calc(0.875rem * var(--mantine-scale, 1)); --text-s-lh:   calc(1.5rem * var(--mantine-scale, 1));
+  --text-m-size:   calc(1rem * var(--mantine-scale, 1));     --text-m-lh:   calc(1.75rem * var(--mantine-scale, 1));
+  --text-l-size:   calc(1.25rem * var(--mantine-scale, 1));  --text-l-lh:   calc(2rem * var(--mantine-scale, 1));
+  --text-xl-size:  calc(1.5rem * var(--mantine-scale, 1));   --text-xl-lh:  calc(2.25rem * var(--mantine-scale, 1));
+  --text-2xl-size: calc(2rem * var(--mantine-scale, 1));     --text-2xl-lh: calc(3rem * var(--mantine-scale, 1));
+  --text-3xl-size: calc(2.5rem * var(--mantine-scale, 1));   --text-3xl-lh: calc(3.75rem * var(--mantine-scale, 1));
 
   /* ─── ACCESSIBILITY TOKENS ────────────────────────── */
   --ads-focus: var(--color-focus);       /* magenta focus ring */
@@ -231,5 +237,7 @@
   --z-sidebar: 10;
   --font-condensed: "Noto Sans Condensed", var(--font-sans);
   --font-semi-condensed: "Noto Sans SemiCondensed", var(--font-sans);
-  --text-xs-size: 0.6875rem; --text-xs-lh: 1rem;
+  /* Scaled like the type scale above (11px/16px at any root). */
+  --text-xs-size: calc(0.6875rem * var(--mantine-scale, 1));
+  --text-xs-lh: calc(1rem * var(--mantine-scale, 1));
 }

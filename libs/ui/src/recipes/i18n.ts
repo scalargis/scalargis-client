@@ -19,7 +19,7 @@ import i18next from 'i18next';
 export const UI_NAMESPACE = 'scalargis_ui';
 
 const en = {
-  confirm: { ok: 'OK', cancel: 'Cancel', yes: 'Yes', no: 'No', title: 'Confirmation' },
+  confirm: { yes: 'Yes', no: 'No', title: 'Confirmation' },
   notify: { success: 'Success', info: 'Info', warn: 'Warning', error: 'Error' },
   upload: {
     choose: 'Choose',
@@ -35,7 +35,7 @@ const en = {
 };
 
 const pt: typeof en = {
-  confirm: { ok: 'OK', cancel: 'Cancelar', yes: 'Sim', no: 'Não', title: 'Confirmação' },
+  confirm: { yes: 'Sim', no: 'Não', title: 'Confirmação' },
   notify: { success: 'Sucesso', info: 'Informação', warn: 'Aviso', error: 'Erro' },
   upload: {
     choose: 'Escolher',

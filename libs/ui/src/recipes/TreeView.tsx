@@ -9,12 +9,14 @@
    depend on, so it belongs here once rather than in every screen.
 
    Accessibility: Mantine's Tree supplies role=tree/treeitem and the arrow-
-   key navigation model. The ARIA tree pattern wants aria-checked on the
-   treeitem itself, but renderNode cannot reach the <li role="treeitem">
-   Mantine owns (upstream limitation) — so the row embeds a REAL Checkbox
-   (named after the node, kept out of the tab order) and AT gets
-   name/role/state from it; Space still toggles via checkOnSpace. Full TOC
-   keyboard parity is verified with the layer tree in Phase 3 (cluster C).
+   key navigation model; the recipe adds the Enter binding Mantine lacks
+   (Enter = the row's default action, mirroring a click — ARIA tree
+   pattern). The pattern also wants aria-checked on the treeitem itself,
+   but renderNode cannot reach the <li role="treeitem"> Mantine owns
+   (upstream limitation) — so the row embeds a REAL Checkbox (named after
+   the node, kept out of the tab order) and AT gets name/role/state from
+   it; Space still toggles via checkOnSpace. Full TOC keyboard parity is
+   verified with the layer tree in Phase 3 (cluster C).
    ===================================================================== */
 
 import React from 'react';
@@ -62,6 +64,7 @@ export function TreeView({
   bordered = true,
   levelOffset = 'md',
   defaultExpandAll = false,
+  onKeyDown,
   ...treeProps
 }: TreeViewProps) {
   // Hooks can't be conditional, so always build a controller and prefer the
@@ -71,6 +74,31 @@ export function TreeView({
     initialExpandedState: getTreeExpandedState(data, defaultExpandAll ? '*' : []),
   });
   const controller = tree ?? internalTree;
+
+  // Mantine's Tree binds Space and the Arrow keys but NOT Enter (9.4.1
+  // TreeNode handleKeyDown), so a keyboard user can focus a row yet never
+  // activate it — the kit 04 (2.1.1) gap recorded in qa/phase-1.md, and what
+  // made TreeSelect unusable without a pointer. The ARIA tree pattern gives
+  // Enter the node's default action; here that mirrors a row click exactly:
+  // toggle the check in checkbox mode, otherwise disclose + select the same
+  // way Mantine's own label click does (expandOnClick/selectOnClick).
+  const handleRootKeyDown = (event: React.KeyboardEvent<HTMLUListElement>) => {
+    onKeyDown?.(event);
+    if (event.key !== 'Enter' || event.defaultPrevented) return;
+    const item = (event.target as HTMLElement).closest('[role="treeitem"]');
+    const value = item?.getAttribute('data-value');
+    if (!value) return;
+    event.preventDefault();
+    if (checkboxes) {
+      if (controller.isNodeChecked(value)) controller.uncheckNode(value);
+      else controller.checkNode(value);
+    } else {
+      // Same order as Mantine's handleNodeClick; toggleExpanded on a leaf
+      // is a no-op, so no hasChildren check is needed.
+      controller.toggleExpanded(value);
+      if (treeProps.selectOnClick) controller.select(value);
+    }
+  };
 
   const renderNode = ({
     node,
@@ -145,6 +173,7 @@ export function TreeView({
       expandOnSpace={!checkboxes}
       checkOnSpace={checkboxes}
       renderNode={renderNode}
+      onKeyDown={handleRootKeyDown}
       {...treeProps}
     />
   );

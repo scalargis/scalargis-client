@@ -15,11 +15,13 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+/* eslint-disable @typescript-eslint/no-empty-function -- intentional no-op stubs */
 class ResizeObserverStub {
   observe() {}
   unobserve() {}
   disconnect() {}
 }
+/* eslint-enable @typescript-eslint/no-empty-function */
 
 window.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
 window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
