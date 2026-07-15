@@ -1,5 +1,10 @@
 /* Mantine reads matchMedia and ResizeObserver on mount; jsdom ships neither. */
 import { vi } from 'vitest';
+import { configure } from '@testing-library/react';
+
+/* waitFor's default 1s cap flakes under machine load (seen in the renderer
+   suite). Polling is unchanged; only true failures wait longer. */
+configure({ asyncUtilTimeout: 5000 });
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

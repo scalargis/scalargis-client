@@ -146,4 +146,13 @@ describe('overlay ladder (kit 03 §8)', () => {
   it('centres modals, as Prime dialogs are', () => {
     expect(theme.components.Modal?.defaultProps).toMatchObject({ centered: true });
   });
+
+  // Popover's centred `bottom` default makes the panel's x depend on its own
+  // width, which Combobox measures as 0 while the dropdown is display:none —
+  // so it paints half a field to the right before snapping into place.
+  it('anchors combobox dropdowns to the target start edge', () => {
+    expect(theme.components.Combobox?.defaultProps).toMatchObject({
+      position: 'bottom-start',
+    });
+  });
 });

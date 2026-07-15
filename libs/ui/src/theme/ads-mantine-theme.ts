@@ -243,7 +243,9 @@ export const adsBaseTheme = createTheme({
     // Dropdown rung (1000): Menu/Select/Combobox panels and every Popover.
     Popover: { defaultProps: { zIndex: 1000 } },
     Menu: { defaultProps: { zIndex: 1000 } },
-    Combobox: { defaultProps: { zIndex: 1000 } },
+    // Popover's centred `bottom` default makes x depend on the panel's own
+    // width, which Combobox measures as 0 while the dropdown is display:none.
+    Combobox: { defaultProps: { zIndex: 1000, position: 'bottom-start' } },
     HoverCard: { defaultProps: { zIndex: 1000 } },
   },
 
