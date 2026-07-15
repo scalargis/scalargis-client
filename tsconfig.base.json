@@ -17,6 +17,9 @@
     "baseUrl": ".",
     "paths": {
       "@scalargis/components": ["libs/components/src/index.ts"],
+      "@scalargis/jsonforms-mantine-renderers": [
+        "libs/jsonforms-mantine-renderers/src/index.ts"
+      ],
       "@scalargis/jsonforms-primereact-renderers": [
         "libs/jsonforms-primereact-renderers/src/index.ts"
       ],
