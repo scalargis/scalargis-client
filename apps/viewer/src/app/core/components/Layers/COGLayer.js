@@ -95,7 +95,7 @@ const COGLayer = ({ config, source, group, checked }) => {
     const layer =  new OLTileLayerWebGL({
         ...config,
         source: layer_source,
-        style: config.options.style || undefined 
+        style: config?.options?.style || undefined 
       });
 
     return layer;
@@ -104,11 +104,10 @@ const COGLayer = ({ config, source, group, checked }) => {
   useEffect(() => {
     if (!mainMap) return;
 
-    if (config.attributions) {
-      source.setAttributions(config.attributions);
-    }
-
     layer.current = createLayer(config);
+    if (config?.attributions) {
+      layer.current.getSource().setAttributions(config.attributions);
+    }
     group.getLayers().push(layer.current);
 
     return () => {
