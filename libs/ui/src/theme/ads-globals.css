@@ -60,6 +60,19 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Loading indicators are status information, not decoration — WCAG 2.3.3
+     scopes non-essential motion, and a frozen spinner reads as a hang
+     (flagged on the Phase 2 pilot: Button loading looked stuck while
+     saving whenever Windows runs with animation effects off). Re-state
+     the cadence the kill rule above erased. */
+  .mantine-Loader-root,
+  .mantine-Loader-root *,
+  .mantine-Loader-root::before,
+  .mantine-Loader-root::after {
+    animation-duration: 0.8s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 /* ─── BASE DOCUMENT — DEFERRED (see ACTIVATION in the header note) ─────

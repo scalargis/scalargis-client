@@ -12,6 +12,21 @@
    calc(... * var(--mantine-scale)), the same way Mantine's rem() does.
    ===================================================================== */
 
+/* ─── Button ───────────────────────────────────────────────────────────
+   Mantine trims the padding on a side that carries a section to
+   padding-x / 1.5, so an icon+label button sits visibly tighter on the
+   icon side than an iconless one next to it (flagged on the Phase 2
+   pilot toolbar: Novo/Eliminar/Limpar/Gravar all carry leftSection).
+   Prime kept .p-button padding symmetric with icons; restore that.
+   -------------------------------------------------------------------- */
+.mantine-Button-root[data-with-left-section] {
+  padding-inline-start: var(--button-padding-x);
+}
+
+.mantine-Button-root[data-with-right-section] {
+  padding-inline-end: var(--button-padding-x);
+}
+
 /* ─── DataGrid ─────────────────────────────────────────────────────────
    Prime's DataTable gives the header a tinted band; Mantine's table gives
    `th` nothing but `font-weight: bold`, so header and body read as one
