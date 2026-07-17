@@ -1,16 +1,19 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { Toolbar } from 'primereact/toolbar';
-import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/dropdown';
-import { classNames } from 'primereact/utils';
+import { Button, Group, Select, TextInput } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+
+const precisionOptions = [0,1,2,3,4,5,6,7,8,9,10].map(val => {
+  return {
+    label: (val + ' casas decimais'),
+    value: String(Math.pow(10, (val)))
+  }
+});
 
 function CoordinateSystemForm(props) {
 
@@ -27,8 +30,6 @@ function CoordinateSystemForm(props) {
 
   const [data, setData] = useState(props.data || {});
 
-  const toast = useRef(null);
-
   const { core } = useContext(AppContext);
 
   const API_URL = core.API_URL;
@@ -38,7 +39,7 @@ function CoordinateSystemForm(props) {
   });
 
   const goBack = () => {
-    const state = { 
+    const state = {
       searchParams: {...location.state.previousSearchParams}
     }
     navigate(location.state.from, { state });
@@ -64,16 +65,16 @@ function CoordinateSystemForm(props) {
 
     setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/portal/lists');      
+    const provider = dataProvider(API_URL + '/portal/lists');
     if (data.id) {
       const params = {
         id: data.id,
         data: {...new_data}
       }
-      provider.update('coordinate_systems', params).then(d => {       
-        toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
+      provider.update('coordinate_systems', params).then(d => {
+        notify.success('Editar Registo', 'Registo alterado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});
+        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
       }).finally(() => {
         setIsSaving(false);
       });
@@ -83,157 +84,129 @@ function CoordinateSystemForm(props) {
       }
       provider.create('coordinate_systems', params).then(d => {
         setData({...data, id: d.data.id});
-        toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
+        notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: 'Ocorreu um erro ao criar o registo'});
+        notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');
       }).finally(() => {
         setIsSaving(false);
-      });       
+      });
     }
-
-    
-    //setShowMessage(true);
-
-    //reset();
   };
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
-      let msg;
+      if (errors[name].message) return errors[name].message;
 
       if (errors[name].type === 'required') {
-        return <small className="p-error">{errors[name].message || 'Campo obrigatório'}</small>
+        return 'Campo obrigatório';
       } else if (errors[name].type === 'maxLength') {
-         return <small className="p-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">{errors[name].message || 'Formato inválido'}</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
-  };  
- 
-  const rightToolbarTemplate = () => {
-    return (
-        <React.Fragment>
-            <Button
-              type="button" 
-              label="Voltar" 
-              icon="pi pi-left" 
-              severity="secondary" className="mr-4"
-              disabled={isSaving ? true : false}
-              onClick={goBack} />
-            <Button
-              type="submit" 
-              label="Gravar"
-              icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-              disabled={isSaving ? true : false} />
-        </React.Fragment>
-    )
-  }
+    }
+    return undefined;
+  };
 
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
-          <Toast ref={toast} baseZIndex={2000} />
-
-          <div className="formgrid grid">      
+          <div className="formgrid grid">
             <div className="field col-12 md:col-2">
-              <label htmlFor="id">Id</label>
-              <InputText id="id" type="text" value={data.id || ''} disabled className="w-full" />
-            </div>              
-
-            <div className="field col-12 md:col-2">
-              <label htmlFor="code">Código</label>
-              <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus
-               className={classNames({ 'w-full': true, 'p-invalid': errors.code })} />
-              {getFormErrorMessage(errors, 'code')}
+              <TextInput id="id" label="Id" value={data.id || ''} disabled />
             </div>
 
             <div className="field col-12 md:col-2">
-              <label htmlFor="srid">SRID</label>
-              <InputText id="srid" name="srid" {...register('srid', { required: true, pattern: { value: /^[0-9]+$/, message: 'Formato inválido'} })}
-                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.srid })} />
-              {getFormErrorMessage(errors, 'srid')}
-            </div>            
-
-            <div className="field col-12 md:col-6">
-              <label htmlFor="name">Designação</label>        
-              <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} autoFocus
-                className={classNames({ 'w-full': true, 'p-invalid': errors.name })} />
-              {getFormErrorMessage(errors, 'name')}
+              <TextInput id="code" label="Código" autoFocus
+               error={fieldError(errors, 'code')}
+               {...register('code', { required: 'Campo obrigatório.' })} />
             </div>
-            
-            <div className="field col-12 md:col-6">
-              <label htmlFor="label">Label</label>        
-              <InputText id="label" name="label" {...register('label')} autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.label })} />
-              {getFormErrorMessage(errors, 'label')}
+
+            <div className="field col-12 md:col-2">
+              <TextInput id="srid" label="SRID"
+               error={fieldError(errors, 'srid')}
+               {...register('srid', { required: true, pattern: { value: /^[0-9]+$/, message: 'Formato inválido'} })} />
             </div>
 
             <div className="field col-12 md:col-6">
-              <label htmlFor="description">Descrição</label>        
-              <InputText id="description" name="description" {...register('description', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.description })} />
-              {getFormErrorMessage(errors, 'description')}
+              <TextInput id="name" label="Designação"
+               error={fieldError(errors, 'name')}
+               {...register('name', { required: 'Campo obrigatório.' })} />
+            </div>
+
+            <div className="field col-12 md:col-6">
+              <TextInput id="label" label="Label"
+               error={fieldError(errors, 'label')}
+               {...register('label')} />
+            </div>
+
+            <div className="field col-12 md:col-6">
+              <TextInput id="description" label="Descrição"
+               error={fieldError(errors, 'description')}
+               {...register('description', { required: 'Campo obrigatório.' })} />
             </div>
 
             <div className="field col-12">
-              <label htmlFor="defs">Definição</label>        
-              <InputText id="defs" name="defs" {...register('defs')} autoFocus className="w-full" />
+              <TextInput id="defs" label="Definição"
+               {...register('defs')} />
             </div>
 
             <div className="field col-12 md:col-3">
-              <label htmlFor="minx">Min X</label>
-              <InputText id="minx" name="minx" {...register('minx', { required: 'Campo obrigatório.', 
+              <TextInput id="minx" label="Min X"
+               error={fieldError(errors, 'minx')}
+               {...register('minx', { required: 'Campo obrigatório.',
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'},
-                min: -180, max: 180 } )} 
-                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.minx })} />
-              {getFormErrorMessage(errors, 'minx')}
+                min: -180, max: 180 } )} />
             </div>
 
             <div className="field col-12 md:col-3">
-              <label htmlFor="miny">Min Y</label>
-              <InputText id="miny" name="minx" {...register('miny', { required: 'Campo obrigatório.', 
+              <TextInput id="miny" label="Min Y"
+               error={fieldError(errors, 'miny')}
+               {...register('miny', { required: 'Campo obrigatório.',
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'},
-                min: -90, max: 90 } )}
-                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.miny })} />
-              {getFormErrorMessage(errors, 'miny')}
+                min: -90, max: 90 } )} />
             </div>
 
             <div className="field col-12 md:col-3">
-              <label htmlFor="maxx">Max X</label>        
-              <InputText id="maxx" name="maxx" {...register('maxx', { required: 'Campo obrigatório.', 
-                pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} 
-                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.maxx })} />
-              {getFormErrorMessage(errors, 'maxx')}
+              <TextInput id="maxx" label="Max X"
+               error={fieldError(errors, 'maxx')}
+               {...register('maxx', { required: 'Campo obrigatório.',
+                pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} />
             </div>
 
             <div className="field col-12 md:col-3">
-              <label htmlFor="maxy">Max Y</label>        
-              <InputText id="maxy" name="minx" {...register('maxy', { required: 'Campo obrigatório.', 
-                pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} 
-                autoFocus className={classNames({ 'w-full': true, 'p-invalid': errors.maxy })} />
-              {getFormErrorMessage(errors, 'maxy')}
+              <TextInput id="maxy" label="Max Y"
+               error={fieldError(errors, 'maxy')}
+               {...register('maxy', { required: 'Campo obrigatório.',
+                pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} />
             </div>
 
             <div className="field col-12 md:col-3">
-              <label htmlFor="precision">Precisão</label>
-              <Controller name="precision" control={control} render={(props) => (
-                <Dropdown  id="precision" value={props.field.value} 
-                  options={[0,1,2,3,4,5,6,7,8,9,10].map(val => {
-                    return {
-                      label: (val + ' casas decimais'),
-                      value: Math.pow(10, (val))
-                      }
-                  })}
-                  onChange={(e) => props.field.onChange(e.value)}
-                  showClear
-                  className={classNames({ 'w-full': true, 'p-invalid': errors.precision })} />                    
+              <Controller name="precision" control={control} render={({ field }) => (
+                <Select
+                  id="precision"
+                  label="Precisão"
+                  data={precisionOptions}
+                  value={field.value != null ? String(field.value) : null}
+                  onChange={(value) => field.onChange(value != null ? Number(value) : null)}
+                  clearable />
               )} />
-            </div>            
+            </div>
 
           </div>
 
-        <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>
+        <Group justify="flex-end" className="mt-4 mb-4">
+          <Button
+            type="button"
+            variant="default"
+            leftSection={<i className="pi pi-arrow-left" />}
+            disabled={isSaving}
+            onClick={goBack}>Voltar</Button>
+          <Button
+            type="submit"
+            leftSection={<i className="pi pi-save" />}
+            loading={isSaving}>Gravar</Button>
+        </Group>
 
       </form>
   );
