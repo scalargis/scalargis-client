@@ -1,7 +1,7 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { addLocale } from 'primereact/api';
+import { addLocale, locale } from 'primereact/api';
 
 import { i18n } from '@scalargis/components';
 
@@ -52,6 +52,7 @@ export const initTranslations = () => {
   Object.entries(primereactResources).forEach(([lang, translations]) => {
     addLocale(lang, translations);
   });
+  locale(i18next.language);
 }
 
 export const loadTranslations = (id, callback) => {
