@@ -52,7 +52,7 @@ export const initTranslations = () => {
   Object.entries(primereactResources).forEach(([lang, translations]) => {
     addLocale(lang, translations);
   });
-  locale(i18next.language);
+  locale((i18next.language || defaultLocale || 'pt').split('-')[0]);
 }
 
 export const loadTranslations = (id, callback) => {
