@@ -1,19 +1,24 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { Password } from 'primereact/password';
-import { ToggleButton } from 'primereact/togglebutton';
-import { Toolbar } from 'primereact/toolbar';
-import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
-import { InputNumber } from 'primereact/inputnumber';
-import { MultiSelect } from 'primereact/multiselect';
-import { ListBox } from 'primereact/listbox';
-import { Message } from 'primereact/message';
-import { classNames } from 'primereact/utils';
+import {
+  ActionIcon,
+  Alert,
+  Button,
+  Checkbox,
+  Group,
+  MultiSelect,
+  NumberInput,
+  Paper,
+  PasswordInput,
+  Stack,
+  Switch,
+  TextInput
+} from '@mantine/core';
+import { DateTimePicker } from '@mantine/dates';
+import dayjs from 'dayjs';
+import { notify } from '@scalargis/ui';
 import { v4 as uuidV4 } from 'uuid'
 
 import AppContext from '../../../AppContext';
@@ -27,6 +32,11 @@ const PASSWORD_LOWER = 'abcdefghijklmnopqrstuvwxyz';
 const PASSWORD_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const PASSWORD_DIGITS = '0123456789';
 const PASSWORD_SPECIAL = '!@#$%^&*()-_=+[]{}';
+
+// The @mantine/dates pickers exchange 'YYYY-MM-DD HH:mm:ss' strings; the form
+// model keeps the Date the API/UserEdit hands over, so the saved payload is
+// unchanged (JSON-serialized UTC ISO, as before).
+const PICKER_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 // Returns true when the password satisfies all platform complexity rules,
 // otherwise a pt-PT message naming the first failing rule.
@@ -94,6 +104,29 @@ const sortGroupsArray = (data) => {
   });
 }
 
+// Prime ListBox (multiple) replacement: a bordered checkbox list; the checked
+// ids are what the Remover button acts on.
+const SelectionList = ({ options, value, onChange, ariaLabel }) => (
+  <Paper withBorder p="xs" role="group" aria-label={ariaLabel} style={{ maxHeight: '14rem', overflowY: 'auto' }}>
+    <Stack gap="xs">
+      {options.map((option) => (
+        <Checkbox
+          key={option.id}
+          label={option.name}
+          checked={!!value && value.includes(option.id)}
+          onChange={(e) =>
+            onChange(
+              e.currentTarget.checked
+                ? [...(value || []), option.id]
+                : (value || []).filter((id) => id !== option.id)
+            )
+          }
+        />
+      ))}
+    </Stack>
+  </Paper>
+);
+
 function UserForm(props) {
 
   const {
@@ -117,15 +150,11 @@ function UserForm(props) {
   const [availableRoles, setAvailableRoles] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState(null);
   const [removedRoles, setRemovedRoles] = useState(null);
-  const [filterRolesValue, setFilterRolesValue] = useState('');
 
   const [groups, setGroups] = useState(props?.data?.groups ? sortGroupsArray([...props.data.groups]) : []);
   const [availableGroups, setAvailableGroups] = useState(null);
   const [selectedGroups, setSelectedGroups] = useState(null);
   const [removedGroups, setRemovedGroups] = useState(null);
-  const [filterGroupsValue, setFilterGroupsValue] = useState('');
-
-  const toast = useRef(null);
 
   const { core } = useContext(AppContext);
 
@@ -140,12 +169,12 @@ function UserForm(props) {
       pagination: { page: 1, perPage: 1000},
       sort: { field: 'name', order: 'Asc' },
       filter: {}
-    }  
+    }
 
     Promise.all([
       dataProvider(API_URL + '/security').getList('roles', params).catch((error) => error),
       dataProvider(API_URL + '/security').getList('groups', params).catch((error) => error)
-    ]).then((result) => {      
+    ]).then((result) => {
       const roles_result = result[0];
       const rids = props?.data?.roles ? props.data.roles.map(v => v.id) : [];
       setAvailableRoles(sortRolesArray(roles_result.data.filter(v => !rids.includes(v.id))
@@ -158,14 +187,16 @@ function UserForm(props) {
 
     }).catch((error) => {
       console.log(error)
-    });    
+    });
   }, []);
 
+  // MultiSelect exchanges string values; ids are numbers everywhere else.
   const addRoles = () => {
-    if (!availableRoles) return;
-    
-    const new_roles = availableRoles.filter(v => selectedRoles.includes(v.id));
-    const new_available_roles = availableRoles.filter(v => !selectedRoles.includes(v.id));
+    if (!availableRoles || !selectedRoles) return;
+
+    const ids = selectedRoles.map(Number);
+    const new_roles = availableRoles.filter(v => ids.includes(v.id));
+    const new_available_roles = availableRoles.filter(v => !ids.includes(v.id));
 
     setRoles(sortRolesArray([...roles, ...new_roles]));
     setAvailableRoles(sortRolesArray([...new_available_roles]));
@@ -175,7 +206,7 @@ function UserForm(props) {
 
   const removeRoles = () => {
     if (!removedRoles) return;
-    
+
     const new_available_roles = roles.filter(v => removedRoles.includes(v.id));
     const new_roles = roles.filter(v => !removedRoles.includes(v.id));
 
@@ -186,10 +217,11 @@ function UserForm(props) {
   }
 
   const addGroups = () => {
-    if (!availableGroups) return;
-    
-    const new_groups = availableGroups.filter(v => selectedGroups.includes(v.id));
-    const new_available_groups = availableGroups.filter(v => !selectedGroups.includes(v.id));
+    if (!availableGroups || !selectedGroups) return;
+
+    const ids = selectedGroups.map(Number);
+    const new_groups = availableGroups.filter(v => ids.includes(v.id));
+    const new_available_groups = availableGroups.filter(v => !ids.includes(v.id));
 
     setGroups(sortGroupsArray([...groups, ...new_groups]));
     setAvailableGroups(sortGroupsArray([...new_available_groups]));
@@ -199,7 +231,7 @@ function UserForm(props) {
 
   const removeGroups = () => {
     if (!removedGroups) return;
-    
+
     const new_available_groups = groups.filter(v => removedGroups.includes(v.id));
     const new_groups = groups.filter(v => !removedGroups.includes(v.id));
 
@@ -210,20 +242,10 @@ function UserForm(props) {
   }
 
   const goBack = () => {
-    /*
-    const location = {
-      pathname: history.location.state.from,
-      state: { 
-        searchParams: {...history.location.state.previousSearchParams}
-      }
-    }
-    history.replace(location);
-    */
-    const state = { 
+    const state = {
       searchParams: {...location.state.previousSearchParams}
     }
     navigate(location.state.from, { state });
-    //history.goBack();
   }
 
   const onSubmit = (formData) => {
@@ -243,20 +265,20 @@ function UserForm(props) {
 
     setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/security');      
+    const provider = dataProvider(API_URL + '/security');
     if (data.id) {
       const params = {
         id: data.id,
         data: {...new_data}
       }
-      provider.update('users', params).then(d => {       
-        toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
+      provider.update('users', params).then(d => {
+        notify.success('Editar Registo', 'Registo alterado com sucesso');
         setValue('password', '', {
           shouldValidate: true,
           shouldDirty: true
         });
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Editar Registo', detail: e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo'});        
+        notify.error('Editar Registo', e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo');
       }).finally(() => {
         setIsSaving(false);
       });
@@ -266,122 +288,93 @@ function UserForm(props) {
       }
       provider.create('users', params).then(d => {
         setData({...data, id: d.data.id});
-        toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
+        notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: e.body?.message || e.message || 'Ocorreu um erro ao criar o registo'});
+        notify.error('Criar Registo', e.body?.message || e.message || 'Ocorreu um erro ao criar o registo');
       }).finally(() => {
         setIsSaving(false);
-      });       
+      });
     }
   };
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
+      if (errors[name].message) return errors[name].message;
+
       if (errors[name].type === 'required') {
-        return <small className="p-error">{errors[name].message || 'Campo obrigatório'}</small>
+        return 'Campo obrigatório';
       } else if (errors[name].type === 'maxLength') {
-         return <small className="p-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">{errors[name].message || 'Formato inválido'}</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
-  };  
- 
-  const rightToolbarTemplate = () => {
-    return (
-        <React.Fragment>
-            <Button
-              type="button" 
-              label="Voltar" 
-              icon="pi pi-left" 
-              severity="secondary" className="mr-4"
-              disabled={isSaving ? true : false}
-              onClick={goBack} />
-            <Button
-              type="submit" 
-              label="Gravar"
-              icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-              disabled={isSaving ? true : false} />
-        </React.Fragment>
-    )
-  }
+    }
+    return undefined;
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
 
-      <Toast ref={toast} baseZIndex={2000} />
-
-      <div className="p-fluid formgrid grid">
+      <div className="formgrid grid">
         <div className="field col-12 md:col-3">
-          <label htmlFor="first_name">Primeiro Nome</label>
-          <InputText id="first_name" name="first_name" {...register('first_name')} autoFocus />
-        </div>            
+          <TextInput id="first_name" label="Primeiro Nome" autoFocus {...register('first_name')} />
+        </div>
         <div className="field col-12 md:col-3">
-          <label htmlFor="last_name">Último Nome</label>
-          <InputText id="last_name" name="last_name" {...register('last_name')} />
+          <TextInput id="last_name" label="Último Nome" {...register('last_name')} />
         </div>
         <div className="field col-12 md:col-6">
-          <label htmlFor="name">Nome</label>
-          <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.name })} />
-          {getFormErrorMessage(errors, 'name')}
+          <TextInput id="name" label="Nome"
+            error={fieldError(errors, 'name')}
+            {...register('name', { required: 'Campo obrigatório.' })} />
         </div>
 
         <div className="field col-12 md:col-3">
-          <label htmlFor="username">Username</label>
-          <InputText id="username" name="username" {...register('username', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.username })} />
-          {getFormErrorMessage(errors, 'username')}
+          <TextInput id="username" label="Username"
+            error={fieldError(errors, 'username')}
+            {...register('username', { required: 'Campo obrigatório.' })} />
         </div>
         <div className="field col-12 md:col-4">
-          <label htmlFor="email">Email</label>
-          <InputText id="email" name="email" {...register('email', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.email })} />
-          {getFormErrorMessage(errors, 'email')}
+          <TextInput id="email" label="Email"
+            error={fieldError(errors, 'email')}
+            {...register('email', { required: 'Campo obrigatório.' })} />
         </div>
-        <div className={classNames('field col-12', isCreate ? 'md:col-5' : 'md:col-4')}>
-          <label htmlFor="password">Password</label>
+        <div className={`field col-12 ${isCreate ? 'md:col-5' : 'md:col-4'}`}>
           { isCreate ?
             <>
-              <div className="p-inputgroup">
-                <Controller
-                  control={control}
-                  name="password"
-                  rules={{ required: 'Campo obrigatório.', validate: validatePassword }}
-                  render={({ field }) => {
-                    return revealPassword
-                      ? <InputText id="password" {...field}
-                          onChange={(e) => field.onChange(e.target.value)}
-                          className={classNames({ 'p-invalid': errors.password })} />
-                      : <Password {...field} feedback={false}
-                          onChange={(e) => field.onChange(e.target.value)}
-                          className={classNames({ 'p-invalid': errors.password })} />
-                  }}
-                />
-                <Button type="button"
-                  icon={revealPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}
-                  severity="secondary"
-                  onClick={() => setRevealPassword(v => !v)} />
-              </div>
-              {getFormErrorMessage(errors, 'password')}
+              <Controller
+                control={control}
+                name="password"
+                rules={{ required: 'Campo obrigatório.', validate: validatePassword }}
+                render={({ field }) => (
+                  <PasswordInput
+                    id="password"
+                    label="Password"
+                    value={field.value || ''}
+                    onChange={(e) => field.onChange(e.currentTarget.value)}
+                    visible={revealPassword}
+                    onVisibilityChange={setRevealPassword}
+                    error={fieldError(errors, 'password')}
+                  />
+                )}
+              />
               <div className="flex align-items-center flex-wrap mt-2" style={{ gap: '0.5rem 1rem' }}>
                 <small className="text-500 line-height-3" style={{ maxWidth: '15rem' }}>
                   Mínimo 12 caracteres, com maiúsculas, minúsculas, dígitos e símbolos.
                 </small>
-                <div className="flex align-items-center ml-auto" style={{ gap: '0.5rem' }}>
-                  <label htmlFor="passwordLength" className="m-0 text-500 white-space-nowrap">Tamanho</label>
-                  <InputNumber inputId="passwordLength" value={passwordLength}
-                    onValueChange={(e) => setPasswordLength(e.value)}
-                    showButtons buttonLayout="horizontal"
-                    decrementButtonIcon="pi pi-minus" incrementButtonIcon="pi pi-plus"
+                <div className="flex align-items-end ml-auto" style={{ gap: '0.5rem' }}>
+                  <NumberInput
+                    label="Tamanho"
+                    value={passwordLength}
+                    onChange={setPasswordLength}
                     min={PASSWORD_MIN_LENGTH} max={PASSWORD_MAX_LENGTH}
-                    style={{ width: 'auto', flex: '0 0 auto' }}
-                    inputStyle={{ width: '3rem', textAlign: 'center' }} />
-                  <Button type="button" label="Gerar" icon="pi pi-key" className="p-button-primary"
+                    style={{ width: '6rem' }}
+                  />
+                  <Button type="button" leftSection={<i className="pi pi-key" />}
                     onClick={() => {
                       const pwd = generatePassword(passwordLength);
                       setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
                       setRevealPassword(true);
-                    }} />
+                    }}>Gerar</Button>
                 </div>
               </div>
             </>
@@ -389,96 +382,114 @@ function UserForm(props) {
             <Controller
               control={control}
               name="password"
-              render={({ field }) => {
-                return <Password {...field} feedback={false} toggleMask onChange={(e) => field.onChange(e.target.value)} />
-              }}
+              render={({ field }) => (
+                <PasswordInput
+                  id="password"
+                  label="Password"
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.currentTarget.value)}
+                />
+              )}
             />
           }
         </div>
 
         <div className="field col-12">
-          <div className="grid">              
+          <div className="grid">
             <div className="col-3 mt-2 mb-2">
-              <label>&nbsp;</label>
               <Controller
                 control={control}
                 name="active"
-                render={({ field }) => {
-                  return <ToggleButton {...field} checked={field.value} onChange={(e) => field.onChange(e.target.value)} onLabel="Utilizador Ativo" offLabel="Utilizador Não Ativo" onIcon="pi pi-check" offIcon="pi pi-times" />
-                }} 
-              />                    
+                render={({ field }) => (
+                  <Switch
+                    label={field.value ? 'Utilizador Ativo' : 'Utilizador Não Ativo'}
+                    checked={!!field.value}
+                    onChange={(e) => field.onChange(e.currentTarget.checked)}
+                  />
+                )}
+              />
             </div>
-          </div>            
+          </div>
         </div>
 
         <div className="field col-12 md:col-6">
-          <label htmlFor="auth_token">Token de Autenticação</label>
-          <div className="p-inputgroup">
-              <Button type="button" label="Gerar" icon="pi pi-check" className="p-button-primary" onClick={(e) => { setValue('auth_token', String(uuidV4())); } } />
-              <InputText id="auth_token" name="auth_token" {...register('auth_token')} placeholder="Token não definido" />
-              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => { setValue('auth_token', null); setValue('auth_token_expire', null); } } />
-          </div>
+          <Group gap="xs" align="flex-end" wrap="nowrap">
+            <Button type="button" leftSection={<i className="pi pi-check" />}
+              onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
+            <TextInput id="auth_token" label="Token de Autenticação" placeholder="Token não definido"
+              style={{ flex: 1 }} {...register('auth_token')} />
+            <ActionIcon size="input-md" color="danger" aria-label="Limpar token"
+              onClick={() => { setValue('auth_token', null); setValue('auth_token_expire', null); }}>
+              <i className="pi pi-times" />
+            </ActionIcon>
+          </Group>
         </div>
         <div className="field col-12 md:col-3">
-          <label htmlFor="auth_token_expire">Data de Validade do Token</label>
-          <div className="p-inputgroup">
-              <Controller
-                control={control}
-                name="auth_token_expire"
-                render={({ field }) => {              
-                  return <Calendar {...field} 
-                    dateFormat="yy-mm-dd"
-                    onChange={(e) => field.onChange(e.target.value)} 
-                    showIcon showTime showSeconds />
-                }} 
-              />                    
-              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => setValue('auth_token_expire', null) } />
-          </div>
-        </div>          
+          <Group gap="xs" align="flex-end" wrap="nowrap">
+            <Controller
+              control={control}
+              name="auth_token_expire"
+              render={({ field }) => (
+                <DateTimePicker
+                  label="Data de Validade do Token"
+                  value={field.value ? dayjs(field.value).format(PICKER_FORMAT) : null}
+                  onChange={(value) => field.onChange(value ? dayjs(value).toDate() : null)}
+                  valueFormat={PICKER_FORMAT}
+                  withSeconds
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            <ActionIcon size="input-md" color="danger" aria-label="Limpar data de validade"
+              onClick={() => setValue('auth_token_expire', null)}>
+              <i className="pi pi-times" />
+            </ActionIcon>
+          </Group>
+        </div>
 
         <div className="field col-12 md:col-6">
           <label>Perfis</label>
           <div className="card p-2">
-            { (availableRoles && availableRoles.length > 0) && 
+            { (availableRoles && availableRoles.length > 0) &&
             <>
             <div className="field col-12 pl-0">
-              <MultiSelect value={selectedRoles} options={availableRoles} 
-                optionLabel="name" optionValue="id" display="chip" showClear 
-                filter filterValue={filterRolesValue} 
-                onFilterValueChange={(e) => setFilterRolesValue(e.value)}
-                onChange={(e) => setSelectedRoles(e.value)} placeholder="Selecionar" />
-            </div>              
+              <MultiSelect
+                data={availableRoles.map(r => ({ value: String(r.id), label: r.name }))}
+                value={selectedRoles || []}
+                onChange={(value) => setSelectedRoles(value.length ? value : null)}
+                placeholder="Selecionar"
+                searchable clearable />
+            </div>
             <div className="grid">
               <div className="col"></div>
               <div className="col">
-                  <Button label="Adicionar" type="button" 
+                  <Button type="button"
                     disabled={(!selectedRoles || selectedRoles.length === 0)}
-                  onClick={addRoles} />
+                  onClick={addRoles}>Adicionar</Button>
               </div>
               <div className="col"></div>
             </div>
             </>
             }
             { (roles && roles.length > 0) ?
-              <>        
+              <>
               <div className="field col-12 pl-0 pt-2">
-                <ListBox optionLabel="name" optionValue="id" className="p-1"
-                  options={roles} value={removedRoles}
-                  onChange={(e) => setRemovedRoles(e.value)} multiple />
+                <SelectionList options={roles} value={removedRoles}
+                  onChange={setRemovedRoles} ariaLabel="Perfis atribuídos" />
               </div>
               <div className="grid">
                 <div className="col"></div>
                 <div className="col">
-                  <Button label="Remover" type="button" 
+                  <Button type="button"
                   disabled={(!removedRoles || removedRoles.length === 0)}
-                  onClick={removeRoles} />
+                  onClick={removeRoles}>Remover</Button>
                 </div>
                 <div className="col"></div>
               </div>
               </> :
               <div className="grid justify-content-center">
                 <div className="col-12 mt-4 mb-2">
-                  <Message severity="warn" text="Adicione um ou mais Perfis" />
+                  <Alert color="warning">Adicione um ou mais Perfis</Alert>
                 </div>
               </div>
             }
@@ -488,55 +499,66 @@ function UserForm(props) {
         <div className="field col-12 md:col-6">
           <label>Grupos</label>
           <div className="card p-2">
-            { (availableGroups && availableGroups.length > 0) && 
+            { (availableGroups && availableGroups.length > 0) &&
             <>
             <div className="field col-12 pl-0">
-              <MultiSelect value={selectedGroups} options={availableGroups} 
-                optionLabel="name" optionValue="id" display="chip" showClear 
-                filter filterValue={filterGroupsValue} 
-                onFilterValueChange={(e) => setFilterGroupsValue(e.value)}
-                onChange={(e) => setSelectedGroups(e.value)} placeholder="Selecionar" />
-            </div>              
+              <MultiSelect
+                data={availableGroups.map(g => ({ value: String(g.id), label: g.name }))}
+                value={selectedGroups || []}
+                onChange={(value) => setSelectedGroups(value.length ? value : null)}
+                placeholder="Selecionar"
+                searchable clearable />
+            </div>
             <div className="grid">
               <div className="col"></div>
               <div className="col">
-                  <Button label="Adicionar" type="button" 
+                  <Button type="button"
                     disabled={(!selectedGroups || selectedGroups.length === 0)}
-                  onClick={addGroups} />
+                  onClick={addGroups}>Adicionar</Button>
               </div>
               <div className="col"></div>
             </div>
             </>
             }
             { (groups && groups.length > 0) ?
-              <>        
+              <>
               <div className="field col-12 pl-0 pt-2">
-                <ListBox optionLabel="name" optionValue="id" className="p-1"
-                  options={groups} value={removedGroups}
-                  onChange={(e) => setRemovedGroups(e.value)} multiple />
+                <SelectionList options={groups} value={removedGroups}
+                  onChange={setRemovedGroups} ariaLabel="Grupos atribuídos" />
               </div>
               <div className="grid">
                 <div className="col"></div>
                 <div className="col">
-                  <Button label="Remover" type="button" 
+                  <Button type="button"
                   disabled={(!removedGroups || removedGroups.length === 0)}
-                  onClick={removeGroups} />
+                  onClick={removeGroups}>Remover</Button>
                 </div>
                 <div className="col"></div>
               </div>
               </> :
               <div className="grid justify-content-center">
                 <div className="col-12 mt-4 mb-2">
-                  <Message severity="warn" text="Adicione um ou mais Grupos" />
+                  <Alert color="warning">Adicione um ou mais Grupos</Alert>
                 </div>
               </div>
             }
           </div>
-        </div>          
+        </div>
 
       </div>
 
-      <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>
+      <Group justify="flex-end" className="mt-4 mb-4">
+        <Button
+          type="button"
+          variant="default"
+          leftSection={<i className="pi pi-arrow-left" />}
+          disabled={isSaving}
+          onClick={goBack}>Voltar</Button>
+        <Button
+          type="submit"
+          leftSection={<i className="pi pi-save" />}
+          loading={isSaving}>Gravar</Button>
+      </Group>
 
     </form>
   );
