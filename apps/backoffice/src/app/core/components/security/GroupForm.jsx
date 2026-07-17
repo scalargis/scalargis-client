@@ -1,19 +1,11 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import React, { useContext, useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { useForm, Controller } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Toolbar } from 'primereact/toolbar';
-import { Button } from 'primereact/button';
-import { MultiSelect } from 'primereact/multiselect';
-import { ListBox } from 'primereact/listbox';
-import { Message } from 'primereact/message';
-import { classNames } from 'primereact/utils';
+import { useForm } from 'react-hook-form';
+import { Alert, Button, Checkbox, Group, MultiSelect, Paper, Stack, TextInput } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
-import useFormFields from '../../useFormFields';
 import dataProvider from '../../../service/DataProvider';
 
 const sortRolesArray = (data) => {
@@ -36,6 +28,29 @@ const sortUsersArray = (data) => {
   });
 }
 
+// Prime ListBox (multiple) replacement: a bordered checkbox list; the checked
+// ids are what the Remover button acts on.
+const SelectionList = ({ options, value, onChange, ariaLabel }) => (
+  <Paper withBorder p="xs" role="group" aria-label={ariaLabel} style={{ maxHeight: '14rem', overflowY: 'auto' }}>
+    <Stack gap="xs">
+      {options.map((option) => (
+        <Checkbox
+          key={option.id}
+          label={option.name}
+          checked={!!value && value.includes(option.id)}
+          onChange={(e) =>
+            onChange(
+              e.currentTarget.checked
+                ? [...(value || []), option.id]
+                : (value || []).filter((id) => id !== option.id)
+            )
+          }
+        />
+      ))}
+    </Stack>
+  </Paper>
+);
+
 function GroupForm(props) {
 
   const {
@@ -55,15 +70,11 @@ function GroupForm(props) {
   const [availableRoles, setAvailableRoles] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState(null);
   const [removedRoles, setRemovedRoles] = useState(null);
-  const [filterRolesValue, setFilterRolesValue] = useState('');
 
   const [users, setUsers] = useState(props?.data?.users ? sortUsersArray([...props.data.users]) : []);
   const [availableUsers, setAvailableUsers] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState(null);
   const [removedUsers, setRemovedUsers] = useState(null);
-  const [filterUsersValue, setFilterUsersValue] = useState('');
-
-  const toast = useRef(null);
 
   const { core } = useContext(AppContext);
 
@@ -78,14 +89,12 @@ function GroupForm(props) {
       pagination: { page: 1, perPage: 1000},
       sort: { field: 'name', order: 'Asc' },
       filter: {}
-    }  
+    }
 
     Promise.all([
       dataProvider(API_URL + '/security').getList('roles', params).catch((error) => error),
       dataProvider(API_URL + '/security').getList('users', params).catch((error) => error)
-    ]).then((result) => {      
-      //console.log(result);
-
+    ]).then((result) => {
       const roles_result = result[0];
       const rids = props?.data?.roles ? props.data.roles.map(v => v.id) : [];
       setAvailableRoles(sortRolesArray(roles_result.data.filter(v => !rids.includes(v.id))
@@ -98,14 +107,16 @@ function GroupForm(props) {
 
     }).catch((error) => {
       console.log(error)
-    });    
+    });
   }, []);
 
+  // MultiSelect exchanges string values; ids are numbers everywhere else.
   const addRoles = () => {
-    if (!availableRoles) return;
-    
-    const new_roles = availableRoles.filter(v => selectedRoles.includes(v.id));
-    const new_available_roles = availableRoles.filter(v => !selectedRoles.includes(v.id));
+    if (!availableRoles || !selectedRoles) return;
+
+    const ids = selectedRoles.map(Number);
+    const new_roles = availableRoles.filter(v => ids.includes(v.id));
+    const new_available_roles = availableRoles.filter(v => !ids.includes(v.id));
 
     setRoles(sortRolesArray([...roles, ...new_roles]));
     setAvailableRoles(sortRolesArray([...new_available_roles]));
@@ -115,7 +126,7 @@ function GroupForm(props) {
 
   const removeRoles = () => {
     if (!removedRoles) return;
-    
+
     const new_available_roles = roles.filter(v => removedRoles.includes(v.id));
     const new_roles = roles.filter(v => !removedRoles.includes(v.id));
 
@@ -124,12 +135,13 @@ function GroupForm(props) {
     setRemovedRoles(null);
     setSelectedRoles(null);
   }
-  
+
   const addUsers = () => {
-    if (!availableUsers) return;
-    
-    const new_users = availableUsers.filter(v => selectedUsers.includes(v.id));
-    const new_available_users = availableUsers.filter(v => !selectedUsers.includes(v.id));
+    if (!availableUsers || !selectedUsers) return;
+
+    const ids = selectedUsers.map(Number);
+    const new_users = availableUsers.filter(v => ids.includes(v.id));
+    const new_available_users = availableUsers.filter(v => !ids.includes(v.id));
 
     setUsers(sortUsersArray([...users, ...new_users]));
     setAvailableUsers(sortUsersArray([...new_available_users]));
@@ -139,7 +151,7 @@ function GroupForm(props) {
 
   const removeUsers = () => {
     if (!removedUsers) return;
-    
+
     const new_available_users = users.filter(v => removedUsers.includes(v.id));
     const new_users = users.filter(v => !removedUsers.includes(v.id));
 
@@ -147,10 +159,10 @@ function GroupForm(props) {
     setAvailableUsers(sortUsersArray([...availableUsers, ...new_available_users]));
     setRemovedUsers(null);
     setSelectedUsers(null);
-  }   
+  }
 
   const goBack = () => {
-    const state = { 
+    const state = {
       searchParams: {...location.state.previousSearchParams}
     }
     navigate(location.state.from, { state });
@@ -166,16 +178,16 @@ function GroupForm(props) {
 
     setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/security');      
+    const provider = dataProvider(API_URL + '/security');
     if (data.id) {
       const params = {
         id: data.id,
         data: {...new_data}
       }
-      provider.update('groups', params).then(d => {       
-        toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
+      provider.update('groups', params).then(d => {
+        notify.success('Editar Registo', 'Registo alterado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});
+        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
       }).finally(() => {
         setIsSaving(false);
       });
@@ -185,115 +197,91 @@ function GroupForm(props) {
       }
       provider.create('groups', params).then(d => {
         setData({...data, id: d.data.id});
-        toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
+        notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: 'Ocorreu um erro ao criar o registo'});
+        notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');
       }).finally(() => {
         setIsSaving(false);
-      });       
+      });
     }
   };
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
-      let msg;
+      if (errors[name].message) return errors[name].message;
 
       if (errors[name].type === 'required') {
-        return <small className="p-error">{errors[name].message || 'Campo obrigatório'}</small>
+        return 'Campo obrigatório';
       } else if (errors[name].type === 'maxLength') {
-         return <small className="p-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">{errors[name].message || 'Formato inválido'}</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
-  };  
- 
-  const rightToolbarTemplate = () => {
-    return (
-        <React.Fragment>
-            <Button
-              type="button" 
-              label="Voltar" 
-              icon="pi pi-left" 
-              severity="secondary" className="mr-4"
-              disabled={isSaving ? true : false}
-              onClick={goBack} />
-            <Button
-              type="submit" 
-              label="Gravar"
-              icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-              disabled={isSaving ? true : false} />
-        </React.Fragment>
-    )
-  }
+    }
+    return undefined;
+  };
 
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
-          <Toast ref={toast} baseZIndex={2000} />
-
-          <div className="formgrid grid">      
+          <div className="formgrid grid">
             <div className="field col-12 md:col-2">
-              <label htmlFor="id">Id</label>
-              <InputText id="id" type="text" value={data.id || ''} disabled className="w-full" />
-            </div>         
+              <TextInput id="id" label="Id" value={data.id || ''} disabled />
+            </div>
 
             <div className="field col-12 md:col-10">
-              <label htmlFor="name">Designação</label>        
-              <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} autoFocus
-               className={classNames({ 'w-full': true, 'p-invalid': errors.name })} />
-              {getFormErrorMessage(errors, 'name')}
+              <TextInput id="name" label="Designação" autoFocus
+               error={fieldError(errors, 'name')}
+               {...register('name', { required: 'Campo obrigatório.' })} />
             </div>
 
             <div className="field col-12">
-              <label htmlFor="description">Descrição</label>        
-              <InputText id="description" name="notes" {...register('description')} autoFocus className="w-full" />
-              {getFormErrorMessage(errors, 'notes')}
+              <TextInput id="description" label="Descrição"
+               error={fieldError(errors, 'description')}
+               {...register('description')} />
             </div>
 
             <div className="field col-12 md:col-6">
               <label>Perfis</label>
               <div className="card pt-4">
-                { (availableRoles && availableRoles.length > 0) && 
+                { (availableRoles && availableRoles.length > 0) &&
                 <>
                 <div className="field col-12">
-                  <MultiSelect value={selectedRoles} options={availableRoles} 
-                    optionLabel="name" optionValue="id" display="chip" showClear 
-                    filter filterValue={filterRolesValue} 
-                    onFilterValueChange={(e) => setFilterRolesValue(e.value)}
-                    onChange={(e) => setSelectedRoles(e.value)} placeholder="Selecionar" className="w-full" />
-                </div>              
+                  <MultiSelect
+                    data={availableRoles.map(r => ({ value: String(r.id), label: r.name }))}
+                    value={selectedRoles || []}
+                    onChange={(value) => setSelectedRoles(value.length ? value : null)}
+                    placeholder="Selecionar"
+                    searchable clearable />
+                </div>
                 <div className="grid">
                   <div className="col text-center">
-                      <Button label="Adicionar" type="button" 
+                      <Button type="button"
                         disabled={(!selectedRoles || selectedRoles.length === 0)}
-                      onClick={addRoles} />
+                      onClick={addRoles}>Adicionar</Button>
                   </div>
                 </div>
                 </>
                 }
                 { (roles && roles.length > 0) ?
-                  <>        
+                  <>
                   <div className="field col-12 pt-2">
-                    <ListBox optionLabel="name" optionValue="id" className="w-full"
-                      options={roles} value={removedRoles}
-                      onChange={(e) => setRemovedRoles(e.value)} multiple />
+                    <SelectionList options={roles} value={removedRoles}
+                      onChange={setRemovedRoles} ariaLabel="Perfis atribuídos" />
                   </div>
                   <div className="grid">
                     <div className="col"></div>
                     <div className="col text-center">
-                      <Button label="Remover" type="button" 
+                      <Button type="button"
                       disabled={(!removedRoles || removedRoles.length === 0)}
-                      onClick={removeRoles} />
+                      onClick={removeRoles}>Remover</Button>
                     </div>
                     <div className="col"></div>
                   </div>
                   </> :
                   <div className="grid justify-center">
                     <div className="col-12 mt-4 mb-2">
-                      <Message severity="warn" text="Adicione um ou mais Perfis" className="w-full" />
+                      <Alert color="warning">Adicione um ou mais Perfis</Alert>
                     </div>
                   </div>
                 }
@@ -303,52 +291,62 @@ function GroupForm(props) {
             <div className="field col-12 md:col-6">
               <label>Utilizadores</label>
               <div className="card pt-4">
-                { (availableUsers && availableUsers.length > 0) && 
+                { (availableUsers && availableUsers.length > 0) &&
                 <>
                 <div className="field col-12">
-                  <MultiSelect value={selectedUsers} options={availableUsers} 
-                    optionLabel="name" optionValue="id" display="chip" showClear 
-                    filter filterValue={filterUsersValue} 
-                    onFilterValueChange={(e) => setFilterUsersValue(e.value)}
-                    onChange={(e) => setSelectedUsers(e.value)} placeholder="Selecionar" className="w-full" />
-                </div>              
+                  <MultiSelect
+                    data={availableUsers.map(u => ({ value: String(u.id), label: u.name }))}
+                    value={selectedUsers || []}
+                    onChange={(value) => setSelectedUsers(value.length ? value : null)}
+                    placeholder="Selecionar"
+                    searchable clearable />
+                </div>
                 <div className="grid">
                   <div className="col text-center">
-                      <Button label="Adicionar" type="button" 
+                      <Button type="button"
                         disabled={(!selectedUsers || selectedUsers.length === 0)}
-                      onClick={addUsers} />
+                      onClick={addUsers}>Adicionar</Button>
                   </div>
                 </div>
                 </>
                 }
                 { (users && users.length > 0) ?
-                  <>        
+                  <>
                   <div className="field col-12 pt-2">
-                    <ListBox optionLabel="name" optionValue="id" className="w-full"
-                      options={users} value={removedUsers}
-                      onChange={(e) => setRemovedUsers(e.value)} multiple />
+                    <SelectionList options={users} value={removedUsers}
+                      onChange={setRemovedUsers} ariaLabel="Utilizadores atribuídos" />
                   </div>
                   <div className="grid">
                     <div className="col text-center">
-                      <Button label="Remover" type="button" 
+                      <Button type="button"
                       disabled={(!removedUsers || removedUsers.length === 0)}
-                      onClick={removeUsers} />
+                      onClick={removeUsers}>Remover</Button>
                     </div>
                   </div>
                   </> :
                   <div className="grid justify-center">
                     <div className="col-12 mt-4 mb-2">
-                      <Message severity="warn" text="Adicione um ou mais Utilizadores" className="w-full" />
+                      <Alert color="warning">Adicione um ou mais Utilizadores</Alert>
                     </div>
                   </div>
                 }
               </div>
-            </div>                       
+            </div>
 
           </div>
 
-
-        <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>
+        <Group justify="flex-end" className="mt-4 mb-4">
+          <Button
+            type="button"
+            variant="default"
+            leftSection={<i className="pi pi-arrow-left" />}
+            disabled={isSaving}
+            onClick={goBack}>Voltar</Button>
+          <Button
+            type="submit"
+            leftSection={<i className="pi pi-save" />}
+            loading={isSaving}>Gravar</Button>
+        </Group>
 
       </form>
   );

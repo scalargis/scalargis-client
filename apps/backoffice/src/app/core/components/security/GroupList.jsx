@@ -1,73 +1,63 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Toolbar } from 'primereact/toolbar';
-import { Button } from 'primereact/button';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { Toast } from 'primereact/toast';
+import { ActionIcon, Button, Group, TextInput } from '@mantine/core';
+import { DataGrid, confirm, notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
 
 
 const initialSearchParams = {
-  filters: undefined,
-  first: 0,
-  rows: 20,
-  page: 0,
-  sortField: 'id',
-  sortOrder: 1
+  page: 1,
+  pageSize: 20,
+  sortStatus: { columnAccessor: 'id', direction: 'asc' },
+  filters: { id: '', name: '', description: '' }
 };
+
+const sameFilters = (a, b) =>
+  Object.keys(initialSearchParams.filters).every((k) => (a?.[k] || '') === (b?.[k] || ''));
 
 
 function GroupList(props) {
-
   // Routing
   const location = useLocation();
   const navigate = useNavigate();
 
   const { core } = useContext(AppContext);
 
-  const toast = useRef(null);
-
-  const [loading, setLoading] = useState(false);  
+  const [fetching, setFetching] = useState(false);
   const [records, setRecords] = useState([]);
-  const [selectedRecords, setSelectedRecords] = useState(null);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [selectedRecords, setSelectedRecords] = useState([]);
 
-  const [searchParams, setSearchParams] = useState({...initialSearchParams}); 
-
-  const [loaded, setLoaded] = useState(false);
-
-  const dt = useRef(null);
+  // One object so the list⇄form navigation round-trip (previousSearchParams)
+  // keeps working unchanged.
+  const [searchParams, setSearchParams] = useState(() =>
+    location?.state?.searchParams ? { ...location.state.searchParams } : { ...initialSearchParams }
+  );
+  // Text the user is typing; committed into searchParams after the debounce.
+  const [filterDraft, setFilterDraft] = useState(searchParams.filters);
 
   const API_URL = core.API_URL;
 
+  useEffect(() => {
+    loadData();
+  }, [searchParams]);
 
   useEffect(() => {
-    setLoaded(true);
-    
-    if (location?.state?.searchParams) {
-      setSearchParams({...location.state.searchParams});
-    } else {
-      loadData();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!loaded) return;
+    if (sameFilters(filterDraft, searchParams.filters)) return;
 
     const handler = setTimeout(() => {
-      loadData();
+      setSearchParams((sp) => ({ ...sp, filters: { ...filterDraft }, page: 1 }));
     }, 500);
     return () => {
       clearTimeout(handler);
-    };    
-  }, [searchParams]);
+    };
+  }, [filterDraft, searchParams.filters]);
 
   const newRecord = () => {
-    const state = { 
+    const state = {
       from: location.pathname,
       previousSearchParams: {...searchParams}
     }
@@ -75,7 +65,7 @@ function GroupList(props) {
   }
 
   const editRecord = (record) => {
-    const state = { 
+    const state = {
       from: location.pathname,
       previousSearchParams: {...searchParams}
     }
@@ -83,169 +73,192 @@ function GroupList(props) {
   }
 
   const deleteSelectedRecords = () => {
-    confirmDialog({
-      message: ' Deseja eliminar o(s) registo(s) selecionado(s)?',
+    confirm({
+      message: 'Deseja eliminar o(s) registo(s) selecionado(s)?',
       header: 'Confirmação',
-      icon: 'pi pi-exclamation-triangle',
+      severity: 'danger',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
-      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/security');
         const params = {
           ids: selectedRecords.filter(v => !v.read_only).map(v => v.id)
         }
-        provider.deleteMany('users', params).then(d => {
-          toast.current.show({life: 3000, severity: 'success', summary: 'Eliminar Registo(s)', detail: 'Registo(s) eliminado(s) com sucesso'});
-          loadData();          
+        provider.deleteMany('groups', params).then(d => {
+          notify.success('Eliminar Registo(s)', 'Registo(s) eliminado(s) com sucesso');
+          loadData();
         }).catch(e => {
-          toast.current.show({life: 3000, severity: 'error', summary: 'Eliminar Registo(s)', detail: 'Ocorreu um erro ao eliminar o(s) registo(s)'}); 
-        }).finally(() => { /* noop */ });
-      },
-      reject: () =>  { /* noop */ }      
+          notify.error('Eliminar Registo(s)', 'Ocorreu um erro ao eliminar o(s) registo(s)');
+        });
+      }
     });
   }
-  
+
   const deleteRecord = (record) => {
-    confirmDialog({
-      message: ' Deseja eliminar o registo selecionado?',
+    confirm({
+      message: 'Deseja eliminar o registo selecionado?',
       header: 'Confirmação',
-      icon: 'pi pi-exclamation-triangle',
+      severity: 'danger',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
-      defaultFocus: 'reject',
       accept: () => {
         const provider = dataProvider(API_URL + '/security');
         const params = {
           id: record.id
-        }      
+        }
         provider.delete('groups', params).then(d => {
-          toast.current.show({life: 3000, severity: 'success', summary: 'Eliminar Registo', detail: 'Registo eliminado com sucesso'});
-          loadData();          
+          notify.success('Eliminar Registo', 'Registo eliminado com sucesso');
+          loadData();
         }).catch(e => {
-          toast.current.show({life: 3000, severity: 'error', summary: 'Eliminar Registo', detail: 'Ocorreu um erro ao eliminar o registo'}); 
-        }).finally(() => {
-          //console.log('finally');
+          notify.error('Eliminar Registo', 'Ocorreu um erro ao eliminar o registo');
         });
-      },
-      reject: () =>  { /* noop */ }      
+      }
     });
-  }  
-
-  const exportCSV = () => {
-    //TODO: implement export
-    //dt.current.exportCSV();
   }
 
   const loadData = () => {
     const provider = dataProvider(API_URL + '/security');
-  
+
     const _filter = {};
-    if (searchParams.filters) {
-      Object.entries(searchParams.filters).forEach(([key, item]) => {
-        if (item.value) {
-          _filter[key] = item.value;
-        }
-      });
-    }
+    Object.entries(searchParams.filters || {}).forEach(([key, value]) => {
+      if (value) {
+        _filter[key] = value;
+      }
+    });
 
     const params = {
-      pagination: { page: searchParams.page + 1, perPage: searchParams.rows},
-      sort: { field: searchParams.sortField, order: searchParams.sortOrder === -1 ? 'Desc' : 'Asc' },
+      pagination: { page: searchParams.page, perPage: searchParams.pageSize },
+      sort: {
+        field: searchParams.sortStatus.columnAccessor,
+        order: searchParams.sortStatus.direction === 'desc' ? 'Desc' : 'Asc'
+      },
       filter: _filter
     }
 
-    setLoading(true);
+    setFetching(true);
 
     provider.getList('groups', params).then(d => {
-      setSelectedRecords(null);
-      setRecords({ ...d, page: searchParams.page });
-      setLoading(false);
+      setSelectedRecords([]);
+      setRecords(d.data);
+      setTotalRecords(d.total);
+      setFetching(false);
     }).catch(e => {
-      setLoading(false);
-      toast.current && toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Grupos', detail: 'Ocorreu um erro na pesquisa'});
+      setFetching(false);
+      notify.error('Pesquisa de Grupos', 'Ocorreu um erro na pesquisa');
     });
   }
 
-  const onPage = (event) => {
-    setSearchParams({ ...searchParams, ...event });
+  const onFilterClear = () => {
+    setFilterDraft({ ...initialSearchParams.filters });
+    setSearchParams({ ...initialSearchParams });
   }
 
-  const onSort = (event) => {
-    setSearchParams({ ...searchParams, ...event });
-  }
-
-  const onFilter = (event) => {
-    setSearchParams({
-      ...searchParams,
-      ...event,
-      first: 0,
-      page: 0
-    });    
-  }
-
-  const onFilterClear = (event) => {
-    setSearchParams({ ...initialSearchParams});    
-  }
-
-  const onSelectionChange = (event) => {
-    setSelectedRecords(event.value.filter(v => !v.read_only));
-  }
-
-  const leftToolbarTemplate = () => {
-    return (
-        <React.Fragment>
-            <Button label="Novo" icon="pi pi-plus" severity="success" className="mr-2" onClick={newRecord} />
-            <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={deleteSelectedRecords} disabled={!selectedRecords || !selectedRecords.length} />
-        </React.Fragment>
-    )
-  }
-
-  const rightToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-          <Button label="Limpar" icon="pi pi-times" severity="help" className="mr-2" onClick={onFilterClear} />
-          {/*<Button label="Export" icon="pi pi-upload" severity="help" onClick={exportCSV} />*/}
-      </React.Fragment>
-    );
-  }
-
-  const actionBodyTemplate = (rowData) => {
-    if (rowData.read_only) {
-      return (<Button icon="fas fa-lock" rounded severity="secondary" disabled />);
-    } else {
-      return (
-          <React.Fragment>
-              <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editRecord(rowData)} />
-              <Button icon="pi pi-trash" rounded severity="warning" onClick={() => deleteRecord(rowData)} />
-          </React.Fragment>
-      );
-    }
-  }
+  const columns = useMemo(
+    () => [
+      {
+        accessor: 'id',
+        title: 'Id',
+        sortable: true,
+        width: 120,
+        filter: (
+          <TextInput
+            label="Id"
+            placeholder="Id"
+            size="sm"
+            value={filterDraft.id}
+            onChange={(e) => setFilterDraft({ ...filterDraft, id: e.currentTarget.value })}
+          />
+        ),
+        filtering: filterDraft.id !== ''
+      },
+      {
+        accessor: 'name',
+        title: 'Nome',
+        sortable: true,
+        cellsStyle: () => ({ wordBreak: 'break-all' }),
+        filter: (
+          <TextInput
+            label="Nome"
+            placeholder="Nome"
+            size="sm"
+            value={filterDraft.name}
+            onChange={(e) => setFilterDraft({ ...filterDraft, name: e.currentTarget.value })}
+          />
+        ),
+        filtering: filterDraft.name !== ''
+      },
+      {
+        accessor: 'description',
+        title: 'Descrição',
+        sortable: true,
+        cellsStyle: () => ({ wordBreak: 'break-all' }),
+        filter: (
+          <TextInput
+            label="Descrição"
+            placeholder="Descrição"
+            size="sm"
+            value={filterDraft.description}
+            onChange={(e) => setFilterDraft({ ...filterDraft, description: e.currentTarget.value })}
+          />
+        ),
+        filtering: filterDraft.description !== ''
+      },
+      {
+        accessor: 'actions',
+        title: '',
+        width: 110,
+        exportable: false,
+        render: (record) =>
+          record.read_only ? (
+            <ActionIcon variant="subtle" color="secondary" aria-label="Registo protegido" disabled>
+              <i className="fas fa-lock" />
+            </ActionIcon>
+          ) : (
+            <Group gap="xs" wrap="nowrap">
+              <ActionIcon color="success" aria-label="Editar" onClick={() => editRecord(record)}>
+                <i className="pi pi-pencil" />
+              </ActionIcon>
+              <ActionIcon color="warning" aria-label="Eliminar" onClick={() => deleteRecord(record)}>
+                <i className="pi pi-trash" />
+              </ActionIcon>
+            </Group>
+          )
+      }
+    ],
+    [filterDraft]
+  );
 
   return (
     <React.Fragment>
       <div className="col-12"><h3>Utilizadores - Grupos</h3></div>
 
       <div className="grid p-viewer-list">
-          <Toast ref={toast} baseZIndex={2000} />
-          <ConfirmDialog />
           <div className="card col-12">
-            <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+            <Group justify="space-between" wrap="wrap" className="mb-4">
+              <Group gap="xs">
+                <Button color="success" leftSection={<i className="pi pi-plus" />} onClick={newRecord}>Novo</Button>
+                <Button color="danger" leftSection={<i className="pi pi-trash" />} onClick={deleteSelectedRecords}
+                  disabled={!selectedRecords.length}>Eliminar</Button>
+              </Group>
+              <Button variant="outline" color="secondary" leftSection={<i className="pi pi-times" />} onClick={onFilterClear}>Limpar</Button>
+            </Group>
 
-            <DataTable ref={dt} value={records ? records.data : []} lazy
-                selectionMode="checkbox"
-                selection={selectedRecords} onSelectionChange={onSelectionChange}
-                paginator first={searchParams.first} rows={searchParams.rows} totalRecords={records.total} onPage={onPage}
-                onSort={onSort} sortField={searchParams.sortField} sortOrder={searchParams.sortOrder}
-                filterDisplay="row" filters={searchParams.filters} onFilter={onFilter} loading={loading}
-                emptyMessage="Não foram encontrados registos." >
-                <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-                <Column field="id" header="Id" sortable filter filterPlaceholder="Id" showFilterMenu={false} headerStyle={{ width: '120px' }} />
-                <Column field="name" header="Nome" sortable filter filterPlaceholder="Nome" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
-                <Column field="description" header="Descrição" sortable filter filterPlaceholder="Descrição" showFilterMenu={false} style={{"wordBreak": "break-all"}} />
-                <Column body={actionBodyTemplate} style={{width: '110px'}} />
-            </DataTable>
+            <DataGrid
+              idAccessor="id"
+              records={records}
+              totalRecords={totalRecords}
+              fetching={fetching}
+              page={searchParams.page}
+              onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
+              recordsPerPage={searchParams.pageSize}
+              sortStatus={searchParams.sortStatus}
+              onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
+              selectedRecords={selectedRecords}
+              onSelectedRecordsChange={setSelectedRecords}
+              isRecordSelectable={(record) => !record.read_only}
+              columns={columns}
+              noRecordsText="Não foram encontrados registos."
+            />
         </div>
       </div>
     </React.Fragment>
