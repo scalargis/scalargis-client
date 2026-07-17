@@ -52,7 +52,15 @@ export const initTranslations = () => {
   Object.entries(primereactResources).forEach(([lang, translations]) => {
     addLocale(lang, translations);
   });
-  locale((i18next.language || defaultLocale || 'pt').split('-')[0]);
+  if (i18next.language && primereactResources[i18next.language]) {
+    locale(i18next.language);
+  } else if (i18next.language && primereactResources[(i18next.language).split('-')[0]]) {
+    locale(i18next.language.split('-')[0]);
+  } else if (defaultLocale && primereactResources[defaultLocale]) {
+    locale(defaultLocale);
+  } else {
+    locale('pt');
+  }
 }
 
 export const loadTranslations = (id, callback) => {
