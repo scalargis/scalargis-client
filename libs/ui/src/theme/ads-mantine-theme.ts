@@ -222,6 +222,10 @@ export const adsBaseTheme = createTheme({
       ].map((name) => [name, { defaultProps: { size: 'md' } }])
     ),
 
+    // Standalone <Input.Label> (section headers) has no wrapper to size it, so
+    // match the md field labels; labels inside an input take the wrapper size.
+    InputLabel: { defaultProps: { size: 'md' } },
+
     // Don't signal links by colour alone (WCAG 1.4.1).
     Anchor: { defaultProps: { underline: 'always' } },
     // Bigger hit area for icon-only controls. Callers MUST pass aria-label.

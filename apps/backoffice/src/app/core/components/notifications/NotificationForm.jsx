@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { Alert, Badge, Button, Group, Textarea, TextInput } from '@mantine/core';
+import { Alert, Badge, Button, Group, Input, Textarea, TextInput } from '@mantine/core';
 import { notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -105,7 +105,7 @@ function NotificationForm(props) {
                       autosize minRows={5} maxRows={10} style={{opacity: '0.6'}} />
                 </div>
                 <div className="field col-12">
-                  <label htmlFor="files">Ficheiros</label>
+                  <Input.Label>Ficheiros</Input.Label>
                   { (data?.files || []).length ?
                     (data.files || []).map((file, index) => (
                       <div className="grid" key={file.url || index}>

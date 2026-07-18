@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { Alert, Button, Checkbox, Group, MultiSelect, Paper, Stack, TextInput } from '@mantine/core';
+import { Alert, Button, Checkbox, Group, Input, MultiSelect, Paper, Stack, TextInput } from '@mantine/core';
 import { notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -242,7 +242,7 @@ function GroupForm(props) {
             </div>
 
             <div className="field col-12 md:col-6">
-              <label>Perfis</label>
+              <Input.Label>Perfis</Input.Label>
               <div className="card pt-4">
                 { (availableRoles && availableRoles.length > 0) &&
                 <>
@@ -294,7 +294,7 @@ function GroupForm(props) {
             </div>
 
             <div className="field col-12 md:col-6">
-              <label>Utilizadores</label>
+              <Input.Label>Utilizadores</Input.Label>
               <div className="card pt-4">
                 { (availableUsers && availableUsers.length > 0) &&
                 <>

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-import { ActionIcon, Button, Group, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Group, Input, TextInput } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { notify } from '@scalargis/ui';
@@ -118,7 +118,7 @@ function AccountForm(props) {
 
         { !isEditMode &&
         <div className="field pl-2">
-          <label htmlFor="password">Password</label>
+          <Input.Label>Password</Input.Label>
           <PasswordChange core={core} />
         </div>
         }

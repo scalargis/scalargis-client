@@ -128,6 +128,12 @@ describe('control defaults (kit 03 §6)', () => {
   it.each(CONTROLS)('%s shares the md control-height baseline', (name) => {
     expect(theme.components[name]?.defaultProps).toMatchObject({ size: 'md' });
   });
+
+  // Standalone <Input.Label> had no wrapper to size it and fell back to sm,
+  // reading 2px short of the md field labels beside it.
+  it('renders standalone Input.Label at the md field-label size', () => {
+    expect(theme.components.InputLabel?.defaultProps).toMatchObject({ size: 'md' });
+  });
 });
 
 describe('overlay ladder (kit 03 §8)', () => {

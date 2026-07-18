@@ -8,6 +8,7 @@ import {
   Button,
   Checkbox,
   Group,
+  Input,
   MultiSelect,
   NumberInput,
   Paper,
@@ -451,7 +452,7 @@ function UserForm(props) {
         </div>
 
         <div className="field col-12 md:col-6">
-          <label>Perfis</label>
+          <Input.Label>Perfis</Input.Label>
           <div className="card p-2">
             { (availableRoles && availableRoles.length > 0) &&
             <>
@@ -505,7 +506,7 @@ function UserForm(props) {
         </div>
 
         <div className="field col-12 md:col-6">
-          <label>Grupos</label>
+          <Input.Label>Grupos</Input.Label>
           <div className="card p-2">
             { (availableGroups && availableGroups.length > 0) &&
             <>

@@ -115,7 +115,7 @@ function PrintElementForm(props) {
             </div>
 
             <div className="field col-12">
-              <label htmlFor="config">Configuração</label>
+              <Input.Label>Configuração</Input.Label>
               <div id="editor-parent">
                 <Controller
                   control={control}
