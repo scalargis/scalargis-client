@@ -11,11 +11,9 @@ import {
 } from 'chart.js';
 import { defaults } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/dropdown'
-import { ProgressSpinner } from 'primereact/progressspinner'
-import { AutoComplete } from 'primereact/autocomplete'
-import { Calendar } from 'primereact/calendar'
+import { Button, Loader, Select } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
+import dayjs from 'dayjs';
 
 import dataProvider from '../../../service/DataProvider';
 import { fetchJson } from  '../../../service/fetch'
@@ -32,6 +30,11 @@ ChartJS.register(
     Tooltip,
     Legend
   );
+
+// The @mantine/dates pickers exchange 'YYYY-MM-DD' strings; customRange keeps
+// Dates because getDataByCustomRange compares them.
+const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
+const fromPickerDate = (value) => (value ? dayjs(value).toDate() : null);
 
 export default function ViewerVisitsChart(props) {
 
@@ -54,8 +57,7 @@ export default function ViewerVisitsChart(props) {
     ]);
 
     const [op_type, set_op_type] = useState("VM")
-    
-    const [viewerFilter, setViewerFilter] = useState(null);
+
     const [selected_viewer, set_selected_viewer] = useState(null);
     const [viewers_list, set_viewers_list] = useState(null);
 
@@ -71,6 +73,8 @@ export default function ViewerVisitsChart(props) {
 
     const [loading_data_chart, set_loading_data_chart] = useState(false)
 
+    const searchTimer = useRef(null);
+
 
     useEffect(() => {
         if (props?.stats?.types) {
@@ -84,14 +88,13 @@ export default function ViewerVisitsChart(props) {
         }
         if (props?.stats?.selected_timerange) {
             changeTimeRange(props.stats.selected_timerange);
-        }        
+        }
     }, [props.stats]);
 
     useEffect(() => {
         set_loading_data_chart(true)
 
         let url = API_URL + '/portal/stats/viewer_visits?type_code=' + op_type;
-        //if (op_type === 'VM' && selected_viewer) {
         if (selected_viewer) {
             url += '&viewer_id=' + selected_viewer.value;
         }
@@ -119,9 +122,9 @@ export default function ViewerVisitsChart(props) {
                     const new_data = getDataByCustomRange(input_d, input_v)
                     changeDates_str(new_data[0])
                     changeData_values(new_data[1])
-                    return                    
+                    return
                 }
-                                
+
                 let pos = input_d.length - 1 - parseInt(timerange)
                 if (pos < 0) pos = 0
 
@@ -129,14 +132,14 @@ export default function ViewerVisitsChart(props) {
                 const new_values = input_v.slice(pos, input_v.length - 1)
 
                 changeDates_str(new_dates)
-                changeData_values(new_values)               
+                changeData_values(new_values)
             } else {
                 set_input_dates_str(null);
                 set_input_data_values(null);
 
                 changeDates_str(null);
-                changeData_values(null);                
-            }          
+                changeData_values(null);
+            }
         })
         .catch(error => {
             console.log("fetch error")
@@ -151,19 +154,17 @@ export default function ViewerVisitsChart(props) {
         const new_data = getDataByCustomRange(input_dates_str, input_data_values);
         changeDates_str(new_data[0]);
         changeData_values(new_data[1]);
-    }, [customRange]);    
+    }, [customRange]);
 
     const data = {
         labels: dates_str,
         datasets: [
             {
-                // label: 'Nº de Visitas',
                 data: data_values,
                 fill: false,
                 backgroundColor: 'rgb(255, 99, 132)',
                 borderColor: 'rgba(255, 99, 132, 0.8)',
                 tension: 0.25
-                // yAxisID: 'y-axis-1'
             },
         ],
     };
@@ -188,19 +189,9 @@ export default function ViewerVisitsChart(props) {
         }
     }
 
-
-    const legend = {
-        display: true,
-        position: "top",
-        labels: {
-            fontColor: "#323130",
-            fontSize: 14
-        }
-    }
-
     function getDataByCustomRange(dates_str, dates_values) {
         let new_dates_str = [];
-        let  new_dates_values = [];        
+        let  new_dates_values = [];
         if (customRange?.length > 1) {
             dates_str.forEach((d, i) => {
                 const date = new Date(d);
@@ -255,10 +246,10 @@ export default function ViewerVisitsChart(props) {
         setCustomRange(new_range);
     }
 
-    const searchViewer = (event) => {
-        const params = { filter: {'name': event.query.trim()} };
+    const searchViewer = (query) => {
+        const params = { filter: {'name': query.trim()} };
 
-        const provider = dataProvider(API_URL + '/portal');        
+        const provider = dataProvider(API_URL + '/portal');
         provider.getSimpleList('/viewers/list', params).then(d => {
             set_viewers_list(d.data.map(d=>{return {value: d.id, name: d.name}}));
           }).catch(e => {
@@ -266,8 +257,15 @@ export default function ViewerVisitsChart(props) {
           });
     }
 
+    // AutoComplete's delay=500 equivalent: debounce the remote search.
+    const onViewerSearchChange = (query) => {
+        if (searchTimer.current) clearTimeout(searchTimer.current);
+        if (!query) return;
+        searchTimer.current = setTimeout(() => searchViewer(query), 500);
+    }
+
     const exportCSV = (e) => {
-        
+
         let data = data_values.map((val, idx) => { return [dates_str[idx], val]});
         data = [['Data', 'Total'], ...data];
 
@@ -281,95 +279,91 @@ export default function ViewerVisitsChart(props) {
         x.setAttribute("href", csvString );
         x.setAttribute("download", `stats_${op_type}.csv`);
         document.body.appendChild(x);
-        x.click()     
+        x.click()
     }
-
-    const [city, setCity] = useState(null);
-
-    const citySelectItems = [
-        {label: 'New York', value: 'NY'},
-        {label: 'Rome', value: 'RM'},
-        {label: 'London', value: 'LDN'},
-        {label: 'Istanbul', value: 'IST'},
-        {label: 'Paris', value: 'PRS'}
-    ];
 
 
     return (
         <div className="card">
             <div className="grid">
                 <div className="col-12 md:col-6">
-                    <Dropdown className="w-full" value={op_type} options={types} onChange={(e) => changeOpType(e.value)} />
+                    <Select
+                        data={types}
+                        value={op_type}
+                        onChange={(value) => { if (value != null) changeOpType(value); }}
+                        allowDeselect={false} />
 
-                    { !props?.stats?.viewers?.length > 0 &&
+                    { !props?.stats?.viewers?.length &&
                         <div className="col-12 pl-0 pr-0">
-                            <AutoComplete
-                                delay={500}
-                                value={selected_viewer ? [selected_viewer] : null}
-                                suggestions={viewers_list}
-                                field="name"
-                                multiple
-                                forceSelection
-                                completeMethod={searchViewer} 
-                                onSelect={(e) => set_selected_viewer(e.value)}
-                                onUnselect={(e) => set_selected_viewer(null)} />
+                            <Select
+                                placeholder="Escolha um Visualizador"
+                                data={(viewers_list || []).map(v => ({ value: String(v.value), label: v.name }))}
+                                value={selected_viewer ? String(selected_viewer.value) : null}
+                                onChange={(value) => {
+                                    const new_val = value != null
+                                      ? (viewers_list || []).find(v => String(v.value) === value) || null
+                                      : null;
+                                    set_selected_viewer(new_val);
+                                }}
+                                onSearchChange={onViewerSearchChange}
+                                searchable clearable />
                         </div>
                     }
                 </div>
                 <div className="col-12 md:col-6">
                     { props?.stats?.viewers?.length > 0 &&
-                        <Dropdown
-                            className="w-full"
-                            value={selected_viewer?.value}
-                            options={props?.stats?.viewers}
+                        <Select
                             placeholder="Escolha um Visualizador"
-                            filter={(props?.stats?.viewers || []).length > 25}
-                            showClear
-                            onChange={(e) => {
+                            data={(props?.stats?.viewers || []).map(v => ({ ...v, value: String(v.value) }))}
+                            value={selected_viewer ? String(selected_viewer.value) : null}
+                            searchable={(props?.stats?.viewers || []).length > 25}
+                            clearable
+                            onChange={(value) => {
                                 let new_val = null;
-                                if (props?.stats?.viewers?.length) {
-                                    new_val = props?.stats?.viewers.find(d => d.value === e.value);
+                                if (value != null && props?.stats?.viewers?.length) {
+                                    new_val = props.stats.viewers.find(d => String(d.value) === value) || null;
                                 }
                                 set_selected_viewer(new_val)
-                            }}
-                            onUnselect={(e) => set_selected_viewer(null)} />
+                            }} />
                     }
                 </div>
                 <div className="col-12 md:col-6">
-                    <Dropdown className="w-full" value={timerange} options={timeranges} onChange={(e) => changeTimeRangeAction(e.value)} />
+                    <Select
+                        data={timeranges}
+                        value={timerange}
+                        onChange={(value) => { if (value != null) changeTimeRangeAction(value); }}
+                        allowDeselect={false} />
 
                     { timerange === 'custom' &&
                     <div className="grid mt-1">
                         <div className="col">
-                            <Calendar
-                                className="w-full"
-                                dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"
-                                value={customRange?.length ? customRange[0] : null}
-                                onChange={(e) => changeCustomRange(0, e.value)} />
+                            <DatePickerInput
+                                valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
+                                value={toPickerDate(customRange?.length ? customRange[0] : null)}
+                                onChange={(value) => changeCustomRange(0, fromPickerDate(value))} />
                         </div>
                         <div className="align-content-center text-center">e</div>
                         <div className="col">
-                            <Calendar
-                                className="w-full"
-                                dateFormat="dd/mm/yy" mask="99/99/9999" placeholder="dd/mm/aaaa"
-                                value={customRange?.length ? customRange[1] : null}
-                                onChange={(e) => changeCustomRange(1, e.value)} />
+                            <DatePickerInput
+                                valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
+                                value={toPickerDate(customRange?.length ? customRange[1] : null)}
+                                onChange={(value) => changeCustomRange(1, fromPickerDate(value))} />
                         </div>
                     </div>
                     }
                 </div>
-                { loading_data_chart && 
+                { loading_data_chart &&
                 <div className="col-12 md:col-6 text-right">
-                    <ProgressSpinner style={{ width: '25px', height: '30px' }} />
+                    <Loader size="sm" />
                 </div>
                 }
 
                 <div className="col-12 text-right">
-                    <Button label="Exportar CSV" 
-                        outlined
-                        icon="pi pi-download"
+                    <Button
+                        variant="outline"
+                        leftSection={<i className="pi pi-download" />}
                         onClick={exportCSV}
-                        disabled={!data_values?.length} />
+                        disabled={!data_values?.length}>Exportar CSV</Button>
                 </div>
 
 
