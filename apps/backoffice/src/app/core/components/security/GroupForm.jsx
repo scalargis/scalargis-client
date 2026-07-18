@@ -36,6 +36,7 @@ const SelectionList = ({ options, value, onChange, ariaLabel }) => (
       {options.map((option) => (
         <Checkbox
           key={option.id}
+          size="md"
           label={option.name}
           checked={!!value && value.includes(option.id)}
           onChange={(e) =>
