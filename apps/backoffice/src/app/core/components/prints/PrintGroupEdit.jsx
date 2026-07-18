@@ -1,12 +1,6 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import React, { useContext, useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useForm, Controller } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { Chips} from 'primereact/chips';
-import { Button } from 'primereact/button';
-import { classNames } from 'primereact/utils';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -37,8 +31,6 @@ function PrintGroupEdit(props) {
   const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState(null);
   const [roles, setRoles] = useState([]);
-
-  const toast = useRef(null);
 
   const API_URL = core.API_URL;
 
