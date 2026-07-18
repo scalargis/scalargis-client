@@ -1,13 +1,8 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { DataView } from 'primereact/dataview';
+import { Alert, Badge, Button, Group, Textarea, TextInput } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -23,23 +18,12 @@ function NotificationForm(props) {
   const [data, setData] = useState(props.data || {});
 
   const { core } = useContext(AppContext);
- 
-  const toast = useRef(null);
 
-  const API_URL = core.API_URL; 
+  const API_URL = core.API_URL;
 
   const goBack = () => {
     if (location.state && location.state.from) {
-      /*
-      const new_location = {
-        pathname: location.state.from,
-        state: { 
-          searchParams: {...location.state.previousSearchParams}
-        }
-      }
-      location.replace(new_location);
-      */
-      const state = { 
+      const state = {
         searchParams: {...location.state.previousSearchParams}
       }
       navigate(location.state.from, { replace: true, state })
@@ -48,12 +32,12 @@ function NotificationForm(props) {
     }
   }
 
-  const onCheck = () => {  
+  const onCheck = () => {
     const values = {
       checked: true,
       checked_date: new Date().toISOString().slice(0, 10)
     }
-    updateNotification(values);  
+    updateNotification(values);
   }
 
   const onClose = () => {
@@ -77,177 +61,137 @@ function NotificationForm(props) {
       notes: data.notes
     }
     updateNotification(values);
-  }  
+  }
 
   const updateNotification = (values) => {
-    setIsSaving(true); 
+    setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/portal');      
+    const provider = dataProvider(API_URL + '/portal');
     const params = {
       id: data.id,
       data: values
     }
-    provider.update('notifications', params).then(d => {       
-      toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});      
+    provider.update('notifications', params).then(d => {
+      notify.success('Editar Registo', 'Registo alterado com sucesso');
       setData({...d.data});
     }).catch(e => {
-      toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});        
+      notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
     }).finally(() => {
       setIsSaving(false);
     });
   }
 
-  const rightToolbarTemplate = () => {
-    return (
-        <React.Fragment>
-          <Button
-            type="button" 
-            label="Voltar" 
-            icon="pi pi-left" 
-            severity="secondary" className="mr-4"
-            disabled={isSaving ? true : false}
-            onClick={goBack} />
-          { data?.status?.value === 0 && <Button
-            type="button" 
-            label="Lida"
-            className="mr-2"
-            icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-            disabled={isSaving ? true : false} 
-            onClick={onCheck} /> }
-          { data?.status?.value !== 2 && <Button
-            type="button" 
-            label="Encerrar"
-            className="mr-2"
-            icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-            disabled={isSaving ? true : false}
-            onClick={onClose} /> }
-          { data?.status?.value === 2 && <Button
-            type="button" 
-            label="Reabrir"
-            className="mr-2"
-            icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-            disabled={isSaving ? true : false}
-            onClick={onReopen} /> }
-          <Button
-            type="button" 
-            label="Gravar"
-            className="mr-2"
-            icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-            disabled={isSaving ? true : false}
-            onClick={onSave} />
-        </React.Fragment>
-    )    
-  }
-  
-  const rightToolbarTemplateNone = () => {
-    return (
-      <Button
-          type="button" 
-          label="Voltar" 
-          icon="pi pi-left" 
-          severity="secondary" className="mr-4"
-          onClick={goBack} />
-    )
-  }
-
-  const fileTemplate = (file, layout) => {
-    if (!file) {
-        return;
-    }
-
-    return (
-      <>
-        <div className="col md:col-9">
-          <div className="m-2">
-            <a href={file.url} target="_blank" rel="noreferrer" download={file.filename}>{file.filename}</a>
-          </div>
-        </div>
-        <div className="col md:col-3">
-          <div className="m-2 text-center">
-            {file.size != null && <span className="p-tag p-component px-1 py-1">
-              <span className="p-tag-value">{(file.size / 1024).toFixed(2) + " KB"}</span>
-            </span>}
-          </div>
-        </div>
-      </>
-    );
-  }  
- 
   return (
     <React.Fragment>
       <h3>Notificação - Edição</h3>
 
       <form>
-        <Toast ref={toast} baseZIndex={2000} />
         { data.id ?
         <React.Fragment>
-          <div className="grid p-fluid">
+          <div className="grid">
             <div className="col-12 md:col-9">
-              <div className="p-fluid formgrid grid">
+              <div className="formgrid grid">
                 <div className="field col-12 md:col-2">
-                    <label htmlFor="id">Id</label>
-                    <InputText id="id" type="text" value={data.id} disabled />
+                    <TextInput id="id" label="Id" value={data.id} disabled />
                 </div>
                 <div className="field col-12 md:col-5">
-                    <label htmlFor="name">Nome</label>
-                    <InputText id="nam" type="text" value={data.name} disabled />
+                    <TextInput id="name" label="Nome" value={data.name} disabled />
                 </div>
                 <div className="field col-12 md:col-5">
-                    <label htmlFor="email">Email</label>
-                    <InputText id="email" type="text" value={data.email} disabled />
+                    <TextInput id="email" label="Email" value={data.email} disabled />
                 </div>
                 <div className="field col-12">
-                    <label htmlFor="message">Messagem</label>
-                    <InputTextarea id="message" rows={5} value={data.message}  autoResize style={{maxHeight: '250px', opacity: '0.6'}} />
+                    <Textarea id="message" label="Mensagem" rows={5} value={data.message} readOnly
+                      autosize minRows={5} maxRows={10} style={{opacity: '0.6'}} />
                 </div>
-                <div className="field col-12">              
-                  <label htmlFor="message">Ficheiros</label>
-                  <DataView value={data?.files || []} layout="list" 
-                    emptyMessage="Não tem ficheiros" itemTemplate={fileTemplate} />                  
-                </div>                                                                 
+                <div className="field col-12">
+                  <label htmlFor="files">Ficheiros</label>
+                  { (data?.files || []).length ?
+                    (data.files || []).map((file, index) => (
+                      <div className="grid" key={file.url || index}>
+                        <div className="col md:col-9">
+                          <div className="m-2">
+                            <a href={file.url} target="_blank" rel="noreferrer" download={file.filename}>{file.filename}</a>
+                          </div>
+                        </div>
+                        <div className="col md:col-3">
+                          <div className="m-2 text-center">
+                            {file.size != null && <Badge variant="light" color="secondary">{(file.size / 1024).toFixed(2) + " KB"}</Badge>}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                    :
+                    <div className="m-2">Não tem ficheiros</div>
+                  }
+                </div>
               </div>
             </div>
             <div className="col-12 md:col-3">
-              <div className="p-fluid formgrid grid">
+              <div className="formgrid grid">
                 <div className="field col-12">
-                    <label htmlFor="viewer">Visualizador</label>
-                    <InputText id="viewer" type="text" value={data.viewer} disabled />
+                    <TextInput id="viewer" label="Visualizador" value={data.viewer} disabled />
                 </div>
                 <div className="field col-12">
-                    <label htmlFor="date">Data</label>
-                    <InputText id="date" type="text" value={data.date || ''}  disabled />
-                </div>                                                
+                    <TextInput id="date" label="Data" value={data.date || ''} disabled />
+                </div>
               </div>
             </div>
             <div className="col-12 md:col-9">
-              <div className="p-fluid formgrid grid">
+              <div className="formgrid grid">
                 <div className="field col-12">
-                  <label htmlFor="notes">Observações</label>
-                  <InputTextarea id="notes" rows={5} autoResize value={data.notes} 
+                  <Textarea id="notes" label="Observações" rows={5} autosize minRows={5} value={data.notes}
                   onChange={(e) => setData({...data, notes: e.target.value})
                   } />
                 </div>
               </div>
             </div>
             <div className="col-12 md:col-3">
-              <div className="p-fluid formgrid grid">
+              <div className="formgrid grid">
                   <div className="field col-12">
-                      <label htmlFor="read_date">Data Leitura</label>
-                      <InputText id="read_date" type="text" value={data.checked_date || ''} disabled />
+                      <TextInput id="read_date" label="Data Leitura" value={data.checked_date || ''} disabled />
                   </div>
                   <div className="field col-12">
-                      <label htmlFor="close_date">Data Encerramento</label>
-                      <InputText id="close_date" type="text" value={data.closed_date || ''} disabled />
-                  </div>                               
-                </div>              
+                      <TextInput id="close_date" label="Data Encerramento" value={data.closed_date || ''} disabled />
+                  </div>
+                </div>
             </div>
           </div>
-          <Toolbar className="mt-2 mb-4" right={rightToolbarTemplate}></Toolbar>
+          <Group justify="flex-end" className="mt-2 mb-4">
+            <Button
+              type="button"
+              variant="default"
+              leftSection={<i className="pi pi-arrow-left" />}
+              disabled={isSaving}
+              onClick={goBack}>Voltar</Button>
+            { data?.status?.value === 0 && <Button
+              type="button"
+              disabled={isSaving}
+              onClick={onCheck}>Lida</Button> }
+            { data?.status?.value !== 2 && <Button
+              type="button"
+              disabled={isSaving}
+              onClick={onClose}>Encerrar</Button> }
+            { data?.status?.value === 2 && <Button
+              type="button"
+              disabled={isSaving}
+              onClick={onReopen}>Reabrir</Button> }
+            <Button
+              type="button"
+              disabled={isSaving}
+              onClick={onSave}>Gravar</Button>
+          </Group>
         </React.Fragment>
         :
         <React.Fragment>
-          <Message severity="error" text="Não foi possível obter os dados da notificação." className="col md:col-12" />
-          <Toolbar className="mt-2 mb-4" right={rightToolbarTemplateNone}></Toolbar>
+          <Alert color="danger" className="col md:col-12">Não foi possível obter os dados da notificação.</Alert>
+          <Group justify="flex-end" className="mt-2 mb-4">
+            <Button
+                type="button"
+                variant="default"
+                leftSection={<i className="pi pi-arrow-left" />}
+                onClick={goBack}>Voltar</Button>
+          </Group>
         </React.Fragment> }
       </form>
     </React.Fragment>
