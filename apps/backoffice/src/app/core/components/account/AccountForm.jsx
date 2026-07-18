@@ -1,23 +1,23 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { Toolbar } from 'primereact/toolbar';
-import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
-import { classNames } from 'primereact/utils';
+import { ActionIcon, Button, Group, TextInput } from '@mantine/core';
+import { DateTimePicker } from '@mantine/dates';
+import dayjs from 'dayjs';
+import { notify } from '@scalargis/ui';
 import { v4 as uuidV4 } from 'uuid';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import PasswordChange from './PasswordChange';
 
+// The @mantine/dates pickers exchange 'YYYY-MM-DD HH:mm:ss' strings; the form
+// model keeps the Date the API hands over, so the saved payload is unchanged.
+const PICKER_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 function AccountForm(props) {
 
   const {
-    history,
     dispatch
   } = props;
 
@@ -29,8 +29,6 @@ function AccountForm(props) {
   const [isSaving, setIsSaving] = useState(false);
 
   const [data, setData] = useState(props.data || {});
-
-  const toast = useRef(null);
 
   const API_URL = core.API_URL;
 
@@ -56,8 +54,8 @@ function AccountForm(props) {
     const params = {
       data: new_data
     }
-    provider.update('account', params).then(d => {       
-      toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
+    provider.update('account', params).then(d => {
+      notify.success('Editar Registo', 'Registo alterado com sucesso');
 
       setData(new_data);
 
@@ -65,107 +63,54 @@ function AccountForm(props) {
 
     }).catch(e => {
       const msg = e.message || 'Ocorreu um erro ao alterar o registo';
-      toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: msg});        
+      notify.error('Editar Registo', msg);
     }).finally(() => {
       setIsSaving(false);
     });
   };
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
+      if (errors[name].message) return errors[name].message;
+
       if (errors[name].type === 'required') {
-        return <small className="p-error">{errors[name].message || 'Campo obrigatório'}</small>
+        return 'Campo obrigatório';
       } else if (errors[name].type === 'maxLength') {
-         return <small className="p-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">{errors[name].message || 'Formato inválido'}</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
-  };
-  
-  
-  const leftToolbarTemplate = () => {
-    if (isEditMode ) return null;
-
-    return (
-      <Button
-        type="button"
-        label="Sair"
-        icon="pi pi-power-off"
-        severity="danger"
-        onClick={e => { e.preventDefault(); dispatch(logout()); }} />
-    );
-  }
- 
-  const rightToolbarTemplate = () => {
-    if (isEditMode) {
-      return (
-        <React.Fragment>
-
-          <Button
-            type="button"
-            label="Cancelar"
-            className="mr-2"
-            onClick={e => { 
-              e.preventDefault(); 
-              setIsEditMode(false);
-
-              Object.entries(data).forEach(([key, val]) => {
-                setValue(key, val, {shouldDirty: false, shouldTouch: false, shouldValidate: false});
-              });
-            }}
-            disabled={isSaving ? true : false} />
-
-          <Button
-            type="submit" 
-            label="Gravar"
-            icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-            disabled={isSaving ? true : false} />
-        </React.Fragment>
-      )
     }
-
-    return (
-      <Button
-          type="button"
-          label="Editar"
-          icon="pi pi pi-pencil"
-          onClick={e => { e.preventDefault(); setIsEditMode(true)} } />
-    )
-
-  }
+    return undefined;
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
 
-      <Toast ref={toast} baseZIndex={2000} />
-
-      <div className="p-fluid formgrid grid">
+      <div className="formgrid grid">
         <div className="field col-12 md:col-3">
-          <label htmlFor="first_name">Primeiro Nome</label>
-          <InputText id="first_name" name="first_name" {...register('first_name')} autoFocus disabled={!isEditMode} />
-        </div>            
+          <TextInput id="first_name" label="Primeiro Nome" autoFocus disabled={!isEditMode}
+            {...register('first_name')} />
+        </div>
         <div className="field col-12 md:col-3">
-          <label htmlFor="last_name">Último Nome</label>
-          <InputText id="last_name" name="last_name" {...register('last_name')} disabled={!isEditMode} />
+          <TextInput id="last_name" label="Último Nome" disabled={!isEditMode}
+            {...register('last_name')} />
         </div>
         <div className="field col-12 md:col-6">
-          <label htmlFor="name">Nome</label>
-          <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} disabled={!isEditMode} className={classNames({ 'p-invalid': errors.name })} />
-          {getFormErrorMessage(errors, 'name')}
+          <TextInput id="name" label="Nome" disabled={!isEditMode}
+            error={fieldError(errors, 'name')}
+            {...register('name', { required: 'Campo obrigatório.' })} />
         </div>
 
         <div className="field col-12 md:col-3">
-          <label htmlFor="username">Username</label>
-          <InputText id="username" name="username" {...register('username', { required: 'Campo obrigatório.' })} disabled={!isEditMode} className={classNames({ 'p-invalid': errors.username })} />
-          {getFormErrorMessage(errors, 'username')}
+          <TextInput id="username" label="Username" disabled={!isEditMode}
+            error={fieldError(errors, 'username')}
+            {...register('username', { required: 'Campo obrigatório.' })} />
         </div>
         <div className="field col-12 md:col-4">
-          <label htmlFor="email">Email</label>
-          <InputText id="email" name="email" {...register('email', { required: 'Campo obrigatório.' })} disabled={!isEditMode} className={classNames({ 'p-invalid': errors.email })} />
-          {getFormErrorMessage(errors, 'email')}
+          <TextInput id="email" label="Email" disabled={!isEditMode}
+            error={fieldError(errors, 'email')}
+            {...register('email', { required: 'Campo obrigatório.' })} />
         </div>
 
         { !isEditMode &&
@@ -176,34 +121,79 @@ function AccountForm(props) {
         }
 
         <div className="field col-12 md:col-6">
-          <label htmlFor="auth_token">Token de Autenticação</label>
-          <div className="p-inputgroup">
-              <Button type="button" label="Gerar" icon="pi pi-check" className="p-button-primary" onClick={(e) => {setValue('auth_token', String(uuidV4()));}} disabled={!isEditMode} />
-              <InputText id="auth_token" name="auth_token" {...register('auth_token')} placeholder="Token não definido" disabled={!isEditMode} />
-              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => {setValue('auth_token', null); setValue('auth_token_expire', null);}} disabled={!isEditMode} />
-          </div>
+          <Group gap="xs" align="flex-end" wrap="nowrap">
+            <Button type="button" leftSection={<i className="pi pi-check" />} disabled={!isEditMode}
+              onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
+            <TextInput id="auth_token" label="Token de Autenticação" placeholder="Token não definido"
+              style={{ flex: 1 }} disabled={!isEditMode} {...register('auth_token')} />
+            <ActionIcon size="input-md" color="danger" aria-label="Limpar token" disabled={!isEditMode}
+              onClick={() => { setValue('auth_token', null); setValue('auth_token_expire', null); }}>
+              <i className="pi pi-times" />
+            </ActionIcon>
+          </Group>
         </div>
         <div className="field col-12 md:col-3">
-          <label htmlFor="auth_token_expire">Data de Validade do Token</label>
-          <div className="p-inputgroup">
-              <Controller
-                control={control}
-                name="auth_token_expire"
-                render={({ field }) => {              
-                  return <Calendar {...field} 
-                    dateFormat="yy-mm-dd"
-                    onChange={(e) => field.onChange(e.target.value)} 
-                    showIcon showTime showSeconds
-                    disabled={!isEditMode} />
-                }} 
-              />                    
-              <Button type="button" icon="pi pi-times" severity="danger" onClick={(e) => setValue('auth_token_expire', null)} disabled={!isEditMode} />
-          </div>
+          <Group gap="xs" align="flex-end" wrap="nowrap">
+            <Controller
+              control={control}
+              name="auth_token_expire"
+              render={({ field }) => (
+                <DateTimePicker
+                  label="Data de Validade do Token"
+                  value={field.value ? dayjs(field.value).format(PICKER_FORMAT) : null}
+                  onChange={(value) => field.onChange(value ? dayjs(value).toDate() : null)}
+                  valueFormat={PICKER_FORMAT}
+                  withSeconds
+                  disabled={!isEditMode}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            <ActionIcon size="input-md" color="danger" aria-label="Limpar data de validade" disabled={!isEditMode}
+              onClick={() => setValue('auth_token_expire', null)}>
+              <i className="pi pi-times" />
+            </ActionIcon>
+          </Group>
         </div>
 
       </div>
 
-      <Toolbar className="mt-4 mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+      <Group justify="space-between" className="mt-4 mb-4">
+        <div>
+          { !isEditMode &&
+          <Button
+            type="button"
+            color="danger"
+            leftSection={<i className="pi pi-power-off" />}
+            onClick={e => { e.preventDefault(); dispatch(logout()); }}>Sair</Button>
+          }
+        </div>
+        { isEditMode ?
+          <Group gap="xs">
+            <Button
+              type="button"
+              variant="default"
+              onClick={e => {
+                e.preventDefault();
+                setIsEditMode(false);
+
+                Object.entries(data).forEach(([key, val]) => {
+                  setValue(key, val, {shouldDirty: false, shouldTouch: false, shouldValidate: false});
+                });
+              }}
+              disabled={isSaving}>Cancelar</Button>
+            <Button
+              type="submit"
+              leftSection={<i className="pi pi-save" />}
+              loading={isSaving}>Gravar</Button>
+          </Group>
+          :
+          <Button
+            type="button"
+            leftSection={<i className="pi pi-pencil" />}
+            onClick={e => { e.preventDefault(); setIsEditMode(true)} }>Editar</Button>
+        }
+      </Group>
 
     </form>
   );

@@ -1,15 +1,13 @@
-import React, { useContext, useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState } from 'react';
 
-import { Dialog } from 'primereact/dialog';
 import { useForm, Controller } from 'react-hook-form';
-import { Password } from 'primereact/password';
-import { Button } from 'primereact/button';
-import { Divider } from 'primereact/divider';
-import { Toast } from 'primereact/toast';
-import { classNames } from 'primereact/utils';
+import { Button, Group, Modal, PasswordInput } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 
 import dataProvider from '../../../service/DataProvider';
 
+
+const PASSWORD_RULES = 'Pelo menos 12 caracteres, com maiúsculas, minúsculas, dígitos e um caractere especial.';
 
 export default function PasswordChange(props) {
 
@@ -20,65 +18,22 @@ export default function PasswordChange(props) {
     const [showPasswordDialog, setShowPasswordDialog] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
-    const formRef = useRef(null);
-
-    const toast = useRef(null);
-
     const API_URL = core.API_URL;
 
-    const passwordStrengthLabels = useMemo(() => {
-        return {
-          weakLabel: "Fraca",
-          mediumLabel: "Média",
-          strongLabel: "Forte"
-        }
-    }, []);
-
-  const getFormErrorMessage = (errors, name) => {
+    const fieldError = (errors, name) => {
         if (errors && errors[name]) {
+            if (errors[name].message) return errors[name].message;
+
             if (errors[name].type === 'required') {
-                return <small className="p-error">{errors[name].message || 'Campo obrigatório'}</small>
+                return 'Campo obrigatório';
             } else if (errors[name].type === 'maxLength') {
-                return <small className="p-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
+                return 'O número de caracteres é superior à dimensão máxima permitida';
             } else if (errors[name].type === 'pattern') {
-                return <small className="p-error">{errors[name].message || 'Formato inválido'}</small>
-            } else {
-                return <small className="p-error">{errors[name].message}</small>
+                return 'Formato inválido';
             }
-        }      
+        }
+        return undefined;
     };
-
-    const passwordFooter = useMemo(() =>{
-        return (
-            <React.Fragment>
-                <Divider className="mt-2" />
-                <p className="mt-2">Sugestões:</p>
-                <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
-                    <li>Pelo menos uma minúscula</li>
-                    <li>Pelo menos uma maiúscula</li>
-                    <li>Pelo menos um dígito</li>
-                    <li>Pelo menos um caractere especial</li>
-                    <li>Pelo menos 12 caracteres</li>
-                </ul>
-            </React.Fragment>
-        );
-    }, []);
-
-    const dialogFooter = () => {
-        return (
-            <div>
-                <Button label="Cancelar" icon="pi pi-times" onClick={() => setShowPasswordDialog(false)} 
-                    text disabled={isSaving} />
-                <Button label="Aceitar"
-                    onClick={(e) => {
-                        formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); 
-                    }}
-                    icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-                    disabled={isSaving}
-                    autoFocus />
-            </div>
-        );
-    }
 
     const defaultValues = {
         newPassword: "",
@@ -91,14 +46,14 @@ export default function PasswordChange(props) {
     const onSubmit = (data) => {
         const provider = dataProvider(API_URL + '/security');
 
-        setIsSaving(true);    
-    
+        setIsSaving(true);
+
         const params = {
             data: {password: data.newPassword}
         }
         provider.update('update_password', params).then(d => {
-            toast.current.show({life: 3000, severity: 'success', summary: 'Alterar Password', detail: 'Password alterada com sucesso'});
-            
+            notify.success('Alterar Password', 'Password alterada com sucesso');
+
             if (d?.data?.data?.token) {
                 const auth = core.store.getState().auth?.data;
                 const new_auth = {
@@ -110,78 +65,81 @@ export default function PasswordChange(props) {
 
             setShowPasswordDialog(false);
         }).catch(e => {
-            toast.current.show({life: 5000, severity: 'error', summary: 'Alterar Password', detail: e.body?.message || e.message || 'Ocorreu um erro ao alterar a password'});        
+            notify.error('Alterar Password', e.body?.message || e.message || 'Ocorreu um erro ao alterar a password');
         }).finally(() => {
             setIsSaving(false);
         });
-        
+
         return false;
     }
 
     return (
         <React.Fragment>
-            <Toast ref={toast} baseZIndex={2000} />
-
-            <Button label="Alterar password" icon="pi pi-user-edit" outlined className="block" onClick={e => {
+            <Button variant="outline" leftSection={<i className="pi pi-user-edit" />} onClick={e => {
                 e.preventDefault();
                 reset();
                 setShowPasswordDialog(true);
-            }} />
-            <Dialog header="Alterar password" visible={showPasswordDialog} style={{ width: '35vw' }} footer={dialogFooter()}  onHide={() => setShowPasswordDialog(false)}>
-                <div className="p-fluid mt-2">
+            }}>Alterar password</Button>
+            <Modal title="Alterar password" opened={showPasswordDialog} size="35vw"
+                onClose={() => setShowPasswordDialog(false)}>
+                <div className="mt-2">
 
-                    <form ref={formRef} onSubmit={(e) => {
+                    <form onSubmit={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         handleSubmit(onSubmit)();
                     }}
                     autoComplete="off">
                         <div className="field">
-                            <label htmlFor="newPassword">Nova password</label>
-                            <Controller name="newPassword" control={control} 
-                                rules={{ required: "Campo obrigatório" }} 
-                                render={({ field, fieldState }) => (
-                                    <Password id={field.name} {...field}
-                                        toggleMask
-                                        promptLabel="Introduza a password"
-                                        {...passwordStrengthLabels}
-                                        className={classNames({ 'p-invalid': fieldState.invalid })} 
-                                        footer={passwordFooter} 
+                            <Controller name="newPassword" control={control}
+                                rules={{ required: "Campo obrigatório" }}
+                                render={({ field }) => (
+                                    <PasswordInput id={field.name}
+                                        label="Nova password"
+                                        description={PASSWORD_RULES}
+                                        value={field.value || ''}
+                                        onChange={(e) => field.onChange(e.currentTarget.value)}
+                                        error={fieldError(errors, 'newPassword')}
                                         autoComplete="off"
-                                        aria-autocomplete="none" />
-                                )} 
+                                        data-autofocus />
+                                )}
                             />
-                            {getFormErrorMessage(errors, 'newPassword')}
                         </div>
 
                         <div className="field">
-                            <label htmlFor="confirmPassword">Confirmar password</label>
-                            <Controller name="confirmPassword" control={control} 
-                                rules={{ 
+                            <Controller name="confirmPassword" control={control}
+                                rules={{
                                     required: "Campo obrigatório",
                                     validate: (value) => {
                                         if (value && watchFields[0] && value != watchFields[0]) {
-                                            return "As passwords instroduzidas não são iguais";
+                                            return "As passwords introduzidas não são iguais";
                                         }
                                         return true;
                                     }
-                                }} 
-                                render={({ field, fieldState }) => (
-                                <Password id={field.name} {...field}
-                                    feedback={false}
-                                    toggleMask
-                                    promptLabel="Confirmar a password"
-                                    className={classNames({ 'p-invalid': fieldState.invalid })} 
-                                    autoComplete="off"
-                                    aria-autocomplete="none" />
-                                )} 
+                                }}
+                                render={({ field }) => (
+                                <PasswordInput id={field.name}
+                                    label="Confirmar password"
+                                    value={field.value || ''}
+                                    onChange={(e) => field.onChange(e.currentTarget.value)}
+                                    error={fieldError(errors, 'confirmPassword')}
+                                    autoComplete="off" />
+                                )}
                             />
-                            {getFormErrorMessage(errors, 'confirmPassword')}
                         </div>
+
+                        <Group justify="flex-end" className="mt-4">
+                            <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+                                onClick={() => setShowPasswordDialog(false)}
+                                disabled={isSaving}>Cancelar</Button>
+                            <Button type="submit"
+                                leftSection={<i className="pi pi-save" />}
+                                loading={isSaving}>Aceitar</Button>
+                        </Group>
 
                     </form>
                 </div>
-            </Dialog>
+            </Modal>
         </React.Fragment>
     )
 }
