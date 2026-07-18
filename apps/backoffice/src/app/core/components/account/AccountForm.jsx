@@ -110,7 +110,10 @@ function AccountForm(props) {
         <div className="field col-12 md:col-4">
           <TextInput id="email" label="Email" disabled={!isEditMode}
             error={fieldError(errors, 'email')}
-            {...register('email', { required: 'Campo obrigatório.' })} />
+            {...register('email', {
+              required: 'Campo obrigatório.',
+              pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Formato de email inválido.' }
+            })} />
         </div>
 
         { !isEditMode &&

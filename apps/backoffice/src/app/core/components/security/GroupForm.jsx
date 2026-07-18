@@ -281,7 +281,12 @@ function GroupForm(props) {
                   </> :
                   <div className="grid justify-center">
                     <div className="col-12 mt-4 mb-2">
-                      <Alert color="warning">Adicione um ou mais Perfis</Alert>
+                      <Alert color="warning" py="xs">
+                        <Group justify="center" gap="xs" wrap="nowrap">
+                          <i className="pi pi-exclamation-triangle" />
+                          <span>Adicione um ou mais Perfis</span>
+                        </Group>
+                      </Alert>
                     </div>
                   </div>
                 }
@@ -326,7 +331,12 @@ function GroupForm(props) {
                   </> :
                   <div className="grid justify-center">
                     <div className="col-12 mt-4 mb-2">
-                      <Alert color="warning">Adicione um ou mais Utilizadores</Alert>
+                      <Alert color="warning" py="xs">
+                        <Group justify="center" gap="xs" wrap="nowrap">
+                          <i className="pi pi-exclamation-triangle" />
+                          <span>Adicione um ou mais Utilizadores</span>
+                        </Group>
+                      </Alert>
                     </div>
                   </div>
                 }

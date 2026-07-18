@@ -336,7 +336,10 @@ function UserForm(props) {
         <div className="field col-12 md:col-4">
           <TextInput id="email" label="Email"
             error={fieldError(errors, 'email')}
-            {...register('email', { required: 'Campo obrigatório.' })} />
+            {...register('email', {
+              required: 'Campo obrigatório.',
+              pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Formato de email inválido.' }
+            })} />
         </div>
         <div className={`field col-12 ${isCreate ? 'md:col-5' : 'md:col-4'}`}>
           { isCreate ?
@@ -489,7 +492,12 @@ function UserForm(props) {
               </> :
               <div className="grid justify-content-center">
                 <div className="col-12 mt-4 mb-2">
-                  <Alert color="warning">Adicione um ou mais Perfis</Alert>
+                  <Alert color="warning" py="xs">
+                    <Group justify="center" gap="xs" wrap="nowrap">
+                      <i className="pi pi-exclamation-triangle" />
+                      <span>Adicione um ou mais Perfis</span>
+                    </Group>
+                  </Alert>
                 </div>
               </div>
             }
@@ -538,7 +546,12 @@ function UserForm(props) {
               </> :
               <div className="grid justify-content-center">
                 <div className="col-12 mt-4 mb-2">
-                  <Alert color="warning">Adicione um ou mais Grupos</Alert>
+                  <Alert color="warning" py="xs">
+                    <Group justify="center" gap="xs" wrap="nowrap">
+                      <i className="pi pi-exclamation-triangle" />
+                      <span>Adicione um ou mais Grupos</span>
+                    </Group>
+                  </Alert>
                 </div>
               </div>
             }
