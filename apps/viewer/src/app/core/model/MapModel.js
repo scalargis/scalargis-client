@@ -324,7 +324,7 @@ const createLayer = (config, map, all) => {
           'TILED': config.tiled,
           'VERSION': config.version,
           'FORMAT': config.get_map_format || config.format || 'image/jpeg',
-          'STYLES': config.wms_style || config.styles
+          'STYLES': config.wms_style || config.styles || ''
         }
       };
 

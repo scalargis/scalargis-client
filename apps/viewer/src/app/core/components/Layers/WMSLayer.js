@@ -42,7 +42,9 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
         'TILED': config.tiled,
         'VERSION': config.version,
         'FORMAT': config.get_map_format || config.format || 'image/png',
-        'STYLES': config.wms_style || config.styles
+        // STYLES é obrigatório no WMS 1.3.0: sem o `|| ''` o OpenLayers deixa
+        // cair o parâmetro e os servidores estritos respondem ServiceException.
+        'STYLES': config.wms_style || config.styles || ''
       }
     };
 
@@ -177,7 +179,7 @@ const WMSLayer = ({ config, group, checked, viewer }) => {
       'TILED': config.tiled,
       'VERSION': config.version,
       'FORMAT': config.get_map_format || config.format || 'image/png',
-      'STYLES': config.wms_style || config.styles
+      'STYLES': config.wms_style || config.styles || ''
     }
     layer.current.getSource().updateParams(params);
     layer.current.set('servertype', config.servertype);
