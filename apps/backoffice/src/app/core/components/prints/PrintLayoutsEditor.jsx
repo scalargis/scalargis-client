@@ -1,13 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Dialog } from 'primereact/dialog';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Toolbar } from 'primereact/toolbar';
-import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/dropdown';
-import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
-import { Toast } from 'primereact/toast';
-import { classNames } from 'primereact/utils';
+import React, { useState, useEffect, useMemo } from "react";
+import { ActionIcon, Button, Group, Input, Modal, Select, Table } from '@mantine/core';
+import { DataGrid, ConfirmPopover } from '@scalargis/ui';
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useForm, Controller } from 'react-hook-form';
 
 import AceEditor from "react-ace";
@@ -28,68 +22,57 @@ const LayoutEditor = props => {
     defaultValues: {...props.data}
   });
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
-      if (errors[name].type === 'maxLength') {
-         return <small className="p-error">O número de caracteres é superior à dimensão máxima permitida</small>
+      if (errors[name].message) return errors[name].message;
+
+      if (errors[name].type === 'required') {
+        return 'Campo obrigatório';
+      } else if (errors[name].type === 'maxLength') {
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">Formato não permitido</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
-  };  
+    }
+    return undefined;
+  };
 
   const onSave = (formData) => {
     props.onSave(formData);
   }
 
-  const renderFooter = (name) => {
-    return (
-        <div className="mt-4">
-            <Button 
-              label="Fechar"
-              icon="pi pi-times"
-              onClick={() => props.onHide()} text />
-            <Button 
-              label="Gravar"
-              icon={"pi pi-check"}
-              onClick={handleSubmit((d) => onSave(d))}
-              autoFocus />
-        </div>
-    );
-  }
-
   return (
-    <Dialog header={"Edição de Layout"} visible={props.show} style={{width: isMobile ? '90%' : '45vw' }} footer={renderFooter} onHide={() => { props.onHide(); }}>
+    <Modal title="Edição de Layout" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
       <form>
         <div className="grid formgrid">
           <div className="field col-12 md:col-6">
-            <label htmlFor="format">Formato</label>
             <Controller name="format" control={control} rules={{ required: 'Campo obrigatório.' }}
-              render={({ field }) => {
-                return <Dropdown id="format" {...field}
-                  options={props.pageFormatList.map(val=>{return {label: val, value: val}})}
-                  onChange={(e) => field.onChange(e.value)}
-                  className={classNames({ 'w-full': true, 'p-invalid': errors.format})} />
-              }}                    
-            />            
-            {getFormErrorMessage(errors, 'format')}
+              render={({ field }) => (
+                <Select
+                  id="format"
+                  label="Formato"
+                  data={props.pageFormatList.map(val=>{return {label: val, value: val}})}
+                  value={field.value || null}
+                  onChange={(value) => field.onChange(value)}
+                  error={fieldError(errors, 'format')} />
+              )}
+            />
           </div>
           <div className="field col-12 md:col-6">
-            <label htmlFor="orientation">Orientação</label>
             <Controller name="orientation" control={control} rules={{ required: 'Campo obrigatório.' }}
-              render={({ field }) => {
-                return <Dropdown id="orientation" {...field}
-                  options={props.pageOrientationList.map(val=>{return {label: val, value: val}})}
-                  onChange={(e) => field.onChange(e.value)}
-                  className={classNames({ 'w-full': true, 'p-invalid': errors.format})} />
-              }}                    
-            />             
-            {getFormErrorMessage(errors, 'orientation')}
+              render={({ field }) => (
+                <Select
+                  id="orientation"
+                  label="Orientação"
+                  data={props.pageOrientationList.map(val=>{return {label: val, value: val}})}
+                  value={field.value || null}
+                  onChange={(value) => field.onChange(value)}
+                  error={fieldError(errors, 'orientation')} />
+              )}
+            />
           </div>
           <div className="field col-12">
-            <label htmlFor="config">Configuração</label>
+            <Input.Label>Configuração</Input.Label>
             <div id="editor-parent">
 
               <Controller
@@ -100,20 +83,20 @@ const LayoutEditor = props => {
                   return <AceEditor
                     mode="json"
                     theme="github"
-                    onLoad={editorInstance => {                
-                      editorInstance.container.style.setProperty('width', (document.getElementById('editor-parent').offsetWidth - 50) + 'px');               
+                    onLoad={editorInstance => {
+                      editorInstance.container.style.setProperty('width', (document.getElementById('editor-parent').offsetWidth - 50) + 'px');
                     }}
                     {...field}
                     onChange={(newValue) => {
                       field.onChange(newValue);
                     }}
                     value={field.value}
-                    name="layout-config"         
+                    name="layout-config"
                     editorProps={{ $blockScrolling: true }}
                     setOptions={{
                       useWorker: false,
                       tabSize: 2
-                    }}              
+                    }}
                   />
                 }}
               />
@@ -121,23 +104,28 @@ const LayoutEditor = props => {
           </div>
 
         </div>
+
+        <Group justify="flex-end" gap="xs" className="mt-4">
+          <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+            onClick={() => props.onHide()}>Fechar</Button>
+          <Button type="button" leftSection={<i className="pi pi-check" />}
+            onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
+        </Group>
       </form>
-    </Dialog>
+    </Modal>
   );
 }
 
 
+const pickLayout = (r) => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r);
+
 const PrintLayoutsEditor = props => {
 
   const [records, setRecords] = useState(props.data ? [...props.data] : []);
-  const [selectedRecords, setSelectedRecords] = useState(null);  
+  const [selectedRecords, setSelectedRecords] = useState([]);
 
   const [layoutEdition, setLayoutEdition] = useState();
   const [showLayoutForm, setShowLayoutForm] = useState(false);
-
-  const toast = useRef(null);
-
-  const dt = useRef(null);
 
   useEffect(() => {
    if (props?.data) setRecords(props.data.map((l) => { return {...l, key: createKey()} }));
@@ -152,7 +140,7 @@ const PrintLayoutsEditor = props => {
         }
     }
     return index;
-  }  
+  }
 
   const createKey = () => {
       let key = '';
@@ -163,44 +151,32 @@ const PrintLayoutsEditor = props => {
       return key;
   }
 
-  const onRowReorder = (e) => {
-    props.onChange(e.value.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
-  }  
-  
+  const onDragEnd = (result) => {
+    // dropped outside the list
+    if (!result.destination) return;
+
+    const _records = [...records];
+    const [moved] = _records.splice(result.source.index, 1);
+    _records.splice(result.destination.index, 0, moved);
+    props.onChange(_records.map(pickLayout));
+  }
+
   const editRecord = (record) => {
     setLayoutEdition({...record});
     setShowLayoutForm(true);
   }
 
-  const deleteRecord = (e, record) => {
-    confirmPopup({
-      target: e.currentTarget,
-      message: 'Tem a certeza que pretende eliminar?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
-        const _records = records.filter(val => val.key !== record.key);
-        props.onChange(_records.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
-        setSelectedRecords([]);
-      }
-    });
+  const deleteRecord = (record) => {
+    const _records = records.filter(val => val.key !== record.key);
+    props.onChange(_records.map(pickLayout));
+    setSelectedRecords([]);
   }
 
-  const deleteSelectedRecords = (e) => {
-    confirmPopup({
-      target: e.currentTarget,
-      message: 'Tem a certeza que pretende eliminar todos os layouts selecionados?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
-        const _keys = selectedRecords.map((r) => r.key);
-        const _records = records.filter(r => !_keys.includes(r.key));
-        props.onChange(_records.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
-        setSelectedRecords([]);
-      }
-    });
+  const deleteSelectedRecords = () => {
+    const _keys = selectedRecords.map((r) => r.key);
+    const _records = records.filter(r => !_keys.includes(r.key));
+    props.onChange(_records.map(pickLayout));
+    setSelectedRecords([]);
   }
 
 
@@ -221,74 +197,111 @@ const PrintLayoutsEditor = props => {
       _records.push(_record);
     }
 
-    props.onChange(_records.map(r => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r)));
+    props.onChange(_records.map(pickLayout));
     setSelectedRecords([]);
     setShowLayoutForm(false);
-  }  
-
-  const leftToolbarTemplate = () => {
-    return null
   }
 
-  const rightToolbarTemplate = () => {
-    return (
-      <React.Fragment>
-          <Button type="button" label="Novo" icon="pi pi-plus" severity="success" className="mr-2"
-            onClick={() => {
-              editRecord({ key: '' });
-            }}
-          />
-          <Button type="button"  label="Eliminar" icon="pi pi-trash" severity="danger"
-            disabled={!selectedRecords || !selectedRecords.length} 
-            onClick={(e) => {
-              deleteSelectedRecords(e);
-            }}
-          />
-      </React.Fragment>
-    )
-  }
-
-  const actionBodyTemplate = (rowData) => {
-    return (
-      <div style={{textAlign: "right"}}>
-          <Button type="button" icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={(e) => {
-            editRecord(rowData);
-          }} />
-          <Button type="button" icon="pi pi-trash" rounded severity="warning" onClick={(e) => {
-            deleteRecord(e, rowData);
-          }} />
-      </div>
-    );
-  }  
+  const columns = useMemo(
+    () => [
+      {
+        accessor: 'move',
+        title: '',
+        width: 40,
+        render: () => <i className="fas fa-arrows-alt" aria-hidden="true" />
+      },
+      { accessor: 'format', title: 'Formato' },
+      { accessor: 'orientation', title: 'Orientação' },
+      {
+        accessor: 'actions',
+        title: '',
+        render: (record) => (
+          <Group gap="xs" wrap="nowrap" justify="flex-end">
+            <ActionIcon type="button" color="success" aria-label="Editar" onClick={() => editRecord(record)}>
+              <i className="pi pi-pencil" />
+            </ActionIcon>
+            <ConfirmPopover
+              message="Tem a certeza que pretende eliminar?"
+              severity="danger"
+              acceptLabel="Sim"
+              rejectLabel="Não"
+              onConfirm={() => deleteRecord(record)}
+            >
+              <ActionIcon type="button" color="warning" aria-label="Eliminar">
+                <i className="pi pi-trash" />
+              </ActionIcon>
+            </ConfirmPopover>
+          </Group>
+        )
+      }
+    ],
+    [records, selectedRecords]
+  );
 
   return (
     <div>
-      <Toast ref={toast} baseZIndex={2000} />
-      <ConfirmPopup />
-
-      { showLayoutForm && 
-        <LayoutEditor data={layoutEdition} 
+      { showLayoutForm &&
+        <LayoutEditor data={layoutEdition}
           pageFormatList={props.pageFormatList}
           pageOrientationList={props.pageOrientationList}
-          show={showLayoutForm} 
-          onHide={onLayoutFormHide} 
+          show={showLayoutForm}
+          onHide={onLayoutFormHide}
           onSave={onLayoutFormSave} />
       }
 
       <div className="grid">
         <div className="card col-12">
-          <Toolbar className="mb-4" start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
+          <Group justify="flex-end" gap="xs" className="mb-4">
+            <Button type="button" color="success" leftSection={<i className="pi pi-plus" />}
+              onClick={() => {
+                editRecord({ key: '' });
+              }}>Novo</Button>
+            <ConfirmPopover
+              message="Tem a certeza que pretende eliminar todos os layouts selecionados?"
+              severity="danger"
+              acceptLabel="Sim"
+              rejectLabel="Não"
+              onConfirm={deleteSelectedRecords}
+            >
+              <Button type="button" color="danger" leftSection={<i className="pi pi-trash" />}
+                disabled={!selectedRecords.length}>Eliminar</Button>
+            </ConfirmPopover>
+          </Group>
 
-          <DataTable ref={dt} value={records ? records : []}
-            selection={selectedRecords} onSelectionChange={(e) => setSelectedRecords(e.value)}
-            reorderableRows onRowReorder={onRowReorder}
-            emptyMessage="Não foram encontrados registos." >
-              <Column rowReorder rowReorderIcon="fas fa-arrows-alt" style={{width: '3em'}} />
-              <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-              <Column field="format" header="Formato" filterPlaceholder="Format" />
-              <Column field="orientation" header="Orientação" filterPlaceholder="Orientação" />
-              <Column body={actionBodyTemplate} />
-          </DataTable>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <DataGrid
+              idAccessor="key"
+              records={records}
+              selectedRecords={selectedRecords}
+              onSelectedRecordsChange={setSelectedRecords}
+              columns={columns}
+              noRecordsText="Não foram encontrados registos."
+              tableWrapper={({ children }) => (
+                <Droppable droppableId="layouts-droppable">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {children}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              )}
+              rowFactory={({ record, index, rowProps, children }) => (
+                <Draggable key={String(record.key)} draggableId={String(record.key)} index={index}>
+                  {(provided) => (
+                    <Table.Tr
+                      {...rowProps}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      {children}
+                    </Table.Tr>
+                  )}
+                </Draggable>
+              )}
+            />
+          </DragDropContext>
         </div>
       </div>
     </div>

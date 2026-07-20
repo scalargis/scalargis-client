@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TabView,TabPanel } from 'primereact/tabview';
-import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { InputNumber } from 'primereact/inputnumber';
-import { Dropdown } from 'primereact/dropdown';
-import { Message } from 'primereact/message';
-import { classNames } from 'primereact/utils';
+import { Alert, Button, Group, Modal, NumberInput, Select, Tabs, Textarea } from '@mantine/core';
 import { useForm, Controller } from 'react-hook-form';
 
 import OlWKT from "ol/format/WKT";
@@ -36,7 +29,7 @@ import { getWindowSize } from '../../utils';
 // Add projections
 const addProjections = (projections) => {
   projections.map(i => {
-    if (!OlProj.get('EPSG:'+i.srid)) {  
+    if (!OlProj.get('EPSG:'+i.srid)) {
       try {
         Proj4.defs('EPSG:'+i.srid, i.defs);
         //This function should be called whenever changes are made to the proj4 registry,
@@ -86,26 +79,27 @@ const GeometryFilterEditor = props => {
     defaultValues: {...props.data}
   });
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
-      if (errors[name].type === 'maxLength') {
-         return <small className="p-error">O número de caracteres é superior à dimensão máxima permitida</small>
+      if (errors[name].message) return errors[name].message;
+
+      if (errors[name].type === 'required') {
+        return 'Campo obrigatório';
+      } else if (errors[name].type === 'maxLength') {
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">Formato não permitido</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
-  };  
+    }
+    return undefined;
+  };
 
   const onSave = (formData) => {
     if (formData.geometryWKT && formData.geometrySRID) {
       try {
         const geom = getGeometryFromWKT(formData.geometryWKT, null);
         if (geom) {
-          //const final_geom_wkt = getWKTFromGeometry(geom.clone().transform('EPSG:' + formData.geometrySRID, 'EPSG:3763'));
           const final_geom_wkt = getWKTFromGeometry(geom.clone());
-          //props.onSave({geometryWKT: final_geom_wkt, geometrySRID: 3763, tolerance: formData.tolerance});
           props.onSave({geometryWKT: final_geom_wkt, geometrySRID: formData.geometrySRID, tolerance: formData.tolerance});
           setShowForm(false);
         } else {
@@ -122,7 +116,7 @@ const GeometryFilterEditor = props => {
     setValue('geometrySRID', null, { shouldValidate: false });
     setValue('geometryWKT', null, { shouldValidate: false });
     setValue('tolerance', null, { shouldValidate: false });
-    //Save new state 
+    //Save new state
     props.onSave({geometryWKT: null, geometrySRID: null, tolerance: null});
   }
 
@@ -131,7 +125,7 @@ const GeometryFilterEditor = props => {
     setValue('geometryWKT', props?.data.geometryWKT, { shouldValidate: false });
     setValue('tolerance', props?.data.tolerance, { shouldValidate: false });
     clearErrors();
-    setShowForm(false); 
+    setShowForm(false);
   }
 
   const refreshFeatures = (geom_data) =>  {
@@ -152,29 +146,29 @@ const GeometryFilterEditor = props => {
         try {
           const parser = new OL3Parser();
           parser.inject(
-            Point, 
-            LineString, 
-            LinearRing, 
-            Polygon, 
-            MultiPoint, 
-            MultiLineString, 
-            MultiPolygon, 
+            Point,
+            LineString,
+            LinearRing,
+            Polygon,
+            MultiPoint,
+            MultiLineString,
+            MultiPolygon,
             GeometryCollection
           );
 
           // convert the OpenLayers geometry to a JSTS geometry
           const jstsGeom = parser.read(feature.getGeometry());
           const jstsBuffer = BufferOp.bufferOp(jstsGeom, geom_data.tolerance);
-          
+
           const geomBuffer = parser.write(jstsBuffer);
           const buffered = new OlFeature({
             geometry: geomBuffer
           });
-        
+
           const bufferStyle = new OlStyle({
             stroke : new OlStroke({
               color : 'rgba(100,27,0,1.0)',
-              width : 1    
+              width : 1
             }),
             fill :  new OlFill({
               color: 'rgba(0,0,0,0)'
@@ -195,7 +189,7 @@ const GeometryFilterEditor = props => {
   useEffect(() => {
     refreshFeatures(props.data);
   }, []);
-  
+
   // Callback version of watch.  It's your responsibility to unsubscribe when done.
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
@@ -208,8 +202,8 @@ const GeometryFilterEditor = props => {
   useEffect(() => {
     if (props.coordinateSystems) {
       setCoordinateSystems(props.coordinateSystems.map( c => { return { value: parseInt(c.config_json.srid), label: c.config_json.title }; }));
-      const projections = props.coordinateSystems.map( c => { 
-        return { 
+      const projections = props.coordinateSystems.map( c => {
+        return {
           srid: parseInt(c.config_json.srid),
           defs: c.config_json.defs,
           extent: c.config_json.extent
@@ -221,103 +215,98 @@ const GeometryFilterEditor = props => {
   }, [props.coordinateSystems]);
 
   useEffect(() => {
-    //console.log(props.data);
     setData({...props.data});
-  }, [props.data]);  
-
-  const renderFooter = (name) => {
-    return (
-        <div>
-            <Button 
-              label="Fechar"
-              icon="pi pi-times"
-              onClick={onHide} text />
-            <Button 
-              label="Gravar"
-              icon={"pi pi-check"}
-              onClick={handleSubmit((d) => onSave(d))}
-              autoFocus />
-        </div>
-    );
-  }
+  }, [props.data]);
 
   return (
 
     <React.Fragment>
-      
+
       <div className="field col-12 mb-1">
-        <div>
-          { data.geometryWKT ?
-            <Message severity="info" text="Clique em 'Editar' para configurar o filtro espacial." className="w-full" /> 
-            :
-            <Message severity="warn" text="Sem filtro espacial definido. Clique em 'Editar' para definir um filtro espacial." className="w-full" />
-          }
-        </div>
-      </div>
-      
-      <div class="flex justify-content-end flex-wrap">
-        <div class="flex align-items-center justify-content-center m-2"></div>
-        <div class="flex align-items-center justify-content-center m-2">
-          { data.geometryWKT &&      
-          <Button type="text" label="Remover" icon="pi pi-trash" severity="danger" outlined
-           onClick={(e)=> {e.preventDefault(); onRemove();}} />
-          }
-        </div>
-        <div class="flex align-items-center justify-content-center m-2">
-          <Button type="text" label="Editar" icon="pi pi-times" outlined
-            onClick={(e)=> {e.preventDefault(); setShowForm(true)}} /> 
-        </div>
+        { data.geometryWKT ?
+          <Alert color="informative" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-info-circle" />
+              <span>Clique em 'Editar' para configurar o filtro espacial.</span>
+            </Group>
+          </Alert>
+          :
+          <Alert color="warning" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-exclamation-triangle" />
+              <span>Sem filtro espacial definido. Clique em 'Editar' para definir um filtro espacial.</span>
+            </Group>
+          </Alert>
+        }
       </div>
 
+      <Group justify="flex-end" gap="xs" className="m-2">
+        { data.geometryWKT &&
+        <Button type="button" variant="outline" color="danger" leftSection={<i className="pi pi-trash" />}
+          onClick={(e)=> {e.preventDefault(); onRemove();}}>Remover</Button>
+        }
+        <Button type="button" variant="outline" leftSection={<i className="pi pi-pencil" />}
+          onClick={(e)=> {e.preventDefault(); setShowForm(true)}}>Editar</Button>
+      </Group>
+
       { showForm &&
-      <Dialog header={"Edição de Filtro Espacial"} visible={showForm} style={{width: isMobile ? '95%' : '45vw' }}
-        footer={renderFooter} 
-        onHide={onHide}>
+      <Modal title="Edição de Filtro Espacial" opened={showForm} size={isMobile ? '95%' : '45vw'} onClose={onHide}>
         <form>
           <div className="grid formgrid">
             <div className="field col-12">
-              <TabView>
-                <TabPanel header="WKT">          
+              <Tabs defaultValue="wkt" keepMounted={false}>
+                <Tabs.List>
+                  <Tabs.Tab value="wkt">WKT</Tabs.Tab>
+                  <Tabs.Tab value="map">Mapa</Tabs.Tab>
+                </Tabs.List>
+                <Tabs.Panel value="wkt" pt="sm">
                   <div className="field col">
-                    <label htmlFor="format">Sistema de Coordenadas</label>
                     <Controller name="geometrySRID" control={control} rules={{required: 'Campo obrigatório.' }}
-                      render={({ field }) => {
-                        return <Dropdown id="geometrySRID" {...field} 
-                          options={coordinateSystems} showClear
-                          onChange={(e) => field.onChange(e.value)}
-                          className={classNames({ 'w-full': true, 'p-invalid': errors.geometrySRID })}
+                      render={({ field }) => (
+                        <Select
+                          id="geometrySRID"
+                          label="Sistema de Coordenadas"
+                          data={coordinateSystems ? coordinateSystems.map(c => ({ value: String(c.value), label: c.label })) : []}
+                          value={field.value == null ? null : String(field.value)}
+                          onChange={(value) => field.onChange(value == null ? null : Number(value))}
+                          error={fieldError(errors, 'geometrySRID')}
+                          clearable
                         />
-                      }}                    
+                      )}
                     />
-                    {getFormErrorMessage(errors, 'geometrySRID')} 
                   </div>
                   <div className="field col-12">
-                    <label htmlFor="orientation">Geometria (WKT)</label>
-                    <InputTextarea id="geometryWKT" name="geometryWKT" rows={5}
-                      {...register("geometryWKT", { required: 'Campo obrigatório.' })} 
-                      className={classNames({ 'w-full': true, 'p-invalid': errors.geometryWKT })} />
-                    {getFormErrorMessage(errors, 'geometryWKT')}  
+                    <Textarea id="geometryWKT" label="Geometria (WKT)" rows={5}
+                      error={fieldError(errors, 'geometryWKT')}
+                      {...register("geometryWKT", { required: 'Campo obrigatório.' })} />
                   </div>
-                </TabPanel>
-                <TabPanel header="Mapa"> 
+                </Tabs.Panel>
+                <Tabs.Panel value="map" pt="sm">
                   <div>
                     <MapWrapper features={features} />
                   </div>
-                </TabPanel>
-              </TabView>
+                </Tabs.Panel>
+              </Tabs>
             </div>
             <div className="field col-12">
-              <label htmlFor="tolerance">Tolerância (m)</label>
               <Controller name="tolerance" control={control}
-                render={({ field }) => {
-                  return <InputNumber id="tolerance" {...field}                    
-                    onChange={(e) => field.onChange(e.value)} className="w-full" />
-                }}                    
+                render={({ field }) => (
+                  <NumberInput id="tolerance" label="Tolerância (m)" hideControls
+                    value={field.value ?? ''}
+                    onChange={(value) => field.onChange(value === '' ? null : value)} />
+                )}
               />
             </div>
-            </div>
+          </div>
+
+          <Group justify="flex-end" gap="xs" className="mt-4">
+            <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+              onClick={onHide}>Fechar</Button>
+            <Button type="button" leftSection={<i className="pi pi-check" />}
+              onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
+          </Group>
         </form>
-      </Dialog>
+      </Modal>
       }
     </React.Fragment>
   );

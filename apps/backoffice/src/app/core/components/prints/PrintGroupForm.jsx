@@ -1,29 +1,28 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
-import { TabMenu } from 'primereact/tabmenu';
-import { Toolbar } from 'primereact/toolbar';
-import { InputText } from 'primereact/inputtext';
-import { InputMask } from 'primereact/inputmask';
-import {Checkbox} from 'primereact/checkbox';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
-import { ToggleButton } from 'primereact/togglebutton';
-import { MultiSelect } from 'primereact/multiselect';
-import { OverlayPanel } from 'primereact/overlaypanel';
+import {
+  ActionIcon,
+  Button,
+  Checkbox,
+  Group,
+  MultiSelect,
+  NumberInput,
+  Popover,
+  Switch,
+  Tabs,
+  TextInput
+} from '@mantine/core';
+import { CollapsiblePanel, notify } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import PrintLayoutsEditor from "./PrintLayoutsEditor";
 import FormFieldsEditor from "../common/FormFieldsEditor";
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 
-import { classNames } from 'primereact/utils';
-
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
-import { isAdminOrManager } from '../../utils';
 
 
 const buildScaleList = (list1, list2) => {
@@ -31,21 +30,11 @@ const buildScaleList = (list1, list2) => {
   return list;
 }
 
-const sortRolesArray = (data) => {
-  if (!data) return data;
-
-  return data.sort(function(a, b) {
-    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-    if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-    return 0;
-  });
-}
-
 const tabItems = [
-  { label: 'Dados Base', icon: 'pi pi-fw pi-home' },
-  { label: 'Formulário', icon: 'pi pi-fw pi-home' },
-  { label: 'Layouts', icon: 'pi pi-fw pi-home' },
-  { label: 'Plantas e Grupos', icon: 'pi pi-fw pi-cog' },  
+  { value: 'base', label: 'Dados Base', icon: 'pi pi-fw pi-home' },
+  { value: 'form', label: 'Formulário', icon: 'pi pi-fw pi-home' },
+  { value: 'layouts', label: 'Layouts', icon: 'pi pi-fw pi-home' },
+  { value: 'childs', label: 'Plantas e Grupos', icon: 'pi pi-fw pi-cog' }
 ];
 
 const pageFormatList = ['A4', 'A3', 'A2', 'A1', 'A0'];
@@ -61,40 +50,27 @@ function PrintGroupForm(props) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('base');
 
   const [data, setData] = useState(props.data);
 
-  const [roles, setRoles] = useState(props?.data?.roles ? sortRolesArray([...props.data.roles]) : []);
-  const [availableRoles, setAvailableRoles] = useState(null);
-  const [selectedRoles, setSelectedRoles] = useState(null);
-  const [removedRoles, setRemovedRoles] = useState(null);
-  const [filterRolesValue, setFilterRolesValue] = useState('');
-
-  const [availableUsers, setAvailableUsers] = useState(null);
-  const [selectedOwner, setSelectedOwner] = useState(data?.owner ? { id: data.owner.id, username: data.owner.username, name: data.owner.name, active: data.owner.active } : null);
-
-  const [coordinateSystems, setCoordinateSystems] = useState([]);
-
   const [printsList, setPrintsList] = useState([]);
   const [groupsList, setGroupsList] = useState([]);
-  
+
   const [scaleList, setScaleList] = useState(buildScaleList([1000,2000,5000,10000,20000,25000,50000], data.restrict_scales_list));
+
+  // The Prime OverlayPanel scale adder, as a Popover on the ellipsis button.
+  const [scalePickerOpened, setScalePickerOpened] = useState(false);
+  const [newScale, setNewScale] = useState('');
 
   const [formFields, setFormFields] = useState(props.data?.form_fields || { fields: {}, groups:{} });
   const [layouts, setLayouts] = useState(props.data?.layouts || []);
   const [groupChilds, setGroupChilds] = useState({ prints: props.data?.prints || [], groups: props.data?.groups || [] });
   const [geometryFilter, setGeometryFilter] = useState();
 
-  const toast = useRef(null);
-  const op = useRef(null);
-
   const { core } = useContext(AppContext);
-
-  const adminOrManager = isAdminOrManager(props.auth);
 
   const API_URL = core.API_URL;
 
@@ -104,10 +80,8 @@ function PrintGroupForm(props) {
       code: data.code,
       title: data.title,
       description: data.description,
-      //form_fields: data.form_fields,
       free_scale: data.free_scale,
       is_active: data.is_active,
-      //layouts: data.layouts,
       allow_drawing: data.allow_drawing,
       draw_location: data.draw_location,
       location_marking: data.location_marking,
@@ -120,9 +94,8 @@ function PrintGroupForm(props) {
       restrict_scales_list: data.restrict_scales_list,
       show_author: data.show_author,
       select_prints: data.select_prints,
-      group_prints:data.group_prints,
-      show_all_prints: data.show_all_prints,
-      //tolerance_filter: data.tolerance_filter      
+      group_prints: data.group_prints,
+      show_all_prints: data.show_all_prints
     }
   });
 
@@ -134,83 +107,42 @@ function PrintGroupForm(props) {
       sort: { field: 'name', order: 'Asc' },
       filter: {}
     }
-    
+
     const params_groups = {
       pagination: { page: 1, perPage: 1000},
       sort: { field: 'title', order: 'Asc' },
       filter: {}
-    }    
+    }
 
     Promise.all([
-      dataProvider(API_URL + '/security').getList('roles', params).catch((error) => error),
-      dataProvider(API_URL + '/security').getList('users', params).catch((error) => error),
       dataProvider(API_URL + '/portal').getList('prints', params).catch((error) => error),
       dataProvider(API_URL + '/portal').getList('prints/groups', params_groups).catch((error) => error)
-    ]).then((result) => {      
-      const roles_result = result[0];
-      const rids = props?.data?.roles ? props.data.roles.map(v => v.id) : [];
-      setAvailableRoles(sortRolesArray(roles_result.data.filter(v => !rids.includes(v.id))
-        .map(r => { return { id: r.id, name: r.name} })));
-
-      setAvailableUsers(result[1].data.map( u => { return { id: u.id, username: u.username, name: u.name, active: u.active}}));
-
-      if (!(props?.data?.id)) {
-        const owner = result[1].data.find(u => u.email === props.auth.data.username);
-        if (owner) {
-          setSelectedOwner({ id: owner.id, username: owner.username, name: owner.name, active: owner.active});
-        }
-      }
-
-      const prints_result = result[2]?.data || [];
-      setPrintsList(prints_result);      
-      const groups_result = result[3]?.data || [];
+    ]).then((result) => {
+      const prints_result = result[0]?.data || [];
+      setPrintsList(prints_result);
+      const groups_result = result[1]?.data || [];
       setGroupsList(groups_result);
     }).catch((error) => {
       console.log(error)
     });
-    
+
   }, []);
 
-  const addRoles = () => {
-    if (!availableRoles) return;
-    
-    const new_roles = availableRoles.filter(v => selectedRoles.includes(v.id));
-    const new_available_roles = availableRoles.filter(v => !selectedRoles.includes(v.id));
-
-    setRoles(sortRolesArray([...roles, ...new_roles]));
-    setAvailableRoles(sortRolesArray([...new_available_roles]));
-    setSelectedRoles(null);
-    setRemovedRoles(null);
+  const addScaleFromPicker = () => {
+    const value = typeof newScale === 'number' ? newScale : null;
+    if (value) {
+      setScaleList(buildScaleList(scaleList, [value]));
+      setNewScale('');
+      setScalePickerOpened(false);
+    }
   }
 
-  const removeRoles = () => {
-    if (!removedRoles) return;
-    
-    const new_available_roles = roles.filter(v => removedRoles.includes(v.id));
-    const new_roles = roles.filter(v => !removedRoles.includes(v.id));
-
-    setRoles(sortRolesArray([...new_roles]));
-    setAvailableRoles(sortRolesArray([...availableRoles, ...new_available_roles]));
-    setRemovedRoles(null);
-    setSelectedRoles(null);
-  } 
-
   const goBack = () => {
-    /*
-    const location = {
-      pathname: history.location.state.from,
-      state: { 
-        searchParams: {...history.location.state.previousSearchParams}
-      }
-    }
-    history.replace(location);
-    */
-    const state = { 
+    const state = {
       searchParams: {...location.state.previousSearchParams}
     }
     navigate(location.state.from, { state });
-    //history.goBack();
-  }  
+  }
 
   const onSubmit = (formData) => {
 
@@ -231,17 +163,17 @@ function PrintGroupForm(props) {
 
     setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/portal');      
+    const provider = dataProvider(API_URL + '/portal');
     if (data.id) {
       const params = {
         id: data.id,
         data: {...new_data}
       }
-      provider.update('prints/groups', params).then(d => {       
-        toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
+      provider.update('prints/groups', params).then(d => {
+        notify.success('Editar Registo', 'Registo alterado com sucesso');
         setLayouts(d?.data ? [...(d.data.layouts || [])] : []);
       }).catch(e => {
-        toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});        
+        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
       }).finally(() => {
         setIsSaving(false);
       });
@@ -252,209 +184,216 @@ function PrintGroupForm(props) {
       provider.create('prints/groups', params).then(d => {
         setData({...data, id: d.data.id});
         setLayouts(d?.data ? [...(d.data.layouts || [])] : []);
-        toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
+        notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: 'Ocorreu um erro ao criar o registo'});
+        notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');
       }).finally(() => {
         setIsSaving(false);
-      });       
+      });
     }
 
   };
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
-      if (errors[name].type === 'maxLength') {
-         return <small className="p-error">O número de caracteres é superior à dimensão máxima permitida</small>
+      if (errors[name].message) return errors[name].message;
+
+      if (errors[name].type === 'required') {
+        return 'Campo obrigatório';
+      } else if (errors[name].type === 'maxLength') {
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">Formato não permitido</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
+    }
+    return undefined;
   };
 
-  const rightToolbarTemplate = () => {
-    return (
-        <React.Fragment>
-            <Button
-              type="button" 
-              label="Voltar" 
-              icon="pi pi-left" 
-              severity="secondary" className="mr-4"
-              disabled={isSaving ? true : false}
-              onClick={goBack} />
-            <Button
-              type="submit" 
-              label="Gravar"
-              icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-              disabled={isSaving ? true : false} />
-        </React.Fragment>
-    )
-  }  
- 
   return (
-    <React.Fragment>      
+    <React.Fragment>
 
-      <TabMenu model={tabItems} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
-
-      <OverlayPanel ref={op} showCloseIcon dismissable>
-          <div className="p-fluid grid">
-            <label>Adicionar escala</label>
-            <InputMask id="addScale" 
-              onChange={(e) => { 
-                if (e.originalEvent.key === 'Enter' || e.originalEvent.keyCode === 13) {
-                    if (e.value) {
-                      setScaleList([...scaleList, e.value].sort((a, b)=>{return a-b}));
-                      op.current.hide();
-                    }
-                }
-              }}
-              mask="1:9?99999999" unmask={true} autoClear={false} />
-          </div>
-      </OverlayPanel> 
+      <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
+        <Tabs.List>
+          {tabItems.map((item) => (
+            <Tabs.Tab key={item.value} value={item.value} leftSection={<i className={item.icon} />}>
+              {item.label}
+            </Tabs.Tab>
+          ))}
+        </Tabs.List>
+      </Tabs>
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <Toast ref={toast} baseZIndex={2000} />       
-
-        {activeIndex === 0 ?
+        {activeTab === 'base' ?
 
           <div className="card">
 
             <div className="p-fluid formgrid grid">
 
-              <div className="field col-1">
-                <label htmlFor="id">Id</label>
-                <InputText id="id" type="text" value={data.id || ''} />
+              <div className="field col-12 md:col-1">
+                <TextInput id="id" label="Id" value={data.id || ''} readOnly />
               </div>
 
               <div className="field col-12 md:col-2">
-                <label htmlFor="code">Código</label>        
-                <InputText id="code" name="code" {...register('code', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.code })} />
-                {getFormErrorMessage(errors, 'code')}
-                {/*{errors.name && <span>This field is required</span>}*/}
+                <TextInput id="code" label="Código" autoFocus
+                  error={fieldError(errors, 'code')}
+                  {...register('code', { required: 'Campo obrigatório.' })} />
               </div>
 
               <div className="field col-12 md:col-7">
-                <label htmlFor="name">Título</label>        
-                <InputText id="title" name="title" {...register('title', { required: 'Campo obrigatório.' })} autoFocus className={classNames({ 'p-invalid': errors.title })} />
-                {getFormErrorMessage(errors, 'title')}       
-              </div>              
+                <TextInput id="title" label="Título"
+                  error={fieldError(errors, 'title')}
+                  {...register('title', { required: 'Campo obrigatório.' })} />
+              </div>
 
-              <div className="field col-12 md:col-2">
-                <label>&nbsp;</label>
+              <div className="field col-12 md:col-2 text-center">
+                <label className="block">&nbsp;</label>
                 <Controller
                   control={control}
                   name="is_active"
-                  render={({ field }) => {
-                    return <ToggleButton {...field} checked={field.value} onChange={(e) => field.onChange(e.target.value)} onLabel="Grupo Ativo" offLabel="Grupo Não Ativo" onIcon="pi pi-check" offIcon="pi pi-times" />
-                  }} 
-                />                 
+                  render={({ field }) => (
+                    <Switch
+                      size="md"
+                      style={{ display: 'inline-block' }}
+                      label={field.value ? 'Grupo Ativo' : 'Grupo Não Ativo'}
+                      checked={!!field.value}
+                      onChange={(e) => field.onChange(e.currentTarget.checked)}
+                    />
+                  )}
+                />
               </div>
 
-
-
               <div className="field col-12">
-                <label htmlFor="name">Descrição</label>        
-                <InputText id="description" name="description" {...register('description')} />   
+                <TextInput id="description" label="Descrição" {...register('description')} />
               </div>
 
               <div className="field col-12 md:col-6">
-                <Panel header="Opções de Escalas">
+                <CollapsiblePanel header="Opções de Escalas" toggleable={false}>
                   <div className="grid">
                     <div className="col field mt-2">
                       <Controller name="free_scale" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="free_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}                    
-                      />                            
-                      <label htmlFor="map_scale" className="p-checkbox-label" style={{display: "inline"}}>Escala livre</label>
+                        render={({ field }) => (
+                          <Checkbox size="md" id="free_scale" label="Escala livre"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
+                      />
                     </div>
                     <div className="col field mt-2">
                       <Controller name="map_scale" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="map_scale" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}                    
-                      />                            
-                      <label htmlFor="map_scale" className="p-checkbox-label" style={{display: "inline"}}>Escala do mapa</label>
-                    </div>                    
+                        render={({ field }) => (
+                          <Checkbox size="md" id="map_scale" label="Escala do mapa"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
+                      />
+                    </div>
                   </div>
                   <div className="grid">
                     <div className={`col field ${restrictScales ? "mt-2 mb-0" : "mt-2 mb-4"}`}>
                       <Controller name="restrict_scales" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="restrict_scales" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}                    
+                        render={({ field }) => (
+                          <Checkbox size="md" id="restrict_scales" label="Escalas restritas"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
                       />
-                      <label htmlFor="cb1" className="p-checkbox-label" style={{display: "inline"}}>Escalas restritas</label>
                     </div>
                     {restrictScales && (
                     <div className="col field mt-2" style={{"overflow": "auto"}}>
-                      <div className="p-inputgroup"> 
+                      <Group gap="xs" align="flex-end" wrap="nowrap">
                         <Controller name="restrict_scales_list" control={control}
-                          render={({ field }) => {                                                  
-                            return <MultiSelect id="restrict_scales_list"
-                              {...field}
-                              value={field.value}
-                              options={scaleList.map(s => {return {value: s, name: '1:' + s}})}
-                              onChange={(e) => field.onChange(e.value)}
-                              optionValue="value" optionLabel="name"
-                              selectedItemsLabel="{0} escalas selecionadas" />                          
-                          }}
+                          render={({ field }) => (
+                            <MultiSelect id="restrict_scales_list"
+                              data={scaleList.map(s => ({ value: String(s), label: '1:' + s }))}
+                              value={(field.value || []).map(String)}
+                              onChange={(values) => field.onChange(values.map(Number))}
+                              style={{ flex: 1 }}
+                              searchable clearable />
+                          )}
                         />
-                        <Button type="button" icon="pi pi-ellipsis-v" className="p-button-primary" 
-                          onClick={(e) => op.current.toggle(e)} />
-                      </div>                           
+                        <Popover
+                          opened={scalePickerOpened}
+                          onChange={setScalePickerOpened}
+                          width={260}
+                          position="bottom-end"
+                          shadow="md"
+                          withArrow
+                          trapFocus
+                        >
+                          <Popover.Target>
+                            <ActionIcon type="button" size="input-md" aria-label="Adicionar escala" title="Adicionar escala"
+                              onClick={() => setScalePickerOpened((o) => !o)}>
+                              <i className="pi pi-ellipsis-v" />
+                            </ActionIcon>
+                          </Popover.Target>
+                          <Popover.Dropdown>
+                            <NumberInput label="Adicionar escala" prefix="1:" hideControls
+                              allowNegative={false} allowDecimal={false}
+                              value={newScale}
+                              onChange={setNewScale}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  addScaleFromPicker();
+                                }
+                              }} />
+                          </Popover.Dropdown>
+                        </Popover>
+                      </Group>
                     </div>
-                    )}                                       
+                    )}
                   </div>
-                </Panel>
+                </CollapsiblePanel>
 
-                <Panel header="Marcação de local e geometrias" className="pt-2">
+                <CollapsiblePanel header="Marcação de local e geometrias" toggleable={false} className="mt-2">
                   <div className="grid">
                     <div className="col field mt-2">
                       <Controller name="allow_drawing" control={control}
-                        render={({ field }) => {
-                          return <Checkbox id="allow_drawing" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}
+                        render={({ field }) => (
+                          <Checkbox size="md" id="allow_drawing" label="Permitir desenhar"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
                       />
-                      <label htmlFor="allow_drawing" className="p-checkbox-label" style={{display: "inline"}}>Permitir desenhar</label>
                     </div>
                     <div className="col field mt-2">
                       <Controller name="location_marking" control={control}
-                        render={({ field }) => {
-                          return <Checkbox id="location_marking" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}
+                        render={({ field }) => (
+                          <Checkbox size="md" id="location_marking" label="Obrigatório marcar local"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
                       />
-                      <label htmlFor="location_marking" className="p-checkbox-label" style={{display: "inline"}}>Obrigatório marcar local</label>
                     </div>
                   </div>
                   <div className="grid">
                     <div className="col field mt-2">
                       <Controller name="draw_location" control={control}
-                        render={({ field }) => {
-                          return <Checkbox id="draw_location" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}
+                        render={({ field }) => (
+                          <Checkbox size="md" id="draw_location" label="Desenhar local"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
                       />
-                      <label htmlFor="cb1" className="p-checkbox-label" style={{display: "inline"}}>Desenhar local</label>
                     </div>
                     <div className="col field mt-2">
                       <Controller name="multi_geom" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="multi_geom" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}                    
+                        render={({ field }) => (
+                          <Checkbox size="md" id="multi_geom" label="Múltiplas geometrias"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
                       />
-                      <label htmlFor="cb1" className="p-checkbox-label" style={{display: "inline"}}>Múltiplas geometrias</label>
                     </div>
                   </div>
-                </Panel>                 
+                </CollapsiblePanel>
 
               </div>
 
               <div className="field col-12 md:col-6">
-                <Panel header="Filtro Geográfico">
-                  <GeometryFilterEditor 
+                <CollapsiblePanel header="Filtro Geográfico" toggleable={false}>
+                  <GeometryFilterEditor
                     data={
                       (
                         geometryFilter ?
@@ -468,9 +407,9 @@ function PrintGroupForm(props) {
                           geometrySRID: props.data?.geom_filter_srid,
                           tolerance: props.data?.tolerance_filter
                         }
-                      )                            
+                      )
                     }
-                    coordinateSystems={props.coordinateSystems} 
+                    coordinateSystems={props.coordinateSystems}
                     onSave={ data => {
                       const filter = {
                         geom_filter: data.geometryWKT,
@@ -480,47 +419,50 @@ function PrintGroupForm(props) {
                       setGeometryFilter(filter);
                     }}
                   />
-                </Panel>
+                </CollapsiblePanel>
 
-                <Panel header="Opções de Grupo" className="mt-2">
+                <CollapsiblePanel header="Opções de Grupo" toggleable={false} className="mt-2">
                   <div className="grid">
                     <div className="col field mt-2">
                       <Controller name="select_prints" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="select_prints" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}                    
-                      />                            
-                      <label htmlFor="select_prints" className="p-checkbox-label" style={{display: "inline"}}>Permitir selecionar plantas</label>
+                        render={({ field }) => (
+                          <Checkbox size="md" id="select_prints" label="Permitir selecionar plantas"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
+                      />
                     </div>
                     <div className="col field mt-2">
                       <Controller name="group_prints" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="group_prints" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}                    
+                        render={({ field }) => (
+                          <Checkbox size="md" id="group_prints" label="Agrupar plantas"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
                       />
-                      <label htmlFor="group_prints" className="p-checkbox-label" style={{display: "inline"}}>Agrupar plantas</label>
                     </div>
                   </div>
                   <div className="grid">
                     <div className="col field mt-2">
                       <Controller name="show_all_prints" control={control}
-                        render={({ field }) => {                      
-                          return <Checkbox id="show_all_prints" {...field} onChange={(e) => field.onChange(!e.value)} checked={field.value} className="mr-2" style={{float: "left"}} />
-                        }}                    
-                      />                            
-                      <label htmlFor="show_all_prints" className="p-checkbox-label" style={{display: "inline"}}>Mostar filhos vazios</label>
+                        render={({ field }) => (
+                          <Checkbox size="md" id="show_all_prints" label="Mostar filhos vazios"
+                            checked={!!field.value}
+                            onChange={(e) => field.onChange(e.currentTarget.checked)} />
+                        )}
+                      />
                     </div>
-                  </div>                  
-                </Panel>
-              </div>              
+                  </div>
+                </CollapsiblePanel>
+              </div>
 
-            </div>  
+            </div>
 
-          </div>     
+          </div>
 
         : null}
 
-        {activeIndex === 1 ?
+        {activeTab === 'form' ?
 
           <div className="card">
 
@@ -530,9 +472,9 @@ function PrintGroupForm(props) {
 
           </div>
 
-        : null}          
-          
-        {activeIndex === 2 ?
+        : null}
+
+        {activeTab === 'layouts' ?
 
           <div className="card">
 
@@ -549,25 +491,36 @@ function PrintGroupForm(props) {
 
         : null}
 
-        {activeIndex === 3 ?
+        {activeTab === 'childs' ?
 
           <div className="card">
 
-            <PrintGroupChildsEditor 
-              data={groupChilds} 
+            <PrintGroupChildsEditor
+              data={groupChilds}
               printsList={printsList}
               groupsList={data.id ? groupsList.filter(g=>g.id !== data.id) : groupsList}
               onChange={(data) => {
                 setGroupChilds(data);
-              }} 
+              }}
             />
 
           </div>
 
-        : null}        
+        : null}
 
 
-        <Toolbar className="mt-4 mb-4" right={rightToolbarTemplate}></Toolbar>        
+        <Group justify="flex-end" className="mt-4 mb-4">
+          <Button
+            type="button"
+            variant="default"
+            leftSection={<i className="pi pi-arrow-left" />}
+            disabled={isSaving}
+            onClick={goBack}>Voltar</Button>
+          <Button
+            type="submit"
+            leftSection={<i className="pi pi-save" />}
+            loading={isSaving}>Gravar</Button>
+        </Group>
 
       </form>
 
