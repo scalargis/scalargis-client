@@ -1,29 +1,32 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useMemo, useRef } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
-import { TabMenu } from 'primereact/tabmenu';
-import { Toolbar } from 'primereact/toolbar';
-import { InputText } from 'primereact/inputtext';
-import { Chips} from 'primereact/chips';
-import { Button } from 'primereact/button';
-import { ToggleButton } from 'primereact/togglebutton';
-import { MultiSelect } from 'primereact/multiselect';
-import { ListBox } from 'primereact/listbox';
-import { Message } from 'primereact/message';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import { BlockUI } from 'primereact/blockui';
+import {
+  ActionIcon,
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  Group,
+  Input,
+  LoadingOverlay,
+  MultiSelect,
+  Paper,
+  Popover,
+  Stack,
+  Switch,
+  Tabs,
+  TagsInput,
+  TextInput
+} from '@mantine/core';
+import { DataGrid, notify } from '@scalargis/ui';
 
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/mode-css";
 import 'ace-builds/src-noconflict/ext-searchbox';
-
-import { classNames } from 'primereact/utils';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -42,11 +45,35 @@ const sortRolesArray = (data) => {
   });
 }
 
+// Prime ListBox (multiple) replacement: a bordered checkbox list; the checked
+// ids are what the Remover button acts on.
+const SelectionList = ({ options, value, onChange, ariaLabel }) => (
+  <Paper withBorder p="xs" role="group" aria-label={ariaLabel} style={{ maxHeight: '14rem', overflowY: 'auto' }}>
+    <Stack gap="xs">
+      {options.map((option) => (
+        <Checkbox
+          key={option.id}
+          size="md"
+          label={option.name}
+          checked={!!value && value.includes(option.id)}
+          onChange={(e) =>
+            onChange(
+              e.currentTarget.checked
+                ? [...(value || []), option.id]
+                : (value || []).filter((id) => id !== option.id)
+            )
+          }
+        />
+      ))}
+    </Stack>
+  </Paper>
+);
+
 const tabItems = [
-  { label: 'Dados Base', icon: 'pi pi-fw pi-home' },
-  { label: 'UI', icon: 'pi pi-fw pi-home' },
-  { label: 'Configuração', icon: 'pi pi-fw pi-cog' },
-  { label: 'Plantas', icon: 'pi pi-fw pi-print' }
+  { value: 'base', label: 'Dados Base', icon: 'pi pi-fw pi-home' },
+  { value: 'ui', label: 'UI', icon: 'pi pi-fw pi-home' },
+  { value: 'config', label: 'Configuração', icon: 'pi pi-fw pi-cog' },
+  { value: 'prints', label: 'Plantas', icon: 'pi pi-fw pi-print' }
 ];
 
 
@@ -63,7 +90,7 @@ function ViewerForm(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('base');
 
   const [data, setData] = useState(props.data || {});
 
@@ -75,22 +102,24 @@ function ViewerForm(props) {
   const [availableRoles, setAvailableRoles] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState(null);
   const [removedRoles, setRemovedRoles] = useState(null);
-  const [filterRolesValue, setFilterRolesValue] = useState('');
 
   const [availableUsers, setAvailableUsers] = useState(null);
   const [selectedOwner, setSelectedOwner] = useState(data?.owner ? { id: data.owner.id, username: data.owner.username, name: data.owner.name, active: data.owner.active } : null);
+
+  // Owner picker (Prime OverlayPanel + DataTable): a Popover with a
+  // client-side DataGrid over the fetched users list.
+  const [ownerPickerOpened, setOwnerPickerOpened] = useState(false);
+  const [ownerSearch, setOwnerSearch] = useState('');
+  const [ownerPage, setOwnerPage] = useState(1);
+  const [ownerSortStatus, setOwnerSortStatus] = useState({ columnAccessor: 'username', direction: 'asc' });
 
   const [printsList, setPrintsList] = useState([]);
   const [groupsList, setGroupsList] = useState([]);
   const [printChilds, setPrintChilds] = useState({ prints: props.data?.prints || [], groups: props.data?.print_groups || [] });
 
+  const [customStyleEditorSearchText, setCustomStyleEditorSearchText] = useState('');
+  const [jsonConfigEditorSearchText, setJsonConfigEditorSearchText] = useState('');
 
-  const [customStyleEditorSearchText, setCustomStyleEditorSearchText] = useState(null);
-  const [jsonConfigEditorSearchText, setJsonConfigEditorSearchText] = useState(null);  
-
-  const toast = useRef(null);
-  const op = useRef(null);
-  const jsonManifestEditor = useRef(null);
   const customStyleEditor = useRef(null);
   const jsonConfigEditor = useRef(null);
 
@@ -100,15 +129,9 @@ function ViewerForm(props) {
 
   const API_URL = core.API_URL;
 
-  /*
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
-    defaultValues: {name: props.data.name, title: props.data.title, slug: props.data.slug,
-      keywords: props.data.keywords}
-  });
-  */
   const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
     defaultValues: {...data}
-  });  
+  });
 
   useEffect(() => {
     const params = {
@@ -122,15 +145,15 @@ function ViewerForm(props) {
       sort: { field: 'title', order: 'Asc' },
       filter: {}
     }
-    
+
     setIsLoading(true);
 
     Promise.all([
       dataProvider(API_URL + '/security').getList('roles', params).catch((error) => error),
       dataProvider(API_URL + '/security').getList('users', params).catch((error) => error),
       dataProvider(API_URL + '/portal').getList('prints', params).catch((error) => error),
-      dataProvider(API_URL + '/portal').getList('prints/groups', params_print_groups).catch((error) => error)      
-    ]).then((result) => {      
+      dataProvider(API_URL + '/portal').getList('prints/groups', params_print_groups).catch((error) => error)
+    ]).then((result) => {
       const roles_result = result[0];
       const rids = props?.data?.roles ? props.data.roles.map(v => v.id) : [];
       setAvailableRoles(sortRolesArray(roles_result.data.filter(v => !rids.includes(v.id))
@@ -146,23 +169,24 @@ function ViewerForm(props) {
       }
 
       const prints_result = result[2]?.data || [];
-      setPrintsList(prints_result);      
+      setPrintsList(prints_result);
       const groups_result = result[3]?.data || [];
       setGroupsList(groups_result);
-      
+
       setIsLoading(false);
 
     }).catch((error) => {
       setIsLoading(false);
-      //console.log(error)
-    });    
+    });
   }, []);
 
+  // MultiSelect exchanges string values; ids are numbers everywhere else.
   const addRoles = () => {
-    if (!availableRoles) return;
-    
-    const new_roles = availableRoles.filter(v => selectedRoles.includes(v.id));
-    const new_available_roles = availableRoles.filter(v => !selectedRoles.includes(v.id));
+    if (!availableRoles || !selectedRoles) return;
+
+    const ids = selectedRoles.map(Number);
+    const new_roles = availableRoles.filter(v => ids.includes(v.id));
+    const new_available_roles = availableRoles.filter(v => !ids.includes(v.id));
 
     setRoles(sortRolesArray([...roles, ...new_roles]));
     setAvailableRoles(sortRolesArray([...new_available_roles]));
@@ -172,7 +196,7 @@ function ViewerForm(props) {
 
   const removeRoles = () => {
     if (!removedRoles) return;
-    
+
     const new_available_roles = roles.filter(v => removedRoles.includes(v.id));
     const new_roles = roles.filter(v => !removedRoles.includes(v.id));
 
@@ -180,28 +204,18 @@ function ViewerForm(props) {
     setAvailableRoles(sortRolesArray([...availableRoles, ...new_available_roles]));
     setRemovedRoles(null);
     setSelectedRoles(null);
-  } 
+  }
 
   const goBack = () => {
     if (location?.state?.from) {
-      /*
-      const location = {
-        pathname: history.location.state.from,
-        state: { 
-          searchParams: {...history.location.state.previousSearchParams}
-        }
-      }
-      history.replace(location);
-      */
-      const state = { 
+      const state = {
         searchParams: {...location.state.previousSearchParams}
       }
       navigate(location.state.from, { state });
     } else {
-      //history.goBack();
       navigate(-1);
     }
-  }  
+  }
 
   const onSubmit = (formData) => {
     let manifest_json = null;
@@ -210,17 +224,18 @@ function ViewerForm(props) {
     try {
       manifest_json = manifestJson ?  JSON.parse(manifestJson) : null;
     } catch (e) {
+        notify.error('Gravar Registo', 'O App Manifest não é JSON válido');
         return false;
-    }    
+    }
 
     try {
       config_json = JSON.parse(configJson);
     } catch (e) {
+        notify.error('Gravar Registo', 'A Configuração não é JSON válido');
         return false;
     }
 
-    const new_data = { 
-      //...formData,
+    const new_data = {
       id: formData.id,
       name: formData.name,
       title: formData.title,
@@ -241,22 +256,21 @@ function ViewerForm(props) {
       owner_id: selectedOwner ? selectedOwner.id : null,
       roles: roles ? roles.map(r => r.id) : [],
       prints: printChilds?.prints ? printChilds.prints : [],
-      print_groups: printChilds?.groups ? printChilds.groups : []      
-    }    
+      print_groups: printChilds?.groups ? printChilds.groups : []
+    }
 
     setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/portal');      
+    const provider = dataProvider(API_URL + '/portal');
     if (data.id) {
       const params = {
         id: data.id,
         data: {...new_data}
       }
-      provider.update('viewers', params).then(d => {       
-        toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
-
+      provider.update('viewers', params).then(d => {
+        notify.success('Editar Registo', 'Registo alterado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});        
+        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
       }).finally(() => {
         setIsSaving(false);
       });
@@ -266,416 +280,458 @@ function ViewerForm(props) {
       }
       provider.create('viewers', params).then(d => {
         setData({...data, id: d.data.id});
-        toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
+        notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: 'Ocorreu um erro ao criar o registo'});
+        notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');
       }).finally(() => {
         setIsSaving(false);
-      });       
-    }    
+      });
+    }
   };
 
-  const getFormErrorMessage = (errors, name) => {
+  const fieldError = (errors, name) => {
     if (errors && errors[name]) {
-      if (errors[name].type === 'maxLength') {
-         return <small className="p-error">O número de caracteres é superior à dimensão máxima permitida</small>
+      if (errors[name].message) return errors[name].message;
+
+      if (errors[name].type === 'required') {
+        return 'Campo obrigatório';
+      } else if (errors[name].type === 'maxLength') {
+        return 'O número de caracteres é superior à dimensão máxima permitida';
       } else if (errors[name].type === 'pattern') {
-        return <small className="p-error">Formato não permitido</small>
-      } else {
-        return <small className="p-error">{errors[name].message}</small>
+        return 'Formato inválido';
       }
-    }      
+    }
+    return undefined;
   };
 
-  const rightToolbarTemplate = () => {
-    return (
-        <React.Fragment>
-            <Button
-              type="button" 
-              label="Voltar" 
-              icon="pi pi-left" 
-              severity="secondary" className="mr-4"
-              disabled={isSaving ? true : false}
-              onClick={goBack} />
-            <Button
-              type="submit"
-              label="Gravar"
-              icon={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
-              disabled={isSaving ? true : false} />
-        </React.Fragment>
-    )
-  }  
- 
+  const filteredUsers = useMemo(() => {
+    const query = ownerSearch.trim().toLowerCase();
+    const filtered = (availableUsers || []).filter((u) =>
+      !query ||
+      (u.username || '').toLowerCase().includes(query) ||
+      (u.name || '').toLowerCase().includes(query)
+    );
+    const dir = ownerSortStatus.direction === 'desc' ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      const va = String(a[ownerSortStatus.columnAccessor] || '').toLowerCase();
+      const vb = String(b[ownerSortStatus.columnAccessor] || '').toLowerCase();
+      return (va > vb ? 1 : va < vb ? -1 : 0) * dir;
+    });
+  }, [availableUsers, ownerSearch, ownerSortStatus]);
+
+  const ownerPageRecords = filteredUsers.slice((ownerPage - 1) * 10, ownerPage * 10);
+
+  const ownerColumns = useMemo(
+    () => [
+      { accessor: 'username', title: 'Username', sortable: true },
+      { accessor: 'name', title: 'Nome', sortable: true }
+    ],
+    []
+  );
+
+  const ownerIcon = selectedOwner?.id > 0
+    ? (selectedOwner.active ? 'fas fa-user-alt' : 'fas fa-user-alt-slash')
+    : 'far fa-user';
+
   return (
-    <BlockUI blocked={isLoading}
-        template={<i className="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
+    <Box pos="relative">
+      <LoadingOverlay visible={isLoading} />
 
-        <TabMenu model={tabItems} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
+      <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
+        <Tabs.List>
+          {tabItems.map((item) => (
+            <Tabs.Tab key={item.value} value={item.value} leftSection={<i className={item.icon} />}>
+              {item.label}
+            </Tabs.Tab>
+          ))}
+        </Tabs.List>
+      </Tabs>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
 
-          <Toast ref={toast} baseZIndex={2000} />
+        {activeTab === 'base' ?
 
-          {activeIndex === 0 ?
+          <div className="card">
 
-            <div className="card">
+            <div className="p-fluid formgrid grid">
 
-              <div className="p-fluid formgrid grid">
+              <div className="field col-12 md:col-2">
+                <TextInput id="id" label="Id" value={data.id || ''} readOnly />
+              </div>
 
-                <div className="field col-12 md:col-2">
-                  <label htmlFor="id">Id</label>
-                  <InputText id="id" type="text" value={data.id || ''} />
-                </div>
+              <div className="field col-12 md:col-4 text-center">
+                <label className="block">&nbsp;</label>
+                <Controller
+                  control={control}
+                  name="is_active"
+                  render={({ field }) => (
+                    <Switch
+                      size="md"
+                      style={{ display: 'inline-block' }}
+                      label={field.value ? 'Mapa Ativo' : 'Mapa Não Ativo'}
+                      checked={!!field.value}
+                      onChange={(e) => field.onChange(e.currentTarget.checked)}
+                    />
+                  )}
+                />
+              </div>
 
-                <div className="field col-12 md:col-4 text-center">
-                  <label className="block">&nbsp;</label>
-                  <Controller
-                    control={control}
-                    name="is_active"
-                    render={({ field }) => {
-                      return <ToggleButton {...field} checked={field.value} onChange={(e) => field.onChange(e.target.value)} onLabel="Mapa Ativo" offLabel="Mapa Não Ativo" onIcon="pi pi-check" offIcon="pi pi-times" />
-                    }} 
-                  />                   
-                </div>
-                
-                { adminOrManager &&
-                <div className="field col-12 md:col-4">
-                  <label>Dono</label>               
-                  <div className="p-inputgroup">
-                    { selectedOwner?.id > 0 ?
-                      <React.Fragment>
-                        <span className="p-inputgroup-addon"><i className={ selectedOwner.active ? "fas fa-user-alt" : "fas fa-user-alt-slash" }></i></span>
-                        <span className="p-inputgroup-addon">{selectedOwner.name} ({selectedOwner.username})</span>
-                      </React.Fragment>
-                      :
-                      <React.Fragment>
-                        <span className="p-inputgroup-addon"><i className="far fa-user"></i></span>
-                        <span className="p-inputgroup-addon">Anómimo</span>
-                      </React.Fragment>
-                    }
-                    <Button type="button" tooltip="Alterar" icon="fas fa-user-edit" className="p-button-primary"
-                      onClick={(e) => { op.current.toggle(e); }}/>
-                    
-                    { (selectedOwner?.id > 0) &&
-                      <Button type="button" icon="pi pi-times" severity="danger"
-                        onClick={(e) => { setSelectedOwner(null); }} />
-                    }
+              { adminOrManager &&
+              <div className="field col-12 md:col-4">
+                <Group gap="xs" align="flex-end" wrap="nowrap">
+                  <TextInput
+                    label="Dono"
+                    readOnly
+                    leftSection={<i className={ownerIcon} />}
+                    value={ selectedOwner?.id > 0 ? `${selectedOwner.name} (${selectedOwner.username})` : 'Anónimo' }
+                    style={{ flex: 1 }}
+                  />
 
-                    <OverlayPanel ref={op} showCloseIcon id="overlay_panel" breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '450px'}} className="overlaypanel-demo">
-                      <div className="p-fluid">
-                          <div className="p-field">
-                              <label htmlFor="observacoes">Utilizadores</label>
-                              <DataTable value={availableUsers} selectionMode="single" paginator rows={10}
-                                selection={selectedOwner}
-                                onSelectionChange={ e=> { setSelectedOwner({...e.value}); op.current.hide(); }}>
-                                <Column field="username" header="Username" sortable filter filterMatchMode="contains" />
-                                <Column field="name" header="Nome" sortable filter filterMatchMode="contains" />
-                            </DataTable>                                
-                          </div>              
-                      </div>
-                    </OverlayPanel>
+                  <Popover
+                    opened={ownerPickerOpened}
+                    onChange={setOwnerPickerOpened}
+                    width={450}
+                    position="bottom-end"
+                    shadow="md"
+                    withArrow
+                    trapFocus
+                  >
+                    <Popover.Target>
+                      <ActionIcon type="button" size="input-md" aria-label="Alterar dono" title="Alterar"
+                        onClick={() => setOwnerPickerOpened((o) => !o)}>
+                        <i className="fas fa-user-edit" />
+                      </ActionIcon>
+                    </Popover.Target>
+                    <Popover.Dropdown>
+                      <Stack gap="xs">
+                        <Input.Label>Utilizadores</Input.Label>
+                        <TextInput
+                          placeholder="Pesquisar"
+                          value={ownerSearch}
+                          onChange={(e) => { setOwnerSearch(e.currentTarget.value); setOwnerPage(1); }}
+                        />
+                        <DataGrid
+                          idAccessor="id"
+                          records={ownerPageRecords}
+                          totalRecords={filteredUsers.length}
+                          page={ownerPage}
+                          onPageChange={setOwnerPage}
+                          recordsPerPage={10}
+                          sortStatus={ownerSortStatus}
+                          onSortStatusChange={(sortStatus) => { setOwnerSortStatus(sortStatus); setOwnerPage(1); }}
+                          columns={ownerColumns}
+                          onRowClick={({ record }) => { setSelectedOwner({ ...record }); setOwnerPickerOpened(false); }}
+                          noRecordsText="Não foram encontrados registos."
+                        />
+                      </Stack>
+                    </Popover.Dropdown>
+                  </Popover>
 
+                  { (selectedOwner?.id > 0) &&
+                    <ActionIcon type="button" size="input-md" color="danger" aria-label="Remover dono"
+                      onClick={() => { setSelectedOwner(null); }}>
+                      <i className="pi pi-times" />
+                    </ActionIcon>
+                  }
+                </Group>
+              </div>
+              }
+
+              <div className="field col-12 md:col-6">
+                <TextInput id="name" label="Designação"
+                  error={fieldError(errors, 'name')}
+                  {...register('name', { required: 'Campo obrigatório.' })} />
+              </div>
+
+              <div className="field col-12 md:col-6">
+                <TextInput id="title" label="Título"
+                  error={fieldError(errors, 'title')}
+                  {...register('title', { required: 'Campo obrigatório.' })} />
+              </div>
+
+              <div className="field col-12 md:col-6">
+                <TextInput id="slug" label="Slug" {...register('slug')} />
+              </div>
+
+              <div className="field col-12 md:col-6">
+                <Controller name="keywords" control={control} render={({ field }) => (
+                  <TagsInput id="keywords" label="Tags" value={field.value || []} onChange={field.onChange} />
+                )} />
+              </div>
+
+              <div className="field col-12 md:col-6">
+                <Input.Label>Perfis</Input.Label>
+                <div className="card p-2">
+                  { (availableRoles && availableRoles.length > 0) &&
+                  <>
+                  <div className="field col-12 pl-0">
+                    <MultiSelect
+                      data={availableRoles.map(r => ({ value: String(r.id), label: r.name }))}
+                      value={selectedRoles || []}
+                      onChange={(value) => setSelectedRoles(value.length ? value : null)}
+                      placeholder="Selecionar"
+                      searchable clearable />
                   </div>
-                </div>
-                }              
-
-                <div className="field col-12 md:col-6">
-                  <label htmlFor="name">Designação</label>        
-                  <InputText id="name" name="name" {...register('name', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.name })} />
-                  {getFormErrorMessage(errors, 'name')}
-                  {/*{errors.name && <span>This field is required</span>}*/}
-                </div>
-
-                <div className="field col-12 md:col-6">
-                  <label htmlFor="name">Título</label>        
-                  <InputText id="title" name="title" {...register('title', { required: 'Campo obrigatório.' })} className={classNames({ 'p-invalid': errors.title })} />
-                  {getFormErrorMessage(errors, 'title')}       
-                </div>          
-
-                <div className="field col-12 md:col-6">
-                  <label htmlFor="slug">Slug</label>
-                  <InputText id="slug" name="slug" {...register('slug')} />
-                </div>
-
-                <div className="p-field col-6">
-                  <label htmlFor="tags">Tags</label>
-                  <Controller name="keywords" control={control} defaultValue={data.keywords} render={(props) => (
-                      <Chips id="keywords" value={props.field.value} onChange={(e) => props.field.onChange(e.value) } />
-                  )} />            
-                </div>            
-
-                <div className="field col-12 md:col-6">
-                  <label>Perfis</label>
-                  <div className="p-card p-2">
-                    { (availableRoles && availableRoles.length > 0) && 
+                  <div className="grid">
+                    <div className="col"></div>
+                    <div className="col">
+                        <Button type="button"
+                          disabled={(!selectedRoles || selectedRoles.length === 0)}
+                        onClick={addRoles}>Adicionar</Button>
+                    </div>
+                    <div className="col"></div>
+                  </div>
+                  </>
+                  }
+                  { (roles && roles.length > 0) ?
                     <>
-                    <div className="field col-12 pl-0">
-                      <MultiSelect value={selectedRoles} options={availableRoles} 
-                        optionLabel="name" optionValue="id" display="chip" showClear 
-                        filter filterValue={filterRolesValue} 
-                        onFilterValueChange={(e) => setFilterRolesValue(e.value)}
-                        onChange={(e) => setSelectedRoles(e.value)} placeholder="Selecionar" />
-                    </div>              
+                    <div className="field col-12 pl-0 pt-2">
+                      <SelectionList options={roles} value={removedRoles}
+                        onChange={setRemovedRoles} ariaLabel="Perfis atribuídos" />
+                    </div>
                     <div className="grid">
                       <div className="col"></div>
                       <div className="col">
-                          <Button label="Adicionar" type="button" 
-                            disabled={(!selectedRoles || selectedRoles.length === 0)}
-                          onClick={addRoles} />
+                        <Button type="button"
+                        disabled={(!removedRoles || removedRoles.length === 0)}
+                        onClick={removeRoles}>Remover</Button>
                       </div>
                       <div className="col"></div>
                     </div>
-                    </>
-                    }
-                    { (roles && roles.length > 0) ?
-                      <>        
-                      <div className="field col-12 pl-0 pt-2">
-                        <ListBox optionLabel="name" optionValue="id" className="p-1"
-                          options={roles} value={removedRoles}
-                          onChange={(e) => setRemovedRoles(e.value)} multiple />
+                    </> :
+                    <div className="grid justify-content-center">
+                      <div className="col-12 mt-4 mb-2">
+                        <Alert color="warning" py="xs">
+                          <Group justify="center" gap="xs" wrap="nowrap">
+                            <i className="pi pi-exclamation-triangle" />
+                            <span>Adicione um ou mais Perfis</span>
+                          </Group>
+                        </Alert>
                       </div>
-                      <div className="grid">
-                        <div className="col"></div>
-                        <div className="col">
-                          <Button label="Remover" type="button" 
-                          disabled={(!removedRoles || removedRoles.length === 0)}
-                          onClick={removeRoles} />
-                        </div>
-                        <div className="col"></div>
-                      </div>
-                      </> :
-                      <div className="grid justify-center">
-                        <div className="col-12 mt-4 mb-2">
-                          <Message severity="warn" text="Adicione um ou mais Perfis" />
-                        </div>
-                      </div>
-                    }
-                  </div>
+                    </div>
+                  }
                 </div>
-
               </div>
 
             </div>
 
-          : null}
+          </div>
 
-          {activeIndex === 1 ?
-            <div className="card">            
-              <div className="p-fluid formgrid grid">
+        : null}
 
-                <div className="field col-12 md:col-4">
-                  <label htmlFor="img_icon">Icon</label>
-                  <InputText id="img_icon" name="img_icon" {...register('img_icon')} />
-                </div>
+        {activeTab === 'ui' ?
+          <div className="card">
+            <div className="p-fluid formgrid grid">
 
-                <div className="field col-12 md:col-4">
-                  <label htmlFor="img_logo">Logo</label>
-                  <InputText id="img_logo" name="img_logo" {...register('img_logo')} />
-                </div>
+              <div className="field col-12 md:col-4">
+                <TextInput id="img_icon" label="Icon" {...register('img_icon')} />
+              </div>
 
-                <div className="field col-12 md:col-4">
-                  <label htmlFor="img_logo_alt">Logo Alternativo</label>
-                  <InputText id="img_logo_alt" name="img_logo_alt" {...register('img_logo_alt')} />
-                </div>
+              <div className="field col-12 md:col-4">
+                <TextInput id="img_logo" label="Logo" {...register('img_logo')} />
+              </div>
 
-                <div className="field col-12" id="manifest-editor-parent">
-                  <label htmlFor="manifest_editor">App Manifest</label>
-                    <AceEditor
-                      ref={jsonManifestEditor}
-                      id="manifest_editor"
-                      mode="json"
-                      theme="github"
-                      onLoad={editorInstance => {                
-                        editorInstance.container.style.setProperty('width', (document.getElementById('manifest-editor-parent').offsetWidth - 20) + 'px');              
-                      }}
-                      onChange={(newValue) => {
-                        setManifestJson(newValue);
-                      }}
-                      value={manifestJson}
-                      name="UNIQUE_ID_OF_MANIFEST"         
-                      editorProps={{ $blockScrolling: true }}
-                      setOptions={{
-                        useWorker: false,
-                        tabSize: 2,
-                        maxLines: 20,
-                        printMargin: false                    
-                      }}              
-                    />
-                </div>
+              <div className="field col-12 md:col-4">
+                <TextInput id="img_logo_alt" label="Logo Alternativo" {...register('img_logo_alt')} />
+              </div>
 
-                <div className="field col-12" id="style-editor-parent">
-                <Toolbar className="mb-1" end={() => { return (
-                <React.Fragment>
-                  <Button icon="pi pi-undo" className="mr-2 pl-3 pr-3"
-                  title="Undo"
-                  onClick={e => {
-                    e.preventDefault();
-                    customStyleEditor.current.editor.undo();
-                  }} />
-                  <Button icon="pi pi-refresh" className="mr-2 pl-3 pr-3"
-                  title="Redo"
-                  onClick={e => {
-                    e.preventDefault();
-                    customStyleEditor.current.editor.redo();
-                  }} />
-                  <div className="p-inputgroup">                  
-                    <InputText placeholder="Pesquisar" 
-                      value={customStyleEditorSearchText}
-                      onChange={e=>{
-                        if (!e.target.value) {
-                          customStyleEditor.current.editor.find('', {
-                            backwards: false,
-                            wrap: true,
-                            caseSensitive: false,
-                            wholeWord: false,
-                            regExp: false
-                          });                        
-                        }
-                        setCustomStyleEditorSearchText(e.target.value)
-                        }} />
-                    <Button icon="pi pi-search" severity="warning"
-                      title="Pesquisar texto"
-                      onClick={e=>{
-                        e.preventDefault();
-                        customStyleEditor.current.editor.find(customStyleEditorSearchText, {
-                          backwards: false,
-                          wrap: true,
-                          caseSensitive: false,
-                          wholeWord: false,
-                          regExp: false
-                        });
-                        return false;                      
-                      }}/>
-                  </div>
-
-                </React.Fragment>
-                )}} />                
-                  <label htmlFor="style_editor">Style (Código)</label>
+              <div className="field col-12" id="manifest-editor-parent">
+                <Input.Label>App Manifest</Input.Label>
                   <AceEditor
-                    ref={customStyleEditor}
-                    id="style_editor"
-                    mode="css"
+                    id="manifest_editor"
+                    mode="json"
                     theme="github"
-                    onLoad={editorInstance => {                
-                      editorInstance.container.style.setProperty('width', (document.getElementById('style-editor-parent').offsetWidth - 20) + 'px');              
+                    onLoad={editorInstance => {
+                      editorInstance.container.style.setProperty('width', (document.getElementById('manifest-editor-parent').offsetWidth - 20) + 'px');
                     }}
                     onChange={(newValue) => {
-                      setCustomStyle(newValue);
+                      setManifestJson(newValue);
                     }}
-                    value={customStyle}
-                    name="UNIQUE_ID_OF_DIV2"         
+                    value={manifestJson}
+                    name="UNIQUE_ID_OF_MANIFEST"
                     editorProps={{ $blockScrolling: true }}
                     setOptions={{
                       useWorker: false,
                       tabSize: 2,
                       maxLines: 20,
-                      printMargin: false                    
-                    }}              
+                      printMargin: false
+                    }}
                   />
-                </div> 
-
               </div>
-            </div>
-          : null}
 
-          {activeIndex === 2 ?
-            <div className="card" id="editor-parent">
-              <Toolbar className="mb-1" end={() => { return (
-                <React.Fragment>
-                  <Button icon="pi pi-undo" className="mr-2 pl-3 pr-3"
-                  title="Undo"
-                  onClick={e => {
-                    e.preventDefault();
-                    jsonConfigEditor.current.editor.undo();
-                  }} />
-                  <Button icon="pi pi-refresh" className="mr-2 pl-3 pr-3"
-                  title="Redo"
-                  onClick={e => {
-                    e.preventDefault();
-                    jsonConfigEditor.current.editor.redo();
-                  }} />
-                  <div className="p-inputgroup">                  
-                    <InputText placeholder="Pesquisar" 
-                      value={jsonConfigEditorSearchText}
-                      onChange={e=>{
-                        if (!e.target.value) {
-                          jsonConfigEditor.current.editor.find('', {
-                            backwards: false,
-                            wrap: true,
-                            caseSensitive: false,
-                            wholeWord: false,
-                            regExp: false
-                          });                        
-                        }
-                        setJsonConfigEditorSearchText(e.target.value)
-                        }} />
-                    <Button icon="pi pi-search" severity="warning"
-                      title="Pesquisar texto"
-                      onClick={e=>{
-                        e.preventDefault();
-                        jsonConfigEditor.current.editor.find(jsonConfigEditorSearchText, {
+              <div className="field col-12" id="style-editor-parent">
+                <Group justify="flex-end" gap="xs" wrap="nowrap" className="mb-1">
+                  <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
+                    onClick={e => {
+                      e.preventDefault();
+                      customStyleEditor.current.editor.undo();
+                    }}>
+                    <i className="pi pi-undo" />
+                  </ActionIcon>
+                  <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
+                    onClick={e => {
+                      e.preventDefault();
+                      customStyleEditor.current.editor.redo();
+                    }}>
+                    <i className="pi pi-refresh" />
+                  </ActionIcon>
+                  <TextInput placeholder="Pesquisar"
+                    value={customStyleEditorSearchText}
+                    onChange={e=>{
+                      if (!e.target.value) {
+                        customStyleEditor.current.editor.find('', {
                           backwards: false,
                           wrap: true,
                           caseSensitive: false,
                           wholeWord: false,
                           regExp: false
                         });
-                        return false;                      
-                      }}/>
-                  </div>
-
-                </React.Fragment>
-                )}} />
-              <AceEditor
-                ref={jsonConfigEditor}
-                mode="json"
-                theme="github"
-                onLoad={editorInstance => {                
-                  editorInstance.container.style.setProperty('width', (document.getElementById('editor-parent').offsetWidth - 30) + 'px');
-                  /*
-                  editorInstance.container.style.resize = "both";
-                  // mouseup = css resize end
-                  document.addEventListener("mouseup", e => (
-                    editorInstance.resize()
-                  ));
-                  */               
-                }}
-                onChange={(newValue) => {
-                  setConfigJson(newValue);
-                }}
-                value={configJson}
-                name="UNIQUE_ID_OF_DIV"         
-                editorProps={{ $blockScrolling: true }}
-                setOptions={{
-                  useWorker: false,
-                  tabSize: 2,
-                  printMargin: false 
-                }}              
-              />
-            </div>
-          : null}
-
-          {activeIndex === 3 ?
-
-            <div className="card">
-
-              <PrintGroupChildsEditor 
-                data={printChilds} 
-                printsList={printsList}
-                groupsList={groupsList}
-                onChange={(data) => {
-                  setPrintChilds(data);
-                }} 
-              />
+                      }
+                      setCustomStyleEditorSearchText(e.target.value)
+                      }} />
+                  <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
+                    onClick={e=>{
+                      e.preventDefault();
+                      customStyleEditor.current.editor.find(customStyleEditorSearchText, {
+                        backwards: false,
+                        wrap: true,
+                        caseSensitive: false,
+                        wholeWord: false,
+                        regExp: false
+                      });
+                      return false;
+                    }}>
+                    <i className="pi pi-search" />
+                  </ActionIcon>
+                </Group>
+                <Input.Label>Style (Código)</Input.Label>
+                <AceEditor
+                  ref={customStyleEditor}
+                  id="style_editor"
+                  mode="css"
+                  theme="github"
+                  onLoad={editorInstance => {
+                    editorInstance.container.style.setProperty('width', (document.getElementById('style-editor-parent').offsetWidth - 20) + 'px');
+                  }}
+                  onChange={(newValue) => {
+                    setCustomStyle(newValue);
+                  }}
+                  value={customStyle}
+                  name="UNIQUE_ID_OF_DIV2"
+                  editorProps={{ $blockScrolling: true }}
+                  setOptions={{
+                    useWorker: false,
+                    tabSize: 2,
+                    maxLines: 20,
+                    printMargin: false
+                  }}
+                />
+              </div>
 
             </div>
-          : null}
+          </div>
+        : null}
 
-          <Toolbar className="mt-4 mb-4" end={rightToolbarTemplate}></Toolbar>
+        {activeTab === 'config' ?
+          <div className="card" id="editor-parent">
+            <Group justify="flex-end" gap="xs" wrap="nowrap" className="mb-1">
+              <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
+                onClick={e => {
+                  e.preventDefault();
+                  jsonConfigEditor.current.editor.undo();
+                }}>
+                <i className="pi pi-undo" />
+              </ActionIcon>
+              <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
+                onClick={e => {
+                  e.preventDefault();
+                  jsonConfigEditor.current.editor.redo();
+                }}>
+                <i className="pi pi-refresh" />
+              </ActionIcon>
+              <TextInput placeholder="Pesquisar"
+                value={jsonConfigEditorSearchText}
+                onChange={e=>{
+                  if (!e.target.value) {
+                    jsonConfigEditor.current.editor.find('', {
+                      backwards: false,
+                      wrap: true,
+                      caseSensitive: false,
+                      wholeWord: false,
+                      regExp: false
+                    });
+                  }
+                  setJsonConfigEditorSearchText(e.target.value)
+                  }} />
+              <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
+                onClick={e=>{
+                  e.preventDefault();
+                  jsonConfigEditor.current.editor.find(jsonConfigEditorSearchText, {
+                    backwards: false,
+                    wrap: true,
+                    caseSensitive: false,
+                    wholeWord: false,
+                    regExp: false
+                  });
+                  return false;
+                }}>
+                <i className="pi pi-search" />
+              </ActionIcon>
+            </Group>
+            <AceEditor
+              ref={jsonConfigEditor}
+              mode="json"
+              theme="github"
+              onLoad={editorInstance => {
+                editorInstance.container.style.setProperty('width', (document.getElementById('editor-parent').offsetWidth - 30) + 'px');
+              }}
+              onChange={(newValue) => {
+                setConfigJson(newValue);
+              }}
+              value={configJson}
+              name="UNIQUE_ID_OF_DIV"
+              editorProps={{ $blockScrolling: true }}
+              setOptions={{
+                useWorker: false,
+                tabSize: 2,
+                printMargin: false
+              }}
+            />
+          </div>
+        : null}
 
-        </form>
-      
-      </BlockUI>
+        {activeTab === 'prints' ?
+
+          <div className="card">
+
+            <PrintGroupChildsEditor
+              data={printChilds}
+              printsList={printsList}
+              groupsList={groupsList}
+              onChange={(data) => {
+                setPrintChilds(data);
+              }}
+            />
+
+          </div>
+        : null}
+
+        <Group justify="flex-end" className="mt-4 mb-4">
+          <Button
+            type="button"
+            variant="default"
+            leftSection={<i className="pi pi-arrow-left" />}
+            disabled={isSaving}
+            onClick={goBack}>Voltar</Button>
+          <Button
+            type="submit"
+            leftSection={<i className="pi pi-save" />}
+            loading={isSaving}>Gravar</Button>
+        </Group>
+
+      </form>
+
+    </Box>
 
   );
 

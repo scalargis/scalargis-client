@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router';
-import { BlockUI } from 'primereact/blockui';
+import { Box, LoadingOverlay } from '@mantine/core';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -20,9 +20,6 @@ function ViewerEdit(props) {
 
   const [isLoading, setIsLoading] = useState(true);
   const [record, setRecord] = useState(null);
-  const [roles, setRoles] = useState([]);
-
-  const toast = useRef(null);
 
   const API_URL = core.API_URL;
 
@@ -42,23 +39,22 @@ function ViewerEdit(props) {
       id: id
     }
 
-    setIsLoading(true);  
+    setIsLoading(true);
 
     provider.getOne('viewers', params).then(d => {
       setRecord(d.data);
     }).catch(e => {
       console.error(e);
-      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de visualizadores'});
     }).finally(() => {
       setIsLoading(false);
     });
-  }  
+  }
 
   return (
-    <BlockUI blocked={isLoading}
-        template={<i className="p-blockui-loading-icon pi-spin pi pi-spinner"></i>} >
-        { record ? <ViewerForm data={record} /> : <div /> }
-      </BlockUI>
+    <Box pos="relative">
+      <LoadingOverlay visible={isLoading} />
+      { record ? <ViewerForm data={record} /> : <div /> }
+    </Box>
   );
 
 }
