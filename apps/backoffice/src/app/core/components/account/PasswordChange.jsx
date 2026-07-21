@@ -75,7 +75,7 @@ export default function PasswordChange(props) {
 
     return (
         <React.Fragment>
-            <Button variant="outline" leftSection={<i className="pi pi-user-edit" />} onClick={e => {
+            <Button type="button" variant="outline" leftSection={<i className="pi pi-user-edit" />} onClick={e => {
                 e.preventDefault();
                 reset();
                 setShowPasswordDialog(true);

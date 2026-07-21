@@ -407,6 +407,7 @@ function UserForm(props) {
                 name="active"
                 render={({ field }) => (
                   <Switch
+                    size="md"
                     label={field.value ? 'Utilizador Ativo' : 'Utilizador Não Ativo'}
                     checked={!!field.value}
                     onChange={(e) => field.onChange(e.currentTarget.checked)}
@@ -423,7 +424,7 @@ function UserForm(props) {
               onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
             <TextInput id="auth_token" label="Token de Autenticação" placeholder="Token não definido"
               style={{ flex: 1 }} {...register('auth_token')} />
-            <ActionIcon size="input-md" color="danger" aria-label="Limpar token"
+            <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar token"
               onClick={() => { setValue('auth_token', null); setValue('auth_token_expire', null); }}>
               <i className="pi pi-times" />
             </ActionIcon>
@@ -445,7 +446,7 @@ function UserForm(props) {
                 />
               )}
             />
-            <ActionIcon size="input-md" color="danger" aria-label="Limpar data de validade"
+            <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar data de validade"
               onClick={() => setValue('auth_token_expire', null)}>
               <i className="pi pi-times" />
             </ActionIcon>

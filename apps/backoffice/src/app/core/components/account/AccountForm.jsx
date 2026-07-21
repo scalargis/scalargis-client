@@ -129,7 +129,7 @@ function AccountForm(props) {
               onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
             <TextInput id="auth_token" label="Token de Autenticação" placeholder="Token não definido"
               style={{ flex: 1 }} disabled={!isEditMode} {...register('auth_token')} />
-            <ActionIcon size="input-md" color="danger" aria-label="Limpar token" disabled={!isEditMode}
+            <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar token" disabled={!isEditMode}
               onClick={() => { setValue('auth_token', null); setValue('auth_token_expire', null); }}>
               <i className="pi pi-times" />
             </ActionIcon>
@@ -152,7 +152,7 @@ function AccountForm(props) {
                 />
               )}
             />
-            <ActionIcon size="input-md" color="danger" aria-label="Limpar data de validade" disabled={!isEditMode}
+            <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar data de validade" disabled={!isEditMode}
               onClick={() => setValue('auth_token_expire', null)}>
               <i className="pi pi-times" />
             </ActionIcon>
