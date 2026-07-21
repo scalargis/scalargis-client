@@ -1,9 +1,6 @@
 import React, { useState, useEffect, Component } from "react";
-import { Button } from 'primereact/button';
-import { ConfirmPopup, confirmPopup  } from 'primereact/confirmpopup';
-import { Panel } from 'primereact/panel';
-import { Message } from 'primereact/message';
-import { MultiSelect } from 'primereact/multiselect';
+import { ActionIcon, Alert, Button, Group, MultiSelect } from '@mantine/core';
+import { CollapsiblePanel, ConfirmPopover } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { getItemStyle, getFieldListStyle } from "./utils";
 
@@ -14,7 +11,6 @@ function RecordSelector(props) {
 
   const [availableRecords, setAvailableRecords] = useState(props.list || []);
   const [selectedRecords, setSelectedRecords] = useState(null);
-  const [filterValue, setFilterValue] = useState('');
 
   useEffect(() => {
     setAvailableRecords([...props.list]);
@@ -25,42 +21,47 @@ function RecordSelector(props) {
   }, [props.data]);
 
 
+  // MultiSelect exchanges string values; ids are numbers everywhere else.
   const addRecords = () => {
-    if (!availableRecords) return;
+    if (!availableRecords || !selectedRecords) return;
 
-    let new_records = availableRecords.filter(v => selectedRecords.includes(v.id));
+    const ids = selectedRecords.map(Number);
+    let new_records = availableRecords.filter(v => ids.includes(v.id));
     new_records = [...new_records, ...props.data];
     props.onChange(new_records);
 
     setSelectedRecords(null);
   }
-  
-  const itemTemplate = (option) => {
-    return (
-      <div>
-        <div>{`[${option.code}] ${option.title}`}</div>
-      </div>
-    );
-  }
+
+  const options = (availableRecords || [])
+    .filter(p => !(records || []).map(f=>f.id).includes(p.id))
+    .map(p => ({ value: String(p.id), label: p.title || '', code: p.code }));
 
   return (
     <div className="card p-2">
         <div className="field col-12 pl-0">
-          <MultiSelect value={selectedRecords || []} 
-            options={(availableRecords || []).filter(p => !(records || []).map(f=>f.id).includes(p.id))} 
-            optionLabel="title" optionValue="id" display="chip" showClear
-            itemTemplate={itemTemplate}
-            filter filterBy="code,title" filterValue={filterValue} 
-            onFilterValueChange={(e) => setFilterValue(e.value)}
-            emptyFilterMessage="Não foram encontrados registos"
-            onChange={(e) => setSelectedRecords(e.value)} placeholder="Selecionar" />
-        </div>              
+          <MultiSelect
+            data={options}
+            value={selectedRecords || []}
+            onChange={(value) => setSelectedRecords(value.length ? value : null)}
+            placeholder="Selecionar"
+            renderOption={({ option }) => <div>{`[${option.code}] ${option.label}`}</div>}
+            filter={({ options, search }) => {
+              const query = (search || '').toLowerCase().trim();
+              if (!query) return options;
+              return options.filter((o) =>
+                `${o.code} ${o.label}`.toLowerCase().includes(query)
+              );
+            }}
+            nothingFoundMessage="Não foram encontrados registos"
+            searchable clearable />
+        </div>
         <div className="grid">
           <div className="col"></div>
           <div className="col">
-              <Button label="Adicionar" type="button" 
+              <Button type="button"
                 disabled={(!selectedRecords || selectedRecords.length === 0)}
-              onClick={addRecords} />
+              onClick={addRecords}>Adicionar</Button>
           </div>
           <div className="col"></div>
         </div>
@@ -77,7 +78,12 @@ const ListChilds = props => {
   if (!list || list.length === 0) {
     return (
       <div>
-        <Message severity="info" text="Selecione uma ou mais opções e clique em 'Adicionar'" />
+        <Alert color="informative" py="xs">
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <i className="pi pi-info-circle" />
+            <span>Selecione uma ou mais opções e clique em 'Adicionar'</span>
+          </Group>
+        </Alert>
       </div>
     )
   } else {
@@ -86,15 +92,14 @@ const ListChilds = props => {
         onDragEnd={(result) => {
           // dropped outside the list
           if (!result.destination) return;
-    
+
           const new_list = [...list];
           const element = new_list[result.source.index];
           new_list.splice(result.source.index, 1);
           new_list.splice(result.destination.index, 0, element);
-    
+
           props.onChange(new_list);
         }}
-        //onDragUpdate={}
       >
         <Droppable droppableId="droppable" type={type}>
           {(provided, snapshot) => (
@@ -102,13 +107,13 @@ const ListChilds = props => {
               ref={provided.innerRef}
               style={getFieldListStyle(snapshot.isDraggingOver)}
             >
-    
+
               {list.map((item, index) => (
                 <Draggable
                   key={item.id.toString()}
                   draggableId={item.id.toString()}
                   index={index}
-                  style={{ "border": "solid 1px lightgray", marginTop: 3 }}                  
+                  style={{ "border": "solid 1px lightgray", marginTop: 3 }}
                 >
                   {(provided, snapshot) => (
                     <div
@@ -128,28 +133,23 @@ const ListChilds = props => {
                         </span>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <Button type="text" icon="pi pi-times" 
-                          rounded text severity="danger"
-                          tooltip="Remover"
-                          tooltipOptions={{position: 'bottom'}}                            
-                          onClick={ (e) => {
-                            e.preventDefault();
-                            confirmPopup({
-                                target: e.currentTarget,
-                                message: 'Tem a certeza que pretende remover?',
-                                icon: 'pi pi-exclamation-triangle',
-                                acceptLabel: 'Sim',
-                                rejectLabel: 'Não',
-                                defaultFocus: 'reject',
-                                accept: () => {                                      
-                                  const new_prints = list.filter(p => p.id !== item.id);
-                                  props.onChange(new_prints);
-                                }
-                            });
-                          }} />                               
+                        <ConfirmPopover
+                          message="Tem a certeza que pretende remover?"
+                          severity="danger"
+                          acceptLabel="Sim"
+                          rejectLabel="Não"
+                          onConfirm={() => {
+                            const new_prints = list.filter(p => p.id !== item.id);
+                            props.onChange(new_prints);
+                          }}
+                        >
+                          <ActionIcon type="button" variant="subtle" color="danger" aria-label="Remover" title="Remover">
+                            <i className="pi pi-times" />
+                          </ActionIcon>
+                        </ConfirmPopover>
                         </div>
                       </div>
-    
+
                       <div className="p-fluid pt-2">
                         <div className="field grid mb-0">
                           <div className="col-12">
@@ -160,9 +160,9 @@ const ListChilds = props => {
                               </div>
                             </div>
                           </div>
-                        </div>                                      
+                        </div>
                       </div>
-    
+
                     </div>
                   )}
                 </Draggable>
@@ -171,10 +171,10 @@ const ListChilds = props => {
             </div>
           )}
         </Droppable>
-      </DragDropContext>  
-    );    
+      </DragDropContext>
+    );
   }
-  
+
 };
 
 class PrintGroupChildsEditor extends Component {
@@ -191,7 +191,7 @@ class PrintGroupChildsEditor extends Component {
 
     this.onChange = props.onChange.bind(this);
     this.onPrintsChange = this.onPrintsChange.bind(this);
-    this.onGroupsChange = this.onGroupsChange.bind(this); 
+    this.onGroupsChange = this.onGroupsChange.bind(this);
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -202,14 +202,12 @@ class PrintGroupChildsEditor extends Component {
   }
 
   onGroupsChange(groups) {
-    console.log(groups);
     this.onChange({...this.state.data, groups: [...groups]});
   }
 
   onPrintsChange(prints) {
-    console.log(prints);
     this.onChange({...this.state.data, prints: [...prints]});
-  } 
+  }
 
 
   render() {
@@ -217,21 +215,19 @@ class PrintGroupChildsEditor extends Component {
 
       <div className="p-fluid formgrid grid">
 
-        <ConfirmPopup />
-
         <div className="field col-12 md:col-6">
-          <Panel header="Plantas">
+          <CollapsiblePanel header="Plantas" toggleable={false}>
             <div className="col-12">
               <div className="grid mb-4">
                 <div className="col-12">
-                  <RecordSelector 
+                  <RecordSelector
                     data={this.state.data.prints}
                     list={this.state.printsList}
                     onChange={(data) => {
                       this.onPrintsChange(data);
                     }}
                   />
-                </div>               
+                </div>
               </div>
               <div className="grid">
                 <div className="col-12">
@@ -240,29 +236,29 @@ class PrintGroupChildsEditor extends Component {
                       data={this.state.data.prints}
                       type="PRINTS"
                       onChange={(data) => {
-                        this.onPrintsChange(data);                     
+                        this.onPrintsChange(data);
                       }}
                     />
                   </div>
                 </div>
               </div>
-            </div>           
-          </Panel>          
+            </div>
+          </CollapsiblePanel>
         </div>
 
         <div className="field col-12 md:col-6">
-          <Panel header="Grupos">
+          <CollapsiblePanel header="Grupos" toggleable={false}>
             <div className="col-12">
               <div className="grid mb-4">
                 <div className="col-12">
-                  <RecordSelector 
+                  <RecordSelector
                     data={this.state.data.groups}
                     list={this.state.groupsList}
                     onChange={(data) => {
                       this.onGroupsChange(data);
                     }}
                   />
-                </div>               
+                </div>
               </div>
               <div className="grid">
                 <div className="col-12">
@@ -271,16 +267,16 @@ class PrintGroupChildsEditor extends Component {
                       data={this.state.data.groups}
                       type="GROUPS"
                       onChange={(data) => {
-                        this.onGroupsChange(data);                      
+                        this.onGroupsChange(data);
                       }}
                     />
                   </div>
                 </div>
               </div>
-            </div>           
-          </Panel>
+            </div>
+          </CollapsiblePanel>
         </div>
-        
+
       </div>
 
     );

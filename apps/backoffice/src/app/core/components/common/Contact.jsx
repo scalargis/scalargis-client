@@ -1,5 +1,6 @@
 import React from 'react';
-import { Panel } from 'primereact/panel';
+import { UnstyledButton } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
 
 export const Contact = (props) => {
 
@@ -8,11 +9,11 @@ export const Contact = (props) => {
     const CLIENT_URL = core.CLIENT_URL;
 
     return (
-      <button className="p-link">
+      <UnstyledButton>
         <img src={icon ? CLIENT_URL + icon : CLIENT_URL + "assets/layout/images/avatar_4.png"} width="35" alt="avatar4" />
         <span className="name">{name}</span>
         <span className="email">{email}</span>
-      </button>
+      </UnstyledButton>
     );
 }
 
@@ -21,7 +22,7 @@ export const ContactList = (props) => {
   const { core, contacts} = props;
 
   return (
-    <Panel header="Contactos (suporte)">
+    <CollapsiblePanel header="Contactos (suporte)" toggleable={false}>
       <ul>
           { contacts.map((item, i) =>
               <li key={i}>
@@ -29,6 +30,6 @@ export const ContactList = (props) => {
               </li>
           )}
       </ul>
-    </Panel>
+    </CollapsiblePanel>
   );
 }
