@@ -16,7 +16,7 @@ import {
   Tabs,
   TextInput
 } from '@mantine/core';
-import { CodeEditor, CollapsiblePanel, notify } from '@scalargis/ui';
+import { CodeEditor, CollapsiblePanel, notify, TabPanel } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import FormFieldsEditor from "../common/FormFieldsEditor";
@@ -24,21 +24,6 @@ import PrintLayoutsEditor from "./PrintLayoutsEditor";
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
-
-// Inactive tabs stay mounted but hidden off-flow (height:0, full width) —
-// NOT display:none, which would drop the editor from layout and make its
-// line-number gutter re-measure/reflow for a frame on the first reveal.
-// The form is position:relative so these absolute hidden cards stay put.
-const HIDDEN = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: 0,
-  overflow: 'hidden',
-  visibility: 'hidden',
-  pointerEvents: 'none',
-};
 
 const buildScaleList = (list1, list2) => {
   const list = [...new Set([...(list1 || []) ,...(list2 || [])])].sort((a, b)=>{return a-b});
@@ -231,9 +216,10 @@ function PrintForm(props) {
         </Tabs.List>
       </Tabs>
 
-      <form onSubmit={handleSubmit(onSubmit)} style={{ position: 'relative' }}>
+      <form onSubmit={handleSubmit(onSubmit)}>
 
-        <div className="card" style={activeTab === 'base' ? undefined : HIDDEN}>
+        <TabPanel active={activeTab === 'base'} mount="eager">
+        <div className="card">
 
             <div className="formgrid grid">
 
@@ -505,8 +491,10 @@ function PrintForm(props) {
             </div>
 
           </div>
+        </TabPanel>
 
-        <div className="card" style={activeTab === 'config' ? undefined : HIDDEN}>
+        <TabPanel active={activeTab === 'config'} mount="eager">
+        <div className="card">
 
             <div className="field col-12">
               <Input.Label>Configuração</Input.Label>
@@ -529,8 +517,10 @@ function PrintForm(props) {
             </div>
 
           </div>
+        </TabPanel>
 
-        <div className="card" style={activeTab === 'form' ? undefined : HIDDEN}>
+        <TabPanel active={activeTab === 'form'} mount="eager">
+        <div className="card">
 
             <FormFieldsEditor data={formFields}
               onChange={(data) => {
@@ -539,8 +529,10 @@ function PrintForm(props) {
             />
 
           </div>
+        </TabPanel>
 
-        <div className="card" style={activeTab === 'layouts' ? undefined : HIDDEN}>
+        <TabPanel active={activeTab === 'layouts'} mount="lazy">
+        <div className="card">
 
               <PrintLayoutsEditor data={layouts}
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
@@ -549,6 +541,7 @@ function PrintForm(props) {
                 }}
               />
           </div>
+        </TabPanel>
 
         <Group justify="flex-end" className="mt-4 mb-4">
           <Button

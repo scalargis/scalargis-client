@@ -30,6 +30,7 @@ What lives here — and the only things allowed to (plan §1c anti-goal:
   | `TreeSelect` | `TreeSelect` (no Mantine core equivalent; keyboard-selectable via TreeView's Enter) |
   | `CollapsiblePanel` | `Panel toggleable` (**not** a one-item Accordion) |
   | `FileUpload` | `FileUpload` (Choose/Upload/Cancel + staged file list) |
+  | `TabPanel` | `TabView` panel mount/hide — `eager`/`lazy`/`unmount` (Mantine's only choices are display:none or unmount, both wrong for CodeMirror + datatable tabs) |
   | `exportCSV`, `toCSV` | `DataTable.exportCSV()` |
 
   Recipes carry no **primereact** dependency (it is removed in Phase 5). They

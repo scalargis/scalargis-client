@@ -42,3 +42,6 @@ export type {
 
 export { FileUpload } from './recipes/FileUpload';
 export type { FileUploadProps } from './recipes/FileUpload';
+
+export { TabPanel } from './recipes/TabPanel';
+export type { TabPanelProps, TabMount } from './recipes/TabPanel';

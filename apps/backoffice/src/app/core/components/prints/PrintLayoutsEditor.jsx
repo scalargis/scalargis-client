@@ -101,16 +101,30 @@ const LayoutEditor = props => {
 
 const pickLayout = (r) => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r);
 
+// DataGrid identifies rows by `key`; keep it a module-scope helper so the
+// initial state can seed keys up front (the grid renders keyless rows for a
+// frame otherwise).
+const createKey = () => {
+    let key = '';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 5; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return key;
+}
+
 const PrintLayoutsEditor = props => {
 
-  const [records, setRecords] = useState(props.data ? [...props.data] : []);
+  const [records, setRecords] = useState(() => (props.data ?? []).map((l) => ({ ...l, key: createKey() })));
   const [selectedRecords, setSelectedRecords] = useState([]);
 
   const [layoutEdition, setLayoutEdition] = useState();
   const [showLayoutForm, setShowLayoutForm] = useState(false);
 
-  // Drag reorders keep stable keys; skip the re-key when our own change bubbles back.
-  const skipReseed = useRef(false);
+  // Drag reorders keep stable keys; skip the re-key when our own change bubbles
+  // back. Starts true so the mount-time effect skips too - the initializer above
+  // already seeded keys, so re-keying on mount would only churn them.
+  const skipReseed = useRef(true);
 
   useEffect(() => {
    if (skipReseed.current) { skipReseed.current = false; return; }
@@ -126,15 +140,6 @@ const PrintLayoutsEditor = props => {
         }
     }
     return index;
-  }
-
-  const createKey = () => {
-      let key = '';
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      for (let i = 0; i < 5; i++) {
-          key += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return key;
   }
 
   const onDragEnd = (result) => {
