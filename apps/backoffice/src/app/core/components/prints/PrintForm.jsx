@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
@@ -16,19 +16,29 @@ import {
   Tabs,
   TextInput
 } from '@mantine/core';
-import { CollapsiblePanel, notify } from '@scalargis/ui';
+import { CodeEditor, CollapsiblePanel, notify } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import FormFieldsEditor from "../common/FormFieldsEditor";
 import PrintLayoutsEditor from "./PrintLayoutsEditor";
 
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/theme-github";
-
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 
+// Inactive tabs stay mounted but hidden off-flow (height:0, full width) —
+// NOT display:none, which would drop the editor from layout and make its
+// line-number gutter re-measure/reflow for a frame on the first reveal.
+// The form is position:relative so these absolute hidden cards stay put.
+const HIDDEN = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: 0,
+  overflow: 'hidden',
+  visibility: 'hidden',
+  pointerEvents: 'none',
+};
 
 const buildScaleList = (list1, list2) => {
   const list = [...new Set([...(list1 || []) ,...(list2 || [])])].sort((a, b)=>{return a-b});
@@ -58,6 +68,8 @@ function PrintForm(props) {
   const [isSaving, setIsSaving] = useState(false);
 
   const [activeTab, setActiveTab] = useState('base');
+
+  const configEditorRef = useRef(null);
 
   const [data, setData] = useState(props.data);
 
@@ -123,6 +135,10 @@ function PrintForm(props) {
       console.log(error)
     });
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== 'config') configEditorRef.current?.closeSearch();
+  }, [activeTab]);
 
   const addScaleFromPicker = () => {
     const value = typeof newScale === 'number' ? newScale : null;
@@ -215,10 +231,9 @@ function PrintForm(props) {
         </Tabs.List>
       </Tabs>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ position: 'relative' }}>
 
-        {activeTab === 'base' ?
-          <div className="card">
+        <div className="card" style={activeTab === 'base' ? undefined : HIDDEN}>
 
             <div className="formgrid grid">
 
@@ -270,7 +285,8 @@ function PrintForm(props) {
                   <div className="field col-12 md:col-4">
                     <Controller name="scale" control={control}
                       render={({ field }) => (
-                        <NumberInput id="scale" label="Escala" prefix="1:" hideControls
+                        <NumberInput id="scale" label="Escala" hideControls
+                          leftSection={<span aria-hidden="true" style={{ fontSize: 'var(--mantine-font-size-md)', color: 'var(--mantine-color-text)' }}>1:</span>} leftSectionWidth={28}
                           allowNegative={false} allowDecimal={false}
                           value={field.value ?? ''}
                           onChange={(value) => field.onChange(value === '' ? null : value)} />
@@ -405,7 +421,8 @@ function PrintForm(props) {
                             </ActionIcon>
                           </Popover.Target>
                           <Popover.Dropdown>
-                            <NumberInput label="Adicionar escala" prefix="1:" hideControls
+                            <NumberInput label="Adicionar escala" hideControls
+                              leftSection={<span aria-hidden="true" style={{ fontSize: 'var(--mantine-font-size-md)', color: 'var(--mantine-color-text)' }}>1:</span>} leftSectionWidth={28}
                               allowNegative={false} allowDecimal={false}
                               value={newScale}
                               onChange={setNewScale}
@@ -489,51 +506,31 @@ function PrintForm(props) {
 
           </div>
 
-        : null}
-
-        {activeTab === 'config' ?
-
-          <div className="card">
+        <div className="card" style={activeTab === 'config' ? undefined : HIDDEN}>
 
             <div className="field col-12">
               <Input.Label>Configuração</Input.Label>
-              <div id="config-editor-parent">
 
                 <Controller
                   control={control}
                   name="config_json"
                   render={({ field }) => {
 
-                    return <AceEditor
-                      mode="json"
-                      theme="github"
-                      onLoad={editorInstance => {
-                        editorInstance.container.style.setProperty('width', (document.getElementById('config-editor-parent').offsetWidth - 50) + 'px');
-                      }}
-                      {...field}
-                      onChange={(newValue) => {
-                        field.onChange(newValue);
-                      }}
+                    return <CodeEditor
+                      ref={configEditorRef}
+                      language="json"
                       value={field.value}
-                      name="print-config"
-                      editorProps={{ $blockScrolling: true }}
-                      setOptions={{
-                        useWorker: false,
-                        tabSize: 2
-                      }}
+                      onChange={field.onChange}
+                      height="400px"
+                      aria-label="Configuração"
                     />
                   }}
                 />
-              </div>
             </div>
 
           </div>
 
-        : null}
-
-        {activeTab === 'form' ?
-
-          <div className="card">
+        <div className="card" style={activeTab === 'form' ? undefined : HIDDEN}>
 
             <FormFieldsEditor data={formFields}
               onChange={(data) => {
@@ -543,10 +540,7 @@ function PrintForm(props) {
 
           </div>
 
-        : null}
-
-        {activeTab === 'layouts' ?
-          <div className="card">
+        <div className="card" style={activeTab === 'layouts' ? undefined : HIDDEN}>
 
               <PrintLayoutsEditor data={layouts}
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
@@ -555,8 +549,6 @@ function PrintForm(props) {
                 }}
               />
           </div>
-
-        : null}
 
         <Group justify="flex-end" className="mt-4 mb-4">
           <Button

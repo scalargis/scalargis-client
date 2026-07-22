@@ -138,14 +138,23 @@ describe('control defaults (kit 03 §6)', () => {
 
 describe('overlay ladder (kit 03 §8)', () => {
   it.each([
-    ['Popover', 1000],
-    ['Menu', 1000],
-    ['Combobox', 1000],
-    ['HoverCard', 1000],
     ['Drawer', 5000],
     ['Modal', 6000],
     ['Tooltip', 8000],
   ])('%s sits on the ADS z-%d rung', (name, zIndex) => {
+    expect(theme.components[name]?.defaultProps).toMatchObject({ zIndex });
+  });
+
+  // Transient dropdown overlays ride above the dialog rung (not the 1000
+  // --z-dropdown token): Mantine portals them to body, so a Select inside a
+  // Modal (6000) must clear it or it paints behind and reads as empty. Still
+  // below toast (7000)/tooltip (8000).
+  it.each([
+    ['Popover', 6100],
+    ['Menu', 6100],
+    ['Combobox', 6100],
+    ['HoverCard', 6100],
+  ])('%s floats above the dialog rung at z-%d', (name, zIndex) => {
     expect(theme.components[name]?.defaultProps).toMatchObject({ zIndex });
   });
 

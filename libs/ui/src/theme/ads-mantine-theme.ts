@@ -244,13 +244,21 @@ export const adsBaseTheme = createTheme({
     },
     Drawer: { defaultProps: { zIndex: 5000 } },
     Tooltip: { defaultProps: { zIndex: 8000 } },
-    // Dropdown rung (1000): Menu/Select/Combobox panels and every Popover.
-    Popover: { defaultProps: { zIndex: 1000 } },
-    Menu: { defaultProps: { zIndex: 1000 } },
+    /* Transient dropdown overlays (Popover/Menu/Combobox/Select/HoverCard)
+       ride ABOVE the dialog rung, not on the ADS --z-dropdown token (1000).
+       Reason: Mantine portals these to document.body, so a Select opened
+       INSIDE a Modal (6000) or Drawer (5000) would otherwise paint behind it
+       and read as an empty dropdown. They float above their spawning surface
+       and below toast (7000)/tooltip (8000) — which is exactly the ordering
+       Mantine ships by default (popover 300 > modal 200); the flat ADS ladder
+       inverted it. The 1000 --z-dropdown token stays for page-level CSS chrome
+       that is never spawned inside a dialog. */
+    Popover: { defaultProps: { zIndex: 6100 } },
+    Menu: { defaultProps: { zIndex: 6100 } },
     // Popover's centred `bottom` default makes x depend on the panel's own
     // width, which Combobox measures as 0 while the dropdown is display:none.
-    Combobox: { defaultProps: { zIndex: 1000, position: 'bottom-start' } },
-    HoverCard: { defaultProps: { zIndex: 1000 } },
+    Combobox: { defaultProps: { zIndex: 6100, position: 'bottom-start' } },
+    HoverCard: { defaultProps: { zIndex: 6100 } },
   },
 
   /* ─── ESCAPE HATCH: raw ADS tokens for hand-written CSS ─────────── */

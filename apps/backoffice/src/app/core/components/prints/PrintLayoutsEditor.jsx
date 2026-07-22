@@ -1,13 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { ActionIcon, Button, Group, Input, Modal, Select, Table } from '@mantine/core';
-import { DataGrid, ConfirmPopover } from '@scalargis/ui';
+import { CodeEditor, DataGrid, ConfirmPopover } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useForm, Controller } from 'react-hook-form';
-
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/theme-github";
-
 
 import { utils } from '@scalargis/components';
 
@@ -73,34 +68,21 @@ const LayoutEditor = props => {
           </div>
           <div className="field col-12">
             <Input.Label>Configuração</Input.Label>
-            <div id="editor-parent">
 
               <Controller
                 control={control}
                 name="config"
                 render={({ field }) => {
 
-                  return <AceEditor
-                    mode="json"
-                    theme="github"
-                    onLoad={editorInstance => {
-                      editorInstance.container.style.setProperty('width', (document.getElementById('editor-parent').offsetWidth - 50) + 'px');
-                    }}
-                    {...field}
-                    onChange={(newValue) => {
-                      field.onChange(newValue);
-                    }}
+                  return <CodeEditor
+                    language="json"
                     value={field.value}
-                    name="layout-config"
-                    editorProps={{ $blockScrolling: true }}
-                    setOptions={{
-                      useWorker: false,
-                      tabSize: 2
-                    }}
+                    onChange={field.onChange}
+                    height="400px"
+                    aria-label="Configuração"
                   />
                 }}
               />
-            </div>
           </div>
 
         </div>
@@ -127,7 +109,11 @@ const PrintLayoutsEditor = props => {
   const [layoutEdition, setLayoutEdition] = useState();
   const [showLayoutForm, setShowLayoutForm] = useState(false);
 
+  // Drag reorders keep stable keys; skip the re-key when our own change bubbles back.
+  const skipReseed = useRef(false);
+
   useEffect(() => {
+   if (skipReseed.current) { skipReseed.current = false; return; }
    if (props?.data) setRecords(props.data.map((l) => { return {...l, key: createKey()} }));
   }, [props.data]);
 
@@ -158,6 +144,8 @@ const PrintLayoutsEditor = props => {
     const _records = [...records];
     const [moved] = _records.splice(result.source.index, 1);
     _records.splice(result.destination.index, 0, moved);
+    skipReseed.current = true;
+    setRecords(_records);
     props.onChange(_records.map(pickLayout));
   }
 
@@ -204,17 +192,20 @@ const PrintLayoutsEditor = props => {
 
   const columns = useMemo(
     () => [
+      // Explicit widths keep the cells from collapsing when a row is lifted for
+      // drag (mantine-datatable only sets td width when the column defines it).
       {
         accessor: 'move',
         title: '',
-        width: 40,
+        width: 48,
         render: () => <i className="fas fa-arrows-alt" aria-hidden="true" />
       },
-      { accessor: 'format', title: 'Formato' },
-      { accessor: 'orientation', title: 'Orientação' },
+      { accessor: 'format', title: 'Formato', width: 180 },
+      { accessor: 'orientation', title: 'Orientação', width: '100%' },
       {
         accessor: 'actions',
         title: '',
+        width: 120,
         render: (record) => (
           <Group gap="xs" wrap="nowrap" justify="flex-end">
             <ActionIcon type="button" color="success" aria-label="Editar" onClick={() => editRecord(record)}>

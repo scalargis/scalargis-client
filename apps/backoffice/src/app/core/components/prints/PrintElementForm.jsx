@@ -3,11 +3,7 @@ import { connect } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Group, Input, TextInput } from '@mantine/core';
-import { notify } from '@scalargis/ui';
-
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/theme-github";
+import { CodeEditor, notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -116,34 +112,21 @@ function PrintElementForm(props) {
 
             <div className="field col-12">
               <Input.Label>Configuração</Input.Label>
-              <div id="editor-parent">
                 <Controller
                   control={control}
                   name="config"
                   rules={{ required: 'Campo obrigatório.' }}
                   render={({ field }) => {
-                    return <AceEditor
-                      mode="json"
-                      theme="github"
-                      onLoad={editorInstance => {
-                        editorInstance.container.style.setProperty('width', (document.getElementById('editor-parent').offsetWidth - 50) + 'px');
-                      }}
-                      {...field}
-                      onChange={(newValue) => {
-                        field.onChange(newValue);
-                      }}
+                    return <CodeEditor
+                      language="json"
                       value={field.value}
-                      name="config"
-                      editorProps={{ $blockScrolling: true }}
-                      setOptions={{
-                        useWorker: false,
-                        tabSize: 2
-                      }}
+                      onChange={field.onChange}
+                      height="400px"
+                      aria-label="Configuração"
                     />
                   }}
                 />
                 {fieldError(errors, 'config') && <Input.Error>{fieldError(errors, 'config')}</Input.Error>}
-              </div>
             </div>
           </div>
 

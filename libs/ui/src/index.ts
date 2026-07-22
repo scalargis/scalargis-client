@@ -33,5 +33,12 @@ export type { TreeSelectProps } from './recipes/TreeSelect';
 export { CollapsiblePanel } from './recipes/CollapsiblePanel';
 export type { CollapsiblePanelProps } from './recipes/CollapsiblePanel';
 
+export { CodeEditor } from './recipes/CodeEditor';
+export type {
+  CodeEditorProps,
+  CodeEditorHandle,
+  CodeEditorLanguage,
+} from './recipes/CodeEditor';
+
 export { FileUpload } from './recipes/FileUpload';
 export type { FileUploadProps } from './recipes/FileUpload';

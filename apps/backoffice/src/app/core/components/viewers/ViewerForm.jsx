@@ -20,13 +20,7 @@ import {
   TagsInput,
   TextInput
 } from '@mantine/core';
-import { DataGrid, notify } from '@scalargis/ui';
-
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/theme-github";
-import "ace-builds/src-noconflict/mode-css";
-import 'ace-builds/src-noconflict/ext-searchbox';
+import { CodeEditor, DataGrid, notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -34,6 +28,24 @@ import { isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 
+// Inactive tabs stay mounted (so editor state and history survive a tab
+// switch) but are hidden off-flow. We deliberately do NOT use display:none:
+// a display:none editor is dropped from layout, so on the first reveal
+// CodeMirror re-measures its gutter and the line-number column snaps width
+// for one frame (a visible "1,2,3" twitch). Keeping the editor laid out at
+// full width with height:0 leaves the gutter measured, so revealing a tab
+// just grows the height with no reflow. The form is position:relative so
+// these absolutely-positioned hidden cards don't escape it.
+const HIDDEN = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: 0,
+  overflow: 'hidden',
+  visibility: 'hidden',
+  pointerEvents: 'none',
+};
 
 const sortRolesArray = (data) => {
   if (!data) return data;
@@ -117,9 +129,6 @@ function ViewerForm(props) {
   const [groupsList, setGroupsList] = useState([]);
   const [printChilds, setPrintChilds] = useState({ prints: props.data?.prints || [], groups: props.data?.print_groups || [] });
 
-  const [customStyleEditorSearchText, setCustomStyleEditorSearchText] = useState('');
-  const [jsonConfigEditorSearchText, setJsonConfigEditorSearchText] = useState('');
-
   const customStyleEditor = useRef(null);
   const jsonConfigEditor = useRef(null);
 
@@ -179,6 +188,13 @@ function ViewerForm(props) {
       setIsLoading(false);
     });
   }, []);
+
+  // Close a left-behind search panel when leaving a tab so it isn't sitting
+  // open the next time the tab is revealed.
+  useEffect(() => {
+    if (activeTab !== 'ui') customStyleEditor.current?.closeSearch();
+    if (activeTab !== 'config') jsonConfigEditor.current?.closeSearch();
+  }, [activeTab]);
 
   // MultiSelect exchanges string values; ids are numbers everywhere else.
   const addRoles = () => {
@@ -347,11 +363,9 @@ function ViewerForm(props) {
         </Tabs.List>
       </Tabs>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ position: 'relative' }}>
 
-        {activeTab === 'base' ?
-
-          <div className="card">
+        <div className="card" style={activeTab === 'base' ? undefined : HIDDEN}>
 
             <div className="p-fluid formgrid grid">
 
@@ -517,10 +531,7 @@ function ViewerForm(props) {
 
           </div>
 
-        : null}
-
-        {activeTab === 'ui' ?
-          <div className="card">
+        <div className="card" style={activeTab === 'ui' ? undefined : HIDDEN}>
             <div className="p-fluid formgrid grid">
 
               <div className="field col-12 md:col-4">
@@ -535,174 +546,92 @@ function ViewerForm(props) {
                 <TextInput id="img_logo_alt" label="Logo Alternativo" {...register('img_logo_alt')} />
               </div>
 
-              <div className="field col-12" id="manifest-editor-parent">
+              <div className="field col-12">
                 <Input.Label>App Manifest</Input.Label>
-                  <AceEditor
-                    id="manifest_editor"
-                    mode="json"
-                    theme="github"
-                    onLoad={editorInstance => {
-                      editorInstance.container.style.setProperty('width', (document.getElementById('manifest-editor-parent').offsetWidth - 20) + 'px');
-                    }}
-                    onChange={(newValue) => {
-                      setManifestJson(newValue);
-                    }}
+                  <CodeEditor
+                    language="json"
                     value={manifestJson}
-                    name="UNIQUE_ID_OF_MANIFEST"
-                    editorProps={{ $blockScrolling: true }}
-                    setOptions={{
-                      useWorker: false,
-                      tabSize: 2,
-                      maxLines: 20,
-                      printMargin: false
-                    }}
+                    onChange={setManifestJson}
+                    minHeight="120px"
+                    maxHeight="360px"
+                    aria-label="App Manifest"
                   />
               </div>
 
-              <div className="field col-12" id="style-editor-parent">
+              <div className="field col-12">
                 <Group justify="flex-end" gap="xs" wrap="nowrap" className="mb-1">
                   <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
                     onClick={e => {
                       e.preventDefault();
-                      customStyleEditor.current.editor.undo();
+                      customStyleEditor.current?.undo();
                     }}>
                     <i className="pi pi-undo" />
                   </ActionIcon>
                   <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
                     onClick={e => {
                       e.preventDefault();
-                      customStyleEditor.current.editor.redo();
+                      customStyleEditor.current?.redo();
                     }}>
                     <i className="pi pi-refresh" />
                   </ActionIcon>
-                  <TextInput placeholder="Pesquisar"
-                    value={customStyleEditorSearchText}
-                    onChange={e=>{
-                      if (!e.target.value) {
-                        customStyleEditor.current.editor.find('', {
-                          backwards: false,
-                          wrap: true,
-                          caseSensitive: false,
-                          wholeWord: false,
-                          regExp: false
-                        });
-                      }
-                      setCustomStyleEditorSearchText(e.target.value)
-                      }} />
                   <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
-                    onClick={e=>{
+                    onClick={e => {
                       e.preventDefault();
-                      customStyleEditor.current.editor.find(customStyleEditorSearchText, {
-                        backwards: false,
-                        wrap: true,
-                        caseSensitive: false,
-                        wholeWord: false,
-                        regExp: false
-                      });
-                      return false;
+                      customStyleEditor.current?.openSearch();
                     }}>
                     <i className="pi pi-search" />
                   </ActionIcon>
                 </Group>
                 <Input.Label>Style (Código)</Input.Label>
-                <AceEditor
+                <CodeEditor
                   ref={customStyleEditor}
-                  id="style_editor"
-                  mode="css"
-                  theme="github"
-                  onLoad={editorInstance => {
-                    editorInstance.container.style.setProperty('width', (document.getElementById('style-editor-parent').offsetWidth - 20) + 'px');
-                  }}
-                  onChange={(newValue) => {
-                    setCustomStyle(newValue);
-                  }}
+                  language="css"
                   value={customStyle}
-                  name="UNIQUE_ID_OF_DIV2"
-                  editorProps={{ $blockScrolling: true }}
-                  setOptions={{
-                    useWorker: false,
-                    tabSize: 2,
-                    maxLines: 20,
-                    printMargin: false
-                  }}
+                  onChange={setCustomStyle}
+                  minHeight="120px"
+                  maxHeight="360px"
+                  aria-label="Style (Código)"
                 />
               </div>
 
             </div>
           </div>
-        : null}
 
-        {activeTab === 'config' ?
-          <div className="card" id="editor-parent">
+        <div className="card" style={activeTab === 'config' ? undefined : HIDDEN}>
             <Group justify="flex-end" gap="xs" wrap="nowrap" className="mb-1">
               <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
                 onClick={e => {
                   e.preventDefault();
-                  jsonConfigEditor.current.editor.undo();
+                  jsonConfigEditor.current?.undo();
                 }}>
                 <i className="pi pi-undo" />
               </ActionIcon>
               <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
                 onClick={e => {
                   e.preventDefault();
-                  jsonConfigEditor.current.editor.redo();
+                  jsonConfigEditor.current?.redo();
                 }}>
                 <i className="pi pi-refresh" />
               </ActionIcon>
-              <TextInput placeholder="Pesquisar"
-                value={jsonConfigEditorSearchText}
-                onChange={e=>{
-                  if (!e.target.value) {
-                    jsonConfigEditor.current.editor.find('', {
-                      backwards: false,
-                      wrap: true,
-                      caseSensitive: false,
-                      wholeWord: false,
-                      regExp: false
-                    });
-                  }
-                  setJsonConfigEditorSearchText(e.target.value)
-                  }} />
               <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
-                onClick={e=>{
+                onClick={e => {
                   e.preventDefault();
-                  jsonConfigEditor.current.editor.find(jsonConfigEditorSearchText, {
-                    backwards: false,
-                    wrap: true,
-                    caseSensitive: false,
-                    wholeWord: false,
-                    regExp: false
-                  });
-                  return false;
+                  jsonConfigEditor.current?.openSearch();
                 }}>
                 <i className="pi pi-search" />
               </ActionIcon>
             </Group>
-            <AceEditor
+            <CodeEditor
               ref={jsonConfigEditor}
-              mode="json"
-              theme="github"
-              onLoad={editorInstance => {
-                editorInstance.container.style.setProperty('width', (document.getElementById('editor-parent').offsetWidth - 30) + 'px');
-              }}
-              onChange={(newValue) => {
-                setConfigJson(newValue);
-              }}
+              language="json"
               value={configJson}
-              name="UNIQUE_ID_OF_DIV"
-              editorProps={{ $blockScrolling: true }}
-              setOptions={{
-                useWorker: false,
-                tabSize: 2,
-                printMargin: false
-              }}
+              onChange={setConfigJson}
+              height="calc(100vh - 300px)"
+              aria-label="Config JSON"
             />
           </div>
-        : null}
 
-        {activeTab === 'prints' ?
-
-          <div className="card">
+        <div className="card" style={activeTab === 'prints' ? undefined : HIDDEN}>
 
             <PrintGroupChildsEditor
               data={printChilds}
@@ -714,7 +643,6 @@ function ViewerForm(props) {
             />
 
           </div>
-        : null}
 
         <Group justify="flex-end" className="mt-4 mb-4">
           <Button
