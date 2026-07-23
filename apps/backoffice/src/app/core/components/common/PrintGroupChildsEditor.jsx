@@ -123,7 +123,7 @@ const ListChilds = props => {
                         snapshot.isDragging,
                         provided.draggableProps.style
                       )}
-                      className="p-shadow-1"
+                      className="shadow-1"
                     >
                     <div style={{marginBottom: 5 }}>
                       <div style={{ float: "left", paddingTop: 6 }}>
@@ -150,7 +150,7 @@ const ListChilds = props => {
                         </div>
                       </div>
 
-                      <div className="p-fluid pt-2">
+                      <div className="pt-2">
                         <div className="field grid mb-0">
                           <div className="col-12">
                             <div className="grid">
@@ -213,7 +213,7 @@ class PrintGroupChildsEditor extends Component {
   render() {
     return (
 
-      <div className="p-fluid formgrid grid">
+      <div className="formgrid grid">
 
         <div className="field col-12 md:col-6">
           <CollapsiblePanel header="Plantas" toggleable={false}>

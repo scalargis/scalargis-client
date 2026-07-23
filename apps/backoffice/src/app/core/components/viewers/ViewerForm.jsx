@@ -367,7 +367,7 @@ function ViewerForm(props) {
 
         <div className="card" style={activeTab === 'base' ? undefined : HIDDEN}>
 
-            <div className="p-fluid formgrid grid">
+            <div className="formgrid grid">
 
               <div className="field col-12 md:col-2">
                 <TextInput id="id" label="Id" value={data.id || ''} readOnly />
@@ -532,7 +532,7 @@ function ViewerForm(props) {
           </div>
 
         <div className="card" style={activeTab === 'ui' ? undefined : HIDDEN}>
-            <div className="p-fluid formgrid grid">
+            <div className="formgrid grid">
 
               <div className="field col-12 md:col-4">
                 <TextInput id="img_icon" label="Icon" {...register('img_icon')} />

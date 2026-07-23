@@ -43,9 +43,8 @@ import ParameterEdit from './settings/ParameterEdit';
 import CoordinateSystemList from './settings/CoordinateSystemList';
 import CoordinateSystemEdit from './settings/CoordinateSystemEdit';
 
-// Prime global CSS moved to app.jsx (shell) so the Prime→Mantine import
-// order is owned in one place (Phase 1 CSS order rule).
-import 'prismjs/themes/prism-coy.css';
+// Global CSS (primeicons/primeflex + the Mantine block) is owned by app.jsx
+// (Phase 1 CSS order rule); these are the layout's own stylesheets.
 import '../../layout/flags/flags.css';
 import '../../layout/layout.scss';
 import './App.scss';

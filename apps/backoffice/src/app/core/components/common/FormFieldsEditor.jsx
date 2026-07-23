@@ -256,7 +256,7 @@ const GroupFields = props => {
                         snapshot.isDragging,
                         provided.draggableProps.style
                       )}
-                      className="p-shadow-1"
+                      className="shadow-1"
                     >
                       <div style={{marginBottom: 5 }}>
                         <div style={{ float: "left", paddingTop: 6 }}>
@@ -408,7 +408,7 @@ const Fields = props => {
                       snapshot.isDragging,
                       provided.draggableProps.style
                     )}
-                    className="p-shadow-1"
+                    className="shadow-1"
                   >
                   <div style={{marginBottom: 5 }}>
                     <div style={{ float: "left", paddingTop: 6 }}>
@@ -748,7 +748,7 @@ class FormFieldsEditor extends Component {
                               snapshot.isDragging,
                               provided.draggableProps.style
                             )}
-                            className="p-shadow-1"
+                            className="shadow-1"
                           >
                             <div>
                               <div style={{ float: "left", paddingTop: "6px" }}>

@@ -228,7 +228,7 @@ function PrintGroupForm(props) {
 
           <div className="card">
 
-            <div className="p-fluid formgrid grid">
+            <div className="formgrid grid">
 
               <div className="field col-12 md:col-1">
                 <TextInput id="id" label="Id" value={data.id || ''} readOnly />
@@ -478,7 +478,7 @@ function PrintGroupForm(props) {
 
           <div className="card">
 
-            <div className="p-fluid formgrid grid">
+            <div className="formgrid grid">
               <PrintLayoutsEditor data={layouts}
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
                 onChange={(data) => {
