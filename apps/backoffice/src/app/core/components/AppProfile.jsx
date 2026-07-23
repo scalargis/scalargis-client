@@ -23,7 +23,7 @@ export const AppProfile = (props) => {
                 <span className="username">{name || username || ''}</span>
                 <i className="pi pi-fw pi-cog" aria-hidden="true" />
             </UnstyledButton>
-            <Collapse in={expanded}>
+            <Collapse expanded={expanded}>
                 <ul>
                     <li>
                         <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/account">

@@ -89,7 +89,7 @@ const AppSubmenu = (props) => {
                 {item.items && props.root === true && <div className='arrow'></div>}
                 {renderLink(item, i)}
                 {item.items && (
-                    <Collapse in={active}>
+                    <Collapse expanded={active}>
                         <AppSubmenu items={item.items} onMenuItemClick={props.onMenuItemClick} />
                     </Collapse>
                 )}
