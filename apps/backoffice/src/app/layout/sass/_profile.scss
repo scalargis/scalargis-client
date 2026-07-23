@@ -13,6 +13,7 @@
         cursor: pointer;
         display: inline-block;
         margin-bottom: .75em;
+        font-size: inherit;
         transition: color v.$transitionDuration;
 
         i {
@@ -29,12 +30,17 @@
         margin: 0;
 
         li {
-            button {
+            // The items are NavLinks (a) and Mantine UnstyledButtons (button).
+            :is(a, button) {
+                display: block;
                 width: 100%;
                 padding: 1em;
                 border: 0 none;
                 border-radius: 0;
                 cursor: pointer;
+                text-align: left;
+                text-decoration: none;
+                font-size: inherit;
                 transition: color v.$transitionDuration;
 
                 &:hover {
@@ -50,26 +56,6 @@
                     vertical-align: middle;
                 }
             }
-        }
-
-        &.layout-submenu-wrapper-enter,
-        &.layout-submenu-wrapper-leave-to {
-            max-height: 0;
-        }
-
-        &.layout-submenu-wrapper-enter-to,
-        &.layout-submenu-wrapper-leave {
-            max-height: 1000px;
-        }
-
-        &.layout-submenu-wrapper-leave-active {
-            overflow: hidden;
-            transition: max-height 0.45s cubic-bezier(0, 1, 0, 1);
-        }
-
-        &.layout-submenu-wrapper-enter-active {
-            overflow: hidden;
-            transition: max-height 1s ease-in-out;
         }
     }
 }
@@ -88,7 +74,7 @@
             background-color: v.$menuitemActiveBgColor;
 
             li {
-                button {
+                :is(a, button) {
                     color: v.$menuitemColor;
 
                     &:hover {
@@ -114,7 +100,7 @@
             background-color: v.$menuitemDarkActiveBgColor;
 
             li {
-                button {
+                :is(a, button) {
                     color: v.$menuitemDarkColor;
 
                     &:hover {

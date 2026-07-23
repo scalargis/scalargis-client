@@ -17,12 +17,16 @@
         display: block;
         animation-duration: .5s;
 
-        button {
+        // The items are NavLinks (a) and Mantine UnstyledButtons (button);
+        // font-size: inherit keeps the em-sized icons on the layout's own
+        // scale instead of Mantine's md.
+        :is(button, a) {
             position: relative;
             color: v.$topbarItemColor;
             margin-left: 20px;
             display: inline-block;
             text-decoration: none;
+            font-size: inherit;
             transition: color v.$transitionDuration;
 
             &:hover {
@@ -113,6 +117,7 @@
         display: inline-block;
         text-decoration: none;
         color: v.$topbarItemColor;
+        font-size: inherit;
         transition: color v.$transitionDuration;
 
         span {

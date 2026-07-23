@@ -1,56 +1,47 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router';
-import classNames from 'classnames';
-import { CSSTransition } from 'react-transition-group';
+import { Collapse, UnstyledButton } from '@mantine/core';
 
 export const AppProfile = (props) => {
 
     const { core, dispatch } = props;
     const { logout } = core.actions;
 
-    //const auth = props.auth?.data ? props.auth?.data : props.auth?.response || {};
     const auth = props.auth?.data || {};
-    const { name, username, email } = auth;
+    const { name, username } = auth;
 
     const cfg = core?.config?.config_json;
 
     const [expanded, setExpanded] = useState(false);
-    const profileMenuRef = useRef(null);
-
-    /*
-    const cookieAuthName = core.COOKIE_AUTH_NAME;
-
-    const CLIENT_URL = core.CLIENT_URL;
-    */
-    const onClick = (event) => {
-        setExpanded(prevState => !prevState);
-        event.preventDefault();
-    }
 
     return (
         <div className="layout-profile">
             <div className="mb-2">
-                <i className="fas fa-user-circle" style={{fontSize: "3rem"}}></i>                
+                <i className="fas fa-user-circle" style={{fontSize: "3rem"}} aria-hidden="true"></i>
             </div>
-            <button className="p-link layout-profile-link" onClick={onClick}>
+            <UnstyledButton className="layout-profile-link" onClick={() => setExpanded(prevState => !prevState)} aria-expanded={expanded}>
                 <span className="username">{name || username || ''}</span>
-                <i className="pi pi-fw pi-cog" />
-            </button>
-            <CSSTransition nodeRef={profileMenuRef} classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={expanded} unmountOnExit>
-                <ul ref={profileMenuRef} className={classNames({ 'layout-profile-expanded': expanded })}>
+                <i className="pi pi-fw pi-cog" aria-hidden="true" />
+            </UnstyledButton>
+            <Collapse in={expanded}>
+                <ul>
                     <li>
-                        <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to={'/account'} target={null}>
-                            <button type="button" className="p-link"><i className="pi pi-fw pi-user" /><span>Conta</span></button>
+                        <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/account">
+                            <i className="pi pi-fw pi-user" aria-hidden="true" /><span>Conta</span>
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to={'/notifications/list'} target={null}>
-                            <button type="button" className="p-link"><i className="pi pi-fw pi-inbox" /><span>Notificações</span><span className="menuitem-badge">{cfg?.notifications?.total || 0}</span></button>
+                        <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/notifications/list">
+                            <i className="pi pi-fw pi-inbox" aria-hidden="true" /><span>Notificações</span><span className="menuitem-badge">{cfg?.notifications?.total || 0}</span>
                         </NavLink>
                     </li>
-                    <li><button type="button" className="p-link" onClick={e => dispatch(logout())}><i className="pi pi-fw pi-power-off" /><span>Sair</span></button></li>
+                    <li>
+                        <UnstyledButton onClick={e => dispatch(logout())}>
+                            <i className="pi pi-fw pi-power-off" aria-hidden="true" /><span>Sair</span>
+                        </UnstyledButton>
+                    </li>
                 </ul>
-            </CSSTransition>
+            </Collapse>
         </div>
     );
 }

@@ -1,27 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { connect } from 'react-redux';
 import LayoutComponent from '../components/Layout'
 
 function Layout(props) {
 
-  const { history, backoffice, layout_toggle_menu, layout_wrapper_click, layout_set_mode, layout_set_colormode } = props;
-  
+  const { history, backoffice, layout_toggle_menu, layout_wrapper_click } = props;
+
   const sidebar = useRef(null);
   const menuClick = useRef(false);
-
-  const addClass = (element, className) => {
-    if (element.classList)
-        element.classList.add(className);
-    else
-        element.className += ' ' + className;
-  }
-
-  const removeClass = (element, className) => {
-    if (element.classList)
-        element.classList.remove(className);
-    else
-        element.className = element.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
-  }
 
   const isDesktop = () => {
       return window.innerWidth > 1024;
@@ -62,16 +48,8 @@ function Layout(props) {
     */
     event.preventDefault();
     menuClick.current = true;
-    layout_toggle_menu(isDesktop());      
+    layout_toggle_menu(isDesktop());
   }
-
-  const onLayoutModeChange = (mode) => {
-      layout_set_mode(mode);
-  }
-
-  const onLayoutColorModeChange = (mode) => {
-      layout_set_colormode(mode);
-  }  
 
   return (
     <LayoutComponent
@@ -80,8 +58,6 @@ function Layout(props) {
       onWrapperClick={onWrapperClick}
       onSidebarClick={onSidebarClick}
       onToggleMenu={onToggleMenu}
-      onLayoutModeChange={onLayoutModeChange}
-      onLayoutColorModeChange={onLayoutColorModeChange}
     />
   )
 }

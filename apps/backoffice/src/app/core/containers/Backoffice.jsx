@@ -27,8 +27,7 @@ function Backoffice(props) {
   // Enable redux actions
   //const dispatch = useDispatch();
   const { core } = useContext(AppContext);
-  const { backoffice_load, layout_wrapper_click, layout_toggle_menu, layout_set_mode, 
-    layout_set_colormode } = core.actions;   
+  const { backoffice_load, layout_wrapper_click, layout_toggle_menu } = core.actions;
 
   // Get config
   React.useEffect(() => {
@@ -45,8 +44,6 @@ function Backoffice(props) {
       backoffice={backoffice}
       layout_wrapper_click={e => dispatch(layout_wrapper_click())}
       layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
-      layout_set_mode={layoutMode => dispatch(layout_set_mode(layoutMode))}
-      layout_set_colormode={layoutColorMode => dispatch(layout_set_colormode(layoutColorMode))}
     />
   );
 }

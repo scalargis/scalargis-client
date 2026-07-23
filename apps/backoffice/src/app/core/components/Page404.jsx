@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { Button } from 'primereact/button';
+import { Button, Group } from '@mantine/core';
 
-function Page404({ history }) {
+function Page404() {
   // Routing
   const navigate = useNavigate();
 
@@ -10,13 +10,13 @@ function Page404({ history }) {
     <div className="flex justify-content-center" style={{ height: '100%' }}>
       <div className="align-self-center p-8" style={{ backgroundColor: 'white' }}>
         <h1>Ops...</h1>
-        <p>O visualizador pedido não existe.</p>
-        <p>Clique para voltar a página inicial</p>
-        <p>
-          <Button label="Página Inicial" onClick={e => navigate("/")}></Button>
-        </p>
+        <p>A página pedida não existe.</p>
+        <p>Clique para voltar à página inicial</p>
+        <Group gap="sm" mt="md">
+          <Button onClick={e => navigate("/")}>Página Inicial</Button>
+        </Group>
       </div>
-  </div>
+    </div>
   )
 }
 

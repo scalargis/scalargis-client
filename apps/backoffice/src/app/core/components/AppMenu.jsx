@@ -1,12 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router';
-import { CSSTransition } from 'react-transition-group';
+import { Collapse, UnstyledButton } from '@mantine/core';
 import classNames from 'classnames';
 
-const AppSubmenu = React.forwardRef((props, ref) => {
+const AppSubmenu = (props) => {
 
     const [activeIndex, setActiveIndex] = useState(null)
-    const submenuRefs = useRef({});
 
     const onMenuItemClick = (event, item, index) => {
         //avoid processing disabled items
@@ -15,12 +14,6 @@ const AppSubmenu = React.forwardRef((props, ref) => {
             return true;
         }
 
-        //execute command
-        /*
-        if (item.command) {
-            item.command({ originalEvent: event, item: item });
-        }
-        */
         if (item.link) {
             if (item.target) {
                 event.preventDefault();
@@ -45,12 +38,12 @@ const AppSubmenu = React.forwardRef((props, ref) => {
     }
 
     const renderLinkContent = (item) => {
-        const submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
+        const submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon" aria-hidden="true"></i>;
         const badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
 
         return (
             <React.Fragment>
-                <i className={item.icon}></i>
+                <i className={item.icon} aria-hidden="true"></i>
                 <span>{item.label}</span>
                 {submenuIcon}
                 {badge}
@@ -68,33 +61,44 @@ const AppSubmenu = React.forwardRef((props, ref) => {
                 </NavLink>
             )
         }
-        else {
+
+        if (item.url || item.link) {
             return (
                 <a href={item.url} onClick={(e) => onMenuItemClick(e, item, i)} target={item.target}>
                     {content}
                 </a>
             );
         }
+
+        // Submenu toggles have no destination: a real button, so keyboard
+        // activation and the announced role work (the old href-less <a>
+        // was mouse-only and invisible to the tab order).
+        return (
+            <UnstyledButton onClick={(e) => onMenuItemClick(e, item, i)} aria-expanded={activeIndex === i}>
+                {content}
+            </UnstyledButton>
+        );
     }
 
     const items = props.items && props.items.map((item, i) => {
         const active = activeIndex === i;
         const styleClass = classNames(item.badgeStyleClass, { 'active-menuitem': active && !item.to });
-        const nodeRef = submenuRefs.current[i] || (submenuRefs.current[i] = React.createRef());
 
         return (
             <li className={styleClass} key={i}>
                 {item.items && props.root === true && <div className='arrow'></div>}
                 {renderLink(item, i)}
-                <CSSTransition nodeRef={nodeRef} classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={active} unmountOnExit>
-                    <AppSubmenu ref={nodeRef} items={item.items} onMenuItemClick={props.onMenuItemClick} />
-                </CSSTransition>
+                {item.items && (
+                    <Collapse in={active}>
+                        <AppSubmenu items={item.items} onMenuItemClick={props.onMenuItemClick} />
+                    </Collapse>
+                )}
             </li>
         );
     });
 
-    return items ? <ul ref={ref} className={props.className}>{items}</ul> : null;
-});
+    return items ? <ul className={props.className}>{items}</ul> : null;
+};
 
 export const AppMenu = (props) => {
     return (

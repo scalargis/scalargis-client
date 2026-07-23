@@ -1,13 +1,11 @@
 import React from 'react';
-import { ProgressBar } from 'primereact/progressbar';
+import { Center, Loader } from '@mantine/core';
 
-function LoadingScreen(props) {
+function LoadingScreen() {
   return (
-    <div className="loadingscreen">
-      <div>
-        <ProgressBar mode="indeterminate" style={{ height: '6px' }}></ProgressBar>
-      </div>
-    </div>    
+    <Center className="loadingscreen" h="100vh">
+      <Loader size="lg" />
+    </Center>
   )
 }
 

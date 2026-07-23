@@ -10,13 +10,18 @@
     margin: 0;
     padding: 0;
 
+    // Menu entries are NavLinks/anchors (a) and, for submenu toggles with
+    // no destination, Mantine UnstyledButtons (button) — :is() styles both
+    // at the anchor selectors' own specificity.
     li {
-        a {
+        :is(a, button) {
             cursor: pointer;
             position: relative;
             text-decoration: none;
             display: flex;
             align-items: center;
+            width: 100%;
+            font-size: inherit;
             transition: color v.$transitionDuration;
 
             i {
@@ -37,7 +42,7 @@
         }
 
         &.active-menuitem {
-            > a {
+            > :is(a, button) {
                 .menuitem-toggle-icon {
                     @include m.icon-override("\e933");
                 }
@@ -46,7 +51,7 @@
     }
 
     > li {
-        > a {
+        > :is(a, button) {
             padding: 1em;
 
             span {
@@ -55,7 +60,7 @@
         }
 
         &:last-child {
-            > a {
+            > :is(a, button) {
                 border-bottom: 1px solid v.$menuitemBorderColor;
             }
         }
@@ -67,7 +72,7 @@
             padding-left: 1.5em;
 
             li {
-                a {
+                :is(a, button) {
                     cursor: pointer;
                     padding: .75em 1em;
                     border-top: 0 none;
@@ -81,26 +86,6 @@
                     padding-bottom: 1em;
                 }
             }
-
-            &.layout-submenu-wrapper-enter,
-            &.layout-submenu-wrapper-leave-to {
-                max-height: 0;
-            }
-
-            &.layout-submenu-wrapper-enter-to,
-            &.layout-submenu-wrapper-leave {
-                max-height: 1000px;
-            }
-
-            &.layout-submenu-wrapper-leave-active {
-                overflow: hidden;
-                transition: max-height 0.45s cubic-bezier(0, 1, 0, 1);
-            }
-
-            &.layout-submenu-wrapper-enter-active {
-                overflow: hidden;
-                transition: max-height 1s ease-in-out;
-            }
         }
     }
 }
@@ -110,12 +95,12 @@
 
     .layout-menu {
         > li {
-            > a {
+            > :is(a, button) {
                 border-top: 1px solid v.$menuitemBorderColor;
             }
 
             &:last-child {
-                > a {
+                > :is(a, button) {
                     border-bottom: 1px solid v.$menuitemBorderColor;
                 }
             }
@@ -126,7 +111,7 @@
         }
 
         li {
-            a {
+            :is(a, button) {
                 color: v.$menuitemColor;
 
                 &.active-route {
@@ -139,7 +124,7 @@
             }
 
             &.active-menuitem {
-                > a {
+                > :is(a, button) {
                     background-color: v.$menuitemActiveBgColor;
                     color: v.$menuitemActiveColor;
                 }
@@ -153,12 +138,12 @@
 
     .layout-menu {
         > li {
-            > a {
+            > :is(a, button) {
                 border-top: 1px solid v.$menuitemDarkBorderColor;
             }
 
             &:last-child {
-                > a {
+                > :is(a, button) {
                     border-bottom: 1px solid v.$menuitemDarkBorderColor;
                 }
             }
@@ -169,7 +154,7 @@
         }
 
         li {
-            a {
+            :is(a, button) {
                 color: v.$menuitemDarkColor;
 
                 &.active-route {
@@ -182,7 +167,7 @@
             }
 
             &.active-menuitem {
-                > a {
+                > :is(a, button) {
                     background-color: v.$menuitemDarkActiveBgColor;
                     color: v.$menuitemDarkActiveColor;
                 }
