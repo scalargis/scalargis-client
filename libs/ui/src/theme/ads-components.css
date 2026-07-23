@@ -128,6 +128,35 @@
   color: var(--mantine-color-placeholder);
 }
 
+/* ─── SkipLink ─────────────────────────────────────────────────────────
+   Visually off-screen until keyboard focus, then pinned over the shell's
+   top-left corner. transform (not display/visibility) keeps the link
+   focusable while hidden, and the reveal is instant — no transition to
+   fight prefers-reduced-motion. While focused nothing may cover it, so
+   it sits one step above the top of the ADS z ladder.
+   -------------------------------------------------------------------- */
+.ads-skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: calc(var(--z-tooltip) + 1);
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-link);
+  font-family: var(--font-sans);
+  font-size: var(--text-m-size);
+  line-height: var(--text-m-lh);
+  text-decoration: underline;
+  border-end-end-radius: var(--radius-8);
+  box-shadow: var(--shadow-bottom-medium);
+  transform: translateY(-100%);
+}
+
+.ads-skip-link:focus-visible,
+.ads-skip-link:focus {
+  transform: translateY(0);
+}
+
 /* ─── FileUpload ───────────────────────────────────────────────────────
    Prime's FileUpload is an action bar over a drop area. @mantine/dropzone
    is only the drop area, so the recipe adds the bar; this styles the seam.

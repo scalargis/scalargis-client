@@ -45,3 +45,6 @@ export type { FileUploadProps } from './recipes/FileUpload';
 
 export { TabPanel } from './recipes/TabPanel';
 export type { TabPanelProps, TabMount } from './recipes/TabPanel';
+
+export { SkipLink } from './recipes/SkipLink';
+export type { SkipLinkProps } from './recipes/SkipLink';

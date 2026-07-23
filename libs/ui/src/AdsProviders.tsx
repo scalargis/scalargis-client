@@ -50,8 +50,21 @@ export interface AdsProvidersProps {
 
 export function AdsProviders({ children }: AdsProvidersProps) {
   // Follows the app language live (i18next); @mantine/dates runs on dayjs.
+  // resolvedLanguage only materialises once translations for the language
+  // are loaded (the shells init with resources:{} and add bundles after),
+  // so fall back to the requested language rather than defaulting wrong.
   const { i18n } = useTranslation();
-  const locale = i18n?.resolvedLanguage?.startsWith('pt') ? 'pt' : 'en';
+  const activeLanguage = i18n?.resolvedLanguage ?? i18n?.language;
+  const locale = activeLanguage?.startsWith('pt') ? 'pt' : 'en';
+
+  // <html lang> follows the active i18next language (kit 04 §screen-reader:
+  // WCAG 3.1.1 — the document lang must flip with the content language so
+  // screen readers switch pronunciation). The tag is already valid BCP-47
+  // ('pt', 'pt-PT', 'en'); until i18next has one, the shell's static
+  // index.html lang stands.
+  React.useEffect(() => {
+    if (activeLanguage) document.documentElement.lang = activeLanguage;
+  }, [activeLanguage]);
 
   // Recipe default strings (scalargis_ui namespace) onto the host i18next.
   registerUiTranslations();

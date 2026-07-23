@@ -32,6 +32,7 @@ const en = {
     remove: 'Remove',
   },
   treeselect: { placeholder: 'Select item', clear: 'Clear selection' },
+  skiplink: { label: 'Skip to main content' },
 };
 
 const pt: typeof en = {
@@ -48,6 +49,7 @@ const pt: typeof en = {
     remove: 'Remover',
   },
   treeselect: { placeholder: 'Selecionar item', clear: 'Limpar seleção' },
+  skiplink: { label: 'Saltar para o conteúdo principal' },
 };
 
 /** Idempotent; safe to call on every render. `pt-PT` resolves to the `pt`
