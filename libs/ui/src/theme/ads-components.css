@@ -56,6 +56,24 @@
   font-size: var(--mantine-font-size-sm);
 }
 
+/* The onRowReorder grip handle: a real button (keyboard-liftable, global
+   magenta ring on :focus-visible) sized to the row so the hit target is
+   comfortable without inflating row height. */
+.ads-datagrid__drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-neutral-6);
+  cursor: grab;
+}
+
+.ads-datagrid__drag-handle:active {
+  cursor: grabbing;
+}
+
 /* ─── TreeView ─────────────────────────────────────────────────────────
    Mantine's Tree renders bare labels: no chevron affordance, no hover
    target, no surface. Prime's Tree is a bordered card whose rows are

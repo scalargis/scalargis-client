@@ -59,6 +59,30 @@ describe('TabPanel', () => {
     expect(bodyWrapper().style.visibility).toBe('hidden');
   });
 
+  it('freezes hidden panels: parent-driven updates wait for the next reveal', () => {
+    const wrap = (active: boolean, label: string) => (
+      <MantineProvider theme={adsBaseTheme}>
+        <TabPanel active={active}>
+          <span>{label}</span>
+        </TabPanel>
+      </MantineProvider>
+    );
+
+    const { rerender } = render(wrap(true, 'one'));
+    expect(screen.getByText('one')).toBeTruthy();
+
+    // Hidden: the panel re-renders its last active element, so the new
+    // children ('two') must not reconcile into the hidden subtree.
+    rerender(wrap(false, 'two'));
+    expect(screen.getByText('one')).toBeTruthy();
+    expect(screen.queryByText('two')).toBeNull();
+
+    // Revealed again: thaws with the fresh element.
+    rerender(wrap(true, 'three'));
+    expect(screen.getByText('three')).toBeTruthy();
+    expect(screen.queryByText('one')).toBeNull();
+  });
+
   it('unmount renders children only while active', () => {
     const { rerender } = renderPanel({ active: true, mount: 'unmount', children: <span>Body</span> });
     expect(screen.getByText('Body')).toBeTruthy();

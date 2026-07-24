@@ -44,6 +44,8 @@ function piIcon(piClass: string) {
 }
 
 export const IconChevronRight = piIcon('pi pi-chevron-right');
+// Prime's own RowReorder glyph — familiar as "drag me" from the old grids.
+export const IconGripVertical = piIcon('pi pi-bars');
 export const IconChevronDown = piIcon('pi pi-chevron-down');
 export const IconCheckCircle = piIcon('pi pi-check-circle');
 export const IconInfoCircle = piIcon('pi pi-info-circle');
