@@ -117,7 +117,7 @@ function AccountForm(props) {
         </div>
 
         { !isEditMode &&
-        <div className="field pl-2">
+        <div className="field col-12 md:col-3">
           <Input.Label>Password</Input.Label>
           <PasswordChange core={core} />
         </div>

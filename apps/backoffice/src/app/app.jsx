@@ -30,6 +30,14 @@ const App = () => {
     base_url = base_url.slice(0, -1);
   }
 
+  // react-router >= 6 renders nothing when the URL lives outside the basename;
+  // the v5 router matched from the root instead, which kept /login, /not-found
+  // and /not-allowed working without the /backoffice prefix. Keep that
+  // tolerance: reached outside the base path, match routes from the root.
+  const { pathname } = window.location;
+  const basename = pathname === base_url || pathname.startsWith(`${base_url}/`)
+    ? base_url : '/';
+
   useEffect(()=> {
     const {actions} = core;
     const {site_load} = actions;
@@ -78,7 +86,7 @@ const App = () => {
     <AdsProviders>
       <AppContext.Provider value={{ core }}>
           <Provider store={core.store}>
-              <Router basename={base_url}>
+              <Router basename={basename}>
                   <ScrollToTop>
                       <RGPD>
                           {pagesLoaded ? <Routes core={core} pages={pages} /> : <LoadingScreen />}
