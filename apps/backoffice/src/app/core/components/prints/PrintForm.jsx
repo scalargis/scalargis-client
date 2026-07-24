@@ -531,7 +531,11 @@ function PrintForm(props) {
           </div>
         </TabPanel>
 
-        <TabPanel active={activeTab === 'layouts'} mount="lazy">
+        {/* unmount, not lazy: a datatable hidden off-flow at height:0 keeps a
+            stale ResizeObserver state and repaints a frame late on reveal; a
+            fresh mount into the laid-out container paints complete. The grid
+            is fully controlled (layouts state lives here), so remounts are free. */}
+        <TabPanel active={activeTab === 'layouts'} mount="unmount">
         <div className="card">
 
               <PrintLayoutsEditor data={layouts}

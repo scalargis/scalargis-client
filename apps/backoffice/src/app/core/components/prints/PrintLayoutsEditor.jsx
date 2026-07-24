@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import { ActionIcon, Button, Group, Input, Modal, Select, Table } from '@mantine/core';
+import React, { useMemo, useState } from "react";
+import { ActionIcon, Button, Group, Input, Modal, Select } from '@mantine/core';
 import { CodeEditor, DataGrid, ConfirmPopover } from '@scalargis/ui';
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useForm, Controller } from 'react-hook-form';
 
 import { utils } from '@scalargis/components';
@@ -13,8 +12,8 @@ const LayoutEditor = props => {
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
-    defaultValues: {...props.data}
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {...(props.data ?? {})}
   });
 
   const fieldError = (errors, name) => {
@@ -32,12 +31,8 @@ const LayoutEditor = props => {
     return undefined;
   };
 
-  const onSave = (formData) => {
-    props.onSave(formData);
-  }
-
   return (
-    <Modal title="Edição de Layout" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
+    <Modal title="Edição de Layout" opened size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
       <form>
         <div className="grid formgrid">
           <div className="field col-12 md:col-6">
@@ -91,7 +86,7 @@ const LayoutEditor = props => {
           <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
             onClick={() => props.onHide()}>Fechar</Button>
           <Button type="button" leftSection={<i className="pi pi-check" />}
-            onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
+            onClick={handleSubmit((d) => props.onSave(d))}>Gravar</Button>
         </Group>
       </form>
     </Modal>
@@ -101,110 +96,47 @@ const LayoutEditor = props => {
 
 const pickLayout = (r) => (({ id, format, orientation, config }) => ({ id, format, orientation, config }))(r);
 
-// DataGrid identifies rows by `key`; keep it a module-scope helper so the
-// initial state can seed keys up front (the grid renders keyless rows for a
-// frame otherwise).
-const createKey = () => {
-    let key = '';
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 5; i++) {
-        key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return key;
-}
+// Unsaved layouts have no id, so the grid keys rows by object identity.
+// Module scope on purpose: the cache survives the editor unmounting with its
+// tab, so a re-mount reuses the same keys for the same (parent-owned) rows.
+const layoutKeys = new WeakMap();
+let layoutKeySeq = 0;
+const layoutKey = (layout) => {
+  if (!layoutKeys.has(layout)) layoutKeys.set(layout, `layout-${++layoutKeySeq}`);
+  return layoutKeys.get(layout);
+};
 
+// Fully controlled: props.data is the single source of truth and every edit
+// (reorder, add, edit, delete) flows out through props.onChange. The grid
+// rows ARE the parent's layout objects — no copies, no key reseeding.
 const PrintLayoutsEditor = props => {
 
-  const [records, setRecords] = useState(() => (props.data ?? []).map((l) => ({ ...l, key: createKey() })));
+  const data = props.data ?? [];
+
   const [selectedRecords, setSelectedRecords] = useState([]);
 
-  const [layoutEdition, setLayoutEdition] = useState();
-  const [showLayoutForm, setShowLayoutForm] = useState(false);
+  // undefined = modal closed · null = new layout · object = the row being edited
+  const [editing, setEditing] = useState();
 
-  // Drag reorders keep stable keys; skip the re-key when our own change bubbles
-  // back. Starts true so the mount-time effect skips too - the initializer above
-  // already seeded keys, so re-keying on mount would only churn them.
-  const skipReseed = useRef(true);
-
-  useEffect(() => {
-   if (skipReseed.current) { skipReseed.current = false; return; }
-   if (props?.data) setRecords(props.data.map((l) => { return {...l, key: createKey()} }));
-  }, [props.data]);
-
-  const findIndexByKey = (key) => {
-    let index = -1;
-    for (let i = 0; i < records.length; i++) {
-        if (records[i].key === key) {
-            index = i;
-            break;
-        }
-    }
-    return index;
-  }
-
-  const onDragEnd = (result) => {
-    // dropped outside the list
-    if (!result.destination) return;
-
-    const _records = [...records];
-    const [moved] = _records.splice(result.source.index, 1);
-    _records.splice(result.destination.index, 0, moved);
-    skipReseed.current = true;
-    setRecords(_records);
-    props.onChange(_records.map(pickLayout));
-  }
-
-  const editRecord = (record) => {
-    setLayoutEdition({...record});
-    setShowLayoutForm(true);
+  const onLayoutFormSave = (formData) => {
+    const layout = pickLayout(formData);
+    props.onChange(editing ? data.map((l) => (l === editing ? layout : l)) : [...data, layout]);
+    setSelectedRecords([]);
+    setEditing(undefined);
   }
 
   const deleteRecord = (record) => {
-    const _records = records.filter(val => val.key !== record.key);
-    props.onChange(_records.map(pickLayout));
+    props.onChange(data.filter((l) => l !== record));
     setSelectedRecords([]);
   }
 
   const deleteSelectedRecords = () => {
-    const _keys = selectedRecords.map((r) => r.key);
-    const _records = records.filter(r => !_keys.includes(r.key));
-    props.onChange(_records.map(pickLayout));
+    props.onChange(data.filter((l) => !selectedRecords.includes(l)));
     setSelectedRecords([]);
-  }
-
-
-  const onLayoutFormHide = () => {
-    setShowLayoutForm(false);
-    setLayoutEdition(null);
-  }
-
-  const onLayoutFormSave = (data) => {
-    const _records = [...records];
-    const _record = {...data}
-
-    if (data.key) {
-      const index = findIndexByKey(data.key);
-      _records[index] = _record;
-    } else {
-      _record.key = createKey();
-      _records.push(_record);
-    }
-
-    props.onChange(_records.map(pickLayout));
-    setSelectedRecords([]);
-    setShowLayoutForm(false);
   }
 
   const columns = useMemo(
     () => [
-      // Explicit widths keep the cells from collapsing when a row is lifted for
-      // drag (mantine-datatable only sets td width when the column defines it).
-      {
-        accessor: 'move',
-        title: '',
-        width: 48,
-        render: () => <i className="fas fa-arrows-alt" aria-hidden="true" />
-      },
       { accessor: 'format', title: 'Formato', width: 180 },
       { accessor: 'orientation', title: 'Orientação', width: '100%' },
       {
@@ -213,7 +145,7 @@ const PrintLayoutsEditor = props => {
         width: 120,
         render: (record) => (
           <Group gap="xs" wrap="nowrap" justify="flex-end">
-            <ActionIcon type="button" color="success" aria-label="Editar" onClick={() => editRecord(record)}>
+            <ActionIcon type="button" color="success" aria-label="Editar" onClick={() => setEditing(record)}>
               <i className="pi pi-pencil" />
             </ActionIcon>
             <ConfirmPopover
@@ -231,17 +163,16 @@ const PrintLayoutsEditor = props => {
         )
       }
     ],
-    [records, selectedRecords]
+    [data, selectedRecords]
   );
 
   return (
     <div>
-      { showLayoutForm &&
-        <LayoutEditor data={layoutEdition}
+      { editing !== undefined &&
+        <LayoutEditor data={editing}
           pageFormatList={props.pageFormatList}
           pageOrientationList={props.pageOrientationList}
-          show={showLayoutForm}
-          onHide={onLayoutFormHide}
+          onHide={() => setEditing(undefined)}
           onSave={onLayoutFormSave} />
       }
 
@@ -249,9 +180,7 @@ const PrintLayoutsEditor = props => {
         <div className="card col-12">
           <Group justify="flex-end" gap="xs" className="mb-4">
             <Button type="button" color="success" leftSection={<i className="pi pi-plus" />}
-              onClick={() => {
-                editRecord({ key: '' });
-              }}>Novo</Button>
+              onClick={() => setEditing(null)}>Novo</Button>
             <ConfirmPopover
               message="Tem a certeza que pretende eliminar todos os layouts selecionados?"
               severity="danger"
@@ -264,40 +193,15 @@ const PrintLayoutsEditor = props => {
             </ConfirmPopover>
           </Group>
 
-          <DragDropContext onDragEnd={onDragEnd}>
-            <DataGrid
-              idAccessor="key"
-              records={records}
-              selectedRecords={selectedRecords}
-              onSelectedRecordsChange={setSelectedRecords}
-              columns={columns}
-              noRecordsText="Não foram encontrados registos."
-              tableWrapper={({ children }) => (
-                <Droppable droppableId="layouts-droppable">
-                  {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
-                      {children}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              )}
-              rowFactory={({ record, index, rowProps, children }) => (
-                <Draggable key={String(record.key)} draggableId={String(record.key)} index={index}>
-                  {(provided) => (
-                    <Table.Tr
-                      {...rowProps}
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      {children}
-                    </Table.Tr>
-                  )}
-                </Draggable>
-              )}
-            />
-          </DragDropContext>
+          <DataGrid
+            idAccessor={layoutKey}
+            records={data}
+            onRowReorder={props.onChange}
+            selectedRecords={selectedRecords}
+            onSelectedRecordsChange={setSelectedRecords}
+            columns={columns}
+            noRecordsText="Não foram encontrados registos."
+          />
         </div>
       </div>
     </div>
