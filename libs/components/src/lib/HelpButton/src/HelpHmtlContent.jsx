@@ -19,13 +19,9 @@ export default function HelpHtmlContent({ config }) {
     html = config?.html || "";
   }
 
-  useEffect(() => {    
+  useEffect(() => { 
     if (config.url) {
-      const url = lang ? 
-        config.url.replace("{lang}", lang).replace("{language}", lang)
-        : config.url;
-      
-      fetch(url).then(res => {
+      fetch(config.url).then(res => {
           return res.text();
       }).then(result => {
           setDialogContent(result);
@@ -36,7 +32,7 @@ export default function HelpHtmlContent({ config }) {
     } else {
       setDialogContent(html);
     }    
-  }, []);
+  }, [lang]);
 
   return (
     <div dangerouslySetInnerHTML={{ __html: dialogContent }}></div>
