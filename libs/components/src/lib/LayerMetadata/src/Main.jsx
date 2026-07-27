@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
 
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
+import { ActionIcon, Modal } from '@mantine/core';
 
 import ThemeInfo from './ThemeInfo';
 
@@ -10,7 +9,7 @@ import ThemeInfo from './ThemeInfo';
 export default function Main({ core, config }) {
 
   const { layer, viewer, mainMap, actions, models } = config;
-  const { getWindowSize, showOnPortal, isComponentExcludedForLayer } = models.Utils;  
+  const { getWindowSize, isComponentExcludedForLayer } = models.Utils;
 
   const { t } = useTranslation(["common", "custom"]);
 
@@ -26,20 +25,23 @@ export default function Main({ core, config }) {
   return (
     <React.Fragment>
 
-      <Button icon="pi pi-info-circle"
-        title={t("metadataInfo", "Informação de Metadados")}
-        color="blue"
-        size="small" rounded text
+      <ActionIcon
+        variant="subtle"
+        size="md"
+        radius="xl"
         className="tool"
+        title={t("metadataInfo", "Informação de Metadados")}
+        aria-label={t("metadataInfo", "Informação de Metadados")}
         onClick={e => setModalThemeInfoOpen(layer)}
-      />
+      >
+        <i className="pi pi-info-circle" aria-hidden="true" />
+      </ActionIcon>
 
-      {showOnPortal(<Dialog 
-        header={t("themeInfo", "Informação do Tema")}
-        visible={!!modalThemeInfoOpen}
-        style={{width: isMobile ? '90%' : '50vw' }}  
-        modal 
-        onHide={e => setModalThemeInfoOpen(false)}>
+      <Modal
+        title={t("themeInfo", "Informação do Tema")}
+        opened={!!modalThemeInfoOpen}
+        size={isMobile ? '90%' : '50vw'}
+        onClose={e => setModalThemeInfoOpen(false)}>
         <ThemeInfo
           viewer={viewer}
           mainMap={mainMap}
@@ -48,7 +50,7 @@ export default function Main({ core, config }) {
           theme={modalThemeInfoOpen}
           downloadTheme={theme => actions.downloadTheme(theme)}
         />
-      </Dialog>)}
+      </Modal>
     </React.Fragment>
   )
 }

@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from "react-i18next"
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast'
+import { Button } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 
 /*
@@ -18,12 +18,9 @@ export const actions = {
 export default function Main({ core, config, record }) {
 
   const { viewer, layer, actions, mainMap, models } = config;
-  const { showOnPortal } = models.Utils;
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadFormat, setDownloadFormat] = useState(null);
-
-  const toast = useRef(null)
 
   const { t } = useTranslation();
 
@@ -189,13 +186,9 @@ export default function Main({ core, config, record }) {
     const data = JSON.stringify(geojson);    
 
     if (format == 'geojson') {
-      download('export', data, format);     
+      download('export', data, format);
     } else {
-      toast.current.show({
-          severity: 'warn', 
-          summary: 'Descarregar Tema',
-          detail: 'Formato não suportado', life: 3000
-      });
+      notify.warn('Descarregar Tema', 'Formato não suportado');
     }
 
     setIsDownloading(false);
@@ -257,54 +250,63 @@ export default function Main({ core, config, record }) {
 
   return (
     <div>
-      {showOnPortal(<Toast ref={toast} position="top-right" />)}
       { showDownloadBtn && (
         <div className="field grid">
             <div className="col-4">{t("download", "Descarregar")}</div>
             <div className="col-8">
               { linkDownload &&
                 <Button
-                  size="small"
+                  size="xs"
                   className="mr-2 mb-2"
-                  icon={(isDownloading && downloadFormat=='link') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"}
-                  label={linkDownload.label || t("open", "Abrir")}
+                  leftSection={<i className="pi pi-external-link" aria-hidden="true" />}
+                  loading={isDownloading && downloadFormat=='link'}
                   onClick={e => downloadLink(linkDownload.filename, linkDownload.url)}
                   disabled={isDownloading}
-                />
+                >
+                  {linkDownload.label || t("open", "Abrir")}
+                </Button>
               }
               { externalDownload &&
                 <Button
-                  size="small"
+                  size="xs"
                   className="mr-2 mb-2"
-                  icon={(isDownloading && downloadFormat=='external') ? "pi pi-spin pi-spinner" : "pi pi-external-link pi"}
-                  label={externalDownload.label || t("open", "Abrir")}
+                  leftSection={<i className="pi pi-external-link" aria-hidden="true" />}
+                  loading={isDownloading && downloadFormat=='external'}
                   onClick={e => window.open(externalDownload.url, "_blank")}
                   disabled={isDownloading}
-                />
+                >
+                  {externalDownload.label || t("open", "Abrir")}
+                </Button>
               }
               { datasourceDownload ?
                 exportFormats.map(opt =>
                   <Button
-                      size="small"
+                      key={opt.value}
+                      size="xs"
                       className="mr-2 mb-2"
-                      icon={(isDownloading && downloadFormat==opt.value) ? "pi pi-spin pi-spinner" : "pi pi-file pi"}
-                      label={opt.title}
+                      leftSection={<i className="pi pi-file" aria-hidden="true" />}
+                      loading={isDownloading && downloadFormat==opt.value}
                       onClick={e => downloadDatasource(layer, opt.outputFormat)}
                       disabled={isDownloading}
-                  />) 
+                  >
+                    {opt.title}
+                  </Button>)
                 : exportFormats.map(opt =>
                 <Button
-                    size="small"
+                    key={opt.value}
+                    size="xs"
                     className="mr-2 mb-2"
-                    icon={(isDownloading && downloadFormat==opt.value) ? "pi pi-spin pi-spinner" : "pi pi-file pi"}
-                    label={opt.title}
+                    leftSection={<i className="pi pi-file" aria-hidden="true" />}
+                    loading={isDownloading && downloadFormat==opt.value}
                     onClick={e => downloadTheme(layer, opt.value)}
                     disabled={isDownloading}
-                />
+                >
+                  {opt.title}
+                </Button>
               )}
             </div>
         </div>
       ) }
-    </div>  
+    </div>
   )
 }

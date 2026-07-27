@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
+import { ActionIcon } from '@mantine/core';
+import { confirm } from '@scalargis/ui';
 
 export default function Main(props) {
 
   const { config } = props;
   const { layer, actions, models, viewer } = config;
   const { isComponentExcludedForLayer } = models.Utils;
-
-  const [confirmDeleteTheme, setConfirmDeleteTheme] = useState(false);
 
   const { t } = useTranslation();
 
@@ -18,46 +16,23 @@ export default function Main(props) {
   if (exclude) return null;
 
   return (
-    <React.Fragment>
-      <Button icon="pi pi-times-circle"
-        title={t("removeTheme", "Remover Tema")}
-        color="red"
-        size="small" rounded text
-        className="tool"
-        onClick={e => setConfirmDeleteTheme([layer.id])}
-      />
-
-      <Dialog
-        header={t("removeTheme", "Remover Tema")}
-        visible={!!confirmDeleteTheme} 
-        modal 
-        style={{ width: '350px' }} 
-        footer={(
-          <div>
-              <Button 
-                label={t("no", "Não" )}
-                icon="pi pi-times" 
-                onClick={() => setConfirmDeleteTheme(false)}
-                text
-              />
-              <Button 
-                label={t("yes", "Sim" )}
-                icon="pi pi-check" 
-                onClick={() => {
-                  actions.removeThemes(confirmDeleteTheme);
-                  setConfirmDeleteTheme(false);
-                }} 
-                autoFocus 
-              />
-          </div>
-        )} 
-        onHide={() => setConfirmDeleteTheme(false)}>
-          <div className="confirmation-content">
-              <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-              <span>{t("confirmAction", "Tem a certeza?")}</span>
-          </div>
-      </Dialog>
-    </React.Fragment>
-    
+    <ActionIcon
+      variant="subtle"
+      size="md"
+      radius="xl"
+      className="tool"
+      title={t("removeTheme", "Remover Tema")}
+      aria-label={t("removeTheme", "Remover Tema")}
+      onClick={() => confirm({
+        header: t("removeTheme", "Remover Tema"),
+        message: t("confirmAction", "Tem a certeza?"),
+        severity: 'danger',
+        acceptLabel: t("yes", "Sim"),
+        rejectLabel: t("no", "Não"),
+        accept: () => actions.removeThemes([layer.id])
+      })}
+    >
+      <i className="pi pi-times-circle" aria-hidden="true" />
+    </ActionIcon>
   )
 }
