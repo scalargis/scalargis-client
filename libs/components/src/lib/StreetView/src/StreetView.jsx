@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
+import { Dialog } from '@scalargis/ui';
+
+import { MapToolButton } from '../../components';
 
 import { transform } from 'ol/proj';
 import 'ol/ol.css';
@@ -26,14 +27,14 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
 
   const streetview_control = record;
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol, viewer_add_notification } = actions;
-  const { getWindowSize, showOnPortal } = utils;
+  const { getWindowSize } = utils;
 
   const [modalStreetViewOpen, setModalStreetViewOpen] = useState(false);
 
   const [position, setPosition] = useState();
   const [pov, setPov] = useState();
 
-  const dialog = useRef();
+  const panoContainer = useRef();
   const streetviewLayer = useRef();
   const panorama = useRef();
 
@@ -253,11 +254,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
       }
 
       if (panorama?.current) {
-        const pos = panorama.current.getPosition();
-        console.log([pos.lng(), pos.lat()]);
-
         const newPos = new window.google.maps.LatLng(lonlat[1], lonlat[0]);
-        console.log([newPos.lng(), newPos.lat()]);
         panorama.current.setPosition(newPos);
       } else {
         setPosition(lonlat);
@@ -266,106 +263,122 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
     }
   }
 
+  // Mount the panorama into the dialog body once it opens. Prime did this in
+  // the Dialog's onShow with getContent(); here the ref'd div is the target
+  // and a ResizeObserver replaces onResizeEnd — it fires on maximize/restore
+  // and on any other body resize, retriggering the pano's self-measure.
+  useEffect(() => {
+    if (!modalStreetViewOpen || !panoContainer.current) return;
+
+    const panoramaOptions = {
+      position: new window.google.maps.LatLng(position[1], position[0]),
+      pov: {
+        heading: 34,
+        pitch: 10
+      }
+    };
+    const pan = new window.google.maps.StreetViewPanorama(panoContainer.current, panoramaOptions);
+    pan.addListener('position_changed', function () {
+      const pos = panorama.current.getPosition();
+      const pov = panorama.current.getPov();
+
+      const coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
+
+      if (streetviewLayer?.current) {
+        const source = streetviewLayer.current.getSource();
+
+        if (source) {
+          source.clear();
+
+          const rotation = (Math.PI / 180) * pov.heading;
+          const style = createStyle(record?.config_json?.style, rotation);
+
+          const feature = new Feature({
+            geometry: new Point(coords)
+          });
+          feature.setStyle(style);
+          source.addFeature(feature);
+
+          /*Tacking modes
+          //  extent - only move map if position is outside map extent
+          //  always - alway move map to position
+          */
+          if (record?.config_json?.tracking) {
+            if (record.config_json.tracking === 'extent') {
+              const extent = mainMap.getView().calculateExtent(mainMap.getSize());
+              if (!containsXY(extent, coords[0], coords[1])) {
+                mainMap.getView().animate({
+                  center: coords
+                });
+              }
+            } else if (record.config_json.tracking === 'always') {
+              mainMap.getView().animate({
+                center: coords
+              });
+            }
+          }
+        }
+      }
+    });
+    pan.addListener('pov_changed', function () {
+      const pos = panorama.current.getPosition();
+      const pov = panorama.current.getPov();
+
+      const coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
+      if (streetviewLayer?.current) {
+        const source = streetviewLayer.current.getSource();
+
+        if (source) {
+          source.clear();
+
+          const rotation = (Math.PI / 180) * pov.heading;
+          const style = createStyle(record?.config_json?.style, rotation);
+
+          const feature = new Feature({
+            geometry: new Point(coords)
+          });
+          feature.setStyle(style);
+          source.addFeature(feature);
+        }
+      }
+    });
+    panorama.current = pan;
+
+    const resizeObserver = new ResizeObserver(() => {
+      window.google.maps.event.trigger(pan, 'resize');
+    });
+    resizeObserver.observe(panoContainer.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [modalStreetViewOpen]);
+
   //Exit if google maps script is not loaded, and component is not configured to open in a new window
   if (!(window.google && window.google.maps) && !openNewWindow) return null;
 
   return (
     <React.Fragment>
       <div id="streetview" className="streetview">
-        <Button
+        <MapToolButton
           title={title}
           icon="fas fa-street-view"
-          className={exclusive_mapcontrol === 'StreetView' ? "p-button-rounded p-button-raised active" : "p-button-rounded p-button-raised"}
+          active={exclusive_mapcontrol === 'StreetView'}
           onClick={e => { e.currentTarget.blur(); toggleStreetViewControl() }}
         />
       </div>
 
-      {showOnPortal(<Dialog
-        ref={dialog}
-        header={header}
-        visible={!!modalStreetViewOpen}
-        style={{ width: isMobile ? '90%' : '50vw', height: '80%' }}
-        modal={false}
-        onShow={() => {
-          const panoramaOptions = {
-            position: new window.google.maps.LatLng(position[1], position[0]),
-            pov: {
-              heading: 34,
-              pitch: 10
-            }
-          };
-          const elem = dialog.current.getContent();
-          const pan = new window.google.maps.StreetViewPanorama(elem, panoramaOptions);
-          pan.addListener('position_changed', function () {
-            const pos = panorama.current.getPosition();
-            const pov = panorama.current.getPov();
-
-            const coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
-
-            if (streetviewLayer?.current) {
-              const source = streetviewLayer.current.getSource();
-
-              if (source) {
-                source.clear();
-
-                const rotation = (Math.PI / 180) * pov.heading;
-                const style = createStyle(record?.config_json?.style, rotation);
-
-                const feature = new Feature({
-                  geometry: new Point(coords)
-                });
-                feature.setStyle(style);
-                source.addFeature(feature);
-
-                /*Tacking modes
-                //  extent - only move map if position is outside map extent
-                //  always - alway move map to position
-                */
-                if (record?.config_json?.tracking) {
-                  if (record.config_json.tracking === 'extent') {
-                    const extent = mainMap.getView().calculateExtent(mainMap.getSize());
-                    if (!containsXY(extent, coords[0], coords[1])) {
-                      mainMap.getView().animate({
-                        center: coords
-                      });
-                    }
-                  } else if (record.config_json.tracking === 'always') {
-                    mainMap.getView().animate({
-                      center: coords
-                    });
-                  }
-                }
-              }
-            }
-          });
-          pan.addListener('pov_changed', function () {
-            const pos = panorama.current.getPosition();
-            const pov = panorama.current.getPov();
-
-            const coords = transform([pos.lng(), pos.lat()], 'EPSG:4326', mainMap.getView().getProjection().getCode());
-            if (streetviewLayer?.current) {
-              const source = streetviewLayer.current.getSource();
-
-              if (source) {
-                source.clear();
-
-                const rotation = (Math.PI / 180) * pov.heading;
-                const style = createStyle(record?.config_json?.style, rotation);
-
-                const feature = new Feature({
-                  geometry: new Point(coords)
-                });
-                feature.setStyle(style);
-                source.addFeature(feature);
-              }
-            }
-          });
-          panorama.current = pan;
-        }}
-        onResizeEnd={() => {
-          window.google.maps.event.trigger(panorama.current, 'resize');
-        }}
-        onHide={e => {
+      <Dialog
+        title={header}
+        opened={!!modalStreetViewOpen}
+        size={isMobile ? '90%' : '50vw'}
+        height="80vh"
+        maximizable
+        withOverlay={false}
+        lockScroll={false}
+        trapFocus={false}
+        closeOnClickOutside={false}
+        onClose={e => {
           if (streetviewLayer?.current) {
             const source = streetviewLayer.current.getSource();
             if (source) source.clear();
@@ -376,7 +389,8 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
             dispatch(viewer_set_exclusive_mapcontrol(null));
           }
         }}>
-      </Dialog>)}
+        <div ref={panoContainer} style={{ width: '100%', height: '100%' }} />
+      </Dialog>
     </React.Fragment>
   )
 }

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { CollapsiblePanel } from '@scalargis/ui';
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
@@ -22,7 +21,7 @@ export function MainMenu({ className, config, actions, record }) {
   {/*const title = record.title || 'Google Street View';
 
   return (
-    <Button
+    <MainMenuButton
       title="Ferramentas do Mapa"
       className={className}
       icon="pi pi-sliders-h"
@@ -87,9 +86,9 @@ export default function Main(props) {
   }
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       {renderContent()}
-    </Panel>
+    </CollapsiblePanel>
   )
 
   // Render component

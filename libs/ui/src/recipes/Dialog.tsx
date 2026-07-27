@@ -41,6 +41,12 @@ export interface DialogProps extends Omit<ModalRootProps, 'title'> {
   maximizable?: boolean;
   /** Fixed content height while windowed, e.g. '80vh'. Body scrolls inside. */
   height?: number | string;
+  /**
+   * false = non-modal (Prime's `modal={false}`): no backdrop, page behind
+   * stays interactive. Pair with `closeOnClickOutside={false}` and
+   * `trapFocus={false}`/`lockScroll={false}` as the call site needs.
+   */
+  withOverlay?: boolean;
 }
 
 export function Dialog({
@@ -53,6 +59,7 @@ export function Dialog({
   onClose,
   centered = true,
   zIndex,
+  withOverlay = true,
   ...rootProps
 }: DialogProps) {
   const theme = useMantineTheme();
@@ -71,7 +78,7 @@ export function Dialog({
       fullScreen={maximized}
       {...rootProps}
     >
-      <Modal.Overlay />
+      {withOverlay && <Modal.Overlay />}
       <Modal.Content
         h={maximized ? undefined : height}
         style={{ display: 'flex', flexDirection: 'column' }}
