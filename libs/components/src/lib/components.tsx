@@ -40,6 +40,7 @@ import * as URLparams from './URLparams/src/Main'
 import * as IntersectLayers from './IntersectLayers/src/Main'
 import * as URLlayers from './URLlayers/src/Main'
 
+import MainMenuButton from './MainMenuButton'
 import ProgressControl from './ProgressControl'
 import ScriptHtmlContent from './ScriptHtmlContent'
 
@@ -103,6 +104,7 @@ export {
 
   Legend,
 
+  MainMenuButton,
   ProgressControl,
   ScriptHtmlContent,
 
