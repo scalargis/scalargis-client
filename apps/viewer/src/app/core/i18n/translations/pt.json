@@ -358,5 +358,14 @@
   "password_set_expired": "Confirmação de alteração de palavra-passe expirada.",
   "password_update_success": "Palavra-passe alterada com sucesso.",
   "account_update_error": "Ocorreu um erro ao alterar o registo.",
-  "password_policy_violation": "A palavra-passe não cumpre os requisitos de segurança."
+  "password_policy_violation": "A palavra-passe não cumpre os requisitos de segurança.",
+
+  "W": "O",
+  "E": "E",
+  "N": "N",
+  "S": "S",
+  "west": "Oeste",
+  "este": "Este",
+  "north": "Norte",
+  "south": "Sul"
 }

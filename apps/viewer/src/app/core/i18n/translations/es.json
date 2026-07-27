@@ -358,5 +358,14 @@
   "password_set_expired": "La confirmación de cambio de contraseña ha expirado.",
   "password_update_success": "Contraseña cambiada con éxito.",
   "account_update_error": "Se produjo un error al actualizar el registro.",
-  "password_policy_violation": "La contraseña no cumple con los requisitos de seguridad."
+  "password_policy_violation": "La contraseña no cumple con los requisitos de seguridad.",
+
+  "w": "O",
+  "E": "E",
+  "N": "N",
+  "S": "S",
+  "west": "Oeste",
+  "este": "Este",
+  "north": "Norte",
+  "south": "Sur"
 }

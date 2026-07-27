@@ -8,7 +8,6 @@ import {SplitButton} from 'primereact/splitbutton';
 import { Message } from 'primereact/message';
 import { Dropdown } from 'primereact/dropdown';
 import { InputMask } from 'primereact/inputmask';
-import { InputNumber } from 'primereact/inputnumber';
 import { RadioButton } from 'primereact/radiobutton';
 import OlFeature from 'ol/Feature';
 import OlPoint from 'ol/geom/Point'
@@ -19,6 +18,74 @@ import { MAPCONTROL_NAME } from './utils';
 
 import './style.css';
 
+
+const positivenumberFieldStrictInput = function(event) {
+  const e = event || window.event;  // get event object
+  const key = e.keyCode || e.which; // get key cross-browser
+
+  if(key==8 || key==46 || key == 9 || key==17 || key==91 || key==18 ||
+          key==116 || key==89 || key==67 || key==88 || key==35 || key==36) //back, delete tab, ctrl, win, alt, f5, paste, copy, cut, home, end
+      return true;
+
+  if (key==16) //shift
+      return true;
+
+  if (key==86) //ctrl-v
+      return true;
+
+  if(key==190 && e.target.value.split(".").length == 1) //point
+    return true;
+
+  if(key>=37 && key<=40) //arrows
+      return true;
+
+  if(key>=48 && key<=57) // top key
+      return true;
+
+  if(key>=96 && key<=105) //num key
+      return true;
+  
+  //console.log('Not allowed key pressed '+key);
+
+  if (e.preventDefault) e.preventDefault(); //normal browsers
+      e.returnValue = false; //IE
+}
+
+
+const numberFieldStrictInput = function(event) {
+  const e = event || window.event;  // get event object
+  const key = e.keyCode || e.which; // get key cross-browser
+
+  if(key==8 || key==46 || key == 9 || key==17 || key==91 || key==18 ||
+          key==116 || key==89 || key==67 || key==88 || key==35 || key==36) //back, delete tab, ctrl, win, alt, f5, paste, copy, cut, home, end
+      return true;
+
+  if (key==16) //shift
+      return true;
+
+  if (key==86) //ctrl-v
+      return true;
+
+  if (key==189 || key==173 || key==109) //minus (173 - firefox; 109 - numpad)
+      return true;
+
+  if(key==190 && e.target.value.split(".").length == 1) //point
+      return true;
+
+  if(key>=37 && key<=40) //arrows
+      return true;
+
+  if(key>=48 && key<=57) // top key
+      return true;
+
+  if(key>=96 && key<=105) //num key
+      return true;
+
+  //console.log('Not allowed key pressed '+key);
+
+  if (e.preventDefault) e.preventDefault(); //normal browsers
+      e.returnValue = false; //IE
+}
 
 export default function Coordinates({ core, config, actions, dispatch, record }) {
 
@@ -38,8 +105,6 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const [showDegrees, setShowDegrees] = useState(false);
   const [optLatitude, setOptLatitude] = useState('N');
   const [optLongitude, setOptLongitude] = useState('W');
-  const [coordLon, setCoordLon] = useState(null);
-  const [coordLat, setCoordLat] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
 
   const userRoles = useMemo(()=>{
@@ -218,67 +283,27 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     return csv;
   }  
 
-  function transformCoordinates () {
-    let x;
-    let y;
-
-    if (units === 'dms') {
-      if (!coordLon || !coordLat) return;
-
-      x = convertDMS2DD(optLongitude + ' ' + coordLon);
-      y = convertDMS2DD(optLatitude + ' ' + coordLat);
-      setCoordX(x);
-      setCoordY(y);
-    } else {
-      x = coordX;
-      y = coordY;
-    }
-
-    if (!(CRS && (x != null) || (x != null))) return;
-
-    const trans_coords = {};
-
-    const new_coords = transform([parseFloat(x), parseFloat(y)], CRS, mainMap.getView().getProjection());
-
-    viewer.config_json.crs_list.forEach(crs => {
-      const coords = transform(new_coords,  mainMap.getView().getProjection(), crs.code);
-
-      //Set precision for user role
-      let precision = crs.precision;
-      if (crs.precision_roles?.length && userRoles?.length) {
-        const rp = crs.precision_roles.find(elem => (elem?.roles || []).some(item => userRoles.includes(item)));
-        if (rp?.precision) {
-          precision = rp?.precision;
-        }
-      }
-
-      trans_coords[crs.code] = { code: crs.code, title: crs.title, description: crs.description, 
-        srid: crs.srid, precision: precision, coordinates: coords }
-    }); 
-
-    const item = { id: uuidV4(), coordinates: new_coords, crs: mainMap.getView().getProjection().getCode(), results: trans_coords };
-    setNewCoord(item);
-    zoomItem(item);
-  }
-
   function transformCoordinatesByApi() {
 
     let x;
     let y;
 
-    if (units === 'dms') {
-      if (!coordLon || !coordLat) return;
+    if (!CRS || coordX == null || coordY == null || coordX == "" || coordY == "") return;
 
-      x = convertDMS2DD(optLongitude + ' ' + coordLon);
-      y = convertDMS2DD(optLatitude + ' ' + coordLat);
-      setCoordX(x);
-      setCoordY(y);
+    if (['dms', 'dd'].includes(units)) {
+      x = parseFloat(coordX);
+      y = parseFloat(coordY);
+
+      if (optLongitude == 'W' && x > 0) {
+        x = x * -1
+      }
+      if (optLatitude == 'S' && y > 0) {
+        y = y * -1
+      }
     } else {
-      x = coordX;
-      y = coordY;
+      x = parseFloat(coordX);
+      y = parseFloat(coordY);
     }
-
-    if (!(CRS && (x != null) || (x != null))) return;
 
     const url = core.API_URL + '/app/utils/transcoord';
 
@@ -326,18 +351,14 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   }   
   
 	function convertDMS2DD (dms) {
-    let val = null;
-
     const parts = dms.replace("º", "").replace("''","").replace("'","").split(" ");
 
+    parts[0] = parseInt(parts[0]);
     parts[1] = parseInt(parts[1]);
-    parts[2] = parseInt(parts[2]);
-    parts[3] = parseFloat(parts[3]);
+    parts[2] = parseFloat(parts[2]);
 
-    val = parts[1] + parts[2]/60 + parts[3]/3600;
-    if (parts[0] == 'W' || parts[0] == 'O' || parts[0] == 'S') {
-        val = val * -1;
-    }
+    const val = parts[0] + parts[1]/60 + parts[2]/3600;
+
     return val;
   }
 
@@ -359,6 +380,18 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       return  val;
   }  
   
+  function formatCoordValue (value, units, is_lon) {
+    if (value == null || value === '') return '';
+    if (units === 'dms') {
+      return convertDD2DMS(value, is_lon);
+    }
+    if (units === 'dd') {
+      return (Math.abs(value));
+    }
+    return value;
+  }
+
+
   function download(filename, text, format) {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -536,34 +569,12 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         if (units === 'degrees') isDegrees = true;
       }
     }
-    if (isDegrees) {
-      setCoordX(null);
-      setCoordY(null);
-      setCoordLat(null);
-      setCoordLon(null);
-    }    
+
+    setCoordX(null);
+    setCoordY(null);   
     setShowDegrees(isDegrees);
     setUnits(isDegrees ? 'dd' : 'm');
   }, [CRS]);
-
-  useEffect(() => {
-
-    if (!showDegrees) return;
-
-    if (units==='dd' && coordLon && coordLat) {
-      const x = convertDMS2DD(optLongitude + ' ' + coordLon);
-      const y = convertDMS2DD(optLatitude + ' ' + coordLat);
-      setCoordX(x);
-      setCoordY(y);
-    } else if (units==='dms' && coordX && coordY) {
-      const lon = convertDD2DMS(Math.abs(coordX), true);
-      const lat = convertDD2DMS(Math.abs(coordY), false);
-      setCoordLon(lon);
-      setOptLongitude(coordX < 0 ? 'W': 'E');
-      setCoordLat(lat);
-      setOptLatitude(coordY < 0 ? 'S': 'N');      
-    }
-  }, [units]);
 
   useEffect(() => {
     if (coordinates && coordinates.length > 0) dispatch(actions.viewer_set_selectedmenu('coordinates'));
@@ -605,11 +616,52 @@ export default function Coordinates({ core, config, actions, dispatch, record })
             <div className="grid formgrid">
               <div className="field col-12 md:col-6">
                 <label>{t("longitude", "Longitude")}</label>
-                <InputNumber value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <div className="p-inputgroup">
+                  <select value={optLongitude} onChange={e => setOptLongitude(e.target.value)}>
+                    <option value="E">{t("E", "E")}</option>
+                    <option value="W">{t("W", "O")}</option>
+                  </select>
+                  <input type="text" value={coordX} onKeyDown={positivenumberFieldStrictInput}
+                    onChange={(e) => {
+                        if (e.target.value) {
+                          const txtval = e.target.value.replace(",", ".");
+                          let val = parseFloat(txtval);
+                          if (typeof val === 'number' && isFinite(val) && val < 0) {
+                            setOptLongitude('W');
+                            setCoordX(txtval.substring(1));
+                          } else {
+                            setCoordX(txtval);
+                          }
+                        } else {
+                          setCoordX(null);
+                        }
+                      }}
+                    className="p-inputmask p-inputtext p-component" />
+                </div>
               </div>
               <div className="field col-12 md:col-6">
                 <label>{t("latitude", "Latitude")}</label>
-                <InputNumber value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <div className="p-inputgroup">
+                  <select value={optLatitude} onChange={e => setOptLatitude(e.target.value)}>
+                    <option value="N">{t("N", "N")}</option>
+                    <option value="S">{t("S", "S")}</option>
+                  </select>
+                  <input type="text" value={coordY} onKeyDown={positivenumberFieldStrictInput}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          let val = parseFloat(e.target.value);
+                          if (typeof val === 'number' && isFinite(val) && val < 0) {
+                            setOptLatitude('S');
+                            setCoordY(e.target.value.substring(1));
+                          } else {
+                            setCoordY(e.target.value);
+                          }
+                        } else {
+                          setCoordY(e.target.value);
+                        }
+                      }}
+                      className="p-inputmask p-inputtext p-component" />
+                </div>
               </div>
             </div>          
           }
@@ -619,20 +671,30 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                 <label>{t("longitude", "Longitude")}</label>
                 <div className="p-inputgroup">
                   <select value={optLongitude} onChange={e => setOptLongitude(e.target.value)}>
-                    <option value="E">E</option>
-                    <option value="W">W</option>
+                    <option value="E">{t("E", "E")}</option>
+                    <option value="W">{t("W", "O")}</option>
                   </select>
-                  <InputMask mask="999º 99' 99?.99''" value={coordLon} onChange={(e) => setCoordLon(e.value)} />
+                  <InputMask mask="?999º 99' 99.99''" slotChar="0" value={formatCoordValue(coordX, units, true)}
+                    onBlur={(e) => {
+                      const coordx = convertDMS2DD(e.target.value.replaceAll("_", "0"));
+                      setCoordX(coordx);
+                    }}
+                  />
                 </div>
               </div>
               <div className="field col-12 md:col-6">
                 <label>{t("latitude", "Latitude")}</label>
                 <div className="p-inputgroup">
                 <select value={optLatitude} onChange={e => setOptLatitude(e.target.value)}>
-                    <option value="N">N</option>
-                    <option value="S">S</option>
+                    <option value="N">{t("N", "N")}</option>
+                    <option value="S">{t("S", "S")}</option>
                   </select>
-                  <InputMask mask="99º 99' 99?.99''" value={coordLat} onChange={(e) => setCoordLat(e.value)} />
+                  <InputMask mask="99º 99' 99?.99''" slotChar="0" value={formatCoordValue(coordY, units)}
+                    onBlur={(e) => {
+                      const coordy = convertDMS2DD(e.target.value.replaceAll("_", "0"), false);
+                      setCoordY(coordy);
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -648,11 +710,15 @@ export default function Coordinates({ core, config, actions, dispatch, record })
             </div>
             <div className="field col-12 md:col-6">
                 <label htmlFor="coordX">X</label>
-                <InputNumber id="coordX" value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <input type="text" id="coordX" value={coordX} onKeyDown={numberFieldStrictInput}
+                  onChange={(e) => setCoordX(e.target.value)}
+                  className="p-inputtext w-full" />
             </div>
             <div className="field col-12 md:col-6">
                 <label htmlFor="coordY">Y</label>              
-                <InputNumber id="coordY" value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <input type="text" id="coordY" value={coordY} onKeyDown={numberFieldStrictInput}
+                  onChange={(e) => setCoordY(e.target.value)}
+                  className="p-inputtext w-full" />
             </div>
         </div>)}
       <div className="card text-center">
@@ -660,7 +726,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
             label={t("locate","Localizar")}
             icon="pi pi-search"
             className="p-button-md"
-            onClick={e => { transformCoordinatesByApi(); }}
+            onClick={transformCoordinatesByApi}
         />
         </div>           
 
