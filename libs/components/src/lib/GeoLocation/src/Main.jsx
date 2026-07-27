@@ -1,8 +1,7 @@
 import React from 'react'
 import { useTranslation} from "react-i18next"
-import { Button } from 'primereact/button'
-import OLGroupLayer from "ol/layer/Group"
-import { Panel } from 'primereact/panel'
+import { CollapsiblePanel } from '@scalargis/ui'
+import { MainMenuButton } from '../../components'
 import GeoLocation from './GeoLocation'
 
 import './style.css'
@@ -15,7 +14,7 @@ export function MainMenu({ className, config, actions, record }) {
   const { t } = useTranslation();
 
   return (
-    <Button
+    <MainMenuButton
       title={t("myLocation", "A minha localização")}
       className={className}
       icon="pi pi-globe"
@@ -41,16 +40,16 @@ export default function Main({ as, config, actions, record }) {
           dispatch={dispatch}
           record={record}
         />
-        
+
       </div>
     )
-    
+
   }
 
   if (as === 'panel') return (
-    <Panel header={t("myLocation", "A minha localização")}>
+    <CollapsiblePanel header={t("myLocation", "A minha localização")} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   return null

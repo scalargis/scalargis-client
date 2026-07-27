@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation} from "react-i18next"
 import { transform } from 'ol/proj'
-import { Button } from 'primereact/button'
-import { InputSwitch } from 'primereact/inputswitch'
-import { ToggleButton } from 'primereact/togglebutton';
-import {Checkbox} from 'primereact/checkbox';
-import { Column } from 'primereact/column'
-import { DataTable } from 'primereact/datatable'
-import { Message } from 'primereact/message'
+import { Alert, Button, Checkbox, Group, Switch, Table } from '@mantine/core'
+
+const StatusMessage = ({ color, icon, text }) => (
+  <Alert color={color} py="xs">
+    <Group justify="center" gap="xs" wrap="nowrap">
+      <i className={icon} />
+      <span>{text}</span>
+    </Group>
+  </Alert>
+);
 
 export default function GeoLocation({ config, actions, dispatch, record }) {
 
@@ -98,15 +101,15 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
   }
 
   function zoomGeoLocation(position) {
-    // Zoom to extent        
+    // Zoom to extent
     if (position && position.coordinates) {
         const coordinates = transform(position.coordinates, 'EPSG:4326', mainMap.getView().getProjection());
-        const extent = [coordinates[0] - 500, coordinates[1] - 500, 
+        const extent = [coordinates[0] - 500, coordinates[1] - 500,
                         coordinates[0] + 500, coordinates[1] + 500];
-        const srid = getProjectionSrid(mainMap.getView().getProjection()); 
+        const srid = getProjectionSrid(mainMap.getView().getProjection());
         dispatch(actions.map_set_extent(coordinates, extent, srid));
     }
-  }  
+  }
 
   useEffect(()=>{
     buildResultsTable();
@@ -117,57 +120,67 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
   }, [geolocation]);
 
   if (geolocation && geolocation.error) return (
-    <Message
-      severity="warn"
+    <StatusMessage
+      color="warning"
+      icon="pi pi-exclamation-triangle"
       text={getErrorMessage(geolocation.error, component_cfg?.messages)}
     />
   )
 
   return (
     <div>
-      <Message
-        severity="info"
+      <StatusMessage
+        color="informative"
+        icon="pi pi-info-circle"
         text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : t("myLocationSelectOption","Selecione a opção 'Ver Posição' para ativar a visualização da sua posição.")}
       />
 
-      <div className="mt-3 pt-3 pr-2 pl-2" style={{"border": "1px solid rgb(111 57 57 / 12%)"}}>
+      <div className="mt-3 pt-3 pr-2 pl-2 pb-2" style={{"border": "1px solid rgb(111 57 57 / 12%)"}}>
         <div className="grid">
           <div className="col flex align-items-center">
-            <InputSwitch
-              className="mr-1"
-              inputId="geolocationSwitch"
+            <Switch
+              size="md"
               checked={geoLocationActive}
-              onChange={(e) => toggleGeoLocationControl(e.value)}
+              onChange={(e) => toggleGeoLocationControl(e.currentTarget.checked)}
+              label={<span className="font-bold">{t("myLocationViewPosition", "Ver Posição")}</span>}
             />
-            {' '}
-            <label htmlFor="geolocationSwitch">
-              <span className="font-bold">{t("myLocationViewPosition", "Ver Posição")}</span>
-            </label>
           </div>
         </div>
         <div className="grid mt-2">
           <div className="col flex align-items-center">
-            <Checkbox onChange={e => trackingGeoLocationControl(e.checked)} checked={geoLocationTracking} disabled={!geoLocationActive}></Checkbox>
-            <label className={"p-checkbox-label ml-2" + (!geoLocationActive ? " p-disabled" : "")}>{t("myLocationUpdate", "Atualizar")}</label>
+            <Checkbox
+              size="md"
+              checked={geoLocationTracking}
+              disabled={!geoLocationActive}
+              onChange={e => trackingGeoLocationControl(e.currentTarget.checked)}
+              label={t("myLocationUpdate", "Atualizar")}
+            />
           </div>
           <div className="col text-right">
             <Button
-              label={t("locate", "Localizar")}
-              icon="pi pi-search"
-              size="small"
+              size="xs"
+              leftSection={<i className="pi pi-search" aria-hidden="true" />}
               onClick={e => { zoomGeoLocation(geolocation); }}
               disabled={!geoLocationActive}
-            />
-          </div>        
+            >
+              {t("locate", "Localizar")}
+            </Button>
+          </div>
         </div>
       </div>
 
       { geolocation &&
-      <div className="card pt-2 p-0">          
-          <DataTable value={results}>
-            <Column field="field" header=""></Column>
-            <Column field="value" header=""></Column>
-          </DataTable>          
+      <div className="card pt-2 p-0">
+          <Table>
+            <Table.Tbody>
+              {results.map(r => (
+                <Table.Tr key={r.field}>
+                  <Table.Td>{r.field}</Table.Td>
+                  <Table.Td>{r.value}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
       </div> }
   </div>
   )
