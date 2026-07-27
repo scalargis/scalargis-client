@@ -149,6 +149,10 @@ export default function Main({ core, config, actions, record }) {
         })}
         onChange={handleChange}
         allowDeselect={false}
+        // This widget lives in the bottom footer, so the dropdown always
+        // opens upward; the theme's bottom-start default would paint one
+        // frame downward before floating-ui flips it (visible flicker).
+        comboboxProps={{ position: 'top-start' }}
         aria-label={t('coordinateSystem') || 'Sistema de Coordenadas'}
         placeholder="Escolha"
       />
