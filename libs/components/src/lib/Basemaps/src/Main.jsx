@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { CollapsiblePanel } from '@scalargis/ui';
+import { MainMenuButton } from '../../components';
 import Basemaps from './Basemaps'
 
 /**
@@ -13,10 +13,10 @@ export function MainMenu({ className, config, actions, record }) {
 
   const component_cfg = record.config_json || {};
   const title = record.title || t("basemaps", "Maps de Base");
-  
+
   if (record && record.target === 'mainmenu') {
       return (
-          <Button
+          <MainMenuButton
             title={title}
             className={className}
             icon="pi pi-image"
@@ -87,11 +87,11 @@ export default function Main({as, core, config, actions, record, utils}) {
     )  
   }
 
-  if (as === 'panel') return (    
-    <Panel header={header}>
+  if (as === 'panel') return (
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
-  )  
+    </CollapsiblePanel>
+  )
 
   // Render component
   return renderContent()

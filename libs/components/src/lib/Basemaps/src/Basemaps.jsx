@@ -1,6 +1,5 @@
-import { Button } from 'primereact/button'
-import { Card } from 'primereact/card';
 import React, { useEffect, useState } from 'react'
+import { MapToolButton } from '../../components'
 import BasemapItem from './BasemapItem'
 import './style.css'
 
@@ -31,11 +30,12 @@ export default function Basemaps({ core, viewer, mainMap, config, actions, recor
             selected={selectedLayer && selectedLayer===item.id} setSelected={selectLayer} core={core} />) }
     </div> :
     <div className="basemaps map-controls">
-      <Button 
+      <MapToolButton
         icon="pi pi-image"
-        rounded
-        className={opened ? "p-button-raised active" : "p-button-raised" }
-        onClick={(e) => { e.currentTarget.blur(); setOpened(!opened) } } 
+        title={record.title || 'Mapas de Base'}
+        active={opened}
+        aria-expanded={opened}
+        onClick={(e) => { e.currentTarget.blur(); setOpened(!opened) } }
       />
       <div className={`basemaps-control${record?.config_json?.vertical === true ? " basemaps-control-vertical": ""}`} style={{ visibility: opened ? "visible": "hidden" }}>
         <div className="inline-flex flex-row flex-wrap">

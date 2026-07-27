@@ -92,38 +92,52 @@
     margin-right: 0.2rem !important;
 }
 
-.basemaps-control-item .p-card-header img {
-    padding: 3px 3px 0px;
+.basemap-card {
+    background: #ffffff;
+    color: #495057;
+    border-radius: 3px;
+    box-shadow: 0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%),
+        0 1px 3px 0 rgb(0 0 0 / 12%);
 }
 
-.basemaps-control-item .p-card .p-card-body {
+.basemaps-control-item .basemap-card-header {
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+
+.basemaps-control-item .basemap-card-header img {
+    display: block;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 3px 3px 0px;
+    opacity: 0.45;
+}
+
+.basemaps-control-item.active .basemap-card-header img {
+    opacity: 1;
+}
+
+.basemaps-control-item .basemap-card-body {
     min-width: 80px;
     max-height: 190px;
     font-size: 0.8rem;
     padding: 0.25rem;
 }
 
-.basemaps-control-item .p-card .p-card-header {
-    cursor: pointer;
-}
-
-.basemaps-control .basemaps-control-item .p-card .p-card-title {
+.basemaps-control .basemaps-control-item .basemap-card-title {
     font-size: 0.8rem;
-    margin-bottom: 0.2rem;    
+    margin-bottom: 0.2rem;
 }
 
-.basemaps-control-item .p-card .p-card-title {
+.basemaps-control-item .basemap-card-title {
     font-weight: 400;
 }
 
-.basemaps-control-item.active .p-card .p-card-title {
+.basemaps-control-item.active .basemap-card-title {
     font-weight: 500;
 }
 
-.basemaps-control-item .p-card .p-card-header img {
-    opacity: 0.45;
-}
-
-.basemaps-control-item.active .p-card .p-card-header img {
-    opacity: 1;
+.basemap-card-subtitle {
+    color: #6c757d;
 }
