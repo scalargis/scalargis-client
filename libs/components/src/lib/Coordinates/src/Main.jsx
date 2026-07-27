@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react'
 import { useTranslation} from "react-i18next"
-import { Button } from 'primereact/button'
-import OLGroupLayer from "ol/layer/Group"
-import { Panel } from 'primereact/panel'
+import { CollapsiblePanel } from '@scalargis/ui'
 
+import { MainMenuButton } from '../../components'
 import { MAPCONTROL_NAME } from './utils'
 import Coordinates from './Coordinates'
 import './style.css'
@@ -26,7 +25,7 @@ export function MainMenu({ className, config, actions, record }) {
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
       icon="fas fa-bullseye"
@@ -90,9 +89,9 @@ export default function Main({ as, core, config, actions, record }) {
   }
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   return null

@@ -1,15 +1,20 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
 import { v4 as uuidV4 } from 'uuid';
-import { DataView } from 'primereact/dataview';
 import { transform } from 'ol/proj'
-import { Button } from 'primereact/button'
-import {SplitButton} from 'primereact/splitbutton';
-import { Message } from 'primereact/message';
-import { Dropdown } from 'primereact/dropdown';
-import { InputMask } from 'primereact/inputmask';
-import { InputNumber } from 'primereact/inputnumber';
-import { RadioButton } from 'primereact/radiobutton';
+import {
+  ActionIcon,
+  Alert,
+  Button,
+  Group,
+  Menu,
+  NativeSelect,
+  NumberInput,
+  Pagination,
+  Radio,
+  Select,
+  TextInput,
+} from '@mantine/core';
 import OlFeature from 'ol/Feature';
 import OlPoint from 'ol/geom/Point'
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
@@ -41,6 +46,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const [coordLon, setCoordLon] = useState(null);
   const [coordLat, setCoordLat] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
+  const [resultsPage, setResultsPage] = useState(1);
 
   const userRoles = useMemo(()=>{
     const logged = core.getLoggedUser();
@@ -54,28 +60,36 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
 
-  const buildSaveBtnItems = data => {
-    const btns = [
-      {
-          label: 'CSV',
-          icon: 'pi pi-align-justify',
-          data: data,
-          command: (e) => {
-            exportItem(e.item.data, 'csv');
-          }
-      },
-      {
-          label: 'GeoJSON',
-          icon: 'pi pi-globe',
-          data: data,
-          command: (e) => {
-            exportItem(e.item.data, 'geojson');
-          }
-      }
-    ]
-
-    return btns;
-  }
+  // Prime's SplitButton had an empty label and no default action — only its
+  // dropdown mattered, so one Menu-wrapped download button replaces the pair.
+  const renderSaveBtn = data => (
+    <Menu>
+      <Menu.Target>
+        <ActionIcon
+          type="button"
+          radius={0}
+          aria-label={t("exportResults", "Exportar resultados")}
+          title={t("exportResults", "Exportar resultados")}
+        >
+          <i className="pi pi-download" aria-hidden="true" />
+        </ActionIcon>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Item
+          leftSection={<i className="pi pi-align-justify" aria-hidden="true" />}
+          onClick={() => exportItem(data, 'csv')}
+        >
+          CSV
+        </Menu.Item>
+        <Menu.Item
+          leftSection={<i className="pi pi-globe" aria-hidden="true" />}
+          onClick={() => exportItem(data, 'geojson')}
+        >
+          GeoJSON
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
 
   const serializeCoordinatesGeoJSON = (list) => {
     const features = [];
@@ -430,19 +444,27 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   function renderCoordinatesItem(data) {
     return (data ? (
       <div className="col-12 coordinates-item">
-        <div className="coordinates-item-tools text-right">
-          <Button
+        <Group className="coordinates-item-tools" justify="flex-end" gap={0}>
+          <ActionIcon
+            type="button"
+            radius={0}
             title={t("zoomToElement", "Aproximar ao elemento")}
-            icon="pi pi-search"
+            aria-label={t("zoomToElement", "Aproximar ao elemento")}
             onClick={e => zoomItem(data)}
-          />
-          <SplitButton label="" icon="pi pi-download" model={buildSaveBtnItems(data)} />
-          <Button
+          >
+            <i className="pi pi-search" aria-hidden="true" />
+          </ActionIcon>
+          {renderSaveBtn(data)}
+          <ActionIcon
+            type="button"
+            radius={0}
             title={t("removeElement","Remover elemento")}
-            icon="pi pi-times"
+            aria-label={t("removeElement","Remover elemento")}
             onClick={e => removeItem(data)}
-          />
-        </div>              
+          >
+            <i className="pi pi-times" aria-hidden="true" />
+          </ActionIcon>
+        </Group>
         <table>
           <tbody>
           { Object.entries(data.results).map(([key, item]) => {
@@ -485,13 +507,6 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       </div> ) : null
     );
   }
-
-  function itemTemplate(item, layout) {
-    if (layout === 'list')
-      return item && renderCoordinatesItem(item);
-    else if (layout === 'grid')
-      return null;
-  }  
 
   useEffect(()=>{
     let list = viewer.config_json.crs_list.map( item => ({ label: (item.title + ' (' + item.code + ')'),
@@ -573,137 +588,183 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   let msg = t("searchByCoordinateInfo", "Clique no mapa para obter as coordenadas ou indique os seus valores através seguinte formulário.");
   if (isInactive) msg = t("searchByCoordinateNotActive", "Clique no botão do menu principal para ativar a ferramenta e depois clique no mapa para obter as coordenadas. Poderá também indicar os valores das coordenadas através do formulário.");
 
+  const previousResults = (coordinates || []).slice(1);
+  const resultsPageSize = 9;
+  const resultsPages = Math.ceil(previousResults.length / resultsPageSize);
+  const safeResultsPage = Math.min(resultsPage, resultsPages) || 1;
+
   return (
     <div>
 
       { (isInactive || !coordinates?.length) ?
         <div className="mt-2 mb-3">
-          <Message
-            severity="info"
-            text={msg}
-          />
+          <Alert color="informative" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-info-circle" />
+              <span>{msg}</span>
+            </Group>
+          </Alert>
         </div> : null }
 
       {(showDegrees &&
       <div className="grid formgrid mt-2">
           <div className="field col-12">
-            <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
-            <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")} className="w-full"/>
+            <Select
+              label={t("coordinateSystem", "Sistema de Coordenadas")}
+              data={listCRS}
+              value={CRS}
+              onChange={(value) => value && setCRS(value)}
+              allowDeselect={false}
+              placeholder={t("selectCRS", "Selecione um CRS")}
+              className="w-full"
+            />
           </div>
           <div className="field col-12">
-            <div className="field-checkbox">
-                <RadioButton value="dd" onChange={(e) => setUnits(e.value)} checked={units === 'dd'}  />
-                <label>{t("decimalDegrees", "Graus decimais")}</label>
-            </div>
-            <div className="field-checkbox mb-1">
-                <RadioButton value="dms" onChange={(e) => setUnits(e.value)} checked={units === 'dms'}  />
-                <label>{`${t("degrees", "Graus")} / ${t("minutes", "Minutos")} / ${t("seconds", "Segundos")}`}</label>
-            </div>
+            <Radio.Group value={units} onChange={setUnits}>
+              <Radio size="md" value="dd" label={t("decimalDegrees", "Graus decimais")} mb={4} />
+              <Radio size="md" value="dms" label={`${t("degrees", "Graus")} / ${t("minutes", "Minutos")} / ${t("seconds", "Segundos")}`} />
+            </Radio.Group>
           </div>
           <div className="field col-12">
           { units === 'dd' &&
             <div className="grid formgrid">
               <div className="field col-12 md:col-6">
-                <label>{t("longitude", "Longitude")}</label>
-                <InputNumber value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <NumberInput label={t("longitude", "Longitude")} value={coordX ?? ''} onChange={(value) => setCoordX(value === '' ? null : value)} hideControls decimalScale={8} className="w-full" />
               </div>
               <div className="field col-12 md:col-6">
-                <label>{t("latitude", "Latitude")}</label>
-                <InputNumber value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <NumberInput label={t("latitude", "Latitude")} value={coordY ?? ''} onChange={(value) => setCoordY(value === '' ? null : value)} hideControls decimalScale={8} className="w-full" />
               </div>
-            </div>          
+            </div>
           }
           { units === 'dms' &&
             <div className="grid formgrid">
               <div className="field col-12 md:col-6">
                 <label>{t("longitude", "Longitude")}</label>
-                <div className="p-inputgroup">
-                  <select value={optLongitude} onChange={e => setOptLongitude(e.target.value)}>
-                    <option value="E">E</option>
-                    <option value="W">W</option>
-                  </select>
-                  <InputMask mask="999º 99' 99?.99''" value={coordLon} onChange={(e) => setCoordLon(e.value)} />
-                </div>
+                <Group gap={0} wrap="nowrap">
+                  <NativeSelect
+                    value={optLongitude}
+                    onChange={e => setOptLongitude(e.target.value)}
+                    data={['E', 'W']}
+                    aria-label={t("longitude", "Longitude")}
+                    w={64}
+                  />
+                  <TextInput
+                    value={coordLon || ''}
+                    onChange={(e) => setCoordLon(e.target.value)}
+                    placeholder="008º 30' 15.00''"
+                    aria-label={t("longitude", "Longitude")}
+                    style={{ flex: 1 }}
+                  />
+                </Group>
               </div>
               <div className="field col-12 md:col-6">
                 <label>{t("latitude", "Latitude")}</label>
-                <div className="p-inputgroup">
-                <select value={optLatitude} onChange={e => setOptLatitude(e.target.value)}>
-                    <option value="N">N</option>
-                    <option value="S">S</option>
-                  </select>
-                  <InputMask mask="99º 99' 99?.99''" value={coordLat} onChange={(e) => setCoordLat(e.value)} />
-                </div>
+                <Group gap={0} wrap="nowrap">
+                  <NativeSelect
+                    value={optLatitude}
+                    onChange={e => setOptLatitude(e.target.value)}
+                    data={['N', 'S']}
+                    aria-label={t("latitude", "Latitude")}
+                    w={64}
+                  />
+                  <TextInput
+                    value={coordLat || ''}
+                    onChange={(e) => setCoordLat(e.target.value)}
+                    placeholder="39º 30' 15.00''"
+                    aria-label={t("latitude", "Latitude")}
+                    style={{ flex: 1 }}
+                  />
+                </Group>
               </div>
             </div>
           }
           </div>
-        </div>      
+        </div>
       )}
       {(!showDegrees &&
       <div className="grid formgrid mt-2">
             <div className="field col-12">
-              <label htmlFor="coordsys">{t("coordinateSystem", "Sistema de Coordenadas")}</label>
-              <Dropdown options={listCRS} value={CRS} onChange={(e) => setCRS(e.value)} placeholder={t("selectCRS", "Selecione um CRS")} className="w-full" />
+              <Select
+                label={t("coordinateSystem", "Sistema de Coordenadas")}
+                data={listCRS}
+                value={CRS}
+                onChange={(value) => value && setCRS(value)}
+                allowDeselect={false}
+                placeholder={t("selectCRS", "Selecione um CRS")}
+                className="w-full"
+              />
             </div>
             <div className="field col-12 md:col-6">
-                <label htmlFor="coordX">X</label>
-                <InputNumber id="coordX" value={coordX} onValueChange={(e) => setCoordX(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <NumberInput id="coordX" label="X" value={coordX ?? ''} onChange={(value) => setCoordX(value === '' ? null : value)} hideControls decimalScale={8} className="w-full" />
             </div>
             <div className="field col-12 md:col-6">
-                <label htmlFor="coordY">Y</label>              
-                <InputNumber id="coordY" value={coordY} onValueChange={(e) => setCoordY(e.value)} mode="decimal" minFractionDigits={1} maxFractionDigits={8} className="p-inputtext-sm w-full" inputClassName="w-full" />
+                <NumberInput id="coordY" label="Y" value={coordY ?? ''} onChange={(value) => setCoordY(value === '' ? null : value)} hideControls decimalScale={8} className="w-full" />
             </div>
         </div>)}
       <div className="card text-center">
         <Button
-            label={t("locate","Localizar")}
-            icon="pi pi-search"
-            className="p-button-md"
+            leftSection={<i className="pi pi-search" aria-hidden="true" />}
             onClick={e => { transformCoordinatesByApi(); }}
-        />
-        </div>           
+        >
+          {t("locate","Localizar")}
+        </Button>
+        </div>
 
       { ( coordinates && coordinates.length && coordinates.length > 0 ? 
         <React.Fragment>
           <hr className="rounded" />
 
-          <div style={ {padding: "1rem 0", textAlign: "right"} }>
+          <Group justify="flex-end" gap="xs" style={ {padding: "1rem 0"} }>
             <Button
+              variant="outline"
+              size="xs"
               title={t("clearResults", "Limpar resultados")}
-              label={t("clear", "Limpar")}
-              icon="pi pi-times"
-              outlined size="small"
+              leftSection={<i className="pi pi-times" aria-hidden="true" />}
               onClick={e => removeAll()}
-            />
+            >
+              {t("clear", "Limpar")}
+            </Button>
             <Button
+              variant="outline"
+              size="xs"
               title={t("exportResults", "Exportar resultados")}
-              label="CSV"
-              icon="pi pi-download"
-              outlined size="small"
-              className="ml-2"
+              leftSection={<i className="pi pi-download" aria-hidden="true" />}
               onClick={e => exportAll('csv')}
-            />
+            >
+              CSV
+            </Button>
             <Button
+              variant="outline"
+              size="xs"
               title={t("exportResults", "Exportar resultados")}
-              label="GeoJSON"
-              icon="pi pi-download"
-              outlined size="small"
-              className="ml-2"
+              leftSection={<i className="pi pi-download" aria-hidden="true" />}
               onClick={e => exportAll('geojson')}
-            />                       
-          </div>         
+            >
+              GeoJSON
+            </Button>
+          </Group>
 
           { renderCoordinatesItem(coordinates[0]) }
-        </React.Fragment> : null 
+        </React.Fragment> : null
       ) }
 
       { ( coordinates.length > 1 ?
         <React.Fragment><h4>{t("previousResults", "Resultados anteriores")}</h4>
-          <DataView value={coordinates.slice(1)} layout="list"
-            itemTemplate={itemTemplate} paginator alwaysShowPaginator={false} pageLinkSize={2} rows={9} style={{fontSize: ".8rem"}} />
+          <div className="coordinates-results" style={{fontSize: ".8rem"}}>
+            { previousResults
+                .slice((safeResultsPage - 1) * resultsPageSize, safeResultsPage * resultsPageSize)
+                .map(item => (
+                  <React.Fragment key={item.id}>
+                    { renderCoordinatesItem(item) }
+                  </React.Fragment>
+                )) }
+            { resultsPages > 1 &&
+              <Group justify="center" mt="xs">
+                <Pagination size="sm" siblings={0} total={resultsPages} value={safeResultsPage} onChange={setResultsPage} />
+              </Group> }
+          </div>
         </React.Fragment> : null)
-      }    
+      }
 
     </div>
   )

@@ -1,14 +1,10 @@
 /* style */
 
-.p-panel-content div.coordinates h4 {
+div.coordinates h4 {
   margin-bottom: 10px;
 }
 
-.p-panel-content div.coordinates .p-paginator.p-paginator-bottom {
-  justify-content: center;
-}
-
-.p-dataview-list div.coordinates-item {
+.coordinates-results div.coordinates-item {
   padding-top: 5px;
   padding-bottom: 10px;
 }
@@ -16,8 +12,8 @@
 .coordinates-item table {
   width: 100%;
   border: none;
-  border-collapse: collapse; 
-  font-size: .9rem; 
+  border-collapse: collapse;
+  font-size: .9rem;
 }
 
 .coordinates-item table td {
@@ -41,14 +37,6 @@
   background: #2196f3;
 }
 
-.coordinates-item .coordinates-item-tools .p-button {
+.coordinates-item .coordinates-item-tools button {
   border-radius: 0;
-}
-
-.coordinates .p-inputtext.p-inputnumber-input {
-  font-size: 1rem;
-}
-
-.coordinates .p-inputmask {
-  padding: 0.65rem 0.5rem;
 }
