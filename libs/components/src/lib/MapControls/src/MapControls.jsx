@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
+import { Checkbox } from '@mantine/core';
+import { MapToolButton } from '../../components';
 import ZoomToExtent from 'ol/control/ZoomToExtent';
 import DragBox from 'ol/interaction/DragBox';
 import {
@@ -167,20 +168,18 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
   function getComponentMapButton(type) {
     if (type === 'Coordinates') {
       return (!!coordinates_control && !!coordinates_control.show_button) ?
-        <Button key={type}
+        <MapToolButton key={type}
           title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
           icon="fas fa-bullseye"
-          rounded
-          className={exclusive_mapcontrol === 'Coordinates' ? "p-button-raised active" : "p-button-raised"}
+          active={exclusive_mapcontrol === 'Coordinates'}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}
         /> : null;
     } else if (type === 'FeatureInfo') {
       return (!!feature_info_control && !!feature_info_control.show_button) ?
-        <Button key={type}
+        <MapToolButton key={type}
           title={feature_info_control.title || t("identifyElements", "Identificar elementos")}
           icon="pi pi-info-circle"
-          rounded
-          className={exclusive_mapcontrol === 'FeatureInfo' ? "p-button-raised active" : "p-button-raised"}
+          active={exclusive_mapcontrol === 'FeatureInfo'}
           onClick={e => { e.currentTarget.blur(); toggleFeatureInfoControl() }}
         /> : null;
     } else if (type === 'GeoLocation') {
@@ -188,18 +187,21 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         <div className="map-controls-geolocation" key={type}
           onMouseOver={e => { setGeoLocationSettings(true); }}
           onMouseLeave={e => { setGeoLocationSettings(false); }}>
-          <Button 
+          <MapToolButton
             title={geo_location_control.title || t("myLocation", "A minha localização")}
             icon="pi pi-globe"
-            rounded
-            className={geoLocationActive ? "p-button-raised active" : "p-button-raised"}
+            active={geoLocationActive}
             onClick={e => { e.currentTarget.blur(); toggleGeoLocationControl() }}
           />
           <div className="btn-geolocation-options" style={!geoLocationActive || !geoLocationSettings ? { display: "none" } : {}}
             onMouseLeave={e => { setGeoLocationSettings(false); }}
           >
-            <input type="checkbox" onClick={e => { toggleGeoLocationTracking(e.currentTarget.checked); }} checked={geoLocationTracking} />
-            <label> {t("myLocationUpdatePosition", "Atualizar posição")}</label>
+            <Checkbox
+              size="xs"
+              checked={geoLocationTracking}
+              onChange={e => { toggleGeoLocationTracking(e.currentTarget.checked); }}
+              label={t("myLocationUpdatePosition", "Atualizar posição")}
+            />
           </div>
         </div> : null;
     } else {

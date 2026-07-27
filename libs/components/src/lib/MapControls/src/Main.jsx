@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { CollapsiblePanel } from '@scalargis/ui';
 import MapControls from './MapControls'
 
 /**
@@ -43,9 +42,9 @@ export default function Main({ core, as, config, record }) {
   }
 
   if (as === 'panel') return (
-    <Panel header={t("mapTools", "Ferramentas do Mapa")}>
+    <CollapsiblePanel header={t("mapTools", "Ferramentas do Mapa")} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   // Render component
