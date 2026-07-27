@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
-import { Dialog } from 'primereact/dialog';
+import React, { useState } from 'react';
+import { Button, Group, UnstyledButton } from '@mantine/core';
+import { CollapsiblePanel, Dialog } from '@scalargis/ui';
 
-import { i18n as i18nUtils } from '../../components';
+import { i18n as i18nUtils, MainMenuButton } from '../../components';
 
 import HelpHtmlContent from './HelpHmtlContent';
 
@@ -15,13 +14,9 @@ import './style.css';
 export function MainMenu({ className, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize, showOnPortal } = Models.Utils;
+  const { getWindowSize } = Models.Utils;
 
   const [showPopup, setShowPopup] = useState(false);
-  const [size, setSize] = useState(null);
-  const [maximized, setMaximized] = useState(false);
-
-  const dialog = useRef();
 
   const component_cfg = record.config_json || {};
   const title = record.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("help", "Ajuda");
@@ -35,74 +30,56 @@ export function MainMenu({ className, config, actions, record }) {
   if (record.as === 'popup') {
     const closeLabel = component_cfg.closeLabel ? i18nUtils.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18nUtils.translateValue("close", "Fechar");
 
-    const url = lang ? 
+    const url = lang ?
       component_cfg.url.replace("{lang}", lang).replace("{language}", lang)
       : component_cfg.url;
 
     return (
       <React.Fragment>
 
-        <Button
+        <MainMenuButton
           title={title}
           className={className}
           icon="far fa-question-circle"
           onClick={e => setShowPopup(true)}
         />
 
-        {showOnPortal(<Dialog
-          ref={dialog}        
-          header={header}
-          visible={showPopup}
-          style={{width: isMobile ? '90%' : '50vw', height: '80%' }}
+        <Dialog
+          title={header}
+          opened={showPopup}
+          size={isMobile ? '90%' : '50vw'}
+          height="80vh"
           maximizable
-          maximized={maximized} 
-          modal
           footer={(
-            <div className="grid">
-              <div className="col">
-                <Button label={closeLabel} onClick={e => setShowPopup(false)} />
-              </div>
-            </div>
+            <Group justify="flex-end">
+              <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
+            </Group>
           )}
-          onShow={() => {
-            const elem = dialog.current.getElement();
-            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
-          }}
-          onResize={e => {
-            const elem = dialog.current.getElement();
-            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
-          }}
-          onMaximize={e => {
-            setMaximized(e.maximized);
-            const elem = dialog.current.getElement();
-            setTimeout(() => {setSize({x: elem.clientWidth, y: elem.clientHeight - 25 }, 200)});
-          }}
-          onHide={e => setShowPopup(false)}>
-          
+          onClose={e => setShowPopup(false)}>
+
           { component_cfg.iframe === true ?
-            <iframe title={title} src={url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
+            <iframe title={title} src={url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>
             :
             <HelpHtmlContent
               config={component_cfg}
-              size={size}
             />
           }
 
-        </Dialog>)}
+        </Dialog>
 
       </React.Fragment>
     )
-  } else if (record.as === 'external') { 
+  } else if (record.as === 'external') {
     let help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url ;
 
     if (!help_url) return null;
 
-    help_url = lang ? 
+    help_url = lang ?
       help_url.replace("{lang}", lang).replace("{language}", lang)
       : help_url;
 
     return (
-      <Button
+      <MainMenuButton
         title={title}
         className={className}
         icon="far fa-question-circle"
@@ -110,7 +87,7 @@ export function MainMenu({ className, config, actions, record }) {
     )
   }  else {
     return (
-      <Button
+      <MainMenuButton
         title={title}
         className={className}
         icon="far fa-question-circle"
@@ -123,13 +100,9 @@ export function MainMenu({ className, config, actions, record }) {
 export default function Main({ type, as, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize, showOnPortal } = Models.Utils;
+  const { getWindowSize } = Models.Utils;
 
   const [showPopup, setShowPopup] = useState(false);
-  const [size, setSize] = useState(null);
-  const [maximized, setMaximized] = useState(false);
-
-  const dialog = useRef();    
 
   const component_cfg = record.config_json || {};
   const title = record.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("help", "Ajuda");
@@ -154,17 +127,17 @@ export default function Main({ type, as, config, actions, record }) {
   }
 
   if (openAs === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   if (openAs === 'popup') {
-    
+
     let url;
-    
+
     if (component_cfg.url) {
-      url = lang ? 
+      url = lang ?
         component_cfg.url.replace("{lang}", lang).replace("{language}", lang)
         : component_cfg.url;
     }
@@ -172,65 +145,47 @@ export default function Main({ type, as, config, actions, record }) {
     return (
       <React.Fragment>
         { type != 'menu' ?
-          <button className="p-link" onClick={e => setShowPopup(true)} title={title}>
+          <UnstyledButton className="p-link" onClick={e => setShowPopup(true)} title={title}>
             <span className="layout-topbar-item-text"></span>
             <span className="layout-topbar-icon far far fa-question-circle" />
-          </button> :
+          </UnstyledButton> :
           <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => setShowPopup(true)} >
             <span className="p-menuitem-icon far far fa-question-circle"></span><span className="p-menuitem-text">Ajuda</span>
           </a> }
 
-        {showOnPortal(<Dialog
-          ref={dialog}        
-          header={header}
-          visible={showPopup}
-          style={{width: isMobile ? '90%' : '50vw', height: '80%' }}
+        <Dialog
+          title={header}
+          opened={showPopup}
+          size={isMobile ? '90%' : '50vw'}
+          height="80vh"
           maximizable
-          maximized={maximized} 
-          modal
           footer={(
-            <div className="grid">
-              <div className="col">
-                <Button label={closeLabel} onClick={e => setShowPopup(false)} />
-              </div>
-            </div>
+            <Group justify="flex-end">
+              <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
+            </Group>
           )}
-          onShow={() => {
-            const elem = dialog.current.getElement();
-            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
-          }}
-          onResize={e => {
-            const elem = dialog.current.getElement();
-            setSize({x: elem.clientWidth, y: elem.clientHeight - 25 });
-          }}
-          onMaximize={e => {
-            setMaximized(e.maximized);
-            const elem = dialog.current.getElement();
-            setTimeout(() => {setSize({x: elem.clientWidth, y: elem.clientHeight - 25 }, 200)});
-          }}
-          onHide={e => setShowPopup(false)}>
-          
+          onClose={e => setShowPopup(false)}>
+
           { component_cfg.iframe === true ?
-            <iframe title={title} src={url} style={ size ? { border: 'none', width: '100%', height: size.y } : {border: 'none', width: '100%'}}></iframe>
+            <iframe title={title} src={url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>
             :
             <HelpHtmlContent
               config={component_cfg}
-              size={size}
             />
           }
 
-        </Dialog>)}
+        </Dialog>
 
       </React.Fragment>
     );
   }
 
-  if (openAs === 'external') {    
+  if (openAs === 'external') {
     let help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url;
 
     if (!help_url) return null;
 
-    help_url = lang ? 
+    help_url = lang ?
       help_url.replace("{lang}", lang).replace("{language}", lang)
       : help_url;
 
@@ -243,21 +198,21 @@ export default function Main({ type, as, config, actions, record }) {
       )
     }
 
+    // One real anchor instead of the old button-wrapping-an-anchor pair —
+    // same chrome classes, no nested interactive controls (kit 04).
     return (
-      <React.Fragment>
-      { component_cfg?.elementType === 'link' ?
-        <div title={title} className="p-link">
-          <a href={help_url} target="_blank" className="sg-help-button-link" style={{"color": "#ffffff"}}>
-            <span className="layout-topbar-icon pi pi-question-circle"></span>
-          </a>
-        </div> :
-        <button className="p-link" title={title} onClick={e => { return; }}>
-          <a href={help_url} target="_blank" style={{"color": "#ffffff"}}>
-            <span className="layout-topbar-item-text">{title}</span>
-            <span className="layout-topbar-icon pi pi-question-circle"/>
-          </a>
-        </button> }
-      </React.Fragment>
+      <a
+        href={help_url}
+        target="_blank"
+        rel="noreferrer"
+        title={title}
+        className={component_cfg?.elementType === 'link' ? "p-link sg-help-button-link" : "p-link"}
+        style={{"color": "#ffffff"}}
+      >
+        { component_cfg?.elementType !== 'link' &&
+          <span className="layout-topbar-item-text">{title}</span> }
+        <span className="layout-topbar-icon pi pi-question-circle"/>
+      </a>
     )
   }
 

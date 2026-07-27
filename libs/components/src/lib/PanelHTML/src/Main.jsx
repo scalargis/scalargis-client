@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Button } from 'primereact/button'
-import { Panel } from 'primereact/panel'
-import { Dialog } from 'primereact/dialog'
+import { Button, Group, Modal } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
+
+import { MainMenuButton } from '../../components';
+
 import PanelHtmlContent from './PanelHmtlContent'
 import './style.css'
 
@@ -11,7 +13,7 @@ import './style.css'
 export function MainMenu({ className, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize, showOnPortal } = Models.Utils;
+  const { getWindowSize } = Models.Utils;
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -22,82 +24,59 @@ export function MainMenu({ className, config, actions, record }) {
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
-  if (record.as === 'popup') {    
-    const closeLabel = component_cfg.closeLabel || "Fechar";    
+  const menuButton = component_cfg?.btn_image ? (
+    <MainMenuButton
+      title={title}
+      className={className ? className + ' main-menu-btn-image' : 'main-menu-btn-image'}
+      icon="pi"
+      style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
+      onClick={e => record.as === 'popup' ? setShowPopup(true) : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+    />
+  ) : (
+    <MainMenuButton
+      title={title}
+      className={className}
+      icon={component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
+      onClick={e => record.as === 'popup' ? setShowPopup(true) : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+    />
+  );
+
+  if (record.as === 'popup') {
+    const closeLabel = component_cfg.closeLabel || "Fechar";
     return (
       <React.Fragment>
-        { component_cfg?.btn_image ? 
-            <Button
-              title={title}
-              className={className ? className + ' main-menu-btn-image' : null}
-              icon="pi"
-              style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
-              onClick={e => setShowPopup(true)}
-            /> :
-            <Button
-              title={title}
-              className={className}
-              icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
-              onClick={e => setShowPopup(true)}
-            /> }
+        {menuButton}
 
-        {showOnPortal(<Dialog
-          header={header}
-          visible={showPopup}
-          style={{width: isMobile ? '90%' : '35vw' }} 
-          modal
-          footer={(
-            <div className="grid">
-              <div className="col">
-                <Button label={closeLabel} onClick={e => setShowPopup(false)} />
-              </div>
-            </div>
-          )}          
-          onHide={e => setShowPopup(false)}>
+        <Modal
+          title={header}
+          opened={showPopup}
+          size={isMobile ? '90%' : '35vw'}
+          onClose={e => setShowPopup(false)}>
 
           <PanelHtmlContent
             config={component_cfg}
           />
 
-        </Dialog>)}
+          <Group justify="flex-end" mt="md">
+            <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
+          </Group>
+
+        </Modal>
 
       </React.Fragment>
     )
-  }  else {
-    if (component_cfg?.btn_image) {
-      return (
-        <Button
-          title={title}
-          className={className ? className + ' main-menu-btn-image' : null}
-          icon="pi"
-          style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
-          onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
-        />
-      )
-    }
-
-    return (
-        <Button
-        title={title}
-        className={className}
-        icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
-        onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
-      /> 
-    )
   }
+
+  return menuButton;
 }
 
 export default function Main({ as, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize, showOnPortal } = Models.Utils;
 
   const component_cfg = record.config_json || {};
   const title = record.title || '';
   const header = component_cfg.header || title;
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768; 
 
   // Render content
   function renderContent() {
@@ -113,9 +92,9 @@ export default function Main({ as, config, actions, record }) {
   )
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   return null
