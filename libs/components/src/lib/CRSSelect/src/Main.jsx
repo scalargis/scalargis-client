@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Dropdown } from 'primereact/dropdown';
+import { Select } from '@mantine/core';
 import { containsCoordinate } from 'ol/extent';
 import { transform } from 'ol/proj';
 import MousePosition from 'ol/control/MousePosition';
@@ -35,8 +35,10 @@ export default function Main({ core, config, actions, record }) {
 
   const invalid_extent_message = t(record?.config_json?.invalid_extent_message) || '';
 
-  const handleChange = (event) => {
-    dispatch(viewer_set_displaycrs(event.value));
+  // Select values ride as strings; the redux state keeps the numeric srid.
+  const handleChange = (value) => {
+    if (!value) return;
+    dispatch(viewer_set_displaycrs(Number(value)));
   }
 
   const userRoles = useMemo(()=>{
@@ -134,18 +136,21 @@ export default function Main({ core, config, actions, record }) {
   return (
     <div className="crsselect">
       <div id="cursor_coords" ref={cursorRef} className="cursor-coords"></div>
-      <Dropdown 
-        value={display_crs} 
-        options={listCRS.map(i => {
+      <Select
+        size="xs"
+        w={250}
+        value={String(display_crs)}
+        data={listCRS.map(i => {
           return {
-            ...i,
-            value: i.srid,
+            value: String(i.srid),
             label: i.label || i.title,
             disabled: !isCoordInExtent(center, proj_code, i.extent)
           }
-        })} 
-        onChange={handleChange} 
-        placeholder={listCRS ? listCRS.find(v => v.srid === display_crs).label : 'Escolha'}
+        })}
+        onChange={handleChange}
+        allowDeselect={false}
+        aria-label={t('coordinateSystem') || 'Sistema de Coordenadas'}
+        placeholder="Escolha"
       />
     </div>
   );

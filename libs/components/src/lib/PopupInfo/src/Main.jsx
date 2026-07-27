@@ -1,9 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import Cookies from 'universal-cookie';
-import { Dialog } from 'primereact/dialog';
-import { InputSwitch } from 'primereact/inputswitch';
-import { Button } from 'primereact/button';
+import { Button, Group, Modal, Switch } from '@mantine/core';
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
 import { LocaleSelectorComponent } from '../../components';
@@ -17,7 +15,7 @@ const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/';
 /**
  * Component Translations
  */
-export const translations = { 
+export const translations = {
   load: loadTranslations
 };
 
@@ -28,7 +26,6 @@ export const translations = {
 export default function Main({ config, as, core, actions, utils, record }) {
 
   const { auth } = config;
-  const { showOnPortal } = utils;
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
@@ -48,7 +45,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
       const data = JSON.parse(cookieData);
       state = data === 0 ? false : true;
     }
-    
+
     //Always show if hideOption is not true
     if (config.hideOption !== false) {
       state = true;
@@ -89,7 +86,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
   }, []);
 
   // Render content
-  let header;  
+  let header;
   if (typeof config?.header === 'object') {
     header = config.header["default"] ? config.header["default"] : "";
     header = config.header[i18n.resolvedLanguage] ? config.header[i18n.resolvedLanguage] : header;
@@ -116,29 +113,14 @@ export default function Main({ config, as, core, actions, utils, record }) {
 
   return (
     <Fragment>
-      {showOnPortal(<Dialog
-        header={header}
-        visible={showPopup}
-        style={{width: isMobile ? config?.modileDialogWidth ||'90%' : config?.dialogWidth || '35vw' }}
-        modal={modal}
-        footer={(
-          <div className="grid mt-2">
-            {(!config.hideOption &&
-            <div className="field col-12 md:col-6 text-left">
-              <InputSwitch
-                inputId="permanentSwitch"
-                checked={permanent}
-                onChange={(e) => setPermanent(!permanent)}
-                className="mr-2" style={{float: "left"}} 
-              />
-              <label htmlFor="permanentSwitch" className="p-checkbox-label" style={{display: "inline"}}>{t("doNotShowAgain", "Não mostrar novamente")}</label>
-            </div>)}
-            <div className="col text-right">
-              <Button label={closeLabel} onClick={e => hidePopup() } />
-            </div>
-          </div>
-        )}
-        onHide={e => hidePopup()}>
+      <Modal
+        title={header}
+        opened={showPopup}
+        size={isMobile ? config?.modileDialogWidth ||'90%' : config?.dialogWidth || '35vw'}
+        withOverlay={modal}
+        lockScroll={modal}
+        trapFocus={modal}
+        onClose={e => hidePopup()}>
           <div>
             { record?.config_json?.showLocaleSelector === true &&
             <div className="col-12 pt-0" style={{ textAlign: 'right'}}>
@@ -147,7 +129,18 @@ export default function Main({ config, as, core, actions, utils, record }) {
             }
             <div dangerouslySetInnerHTML={{ __html: html }}></div>
           </div>
-      </Dialog>)}
+
+          <Group justify="space-between" mt="md">
+            {(!config.hideOption &&
+              <Switch
+                size="md"
+                checked={permanent}
+                onChange={(e) => setPermanent(!permanent)}
+                label={t("doNotShowAgain", "Não mostrar novamente")}
+              />) || <span />}
+            <Button onClick={e => hidePopup() }>{closeLabel}</Button>
+          </Group>
+      </Modal>
     </Fragment>
   )
 }

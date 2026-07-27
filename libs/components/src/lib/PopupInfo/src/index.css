@@ -1,14 +1,14 @@
-.popupinfo-locale-selector.p-dropdown {
-    border: none;
+/* The popup's locale selector sits on a white Modal, not the topbar:
+   undo the topbar nudge and repaint the old primary-blue look onto the
+   Mantine Select structure. */
+
+.locale-selector.popupinfo-locale-selector {
+  display: inline-block;
+  margin-top: 0;
+  margin-left: 0;
+  color: #2196f3;
 }
 
-.popupinfo-locale-selector.p-dropdown .p-hidden-accessible.p-dropdown-hidden-select,
-.popupinfo-locale-selector.p-dropdown .p-dropdown.p-dropdown-label,
-.popupinfo-locale-selector.p-dropdown .p-dropdown-label.p-inputtext,
-.popupinfo-locale-selector.p-dropdown .p-dropdown-trigger {
-    color: #2196f3;
-}
-
-.popupinfo-locale-selector.p-dropdown .p-dropdown-trigger {
-    border-left: 1px solid #2196f3;
+.locale-selector.popupinfo-locale-selector input {
+  color: #2196f3;
 }

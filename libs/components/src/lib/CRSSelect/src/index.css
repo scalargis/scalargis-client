@@ -7,13 +7,9 @@
   .footer-right .crsselect { display: none !important; }
 }
 
-.footer-right .crsselect .p-dropdown.p-component  {
+.footer-right .crsselect input {
   height: 30px;
-  align-items: center;
-}
-
-.footer-right .crsselect .p-dropdown.p-component .p-dropdown-label.p-inputtext {
-  max-width: 250px;
+  min-height: 30px;
 }
 
 .footer-right .crsselect .cursor-coords .viewer-mouse-position {
