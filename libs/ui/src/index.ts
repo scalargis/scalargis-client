@@ -48,3 +48,6 @@ export type { TabPanelProps, TabMount } from './recipes/TabPanel';
 
 export { SkipLink } from './recipes/SkipLink';
 export type { SkipLinkProps } from './recipes/SkipLink';
+
+export { Dialog } from './recipes/Dialog';
+export type { DialogProps } from './recipes/Dialog';

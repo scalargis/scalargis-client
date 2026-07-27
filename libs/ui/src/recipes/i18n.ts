@@ -34,6 +34,7 @@ const en = {
   treeselect: { placeholder: 'Select item', clear: 'Clear selection' },
   skiplink: { label: 'Skip to main content' },
   datagrid: { reorder: 'Reorder row' },
+  dialog: { maximize: 'Maximize', restore: 'Restore', close: 'Close' },
 };
 
 const pt: typeof en = {
@@ -52,6 +53,7 @@ const pt: typeof en = {
   treeselect: { placeholder: 'Selecionar item', clear: 'Limpar seleção' },
   skiplink: { label: 'Saltar para o conteúdo principal' },
   datagrid: { reorder: 'Reordenar linha' },
+  dialog: { maximize: 'Maximizar', restore: 'Restaurar', close: 'Fechar' },
 };
 
 /** Idempotent; safe to call on every render. `pt-PT` resolves to the `pt`

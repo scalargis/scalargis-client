@@ -55,3 +55,5 @@ export const IconUpload = piIcon('pi pi-upload');
 export const IconX = piIcon('pi pi-times');
 export const IconPlus = piIcon('pi pi-plus');
 export const IconFile = piIcon('pi pi-file');
+export const IconWindowMaximize = piIcon('pi pi-window-maximize');
+export const IconWindowMinimize = piIcon('pi pi-window-minimize');

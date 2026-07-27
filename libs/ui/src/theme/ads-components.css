@@ -192,3 +192,13 @@
   border-start-start-radius: 0;
   border-start-end-radius: 0;
 }
+
+/* ─── Dialog ───────────────────────────────────────────────────────────
+   The recipe's footer bar sits OUTSIDE Modal.Body's scroll region, pinned
+   to the dialog's bottom edge — Prime Dialog's `footer` contract.
+   -------------------------------------------------------------------- */
+.ads-dialog__footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--mantine-color-neutral-2);
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+}
