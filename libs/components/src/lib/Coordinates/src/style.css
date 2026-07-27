@@ -52,3 +52,7 @@
 .coordinates .p-inputmask {
   padding: 0.65rem 0.5rem;
 }
+
+.coordinates select {
+  border: 1px solid #ced4da;
+}
