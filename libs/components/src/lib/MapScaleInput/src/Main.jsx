@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { InputMask } from 'primereact/inputmask';
-import { InputText } from 'primereact/inputtext';
+import { TextInput } from '@mantine/core';
 import './style.css'
 
 export default function Main({ config, actions }) {
@@ -45,11 +44,12 @@ export default function Main({ config, actions }) {
 
   return (
     <div className="mapscale-input">
-      <InputText value={scale}
+      <TextInput value={scale}
+        aria-label="Escala"
         onChange={(e) => onChangeScale(e)}
         onKeyUp={(e) => onSetScale(e)}
-        onBlur={(e) => onEndEditing(e)}>
-      </InputText>
+        onBlur={(e) => onEndEditing(e)}
+      />
     </div>
     );
 }
