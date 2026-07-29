@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Card } from 'primereact/card';
+import { UnstyledButton } from '@mantine/core';
 import classNames from 'classnames';
 
 import { getDescribeFeatureType } from './service';
@@ -28,7 +28,7 @@ export default function SearchLayers(props) {
         uischema: {...active.uischema}
       }
     }
-    
+
     if (schemas[active.id]) {
       schemaCfg = {...schemas[active.id]};
     }
@@ -55,7 +55,7 @@ export default function SearchLayers(props) {
     getDescribeFeatureType({cfg: active, core, viewer, auth}).then(data => {
       try {
         if (active?.uischema) {
-          updateLayerSchema(id, {
+          updateLayerSchema(active.id, {
             ...data,
             uischema: {
               type: 'VerticalLayout',
@@ -70,7 +70,7 @@ export default function SearchLayers(props) {
         return Promise.reject(err);
       }
       setLoaded(true);
-    }).catch(error => {      
+    }).catch(error => {
       console.log(error);
       setErrorSchema({message:'Não foi possível obter informação do tema'});
     }).finally(()=> {
@@ -108,7 +108,7 @@ export default function SearchLayers(props) {
       layer={layer}
       searchConfig={active}
       schemaConfig={schemaConfig}
-      goPanelSearchPrev={showPanelPrev && ((e) => 
+      goPanelSearchPrev={showPanelPrev && ((e) =>
         {
           layer.current.getSource().clear();
           setActive(null);
@@ -130,20 +130,19 @@ export default function SearchLayers(props) {
           }
           iconClass[l.icon] = l.icon ? true : false;
           iconClass['pi-bars'] = l.icon ? false : true;
-          
-          const icon = <div style={{ cursor: 'pointer'}} title={l.tooltip} 
-            onClick={e => setActive(l)}>
-            <i className={classNames(iconClass)} style={{fontSize: '3em'}}></i>
-          </div>
-          const title = <div style={{ cursor: 'pointer'}} title={l.tooltip} 
-            onClick={e => setActive(l)}>
-            {l.title}
-          </div>
 
-          return <Card key={i} header={show_icon && icon} title={title} subTitle={l.subtitle && l.subtitle} style={{ marginBottom: '2em' }} 
-            onClick={e => console.log(e)}>
+          return (
+            <UnstyledButton key={i} type="button" className="search-layer-card"
+              title={l.tooltip} onClick={e => setActive(l)}>
+              {show_icon &&
+                <div className="search-layer-card-header">
+                  <i className={classNames(iconClass)} style={{fontSize: '3em'}} aria-hidden="true"></i>
+                </div>}
+              <div className="search-layer-card-title">{l.title}</div>
+              {l.subtitle && <div className="search-layer-card-subtitle">{l.subtitle}</div>}
               <div className="m-0" dangerouslySetInnerHTML={{__html: l.description || ''}}></div>
-            </Card>
+            </UnstyledButton>
+          )
         })}
       </div>
     )

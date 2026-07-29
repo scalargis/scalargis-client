@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ProgressSpinner } from 'primereact/progressspinner';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { Box, LoadingOverlay } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
+
+import { MainMenuButton } from '../../components';
+
 import componentActions from './actions';
 import componentReducers from './reducers';
 import SearchLayers from './SearchLayers';
@@ -14,13 +16,12 @@ import './style.scss';
  * Main menu component
  */
 export function MainMenu({ className, config, actions, record }) {
-  const component_cfg = record.config_json || {};
   const title = record.title || 'Pesquisar Temas';
   const icon = record.icon || "pi pi-search";
 
   if (record.mode !== 'child') {
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={className}
       icon={icon}
@@ -63,7 +64,6 @@ export default function Main(props) {
   const layer_id = component_cfg.exclusive_layer === true ? record.id : 'searchlayers';
   const layer = useRef();
 
-  const ref = useRef(null);
   const [blockedPanel, setBlockedPanel] = useState(false);
   const [layers, setLayers] = useState(component_cfg.layers || []);
 
@@ -98,32 +98,9 @@ export default function Main(props) {
   }, [component_store_state, record.id]);
 
 
-  const getBlockFullHeight = () => {
-
-    const oDiv = ref.current;
-    
-    let clientHeight = 0;
-    let height = 0;
-    
-    try {
-      clientHeight = oDiv.clientHeight;
-    
-      const sOriginalOverflow = oDiv.style.overflow;
-      const sOriginalHeight = oDiv.style.height;
-      oDiv.style.overflow = "";
-      oDiv.style.height = "";
-
-      height = oDiv.offsetHeight;
-      oDiv.style.height = sOriginalHeight;
-      oDiv.style.overflow = sOriginalOverflow;
-    } catch { /* empty */ }
-        
-    return clientHeight > height ? clientHeight : height;
-  }
-
   // Render content
   function renderContent() {
-    return (     
+    return (
       <div className="search-layers">
         <SearchLayers
           core={core}
@@ -137,20 +114,18 @@ export default function Main(props) {
           record={record}
           Models={Models}
           setBlockedPanel={setBlockedPanel}
-        />        
+        />
       </div>
-    )    
+    )
   }
 
   if (as === 'panel') return (
-    <div ref={ref} className="p-blockui-container" style={{height: 'calc(100%)'}}>
-      <Panel header={header}>
+    <Box pos="relative" style={{height: 'calc(100%)'}}>
+      <CollapsiblePanel header={header} toggleable={false}>
         { renderContent() }
-      </Panel>
-      { blockedPanel && <div className="p-blockui p-component-overlay p-component-overlay-enter" style={{zIndex: 1003, height: getBlockFullHeight()}}>
-        <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="8" fill="#EEEEEE" animationDuration=".5s"/>
-      </div> }
-    </div>
+      </CollapsiblePanel>
+      <LoadingOverlay visible={blockedPanel} zIndex={1003} loaderProps={{ size: 50 }} />
+    </Box>
   )
 
   return null

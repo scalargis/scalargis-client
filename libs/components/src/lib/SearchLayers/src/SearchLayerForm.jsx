@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import { FigTreeEvaluator } from 'fig-tree-evaluator';
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
-import { Message } from 'primereact/message';
+import { Alert, Button, Group } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 
 import {
   i18n,
   JsonForm,
-  JsonFormContext, 
+  JsonFormContext,
   JsonFormDefaultRenderers,
   JsonFormValidationMode
 } from '../../components';
@@ -16,22 +15,19 @@ import { getFeatures } from './service';
 import SearchLayerResults from './SearchLayerResults';
 
 
-let toastEl = null;
-
 const fig = new FigTreeEvaluator({ evaluateFullObject: true });
 
 
 export default function SearchLayerForm(props) {
-  const {core, viewer, auth, actions, pubsub, dispatch, mainMap, Models, layers, layer, 
+  const {core, viewer, auth, actions, pubsub, dispatch, mainMap, Models, layers, layer,
     searchConfig, schemaConfig, goPanelSearchPrev} = props;
-  const { showOnPortal } = Models.Utils;
-  
+
   const {schema={}, uischema={}, geometry_field} = schemaConfig || {};
 
   const id = searchConfig?.id;
 
   const searchTitle = searchConfig?.title ? i18n.translateValue(searchConfig.title, searchConfig?.title) : "";
-  
+
   const [formData, setFormData] = useState({});
   const [formErrors, setFormErrors] = useState({});
   const [results, setResults] = useState({});
@@ -41,7 +37,7 @@ export default function SearchLayerForm(props) {
   const doSearch = (startIndex=0, maxFeatures, filter, sort) => {
     let start = null;
     let numRecords = null;
-  
+
     if (searchConfig.pagination == null || searchConfig.pagination === true) {
       start = startIndex;
       numRecords = maxFeatures || searchConfig.maxFeatures || 10;
@@ -56,50 +52,40 @@ export default function SearchLayerForm(props) {
       new_results[id] ={
         filter: filter || {},
         sort: sort || {},
-        startIndex, 
-        maxFeatures: numRecords, 
-        total: data.total, 
-        features: data.features        
+        startIndex,
+        maxFeatures: numRecords,
+        total: data.total,
+        features: data.features
       };
       if (layer && layer.current) layer.current.getSource().clear();
       setResults(new_results);
     }).catch(error => {
       console.log(error);
-      toastEl.show({
-        severity: 'error',
-        summary: 'Ocorreu um erro',
-        detail: 'Não foi possível realizar a pesquisa',
-        sticky: true
-      });      
+      notify.error('Ocorreu um erro', 'Não foi possível realizar a pesquisa', { autoClose: false });
     }).finally(()=> props.setBlockedPanel(false));
   }
 
   return (
     <>
-      {showOnPortal(<Toast ref={(el) => toastEl = el} />)}
-
       {goPanelSearchPrev && <div className="mt-2">
-        <div className="grid">
-          <div className="col text-left">
-            <Button
-                label="Voltar"
-                icon="pi pi-chevron-left"
-                size="small"
-                onClick={e => { goPanelSearchPrev(); }}
-            />
-          </div>
-        </div>  
+        <Button
+          size="xs"
+          leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+          onClick={e => { goPanelSearchPrev(); }}>
+          Voltar
+        </Button>
       </div>}
 
       <div className="mt-2">{searchTitle}</div>
       <hr />
 
-      { props?.errorSchema && <React.Fragment>
-        <Message
-          severity="warn"
-          text={props?.errorSchema.message} 
-        />
-      </React.Fragment> }
+      { props?.errorSchema &&
+        <Alert color="warning" py="xs">
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <i className="pi pi-exclamation-triangle" aria-hidden="true" />
+            <span>{props?.errorSchema.message}</span>
+          </Group>
+        </Alert> }
 
       <React.Fragment>
         <div className="mt-3">
@@ -109,7 +95,6 @@ export default function SearchLayerForm(props) {
               uischema={uischema}
               data={id ? formData[id] || {} : {} }
               renderers={JsonFormDefaultRenderers}
-              //cells={vanillaCells}
               onChange={({ data, errors }) => {
                 const _formdata = {...formData};
                 _formdata[id] = data;
@@ -120,14 +105,11 @@ export default function SearchLayerForm(props) {
                 setFormErrors(_formerrors);
               }}
               validationMode={validationMode}
-              //locale={locale}
-              //translations={translations}
-              //i18n={{locale: locale, translate: translation}}
             />
           </JsonFormContext.Provider>
         </div>
 
-        <div className="text-center">
+        <Group justify="center" mt="md">
           <Button onClick={() => {
               const _formdata = {...formData};
               _formdata[id] = {};
@@ -142,9 +124,7 @@ export default function SearchLayerForm(props) {
               setResults(_results);
 
               if (layer && layer.current) layer.current.getSource().clear();
-            }}
-            className="mr-2"
-            color='primary'>
+            }}>
             Limpar
           </Button>
           <Button onClick={async (e) => {
@@ -159,9 +139,9 @@ export default function SearchLayerForm(props) {
 
                 if (config?.fields_exclude_query?.length) {
                   const tmpFields = {};
-                  Object.keys(finalFormData).forEach(k => {
+                  Object.keys(_formData).forEach(k => {
                     if (!config.fields_exclude_query.includes(k)) {
-                      tmpFields[k] = finalFormData[k];
+                      tmpFields[k] = _formData[k];
                     }
                   });
                   _formData = {...tmpFields}
@@ -178,13 +158,13 @@ export default function SearchLayerForm(props) {
                   if (val !== null && val !== '') {
                     formvalues[k] = v;
                   }
-                });             
-                
+                });
+
                 //Apply expression to filled form fields values
                 const fielddata = Object.entries(formvalues).map(([k, v]) => {
                   let final_value = v;
                   if (k in template && template[k].expression) {
-                    final_value = template[k].expression.replace('{value}', v);                 
+                    final_value = template[k].expression.replace('{value}', v);
                     Object.entries(formvalues).forEach(([f, z]) => {
                       final_value = final_value.replace('{' + f + '}', z);
                     });
@@ -202,7 +182,7 @@ export default function SearchLayerForm(props) {
                   let final_value = v.expression;
                   Object.entries(formvalues).forEach(([f, z]) => {
                     final_value = final_value.replace('{' + f + '}', z);
-                  });                
+                  });
                   return { [k]: final_value};
                 }).reduce((obj, val) => {
                   return Object.assign(obj, val);
@@ -211,7 +191,7 @@ export default function SearchLayerForm(props) {
                 const data = {...virtualdata, ...fielddata};
                 return data;
               }
-              
+
               //Combine values of form and virtual fields
               const data = await getFormData(schema, formData[id], searchConfig);
 
@@ -224,25 +204,25 @@ export default function SearchLayerForm(props) {
 
               doSearch(0, null, data, sort);
 
-          }} color='primary'>
+          }}>
             Pesquisar
-          </Button> 
-        </div>
+          </Button>
+        </Group>
 
         {(results && results[id] && results[id].total === 0) &&
-          <div className="mt-4" style={{textAlign: 'center'}}>
-            <Message
-              severity="info"
-              text='Pesquisa sem resultados'
-            />
-          </div>
+          <Alert color="informative" py="xs" mt="lg">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-info-circle" aria-hidden="true" />
+              <span>Pesquisa sem resultados</span>
+            </Group>
+          </Alert>
         }
 
         {(results && results[id] && results[id].total > 0) &&
           <SearchLayerResults
             core={core}
             viewer={viewer}
-            auth={auth}          
+            auth={auth}
             actions={actions}
             Models={Models}
             pubsub={pubsub}
@@ -255,7 +235,7 @@ export default function SearchLayerForm(props) {
             doSearch={doSearch}
           />
         }
-      </React.Fragment> 
+      </React.Fragment>
     </>
   )
 

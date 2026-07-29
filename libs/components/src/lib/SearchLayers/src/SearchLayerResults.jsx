@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Paginator } from 'primereact/paginator';
-import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/dropdown';
+import { ActionIcon, Button, Text } from '@mantine/core';
+import { DataGrid } from '@scalargis/ui';
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import OlFeature from 'ol/Feature';
 import {getCenter as olGetCenter} from 'ol/extent';
@@ -24,19 +21,21 @@ export default function SearchLayerResults(props) {
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState(null);
 
-  useEffect(() => {    
+  useEffect(() => {
     if (!results && !results.features && !results.features.length > 0) {
       setData([]);
       setColumns([]);
       setSortField(null);
       setSortOrder(null);
       return;
-    }   
+    }
 
     const new_data = [];
-    results.features.forEach(f => {
+    results.features.forEach((f, idx) => {
       let properties = f.getProperties(); //(({ geometry, ...o }) => o)(f.getProperties()); // remove geometry field
-      properties = { id_: f.getId(), ...properties }
+      // The grid keys rows by id_; features without a server id fall back to
+      // their absolute result index.
+      properties = { id_: f.getId() != null ? f.getId() : `row-${results.startIndex + idx}`, ...properties }
       new_data.push(properties);
     });
 
@@ -77,69 +76,34 @@ export default function SearchLayerResults(props) {
 
   const zoomActionTemplate = (rowData) => {
     return (
-        <React.Fragment>
-            <Button icon="pi pi-search" rounded text
-              onClick={() => { 
-                layer.current.getSource().clear();
-                if (rowData.geometry == null) {
-                  getFeatureById({cfg: searchConfig, featureId: rowData['id_'], core, viewer, auth}).then(d => {                   
-                    if (!d.features || !d.features.length > 0) return;                
-                    const options = {
-                      dataProjection: 'EPSG:4326',
-                      featureProjection: mainMap.getView().getProjection().getCode()
-                    }
-                    const features = new OlFormatGeoJSON(options).readFeatures(d);
-                    layer.current.getSource().addFeatures(features);                      
-                    zoomLayerFeatures(searchConfig?.zoom_buffer);
-                  });
-                } else {
-                  const geom = rowData.geometry.clone().transform('EPSG:4326',mainMap.getView().getProjection().getCode());
-                  const feature = new OlFeature({...rowData, geometry: geom});
-                  feature.setId(rowData.id_);
-                  layer.current.getSource().addFeature(feature);
-                  zoomLayerFeatures();
-                }                
-              }} />
-        </React.Fragment>
+        <ActionIcon variant="subtle" radius="xl" size="md"
+          title="Zoom" aria-label="Zoom"
+          onClick={() => {
+            layer.current.getSource().clear();
+            if (rowData.geometry == null) {
+              getFeatureById({cfg: searchConfig, featureId: rowData['id_'], core, viewer, auth}).then(d => {
+                if (!d.features || !d.features.length > 0) return;
+                const options = {
+                  dataProjection: 'EPSG:4326',
+                  featureProjection: mainMap.getView().getProjection().getCode()
+                }
+                const features = new OlFormatGeoJSON(options).readFeatures(d);
+                layer.current.getSource().addFeatures(features);
+                zoomLayerFeatures(searchConfig?.zoom_buffer);
+              });
+            } else {
+              const geom = rowData.geometry.clone().transform('EPSG:4326',mainMap.getView().getProjection().getCode());
+              const feature = new OlFeature({...rowData, geometry: geom});
+              feature.setId(rowData.id_);
+              layer.current.getSource().addFeature(feature);
+              zoomLayerFeatures();
+            }
+          }}>
+          <i className="pi pi-search" aria-hidden="true" />
+        </ActionIcon>
     );
   }
-  
-  const paginatorTemplate = {
-    layout: 'RowsPerPageDropdown CurrentPageReport',
-    'RowsPerPageDropdown': (options) => {
-        const dropdownOptions = [
-            { label: 10, value: 10 },
-            { label: 20, value: 20 },
-            { label: 50, value: 50 }
-        ];
 
-        return (
-          <>
-              <span className="mx-1" style={{ color: 'var(--text-color)', userSelect: 'none' }}>Registos: </span>
-              <Dropdown value={results.maxFeatures} options={dropdownOptions} onChange={(e) => doSearch(0, e.value, results.filter, results.sort)} />
-          </>
-        );
-    },
-    'CurrentPageReport': (options) => {
-        return (
-            <span style={{ color: 'var(--text-color)', userSelect: 'none', width: '120px', textAlign: 'center' }}>
-                {results.startIndex + 1} - {results.startIndex + data.length} de {options.totalRecords}
-            </span>
-        )
-    }
-  };
-
-  const totalPaginatorTemplate = {
-    layout: 'CurrentPageReport',
-    'CurrentPageReport': (options) => {
-        return (
-            <span style={{ color: 'var(--text-color)', userSelect: 'none', width: '120px', textAlign: 'center' }}>
-                {options.totalRecords} registos
-            </span>
-        )
-    }
-  };
-  
   const showPagination = () => {
     let show = (searchConfig.pagination == null || searchConfig.pagination === true);
     if (results && results.startIndex === 0 && results.total <= 1) {
@@ -148,21 +112,14 @@ export default function SearchLayerResults(props) {
     return show;
   }
 
-  const getPaginator = () => {
-    return {
-      paginator: showPagination(),
-      paginatorTemplate: searchConfig.pagination === false ? totalPaginatorTemplate : paginatorTemplate
-    }
-  }
-
   const htmlTemplate = (rowData, field) => {
     let new_value = field.value ? field.value : rowData[field.name];
     const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
     if (rf) {
       rf.forEach(fld => {
-        new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');      
-      });                 
-    }    
+        new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');
+      });
+    }
     return <div>{parse(new_value)}</div>;
   }
 
@@ -172,7 +129,7 @@ export default function SearchLayerResults(props) {
 
     if (field.action.data) {
       const new_data = {}
-      Object.entries(field.action.data).forEach(([key, value]) => {                                    
+      Object.entries(field.action.data).forEach(([key, value]) => {
         new_data[key] = formatTemplateValue(rowData, value);
       });
       action.data = new_data;
@@ -190,7 +147,7 @@ export default function SearchLayerResults(props) {
 
     //Replace value
     let new_value = field.value ? field.value : rowData[field.name];
-    new_value = formatTemplateValue(rowData, new_value);    
+    new_value = formatTemplateValue(rowData, new_value);
 
     if (action.show_null === true || new_value != null) {
 
@@ -199,40 +156,43 @@ export default function SearchLayerResults(props) {
         data[key] = formatTemplateValue(rowData, value);
       });
 
-      return <Button label={label} icon={action.icon}
+      return <Button size="xs"
+          leftSection={action.icon ? <i className={action.icon} aria-hidden="true" /> : undefined}
           className={action.classname || action.className}
           title={tooltip}
           onClick={(e) => publish(action.type, data)}
-        />
+        >
+          {label}
+        </Button>
     }
-    
+
     return null;
 
   }
-  
+
   const valueTemplate = (rowData, field) => {
     let new_value = field.value ? field.value : rowData[field.name];
     const rf = (new_value && new_value.match) ? new_value.match(/[^{}]+(?=})/g) : null;
     if (rf) {
       rf.forEach(fld => {
-        new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');      
-      });                 
+        new_value = new_value.replace(`{${fld}}`, rowData[fld] || '');
+      });
     }
     return new_value;
   }
 
   const formatTemplateValue = (rowData, value) => {
     let new_value = value;
-  
+
     const _isPureObject = (input) => {
-      return null !== input && 
+      return null !== input &&
         typeof input === 'object' &&
         Object.prototype.isPrototypeOf.call(Object.getPrototypeOf(input), Object);
     }
-  
+
     const _formatValue = (data, value) => {
       let _new_value = value;
-  
+
       const rf = (_new_value && _new_value.match) ? _new_value.match(/[^{}]+(?=})/g) : null;
       if (rf) {
         if (rf.length === 1) {
@@ -248,7 +208,7 @@ export default function SearchLayerResults(props) {
       }
       return _new_value;
     }
-  
+
     if (_isPureObject(value)) {
       function iter(o) {
         Object.keys(o).forEach(function (k) {
@@ -268,7 +228,7 @@ export default function SearchLayerResults(props) {
 
   const buildColumns = (cfg, columns) => {
     let cols = [];
-    if (cfg.fields_list && Object.keys(cfg.fields_list).length > 0) {      
+    if (cfg.fields_list && Object.keys(cfg.fields_list).length > 0) {
       cols = Object.entries(cfg.fields_list).map(([k, f]) => {
         return [k, f.label || k];
       })
@@ -276,61 +236,73 @@ export default function SearchLayerResults(props) {
       cols = columns.map(f => [f, f]);
     }
 
-    return cols.map((f, i) => {
+    return cols.map((f) => {
       const sortable = cfg.fields_sort && cfg.fields_sort.length > 0 && cfg.fields_sort.includes(f[0]);
+
+      const col = { accessor: f[0], title: f[1], sortable };
 
       if (cfg?.fields_list) {
         const field_cfg = cfg.fields_list[f[0]];
 
         if (field_cfg) {
+          if (field_cfg.style) col.cellsStyle = () => field_cfg.style;
+
           if (field_cfg.type === 'html') {
-            return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
-              style={field_cfg.style}
-              body={(rowData) => htmlTemplate(rowData, {...field_cfg, 'name': f[0]})} />
+            col.render = (rowData) => htmlTemplate(rowData, {...field_cfg, 'name': f[0]});
           } else if (field_cfg.type === 'action') {
-            return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
-              style={field_cfg.style}
-              body={(rowData) => actionTemplate(rowData, {...field_cfg, 'name': f[0]})} />
+            col.render = (rowData) => actionTemplate(rowData, {...field_cfg, 'name': f[0]});
           } else {
-            return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable}
-              style={field_cfg.style}
-              body={(rowData) => valueTemplate(rowData, {...field_cfg, 'name': f[0]})} />
+            col.render = (rowData) => valueTemplate(rowData, {...field_cfg, 'name': f[0]});
           }
         }
       }
 
-      return <Column key={i+1} field={f[0]} header={f[1]} sortable={sortable} />
-
+      return col;
     });
   }
 
-  return (
-    <>
-      <DataTable value={data} lazy
-        {...getPaginator()} 
-        first={results.startIndex} 
-        rows={results.maxFeatures} totalRecords={totalRecords}
-        sortField={sortField} sortOrder={sortOrder}
-        onSort={(e) => {
-          const new_sort = {};
-          new_sort[e.sortField] = e.sortOrder === 1 ? 'ASC' : 'DESC'
-          doSearch(0, results.maxFeatures, results.filter, new_sort);
-        }}
-        paginatorClassName="justify-content-end" className="mt-4"> 
-        {(columns && columns.length > 0) && <Column key={0} body={zoomActionTemplate} style={{width: '30px'}} />}
-        {buildColumns(searchConfig, columns).map(c => c)}
-      </DataTable>
-      
-      { showPagination() &&
-        <Paginator first={results.startIndex} rows={results.maxFeatures} totalRecords={totalRecords} pageLinkSize={3} 
-          onPageChange={e => {
-              doSearch(e.first, results.maxFeatures, results.filter, results.sort);
-          }}
-          className="pl-1 pr-1 w-max" 
-          style={{fontSize: ".8rem"}}></Paginator>
-      }
-    </>
+  const gridColumns = [
+    ...((columns && columns.length > 0) ? [{ accessor: '__zoom__', title: '', width: 40, render: zoomActionTemplate }] : []),
+    ...buildColumns(searchConfig, columns)
+  ];
 
+  const hasSortableColumns = gridColumns.some(c => c.sortable);
+
+  // Server-driven paging/sorting: mantine-datatable pages are 1-based where
+  // Prime's first was a 0-based row offset.
+  const paginationProps = showPagination() ? {
+    totalRecords,
+    page: Math.floor(results.startIndex / results.maxFeatures) + 1,
+    onPageChange: (p) => doSearch((p - 1) * results.maxFeatures, results.maxFeatures, results.filter, results.sort),
+    recordsPerPage: results.maxFeatures,
+    recordsPerPageOptions: [10, 20, 50],
+    onRecordsPerPageChange: (size) => doSearch(0, size, results.filter, results.sort),
+    recordsPerPageLabel: 'Registos',
+    paginationText: ({ from, to, totalRecords: total }) => `${from} - ${to} de ${total}`,
+  } : {};
+
+  const sortProps = hasSortableColumns ? {
+    sortStatus: { columnAccessor: sortField || '', direction: sortOrder === -1 ? 'desc' : 'asc' },
+    onSortStatusChange: (status) => {
+      const new_sort = {};
+      new_sort[status.columnAccessor] = status.direction === 'asc' ? 'ASC' : 'DESC';
+      doSearch(0, results.maxFeatures, results.filter, new_sort);
+    },
+  } : {};
+
+  return (
+    <div className="mt-4 search-layers-results">
+      <DataGrid
+        idAccessor="id_"
+        records={data}
+        columns={gridColumns}
+        {...paginationProps}
+        {...sortProps}
+      />
+      { searchConfig.pagination === false && totalRecords != null &&
+        <Text size="sm" ta="center" mt="xs" c="dimmed">{totalRecords} registos</Text>
+      }
+    </div>
   )
 
 }
