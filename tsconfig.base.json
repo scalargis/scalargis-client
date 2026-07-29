@@ -20,9 +20,6 @@
       "@scalargis/jsonforms-mantine-renderers": [
         "libs/jsonforms-mantine-renderers/src/index.ts"
       ],
-      "@scalargis/jsonforms-primereact-renderers": [
-        "libs/jsonforms-primereact-renderers/src/index.ts"
-      ],
       "@scalargis/ui": ["libs/ui/src/index.ts"]
     }
   },

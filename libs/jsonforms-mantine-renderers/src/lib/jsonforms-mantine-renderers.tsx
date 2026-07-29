@@ -17,7 +17,8 @@
    - label/error/aria wiring is native to every Mantine input;
    - layout/label/divider renderers honour `visible`.
 
-   The Prime lib stays until its last consumer migrates (Phase 3).
+   The Prime lib retired in Phase 3 cluster B, when the viewer's JsonForm
+   module (its last consumer) switched to this set.
    ===================================================================== */
 
 import type {
