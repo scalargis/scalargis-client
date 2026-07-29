@@ -1,6 +1,5 @@
-import React, { useState, useRef } from 'react'
+import React from 'react'
 import { useTranslation} from "react-i18next";
-import './style.css'
 
 export default function ContactInfo(props) {
 

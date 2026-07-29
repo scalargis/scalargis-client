@@ -42,6 +42,8 @@ export interface FileUploadProps
   /**
    * Performs the upload. Report progress in 0..100 to drive the bar; resolve
    * to finish, reject to surface an error and keep the files staged.
+   * Omit it for staging-only forms (the caller reads `onFilesChange` and
+   * submits the files itself) — the Upload button is not rendered then.
    */
   onUpload?: (files: File[], onProgress: (percent: number) => void) => Promise<void>;
   /** Called whenever the staged selection changes. */
@@ -125,15 +127,17 @@ export function FileUpload({
 
         {!auto && (
           <>
-            <Button
-              leftSection={<IconUpload />}
-              color="success"
-              onClick={() => void runUpload(files)}
-              disabled={files.length === 0 || uploading || !onUpload}
-              loading={uploading}
-            >
-              {uploadLabel}
-            </Button>
+            {onUpload && (
+              <Button
+                leftSection={<IconUpload />}
+                color="success"
+                onClick={() => void runUpload(files)}
+                disabled={files.length === 0 || uploading}
+                loading={uploading}
+              >
+                {uploadLabel}
+              </Button>
+            )}
             <Button
               leftSection={<IconX />}
               color="danger"

@@ -1,15 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { FileUpload } from 'primereact/fileupload';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { Tag } from 'primereact/tag';
-//import { Captcha } from 'primereact/captcha';
+import { Alert, Button, Group, Textarea, TextInput } from '@mantine/core';
+import { FileUpload, notify } from '@scalargis/ui';
 
 import ContactInfo from './ContactInfo';
-
-import './style.css';
 
 
 const validateEmail = (email) => {
@@ -30,9 +23,9 @@ const readUploadedFile = (file) => {
     reader.onload = () => {
       const f = {
         filename: file.name,
-        type: file.type, 
-        size: file.size, 
-        data: reader.result 
+        type: file.type,
+        size: file.size,
+        data: reader.result
       }
       resolve(f);
     };
@@ -49,6 +42,22 @@ const handleUpload = async (file) => {
     return null;
   }
 }
+
+const severityColor = {
+  success: 'success',
+  info: 'informative',
+  warn: 'warning',
+  error: 'danger'
+};
+
+const InfoMessage = ({ info }) => (
+  <Alert color={severityColor[info.type] || 'informative'} py="xs" style={{ width: '100%' }}>
+    <Group justify="center" gap="xs" wrap="nowrap">
+      <i className={info.type === 'success' ? 'pi pi-check' : 'pi pi-exclamation-triangle'} aria-hidden="true" />
+      <span>{info.message}</span>
+    </Group>
+  </Alert>
+);
 
 export default function ContactFrom(props) {
 
@@ -69,33 +78,19 @@ export default function ContactFrom(props) {
   const [sending, setSending] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
-  const fileUploadRef = useRef(null);
+  // The staged File objects mirror what FileUpload shows; `files` keeps the
+  // parsed base64 payloads the submit sends.
+  const stagedFiles = useRef([]);
 
-  const onFileSelect = (e) => {
-    const upload_files = Array.from(e.files).filter(f => !fileUploadRef.current.getFiles().includes(f)).map(f=>f);
-    const promises = Array.from(upload_files).map(file => handleUpload(file));
-    if (promises && promises.length) setIsProcessingFiles(true);
-    Promise.all(promises).then((values) => {;
-      setFiles([...files, ...values]);
+  const onFilesChange = (staged) => {
+    stagedFiles.current = staged;
+    const promises = staged.map(file => handleUpload(file));
+    if (promises.length) setIsProcessingFiles(true);
+    Promise.all(promises).then((values) => {
+      setFiles(values.filter(f => f !== null));
       setIsProcessingFiles(false);
       setInfoMessage(null);
     });
-  }
-
-  const onFileRemove = (e) => {
-    if (files && files.length) {
-      const new_files = files.filter(obj => obj.filename !== e.file.name);
-      setFiles(new_files);
-      setInfoMessage(null);
-    }
-  }
-  const onTemplateRemove = (file, callback) => {
-      callback();
-  }  
-
-  const onFileClear = () => {
-    setFiles([]);
-    setInfoMessage(null);
   }
 
   const onCaptchaResponse = (e) => {
@@ -106,12 +101,12 @@ export default function ContactFrom(props) {
   const onCaptchaExpire = () => {
     setCaptchaResponse(null);
     setEnableSubmit(false);
-  }  
+  }
 
   function submit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
-    const final_files = fileUploadRef.current ? fileUploadRef.current.getFiles().map(f=>f.name) : [];
+    const final_files = stagedFiles.current.map(f => f.name);
 
     if (!name || !email || !description) {
       setInfoMessage({
@@ -119,11 +114,11 @@ export default function ContactFrom(props) {
         message: 'Campos obrigatórios não preenchidos'
       });
       return false;
-    } else if (!validateEmail(email)) { 
+    } else if (!validateEmail(email)) {
       setInfoMessage({
         type: 'error',
         message: 'Formato de email incorreto'
-      }); 
+      });
       return false;
     } else if (upload_cfg?.minFiles != null && (upload_cfg.minFiles  > final_files.length)) {
       setInfoMessage({
@@ -140,7 +135,7 @@ export default function ContactFrom(props) {
     } else {
       setInfoMessage(null);
     }
-      
+
     const record = {
       name,
       email,
@@ -159,7 +154,7 @@ export default function ContactFrom(props) {
     const options = {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'        
+        'Content-Type': 'application/json'
       },
       method: 'POST',
       body: JSON.stringify(record)
@@ -188,7 +183,7 @@ export default function ContactFrom(props) {
             type: 'error',
             message: res.message
           });
-          setIsComplete(false);   
+          setIsComplete(false);
         }
       }).catch(error => {
         setSending(false);
@@ -200,171 +195,135 @@ export default function ContactFrom(props) {
       });
   }
 
-  const itemTemplate = (file, props) => {
-      return (
-          <div className="flex align-items-center flex-wrap">
-              <div className="flex align-items-center" style={{width: '70%'}}>
-                  <span className="flex flex-column text-left ml-0 mr-1" style={{"wordBreak": "break-all"}}>
-                      {file.name}
-                  </span>
-              </div>
-              <Tag value={props.formatSize} className="px-1 py-1" />
-              <Button type="button" icon="pi pi-times" outlined rounded severity="danger" className="ml-auto" onClick={() => onTemplateRemove(file, props.onRemove)} />
-          </div>
-      )
-  }
-
-  const emptyTemplate = () => {
-      return (
-          <div className="flex align-items-center flex-column">
-              <i className="pi pi-image mt-3 p-5" style={{'fontSize': '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)'}}></i>
-              <span style={{'fontSize': '1.2em', color: 'var(--text-color-secondary)'}} className="my-5">Drag and Drop Image Here</span>
-          </div>
-      )
-  }
-
   if (isComplete) {
     return (
-      <div className="p-fluid">
-        <div className="field">
-          <label htmlFor="contact_name">Nome</label>
-          <InputText
-              id="contact_name"
-              value={name}
-              placeholder="Nome"
-              disabled
-            />                                 
-        </div>
-        <div className="field">
-          <label htmlFor="contact_email">Email</label>
-          <InputText
-              id="contact_email"
-              value={email}
-              placeholder="Email"
-              disabled
-            />                                  
-        </div>
-        <div className="field">
-          <label htmlFor="contact_description">Descrição</label>
-          <InputTextarea rows={3}
-              id="contact_description"
-              value={description}
-              placeholder="Descrição"
-              disabled
-            />
-        </div>      
-        <div className="field">    
-          <div className="mb-2">
-            { (infoMessage && infoMessage.type) && 
-              <Message style={{ width: '100%' }} severity={infoMessage.type} text={infoMessage.message}></Message>
-            }
-          </div> 
+      <div>
+        <TextInput
+          id="contact_name"
+          label="Nome"
+          value={name || ''}
+          placeholder="Nome"
+          disabled
+          mb="sm"
+        />
+        <TextInput
+          id="contact_email"
+          label="Email"
+          value={email || ''}
+          placeholder="Email"
+          disabled
+          mb="sm"
+        />
+        <Textarea rows={3}
+          id="contact_description"
+          label="Descrição"
+          value={description || ''}
+          placeholder="Descrição"
+          disabled
+          mb="sm"
+        />
+        <div className="mb-2">
+          { (infoMessage && infoMessage.type) &&
+            <InfoMessage info={infoMessage} />
+          }
         </div>
       </div>
     )
   }
 
+  const requiredMessage = config.requiredFieldMessage || 'Campo de preenchimento obrigatório';
+
   return (
-    <form onSubmit={e => submit()}>
+    <form onSubmit={e => submit(e)}>
 
-        <div className="p-fluid">
-          <div className="field">
-              <label htmlFor="contact_name">Nome</label>
-              <InputText
-                  id="contact_name"
-                  className={(!name || name.length === 0 ? 'p-invalid' : '')}
-                  value={name}
-                  placeholder="Nome"
-                  disabled={viewer?.user_info?.name}
-                  onChange={e => {setName(e.target.value); setInfoMessage(null);}}
-                />
-                { (!name || name.length === 0) &&
-                <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
-          </div>
-          <div className="field">
-              <label htmlFor="contact_email">Email</label>
-              <InputText
-                  id="contact_email"
-                  className={(!email || email.length === 0 ? 'p-invalid' : '')}
-                  value={email}
-                  placeholder="Email"
-                  disabled={viewer?.user_info?.email}
-                  onChange={e => {setEmail(e.target.value); setInfoMessage(null);}}
-                />
-                { (!email || email.length === 0) &&
-                <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }                                  
-          </div>
-          <div className="field">
-              <label htmlFor="contact_description">Descrição</label>
-              <InputTextarea rows={3}
-                  id="contact_description"
-                  className={(!description || description.length === 0 ? 'p-invalid' : '')}
-                  value={description}
-                  placeholder="Descrição"
-                  onChange={e => {setDescription(e.target.value); setInfoMessage(null);}}
-                />
-                { (!description || description.length === 0) &&
-                <small className="p-invalid block">{config.requiredFieldMessage || 'Campo de preenchimento obrigatório'}</small> }
-          </div>
-
-          { upload_cfg.enabled &&
-          <div className="field">
-            <label htmlFor="contact_description">Anexos</label>
-
-            <FileUpload ref={fileUploadRef} name="files[]"
-                uploadOptions={{"style" : {"display": 'none'}}}
-                className="contact-form-upload-file"
-                chooseLabel={ upload_cfg.chooseLabel || "Selecionar" }
-                cancelLabel={ upload_cfg.cancelLabel || "Limpar" }
-                itemTemplate={itemTemplate}
-                onSelect={onFileSelect}
-                onRemove={onFileRemove}
-                onClear={onFileClear}                               
-                multiple
-                disabled={isProcessingFiles} 
-                accept={ upload_cfg.accept || "image/*, application/pdf" }
-                maxFileSize={ upload_cfg.maxFileSize || 1000000}
-                invalidFileSizeMessageSummary="{0}"
-                invalidFileSizeMessageDetail={ upload_cfg.invalidFileSizeMessageDetail || "Ficheiro com dimensão superior ao permitido ({0})." }
-                emptyTemplate={<p className="m-0">{ upload_cfg.emptyMessage || "Arraste para aqui o ficheiros a enviar." }</p>} 
-              />
-
-              { (upload_cfg.maxFileSize) && <small className="p-invalid block">Tamanho máximo do ficheiro: {(upload_cfg.maxFileSize / 1048576).toFixed(2)} MB</small> } 
-
-          </div> }
-          
-          {/*
-          { showCaptcha ?
-          <div className="p-field">
-            <Captcha siteKey={viewer.captcha_key}
-              language='pt'
-              onResponse={onCaptchaResponse} 
-              onExpire={onCaptchaExpire}
-              />
-          </div> : null }
-          */}
-        </div>
-        
-        <ContactInfo
-          viewer={viewer} 
-          config={config} 
+        <TextInput
+          id="contact_name"
+          label="Nome"
+          value={name || ''}
+          placeholder="Nome"
+          disabled={!!viewer?.user_info?.name}
+          error={(!name || name.length === 0) ? requiredMessage : undefined}
+          onChange={e => {setName(e.target.value); setInfoMessage(null);}}
+          mb="sm"
         />
-                  
-        <div className="mb-2">
-          { (infoMessage && infoMessage.type) && 
-            <Message style={{ width: '100%' }} severity={infoMessage.type} text={infoMessage.message}></Message>
-          }
-        </div>                   
+        <TextInput
+          id="contact_email"
+          label="Email"
+          value={email || ''}
+          placeholder="Email"
+          disabled={!!viewer?.user_info?.email}
+          error={(!email || email.length === 0) ? requiredMessage : undefined}
+          onChange={e => {setEmail(e.target.value); setInfoMessage(null);}}
+          mb="sm"
+        />
+        <Textarea rows={3}
+          id="contact_description"
+          label="Descrição"
+          value={description || ''}
+          placeholder="Descrição"
+          error={(!description || description.length === 0) ? requiredMessage : undefined}
+          onChange={e => {setDescription(e.target.value); setInfoMessage(null);}}
+          mb="sm"
+        />
 
-        <div className="p-dialog-myfooter">
-          <Button
-            severity="secondary"
-            icon={ sending ? "pi pi-spin pi-spinner": "pi pi-check" }
-            label="Enviar" 
-            onClick={submit}
-            disabled={!enableSubmit || sending}
+        { upload_cfg.enabled &&
+        <div className="field">
+          <label>Anexos</label>
+
+          <FileUpload
+            className="contact-form-upload-file"
+            chooseLabel={ upload_cfg.chooseLabel || "Selecionar" }
+            cancelLabel={ upload_cfg.cancelLabel || "Limpar" }
+            onFilesChange={onFilesChange}
+            multiple
+            disabled={isProcessingFiles}
+            accept={ (upload_cfg.accept || "image/*, application/pdf").split(',').map(s => s.trim()) }
+            maxSize={ upload_cfg.maxFileSize || 1000000}
+            placeholder={ upload_cfg.emptyMessage || "Arraste para aqui os ficheiros a enviar." }
+            onReject={(rejections) => {
+              const maxSizeMsg = (upload_cfg.invalidFileSizeMessageDetail || "Ficheiro com dimensão superior ao permitido ({0}).")
+                .replace('{0}', `${(((upload_cfg.maxFileSize || 1000000)) / 1048576).toFixed(2)} MB`);
+              rejections.forEach(r => notify.error(r.file.name, maxSizeMsg));
+            }}
           />
-        </div>         
+
+            { (upload_cfg.maxFileSize) && <small className="block">Tamanho máximo do ficheiro: {(upload_cfg.maxFileSize / 1048576).toFixed(2)} MB</small> }
+
+        </div> }
+
+        {/*
+        { showCaptcha ?
+        <div className="p-field">
+          <Captcha siteKey={viewer.captcha_key}
+            language='pt'
+            onResponse={onCaptchaResponse}
+            onExpire={onCaptchaExpire}
+            />
+        </div> : null }
+        */}
+
+        <ContactInfo
+          viewer={viewer}
+          config={config}
+        />
+
+        <div className="mb-2">
+          { (infoMessage && infoMessage.type) &&
+            <InfoMessage info={infoMessage} />
+          }
+        </div>
+
+        <Group justify="flex-end" mt="md">
+          <Button
+            type="submit"
+            color="secondary"
+            leftSection={<i className="pi pi-check" aria-hidden="true" />}
+            loading={sending}
+            disabled={!enableSubmit || sending}
+          >
+            Enviar
+          </Button>
+        </Group>
       </form>
   )
 }
