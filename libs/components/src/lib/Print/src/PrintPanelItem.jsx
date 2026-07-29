@@ -1,15 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/dropdown';
-import { Toolbar } from 'primereact/toolbar';
-import { InputText } from 'primereact/inputtext';
-import { Message } from 'primereact/message';
-import { TabView, TabPanel } from 'primereact/tabview';
-import { InputNumber } from 'primereact/inputnumber';
-import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import { Toast } from 'primereact/toast';
-import { Checkbox } from 'primereact/checkbox';
+import { Alert, Button, Checkbox, Group, NumberInput, Select, Tabs } from '@mantine/core';
+import { confirm, notify } from '@scalargis/ui';
 import OlInteractionDraw from 'ol/interaction/Draw';
 import OlInteractionModify from 'ol/interaction/Modify';
 import OlInteractionSelect from 'ol/interaction/Select';
@@ -22,24 +14,26 @@ import Feature from 'ol/Feature';
 import { extend, createEmpty } from 'ol/extent';
 import { singleClick, platformModifierKeyOnly } from 'ol/events/condition';
 
+import DrawingToolbar from './DrawingToolbar';
+import PrintFormFields from './PrintFormFields';
 import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
 
 import './style.css';
 
+// Scale-tab key (the config's defaultScaleSelector vocabulary) → scale mode.
+const TAB_MODE = { predefined: 'restricted', freescale: 'free', map: 'map' };
 
 export default function PrintPanelItem(props) {
 
   const { core, control, printItem, printLayer, fields, handleFieldChange, standalone, config, actions } = props;
   const { viewer, mainMap, dispatch, Models, auth } = config;
-  const { showOnPortal, findOLInteraction, isUrlAppHostname } = Models.Utils;
+  const { findOLInteraction, isUrlAppHostname } = Models.Utils;
   const { getScaleForResolution, getWMSVisibleLayers, getArcGISVisibleLayers } = Models.MapModel;
   const { exclusive_mapcontrol } = viewer;
 
   const { selected_menu } = viewer.config_json;
 
   const { i18n, t } = useTranslation();
-
-  const toast = useRef(null);
 
   const paperBoxLayer = useRef();
   const [paperBox, setPaperBox] = useState(false);
@@ -53,34 +47,33 @@ export default function PrintPanelItem(props) {
   const [formats, setFormats] = useState(null);
   const [restrictScales, setRestrictScales] = useState(null);
 
-  const [scaleTabIndex, setScaleTabIndex] = useState(0);
-  const [scaleModes, setScaleModes] = useState([]);
-  const [selectedScaleMode, setSelectedScaleMode] = useState(null);
+  const initialScaleTab = (() => {
+    const keys = [];
+    if (printItem.restrict_scales) keys.push('predefined');
+    if (printItem.free_scale) keys.push('freescale');
+    if (printItem.map_scale) keys.push('map');
+    if (!keys.length) return null;
+    const def = control?.config_json?.defaultScaleSelector;
+    return keys.includes(def) ? def : keys[0];
+  })();
+  const [scaleTab, setScaleTab] = useState(initialScaleTab);
+  const [selectedScaleMode, setSelectedScaleMode] = useState(initialScaleTab ? TAB_MODE[initialScaleTab] : null);
   const [restrictedScale, setRestrictedScale] = useState(null);
   const [freeScale, setFreeScale] = useState(null);
 
   const [isPrinting, setIsPrinting] = useState(false);
-  const [geometryError, setGeometryError] = useState(false);  
+  const [geometryError, setGeometryError] = useState(false);
 
   const [printFile, setPrintFile] = useState(null);
 
   const drawingOptionsTools = useMemo(() => {
-    const _tools = control?.config_json?.drawingOptions?.tools || DEFAULT_DRAWING_TOOLS;      
+    const _tools = control?.config_json?.drawingOptions?.tools || DEFAULT_DRAWING_TOOLS;
     return _tools.map(t => t.toLowerCase());
   }, [control?.config_json?.drawingOptions?.tools]);
 
-  const drawTools = [
-    { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
-    { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
-    { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
-    { value: "Copy", title: "copyFeature", "defaultTitle": "Copiar geometria", icon: "pi pi-copy" },
-    { value: "Select", title: "selectElement", "defaultTitle": "Selecionar elemento", icon: "fas fa-mouse-pointer" },
-    { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: "pi pi-pencil" }     
-  ];
-
   function selectDrawTool(e, tool) {
     e.preventDefault();
-    e.target.blur();
+    e.currentTarget.blur();
 
     if (drawTool !== tool) setDrawTool(tool);
     else setDrawTool(null);
@@ -123,14 +116,11 @@ export default function PrintPanelItem(props) {
   }
 
   const confirmCopyFeatureGeometry = (feature) => {
-    confirmDialog({
-      group: `${MAPCONTROL_NAME}-${control.id}`,
+    confirm({
       message: `${t("copyGeometryConfirmation", "Deseja copiar a geometria selecionada?")}`,
       header: t("confirmation", "Confirmação"),
-      icon: 'pi pi-exclamation-triangle',
       acceptLabel: t("yes", "Sim"),
       rejectLabel: t("no", "Não"),
-      defaultFocus: "reject",
       accept: () => {
         // Chek if the print item allows multiple geometries, clear the previous geometries if not
         if (!printItem.multi_geom) {
@@ -145,7 +135,7 @@ export default function PrintPanelItem(props) {
         });
         printLayer.current.getSource().addFeature(_feat);
       },
-      reject: () => { 
+      reject: () => {
         // do nothing
       },
       onHide: () => {
@@ -157,13 +147,12 @@ export default function PrintPanelItem(props) {
   }
 
   const confirmDeleteAll = (features) => {
-    confirmDialog({
+    confirm({
       message: ` ${t("deleteAllElments", "Deseja eliminar todos os elementos?")}`,
       header: t("confirmation", "Confirmação"),
-      icon: 'pi pi-exclamation-triangle',
+      severity: 'danger',
       acceptLabel: t("yes", "Sim"),
       rejectLabel: t("no", "Não"),
-      defaultFocus: "reject",
       accept: () => {
         features.forEach((f) => {
           printLayer.current.getSource().removeFeature(f);
@@ -257,7 +246,7 @@ export default function PrintPanelItem(props) {
       } else {
         setGeometryError(false);
       }
-    }    
+    }
 
     //Abort if form is not valid
     if (isFormInvalid) return;
@@ -336,7 +325,7 @@ export default function PrintPanelItem(props) {
     const allLayers = [
       ...wmsLayers.map(l => {
         let vals =  'wms' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '') + ';' + (l.params.FORMAT || '');
-        //Add user authentication token  
+        //Add user authentication token
         if (isUrlAppHostname(l.url) && auth?.data?.auth_token) {
             vals += ";" + auth.data.auth_token;
         }
@@ -365,45 +354,17 @@ export default function PrintPanelItem(props) {
         }
       }).catch(error => {
         setIsPrinting(false);
-        toast.current.show({
-          severity: 'warn', summary: printItem.title || 'Emissão de plantas',
-          detail: t("printError", "Não foi possível gerar a planta"), life: 3000
-        });
+        notify.warn(printItem.title || 'Emissão de plantas',
+          t("printError", "Não foi possível gerar a planta"));
       });
   }
 
   //---------------------------------------------------------------------------------- END DO PRINT
 
-  function getScalesTabs() {
-    const tabs = [];
-    if (printItem.restrict_scales) {
-      tabs.push(<TabPanel key={'predefined'} header={t("predefined", "Predefinida")}>
-        <Dropdown
-          className="p-inputgroup"
-          options={restrictScales}
-          optionLabel="label"
-          optionValue="value"
-          value={restrictedScale}
-          onChange={e => setRestrictedScale(e.value)}
-        />
-      </TabPanel>)
-    }
-    if (printItem.free_scale) {
-      tabs.push(<TabPanel key={'freescale'} header={t("free", "Livre")}>
-        <InputNumber value={freeScale} onChange={(e) => setFreeScale(e.value)} prefix="1:" />
-      </TabPanel>)
-    }
-    if (printItem.map_scale) {
-      tabs.push(<TabPanel key={'map'} header={t("map", "Mapa")}>
-        <Message
-          severity="info"
-          text={t("printMapScaleOptionMsg", "A planta será emitida em função da escala de visualização do mapa")}
-        />
-      </TabPanel>)
-    }
-    return tabs;
-  }
-
+  const scaleTabs = [];
+  if (printItem.restrict_scales) scaleTabs.push({ key: 'predefined', label: t("predefined", "Predefinida") });
+  if (printItem.free_scale) scaleTabs.push({ key: 'freescale', label: t("free", "Livre") });
+  if (printItem.map_scale) scaleTabs.push({ key: 'map', label: t("map", "Mapa") });
 
   useEffect(() => {
     const frmts = {};
@@ -419,14 +380,6 @@ export default function PrintPanelItem(props) {
     setFormats(ff);
     if (ff.length > 0) handleFieldChange({ target: { id: 'layout', value: ff[0] } });
 
-    //Set scale modes
-    const scale_types = [];
-    if (printItem.restrict_scales) scale_types.push('restricted');
-    if (printItem.free_scale) scale_types.push('free');
-    if (printItem.map_scale) scale_types.push('map');
-    setScaleModes(scale_types);
-
-
     //Set restricted scales
     const scales = [];
     if (printItem.restrict_scales_list) {
@@ -437,24 +390,11 @@ export default function PrintPanelItem(props) {
     setRestrictScales(scales);
     //Set restricted scale default value
     if (scales.length > 0) setRestrictedScale(scales[0].value);
-
-
-    const tabs = getScalesTabs()
-    const defaultTab = tabs.findIndex(e => e.key === control?.config_json?.defaultScaleSelector)
-    
-    if (scale_types.length > 0) {
-      if (defaultTab > -1) {
-        setScaleTabIndex(defaultTab);
-        setSelectedScaleMode(scale_types[defaultTab]);
-      } else {
-        setSelectedScaleMode(scale_types[0]);
-      }
-    }
   }, []);
 
-  function onScaleTabChange(e) {
-    setScaleTabIndex(e.index);
-    setSelectedScaleMode(scaleModes[e.index]);
+  function onScaleTabChange(key) {
+    setScaleTab(key);
+    setSelectedScaleMode(TAB_MODE[key]);
   }
 
   // Add paper box layer
@@ -482,12 +422,12 @@ export default function PrintPanelItem(props) {
       if (mainMap && paperBoxLayer.current) {
         mainMap.removeLayer(paperBoxLayer.current);
       }
-    } 
+    }
 
   }, []);
 
   useEffect(()=> {
-    const fn_change = printLayer.current.getSource().on('change', () => {      
+    const fn_change = printLayer.current.getSource().on('change', () => {
       if (printItem.location_marking) {
         const ft = printLayer.current.getSource().getFeatures();
         if (ft.length == 0) {
@@ -495,11 +435,11 @@ export default function PrintPanelItem(props) {
         } else {
           setGeometryError(false);
         }
-      } 
+      }
     });
 
     return () => {
-      if (fn_change && printLayer.current) {        
+      if (fn_change && printLayer.current) {
         printLayer.current.getSource().un('change', fn_change.listener);
       }
     }
@@ -511,7 +451,7 @@ export default function PrintPanelItem(props) {
   }, [i18n.resolvedLanguage]);
 
 
-  // draw paper box 
+  // draw paper box
   function drawPaperBox() {
     if (!paperBoxLayer.current.getSource()) { return null }
 
@@ -519,7 +459,7 @@ export default function PrintPanelItem(props) {
 
     if (!paperBox) { return null }
     if (selected_menu !== control.id) { return null }
-    
+
 
     let scale;
 
@@ -541,7 +481,7 @@ export default function PrintPanelItem(props) {
     let center_x
     let center_y
 
-    if (printLayer.current.getSource().getFeatures().length > 0) { // user geoms 
+    if (printLayer.current.getSource().getFeatures().length > 0) { // user geoms
       let f_extent = new createEmpty()
       printLayer.current.getSource().getFeatures().forEach((i) => {
         f_extent = extend(f_extent, i.getGeometry().getExtent())
@@ -645,7 +585,7 @@ export default function PrintPanelItem(props) {
         if (printLayer.current && layer.get('id') == printLayer.current.get('id')) return false;
 
         if (paperBoxLayer.current && layer.get('id') == paperBoxLayer.current.get('id')) return false;
-        
+
         const _tool = drawingOptionsTools.find((opt) => {
           const geomType = feature.getGeometry().getType().toLowerCase();
           if (geomType.includes(opt)) {
@@ -659,11 +599,9 @@ export default function PrintPanelItem(props) {
             copyGeometry.current.getFeatures().clear();
             mainMap.render();
           }, 500);
-          
-          toast.current.show({
-            severity: 'warn', summary:  t("copyGeometry", "Copiar geometria"),
-            detail: t("copyGeometryNotSupportedMsg", "O tipo de geometria não é permitido ({{type}}).", { type: feature.getGeometry().getType()}), life: 3000
-          });
+
+          notify.warn(t("copyGeometry", "Copiar geometria"),
+            t("copyGeometryNotSupportedMsg", "O tipo de geometria não é permitido ({{type}}).", { type: feature.getGeometry().getType()}));
 
           return true;
         }
@@ -721,168 +659,134 @@ export default function PrintPanelItem(props) {
   }, [mainMap]);
 
 
-  const toolbarLeftContents = (
-    <React.Fragment>
-      {drawTools.filter( opt => {
-        if (drawingOptionsTools.length === 0) return true;
-        return drawingOptionsTools.includes(opt.value.toLowerCase());
-       }).map(opt => <Button
-          key={opt.value}
-          icon={opt.icon}
-          label={opt.label ? opt.label : ''}
-          title={t(opt.title, opt.defaultTitle)}
-          size="small"
-          className={"mr-1 tool" + (opt.value === drawTool ? " active" : "")}
-          onClick={(e) => selectDrawTool(e, opt.value)}
-        />
-      )}
-    </React.Fragment>
-  );
-
-  const toolbarRightContents = (
-    <React.Fragment>
-      <Button
-        icon="pi pi-trash"
-        title={t("deleteElement(s)", "Eliminar elemento(s)")}
-        size="small"
-        severity="danger"
-        className="mr-1 tool"
-        onClick={(e) => deletedSelectedFeature()}
-      />
-      <Button
-        icon="fas fa-search-plus"
-        title={t("viewAllElements", "Ver todos os elementos")}
-        size="small"
-        className="mr-1 tool"
-        onClick={(e) => zoomFeaturesExtent()}
-      />
-    </React.Fragment>
-  );
-
   return (
     <div className="print-panel-item">
-      {showOnPortal(<Toast ref={toast} position="top-right" />)}
-      <ConfirmDialog group={`${MAPCONTROL_NAME}-${control.id}`} />
-
       <h3>{props.printItem.title}</h3>
 
       {(printItem.allow_drawing !== false) && <div className="p-fluid">
         <h4>{t("locationMarking", "Marcação do Local")}</h4>
-        <div>
-          <Toolbar start={toolbarLeftContents} end={toolbarRightContents} className="pl-2 pr-2" />
-        </div>
+        <DrawingToolbar
+          availableTools={drawingOptionsTools}
+          activeTool={drawTool}
+          onSelectTool={selectDrawTool}
+          onDeleteSelected={deletedSelectedFeature}
+          onZoomAll={zoomFeaturesExtent}
+          deleteTitle={t("deleteElement(s)", "Eliminar elemento(s)")}
+        />
         {printItem.location_marking &&
-          <Message severity={ geometryError === true ? "error" : "info" } text={t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")} />
+          <Alert color={ geometryError === true ? "danger" : "informative" } py="xs" mt="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className={geometryError === true ? "pi pi-times-circle" : "pi pi-info-circle"} aria-hidden="true" />
+              <span>{t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")}</span>
+            </Group>
+          </Alert>
         }
       </div>}
 
-      {(printItem.restrict_scales || printItem.free_scale || printItem.map_scale) &&
+      {(scaleTabs.length > 0) &&
         <div className="p-fluid">
           <h4>{t("outputScale", "Escala de Saída")}</h4>
-          <TabView activeIndex={scaleTabIndex} onTabChange={(e) => onScaleTabChange(e)}>
-            {getScalesTabs().map(tab => tab)}
-          </TabView>
+          <Tabs value={scaleTab} onChange={onScaleTabChange} keepMounted={false}>
+            <Tabs.List>
+              {scaleTabs.map(tab => <Tabs.Tab key={tab.key} value={tab.key}>{tab.label}</Tabs.Tab>)}
+            </Tabs.List>
+            {printItem.restrict_scales &&
+              <Tabs.Panel value="predefined" pt="xs">
+                <Select
+                  aria-label={t("predefined", "Predefinida")}
+                  data={(restrictScales || []).map(s => ({ value: String(s.value), label: s.label }))}
+                  value={restrictedScale != null ? String(restrictedScale) : null}
+                  onChange={v => { if (v != null) setRestrictedScale(parseInt(v, 10)); }}
+                  allowDeselect={false}
+                />
+              </Tabs.Panel>}
+            {printItem.free_scale &&
+              <Tabs.Panel value="freescale" pt="xs">
+                <NumberInput
+                  aria-label={t("free", "Livre")}
+                  hideControls
+                  prefix="1:"
+                  value={freeScale ?? ''}
+                  onChange={(v) => setFreeScale(v === '' || v == null ? null : Number(v))}
+                />
+              </Tabs.Panel>}
+            {printItem.map_scale &&
+              <Tabs.Panel value="map" pt="xs">
+                <Alert color="informative" py="xs">
+                  <Group justify="center" gap="xs" wrap="nowrap">
+                    <i className="pi pi-info-circle" aria-hidden="true" />
+                    <span>{t("printMapScaleOptionMsg", "A planta será emitida em função da escala de visualização do mapa")}</span>
+                  </Group>
+                </Alert>
+              </Tabs.Panel>}
+          </Tabs>
         </div>}
 
       <div className="p-fluid">
         <h4>{t("format", "Formato")}</h4>
-        <Dropdown
+        <Select
           id="layout"
-          optionLabel="label"
-          value={fields.layout}
-          options={formats}
-          onChange={handleFieldChange}
+          aria-label={t("format", "Formato")}
+          data={(formats || []).map(f => ({ value: f.format + '|' + f.orientation, label: f.label }))}
+          value={fields.layout ? fields.layout.format + '|' + fields.layout.orientation : null}
+          onChange={(v) => {
+            const f = (formats || []).find(x => x.format + '|' + x.orientation === v);
+            if (f) handleFieldChange({ target: { id: 'layout', value: f } });
+          }}
+          allowDeselect={false}
           placeholder={t("selectFormat", "Selecione um formato")} />
       </div>
 
-      {(printItem.form_fields && printItem.form_fields.groups) &&
-        <div className="mt-2">
-          {Object.entries(printItem.form_fields.groups).map(([groupKey, group]) => {
-            if (group.active) {
-              return <div key={groupKey} className="p-fluid">
-                <h4>{group.title}</h4>
-                {group.fields && Object.entries(group.fields).map(([fieldKey, field]) => {
-                  const field_key = groupKey + '.' + fieldKey;
-                  if (field.active) {
-                    return <div key={field_key} className="field">
-                      {field.header && <h4>{field.header}</h4>}
-                      {field.showLabel && <label>{field.title}</label>}
-                      <InputText id={field_key} className="p-inputtext block"
-                        placeholder={!field.header && !field.showLabel ? field.title : ''}
-                        title={!field.header && !field.showLabel ? field.title : ''}
-                        value={fields[field_key]} onChange={handleFieldChange} />
-                      {(field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small>}
-                    </div>
-                  }
-                })}
-              </div>
-            }
-          })}
-        </div>
-      }
-
-      {(printItem.form_fields && printItem.form_fields.fields) &&
-        <div className="mt-2">
-          {Object.entries(printItem.form_fields.fields).map(([fieldKey, field]) => {
-            const field_key = fieldKey;
-            if (field.active) {
-              return <div key={field_key} className="p-fluid">
-                  {field.header && <h4>{field.header}</h4>}
-                  <div className="field">
-                    {field.showLabel && <label>{field.title}</label>}
-                    <InputText id={field_key} className="p-inputtext block"
-                      placeholder={!field.header && !field.showLabel ? field.title : ''}
-                      title={!field.header && !field.showLabel ? field.title : ''}
-                      value={fields[field_key]} onChange={handleFieldChange} />
-                    {(field.required && !fields[field_key]) && <small id={field_key + "-help"} className="p-error">{t("requiredField", "Campo de preenchimento obrigatório")}.</small>}
-                  </div>
-                </div>
-            }
-          })}
-        </div>
-      }
+      <PrintFormFields
+        formFields={printItem.form_fields}
+        fields={fields}
+        handleFieldChange={handleFieldChange}
+      />
 
       {isPrinting ?
-        <div className="card text-center mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
-          <div><i className="pi pi-spin pi-spinner mr-1"></i>{t("generatingPrint", "A gerar a planta...")}</div>
-        </div> : null
+        <Alert color="informative" py="xs" mt="lg">
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <i className="pi pi-spin pi-spinner" aria-hidden="true" />
+            <span>{t("generatingPrint", "A gerar a planta...")}</span>
+          </Group>
+        </Alert> : null
       }
       {!isPrinting && printFile ?
-        <div className="card text-center mt-4" style={{ backgroundColor: "#add8e6", borderRadius: "4px" }}>
-          <a href={printFile.url} target="_blank" rel="noreferrer">
-            <i className="pi pi-external-link pl-2 mr-1"></i>{t("openPrintPdf", "Abrir PDF da planta")}
-          </a>
-        </div> : null
+        <Alert color="informative" py="xs" mt="lg">
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <a href={printFile.url} target="_blank" rel="noreferrer">
+              <i className="pi pi-external-link pl-2 mr-1" aria-hidden="true"></i>{t("openPrintPdf", "Abrir PDF da planta")}
+            </a>
+          </Group>
+        </Alert> : null
       }
 
-      <div className="card">
-        <div className="grid">
-          <div className="col text-left">
-            {!standalone &&
-              <Button
-                label={t("back", "Voltar")}
-                icon="pi pi-chevron-left"
-                size="small"
-                onClick={e => { goPanelPrintPrev(); }}
-              />}
-          </div>
-          <div className="col text-right">
+      <Group justify="space-between" mt="md">
+        <div>
+          {!standalone &&
             <Button
-              label={t("print", "Imprimir")}
-              icon="pi pi-print"
-              size="small"
-              onClick={e => { doPrint(); }}
-              disabled={isPrinting}
-            />
-          </div>
+              size="xs"
+              leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+              onClick={e => { goPanelPrintPrev(); }}
+            >
+              {t("back", "Voltar")}
+            </Button>}
         </div>
-      </div>
-      {config.showPreview ? <div className="card">
-        <div className="field-checkbox">
-          <Checkbox inputId="binary" checked={paperBox}
-            onChange={e => setPaperBox(e.checked)} />
-          <label htmlFor="binary" className="pl-2">{t("showPrintArea", "Visualizar área de impressão")}</label>
-        </div>
+        <Button
+          size="xs"
+          leftSection={<i className="pi pi-print" aria-hidden="true" />}
+          onClick={e => { doPrint(); }}
+          disabled={isPrinting}
+        >
+          {t("print", "Imprimir")}
+        </Button>
+      </Group>
+      {config.showPreview ? <div className="mt-2">
+        <Checkbox
+          checked={paperBox}
+          onChange={e => setPaperBox(e.currentTarget.checked)}
+          label={t("showPrintArea", "Visualizar área de impressão")}
+        />
       </div> : null}
     </div>
   )

@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useTranslation} from "react-i18next"
-import { Button } from 'primereact/button'
-import { Message } from 'primereact/message'
+import { ActionIcon, Alert, Group } from '@mantine/core'
 import './style.css'
 
 export default function PrintPanel1(props) {
 
-  const { viewer, mainMap, dispatch, Models } = props.config;
-  const control = props.control;
-  const actions = props.actions;
-
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   function goPanelPrintGroup(group) {
     props.setPrintGroup(group);
@@ -20,22 +15,28 @@ export default function PrintPanel1(props) {
   function goPanelPrintItem(item) {
     props.setPrintItem(item);
     props.changeActivePanel("p2-item");
-  }  
+  }
+
+  const { viewer } = props.config;
 
   return (
-    <div className="print-panel1">  
-      <Message
-        severity="info"
-        text={t("selectPrintTypeMsg", "Escolha o tipo de planta que pretende emitir.")} 
-      />
+    <div className="print-panel1">
+      <Alert color="informative" py="xs">
+        <Group justify="center" gap="xs" wrap="nowrap">
+          <i className="pi pi-info-circle" aria-hidden="true" />
+          <span>{t("selectPrintTypeMsg", "Escolha o tipo de planta que pretende emitir.")}</span>
+        </Group>
+      </Alert>
 
       { (viewer.printing && viewer.printing.groups) && viewer.printing.groups.map( (group, index) => {
         return (
           <div key={index}>
-            <Button label="" 
-              icon="pi pi-chevron-right" 
-              rounded text
-              onClick={e => { goPanelPrintGroup(group) }} />
+            <ActionIcon variant="subtle" radius="xl"
+              title={group.title}
+              aria-label={group.title}
+              onClick={e => { goPanelPrintGroup(group) }}>
+              <i className="pi pi-chevron-right" aria-hidden="true" />
+            </ActionIcon>
             <h4 className="print-link" onClick={e => { goPanelPrintGroup(group) }}>{group.title}</h4>
             <p>{group.description}</p>
           </div>
@@ -44,9 +45,12 @@ export default function PrintPanel1(props) {
       { (viewer.printing && viewer.printing.prints) && viewer.printing.prints.map( (print, index) => {
         return (
           <div key={index}>
-            <Button label="" icon="pi pi-chevron-right" 
-              rounded text
-              onClick={e => { goPanelPrintItem(print) }} />
+            <ActionIcon variant="subtle" radius="xl"
+              title={print.title}
+              aria-label={print.title}
+              onClick={e => { goPanelPrintItem(print) }}>
+              <i className="pi pi-chevron-right" aria-hidden="true" />
+            </ActionIcon>
             <h4 className="print-link" onClick={e => { goPanelPrintItem(print) }}>{print.title}</h4>
             <p>{print.description}</p>
           </div>

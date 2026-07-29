@@ -1,11 +1,10 @@
 import React, { useState,useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'primereact/button'
-import { Panel } from 'primereact/panel'
-import { Dialog } from 'primereact/dialog'
+import { Button, Group, Modal } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
 import Print from './Print'
 
-import { i18n } from '../../components';
+import { i18n, MainMenuButton, MapToolButton } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
 import './style.css'
@@ -16,7 +15,7 @@ import './style.css'
 export function MainMenu({ className, core, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize, showOnPortal } = Models.Utils;
+  const { getWindowSize } = Models.Utils;
   useTranslation();
 
   const [showPopup, setShowPopup] = useState(false);
@@ -36,26 +35,18 @@ export function MainMenu({ className, core, config, actions, record }) {
     return (
       <React.Fragment>
 
-        <Button
+        <MainMenuButton
           title={title}
           className={className}
           icon="pi pi-print"
           onClick={e => setShowPopup(true)}
         />
 
-        {showOnPortal(<Dialog
-          header={header}
-          visible={showPopup}
-          style={{width: isMobile ? '90%' : '35vw' }} 
-          modal
-          footer={(
-            <div className="grid">
-              <div className="col" style={{ textAlign: 'right'}}>
-                <Button label={closeLabel} onClick={e => setShowPopup(false)} />
-              </div>
-            </div>
-          )}          
-          onHide={e => setShowPopup(false)}>
+        <Modal
+          title={header}
+          opened={showPopup}
+          size={isMobile ? '90%' : '35vw'}
+          onClose={e => setShowPopup(false)}>
 
           <Print
             core={core}
@@ -65,13 +56,17 @@ export function MainMenu({ className, core, config, actions, record }) {
             record={record}
           />
 
-        </Dialog>)}
+          <Group justify="flex-end" mt="md">
+            <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
+          </Group>
+
+        </Modal>
 
       </React.Fragment>
     )
   }  else {
     return (
-      <Button
+      <MainMenuButton
         title={title}
         className={className}
         icon="pi pi-print"
@@ -85,7 +80,7 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   const { viewer, dispatch, Models } = config;
   const { selected_menu } = viewer.config_json;
-  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;
+  const { getWindowSize } = Models ? Models.Utils : utils;
   useTranslation();
 
   const component_cfg = record.config_json || {};
@@ -101,7 +96,7 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   useEffect(() => {
     if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
-  }, [selected_menu]);  
+  }, [selected_menu]);
 
   // Render content
   function renderContent() {
@@ -115,17 +110,15 @@ export default function Main({ type, region, as, core, config, actions, record, 
           dispatch={dispatch}
           record={record}
         />
-        
+
       </div>
     )
   }
 
   if (type === 'link' && region === record.links) {
-    return <Button
+    return <MapToolButton
       title={title}
       icon="pi pi-print"
-      rounded
-      className="p-button-raised"
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));
@@ -135,9 +128,9 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   if (as === 'panel') {
     return (
-      <Panel header={header}>
+      <CollapsiblePanel header={header} toggleable={false}>
         { renderContent() }
-      </Panel>
+      </CollapsiblePanel>
     )
   }
 

@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/dropdown';
-import { Message } from 'primereact/message';
+import { Alert, Button, Group, Select } from '@mantine/core';
 import PrintGroupItem from "./PrintGroupItem";
 
 import './style.css'
 
 export default function PrintPanel3(props) {
 
-  const { control, printGroup, printLayer, printDetails, setFinalPrints, fields, handleFieldChange, config, actions } = props;
-  const { viewer, mainMap, dispatch, Models } = config;
-  const { exclusive_mapcontrol } = viewer;
+  const { printGroup, printDetails, setFinalPrints, fields, handleFieldChange, config, actions } = props;
 
   const { t } = useTranslation();
 
@@ -67,7 +63,6 @@ export default function PrintPanel3(props) {
 
     getSelectedPrintsRecursive(printDetails);
 
-    //console.log(finalPrints);
     setFinalPrints(finalPrints);
     props.changeActivePanel('p4');
   }
@@ -101,13 +96,25 @@ export default function PrintPanel3(props) {
     <div className="print-panel3">
       <h3>{printDetails.title}</h3>
 
-      <div className="p-fluid">
-        <Message severity="info" text={t("selectFormatAndPrints", "Selecione o formato e as plantas pretendidas e clique em Continuar")} />
-      </div>
+      <Alert color="informative" py="xs">
+        <Group justify="center" gap="xs" wrap="nowrap">
+          <i className="pi pi-info-circle" aria-hidden="true" />
+          <span>{t("selectFormatAndPrints", "Selecione o formato e as plantas pretendidas e clique em Continuar")}</span>
+        </Group>
+      </Alert>
 
       <div className="p-fluid">
         <h4>Formato</h4>
-        <Dropdown id="layout" optionLabel="label" value={fields.layout} options={formats} onChange={handleFieldChange} placeholder={t("selectFormat", "Selecione um Formato")} />
+        <Select id="layout"
+          aria-label="Formato"
+          data={(formats || []).map(f => ({ value: f.format + '|' + f.orientation, label: f.label }))}
+          value={fields.layout ? fields.layout.format + '|' + fields.layout.orientation : null}
+          onChange={(v) => {
+            const f = (formats || []).find(x => x.format + '|' + x.orientation === v);
+            if (f) handleFieldChange({ target: { id: 'layout', value: f } });
+          }}
+          allowDeselect={false}
+          placeholder={t("selectFormat", "Selecione um Formato")} />
       </div>
 
       <div className="p-fluid">
@@ -122,45 +129,42 @@ export default function PrintPanel3(props) {
           setSelectedPrints={setSelectedPrints}
         />
         {(printDetails.allow_selection && (printDetails.children.length + printDetails.prints.length > 1)) ?
-          <div className="flex">
-            <Button label={t("none", "Nenhuma")}
-              size="small" severity="warning" text
+          <Group justify="space-between">
+            <Button size="xs" variant="subtle" color="warning"
               onClick={() => {
                 setSelectedPrints([])
               }}
-            />
-            <Button label={t("all", "Todas")}
-              style={{ float: 'right' }}
-              size="small" severity="warning" text
+            >
+              {t("none", "Nenhuma")}
+            </Button>
+            <Button size="xs" variant="subtle" color="warning"
               onClick={() => {
                 getAllPrints()
               }}
-            />
-          </div>
+            >
+              {t("all", "Todas")}
+            </Button>
+          </Group>
           : null}
       </div>
 
-      <div className="card">
-        <div className="grid">
-          <div className="col text-left">
-            <Button
-              label={t("back", "Voltar")}
-              icon="pi pi-chevron-left"
-              size="small"
-              onClick={e => { goPanelPrintPrev(); }}
-            />
-          </div>
-          <div className="col text-right">
-            <Button
-              label={t("continue", "Continuar")}
-              icon={isLoading ? "pi pi-spin pi-spinner" : ""}
-              size="small"
-              onClick={e => { goPanelPrintNext(); }}
-              disabled={isLoading || selectedPrints.length === 0}
-            />
-          </div>
-        </div>
-      </div>
+      <Group justify="space-between" mt="md">
+        <Button
+          size="xs"
+          leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+          onClick={e => { goPanelPrintPrev(); }}
+        >
+          {t("back", "Voltar")}
+        </Button>
+        <Button
+          size="xs"
+          loading={isLoading}
+          disabled={isLoading || selectedPrints.length === 0}
+          onClick={e => { goPanelPrintNext(); }}
+        >
+          {t("continue", "Continuar")}
+        </Button>
+      </Group>
     </div>
   )
 

@@ -9,7 +9,7 @@
 }
 
 #content .print h4.print-link {
-  cursor: pointer; 
+  cursor: pointer;
   cursor: hand;
 }
 
@@ -17,20 +17,18 @@
   margin-top: 10px;
 }
 
-#content .print .print-panel1 button { 
+#content .print .print-panel1 button {
   position: absolute;
   right: 15px;
   margin-top: -8px;
 }
 
-#content .print .print-panel2 button.tool.p-button-sm,
-#content .print .print-panel-item button.tool.p-button-sm  { 
-  padding: 0.49rem 0.49rem !important
-}
-
-#content .print .print-panel2 button.tool.active,
-#content .print .print-panel-item button.tool.active { 
-  background-color: #004175;
+/* The location-marking toolbar: the Prime Toolbar chrome restated */
+.print-drawing-toolbar {
+  border: 1px solid #dee2e6;
+  background: #f8f9fa;
+  border-radius: 3px;
+  padding: 0.5rem;
 }
 
 #content .print .print-panel3 ul {

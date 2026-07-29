@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { Checkbox } from 'primereact/checkbox';
+import React from 'react'
+import { Checkbox } from '@mantine/core';
 
 import './style.css'
 
 export default function PrintGroupItem(props) {
 
-  const { control, printLayer, printGroup, printDetails, groupItem, config, actions } = props;
+  const { printGroup, printDetails, groupItem, config, actions } = props;
   const { selectedPrints, setSelectedPrints } = props;
-  const { viewer, mainMap, dispatch, Models } = config;
 
   const onSelectedPrintChange = (e) => {
     const prints = [...selectedPrints];
@@ -47,11 +46,14 @@ export default function PrintGroupItem(props) {
             {groupItem.prints.map(print => {
               return (
                 <li key={print.id}>
-                  {printDetails.allow_selection &&
-                    <Checkbox value={print.uuid}
-                      onChange={onSelectedPrintChange} checked={selectedPrints.includes(print.uuid)} />
+                  {printDetails.allow_selection ?
+                    <Checkbox size="sm"
+                      label={print.title}
+                      checked={selectedPrints.includes(print.uuid)}
+                      onChange={(e) => onSelectedPrintChange({ checked: e.currentTarget.checked, value: print.uuid })} />
+                    :
+                    <span className="task-name">{print.title}</span>
                   }
-                  <span className="task-name ml-1">{print.title}</span>
                 </li>
               )
             })}
