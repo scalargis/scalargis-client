@@ -6,6 +6,7 @@ import { createAjv, toDataPath, toDataPathSegments } from '@jsonforms/core';
 import { get, set, merge } from 'lodash';
 
 import { JsonFormContext } from './JsonFormContext';
+import { defaultRenderers } from './renderers';
 import { i18nDefaults } from './util/i18nDefaults';
 import { getTranslations } from './../utils/i18n';
 import { useFigTreeEvaluator } from './useFigTreeEvaluator';

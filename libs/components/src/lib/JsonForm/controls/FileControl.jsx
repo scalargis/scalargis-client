@@ -1,4 +1,4 @@
-import React, { useRef, useContext, useMemo } from 'react';
+import React, { useRef, useMemo } from 'react';
 import {
   optionIs,
   rankWith,
@@ -8,11 +8,9 @@ import {
   withJsonFormsControlProps
 } from '@jsonforms/react';
 
-import { Toast } from 'primereact/toast';
-import { Chip } from 'primereact/chip';
-import { FileUpload } from 'primereact/fileupload';
+import { Badge, Button, FileButton } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 
-import { JsonFormContext } from './../JsonFormContext';
 import { translateMsg } from './../util/i18n';
 
 const fileDefaultValues = {
@@ -23,61 +21,45 @@ const fileDefaultValues = {
 
 export const FileControl = (props) => {
 
-  const ctx = useContext(JsonFormContext);
-  
-  const { showOnPortal } = ctx.utils;
+  const { schema, uischema, path, t, locale } = props;
 
-  const { schema, uischema, path, label, t, locale } = props;
- 
-  const file_upload = useRef();
-
-  const toast = useRef(null);
+  const resetPicker = useRef(null);
 
   let maxFileSize = 51200 //KB
   if (props.config && props.config.viewer && props.config.viewer.upload_maxfilesize) {
     maxFileSize = props.config.viewer.upload_maxfilesize;
   }
-  
+
   const file = props?.data ? {...props?.data}  : {...fileDefaultValues};
 
-  function selectFile(e) {
-    if (file_upload.current && e.files.length) {
-      const reader = new FileReader();
-      reader.onload = async function() {
-        const file_data = reader.result;
+  function selectFile(selected) {
+    if (!selected) return;
 
-        try {
-          const data = {
-            ...file,
-            file_url: null,
-            original_filename: e.files[0].name,
-            filename: e.files[0].name,
-            file_size: e.files[0].size,
-            data: file_data
-          };
-          props.handleChange(props.path, data);
-
-        } catch (err) {
-          const data = {
-            ...file,
-            file_url: null,
-            original_filename: e.files[0].name,
-            filename: e.files[0].name,
-            size: e.files[0].size,
-            data: file_data
-          };
-          props.handleChange(props.path, data);
-        }
-
-        file_upload.current.clear();
-        file_upload.current.setFiles([]);
-      };
-      reader.readAsDataURL(e.files[0]);
+    if (maxFileSize > 0 && selected.size > maxFileSize * 1024) {
+      notify.warn('Selecionar Ficheiro', 'Não foi possível selecionar o ficheiro. Por favor, verifique se o ficheiro selecionado ultrapassa a dimensão máxima permitida.');
+      resetPicker.current?.();
+      return;
     }
-  }
 
-  function fileValidationFail(e) {
-    toast.current.show({life: 5000, severity: 'warn', summary: 'Selecionar Ficheiro', detail: 'Não foi possível selecionar o ficheiro. Por favor, verifique se o ficheiro selecionado ultrapassa a dimensão máxima permitida.'});
+    const reader = new FileReader();
+    reader.onload = function() {
+      const file_data = reader.result;
+
+      const data = {
+        ...file,
+        file_url: null,
+        original_filename: selected.name,
+        filename: selected.name,
+        file_size: selected.size,
+        data: file_data
+      };
+      props.handleChange(props.path, data);
+
+      // Reset the native input so re-picking the same file fires again
+      // (Prime's file_upload.clear() behaviour).
+      resetPicker.current?.();
+    };
+    reader.readAsDataURL(selected);
   }
 
   const labels = useMemo(() => {
@@ -89,54 +71,40 @@ export const FileControl = (props) => {
       size: translateMsg(`${elem}.size`, `${fallbackElem}.size`, 'Size', {t, schema, uischema, path}),
       newfile: translateMsg(`${elem}.newfile`, `${fallbackElem}.newfile`, 'New file', {t, schema, uischema, path}),
       choose: translateMsg(`${elem}.choose`, `${fallbackElem}.choose`, 'Choose', {t, schema, uischema, path}),
-      upload: translateMsg(`${elem}.upload`, `${fallbackElem}.upload`, 'Upload', {t, schema, uischema, path}),
-      cancel: translateMsg(`${elem}.cancel`, `${fallbackElem}.cancel`, 'Cancel', {t, schema, uischema, path}),
       maxFileSize: translateMsg(`${elem}.maxFileSize`, `${fallbackElem}.maxFileSize`, 'Max file size', {t, schema, uischema, path}),
     }
   }, [locale, schema, uischema, path]);
 
   return (
-    <>
-      {showOnPortal(<Toast ref={toast} baseZIndex={2000} />)}
-      <form onSubmit={(e)=>{ e.preventDefault(); }}>
-        <div className="p-fluid">    
-          <div className="field">
-            { (file && file.data && file.original_filename) ?
-            <div>
-              <div><strong>{labels.file}: </strong>{file.original_filename} <Chip label={` ${labels.newfile}`} icon="pi pi-info-circle" className="ml-2" style={{color:"var(--primary-color)"}} /></div>
-              <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
-            </div>
-            :
-            <div>
-              <div><strong>{labels.file}: </strong><a href={`${file.file_url}`} target="_blank" rel="noreferrer">{file.original_filename}</a></div>
-              <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
-            </div>
-            }
+    <form onSubmit={(e)=>{ e.preventDefault(); }}>
+      <div className="p-fluid">
+        <div className="field">
+          { (file && file.data && file.original_filename) ?
+          <div>
+            <div><strong>{labels.file}: </strong>{file.original_filename} <Badge variant="light" ml="xs" leftSection={<i className="pi pi-info-circle" aria-hidden="true" />}>{labels.newfile}</Badge></div>
+            <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
           </div>
-          <div className="field col-12">
-            <FileUpload
-              ref={file_upload} 
-              name="upload"
-              mode="basic"
-              maxFileSize={maxFileSize*1024}
-              customUpload 
-              onSelect={selectFile}
-              onValidationFail={fileValidationFail}
-              disabled={false}
-              url="./upload"
-              chooseLabel={labels.choose}
-              uploadLabel={labels.upload}
-              cancelLabel={labels.cancel}
-              invalidFileSizeMessageDetail=""
-              invalidFileSizeMessageSummary=""
-            />
-            { (maxFileSize > 0) ?
-            <small id="upload-help" className="p-warn">{labels.maxFileSize}: {Math.round((maxFileSize/1024) * 100) / 100} MB</small>
-            : null }
+          :
+          <div>
+            <div><strong>{labels.file}: </strong><a href={`${file.file_url}`} target="_blank" rel="noreferrer">{file.original_filename}</a></div>
+            <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
           </div>
+          }
         </div>
-      </form>
-    </>
+        <div className="field col-12">
+          <FileButton onChange={selectFile} resetRef={resetPicker}>
+            {(buttonProps) => (
+              <Button {...buttonProps} leftSection={<i className="pi pi-plus" aria-hidden="true" />}>
+                {labels.choose}
+              </Button>
+            )}
+          </FileButton>
+          { (maxFileSize > 0) ?
+          <small id="upload-help" className="p-warn block">{labels.maxFileSize}: {Math.round((maxFileSize/1024) * 100) / 100} MB</small>
+          : null }
+        </div>
+      </div>
+    </form>
   );
 };
 

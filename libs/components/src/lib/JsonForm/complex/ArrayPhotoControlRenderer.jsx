@@ -1,10 +1,7 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { Tag } from 'primereact/tag';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { Image } from 'primereact/image';
+import { ActionIcon, Alert, Badge, Button, Group, Image, Modal, UnstyledButton } from '@mantine/core';
+import { confirm } from '@scalargis/ui';
 
 import {
   isObjectArrayControl,
@@ -14,7 +11,7 @@ import {
   or,
   rankWith,
 } from '@jsonforms/core';
-import { 
+import {
   withTranslateProps,
   withJsonFormsArrayControlProps
 } from '@jsonforms/react';
@@ -23,10 +20,25 @@ import { JsonFormContext } from './../JsonFormContext';
 import PhotoForm from './PhotoForm';
 import { translateMsg } from './../util/i18n';
 
+/** Prime Image `preview` twin: the thumbnail is a real button that opens the
+ *  full-size photo in a modal. */
+const PhotoPreview = ({ src, alt, title }) => {
+  const [opened, setOpened] = useState(false);
+  return (
+    <>
+      <UnstyledButton type="button" onClick={() => setOpened(true)} title={title} aria-label={title}>
+        <Image src={src} alt={alt} w={100} fit="contain" />
+      </UnstyledButton>
+      <Modal opened={opened} onClose={() => setOpened(false)} title={alt} size="auto">
+        <Image src={src} alt={alt} fit="contain" mah="75vh" />
+      </Modal>
+    </>
+  );
+};
+
 export const ArrayPhotoControlRenderer = (props) => {
 
-  const { 
-    data,
+  const {
     schema,
     uischema,
     path,
@@ -36,29 +48,22 @@ export const ArrayPhotoControlRenderer = (props) => {
   } = props;
 
   const i18Props = {t, schema, uischema, path};
-  
+
   const ctx = useContext(JsonFormContext);
 
-  const { showOnPortal } = ctx.utils; 
-
   const { removeItems } = props;
- 
+
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
   const [showPhotoForm, setShowPhotoForm] = useState(false);
 
-  const buttonAddStyle = {
-    width: 'auto'
-  };
-  
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
   }, [props.path]);
-  
-  return(    
+
+  return(
     <div className="grid">
-      <ConfirmDialog />
-      {showPhotoForm && showOnPortal(
+      {showPhotoForm && (
         <PhotoForm
           schema={schema}
           uischema={uischema}
@@ -78,9 +83,9 @@ export const ArrayPhotoControlRenderer = (props) => {
             const newData = [...(props?.data || [])];
             if (rowIndex === null) {
               newData.push({...data});
-            } else {              
+            } else {
               newData[rowIndex] = {...data};
-            }            
+            }
             props.handleChange(props.path, newData);
             setShowPhotoForm(false);
           }}
@@ -88,13 +93,14 @@ export const ArrayPhotoControlRenderer = (props) => {
       )}
 
       <div className="field col-12 mb-0 pb-0">
-        { (props?.data?.length) ? 
+        { (props?.data?.length) ?
           <div className="col-12">
-            <div className="card text-center mb-1 p-0">
-              <Tag severity="info" rounded style={{width:'80%'}} 
-                value={props.data.length + " " + (props.data.length > 1 ? 
-                  translateMsg("common.photos", "photos", "Fotografias", i18Props) : 
-                  translateMsg("common.photo", "photo", "Fotografia", i18Props))}></Tag>
+            <div className="text-center mb-1 p-0">
+              <Badge variant="light" color="informative" radius="xl" style={{width:'80%'}}>
+                {props.data.length + " " + (props.data.length > 1 ?
+                  translateMsg("common.photos", "photos", "Fotografias", i18Props) :
+                  translateMsg("common.photo", "photo", "Fotografia", i18Props))}
+              </Badge>
             </div>
             <table style={{"width": "100%"}}>
               <tbody>
@@ -102,60 +108,71 @@ export const ArrayPhotoControlRenderer = (props) => {
                   (props.data).map((item, index) => {
                     const f = item.file || {};
                     return (
-                      <tr key={index}>  
+                      <tr key={index}>
                         <td className="" style={{"wordBreak": "break-all", "textAlign": "center"}}>
-                          <Image src={f.data || `${f.file_url}`} alt={f.filename} width={100} preview />
+                          <PhotoPreview src={f.data || `${f.file_url}`} alt={f.filename}
+                            title={translateMsg("common.viewPhoto", "viewPhoto", "Ver fotografia", i18Props)} />
                         </td>
                         <td className="col-9" style={{"wordBreak": "break-all", "textAlign": "center"}}>{(f?.original_filename || f?.filename)}</td>
                         <td className="col-1" style={{"verticalAlign": "top", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" rounded outlined className="mb-2"
+                          <ActionIcon variant="outline" radius="xl" size="md" mb="xs"
                             title={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
+                            aria-label={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
                               setShowPhotoForm(true);
                               setRowIndex(index);
-                              setRowData(item);                   
-                            }} />                                                                            
-                          <Button icon="pi pi-trash" rounded outlined severity="danger"
+                              setRowData(item);
+                            }}>
+                            <i className="pi pi-pencil" aria-hidden="true" />
+                          </ActionIcon>
+                          <ActionIcon variant="outline" color="danger" radius="xl" size="md"
                             title={translateMsg("common.deletePhoto", "deletePhoto", "Eliminar fotografia", i18Props)}
-                            onClick={(e) => { 
+                            aria-label={translateMsg("common.deletePhoto", "deletePhoto", "Eliminar fotografia", i18Props)}
+                            onClick={(e) => {
                               e.preventDefault();
 
-                              confirmDialog({
+                              confirm({
                                 message: `${translateMsg("common.deleteFileConfirmation", "deleteFileConfirmation", "Deseja remover a ficheiro", i18Props)} "${f.original_filename || f.filename}"?`,
                                 header:  translateMsg("common.confirmation", "confirmation", "Confirmação", i18Props),
-                                icon: 'pi pi-exclamation-triangle mr-1',
+                                severity: 'danger',
                                 acceptLabel: translateMsg("yes", null, "Sim", i18Props),
                                 rejectLabel: translateMsg("no", null, "Não", i18Props),
                                 accept: () => {
                                   deleteConfirm(index);
                                 },
-                                reject: () =>  { /* noop */ }      
+                                reject: () =>  { /* noop */ }
                               });
 
-                          } } />                    
+                          } }>
+                            <i className="pi pi-trash" aria-hidden="true" />
+                          </ActionIcon>
                         </td>
                     </tr>)
                   })
                 }
               </tbody>
             </table>
-          </div> : 
-          <Message
-            severity="info"
-            text={translateMsg("noPhotosInfo", null, "Não existem fotografias. Pode adicioná-las através do botão 'Adicionar fotografia'.", i18Props)} 
-          />
-        }              
+          </div> :
+          <Alert color="informative" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-info-circle" aria-hidden="true" />
+              <span>{translateMsg("noPhotosInfo", null, "Não existem fotografias. Pode adicioná-las através do botão 'Adicionar fotografia'.", i18Props)}</span>
+            </Group>
+          </Alert>
+        }
       </div>
 
       <div className="col-12 text-center">
-        <Button label={translateMsg("addPhoto", null, "Adicionar Fotografia", i18Props)} text style={buttonAddStyle}
+        <Button variant="subtle" style={{width: 'auto'}}
           onClick={(e) => {
             e.preventDefault();
             setShowPhotoForm(true);
             setRowIndex(null);
             setRowData(null);
-          }} />
+          }}>
+          {translateMsg("addPhoto", null, "Adicionar Fotografia", i18Props)}
+        </Button>
       </div>
     </div>
 

@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Dialog } from 'primereact/dialog';
-import { Toast } from 'primereact/toast';
-import { Button } from 'primereact/button';
+import React, { useState, useMemo } from 'react';
+import { Button, Group, Modal } from '@mantine/core';
 
 import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '../../components';
 
@@ -11,7 +9,7 @@ export default function FileForm(props) {
 
   const { schema, path, label, t, locale } = props;
 
-  const { getWindowSize, showOnPortal } = props.utils;  
+  const { getWindowSize } = props.utils;
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -20,8 +18,6 @@ export default function FileForm(props) {
 
   const [showFormErrors, setShowFormErrors] = useState(false);
 
-  const toast = useRef(null);  
-
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
@@ -29,7 +25,7 @@ export default function FileForm(props) {
 
   function close() {
     props.setShowForm(false);
-  } 
+  }
 
   const onSave = (e) => {
     if (!formData?.file?.data || !formData?.file?.filename) {
@@ -47,7 +43,7 @@ export default function FileForm(props) {
       return;
     }
 
-    props.onSave({...formData});   
+    props.onSave({...formData});
   };
 
   const labels = useMemo(() => {
@@ -61,56 +57,44 @@ export default function FileForm(props) {
     }
   }, [locale, schema, uischema, path]);
 
-  const renderFooter = (name) => {
-    return (
-        <div>
-            <Button 
-              label={labels.close}
-              icon="pi pi-times"
-              disabled={isSaving ? true : false}
-              onClick={() => close()} text />
-            <Button 
-              label={labels.save}
-              icon={isSaving ? "pi pi-check pi-spinner" : "pi pi-check" }
-              disabled={isSaving ? true : false}
-              autoFocus
-              onClick={onSave} 
-               />
-        </div>
-    );
-  } 
-
   return (
-    <Dialog
-      header={labels.title}
-      visible={!!props.showForm}
+    <Modal
+      title={labels.title}
+      opened={!!props.showForm}
       className="jsonform-file-form-editor"
-      style={{ width: isMobile ? '90%' : '50vw' }}
-      position="top"
-      modal
-      footer={renderFooter()}
-      onHide={e => {
-        props.setShowForm(false);
-        }}
+      size={isMobile ? '90%' : '50vw'}
+      onClose={() => props.setShowForm(false)}
       >
         <div>
-          {showOnPortal(<Toast ref={toast} baseZIndex={2000} />)}
-          <div>
-            <JsonForm
-              data={props.data}
-              onChange={({errors, data}) => {
-                setFormErrors(errors);
-                setFormData(data);
-                setShowFormErrors(false);
-              }}
-              schema={schema}
-              uischema={uischema}
-              renderers={JsonFormDefaultRenderers}
-              locale={locale}
-            />
-            <FormErrors errors={formErrors} data={formData} show={showFormErrors} displayMode="static" />
-          </div>
-      </div>
-    </Dialog>
+          <JsonForm
+            data={props.data}
+            onChange={({errors, data}) => {
+              setFormErrors(errors);
+              setFormData(data);
+              setShowFormErrors(false);
+            }}
+            schema={schema}
+            uischema={uischema}
+            renderers={JsonFormDefaultRenderers}
+            locale={locale}
+          />
+          <FormErrors errors={formErrors} data={formData} show={showFormErrors} displayMode="static" />
+        </div>
+        <Group justify="flex-end" mt="md">
+          <Button variant="subtle"
+            leftSection={<i className="pi pi-times" aria-hidden="true" />}
+            disabled={isSaving}
+            onClick={() => close()}>
+            {labels.close}
+          </Button>
+          <Button
+            leftSection={<i className={isSaving ? "pi pi-check pi-spinner" : "pi pi-check"} aria-hidden="true" />}
+            disabled={isSaving}
+            data-autofocus
+            onClick={onSave}>
+            {labels.save}
+          </Button>
+        </Group>
+    </Modal>
   )
 }

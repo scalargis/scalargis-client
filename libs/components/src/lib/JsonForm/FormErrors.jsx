@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
+import { Button, Group, Modal } from '@mantine/core';
 
 const displayModes = {
   STATIC: 'static',
@@ -10,7 +9,7 @@ const displayModes = {
 
 function FormErrors(props) {
   const { errors, data, show, displayMode, t } = props;
-  
+
   const [showErrors, setShowErrors] = useState(false);
 
   if (!show || !errors?.length) return null;
@@ -34,32 +33,31 @@ function FormErrors(props) {
   let lblErrorsBtn = t("showErrors", "Ver erros");
   if (showErrors && props?.displayMode !== displayModes.DIALOG) {
     lblErrorsBtn = t("hideErrors", "Ocultar erros");
-  }  
-
-  const footer = (
-    <div>
-        <Button label={t("close", "Fechar")} onClick={()=>setShowErrors(false)} />
-    </div>
-  );  
+  }
 
   return (
     <>
       {<div className="text-right">
-        <Button label={lblErrorsBtn} severity="danger" text
-          onClick={(e) => setShowErrors(!showErrors)}
-       />
+        <Button variant="subtle" color="danger"
+          onClick={(e) => setShowErrors(!showErrors)}>
+          {lblErrorsBtn}
+        </Button>
       </div>}
-        { props?.displayMode === displayModes.DIALOG ? <Dialog header={props?.title || "Erros do formulário"} footer={footer} visible={showErrors} style={{ width: '50vw' }}  onHide={() => setShowErrors(false)}>
+        { props?.displayMode === displayModes.DIALOG ?
+          <Modal title={props?.title || "Erros do formulário"} opened={showErrors} size="50vw" onClose={() => setShowErrors(false)}>
             <div aria-live="polite" className="dataform-inline-message p-component dataform-inline-message-error mt-2 mb-2" role="alert">
               {buildErrorsList()}
             </div>
-          </Dialog> :
+            <Group justify="flex-end" mt="md">
+              <Button onClick={()=>setShowErrors(false)}>{t("close", "Fechar")}</Button>
+            </Group>
+          </Modal> :
           showErrors &&
             <div aria-live="polite" className="dataform-inline-message p-component dataform-inline-message-error mt-2 mb-2" role="alert">
               {buildErrorsList()}
             </div>
           }
-      </>    
+      </>
   )
 
 }

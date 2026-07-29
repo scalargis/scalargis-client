@@ -1,34 +1,34 @@
-import PrimereactEnumExtendedControl, { 
-  primereactEnumExtendedControlTester
-} from './PrimereactEnumExtendedControl';
+import MantineEnumExtendedControl, {
+  mantineEnumExtendedControlTester
+} from './MantineEnumExtendedControl';
 
-import PrimereactOneOfEnumExtendedControl, { 
-  primereactOneOfEnumExtendedControlTester
-} from './PrimereactOneOfEnumExtendedControl';
+import MantineOneOfEnumExtendedControl, {
+  mantineOneOfEnumExtendedControlTester
+} from './MantineOneOfEnumExtendedControl';
 
 import PhotoControl, {
-  photoControlTester  
+  photoControlTester
 } from './PhotoControl';
 
 import FileControl, {
-  fileControlTester  
+  fileControlTester
 } from './FileControl';
 
 import TextDisplay, {
-  textDisplayTester  
+  textDisplayTester
 } from './TextDisplay';
 
 import HtmlDisplay, {
-  htmlDisplayTester  
+  htmlDisplayTester
 } from './HtmlDisplay';
 
 export {
-  PrimereactEnumExtendedControl,
-  primereactEnumExtendedControlTester,
-  PrimereactOneOfEnumExtendedControl,
-  primereactOneOfEnumExtendedControlTester,
+  MantineEnumExtendedControl,
+  mantineEnumExtendedControlTester,
+  MantineOneOfEnumExtendedControl,
+  mantineOneOfEnumExtendedControlTester,
   PhotoControl,
-  photoControlTester,  
+  photoControlTester,
   FileControl,
   fileControlTester,
   TextDisplay,

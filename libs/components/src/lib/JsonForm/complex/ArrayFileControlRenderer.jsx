@@ -1,10 +1,7 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { Tag } from 'primereact/tag';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { Image } from 'primereact/image';
+import { ActionIcon, Alert, Badge, Button, Group } from '@mantine/core';
+import { confirm } from '@scalargis/ui';
 
 import {
   isObjectArrayControl,
@@ -25,8 +22,7 @@ import { translateMsg } from './../util/i18n';
 
 export const ArrayFileControlRenderer = (props) => {
 
-  const { 
-    data,
+  const {
     schema,
     uischema,
     path,
@@ -36,29 +32,22 @@ export const ArrayFileControlRenderer = (props) => {
   }= props;
 
   const i18Props = {t, schema, uischema, path};
-  
+
   const ctx = useContext(JsonFormContext);
 
-  const { showOnPortal } = ctx.utils; 
-
   const { removeItems } = props;
- 
+
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
   const [showFileForm, setShowFileForm] = useState(false);
 
-  const buttonAddStyle = {
-    width: 'auto'
-  };
-  
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
   }, [props.path]);
-  
-  return(    
+
+  return(
     <div className="grid">
-      <ConfirmDialog />
-      {showFileForm && showOnPortal(
+      {showFileForm && (
         <FileForm
           schema={schema}
           uischema={uischema}
@@ -78,9 +67,9 @@ export const ArrayFileControlRenderer = (props) => {
             const newData = [...(props?.data || [])];
             if (rowIndex === null) {
               newData.push({...data});
-            } else {              
+            } else {
               newData[rowIndex] = {...data};
-            }            
+            }
             props.handleChange(props.path, newData);
             setShowFileForm(false);
           }}
@@ -88,13 +77,14 @@ export const ArrayFileControlRenderer = (props) => {
       )}
 
       <div className="field col-12 mb-0 pb-0">
-        { (props?.data?.length) ? 
+        { (props?.data?.length) ?
           <div className="col-12">
-            <div className="card text-center mb-1 p-0">
-              <Tag severity="info" rounded style={{width:'80%'}} 
-                value={props.data.length + " " + (props.data.length > 1 ? 
-                  translateMsg("common.files", "files", "Ficheiros", i18Props) : 
-                  translateMsg("common.file", "file", "Ficheiro", i18Props))}></Tag>
+            <div className="text-center mb-1 p-0">
+              <Badge variant="light" color="informative" radius="xl" style={{width:'80%'}}>
+                {props.data.length + " " + (props.data.length > 1 ?
+                  translateMsg("common.files", "files", "Ficheiros", i18Props) :
+                  translateMsg("common.file", "file", "Ficheiro", i18Props))}
+              </Badge>
             </div>
             <table style={{"width": "100%"}}>
               <tbody>
@@ -102,61 +92,71 @@ export const ArrayFileControlRenderer = (props) => {
                   (props.data).map((item, index) => {
                     const f = item.file || {};
                     return (
-                      <tr key={index}>                 
+                      <tr key={index}>
                         <td className="col-9" style={{"verticalAlign": "top", "wordBreak": "break-all"}}>
                           <div>{(f?.original_filename || f?.filename)}</div>
                           <div className="file-description" style={{"fontSize": "0.9rem","color": "#b7bdbb"}}>{(item?.description)}</div>
                         </td>
                         <td className="col-1" style={{"verticalAlign": "middle", "textAlign": "center"}}>
-                          <Button icon="pi pi-pencil" rounded outlined className="mb-2"
+                          <ActionIcon variant="outline" radius="xl" size="md" mb="xs"
                             title={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
+                            aria-label={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
                               setShowFileForm(true);
                               setRowIndex(index);
-                              setRowData(item);                              
-                            }} />                                                                            
-                          <Button icon="pi pi-trash" rounded outlined severity="danger"
+                              setRowData(item);
+                            }}>
+                            <i className="pi pi-pencil" aria-hidden="true" />
+                          </ActionIcon>
+                          <ActionIcon variant="outline" color="danger" radius="xl" size="md"
                             title={translateMsg("common.deleteFile", "deleteFile", "Eliminar ficheiro", i18Props)}
-                            onClick={(e) => { 
+                            aria-label={translateMsg("common.deleteFile", "deleteFile", "Eliminar ficheiro", i18Props)}
+                            onClick={(e) => {
                               e.preventDefault();
 
-                              confirmDialog({
+                              confirm({
                                 message: `${translateMsg("common.deleteFileConfirmation", "deleteFileConfirmation", "Deseja remover a ficheiro", i18Props)} "${f.original_filename || f.filename}"?`,
                                 header:  translateMsg("common.confirmation", "confirmation", "Confirmação", i18Props),
-                                icon: 'pi pi-exclamation-triangle mr-1',
+                                severity: 'danger',
                                 acceptLabel: 'Sim',
                                 rejectLabel: 'Não',
                                 accept: () => {
                                   deleteConfirm(index);
                                 },
-                                reject: () =>  { /* noop */ }      
+                                reject: () =>  { /* noop */ }
                               });
 
-                          } } />                    
+                          } }>
+                            <i className="pi pi-trash" aria-hidden="true" />
+                          </ActionIcon>
                         </td>
-                    </tr>                      
+                    </tr>
                     )
                   })
                 }
               </tbody>
             </table>
-          </div> : 
-          <Message
-            severity="info"
-            text={translateMsg("noFilesInfo", null, "Não existem ficheiros. Pode adicioná-las através do botão 'Adicionar ficheiro'.", i18Props)} 
-          />
-        }              
+          </div> :
+          <Alert color="informative" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-info-circle" aria-hidden="true" />
+              <span>{translateMsg("noFilesInfo", null, "Não existem ficheiros. Pode adicioná-las através do botão 'Adicionar ficheiro'.", i18Props)}</span>
+            </Group>
+          </Alert>
+        }
       </div>
 
       <div className="col-12 text-center">
-        <Button label={translateMsg("addFile", null, "Adicionar Ficheiro", i18Props)} text style={buttonAddStyle}
+        <Button variant="subtle" style={{width: 'auto'}}
           onClick={(e) => {
             e.preventDefault();
             setShowFileForm(true);
             setRowIndex(null);
             setRowData(null);
-          }} />
+          }}>
+          {translateMsg("addFile", null, "Adicionar Ficheiro", i18Props)}
+        </Button>
       </div>
     </div>
 
