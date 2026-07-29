@@ -42,7 +42,7 @@ export default function PanelJsonContent({ core, config }) {
 
   return (
     <div>
-      { (componentConfig || []).map(cfg => RenderComponent(cfg)) }
+      { (componentConfig || []).map((cfg, i) => <React.Fragment key={i}>{RenderComponent(cfg)}</React.Fragment>) }
     </div>
   );
 

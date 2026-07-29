@@ -1,13 +1,21 @@
 import React from "react";
 
-import { Button } from 'primereact/button';
+import { Button } from '@mantine/core';
 
 import { TreeComponent } from './TreeComponent';
 
 
+/** Config-compat Button: existing panel configs carry Prime's `label`/`icon`
+ *  props, which Mantine's Button does not know. */
+const ConfigButton = ({ label, icon, options, children, ...rest }) => (
+  <Button leftSection={icon ? <i className={icon} aria-hidden="true" /> : undefined} {...rest}>
+    {children || label}
+  </Button>
+);
+
 const KeysToComponentMap = {
   tree: TreeComponent,
-  button: Button
+  button: ConfigButton
 };
 
 function renderer(config) {
@@ -22,7 +30,7 @@ function renderer(config) {
     config.children &&
       (typeof config.children === "string"
         ? config.children
-        : config.children.map(c => renderer(c)))
+        : config.children.map((c, i) => <React.Fragment key={i}>{renderer(c)}</React.Fragment>))
   );
 }
 
