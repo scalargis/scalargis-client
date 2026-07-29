@@ -87,3 +87,34 @@
   display: block;
   margin-left: 23px;
 }
+
+/* Results panel - the Prime ListBox chrome restated on the Mantine structure */
+.places-search-list {
+  min-width: 185px;
+  max-height: 250px;
+  overflow: auto;
+  background: #ffffff;
+  color: #495057;
+}
+
+.places-search-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.places-search-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  color: inherit;
+}
+
+.places-search-option:hover {
+  background: #e9ecef;
+}
+
+.places-search-option.selected {
+  background: #E3F2FD;
+}

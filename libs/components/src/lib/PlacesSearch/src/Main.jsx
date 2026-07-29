@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from "react-i18next";
-import { InputText } from 'primereact/inputtext';
-import { ListBox } from 'primereact/listbox';
+import { Paper, TextInput, UnstyledButton } from '@mantine/core';
 import 'ol/ol.css';
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
@@ -31,7 +30,7 @@ const featureStyle = new Style({
       color: 'rgba(255, 255, 255, 0.5)',
       width: 2,
     })
-  })    
+  })
 });
 
 export default function Main({ core, config, actions, utils, record }) {
@@ -39,7 +38,7 @@ export default function Main({ core, config, actions, utils, record }) {
   const { MapModel } = Models;
   const { getGeometryFromWKT } = MapModel;
   const { findOlLayer } = utils;
-  
+
   const { t } = useTranslation(["common", "custom"]);
 
   const [filter, setFilter] = useState("");
@@ -56,9 +55,9 @@ export default function Main({ core, config, actions, utils, record }) {
 
   const component_cfg = record.config_json || {};
 
-  useOutsideClick(ref, () => {    
+  useOutsideClick(ref, () => {
     setShowPlaces(false);
-  });  
+  });
 
   function changeFilterFunc(e) {
     setSelectedPlace(null);
@@ -81,9 +80,9 @@ export default function Main({ core, config, actions, utils, record }) {
     }
     if (config.min_similarity) {
       url = url.replace('{min_similarity}', config.min_similarity);
-    }     
+    }
     url = url.replace('{filter}', e.target.value);
-    fetch(url).then(res => {      
+    fetch(url).then(res => {
         // TODO: Validate response
         return res.json();
     }).then(result => {
@@ -97,11 +96,9 @@ export default function Main({ core, config, actions, utils, record }) {
         //console.log('error', error);
         setIsLoading(false);
     })
-  }  
+  }
 
-  function selectPlace(e) {
-    const item = e.value || selectedPlace;
-
+  function selectPlace(item) {
     if (item?.geom_wkt) {
       const geom = MapModel.getGeometryFromWKT(item.geom_wkt);
       const srid = component_cfg?.geometrySRID || item?.geom_srid || 4326;
@@ -136,7 +133,7 @@ export default function Main({ core, config, actions, utils, record }) {
   // Legacy code. To be removed
   function buildLegacyDefaultItem(option, iconClass) {
     let elem = null;
-  
+
     if (iconClass) {
       elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} mr-2`}></i> <span>{option.designacao} ({option.concelho})</span></div>;
       if (option.designacao === option.concelho) {
@@ -156,8 +153,8 @@ export default function Main({ core, config, actions, utils, record }) {
     let elem = null;
 
     const admin_level = option.admin_level4 || option.admin_level3 || option.admin_level2 || option.admin_level1 || '';
-  
-    if (iconClass) {      
+
+    if (iconClass) {
       elem = <div className="place-list-item"><i className={`pi ${iconClass || ''} mr-2`}></i> <span>{option.name} {admin_level ? `(${admin_level})` : ''}</span></div>;
       if (option.name === admin_level) {
         elem = <div>{admin_level}</div>
@@ -188,7 +185,7 @@ export default function Main({ core, config, actions, utils, record }) {
         const rf = (html && html.match) ? html.match(/[^{}]+(?=})/g) : null;
         if (rf) {
           rf.forEach(fld => {
-            html = html.replace(`{${fld}}`, option[fld] || '');      
+            html = html.replace(`{${fld}}`, option[fld] || '');
           });
         }
         elem = <div>{parse(html)}</div>;
@@ -203,22 +200,22 @@ export default function Main({ core, config, actions, utils, record }) {
           const rf = (html && html.match) ? html.match(/[^{}]+(?=})/g) : null;
           if (rf) {
             rf.forEach(fld => {
-              html = html.replace(`{${fld}}`, option[fld] || '');      
+              html = html.replace(`{${fld}}`, option[fld] || '');
             });
           }
           elem = <div>{parse(html)}</div>;
         } else if (tpl.iconClass) {
           elem = buildDefaultItem(option, tpl.iconClass);
-        }       
+        }
       }
-    }    
+    }
 
     return elem;
   }
 
   useEffect(() => {
     const sources_ids = [];
-    if (config.sources && config.sources.length > 0) {      
+    if (config.sources && config.sources.length > 0) {
       config.sources.forEach(src => {
         if (src.active) {
           sources_ids.push(src.id);
@@ -250,7 +247,7 @@ export default function Main({ core, config, actions, utils, record }) {
 
     const parentLayer = utils.findOlLayer(mainMap, 'overlays');
 
-    if (parentLayer) {      
+    if (parentLayer) {
       parentLayer.getLayers().getArray().push(featuresLayer.current);
     } else {
       mainMap.addLayer(featuresLayer.current);
@@ -274,7 +271,7 @@ export default function Main({ core, config, actions, utils, record }) {
 
     if (component_cfg.drawGeometry=== false) return;
 
-    const types = component_cfg?.types || {};    
+    const types = component_cfg?.types || {};
     if (types.templates?.length) {
       let template;
       if (selectedPlace.type) {
@@ -293,7 +290,7 @@ export default function Main({ core, config, actions, utils, record }) {
 
     if (!selectedPlace?.geom_wkt && !selectedPlace?.geom_ext) return;
 
-    if (selectedPlace?.geom_wkt) {      
+    if (selectedPlace?.geom_wkt) {
       const geom = getGeometryFromWKT(selectedPlace.geom_wkt);
       const srid = component_cfg?.geometrySRID || selectedPlace?.geom_srid || 4326;
 
@@ -303,7 +300,7 @@ export default function Main({ core, config, actions, utils, record }) {
       feature.setGeometry(geom);
       feature.setStyle(featureStyle);
       featuresLayer.current.getSource().addFeatures([feature]);
-    }  
+    }
   }, [selectedPlace]);
 
 
@@ -311,29 +308,37 @@ export default function Main({ core, config, actions, utils, record }) {
   return (
     <div ref={ref} className="layout-topbar-search-container">
       <span className="layout-topbar-search">
-          <InputText type="text"
+          <TextInput type="text" variant="unstyled"
             placeholder={ config.placeholder ? t(config.placeholder, config.placeholder, {"ns": "custom"}) : `${t("search", "Pesquisar")}...`}
+            aria-label={t("search", "Pesquisar")}
             value={filter}
             onFocus={(e) => setShowPlaces(true)}
             onChange={(e) => changeFilterFunc(e)} />
           { isLoading ?
-            <span className='layout-topbar-search-icon pi pi-spin pi-spinner' />
-            : filter ? <span className='layout-topbar-search-icon pi pi-times mouse-pointer'
+            <span className='layout-topbar-search-icon pi pi-spin pi-spinner' aria-hidden="true" />
+            : filter ? <UnstyledButton type="button" className='layout-topbar-search-icon pi pi-times'
               aria-label={t('clear', 'Limpar')}
               title={t('clear', 'Limpar')}
               onClick={e=>clearFilter()} />
-            : <span className='layout-topbar-search-icon pi pi-search' />
-          }          
+            : <span className='layout-topbar-search-icon pi pi-search' aria-hidden="true" />
+          }
       </span>
       {(showPlaces && places && places.length > 0 ?
         <div className="layout-topbar-search-results">
-          <ListBox
-              optionLabel={t("place", "Lugar")}
-              value={selectedPlace}
-              options={places}
-              itemTemplate={itemTemplate}
-              onChange={(e) => selectPlace(e)}
-          />
+          <Paper withBorder shadow="md" className="places-search-list">
+            <ul>
+              {places.map((place, i) => (
+                <li key={i}>
+                  <UnstyledButton type="button"
+                    className={"places-search-option" + (place === selectedPlace ? " selected" : "")}
+                    aria-current={place === selectedPlace || undefined}
+                    onClick={() => selectPlace(place)}>
+                    {itemTemplate(place)}
+                  </UnstyledButton>
+                </li>
+              ))}
+            </ul>
+          </Paper>
         </div> : null
       )}
     </div>
