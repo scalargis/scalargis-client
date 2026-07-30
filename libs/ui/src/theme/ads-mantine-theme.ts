@@ -255,9 +255,26 @@ export const adsBaseTheme = createTheme({
        that is never spawned inside a dialog. */
     Popover: { defaultProps: { zIndex: 6100 } },
     Menu: { defaultProps: { zIndex: 6100 } },
-    // Popover's centred `bottom` default makes x depend on the panel's own
-    // width, which Combobox measures as 0 while the dropdown is display:none.
-    Combobox: { defaultProps: { zIndex: 6100, position: 'bottom-start' } },
+    /* Popover's centred `bottom` default makes x depend on the panel's own
+       width, which Combobox measures as 0 while the dropdown is display:none —
+       hence bottom-start. Where it opens is then floating-ui's call: `flip`
+       sends it upward when the control is near the bottom edge (the footer CRS
+       select), `shift` keeps it inside the viewport.
+
+       `floatingStrategy: 'fixed'` is what stops the flicker. Under the default
+       'absolute' strategy the dropdown is portaled to <body> and positioned in
+       document coordinates, so on the frame before floating-ui measures it, it
+       EXTENDS the document: the viewport grows scrollbars, the map reflows, and
+       the whole viewer shudders before the dropdown lands. Positioned fixed it
+       is laid out against the viewport and can never grow the document. */
+    Combobox: {
+      defaultProps: {
+        zIndex: 6100,
+        position: 'bottom-start',
+        floatingStrategy: 'fixed',
+        middlewares: { flip: true, shift: true },
+      },
+    },
     HoverCard: { defaultProps: { zIndex: 6100 } },
   },
 

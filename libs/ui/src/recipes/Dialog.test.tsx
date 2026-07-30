@@ -45,6 +45,28 @@ describe('Dialog', () => {
     expect(screen.getByRole('button', { name: 'Maximize' })).toBeTruthy();
   });
 
+  /* Mantine's ModalContent copies `style`/`className` onto the inner wrapper as
+     well as the content. The inner is the flex ROW that centres the dialog, so
+     a `flexDirection: column` there flips `flex: 0 0 var(--modal-size)` from a
+     width basis to a height one: narrow dialog, maximize that only grows
+     downward, zero-height body (blank StreetView pano). The column must stay on
+     the content slot alone. */
+  it('does not leak the content column onto the inner wrapper', () => {
+    renderDialog(
+      <Dialog opened onClose={() => {}} title="Ajuda" size="50vw" height="80vh">
+        Corpo
+      </Dialog>
+    );
+
+    // The Modal is portaled, so it is not under the render container.
+    const content = document.querySelector('.mantine-Modal-content');
+    const inner = document.querySelector('.mantine-Modal-inner');
+
+    expect(content?.classList.contains('ads-dialog__content')).toBe(true);
+    expect(inner?.classList.contains('ads-dialog__content')).toBe(false);
+    expect((inner as HTMLElement).style.flexDirection).toBe('');
+  });
+
   it('has no maximize control unless asked, and close calls onClose', () => {
     const onClose = vi.fn();
     renderDialog(

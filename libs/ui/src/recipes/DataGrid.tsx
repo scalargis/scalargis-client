@@ -103,6 +103,11 @@ const ADS_DEFAULTS = {
 } as const satisfies Partial<DataTableProps<never>>;
 
 const ADS_CLASS_NAMES = {
+  // The root carries `container-type: inline-size`, so the pagination footer
+  // can reflow against the GRID's width rather than the viewport's: the same
+  // grid sits in a full-width backoffice page and in a ~300px viewer side
+  // panel, and only the latter needs the footer stacked. See ads-components.css.
+  root: 'ads-datagrid',
   header: 'ads-datagrid__header',
   pagination: 'ads-datagrid__pagination',
 } as const;

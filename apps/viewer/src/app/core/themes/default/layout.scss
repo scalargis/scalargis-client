@@ -198,7 +198,14 @@ body .p-dropdown {
 
 .layout-sidebar #content .content-root {
   overflow-y: auto;
-  height: calc(100%)
+  height: calc(100%);
+  // A box that scrolls on one axis clips on the other too (overflow-y:auto
+  // makes overflow-x compute to auto), and this one has no padding of its own,
+  // so anything flush with its edge loses the focus ring the ADS spec draws
+  // 2px outside the control (2px outline + 2px offset). The Coordinates result
+  // bar puts its buttons hard against the right edge; the inset buys the ring
+  // room to paint. #content, one level up, already has 5px and is fine.
+  padding-inline: 4px;
 }
 
 .layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #content {

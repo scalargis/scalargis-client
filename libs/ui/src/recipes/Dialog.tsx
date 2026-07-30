@@ -79,9 +79,17 @@ export function Dialog({
       {...rootProps}
     >
       {withOverlay && <Modal.Overlay />}
+      {/* The flex column MUST ride a per-slot class, never the plain `style`
+          prop: Mantine's ModalContent hands the same `style`/`className` to
+          BOTH the content and the inner wrapper, and the inner is the flex ROW
+          that centres the dialog. Turning it into a column makes the content's
+          `flex: 0 0 var(--modal-size)` a HEIGHT basis, so the dialog collapses
+          to shrink-to-fit width, maximize only grows downward, and the body
+          never distributes height (blank StreetView pano). `h` is a Box style
+          prop and reaches the content alone, so it is safe. */}
       <Modal.Content
         h={maximized ? undefined : height}
-        style={{ display: 'flex', flexDirection: 'column' }}
+        classNames={{ content: 'ads-dialog__content' }}
       >
         <Modal.Header>
           <Modal.Title>{title}</Modal.Title>

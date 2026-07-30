@@ -65,9 +65,19 @@ describe('notify', () => {
     );
   });
 
-  it('lets explicit options win over the defaults (persistent toast opt-in)', () => {
-    notify.error('Blocked', 'Action required', { autoClose: false });
-    expect(shown).toHaveBeenCalledWith(expect.objectContaining({ autoClose: false }));
+  it('lets an explicit duration win over the default', () => {
+    notify.error('Blocked', 'Action required', { autoClose: 12000 });
+    expect(shown).toHaveBeenCalledWith(expect.objectContaining({ autoClose: 12000 }));
+  });
+
+  // D33: an error toast that never leaves the screen. `autoClose: false` is off
+  // the type, and discarded here too so untyped JS call sites cannot bring it
+  // back — every toast dismisses itself.
+  it('refuses a sticky toast, falling back to the severity default', () => {
+    notify.error('Blocked', 'Action required', {
+      autoClose: false,
+    } as unknown as Parameters<typeof notify.error>[2]);
+    expect(shown).toHaveBeenCalledWith(expect.objectContaining({ autoClose: 5000 }));
   });
 
   it('always carries an icon — severity is never colour-alone (WCAG 1.4.1)', () => {

@@ -61,7 +61,7 @@ export default function SearchLayerForm(props) {
       setResults(new_results);
     }).catch(error => {
       console.log(error);
-      notify.error('Ocorreu um erro', 'Não foi possível realizar a pesquisa', { autoClose: false });
+      notify.error('Ocorreu um erro', 'Não foi possível realizar a pesquisa');
     }).finally(()=> props.setBlockedPanel(false));
   }
 

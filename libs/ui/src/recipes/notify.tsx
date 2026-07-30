@@ -39,16 +39,23 @@ const SEVERITY: Record<
   error: { color: 'danger', icon: <IconXCircle />, titleKey: 'notify.error', titleFallback: 'Error' },
 };
 
-export interface NotifyOptions extends Omit<NotificationData, 'message' | 'color'> {
-  /** Milliseconds before auto-dismiss. `false` keeps it until dismissed. */
-  autoClose?: number | false;
+export interface NotifyOptions
+  extends Omit<NotificationData, 'message' | 'color' | 'autoClose'> {
+  /** Milliseconds before auto-dismiss. There is no opt-out — see below. */
+  autoClose?: number;
 }
 
-/** How long a toast stays up. Every severity auto-dismisses — Prime's Toast
- *  does (life 3000 for all severities), and the 76 migrating call sites
- *  expect that; errors/warnings get longer to read. A toast that demands an
- *  action passes `{ autoClose: false }` explicitly. */
-const DEFAULT_AUTO_CLOSE: Record<NotifySeverity, number | false> = {
+/** How long a toast stays up. EVERY toast auto-dismisses, at every severity —
+ *  Prime's Toast did (life 3000 across the board) and the migrated call sites
+ *  expect it; errors and warnings just get longer to read.
+ *
+ *  A sticky toast is not on offer: `autoClose: false` is off the type AND
+ *  discarded at runtime below, because errors that never leave the screen are
+ *  what the Phase-3 smoke found (D33) and a type alone would not have stopped
+ *  the next call site from reintroducing it. A message that truly demands an
+ *  action wants a dialog, not a toast — `notify.show` remains the escape hatch
+ *  into Mantine's raw API for anything genuinely exceptional. */
+const DEFAULT_AUTO_CLOSE: Record<NotifySeverity, number> = {
   success: 3000,
   info: 3000,
   warn: 5000,
@@ -69,14 +76,21 @@ function show(
   const title = hasDetail ? summary : undefined;
   const message = hasDetail ? detail : summary ?? uiText(titleKey, titleFallback);
 
+  // autoClose is resolved AFTER the spread, so a stray `false` (from JS, or
+  // from a `any`-typed options bag) cannot bring the sticky toast back.
+  const autoClose =
+    typeof options.autoClose === 'number'
+      ? options.autoClose
+      : DEFAULT_AUTO_CLOSE[severity];
+
   return notifications.show({
     color,
     icon,
     title,
     message,
-    autoClose: DEFAULT_AUTO_CLOSE[severity],
     withBorder: true,
     ...options,
+    autoClose,
   });
 }
 

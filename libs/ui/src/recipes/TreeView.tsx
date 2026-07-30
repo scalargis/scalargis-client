@@ -36,6 +36,34 @@ import {
 
 import { IconChevronRight } from './icons';
 
+/* Mantine memoizes isNodeChecked/isNodeIndeterminate on a cache key of
+   JSON.stringify([value, data, checkedState]) — the WHOLE data array, on every
+   node of every render. A `label` that is a React element carries a circular
+   fiber reference, so that stringify throws ("Converting circular structure to
+   JSON") and takes the screen with it; even where it survives (production
+   elements may have no _owner) it serialises the entire tree per node.
+
+   Labels are ours to render anyway — the recipe owns renderNode — so Mantine
+   only ever sees values and shape, and the real labels ride a side map keyed by
+   value. Any consumer can hand us JSX labels (the PanelJSON tree does; the TOC
+   will) without knowing this.
+
+   TreeNodeData requires a label, so the twin carries the node's own value as a
+   plain string — serializable, and never rendered (renderNode reads the map). */
+type ShapeOnlyNode = { value: string; label: string; children?: ShapeOnlyNode[] };
+
+function splitLabels(
+  nodes: TreeNodeData[],
+  labels: Map<string, React.ReactNode>
+): ShapeOnlyNode[] {
+  return nodes.map((node) => {
+    labels.set(node.value, node.label);
+    const twin: ShapeOnlyNode = { value: node.value, label: node.value };
+    if (node.children?.length) twin.children = splitLabels(node.children, labels);
+    return twin;
+  });
+}
+
 export interface TreeViewProps
   extends Omit<TreeProps, 'renderNode' | 'data' | 'tree' | 'levelOffset'> {
   data: TreeNodeData[];
@@ -75,6 +103,11 @@ export function TreeView({
   });
   const controller = tree ?? internalTree;
 
+  const [shapeData, labels] = React.useMemo(() => {
+    const map = new Map<string, React.ReactNode>();
+    return [splitLabels(data, map), map] as const;
+  }, [data]);
+
   // Mantine's Tree binds Space and the Arrow keys but NOT Enter (9.4.1
   // TreeNode handleKeyDown), so a keyboard user can focus a row yet never
   // activate it — the kit 04 (2.1.1) gap recorded in qa/phase-1.md, and what
@@ -107,8 +140,13 @@ export function TreeView({
     elementProps,
     tree: t,
   }: RenderTreeNodePayload) => {
-    const checked = t.isNodeChecked(node.value);
-    const indeterminate = t.isNodeIndeterminate(node.value);
+    // Only ask in checkbox mode: a plain tree has no use for the answer, and
+    // these two are the memoized pair described at the top of the file.
+    const checked = checkboxes && t.isNodeChecked(node.value);
+    const indeterminate = checkboxes && t.isNodeIndeterminate(node.value);
+
+    // `node` is the shape-only twin, so the label comes back from the map.
+    const label = labels.get(node.value);
 
     const toggleChecked = () =>
       checked ? t.uncheckNode(node.value) : t.checkNode(node.value);
@@ -149,21 +187,21 @@ export function TreeView({
             // put aria-checked on the treeitem <li> where the ARIA pattern
             // wants it. Out of the tab order: the roving-tabindex treeitem
             // plus Space (checkOnSpace) is the keyboard surface.
-            aria-label={typeof node.label === 'string' ? node.label : String(node.value)}
+            aria-label={typeof label === 'string' ? label : String(node.value)}
             tabIndex={-1}
             onClick={(event: React.MouseEvent) => event.stopPropagation()}
             onChange={toggleChecked}
           />
         )}
 
-        <span>{node.label}</span>
+        <span>{label}</span>
       </Group>
     );
   };
 
   const treeElement = (
     <Tree
-      data={data}
+      data={shapeData}
       tree={controller}
       levelOffset={levelOffset}
       /* In checkbox mode, click and Space CHECK; expansion stays on the

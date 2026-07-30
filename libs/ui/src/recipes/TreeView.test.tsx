@@ -68,3 +68,37 @@ describe('TreeView — Enter activates the focused row', () => {
     expect(onKeyDown).toHaveBeenCalledTimes(1);
   });
 });
+
+/**
+ * Mantine keys its memoized isNodeChecked/isNodeIndeterminate on
+ * JSON.stringify([value, data, checkedState]), so a React-element `label`
+ * (circular via its fiber) used to throw "Converting circular structure to
+ * JSON" and take the screen down — the PanelJSON tree renders exactly such
+ * labels, and the TOC will. The recipe keeps labels out of the data Mantine
+ * sees; these pin that.
+ */
+describe('TreeView — React-element labels', () => {
+  const jsxData: TreeNodeData[] = [
+    {
+      value: 'europe',
+      label: <b>Europe</b>,
+      children: [{ value: 'pt', label: <a href="https://example.org">Portugal</a> }],
+    },
+  ];
+
+  it('renders them in a plain tree', () => {
+    renderTree(<TreeView data={jsxData} defaultExpandAll />);
+
+    expect(screen.getByText('Europe').tagName).toBe('B');
+    expect(screen.getByRole('link', { name: 'Portugal' })).toBeTruthy();
+  });
+
+  it('renders them in a checkbox tree, which still cascades', () => {
+    renderTree(<TreeView data={jsxData} checkboxes defaultExpandAll />);
+
+    // No string label to name the checkbox: it falls back to the node value.
+    fireEvent.keyDown(treeitemByValue('europe'), { key: 'Enter' });
+    expect(checkboxByName('europe').checked).toBe(true);
+    expect(checkboxByName('pt').checked).toBe(true);
+  });
+});

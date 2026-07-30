@@ -52,6 +52,29 @@
    outline:none, the ring above still applies on :focus-visible. Do NOT add
    rules that blanket-remove outlines. */
 
+/* ─── FOCUS RING ON A SIBLING (the four controls the rule above misses) ───
+   Switch, Chip, Rating and SegmentedControl hide their real <input> and paint
+   the ring on the SIBLING that stands in for it:
+
+     .input:focus-visible + .track { outline: 2px solid var(--mantine-primary-color-filled) }
+
+   The focused element is the input, not the sibling, so `:focus-visible`
+   above never matches the thing carrying the outline and the ring stays on
+   the brand hue (blue) instead of the ADS magenta. These are the only four
+   components in @mantine/core that do this — restate the colour for each.
+   -------------------------------------------------------------------- */
+.mantine-Switch-input:focus-visible + .mantine-Switch-track,
+.mantine-Chip-input:focus-visible + .mantine-Chip-label,
+.mantine-Rating-input:focus-visible + label {
+  outline-color: var(--ads-focus, #F408FC) !important;
+}
+
+/* SegmentedControl routes its ring through a custom property, so the colour
+   has to be replaced at the property, not at outline-color. */
+.mantine-SegmentedControl-input:focus-visible + .mantine-SegmentedControl-label {
+  --segmented-control-outline: 2px solid var(--ads-focus, #F408FC) !important;
+}
+
 /* ─── REDUCED MOTION (WCAG 2.3.3 / user preference) ──────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

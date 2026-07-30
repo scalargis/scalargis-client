@@ -27,6 +27,16 @@
   padding-inline-end: var(--button-padding-x);
 }
 
+/* ─── TimePicker (inside DateTimePicker) ───────────────────────────────
+   @mantine/dates clips the row that holds the hour/minute/second fields
+   (`.mantine-TimePicker-fieldsRoot { overflow: hidden }`), which eats the
+   ADS focus ring — drawn 2px OUTSIDE the field it belongs to. The fields
+   are laid out to fit, so nothing needs clipping here; let the ring out.
+   -------------------------------------------------------------------- */
+.mantine-TimePicker-fieldsRoot {
+  overflow: visible;
+}
+
 /* ─── DataGrid ─────────────────────────────────────────────────────────
    Prime's DataTable gives the header a tinted band; Mantine's table gives
    `th` nothing but `font-weight: bold`, so header and body read as one
@@ -54,6 +64,34 @@
   background-color: var(--mantine-color-neutral-0);
   border-top: 1px solid var(--mantine-color-neutral-2);
   font-size: var(--mantine-font-size-sm);
+}
+
+/* The pagination footer is one flex row — count, page-size selector, pages —
+   which needs ~500px to stay legible. mantine-datatable can stack it, but off
+   `paginationWrapBreakpoint`, a VIEWPORT media query: on a desktop screen it
+   never fires, so the same grid that reads fine on a backoffice page collapses
+   into four ragged lines inside the viewer's ~300px side panel.
+
+   The grid's own width is what matters, so ask the container, not the screen.
+   Nothing is hidden — the row simply breaks in two: count + page size above,
+   pages centred below. */
+.ads-datagrid {
+  container-type: inline-size;
+}
+
+@container (max-width: 520px) {
+  .ads-datagrid__pagination {
+    flex-wrap: wrap;
+    row-gap: var(--mantine-spacing-xs);
+  }
+
+  /* Full-width second row. The pages themselves may wrap too rather than
+     overflow, which is what a 25-page set does at panel width. */
+  .ads-datagrid__pagination .mantine-datatable-pagination-pages {
+    flex: 0 0 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }
 
 /* The onRowReorder grip handle: a real button (keyboard-liftable, global
@@ -194,9 +232,18 @@
 }
 
 /* ─── Dialog ───────────────────────────────────────────────────────────
-   The recipe's footer bar sits OUTSIDE Modal.Body's scroll region, pinned
-   to the dialog's bottom edge — Prime Dialog's `footer` contract.
+   The content column: header, scrolling body, pinned footer. This lives in
+   a class, not in the recipe's `style` prop, because Mantine's ModalContent
+   copies `style`/`className` onto the inner wrapper too — and the inner is
+   the flex ROW that centres the dialog (see the note in Dialog.tsx).
    -------------------------------------------------------------------- */
+.ads-dialog__content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The recipe's footer bar sits OUTSIDE Modal.Body's scroll region, pinned
+   to the dialog's bottom edge — Prime Dialog's `footer` contract. */
 .ads-dialog__footer {
   flex-shrink: 0;
   border-top: 1px solid var(--mantine-color-neutral-2);

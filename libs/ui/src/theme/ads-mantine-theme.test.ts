@@ -170,4 +170,16 @@ describe('overlay ladder (kit 03 §8)', () => {
       position: 'bottom-start',
     });
   });
+
+  // Under the default 'absolute' strategy the portaled dropdown is positioned
+  // in document coordinates, so for one frame it EXTENDS the document: the
+  // viewport grows scrollbars and the map shudders before floating-ui lands it.
+  // Fixed positioning cannot grow the document; flip/shift then choose the side
+  // by the space available, which is what the footer CRS select needs.
+  it('positions combobox dropdowns against the viewport, flipping on demand', () => {
+    expect(theme.components.Combobox?.defaultProps).toMatchObject({
+      floatingStrategy: 'fixed',
+      middlewares: { flip: true, shift: true },
+    });
+  });
 });
