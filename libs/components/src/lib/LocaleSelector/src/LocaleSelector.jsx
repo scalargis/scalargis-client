@@ -35,8 +35,9 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
         locales =locales.map(l => { return { label: l, value: l.toLowerCase() } });
       }
     } else {
+      const fallbackLocale = i18n.resolvedLanguage || i18n.language || 'pt';
       locales = [
-        { label: i18n.resolvedLanguage.toUpperCase(), value: i18n.resolvedLanguage }
+        { label: fallbackLocale.toUpperCase(), value: fallbackLocale }
       ]
     }
     return locales;
