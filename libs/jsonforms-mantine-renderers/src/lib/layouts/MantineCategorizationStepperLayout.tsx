@@ -5,16 +5,21 @@ import {
   and,
   categorizationHasCategory,
   deriveLabelForUISchemaElement,
+  getControlPath,
   isVisible,
   optionIs,
+  Paths,
   rankWith,
+  toDataPath,
   uiTypeIs,
   type Categorization,
   type Category,
   type RankedTester,
   type StatePropsOfLayout,
+  type UISchemaElement,
 } from '@jsonforms/core';
 import {
+  useJsonForms,
   withJsonFormsLayoutProps,
   withTranslateProps,
   type TranslateProps,
@@ -33,6 +38,30 @@ import { translateDefault } from '../util/i18nDefaults';
 const isStepperReadOnly = (uiSchemaOptions: Record<string, unknown>): boolean =>
   !uiSchemaOptions['showNavButtons'] ? false : !!uiSchemaOptions['stepperReadOnly'];
 
+/** Every data path a category writes to, so its errors can be told apart
+ *  from the other categories'. */
+const categoryDataPaths = (element: UISchemaElement, basePath: string): string[] => {
+  const paths: string[] = [];
+  const walk = (el: UISchemaElement | undefined) => {
+    if (!el) return;
+    const scope = (el as { scope?: string }).scope;
+    if (el.type === 'Control' && scope) {
+      paths.push(Paths.compose(basePath, toDataPath(scope)));
+    }
+    ((el as { elements?: UISchemaElement[] }).elements ?? []).forEach(walk);
+  };
+  walk(element);
+  return paths;
+};
+
+const pathHasError = (errorPaths: string[], dataPath: string): boolean =>
+  errorPaths.some(
+    (errorPath) =>
+      errorPath === dataPath ||
+      errorPath.startsWith(`${dataPath}.`) ||
+      errorPath.startsWith(`${dataPath}[`)
+  );
+
 export const mantineCategorizationStepperTester: RankedTester = rankWith(
   2,
   and(
@@ -49,10 +78,20 @@ export interface MantineCategorizationStepperLayoutRendererProps
   data: unknown;
 }
 
+/**
+ * Categorization as a wizard. Unlike the Prime renderer, a step with
+ * validation errors is marked instead of being shown as completed (D26).
+ *
+ * It marks, it does not block: Next stays enabled. A required field hidden
+ * by a rule is cleared by MantineInputControl (the lib's documented
+ * clear-on-hide deviation), which leaves an error nobody can fix — blocking
+ * navigation on it would trap the user in the form.
+ */
 export const MantineCategorizationStepperLayoutRenderer = (
   props: MantineCategorizationStepperLayoutRendererProps
 ) => {
   const [activeCategory, setActiveCategory] = useState<number>(0);
+  const { core } = useJsonForms();
 
   const {
     data,
@@ -98,6 +137,24 @@ export const MantineCategorizationStepperLayoutRenderer = (
     [categories, t]
   );
 
+  // D26: a step whose fields are invalid must not be shown as completed.
+  // The errors come from the core state; getControlPath turns each one into
+  // the data path of the field it belongs to — including the `required`
+  // errors, which AJV reports on the parent object with `missingProperty`.
+  const errorPaths = useMemo(
+    () => (core?.errors ?? []).map((error) => getControlPath(error)),
+    [core?.errors]
+  );
+  const invalidSteps = useMemo(
+    () =>
+      categories.map((category) =>
+        categoryDataPaths(category, path ?? '').some((dataPath) =>
+          pathHasError(errorPaths, dataPath)
+        )
+      ),
+    [categories, errorPaths, path]
+  );
+
   const previousButtonLabel = useMemo(
     () => translateDefault(t, locale, 'stepper.previous', { schema, uischema, path }),
     [t, locale, schema, uischema, path]
@@ -117,9 +174,21 @@ export const MantineCategorizationStepperLayoutRenderer = (
         mb="sm"
         size="sm"
       >
-        {categories.map((_, idx) => (
-          <Stepper.Step key={idx} label={stepLabels[idx]} />
-        ))}
+        {categories.map((_, idx) => {
+          // Invalid steps keep the number/check off and go danger-coloured,
+          // in every state — including the ones already walked past, which
+          // is where Mantine would otherwise paint a completed tick.
+          const invalidIcon = <i className="pi pi-exclamation-triangle" aria-hidden="true" />;
+          return (
+            <Stepper.Step
+              key={idx}
+              label={stepLabels[idx]}
+              color={invalidSteps[idx] ? 'danger' : undefined}
+              icon={invalidSteps[idx] ? invalidIcon : undefined}
+              completedIcon={invalidSteps[idx] ? invalidIcon : undefined}
+            />
+          );
+        })}
       </Stepper>
       <MantineLayoutRenderer {...childProps} key={safeCategory} />
       {appliedUiSchemaOptions.showNavButtons ? (

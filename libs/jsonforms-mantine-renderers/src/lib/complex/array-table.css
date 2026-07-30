@@ -1,0 +1,28 @@
+/* The table control dispatches a full Control per cell — that is how it
+   reuses every registered widget without a cells registry (mantineCells is
+   empty by design). A Control paints its own label, which in a table would
+   repeat the column header on every row, so the label is hidden VISUALLY
+   ONLY: it stays in the DOM, and with it the <label for> that gives the
+   input its accessible name. `display: none` would take it out of the
+   accessibility tree too — that is the whole point of the clip-path. */
+.ads-jf-cell :is(
+    .mantine-InputWrapper-label,
+    .mantine-Checkbox-label,
+    .mantine-Switch-label,
+    .mantine-Radio-label
+  ) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Cells size to their content; the row grows when an error text appears
+   under a field rather than clipping it. */
+.ads-jf-array-table td {
+  vertical-align: top;
+}

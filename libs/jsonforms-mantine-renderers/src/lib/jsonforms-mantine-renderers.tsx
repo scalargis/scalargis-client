@@ -2,9 +2,8 @@
    jsonforms-mantine-renderers — the Mantine twin of
    libs/jsonforms-primereact-renderers (migration2 plan §1d).
 
-   Same registered renderer set, same testers, same ranks; Mantine
-   widgets themed by the ADS base theme (@scalargis/ui). Behavioural
-   contracts carried over from the Prime lib:
+   Same testers and ranks; Mantine widgets themed by the ADS base theme
+   (@scalargis/ui). Behavioural contracts carried over from the Prime lib:
 
    - a control hidden by a rule CLEARS its value (MantineInputControl);
    - '' / empty selections store undefined, never '' or [];
@@ -15,7 +14,14 @@
    /demo-ext/jsonforms-mantine and qa/phase-1.md):
    - `options.multi` renders a real Textarea;
    - label/error/aria wiring is native to every Mantine input;
-   - layout/label/divider renderers honour `visible`.
+   - layout/label/divider renderers honour `visible`;
+   - arrays actually render (qa/phase-3.md D16/D17): the Prime lib's array
+     control was a `TODO:` stub left out of its registry, and its array
+     layout a registered stub, so object arrays showed "No applicable
+     renderer found" or the raw TODO text. Here they are a table control
+     and an accordion detail layout;
+   - the stepper marks a step that has validation errors instead of
+     showing it as completed (D26).
 
    The Prime lib retired in Phase 3 cluster B, when the viewer's JsonForm
    module (its last consumer) switched to this set.
@@ -27,6 +33,8 @@ import type {
 } from '@jsonforms/core';
 
 import {
+  MantineArrayControlRenderer,
+  mantineArrayControlTester,
   MantineEnumArrayRenderer,
   mantineEnumArrayRendererTester,
   MantineEnumArraySelectRenderer,
@@ -111,6 +119,10 @@ export const mantineRenderers: JsonFormsRendererRegistryEntry[] = [
   },
   { tester: mantineRadioGroupControlTester, renderer: MantineRadioGroupControl },
   { tester: mantineTextControlTester, renderer: MantineTextControl },
+  // complex: object/primitive arrays in a table. Rank 3, so the array
+  // layout below (rank 4) still takes the ones with a detail uischema, and
+  // JsonForm's own format=photo/file array renderers (rank 4) still win.
+  { tester: mantineArrayControlTester, renderer: MantineArrayControlRenderer },
   // layouts
   { tester: mantineGroupTester, renderer: MantineGroupLayout },
   { tester: mantineHorizontalLayoutTester, renderer: MantineHorizontalLayout },

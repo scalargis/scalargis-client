@@ -9,6 +9,7 @@
 
 import { useState } from 'react';
 import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 import { JsonForms } from '@jsonforms/react';
 import type { JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -25,19 +26,23 @@ interface HarnessProps {
 function Harness({ schema, uischema, initialData = {}, onData }: HarnessProps) {
   const [data, setData] = useState<Record<string, unknown>>(initialData);
   return (
+    // ModalsProvider because the array renderers confirm a row deletion
+    // through the shared confirm() recipe, which opens a managed modal.
     <MantineProvider>
-      <JsonForms
-        schema={schema}
-        uischema={uischema}
-        data={data}
-        renderers={mantineRenderers}
-        cells={mantineCells}
-        validationMode="ValidateAndShow"
-        onChange={({ data: next }) => {
-          setData(next);
-          onData?.(next);
-        }}
-      />
+      <ModalsProvider>
+        <JsonForms
+          schema={schema}
+          uischema={uischema}
+          data={data}
+          renderers={mantineRenderers}
+          cells={mantineCells}
+          validationMode="ValidateAndShow"
+          onChange={({ data: next }) => {
+            setData(next);
+            onData?.(next);
+          }}
+        />
+      </ModalsProvider>
     </MantineProvider>
   );
 }
@@ -291,5 +296,173 @@ describe('mantineRenderers registry dispatch', () => {
     );
 
     expect(screen.getByLabelText('Notes').tagName).toBe('TEXTAREA');
+  });
+});
+
+/* The array renderers are new in this lib — the Prime twin registered no
+   array control at all, and its array layout was a `TODO:` stub, so both
+   shapes below used to reach the user as an error message (D16/D17). */
+describe('array renderers', () => {
+  const tableSchema: JsonSchema = {
+    type: 'object',
+    properties: {
+      layers: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['title'],
+          properties: {
+            title: { type: 'string' },
+            visible: { type: 'boolean' },
+          },
+        },
+      },
+    },
+  };
+  const tableUiSchema = {
+    type: 'VerticalLayout',
+    elements: [control('#/properties/layers')],
+  } as UISchemaElement;
+
+  it('renders an object array as a table: a column per property, a row per item', () => {
+    render(
+      <Harness
+        schema={tableSchema}
+        uischema={tableUiSchema}
+        initialData={{ layers: [{ title: 'OSM', visible: true }, { title: 'Aerial' }] }}
+      />
+    );
+
+    expect(screen.getByRole('columnheader', { name: /Title/ })).toBeTruthy();
+    expect(screen.getByRole('columnheader', { name: /Visible/ })).toBeTruthy();
+    // Header row + one row per item.
+    expect(screen.getAllByRole('row')).toHaveLength(3);
+    // Each cell keeps the control's label: hidden by CSS, but still the
+    // input's accessible name — and each row's label points at its own input.
+    const titles = screen.getAllByLabelText(/Title/);
+    expect(titles).toHaveLength(2);
+    expect(titles[0]).not.toBe(titles[1]);
+    expect(screen.queryByText(/No applicable renderer/)).toBeNull();
+  });
+
+  it('adds a row, and removes one only after the confirmation is accepted', async () => {
+    render(
+      <Harness
+        schema={tableSchema}
+        uischema={tableUiSchema}
+        initialData={{ layers: [{ title: 'OSM' }] }}
+      />
+    );
+
+    // JSONForms' own default for addTooltip is "Add to <label>".
+    fireEvent.click(screen.getByRole('button', { name: /Add/ }));
+    await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(3));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete 1' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Yes' }));
+    await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+  });
+
+  it('renders the empty array as a message, not an empty table', () => {
+    render(<Harness schema={tableSchema} uischema={tableUiSchema} initialData={{ layers: [] }} />);
+
+    expect(screen.getByText('No data')).toBeTruthy();
+    expect(screen.queryByRole('table')).toBeNull();
+  });
+
+  it('renders an array with an options.detail uischema as accordion panels', () => {
+    render(
+      <Harness
+        schema={{
+          type: 'object',
+          properties: {
+            contacts: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  email: { type: 'string' },
+                },
+              },
+            },
+          },
+        }}
+        uischema={{
+          type: 'VerticalLayout',
+          elements: [
+            control('#/properties/contacts', {
+              detail: {
+                type: 'HorizontalLayout',
+                elements: [control('#/properties/name'), control('#/properties/email')],
+              },
+            }),
+          ],
+        } as UISchemaElement}
+        initialData={{ contacts: [{ name: 'Ana', email: 'ana@example.pt' }] }}
+      />
+    );
+
+    // The stub this replaced printed its own name on the page.
+    expect(screen.queryByText(/TODO/)).toBeNull();
+    // Panel titled by the item's first primitive property, holding the detail.
+    expect(screen.getByRole('button', { name: 'Ana' })).toBeTruthy();
+    expect(screen.getByLabelText('Name')).toBeTruthy();
+    expect(screen.getByLabelText('Email')).toBeTruthy();
+  });
+});
+
+describe('categorization stepper', () => {
+  const stepperUiSchema = {
+    type: 'Categorization',
+    options: { variant: 'stepper', showNavButtons: true },
+    elements: [
+      { type: 'Category', label: 'Personal', elements: [control('#/properties/name')] },
+      { type: 'Category', label: 'Notes', elements: [control('#/properties/notes')] },
+    ],
+  } as unknown as UISchemaElement;
+
+  const stepperSchema: JsonSchema = {
+    type: 'object',
+    required: ['name'],
+    properties: { name: { type: 'string' }, notes: { type: 'string' } },
+  };
+
+  it('marks the step whose fields are invalid instead of completing it, and still lets Next through', async () => {
+    const { container } = render(
+      <Harness schema={stepperSchema} uischema={stepperUiSchema} initialData={{}} />
+    );
+
+    const next = screen.getByRole('button', { name: 'Next' });
+    expect((next as HTMLButtonElement).disabled).toBe(false);
+
+    // Walk past the step with the missing required field: Mantine would
+    // otherwise tick it as completed (D26).
+    fireEvent.click(next);
+    await waitFor(() => expect(screen.getByLabelText('Notes')).toBeTruthy());
+
+    const steps = container.querySelectorAll('.mantine-Stepper-step');
+    // Mantine paints a step behind the active one as completed; the invalid
+    // one goes danger-coloured and swaps the tick for a warning icon (which
+    // rides in a Transition, hence the wait).
+    expect(steps[0].getAttribute('style')).toContain('danger');
+    await waitFor(() =>
+      expect(steps[0].querySelector('.pi-exclamation-triangle')).toBeTruthy()
+    );
+    expect(steps[1].getAttribute('style') ?? '').not.toContain('danger');
+  });
+
+  it('leaves a valid step unmarked', () => {
+    const { container } = render(
+      <Harness
+        schema={stepperSchema}
+        uischema={stepperUiSchema}
+        initialData={{ name: 'Ana' }}
+      />
+    );
+
+    const steps = container.querySelectorAll('.mantine-Stepper-step');
+    expect(steps[0].querySelector('.pi-exclamation-triangle')).toBeNull();
+    expect(steps[0].getAttribute('style') ?? '').not.toContain('danger');
   });
 });
