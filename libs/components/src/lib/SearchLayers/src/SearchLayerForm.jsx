@@ -72,7 +72,7 @@ export default function SearchLayerForm(props) {
           size="xs"
           leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
           onClick={e => { goPanelSearchPrev(); }}>
-          Voltar
+          {i18n.translateValue("back", "Voltar")}
         </Button>
       </div>}
 
@@ -125,7 +125,7 @@ export default function SearchLayerForm(props) {
 
               if (layer && layer.current) layer.current.getSource().clear();
             }}>
-            Limpar
+            {i18n.translateValue("clear", "Limpar")}
           </Button>
           <Button onClick={async (e) => {
               if (formErrors[id]?.length) return;
@@ -205,7 +205,7 @@ export default function SearchLayerForm(props) {
               doSearch(0, null, data, sort);
 
           }}>
-            Pesquisar
+            {i18n.translateValue("search", "Pesquisar")}
           </Button>
         </Group>
 
@@ -213,7 +213,7 @@ export default function SearchLayerForm(props) {
           <Alert color="informative" py="xs" mt="lg">
             <Group justify="center" gap="xs" wrap="nowrap">
               <i className="pi pi-info-circle" aria-hidden="true" />
-              <span>Pesquisa sem resultados</span>
+              <span>{i18n.translateValue("noResultsFound", "Pesquisa sem resultados")}</span>
             </Group>
           </Alert>
         }

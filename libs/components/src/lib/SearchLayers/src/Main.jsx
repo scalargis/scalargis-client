@@ -65,7 +65,18 @@ export default function Main(props) {
   const layer = useRef();
 
   const [blockedPanel, setBlockedPanel] = useState(false);
-  const [layers, setLayers] = useState(component_cfg.layers || []);
+  const [layers, setLayers] = useState(() => {
+    if (component_cfg?.use_layers_datatables === true) {
+      return (viewer?.config_json?.layers || []).filter(l => l.datatable).map(l => {
+        return {
+          title: l.title,
+          description: l.description,
+          ...l.datatable
+        }
+      });
+    }
+    return component_cfg.layers || [];
+  });
 
 
   const component_store_state = useSelector((state) => {
@@ -107,6 +118,7 @@ export default function Main(props) {
           config={config}
           layer={layer}
           layers={layers}
+          setLayers={setLayers}
           actions={actions}
           pubsub={core.pubsub}
           dispatch={dispatch}
