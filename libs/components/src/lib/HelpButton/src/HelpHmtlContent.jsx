@@ -19,23 +19,32 @@ export default function HelpHtmlContent({ config }) {
     html = config?.html || "";
   }
 
-  useEffect(() => {    
-    if (config.url) {
-      const url = lang ? 
-        config.url.replace("{lang}", lang).replace("{language}", lang)
-        : config.url;
-      
-      fetch(url).then(res => {
-          return res.text();
-      }).then(result => {
-          setDialogContent(result);
-      }).catch(error => {        
-          console.log('error', error);
-          setDialogContent(html);
-      })
-    } else {
+  useEffect(() => {
+    if (!config.url) {
       setDialogContent(html);
-    }    
+      return;
+    }
+
+    const url = lang ?
+      config.url.replace("{lang}", lang).replace("{language}", lang)
+      : config.url;
+
+    // See the twin in PanelHtmlContent: the fetch is aborted on unmount, so the
+    // StrictMode remount stops asking for the help file twice and a late answer
+    // cannot set state on a component that is gone.
+    const controller = new AbortController();
+
+    fetch(url, { signal: controller.signal })
+      .then(res => res.text())
+      .then(result => {
+        setDialogContent(result);
+      })
+      .catch(error => {
+        if (error.name === 'AbortError') return;
+        setDialogContent(html);
+      })
+
+    return () => controller.abort();
   }, []);
 
   return (

@@ -20,12 +20,15 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
   const { exclusive_mapcontrol } = viewer;
   const coordinates_control = viewer.config_json.map_controls.find(c => c.id === 'Coordinates');
-  const coordinatesActive = coordinates_control ? coordinates_control.active : false;
+  const coordinatesActive = !!coordinates_control?.active;
   const feature_info_control = viewer.config_json.map_controls.find(c => c.id === 'FeatureInfo');
-  const featureInfoActive = feature_info_control ? feature_info_control.active : false;
+  const featureInfoActive = !!feature_info_control?.active;
   const geo_location_control = viewer.config_json.map_controls.find(c => c.id === 'GeoLocation');
-  const geoLocationActive = geo_location_control ? geo_location_control.active : false;
-  const geoLocationTracking = geo_location_control ? geo_location_control.tracking : false;
+  // Coerced, not just defaulted - see the same lines in GeoLocation.jsx: a
+  // control declared without a tracking key fed `checked={undefined}` to the
+  // Mantine Checkbox, which is the uncontrolled-to-controlled React warning.
+  const geoLocationActive = !!geo_location_control?.active;
+  const geoLocationTracking = !!geo_location_control?.tracking;
   const geo_location_component = viewer?.config_json?.components?.length ? viewer.config_json.components.find(c => c.config_json &&
     c.config_json.map_control === 'GeoLocation') : null;
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, viewer_set_exclusive_mapcontrol } = actions;

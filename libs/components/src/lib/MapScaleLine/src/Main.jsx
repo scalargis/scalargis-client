@@ -1,28 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import OlScaleLine from 'ol/control/ScaleLine';
 import './style.css'
 
 export default function Main({ config, actions }) {
-  const { viewer, mainMap, dispatch, Models } = config;
-  const { MapModel } = Models;
-  const { getResolutionForScale, getScaleForResolution } = MapModel;
+  const { mainMap } = config;
 
-  const [scaleLineControl, setScaleLineControl] = useState(null);
+  const targetRef = useRef(null);
 
-  useEffect(()=>{
-    if (!mainMap) return;
+  useEffect(() => {
+    if (!mainMap || !targetRef.current) return;
+
     const scaleLineControl = new OlScaleLine({
-      target: document.getElementById('mapscale-line')
-      //bar: true,
-      //text: true
+      target: targetRef.current
     });
     mainMap.addControl(scaleLineControl);
-    setScaleLineControl(scaleLineControl)
-  }, []);
+
+    // The control appends its bar into the target and stays on the map until it
+    // is removed. Without this, every remount added another one - which in dev is
+    // every mount, since StrictMode mounts twice - and the footer showed two
+    // stacked scale bars.
+    return () => mainMap.removeControl(scaleLineControl);
+  }, [mainMap]);
 
   return (
     <div className="mapscale-line">
-        <div id="mapscale-line" />
+        <div ref={targetRef} />
     </div>
     );
 }

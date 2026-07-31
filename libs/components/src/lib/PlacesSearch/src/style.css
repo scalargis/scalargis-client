@@ -1,4 +1,20 @@
+/*
+ * The topbar sass (_topbar.scss) styles `.layout-topbar .layout-topbar-icons button`
+ * at (0,2,1) with color:#fff, display:inline-block and margin-left:20px. It was
+ * written when the only buttons in the topbar WERE topbar buttons - but the search
+ * box now has real buttons of its own (each result option, and the clear X), so
+ * every rule here that has to beat it carries the full topbar prefix. Same reason
+ * the input rules name the slot class: Mantine's own input styles land on the
+ * element and the plain (0,1,0) class would lose to the sass.
+ */
+
 .layout-topbar .layout-topbar-icons .layout-topbar-search-container {
+  /* The results panel below is absolutely positioned. Without this, its containing
+     block is the initial one (layout.scss resets .layout-topbar to position:unset),
+     so it laid itself out past the right edge of the viewport, #root grew a
+     horizontal scroll area and the 100%-wide map no longer covered it: that was
+     the white band to the right of the map. */
+  position: relative;
   text-align: right;
 }
 
@@ -16,64 +32,87 @@
   margin-left: 0px;
 }
 
-.layout-topbar .layout-topbar-icons .layout-topbar-search input {
-  font-size: 1.1rem !important;
-  width: 155px !important;
-  padding: 1px 34px 1px 1px !important;
-
-  @media screen and (max-width: 768px) {
-    width: 120px !important;
-  }  
+/* Mantine wraps the input in two block divs; the topbar expects the bare inline
+   input Prime gave it, and the magnifier is positioned in absolute against that. */
+.layout-topbar .layout-topbar-icons .layout-topbar-search .places-search-input-root,
+.layout-topbar .layout-topbar-icons .layout-topbar-search .places-search-input-wrapper {
+  display: inline-block;
+  width: auto;
+  min-height: 0;
 }
 
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search input {
-  width: 100% !important;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.87);
-  color: rgba(0, 0, 0, 0.87);
+.layout-topbar .layout-topbar-icons .layout-topbar-search input.places-search-input {
+  font-size: 1.1rem;
+  width: 155px;
+  /* Mantine sizes inputs by --input-height (≈37px at size md); the topbar strip
+     is 50px tall with padding, and the icon sits at top:2px against a ~20px box. */
+  height: auto;
+  min-height: 0;
+  line-height: normal;
+  padding: 1px 34px 1px 1px;
+  border: 0 none;
+  border-bottom: 2px solid #ffffff;
+  border-radius: 0;
+  background: transparent;
+  color: #ffffff;
 }
 
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search:hover input {
-    border-bottom-color: #000;
-}
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search input::-webkit-input-placeholder {
-  color: #6d6d6d !important;
-}  
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search input:-moz-placeholder { /* Firefox 18- */
-  color: #6d6d6d !important;  
-}   
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search input::-moz-placeholder {  /* Firefox 19+ */
-  color: #6d6d6d !important;  
-}   
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search input:-ms-input-placeholder {  
-  color: #6d6d6d !important;  
+@media screen and (max-width: 768px) {
+  .layout-topbar .layout-topbar-icons .layout-topbar-search input.places-search-input {
+    width: 120px;
+  }
 }
 
 .layout-topbar .layout-topbar-icons .layout-topbar-search .layout-topbar-search-icon {
   top: 2px;
-}
-
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search:hover .layout-topbar-search-icon {
-  color: rgba(0, 0, 0, 0.87);
+  margin-left: 0;
 }
 
 .layout-topbar .layout-topbar-icons .layout-topbar-search .layout-topbar-search-icon.mouse-pointer {
   cursor: pointer;
 }
 
+/* Results panel - the Prime ListBox chrome restated on the Mantine structure */
 .layout-topbar .layout-topbar-icons .layout-topbar-search-results {
   position: absolute;
-  margin-top: 5px; 
-  margin-right: 5px;  
+  right: 0;
+  margin-top: 5px;
   z-index: 10;
-
-  @media screen and (min-width: 450px) {
-    margin-left: 20px;
-  }  
 }
 
-.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search-results {
-  left: 0;
-  margin-right: 0;
+.layout-topbar .layout-topbar-icons .places-search-list {
+  min-width: 185px;
+  max-height: 250px;
+  overflow-y: auto;
+  background: #ffffff;
+  color: #495057;
+}
+
+.layout-topbar .layout-topbar-icons .places-search-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.layout-topbar .layout-topbar-icons .places-search-option {
+  display: block;
+  width: 100%;
+  /* the sass gives every topbar button 20px of left margin; on a 100%-wide option
+     that is what overflowed the panel and grew it a horizontal scrollbar */
+  margin: 0;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  color: #495057;
+}
+
+.layout-topbar .layout-topbar-icons .places-search-option:hover {
+  /* the sass hover paints topbar buttons #c3e8fb, unreadable on the panel */
+  background: #e9ecef;
+  color: #495057;
+}
+
+.layout-topbar .layout-topbar-icons .places-search-option.selected {
+  background: #e3f2fd;
 }
 
 .layout-topbar .layout-topbar-icons .layout-topbar-search-results .place-list-item {
@@ -83,38 +122,36 @@
 .layout-topbar .layout-topbar-icons .layout-topbar-search-results .place-list-item > i {
   float: left;
 }
+
 .layout-topbar .layout-topbar-icons .layout-topbar-search-results .place-list-item > span {
   display: block;
   margin-left: 23px;
 }
 
-/* Results panel - the Prime ListBox chrome restated on the Mantine structure */
-.places-search-list {
-  min-width: 185px;
-  max-height: 250px;
-  overflow: auto;
-  background: #ffffff;
-  color: #495057;
-}
-
-.places-search-list ul {
-  list-style: none;
-  margin: 0;
-  padding: 0.5rem 0;
-}
-
-.places-search-option {
-  display: block;
+/*
+ * Mobile: the topbar collapses its items into a Prime Menu popup, which is a
+ * light surface - the search goes dark-on-light there. These come last so they
+ * win the ties against the desktop rules above.
+ */
+.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search input.places-search-input {
   width: 100%;
-  text-align: left;
-  padding: 0.5rem 1rem;
-  color: inherit;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.87);
+  color: rgba(0, 0, 0, 0.87);
 }
 
-.places-search-option:hover {
-  background: #e9ecef;
+.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search:hover input.places-search-input {
+  border-bottom-color: #000;
 }
 
-.places-search-option.selected {
-  background: #E3F2FD;
+.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search input.places-search-input::placeholder {
+  color: #6d6d6d;
+}
+
+.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search:hover .layout-topbar-search-icon {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search-results {
+  left: 0;
+  right: auto;
 }

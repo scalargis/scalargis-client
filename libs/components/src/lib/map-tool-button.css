@@ -3,7 +3,13 @@
     0 1px 5px 0 rgb(0 0 0 / 12%);
 }
 
-.map-tool-btn.active,
+/* Active is a state the user must read at a glance against the map behind it,
+   so it goes solid; hover/focus keep the translucent tone, which is what makes
+   the two states tellable apart on an already-active button. */
+.map-tool-btn.active {
+  background-color: #673ab7;
+}
+
 .map-tool-btn:hover,
 .map-tool-btn:focus-visible {
   background-color: rgba(103, 58, 183, 0.76);

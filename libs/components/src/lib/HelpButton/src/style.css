@@ -7,3 +7,39 @@
     transition: color 0.2s;
     overflow: visible;
 }
+
+/*
+ * The external help used to be a <button> wrapping an <a>, so the topbar sass -
+ * which styles `button` and nothing else - gave it the 20px gap, the 2em icon and
+ * a hidden label. Unnesting that pair into one real anchor (no interactive inside
+ * interactive) left the anchor matching no rule at all: the label showed, glued to
+ * the icon and to the border. Same chrome, restated for the anchor.
+ */
+.layout-topbar .layout-topbar-icons a.sg-help-button-external {
+  position: relative;
+  margin-left: 20px;
+  display: inline-block;
+  text-decoration: none;
+  overflow: visible;
+  transition: color 0.2s;
+}
+
+.layout-topbar .layout-topbar-icons a.sg-help-button-external:hover {
+  color: #c3e8fb;
+}
+
+.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-icon {
+  font-size: 2em;
+}
+
+/* The sass hid this label with display:none, which also takes it out of the
+   accessibility tree and leaves the link named only by its title attribute.
+   Clipping hides it on screen and keeps the name. */
+.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-item-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}

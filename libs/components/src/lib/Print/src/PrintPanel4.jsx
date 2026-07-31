@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation} from "react-i18next";
-import { Alert, Button, Group } from '@mantine/core';
+import { Alert, Button, Group, Loader } from '@mantine/core';
 import { notify } from '@scalargis/ui';
 
 import './style.css';
@@ -252,7 +252,7 @@ export default function PrintPanel4(props) {
                 <div key={print.uuid || index} className="grid">
                   <div className="col-fixed" style={{ width: '30px' }}>
                     <div className="pl-2">
-                      <i className={print.processed ? 'pi pi-check print-success' : 'pi pi-spin pi-spinner'}></i>
+                      { print.processed ? <i className="pi pi-check print-success"></i> : <Loader size="xs" /> }
                     </div>
                   </div>
                   <div className="col">
@@ -265,7 +265,7 @@ export default function PrintPanel4(props) {
                 <div key={print.uuid || index} className="grid">
                   <div className="col-fixed" style={{ width: '30px' }}>
                     <div className="pl-2">
-                      <i className={print.processed ? 'pi pi-check print-success' : 'pi pi-spin pi-spinner'}></i>
+                      { print.processed ? <i className="pi pi-check print-success"></i> : <Loader size="xs" /> }
                     </div>
                   </div>
                   <div className="col-9">

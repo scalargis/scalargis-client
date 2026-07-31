@@ -637,8 +637,12 @@ export default function Coordinates({ core, config, actions, dispatch, record })
             </div>
           }
           { units === 'dms' &&
+            // Full-width rows, not the md:col-6 halves the decimal form uses: the
+            // side panel is ~330px, so a half leaves ~85px next to the hemisphere
+            // select - not enough for the select to show its letter, let alone for
+            // the field to show a "008º 30' 15.00''".
             <div className="grid formgrid">
-              <div className="field col-12 md:col-6">
+              <div className="field col-12">
                 <label>{t("longitude", "Longitude")}</label>
                 <Group gap={0} wrap="nowrap">
                   <NativeSelect
@@ -646,7 +650,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                     onChange={e => setOptLongitude(e.target.value)}
                     data={['E', 'W']}
                     aria-label={t("longitude", "Longitude")}
-                    w={64}
+                    w={72}
                   />
                   <TextInput
                     value={coordLon || ''}
@@ -657,7 +661,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                   />
                 </Group>
               </div>
-              <div className="field col-12 md:col-6">
+              <div className="field col-12">
                 <label>{t("latitude", "Latitude")}</label>
                 <Group gap={0} wrap="nowrap">
                   <NativeSelect
@@ -665,7 +669,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                     onChange={e => setOptLatitude(e.target.value)}
                     data={['N', 'S']}
                     aria-label={t("latitude", "Latitude")}
-                    w={64}
+                    w={72}
                   />
                   <TextInput
                     value={coordLat || ''}

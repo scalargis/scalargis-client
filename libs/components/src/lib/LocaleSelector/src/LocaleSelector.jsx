@@ -4,7 +4,7 @@ import { Select, UnstyledButton } from '@mantine/core';
 
 import './style.css';
 
-const defaultMode = 'dropddown';
+const defaultMode = 'dropdown';
 
 
 export default function LocaleSelector({ type, config, actions, componentConfig, className }) {
@@ -28,7 +28,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
     }
     if (locales?.length) {
       if (typeof locales[0] === 'object') {
-        locales = locales.map(l => { return { label: String(l), value: l.values } });
+        locales = locales.map(l => { return { label: l.label ?? String(l.value ?? l.values ?? ''), value: l.value ?? l.values } });
       } else {
         locales =locales.map(l => { return { label: l, value: l.toLowerCase() } });
       }
@@ -93,11 +93,20 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
     );
   }
 
+  // Wide enough for the longest label and no wider: configs carry siglas ("PT"),
+  // where a fixed width ate the topbar, but nothing stops one carrying
+  // "Português", which a sigla-sized box would clip. 44px covers the chevron and
+  // the input's own padding.
+  const selectWidth = useMemo(() => {
+    const longest = localesList.reduce((max, item) => Math.max(max, String(item.label ?? '').length), 2);
+    return `calc(${longest}ch + 44px)`;
+  }, [localesList]);
+
   const select = (
     <Select
       className={className ? `locale-selector ${className}` : 'locale-selector'}
       size="xs"
-      w={86}
+      w={selectWidth}
       variant="unstyled"
       data={localesList.map(item => ({ value: String(item.value), label: String(item.label) }))}
       value={locale.toLowerCase()}

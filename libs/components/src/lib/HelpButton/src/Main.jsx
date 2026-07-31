@@ -206,7 +206,7 @@ export default function Main({ type, as, config, actions, record }) {
         target="_blank"
         rel="noreferrer"
         title={title}
-        className={component_cfg?.elementType === 'link' ? "p-link sg-help-button-link" : "p-link"}
+        className={component_cfg?.elementType === 'link' ? "p-link sg-help-button-link" : "p-link sg-help-button-external"}
         style={{"color": "#ffffff"}}
       >
         { component_cfg?.elementType !== 'link' &&

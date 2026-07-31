@@ -1,7 +1,10 @@
+/* The 100px came from the Prime input's metrics; Mantine's is roomier inside,
+   so a "1:279734" lost its last digit. Wider box, tighter horizontal padding. */
 .footer-right .mapscale-input input {
-  max-width: 100px;
-  min-width: 100px;
+  max-width: 120px;
+  min-width: 120px;
   line-height: 10px;
   height: 30px;
   min-height: 30px;
+  padding-inline: 6px;
 }

@@ -32,6 +32,7 @@ export default function Main({ core, config, actions, record }) {
 
   const mousePositionControlRef = useRef();
   const cursorRef = useRef();
+  const lastPointerEventRef = useRef(null);
 
   const invalid_extent_message = t(record?.config_json?.invalid_extent_message) || '';
 
@@ -58,6 +59,28 @@ export default function Main({ core, config, actions, record }) {
       setListCRS(crs_filtered);
     }
   }, []);
+
+  // Remember where the pointer last was over the map. OpenLayers' MousePosition
+  // only ever paints from a pointermove, so a control built after a CRS change
+  // has nothing to show until the user happens to move the mouse again - the
+  // readout just went blank. Keeping the last event lets us hand it straight back
+  // to the new control below. Cleared when the pointer leaves the map, so we
+  // never repaint a coordinate for a cursor that is no longer there.
+  useEffect(() => {
+    if (!mainMap) return;
+
+    const viewport = mainMap.getViewport();
+    const onPointerMove = (evt) => { lastPointerEventRef.current = evt; };
+    const onPointerOut = () => { lastPointerEventRef.current = null; };
+
+    viewport.addEventListener('pointermove', onPointerMove);
+    viewport.addEventListener('pointerout', onPointerOut);
+
+    return () => {
+      viewport.removeEventListener('pointermove', onPointerMove);
+      viewport.removeEventListener('pointerout', onPointerOut);
+    }
+  }, [mainMap]);
 
   useEffect(() => {
     const selected = listCRS.find(v => v.srid === display_crs);
@@ -99,6 +122,15 @@ export default function Main({ core, config, actions, record }) {
     mainMap.addControl(mousePosition);
 
     mousePositionControlRef.current = mousePosition;
+
+    // Repaint straight away in the new system, from where the cursor already is,
+    // instead of leaving the readout empty until the next mouse move. Feeding the
+    // control its own handler keeps this to the control alone - re-dispatching a
+    // pointermove on the viewport would wake every other map listener too.
+    const lastPointerEvent = lastPointerEventRef.current;
+    if (lastPointerEvent && typeof mousePosition.handleMouseMove === 'function') {
+      mousePosition.handleMouseMove(lastPointerEvent);
+    }
 
     // Cleanup on dismount
     return () => {

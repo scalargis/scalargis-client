@@ -23,14 +23,14 @@ export default function DrawingToolbar({ availableTools, activeTool, onSelectToo
 
   return (
     <Group justify="space-between" wrap="nowrap" className="print-drawing-toolbar">
-      <Group gap={4} wrap="wrap">
+      <Group gap={4} wrap="nowrap">
         {DRAW_TOOLS.filter(opt => {
           if (!availableTools || availableTools.length === 0) return true;
           return availableTools.includes(opt.value.toLowerCase());
         }).map(opt => (
           <ActionIcon
             key={opt.value}
-            size="lg"
+            size="md"
             variant={opt.value === activeTool ? 'filled' : 'default'}
             aria-pressed={opt.value === activeTool}
             title={t(opt.title, opt.defaultTitle)}
@@ -43,7 +43,7 @@ export default function DrawingToolbar({ availableTools, activeTool, onSelectToo
       </Group>
       <Group gap={4} wrap="nowrap">
         <ActionIcon
-          size="lg"
+          size="md"
           variant="filled"
           color="danger"
           title={deleteTitle}
@@ -53,7 +53,7 @@ export default function DrawingToolbar({ availableTools, activeTool, onSelectToo
           <i className="pi pi-trash" aria-hidden="true" />
         </ActionIcon>
         <ActionIcon
-          size="lg"
+          size="md"
           variant="default"
           title={t("viewAllElements", "Ver todos os elementos")}
           aria-label={t("viewAllElements", "Ver todos os elementos")}

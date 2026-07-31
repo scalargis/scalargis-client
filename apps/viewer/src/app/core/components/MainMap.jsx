@@ -83,6 +83,34 @@ function MainMap(props) {
   }, [constrained_extent, min_zoom, max_zoom, max_resolution, min_resolution, min_zoom_authenticated, max_zoom_authenticated, max_resolution_authenticated, min_resolution_authenticated]);
 
 
+  // OpenLayers reads the container size once and caches it, and the only
+  // updateSize() call in the app hangs off a redux `viewer` change (see
+  // containers/Layout.jsx). Anything else that resizes the map box - a scrollbar
+  // appearing, the topbar reflowing, a themed chrome change - left the canvas at
+  // its old width, painting the container's background beside the map. Watch the
+  // box itself instead. The frame coalesces bursts and keeps the observer from
+  // re-entering; updateSize only touches the canvas, never the observed box, so
+  // this cannot feed itself.
+  useEffect(() => {
+    const el = mainMapEl.current;
+    if (!olMap || !el || typeof ResizeObserver === 'undefined') return;
+
+    let frame = null;
+    const observer = new ResizeObserver(() => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        olMap.updateSize();
+      });
+    });
+    observer.observe(el);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    }
+  }, [olMap]);
+
   // Set map size
   let map_style = {};
   if (viewer?.size?.width != null) map_style = {...map_style, width : viewer.size.width};

@@ -21,8 +21,12 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
   const component_cfg = record.config_json;
 
   const geo_location_control = viewer.config_json.map_controls.find(c => c.id === 'GeoLocation');
-  const geoLocationActive = geo_location_control ? geo_location_control.active : false;
-  const geoLocationTracking = geo_location_control ? geo_location_control.tracking : false;
+  // Coerced, not just defaulted: the control can exist in the config without an
+  // active/tracking key, and Mantine hands `checked` straight to the native
+  // input - undefined there makes it an uncontrolled one and React complains
+  // the moment the first dispatch supplies a real boolean.
+  const geoLocationActive = !!geo_location_control?.active;
+  const geoLocationTracking = !!geo_location_control?.tracking;
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol } = actions;
 
   const { t } = useTranslation();

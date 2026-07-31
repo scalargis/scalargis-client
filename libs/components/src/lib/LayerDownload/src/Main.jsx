@@ -61,6 +61,10 @@ export default function Main({ core, config, record }) {
     datasourceDownload  = {...layer.download.datasource}
   }
 
+  function notifyFormatNotSupported() {
+    notify.warn(t("downloadTheme", "Descarregar Tema"), t("formatNotSupported", "Formato não suportado"));
+  }
+
   function getWFSFeatures(request) {
     const params = [
       "SERVICE=WFS",
@@ -188,7 +192,7 @@ export default function Main({ core, config, record }) {
     if (format == 'geojson') {
       download('export', data, format);
     } else {
-      notify.warn('Descarregar Tema', 'Formato não suportado');
+      notifyFormatNotSupported();
     }
 
     setIsDownloading(false);
@@ -235,7 +239,7 @@ export default function Main({ core, config, record }) {
     if (['WFS', 'KML', 'GML', 'DXF', 'GeoJSON'].includes(theme.type)) {
       downloadVectorTheme(theme, format);
     } else {
-      alert("Formato não suportado");
+      notifyFormatNotSupported();
     }
   }
 

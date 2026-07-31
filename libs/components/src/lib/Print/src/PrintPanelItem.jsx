@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
-import { Alert, Button, Checkbox, Group, NumberInput, Select, Tabs } from '@mantine/core';
+import { Alert, Button, Checkbox, Group, Loader, NumberInput, Select, Tabs } from '@mantine/core';
 import { confirm, notify } from '@scalargis/ui';
 import OlInteractionDraw from 'ol/interaction/Draw';
 import OlInteractionModify from 'ol/interaction/Modify';
@@ -746,7 +746,7 @@ export default function PrintPanelItem(props) {
       {isPrinting ?
         <Alert color="informative" py="xs" mt="lg">
           <Group justify="center" gap="xs" wrap="nowrap">
-            <i className="pi pi-spin pi-spinner" aria-hidden="true" />
+            <Loader size="xs" />
             <span>{t("generatingPrint", "A gerar a planta...")}</span>
           </Group>
         </Alert> : null

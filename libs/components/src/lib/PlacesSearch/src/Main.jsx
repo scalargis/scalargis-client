@@ -309,6 +309,11 @@ export default function Main({ core, config, actions, utils, record }) {
     <div ref={ref} className="layout-topbar-search-container">
       <span className="layout-topbar-search">
           <TextInput type="text" variant="unstyled"
+            classNames={{
+              root: 'places-search-input-root',
+              wrapper: 'places-search-input-wrapper',
+              input: 'places-search-input'
+            }}
             placeholder={ config.placeholder ? t(config.placeholder, config.placeholder, {"ns": "custom"}) : `${t("search", "Pesquisar")}...`}
             aria-label={t("search", "Pesquisar")}
             value={filter}
