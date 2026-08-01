@@ -82,6 +82,14 @@ export default defineConfig(() => {
           changeOrigin: true,
           rewrite: (pathname) => pathname.replace(/^\/spatial_toolbox/, ''),
         },
+        // Generated files (print PDFs, exports) are served by the Flask /file
+        // blueprint at the app root. In production the app is served from that
+        // same origin, so only the dev server needs the hop.
+        '/file': {
+          target: proxyUrl + '/file',
+          changeOrigin: true,
+          rewrite: (pathname) => pathname.replace(/^\/file/, ''),
+        },
         ...userProxyRoutes
       },
     },

@@ -1,4 +1,4 @@
-/* Dropdown mode (Mantine Select; the topbar look is the default, the
+/* Dropdown mode (Mantine Menu text trigger; the topbar look is the default, the
    still-Prime mobile menu wrapper overrides below, mirroring the old
    white-by-default / dark-in-menu split). */
 
@@ -6,12 +6,6 @@
   margin-top: -10px;
   margin-left: 10px;
   color: white;
-}
-
-.locale-selector input {
-  color: white;
-  height: 30px;
-  min-height: 30px;
 }
 
 /* Inline mode (language buttons). */
@@ -35,7 +29,7 @@
   color: rgba(0, 0, 0, 0.87);
 }
 
-.p-menu .locale-selector input,
+.p-menu .locale-selector,
 .p-menu .locale-selector .locale-btn {
   color: rgba(0, 0, 0, 0.87);
 }

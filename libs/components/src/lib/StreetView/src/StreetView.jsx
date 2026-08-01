@@ -34,7 +34,13 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
   const [position, setPosition] = useState();
   const [pov, setPov] = useState();
 
-  const panoContainer = useRef();
+  // The pano mount target is tracked as STATE, not a ref: the mount effect below
+  // needs to run the moment the div is attached, and the Dialog only renders its
+  // body once opened (with a transition). A ref would be null when an effect
+  // keyed on `opened` first fired, and — since `opened` never changes again —
+  // the effect would never re-run and the pano would stay blank. A callback ref
+  // to setState re-runs the effect exactly when the node attaches/detaches.
+  const [panoNode, setPanoNode] = useState(null);
   const streetviewLayer = useRef();
   const panorama = useRef();
 
@@ -235,8 +241,9 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
     if (openNewWindow) {
       // Open in new window using Google Maps URL scheme, no api key needed
       const url_params = { lat: lonlat[1], lng: lonlat[0], heading: 34, pitch: 10, fov: 80 };
-      const browser_url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=
-          ${url_params.lat},${url_params.lng}&heading=${url_params.heading}&pitch=${url_params.pitch}&fov=${url_params.fov}`;
+      // Single line: the template literal must not bake the newline + indentation
+      // into viewpoint=, or the URL is malformed and the pano fails to open.
+      const browser_url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${url_params.lat},${url_params.lng}&heading=${url_params.heading}&pitch=${url_params.pitch}&fov=${url_params.fov}`;
       window.open(browser_url, "_blank", "noopener,noreferrer");
     } else {
       // Handle opening in portal dialog with embedded StreetView
@@ -268,7 +275,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
   // and a ResizeObserver replaces onResizeEnd — it fires on maximize/restore
   // and on any other body resize, retriggering the pano's self-measure.
   useEffect(() => {
-    if (!modalStreetViewOpen || !panoContainer.current) return;
+    if (!modalStreetViewOpen || !panoNode || !position) return;
 
     const panoramaOptions = {
       position: new window.google.maps.LatLng(position[1], position[0]),
@@ -277,7 +284,10 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
         pitch: 10
       }
     };
-    const pan = new window.google.maps.StreetViewPanorama(panoContainer.current, panoramaOptions);
+    const pan = new window.google.maps.StreetViewPanorama(panoNode, panoramaOptions);
+    // Assign BEFORE wiring listeners: position_changed can fire during init and
+    // both handlers read panorama.current, which was previously set only after.
+    panorama.current = pan;
     pan.addListener('position_changed', function () {
       const pos = panorama.current.getPosition();
       const pov = panorama.current.getPov();
@@ -342,17 +352,20 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
         }
       }
     });
-    panorama.current = pan;
 
+    // The Modal mounts its body with a transition, so the container can measure
+    // 0×0 on this first commit and Google paints blank until told to remeasure.
+    // ResizeObserver fires an initial notification on observe() and again on
+    // maximize/restore; each triggers the pano's self-measure so it repaints.
     const resizeObserver = new ResizeObserver(() => {
       window.google.maps.event.trigger(pan, 'resize');
     });
-    resizeObserver.observe(panoContainer.current);
+    resizeObserver.observe(panoNode);
 
     return () => {
       resizeObserver.disconnect();
     };
-  }, [modalStreetViewOpen]);
+  }, [modalStreetViewOpen, panoNode, position]);
 
   //Exit if google maps script is not loaded, and component is not configured to open in a new window
   if (!(window.google && window.google.maps) && !openNewWindow) return null;
@@ -389,7 +402,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
             dispatch(viewer_set_exclusive_mapcontrol(null));
           }
         }}>
-        <div ref={panoContainer} style={{ width: '100%', height: '100%' }} />
+        <div ref={setPanoNode} style={{ width: '100%', height: '100%' }} />
       </Dialog>
     </React.Fragment>
   )

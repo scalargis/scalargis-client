@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Button, Group } from '@mantine/core';
 import { TreeView, useTree, getTreeExpandedState } from '@scalargis/ui';
 
@@ -54,7 +54,11 @@ function toTreeData(nodes) {
 
 export const TreeComponent = (props) => {
 
-    const data = toTreeData(props?.value);
+    // toTreeData mints fresh JSX labels on every call, so a new identity each
+    // render fed Mantine's Tree, whose useEffect(initialize, [data]) fires
+    // setState -> render -> new array -> infinite loop. Key the memo on the raw
+    // value (the JSX labels are circular; no deep compare would survive them).
+    const data = useMemo(() => toTreeData(props?.value), [props?.value]);
 
     const tree = useTree({
         initialExpandedState: getTreeExpandedState(

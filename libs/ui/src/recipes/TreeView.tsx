@@ -52,16 +52,39 @@ import { IconChevronRight } from './icons';
    plain string — serializable, and never rendered (renderNode reads the map). */
 type ShapeOnlyNode = { value: string; label: string; children?: ShapeOnlyNode[] };
 
-function splitLabels(
-  nodes: TreeNodeData[],
-  labels: Map<string, React.ReactNode>
-): ShapeOnlyNode[] {
+// The shape twin (values + nesting only) is what feeds Mantine's <Tree>, whose
+// useEffect(initialize, [data]) fires setState on every new `data` identity — so
+// a caller that mints a fresh array each render (the PanelJSON tree did; the TOC
+// will) drives an infinite loop. buildShape is memoized below on a SHAPE key so
+// a new array of identical shape reuses the same twin and the Tree never
+// re-initialises. Labels are separate: collectLabels rebuilds them each render
+// (they are read at render time, never in an effect, so they loop nothing),
+// which keeps JSX labels fresh even when the shape is unchanged.
+function buildShape(nodes: TreeNodeData[]): ShapeOnlyNode[] {
   return nodes.map((node) => {
-    labels.set(node.value, node.label);
     const twin: ShapeOnlyNode = { value: node.value, label: node.value };
-    if (node.children?.length) twin.children = splitLabels(node.children, labels);
+    if (node.children?.length) twin.children = buildShape(node.children);
     return twin;
   });
+}
+
+function collectLabels(
+  nodes: TreeNodeData[],
+  labels: Map<string, React.ReactNode>
+): void {
+  for (const node of nodes) {
+    labels.set(node.value, node.label);
+    if (node.children?.length) collectLabels(node.children, labels);
+  }
+}
+
+// A stable key derived from the shape alone (values + nesting), serializable and
+// label-free. Two data arrays with the same shape share a key, so buildShape's
+// memo hands back the same twin object across renders.
+function shapeKeyOf(nodes: TreeNodeData[]): string {
+  return nodes
+    .map((n) => (n.children?.length ? `${n.value}(${shapeKeyOf(n.children)})` : n.value))
+    .join(',');
 }
 
 export interface TreeViewProps
@@ -103,9 +126,16 @@ export function TreeView({
   });
   const controller = tree ?? internalTree;
 
-  const [shapeData, labels] = React.useMemo(() => {
+  // shapeData is keyed on the shape so a same-shape re-render reuses the twin
+  // (breaks Mantine's Tree re-initialise loop even for callers that don't
+  // memoize their data); labels rebuild on every data change to stay fresh.
+  const shapeKey = shapeKeyOf(data);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const shapeData = React.useMemo(() => buildShape(data), [shapeKey]);
+  const labels = React.useMemo(() => {
     const map = new Map<string, React.ReactNode>();
-    return [splitLabels(data, map), map] as const;
+    collectLabels(data, map);
+    return map;
   }, [data]);
 
   // Mantine's Tree binds Space and the Arrow keys but NOT Enter (9.4.1

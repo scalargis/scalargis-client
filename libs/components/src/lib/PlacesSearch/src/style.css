@@ -81,7 +81,12 @@
 }
 
 .layout-topbar .layout-topbar-icons .places-search-list {
+  /* Prime's ListBox grew with its content; the fixed 185px clipped longer place
+     names onto a second line. Grow to the widest option (anchored right:0, so it
+     grows leftward), capped so it can't run off the viewport. */
   min-width: 185px;
+  width: max-content;
+  max-width: min(340px, 90vw);
   max-height: 250px;
   overflow-y: auto;
   background: #ffffff;
@@ -103,6 +108,11 @@
   padding: 0.5rem 1rem;
   text-align: left;
   color: #495057;
+  /* One line per place: no wrap (paired with the panel's width:max-content), and
+     font-weight normal to override the bold inherited from the topbar chrome —
+     no font-weight rule targets these elements, so it can only be inherited. */
+  white-space: nowrap;
+  font-weight: normal;
 }
 
 .layout-topbar .layout-topbar-icons .places-search-option:hover {

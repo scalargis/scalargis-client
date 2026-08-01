@@ -253,8 +253,12 @@ export const adsBaseTheme = createTheme({
        Mantine ships by default (popover 300 > modal 200); the flat ADS ladder
        inverted it. The 1000 --z-dropdown token stays for page-level CSS chrome
        that is never spawned inside a dialog. */
-    Popover: { defaultProps: { zIndex: 6100 } },
-    Menu: { defaultProps: { zIndex: 6100 } },
+    // floatingStrategy: 'fixed' for the same reason as Combobox below — a Menu
+    // (F2 mounts one in the topbar) or Popover on the default 'absolute' strategy
+    // positions in document coordinates and, on the frame before floating-ui
+    // measures it, extends the document: scrollbars appear, the map reflows.
+    Popover: { defaultProps: { zIndex: 6100, floatingStrategy: 'fixed' } },
+    Menu: { defaultProps: { zIndex: 6100, floatingStrategy: 'fixed' } },
     /* Popover's centred `bottom` default makes x depend on the panel's own
        width, which Combobox measures as 0 while the dropdown is display:none —
        hence bottom-start. Where it opens is then floating-ui's call: `flip`
@@ -273,6 +277,19 @@ export const adsBaseTheme = createTheme({
         position: 'bottom-start',
         floatingStrategy: 'fixed',
         middlewares: { flip: true, shift: true },
+        /* THE GATE for the "dropdown flips side after painting" flicker.
+           Combobox is the ONE overlay Mantine ships with transitionProps
+           duration 0 (Popover/Menu default to fade/150). At duration 0 the
+           Transition drops display:none in the SAME commit the panel is still
+           measured 0×0, so floating-ui has no height to flip and places it
+           below — and the browser paints that frame before autoUpdate's
+           ResizeObserver sees the real height and jumps it up. A duration > 0
+           keeps the panel display:none for the first commit and brings it back
+           at opacity:0 ('pre-entering'); it gains height, gets remeasured and
+           repositioned INSIDE that invisible window, so it is never seen
+           mispositioned. Do NOT "optimise" this back to 0 — the jump returns.
+           (respectReducedMotion is false, so this holds for every user.) */
+        transitionProps: { transition: 'fade', duration: 120 },
       },
     },
     HoverCard: { defaultProps: { zIndex: 6100 } },

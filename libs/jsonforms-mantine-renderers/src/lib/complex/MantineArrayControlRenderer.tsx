@@ -97,7 +97,13 @@ export const MantineArrayControlRenderer = (props: ArrayLayoutProps) => {
       ) : (
         // The viewer renders these forms in a narrow sidebar: the table
         // scrolls sideways instead of crushing its columns.
-        <Table.ScrollContainer minWidth={Math.max(columns.length, 1) * 160}>
+        // miw={0}: this ScrollContainer is a flex child of the Stack, so its
+        // default min-width:auto refused to shrink below the table's min-content
+        // (columns*160), forcing the Stack — and the sidebar's content-root — to
+        // that width and giving a SECOND horizontal scrollbar on the panel on top
+        // of the ScrollArea's own. min-width:0 lets the ScrollArea clip to the
+        // panel width, leaving the single bar that actually scrolls the table.
+        <Table.ScrollContainer miw={0} minWidth={Math.max(columns.length, 1) * 160}>
           <Table className="ads-jf-array-table" verticalSpacing="xs" horizontalSpacing="xs">
             <Table.Thead>
               <Table.Tr>

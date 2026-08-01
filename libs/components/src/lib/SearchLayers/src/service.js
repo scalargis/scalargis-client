@@ -7,7 +7,37 @@ import {
 import {  isUrlAppOrigin, isUrlAppHostname,
   getGeometryFieldFromFeatureType, buildSchemaFromFeatureType, buildUiSchemaFromSchema } from './utils';
 
-export const getDescribeFeatureType = (options) => {
+// A fetch that fails loudly instead of hanging or feeding malformed HTML to
+// JSON.parse: it aborts after a timeout, and rejects on a non-OK status or a
+// non-JSON body BEFORE .json() throws a bare SyntaxError. The thrown Error
+// reaches SearchLayerForm's .catch (the notification) and .finally (which drops
+// the LoadingOverlay) — without this a mis-serving WFS left the panel blocked.
+const REQUEST_TIMEOUT_MS = 30000;
+
+async function fetchJson(url, init) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response;
+  try {
+    response = await fetch(url, { ...init, signal: controller.signal });
+  } catch (err) {
+    throw err?.name === 'AbortError'
+      ? new Error('O serviço de pesquisa demorou demasiado a responder.')
+      : err;
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!response.ok) {
+    throw new Error(`O serviço de pesquisa respondeu com o estado ${response.status}.`);
+  }
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('json')) {
+    throw new Error('O serviço de pesquisa não devolveu JSON (verifique a configuração da camada).');
+  }
+  return response.json();
+}
+
+export const getDescribeFeatureType = async (options) => {
   const { core, cfg, viewer, auth } = options;
 
   const featureType = cfg.feature_prefix ? `${cfg.feature_prefix}:${cfg.feature_type}` : cfg.feature_type;
@@ -26,29 +56,33 @@ export const getDescribeFeatureType = (options) => {
     url = core.MAP_PROXY_URL + encodeURIComponent(url);
   }
 
-  return fetch(url).then(res => {
-    return res.json();
-  }).then(result => {
-    const sch = buildSchemaFromFeatureType(result.featureTypes[0]);
-    const uisch = buildUiSchemaFromSchema(sch);
-    const geometry_field = getGeometryFieldFromFeatureType(result.featureTypes[0]);
+  const result = await fetchJson(url);
 
-    const data = {
-      schema: sch,
-      uischema: uisch,
-      geometry_field: geometry_field
-    }
+  const sch = buildSchemaFromFeatureType(result.featureTypes[0]);
+  const uisch = buildUiSchemaFromSchema(sch);
+  const geometry_field = getGeometryFieldFromFeatureType(result.featureTypes[0]);
 
-    return Promise.resolve(data);    
-
-  }).catch(error => {
-    return Promise.reject(error);
-  });
+  return {
+    schema: sch,
+    uischema: uisch,
+    geometry_field: geometry_field
+  };
 };
 
-export const getFeatures = (options) => {
+export const getFeatures = async (options) => {
 
   const {core, cfg, schema, startIndex, maxFeatures, filter, sort, viewer, auth} = options;
+
+  // Guard the feature type BEFORE writeGetFeature. new WFS().writeGetFeature()
+  // reads featureType.geometryName synchronously (below), so a missing/blank
+  // feature_type throws a bare TypeError there — and because that throw is
+  // synchronous inside this promise-returning function, without this guard it
+  // escaped the .then chain entirely: neither .catch nor .finally ran and the
+  // panel's LoadingOverlay stayed up for good. As an async function now, the
+  // throw becomes a rejection the caller can handle.
+  if (!cfg.feature_type || typeof cfg.feature_type !== 'string') {
+    throw new Error('Configuração de pesquisa inválida: falta o feature_type da camada.');
+  }
 
   let url = cfg.source_url + (cfg.source_url.indexOf('?') > -1 ? '' : '?');
 
@@ -122,10 +156,15 @@ export const getFeatures = (options) => {
           } else if (schema.properties[key].type === 'number') {
             conditions.push(equalToFilter(key, value));
           } else {
-            conditions.push(likeFilter(key, value, '*', '.','!', false));
+            // Wrap in wildcards so a bare term is a case-insensitive "contains"
+            // (matchCase already false). NOTE: shared with snic3/mapaspt — this
+            // widens their search semantics too. singleChar '.' / escapeChar '!'
+            // already read a dotted value as a pattern; wrapping only broadens.
+            conditions.push(likeFilter(key, `*${value}*`, '*', '.','!', false));
           }
         } else {
-          conditions.push(likeFilter(key, value, '*', '.','!', false));
+          // Same wildcard "contains" as above, for fields with no schema type.
+          conditions.push(likeFilter(key, `*${value}*`, '*', '.','!', false));
         }
       }
     });
@@ -185,24 +224,13 @@ export const getFeatures = (options) => {
   }
 
   // then post the request and add the received features to a layer
-  return fetch(url, {
-    method: 'POST',
-    body,
-  })
-  .then(function (response) {
-    return response.json();
-  })
-  .then(function (json) {
-    const features = new GeoJSON().readFeatures(json);
-    return Promise.resolve({features, total: json.totalFeatures || json?.features?.length});
-  }).catch(error => {
-    return Promise.reject(error);
-  });
-
+  const json = await fetchJson(url, { method: 'POST', body });
+  const features = new GeoJSON().readFeatures(json);
+  return {features, total: json.totalFeatures || json?.features?.length};
 }
 
 
-export const getFeatureById = (options) => {
+export const getFeatureById = async (options) => {
 
   const { core, viewer, auth, cfg, featureId, crs = 'EPSG:4326', format = 'application/json'} = options;
 
@@ -227,11 +255,5 @@ export const getFeatureById = (options) => {
     url = core.MAP_PROXY_URL + encodeURIComponent(url);
   }
 
-  return fetch(url).then(res => {
-    return res.json();
-  }).then(result => {
-    return Promise.resolve(result);
-  }).catch(error => {
-    return Promise.reject(error);
-  });
+  return fetchJson(url);
 }

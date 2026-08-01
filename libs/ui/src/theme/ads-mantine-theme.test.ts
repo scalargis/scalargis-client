@@ -182,4 +182,21 @@ describe('overlay ladder (kit 03 §8)', () => {
       middlewares: { flip: true, shift: true },
     });
   });
+
+  // Popover and Menu default to 'absolute'; on that strategy a topbar Menu (F2)
+  // positions in document coordinates and extends the document for one frame.
+  it.each(['Popover', 'Menu'])('positions %s against the viewport', (name) => {
+    expect(theme.components[name]?.defaultProps).toMatchObject({
+      floatingStrategy: 'fixed',
+    });
+  });
+
+  // Combobox is the one overlay Mantine ships with duration 0, which lets the
+  // panel paint at 0×0 before floating-ui measures it (the "flips side after
+  // painting" flicker). A non-zero fade keeps it display:none until positioned.
+  it('gives combobox dropdowns a non-zero fade so they never paint unmeasured', () => {
+    expect(theme.components.Combobox?.defaultProps).toMatchObject({
+      transitionProps: { transition: 'fade', duration: 120 },
+    });
+  });
 });

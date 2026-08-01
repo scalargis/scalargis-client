@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from "react-i18next";
-import { Select, UnstyledButton } from '@mantine/core';
+import { Menu, UnstyledButton } from '@mantine/core';
 
 import './style.css';
 
@@ -93,35 +93,46 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
     );
   }
 
-  // Wide enough for the longest label and no wider: configs carry siglas ("PT"),
-  // where a fixed width ate the topbar, but nothing stops one carrying
-  // "Português", which a sigla-sized box would clip. 44px covers the chevron and
-  // the input's own padding.
-  const selectWidth = useMemo(() => {
-    const longest = localesList.reduce((max, item) => Math.max(max, String(item.label ?? '').length), 2);
-    return `calc(${longest}ch + 44px)`;
-  }, [localesList]);
+  // A Select is an input — a ~37px box with a rightSection and form alignment —
+  // which stood out in a 50px strip of 1em icons. The widget is really a choice
+  // menu, so it IS one: a text trigger ("PT ▾") that, being a real <button>,
+  // inherits the topbar chrome (_topbar.scss `button` rule) like every sibling.
+  const currentLabel = useMemo(() => {
+    const match = localesList.find(
+      item => String(item.value).toLowerCase() === locale.toLowerCase()
+    );
+    return match?.label ?? locale.toUpperCase();
+  }, [localesList, locale]);
 
-  const select = (
-    <Select
-      className={className ? `locale-selector ${className}` : 'locale-selector'}
-      size="xs"
-      w={selectWidth}
-      variant="unstyled"
-      data={localesList.map(item => ({ value: String(item.value), label: String(item.label) }))}
-      value={locale.toLowerCase()}
-      onChange={handleChange}
-      allowDeselect={false}
-      aria-label={t("language", "Idioma")}
-    />
+  const menu = (
+    <Menu shadow="md" position="bottom-end" withinPortal>
+      <Menu.Target>
+        <UnstyledButton
+          className={className ? `locale-selector ${className}` : 'locale-selector'}
+          aria-label={t("language", "Idioma")}
+        >
+          {currentLabel} <span aria-hidden="true">▾</span>
+        </UnstyledButton>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {localesList.map(item => (
+          <Menu.Item
+            key={item.value}
+            onClick={() => handleChange(String(item.value))}
+          >
+            {item.label}
+          </Menu.Item>
+        ))}
+      </Menu.Dropdown>
+    </Menu>
   );
 
   return (
     <React.Fragment>
       { type != 'menu' ?
-      select :
+      menu :
       <span className="p-menuitem-link">
-        <span className="p-menuitem-icon pi pi-flag"></span>{select}
+        <span className="p-menuitem-icon pi pi-flag"></span>{menu}
       </span> }
     </React.Fragment>
   );

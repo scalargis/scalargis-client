@@ -6,8 +6,10 @@
   background-color: #2196f3;
 }
 
+/* Same opaque ADS action-hover step as the MapToolButton in the same strip
+   (was the translucent purple that composited against the map tiles). */
 .ol-control button:hover {
-  background-color: rgba(103, 58, 183, 0.76);
+  background-color: var(--mantine-color-primary-6);
 }
 
 .ol-zoom-extent {
