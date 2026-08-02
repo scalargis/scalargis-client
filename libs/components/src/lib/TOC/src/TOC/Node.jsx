@@ -1,9 +1,7 @@
 import React from "react";
 import { withTranslation } from "react-i18next";
 import Tree from "./Tree";
-import { Checkbox } from 'primereact/checkbox';
-import { RadioButton } from 'primereact/radiobutton';
-import { Button } from 'primereact/button';
+import { ActionIcon, Checkbox, Radio } from '@mantine/core';
 import DraggableItem from './DraggableItem';
 import Legend from "./Legend";
 
@@ -107,38 +105,43 @@ class Node extends React.Component {
 
           <div style={tocGroupStyle}>
             <div className="flex flex-row justify-content-between flex-wrap">
-    
+
               <div className="flex flex-row col-12 pl-0 pr-0" style={tocItemStyle}>
 
                 {isGroup && (
                   <div className="group-button">
-                    <Button
-                      size="small" text
+                    <ActionIcon
+                      variant="subtle" size="md" radius="xl" type="button"
                       style={!isChildrenVisible ? { visibility: "hidden" } : null}
                       title={this.props.t("showHideChildThemes", "Mostrar/esconder subtemas")}
-                      icon={this.isOpen() ? "pi pi-chevron-down" : "pi pi-chevron-right"}
+                      aria-label={this.props.t("showHideChildThemes", "Mostrar/esconder subtemas")}
+                      aria-expanded={this.isOpen()}
                       onClick={e => actions.open(e, data.id)}
-                    />
+                    >
+                      <i className={this.isOpen() ? "pi pi-chevron-down" : "pi pi-chevron-right"} aria-hidden="true" />
+                    </ActionIcon>
                   </div>
                 )}
 
                 <div>
                   {!radioName ? (
                     <Checkbox
+                      size="md"
                       title={this.props.t("switchOnOffTheme", "Ligar/desligar tema")}
                       id={data.id}
                       checked={this.isChecked()}
                       onChange={e => actions.toggle(data.id, data)}
-                      className={!isGroup ? "toc-leaf" : ""}
+                      className={"toc-check" + (!isGroup ? " toc-leaf" : "")}
                     />
                   ) : (
-                    <RadioButton
+                    <Radio
+                      size="md"
                       title={this.props.t("switchOnOffTheme", "Ligar/desligar tema")}
                       id={data.id}
                       name={radioName}
                       checked={this.isChecked()}
                       onChange={e => actions.toggle(data.id, data, items)}
-                      className={!isGroup ? "toc-leaf" : ""}
+                      className={"toc-check" + (!isGroup ? " toc-leaf" : "")}
                     />
                   )}
                 </div>
@@ -155,20 +158,25 @@ class Node extends React.Component {
                     <div>
                       <div className="buttons">
                         {data.show_details !== false ?
-                          <Button
-                            size="small" text={!detailsOpen}
+                          <ActionIcon
+                            variant={detailsOpen ? "filled" : "subtle"} size="md" radius="xl" type="button"
                             title={this.props.t("showHideDetails", "Mostrar/esconder detalhes")}
-                            icon={this.isOpen() ? "pi pi-cog" : "pi pi-cog"}
+                            aria-label={this.props.t("showHideDetails", "Mostrar/esconder detalhes")}
+                            aria-pressed={detailsOpen}
                             onClick={e => this.setState({ ...this.state, detailsOpen: !detailsOpen })}
-                          /> : null}
+                          >
+                            <i className="pi pi-cog" aria-hidden="true" />
+                          </ActionIcon> : null}
                         {' '}
                         {data.bbox && data.show_zoom_extent !== false ? (
-                          <Button
-                            size="small" text
+                          <ActionIcon
+                            variant="subtle" size="md" radius="xl" type="button"
                             title={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
-                            icon="pi pi-search"
+                            aria-label={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
                             onClick={e => this.onClickZoom(e, data)}
-                          />
+                          >
+                            <i className="pi pi-search" aria-hidden="true" />
+                          </ActionIcon>
                         ) : null}
                       </div>
                     </div>

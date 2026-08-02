@@ -1,21 +1,15 @@
 import React from 'react';
 import { withTranslation, useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { Panel } from 'primereact/panel';
-import { Message } from 'primereact/message';
-import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
+import { Alert, Badge, Button, Group, TextInput } from '@mantine/core';
+import { CollapsiblePanel, notify } from '@scalargis/ui';
 
+import { MainMenuButton } from '../../components';
 import { translateValue } from '../../utils/i18n';
 import Tree from './TOC/Tree';
 import { traverseTree, findAllParents, findAllChildren } from './TOC/Model';
 
 import './TOC/style.css';
 
-
-const diffArray = (arr1, arr2) => arr1.concat(arr2)
-    .filter(val => !(arr1.includes(val) && arr2.includes(val)));
 
 /**
  * Actions
@@ -31,12 +25,10 @@ export function MainMenu({ className, config, actions, record }) {
 
   const { t } = useTranslation();
 
-  const component_cfg = record.config_json || {};
   const title = record.title || t("themes", "Temas");
-  const header = component_cfg.header || title;
 
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={className}
       icon="pi pi-list"
@@ -49,7 +41,7 @@ class Main extends React.Component {
 
   constructor(props) {
     super(props);
-    
+
     const { core } = props;
     const { opened } = props.config.viewer.config_json;
 
@@ -80,17 +72,17 @@ class Main extends React.Component {
     if (index === -1) opened.push(id);
     else opened.splice(index, 1);
     this.setState({ ...this.state, opened });
-    
+
     if (this.props.actions.layers_set_opened && this.props.config.dispatch) {
       this.props.config.dispatch(this.props.actions.layers_set_opened(opened));
-    }    
+    }
   }
 
   toggle(id, layer_data, items) {
     const { activate_parents, deactivate_children, open_children, viewer } = this.props.config;
     const { layers } = viewer.config_json;
     const checked = Object.assign([], viewer.config_json.checked);
-    
+
     // Toggle selected
     const index = checked.indexOf(id);
     if (index === -1) checked.push(id);
@@ -103,7 +95,7 @@ class Main extends React.Component {
         if (child.id !== id && index > -1) checked.splice(index, 1);
       });
     }
-    
+
     // If checked, activate all parents
     if (index === -1 && ((activate_parents && layer_data?.activate_parents !== false)
       || layer_data?.activate_parents === true)) {
@@ -113,9 +105,9 @@ class Main extends React.Component {
         if (index === -1) checked.push(p);
       });
     }
-    
+
     // If unchecked deactivate all children
-    if (index > -1 && ((deactivate_children && layer_data?.deactivate_children !== false) 
+    if (index > -1 && ((deactivate_children && layer_data?.deactivate_children !== false)
       || layer_data?.deactivate_children === true)) {
       const children = findAllChildren(layers, [id]);
       children.forEach(p => {
@@ -138,7 +130,7 @@ class Main extends React.Component {
         if (index === -1) {
           opened.push(id);
           this.setState({ ...this.state, opened });
-        
+
           if (this.props.actions.layers_set_opened && this.props.config.dispatch) {
             this.props.config.dispatch(this.props.actions.layers_set_opened(opened));
           }
@@ -180,7 +172,7 @@ class Main extends React.Component {
   moveTheme(fromIndex, fromParent, toIndex, toParent) {
     const { layers } = this.props.config.viewer.config_json;
     const updated = Object.assign([], layers);
-    
+
     const parentIndex = updated.findIndex(i => i.id === fromParent);
     const targetIndex = updated.findIndex(i => i.id === toParent);
     const idIndex = updated[parentIndex].children.indexOf(fromIndex);
@@ -244,7 +236,7 @@ class Main extends React.Component {
             p.filtered = false;
             filterDone.push(p.id);
           }
-        }); 
+        });
       }
     });
   }
@@ -262,7 +254,7 @@ class Main extends React.Component {
     this.setState({ ...this.state, filter: '' });
   }
 
-  saveSession(toastEl) {
+  saveSession() {
     this.props.config.dispatch(this.props.actions.viewer_save_http_loading());
 
     //Get current session viewer config
@@ -283,7 +275,7 @@ class Main extends React.Component {
     const options = {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'        
+        'Content-Type': 'application/json'
       },
       method: 'POST',
       body: JSON.stringify(record)
@@ -300,23 +292,19 @@ class Main extends React.Component {
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          toastEl.show({
-            severity: 'success',
-            summary: this.props.t("saveSession", "Gravar sessão"),
-            detail: this.props.t("saveSessionSuccessMsg", "A sessão foi gravada com sucesso."),
-            sticky: false
-          });
-          this.props.config.dispatch(this.props.actions.viewer_session_saved(res.session));       
+          notify.success(
+            this.props.t("saveSession", "Gravar sessão"),
+            this.props.t("saveSessionSuccessMsg", "A sessão foi gravada com sucesso.")
+          );
+          this.props.config.dispatch(this.props.actions.viewer_session_saved(res.session));
         } else {
-          throw new Error(this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão."));        
+          throw new Error(this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão."));
         }
       }).catch(error => {
-        toastEl.show({
-          severity: 'error',
-          summary: this.props.t("unexpectedError", "Ocorreu um erro inesperado"),
-          detail: this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão."),
-          sticky: false
-        });
+        notify.error(
+          this.props.t("unexpectedError", "Ocorreu um erro inesperado"),
+          this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão.")
+        );
         this.props.config.dispatch(this.props.actions.viewer_save_http_error());
       });
   }
@@ -344,20 +332,19 @@ class Main extends React.Component {
     const { layers, checked } = config.viewer.config_json;
     */
     const { filter, dragging } = this.state;
-    const { layers, checked, opened } = config.viewer.config_json;   
-    const { showOnPortal } = config.Models.Utils;
+    const { layers, checked, opened } = config.viewer.config_json;
 
     if (!Array.isArray(layers)) return null;
-    
+
     const main = layers.find(i => i.id === 'main');
     if (!main) return null;
 
     //User authentication
     const logged = core.getLoggedUser();
-    
+
     // Filter themes
     this.filterThemes(layers, filter);
-    
+
     // Get main items
     const tree = main.children.map(id => layers.find(l => l.id === id)).filter(i => !!i);
 
@@ -373,66 +360,74 @@ class Main extends React.Component {
       applyThemeChanges: this.applyThemeChanges.bind(this)
     }
 
-    let toastEl = null;
-
     return (
-      <div style={{ height: '100%' }} 
+      <div style={{ height: '100%' }}
         onMouseLeave={this.endDragging.bind(this)}
         onDrop={ev => {
           this.endDragging.bind(this)
         }}>
-        
-        {showOnPortal(<Toast ref={(el) => toastEl = el} />)}
 
         <div id="layer-switcher" className={"plugin-main" + (dragging ? " dragging" : "")}>
 
           { !!withHeading && <h3>{this.props.t("themes","Temas")}</h3> }
 
-          { (!!logged?.token && !!config.viewer.allow_user_session) && 
-            <Toolbar className="mb-2"
-              start={(config.viewer.is_session && 
-                <Button label={this.props.t("session", "Sessão")} size="small" rounded severity="info"
-                  icon="pi pi-check" title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}  />)} 
-              end={ 
-              <React.Fragment>
-                {(config.viewer.session && !config.viewer.is_session) && <Button label={this.props.t("loadSession","Abrir sessão")} 
-                  icon="pi pi-folder-open" 
-                  text size="small"
-                  onClick={e => this.loadSession()}
-                  disabled={(config.viewer.save_loading)}
-                  title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )} />}
-                <Button label={this.props.t("saveSession", "Gravar sessão")}
-                  icon={config.viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-save"}
-                  text size="small"
-                  onClick={e => this.saveSession(toastEl)}
-                  disabled={(config.viewer.save_loading)} />                                    
-              </React.Fragment> } />
+          { (!!logged?.token && !!config.viewer.allow_user_session) &&
+            <Group justify="space-between" wrap="nowrap" className="toc-session-toolbar mb-2">
+              <div>
+                {config.viewer.is_session &&
+                  <Badge variant="light" color="informative" radius="xl"
+                    leftSection={<i className="pi pi-check" aria-hidden="true" />}
+                    title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
+                    {this.props.t("session", "Sessão")}
+                  </Badge>}
+              </div>
+              <Group gap={4} wrap="nowrap">
+                {(config.viewer.session && !config.viewer.is_session) &&
+                  <Button variant="subtle" size="compact-sm" type="button"
+                    leftSection={<i className="pi pi-folder-open" aria-hidden="true" />}
+                    onClick={e => this.loadSession()}
+                    disabled={(config.viewer.save_loading)}
+                    title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
+                    {this.props.t("loadSession","Abrir sessão")}
+                  </Button>}
+                <Button variant="subtle" size="compact-sm" type="button"
+                  leftSection={<i className="pi pi-save" aria-hidden="true" />}
+                  loading={config.viewer.save_loading}
+                  onClick={e => this.saveSession()}>
+                  {this.props.t("saveSession", "Gravar sessão")}
+                </Button>
+              </Group>
+            </Group>
           }
 
           { tree.length ? (
             <>
             { component_cfg.show_filter !== false ? (
-              <div className="p-inputgroup">
-                <InputText 
+              <Group gap={0} wrap="nowrap" align="stretch" mb="xs">
+                <TextInput
+                  size="sm"
                   placeholder={`${this.props.t('filter', "Filtro")}...`}
-                  className="p-inputtext-sm mb-2"
                   value={filter}
                   onChange={this.changeFilter.bind(this)}
+                  style={{ flex: 1 }}
                 />
                 <Button
-                  icon="pi pi-times"
-                  label={this.props.t('clear', "Limpar")}
-                  size="small" className="mb-2"
+                  size="sm" type="button"
+                  leftSection={<i className="pi pi-times" aria-hidden="true" />}
                   onClick={this.clearFilter.bind(this)}
-                />
-              </div>
+                >
+                  {this.props.t('clear', "Limpar")}
+                </Button>
+              </Group>
             ) : null }
             </>
           ) : (
-            <Message
-              severity="info"
-              text={this.props.t("noTocThemesMsg", "Não existem temas. Clique no menu + para adicionar.")}
-            />
+            <Alert color="informative" py="xs">
+              <Group justify="center" gap="xs" wrap="nowrap">
+                <i className="pi pi-info-circle" aria-hidden="true" />
+                <span>{this.props.t("noTocThemesMsg", "Não existem temas. Clique no menu + para adicionar.")}</span>
+              </Group>
+            </Alert>
           ) }
 
           <Tree
@@ -448,7 +443,7 @@ class Main extends React.Component {
             olmap={olmap}
             actions={tocActions}
             onDragStart={e => this.setState({ ...this.state, dragging: true })}
-            isDraggable={this.state.isDraggable} 
+            isDraggable={this.state.isDraggable}
             setDraggable={(val) => this.setState({ ...this.state, isDraggable: val })}
           />
 
@@ -460,15 +455,15 @@ class Main extends React.Component {
 
   render() {
     const { as } = this.props;
-    
+
     if (as === 'panel') return (
-      <Panel header={this.props.t("themes","Temas")}>
+      <CollapsiblePanel header={this.props.t("themes","Temas")} toggleable={false}>
         { this.renderContent() }
-      </Panel>
+      </CollapsiblePanel>
     )
 
     if (as === 'button') return (
-      <Button label="teste" />
+      <Button type="button">teste</Button>
     )
 
     // Render content
