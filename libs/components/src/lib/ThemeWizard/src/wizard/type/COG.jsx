@@ -1,15 +1,9 @@
-import React, {useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 
 import * as GeoTIFFLib from "geotiff";
 
-import { Dropdown } from 'primereact/dropdown';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import {InputSwitch} from 'primereact/inputswitch';
-import { InputNumber } from 'primereact/inputnumber';
-import { Accordion, AccordionTab } from 'primereact/accordion';
-import { Fieldset } from 'primereact/fieldset';
+import { Accordion, ActionIcon, Fieldset, Group, NumberInput, Select, Switch, TextInput } from '@mantine/core';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -22,9 +16,6 @@ export default function COG(props) {
   const { getCOGImageProjCode } = Models.OWSModel;
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
-
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
-
 
   const bandOptions = useMemo(() => {
     if (!data?.options?.image_bands) {
@@ -215,30 +206,36 @@ export default function COG(props) {
 
     return (
       <React.Fragment>
-        <div className="p-inputgroup">
-          <InputText placeholder='https://...'
+        <Group gap={0} wrap="nowrap" align="stretch">
+          <TextInput placeholder='https://...'
             value={data.url}
             list='urlhistory'
+            style={{ flex: 1 }}
             onChange={e => editField('url', e.target.value.trim())}
           />
-          <Button
-            icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            title={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
-            disabled={loading}
+          <ActionIcon
+            size="input-sm" variant="filled" type="button"
+            title={t("load", "Carregar")}
+            aria-label={t("load", "Carregar")}
+            loading={loading}
             onClick={e => {
               e.preventDefault();
               loadCOGMetadata()
             }}
-          />
-        </div>
+          >
+            <i className="pi pi-search" aria-hidden="true" />
+          </ActionIcon>
+        </Group>
         {/*
         <datalist id='urlhistory'>
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
           */}
 
-        <Accordion activeIndex={showAdvancedOptions ? 0 : -1} className="pt-2">
-          <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
+        <Accordion className="pt-2">
+          <Accordion.Item value="advanced">
+            <Accordion.Control>{t("advancedOptions", "Opções Avançadas")}</Accordion.Control>
+            <Accordion.Panel>
 
             <div className="p-fluid">
               <div className="field grid">
@@ -246,11 +243,11 @@ export default function COG(props) {
                   <div className="field grid">
                     <label className="col-12 md:col-4">{t("red", "Vermelho")}</label>
                     <div className="col-12 md:col-8">
-                      <Dropdown placeholder={t("selectBands", "Selecione a banda")}
-                        options={bandOptions}
-                        value={selectedBands[0]}
-                        onChange={({ value }) => {
-                          onChangeBand(0, value);
+                      <Select placeholder={t("selectBands", "Selecione a banda")}
+                        data={bandOptions.map(b => String(b))}
+                        value={selectedBands[0] != null ? String(selectedBands[0]) : null}
+                        onChange={(value) => {
+                          onChangeBand(0, Number(value));
                         }}
                       />
                     </div>
@@ -258,11 +255,11 @@ export default function COG(props) {
                   <div className="field grid">
                     <label className="col-12 md:col-4">{t("green", "Verde")}</label>
                     <div className="col-12 md:col-8">
-                      <Dropdown placeholder={t("selectBands", "Selecione a banda")}
-                        options={bandOptions}
-                        value={selectedBands[1]}
-                        onChange={({ value }) => {
-                          onChangeBand(1, value);
+                      <Select placeholder={t("selectBands", "Selecione a banda")}
+                        data={bandOptions.map(b => String(b))}
+                        value={selectedBands[1] != null ? String(selectedBands[1]) : null}
+                        onChange={(value) => {
+                          onChangeBand(1, Number(value));
                         }}
                       />
                     </div>
@@ -270,11 +267,11 @@ export default function COG(props) {
                   <div className="field grid">
                     <label className="col-12 md:col-4">{t("blue", "Azul")}</label>
                     <div className="col-12 md:col-8">
-                      <Dropdown placeholder={t("selectBands", "Selecione a banda")}
-                        options={bandOptions}
-                        value={selectedBands[2]}
-                        onChange={({ value }) => {
-                          onChangeBand(2, value);
+                      <Select placeholder={t("selectBands", "Selecione a banda")}
+                        data={bandOptions.map(b => String(b))}
+                        value={selectedBands[2] != null ? String(selectedBands[2]) : null}
+                        onChange={(value) => {
+                          onChangeBand(2, Number(value));
                         }}
                       />
                     </div>
@@ -283,21 +280,23 @@ export default function COG(props) {
               </div>
               <div className="field grid">
                 <label className="col-12 md:col-6">{t("convertToRGB", "Converter para RGB")}</label>
-                <InputSwitch checked={convertToRGB} onChange={(e) => {
-                  onChangeConvertToRGB(e.value);
+                <Switch size="md" style={{ display: 'inline-block' }} checked={convertToRGB || false} onChange={(e) => {
+                  onChangeConvertToRGB(e.currentTarget.checked);
                 }} />
-              </div> 
+              </div>
 
               <div className="field grid">
                 <label className="col-12 md:col-4">{t("nodataValue", "Valor NoData")}</label>
                 <div className="col-12 md:col-8">
-                  <InputNumber value={nodata} mode="decimal" onValueChange={(e) => {
-                    onChangeNoData(e.value);
+                  <NumberInput hideControls value={nodata != null ? nodata : ''} onChange={(value) => {
+                    onChangeNoData(typeof value === 'number' ? value : (value === '' || value == null ? null : Number(value)));
                   }} />
                 </div>
               </div>
             </div>
-          </AccordionTab>
+
+            </Accordion.Panel>
+          </Accordion.Item>
         </Accordion>
 
       </React.Fragment>

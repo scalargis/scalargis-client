@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from "react-i18next";
-import { Button } from 'primereact/button';
-import { RadioButton } from 'primereact/radiobutton';
+import { Button, Radio, Stack } from '@mantine/core';
 
 import { I18N_NAMESPACE } from './../i18n/index';
 
@@ -24,29 +23,34 @@ export default function WizardStepType(props) {
 
   return (
     <div>
-      
+
       <div className="mt-2">
-        { types.map(t => (
-          <div className="field-radiobutton" key={t.value}>
-            <RadioButton
-              id={'wizard_type' + t.value}
-              value={t.value}
-              name="type"
-              onChange={(e) => props.onChange(e.value)}
-              checked={type === t.value}
-            />
-            <label htmlFor={'wizard_type' + t.value}>{ t.label }</label>
-          </div>
-        ))}
+        <Radio.Group
+          value={type || null}
+          onChange={(value) => props.onChange(value)}
+        >
+          <Stack gap="xs">
+            { types.map(t => (
+              <Radio
+                key={t.value}
+                value={t.value}
+                label={t.label}
+              />
+            ))}
+          </Stack>
+        </Radio.Group>
       </div>
-      
+
       <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
-        <Button           
+        <Button
+          type="button"
           disabled={!type}
           onClick={e => {
             props.onSave();
           }}
-          label={t("next", "Seguinte")} />
+        >
+          {t("next", "Seguinte")}
+        </Button>
       </div>
     </div>
   )

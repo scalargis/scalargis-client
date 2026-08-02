@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message'
+import { Alert, Button, Group } from '@mantine/core';
 import ThemesSelector from './ThemesSelector';
 import WMSThemesSelector from './WMSThemesSelector';
 
@@ -15,16 +14,15 @@ export default function WizardStepConfirm(props) {
   const data = props.wizardData;
   return (
     <div>
-      
+
       <h2 className="mb-2">{t("confirm", "Confirmar")}</h2>
-      
+
       { data.items && data.items.length > 0 ? (
         data.type === 'wms' ? (
-          <WMSThemesSelector 
+          <WMSThemesSelector
             themes={data.items}
             selected={data.selected}
             readOnly={true}
-            expandAllGroups={true}
           />
         ) : (
           <ThemesSelector
@@ -32,21 +30,25 @@ export default function WizardStepConfirm(props) {
             selected={data.selected}
             readOnly={true}
           />
-        ) 
+        )
       ) :
-        <Message
-          severity="info"
-          text={t("noThemeSelectedMsg", "Não há nenhum tema selecionado. Volte à etapa anterior e selecione pelo menos um tema.")} 
-        />      
+        <Alert color="informative" py="xs">
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <i className="pi pi-info-circle" aria-hidden="true" />
+            <span>{t("noThemeSelectedMsg", "Não há nenhum tema selecionado. Volte à etapa anterior e selecione pelo menos um tema.")}</span>
+          </Group>
+        </Alert>
       }
 
       <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
-        <Button 
-          onClick={e => props.onSave(data)} 
-          label={t("finish", "Concluir")}
+        <Button
+          type="button"
+          onClick={e => props.onSave(data)}
           disabled={props.loading || data.items.length === 0}
           style={{ marginTop: '1em' }}
-        />
+        >
+          {t("finish", "Concluir")}
+        </Button>
       </div>
     </div>
   )

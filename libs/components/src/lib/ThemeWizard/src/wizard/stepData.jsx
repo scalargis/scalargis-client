@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from "react-i18next";
-import { Button } from 'primereact/button';
+import { Button } from '@mantine/core';
+import { notify } from '@scalargis/ui';
 import WMS from './type/WMS';
 import WMTS from './type/WMTS';
 import COG from './type/COG';
@@ -12,21 +13,18 @@ import KML from './type/KML';
 import GML from './type/GML';
 import DXF from './type/DXF';
 import Group from './type/Group';
-import { Toast } from 'primereact/toast';
 import WMSThemesSelector from './WMSThemesSelector';
 import WMTSThemesSelector from './WMTSThemesSelector';
 import ThemesSelector from './ThemesSelector';
 
 import { I18N_NAMESPACE } from './../i18n/index';
 
-let toastEl = null;
-
 export default function WizardStepData(props) {
 
   const { Models, fastFetch } = props;
   const { selected, setSelected } = props;
   const [filter, setFilter] = useState('');
-  const { getWindowSize, showOnPortal } = Models.Utils;
+  const { getWindowSize } = Models.Utils;
   const winSize = getWindowSize();
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
@@ -57,12 +55,7 @@ export default function WizardStepData(props) {
   }
 
   function setError(message) {
-    toastEl.show({
-      severity: 'error',
-      summary: t("unexpectedError", "Ocorreu um erro inesperado"),
-      detail: message,
-      sticky: true
-    });
+    notify.error(t("unexpectedError", "Ocorreu um erro inesperado"), message);
   }
 
   function saveSelection() {
@@ -102,8 +95,6 @@ export default function WizardStepData(props) {
 
   return (
     <div>
-      {showOnPortal(<Toast ref={(el) => toastEl = el} />)}
-      
       <TypeComponent
         core={props.core}
         auth={props.auth}
@@ -155,13 +146,15 @@ export default function WizardStepData(props) {
       }
 
       <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
-        <Button 
-          onClick={e => saveSelection()} 
-          label={t("next","Seguinte")} 
-          disabled={props.loading || (Object.keys(selected).length === 0) || 
+        <Button
+          type="button"
+          onClick={e => saveSelection()}
+          disabled={props.loading || (Object.keys(selected).length === 0) ||
             (Object.keys(selected).length === 1 && !selected[Object.keys(selected)[0]].checked) }
           style={{ marginTop: '1em' }}
-        />
+        >
+          {t("next","Seguinte")}
+        </Button>
       </div>
     </div>
   )

@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { WMTSCapabilities } from 'ol/format';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import {InputSwitch} from 'primereact/inputswitch';
-import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Accordion, ActionIcon, Group, Select, Switch, TextInput } from '@mantine/core';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -110,45 +106,52 @@ export default function WMTS(props) {
     
     return (
       <React.Fragment>
-        <div className="p-inputgroup">
-          <InputText placeholder='https://...'
+        <Group gap={0} wrap="nowrap" align="stretch">
+          <TextInput placeholder='https://...'
             value={data.url}
             list='urlhistory'
+            style={{ flex: 1 }}
             onChange={e => editField('url', e.target.value.trim())}
           />
-          <Button
-            icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            title={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
-            disabled={loading}
+          <ActionIcon
+            size="input-sm" variant="filled" type="button"
+            title={t("load", "Carregar")}
+            aria-label={t("load", "Carregar")}
+            loading={loading}
             onClick={e => {
               e.preventDefault();
               loadWMTSCapabilities()
             }}
-          />
-        </div>
+          >
+            <i className="pi pi-search" aria-hidden="true" />
+          </ActionIcon>
+        </Group>
         <datalist id='urlhistory'>
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 
-        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="pt-2"
-          onTabChange={(e) => {
+        <Accordion className="pt-2"
+          value={data?.options?.showAdvancedOptions ? 'advanced' : null}
+          onChange={(value) => {
             const new_options = {
               ...data?.options,
-              showAdvancedOptions: e.index === 0 ? true : false
+              showAdvancedOptions: value === 'advanced'
             }
             editField("options", new_options);
           }}>
-          <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
+          <Accordion.Item value="advanced">
+            <Accordion.Control>{t("advancedOptions", "Opções Avançadas")}</Accordion.Control>
+            <Accordion.Panel>
 
             <div className="p-fluid">
 
               <div className="field grid">
                 <label className="col-12 md:col-7">{t("version", "Versão")}</label>
                 <div className="col-12 md:col-5">
-                  <Dropdown
-                    options={versions}
+                  <Select
+                    data={versions.map(o => ({ value: o.value, label: o.label }))}
                     value={wmtsVersion}
-                    onChange={(e) => editField('wmtsVersion', e.value)}
+                    onChange={(value) => editField('wmtsVersion', value)}
                   />
                 </div>
               </div>
@@ -156,7 +159,9 @@ export default function WMTS(props) {
               <div className="field grid">
                 <label className="col-12 md:col-7">{t("ignoreServiceUrl", "Ignorar URL do serviço")}</label>
                 <div className="col-12 md:col-5" style={{ textAlign: 'right' }}>
-                  <InputSwitch
+                  <Switch
+                    size="md"
+                    style={{ display: 'inline-block' }}
                     checked={wmtsIgnoreServiceUrl}
                     onChange={e => editField('wmtsIgnoreServiceUrl', !wmtsIgnoreServiceUrl)}
                   />
@@ -165,7 +170,8 @@ export default function WMTS(props) {
 
             </div>
 
-          </AccordionTab>
+            </Accordion.Panel>
+          </Accordion.Item>
         </Accordion>
 
       </React.Fragment>

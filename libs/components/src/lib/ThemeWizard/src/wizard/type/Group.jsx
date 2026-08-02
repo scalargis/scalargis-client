@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import { useTranslation } from "react-i18next";
-import { InputText } from 'primereact/inputtext';
+import { TextInput } from '@mantine/core';
 import { v4 as uuidV4 } from 'uuid';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
@@ -72,7 +72,7 @@ export default function Group(props) {
     const theme = data.dataitems.length ? data.dataitems[0] : null;
 
     return (
-      <InputText placeholder={`${t("groupName", "Nome do Grupo")}...`}
+      <TextInput placeholder={`${t("groupName", "Nome do Grupo")}...`}
           value={theme ? theme.title : ''}
           onChange={e => changeName(e.target.value)}
           style={{ width: '100%' }}

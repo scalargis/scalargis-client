@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import { Dropdown } from 'primereact/dropdown';
-import { FileUpload } from 'primereact/fileupload';
+import { Select } from '@mantine/core';
+import { FileUpload, notify } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -79,33 +79,33 @@ export default function ArcGISMap(props) {
 
           <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
-            <Dropdown 
+            <Select
               placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
-              options={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
-              value={data.crs || '4326'}
-              onChange={(e) => editField('crs', e.value)}
+              data={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
+              value={String(data.crs || '4326')}
+              onChange={(value) => editField('crs', value)}
             />
           </div>
 
           <div className="field">
             <label>{t("shapefileFormatInfo", "Ficheiro ZIP contendo os ficheiros SHP, DBF e SHX")}</label>
-            <FileUpload 
-              name="upload"
-              accept="application/zip"
-              maxFileSize={props.maxFileSize * 1024}
-              customUpload 
-              uploadHandler={loadShapeFile}
+            <FileUpload
+              multiple={false}
+              accept={{ 'application/zip': ['.zip'], 'application/x-zip-compressed': ['.zip'] }}
+              maxSize={props.maxFileSize * 1024}
               disabled={loading}
-              url="./upload"
               chooseLabel={t("choose", "Escolher")}
               uploadLabel={t("load", "Carregar")}
               cancelLabel={t("cancel", "Cancelar")}
-              invalidFileSizeMessageDetail=""
-              invalidFileSizeMessageSummary={t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}
+              onUpload={async (files) => loadShapeFile({ files })}
+              onReject={(rejections) => {
+                const msg = t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)});
+                rejections.forEach(r => notify.error(r.file.name, msg));
+              }}
             />
             { (props.maxFileSize && props.maxFileSize > 0) ?
             <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>
-            : null }            
+            : null }
           </div>
         </div>
     )

@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import xml2js from 'xml2js';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import {InputSwitch} from 'primereact/inputswitch';
-import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Accordion, ActionIcon, Group, Select, Switch, TextInput } from '@mantine/core';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -121,56 +117,63 @@ export default function WFS(props) {
 
     return (
       <React.Fragment>
-        <div className="p-inputgroup">
-          <InputText placeholder='https://...'
+        <Group gap={0} wrap="nowrap" align="stretch">
+          <TextInput placeholder='https://...'
             value={data.url}
             list='urlhistory'
+            style={{ flex: 1 }}
             onChange={e => editField('url', e.target.value.trim())}
           />
-          <Button
-            icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-            title={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
-            disabled={loading}
+          <ActionIcon
+            size="input-sm" variant="filled" type="button"
+            title={t("load", "Carregar")}
+            aria-label={t("load", "Carregar")}
+            loading={loading}
             onClick={e => {
               e.preventDefault();
               loadWFSCapabilities()
             }}
-          />
-        </div>
+          >
+            <i className="pi pi-search" aria-hidden="true" />
+          </ActionIcon>
+        </Group>
         <datalist id='urlhistory'>
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 
-        <Accordion activeIndex={data?.options?.showAdvancedOptions ? 0 : -1} className="pt-2"
-          onTabChange={(e) => {
+        <Accordion className="pt-2"
+          value={data?.options?.showAdvancedOptions ? 'advanced' : null}
+          onChange={(value) => {
             const new_options = {
               ...data?.options,
-              showAdvancedOptions: e.index === 0 ? true : false
+              showAdvancedOptions: value === 'advanced'
             }
             editField("options", new_options);
           }}>
-          <AccordionTab header={t("advancedOptions", "Opções Avançadas")}>
+          <Accordion.Item value="advanced">
+            <Accordion.Control>{t("advancedOptions", "Opções Avançadas")}</Accordion.Control>
+            <Accordion.Panel>
 
             <div className="p-fluid">
 
               <div className="field grid">
                 <label className="col-12 md:col-4">{t("serverType", "Tipo de servidor")}</label>
                 <div className="col-12 md:col-8">
-                  <Dropdown placeholder={t("selectServerType", "Escolha o tipo de servidor")}
-                    options={wfsServerTypeOtions}
+                  <Select placeholder={t("selectServerType", "Escolha o tipo de servidor")}
+                    data={wfsServerTypeOtions.map(o => ({ value: o.value, label: o.label }))}
                     value={wfsServerType || ''}
-                    onChange={({ value }) => editField('wfsServerType', value)}
+                    onChange={(value) => editField('wfsServerType', value)}
                   />
                 </div>
-              </div> 
+              </div>
 
               <div className="field grid">
                 <label className="col-12 md:col-4">{t("version", "Versão")}</label>
                 <div className="col-12 md:col-8">
-                  <Dropdown
-                    options={versions}
+                  <Select
+                    data={versions.map(o => ({ value: o.value, label: o.label }))}
                     value={wfsVersion}
-                    onChange={(e) => editField('wfsVersion', e.value)}
+                    onChange={(value) => editField('wfsVersion', value)}
                   />
                 </div>
               </div>
@@ -178,7 +181,9 @@ export default function WFS(props) {
               <div className="field grid">
                 <label className="col-12 md:col-7">{t("ignoreServiceUrl", "Ignorar URL do serviço")}</label>
                 <div className="col-12 md:col-5" style={{ textAlign: 'right' }}>
-                  <InputSwitch
+                  <Switch
+                    size="md"
+                    style={{ display: 'inline-block' }}
                     checked={wfsIgnoreServiceUrl}
                     onChange={e => editField('wfsIgnoreServiceUrl', !wfsIgnoreServiceUrl)}
                   />
@@ -188,17 +193,18 @@ export default function WFS(props) {
               <div className="field grid">
                 <label className="col-12 md:col-4">{t("wfsDataCRS", "Sistema de Coordenadas dos Dados")}</label>
                 <div className="col-12 md:col-8">
-                  <Dropdown
-                    options={wfsDataCRSOptions}
-                    value={wfsDataCRS || 0}
-                    onChange={(e) => editField('wfsDataCRS', e.value)}
+                  <Select
+                    data={wfsDataCRSOptions.map(o => ({ value: String(o.value), label: o.label }))}
+                    value={String(wfsDataCRS || 0)}
+                    onChange={(value) => editField('wfsDataCRS', Number(value))}
                   />
                 </div>
               </div>
 
             </div>
 
-          </AccordionTab>
+            </Accordion.Panel>
+          </Accordion.Item>
         </Accordion>
 
       </React.Fragment>

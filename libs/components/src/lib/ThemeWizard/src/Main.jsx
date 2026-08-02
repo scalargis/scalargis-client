@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
-import {Steps} from 'primereact/steps';
+import { Stepper } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
 import { v4 as uuidV4 } from 'uuid';
 
-import { i18n } from '../../components';
+import { i18n, MainMenuButton } from '../../components';
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index';
 import WizardStepType from './wizard/stepType';
 import WizardStepData from './wizard/stepData';
 import WizardStepConfirm from './wizard/stepConfirm';
 import componentMessages from './messages';
-import './index.css'
 
 
 const items = [
@@ -69,7 +67,7 @@ export function MainMenu({ className, config, actions, record }) {
   const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("addThemes", "Adicionar Temas");
 
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={className}
       icon="pi pi-plus-circle"
@@ -288,13 +286,16 @@ export default function Main(props) {
     // Render content
     return (
       <div id="themewizard">
-        <Steps 
-          model={stepItems} 
-          activeIndex={activeIndex} 
-          onSelect={(e) => changeStep(activeIndex, e.index)} 
-          readOnly={false}
+        <Stepper
+          active={activeIndex}
+          onStepClick={(index) => changeStep(activeIndex, index)}
+          size="sm"
           className="mb-4"
-        />
+        >
+          {stepItems.map((item, idx) => (
+            <Stepper.Step key={idx} label={item.label} />
+          ))}
+        </Stepper>
         { step }
       </div>
     )
@@ -302,9 +303,9 @@ export default function Main(props) {
 
   const { as } = props;
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   // Render content

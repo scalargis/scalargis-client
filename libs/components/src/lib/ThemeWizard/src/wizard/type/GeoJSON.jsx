@@ -1,10 +1,7 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import { Dropdown } from 'primereact/dropdown';
-import { FileUpload } from 'primereact/fileupload';
-import { TabView, TabPanel } from 'primereact/tabview';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
+import { ActionIcon, Group, Select, Tabs, TextInput } from '@mantine/core';
+import { FileUpload, notify } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -81,7 +78,7 @@ export default function GeoJSON (props) {
 
   const loadFromUserURL = () => {
     const { core, data, setData, setSelected, setError, cookies, setLoading, Models } = props;
-    const { isUrlAppOrigin } = Models.Utils;
+    const { isUrlAppOrigin, rememberUrl } = Models.Utils;
     const name = 'GeoJSON';
     let url = data.url || '';
 
@@ -134,63 +131,71 @@ export default function GeoJSON (props) {
 
           <div className="field">
             <label>{t("coordinateSystem", "Sistema de Coordenadas")}</label>
-            <Dropdown 
+            <Select
               placeholder={t("selectCoordinateSystem", "Escolha o sistema de coordenadas")}
-              options={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
-              value={data.crs || '4326'}
-              onChange={(e) => editField('crs', e.value)}
+              data={viewer.config_json.crs_list.map(c => ({value: String(c.srid), label: c.title }))}
+              value={String(data.crs || '4326')}
+              onChange={(value) => editField('crs', value)}
             />
           </div>
 
-          <TabView>
-            <TabPanel header={t("file", "Ficheiro")}>
+          <Tabs defaultValue="file">
+            <Tabs.List>
+              <Tabs.Tab value="file">{t("file", "Ficheiro")}</Tabs.Tab>
+              <Tabs.Tab value="url">URL</Tabs.Tab>
+            </Tabs.List>
+
+            <Tabs.Panel value="file" pt="sm">
               <div className="field">
                 <label>{t("file", "Ficheiro")} GeoJSON</label>
-                <FileUpload 
-                  name="upload"
-                  accept="application/json,.geojson"
-                  maxFileSize={props.maxFileSize * 1024}
-                  customUpload 
-                  uploadHandler={loadGeoJSONFile}
+                <FileUpload
+                  multiple={false}
+                  accept={{ 'application/json': ['.json', '.geojson'], 'application/geo+json': ['.geojson'] }}
+                  maxSize={props.maxFileSize * 1024}
                   disabled={loading}
-                  url="./upload"
                   chooseLabel={t("choose", "Escolher")}
                   uploadLabel={t("load", "Carregar")}
-                  cancelLabel={t("cancel", "Cancelar")} 
-                  invalidFileSizeMessageDetail=""
-                  invalidFileSizeMessageSummary={t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}
+                  cancelLabel={t("cancel", "Cancelar")}
+                  onUpload={async (files) => loadGeoJSONFile({ files })}
+                  onReject={(rejections) => {
+                    const msg = t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)});
+                    rejections.forEach(r => notify.error(r.file.name, msg));
+                  }}
                 />
                 { (props.maxFileSize && props.maxFileSize > 0) ?
                 <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>
                 : null }
               </div>
-            </TabPanel>
-            <TabPanel header="URL">
+            </Tabs.Panel>
+            <Tabs.Panel value="url" pt="sm">
               <div className="field">
                 <label>URL</label>
-                <div className="p-inputgroup">
-                  <InputText placeholder='https://...'
+                <Group gap={0} wrap="nowrap" align="stretch">
+                  <TextInput placeholder='https://...'
                     value={data.url}
                     onChange={e => changeURL(e.target.value)}
-                    style={{ width: '100%' }}
+                    style={{ flex: 1 }}
                   />
-                  <Button
-                    icon={ loading ? "pi pi-spin pi-spinner" : "pi pi-search" }
-                    title={t("load", "Carregar")} tooltipOptions={{position: 'bottom'}}
-                    disabled={loading}
+                  <ActionIcon
+                    size="input-sm" variant="filled" type="button"
+                    title={t("load", "Carregar")}
+                    aria-label={t("load", "Carregar")}
+                    loading={loading}
                     onClick={e => {
                       e.preventDefault();
                       loadFromUserURL()
                     }}
-                  />
-                </div>
-                
+                  >
+                    <i className="pi pi-search" aria-hidden="true" />
+                  </ActionIcon>
+                </Group>
+
               </div>
-            </TabPanel>
+            </Tabs.Panel>
 
-          </TabView>
+          </Tabs>
 
-          
+
         </div>
     )
   }
