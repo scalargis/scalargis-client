@@ -1,6 +1,5 @@
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
 import React, { useState } from 'react';
+import { ActionIcon, Modal } from '@mantine/core';
 import ThemeAttributes from './ThemeAttributes';
 
 function hasAttributes(theme) {
@@ -21,7 +20,7 @@ export default function Main(props) {
 
   const { config } = props;
   const { layer, dispatch, actions, models } = config;
-  const { getWindowSize, showOnPortal } = models.Utils;  
+  const { getWindowSize } = models.Utils;
   const [modalThemeAttributesOpen, setModalThemeAttributesOpen] = useState(false);
 
   const wsize = getWindowSize();
@@ -41,26 +40,29 @@ export default function Main(props) {
 
       {' '}
 
-      <Button icon="pi pi-table"
-        title="Tabela de atributos"
-        color="blue"
-        size="small" rounded text
+      <ActionIcon
+        variant="subtle"
+        size="md"
+        radius="xl"
         className="tool"
+        title="Tabela de atributos"
+        aria-label="Tabela de atributos"
         onClick={e => {
           dispatch(actions.searchlayers_set_layer(target, layer));
           dispatch(actions.viewer_set_selectedmenu(target));
           //setModalThemeAttributesOpen(layer)
         }}
-      />
+      >
+        <i className="pi pi-table" aria-hidden="true" />
+      </ActionIcon>
 
-      {showOnPortal(<Dialog 
-        header="Tabela de Atributos"
-        visible={!!modalThemeAttributesOpen}
-        style={{width: isMobile ? '90%' : '50vw' }} 
-        modal 
-        onHide={e => setModalThemeAttributesOpen(false)}>
+      <Modal
+        title="Tabela de Atributos"
+        opened={!!modalThemeAttributesOpen}
+        size={isMobile ? '90%' : '50vw'}
+        onClose={e => setModalThemeAttributesOpen(false)}>
         <ThemeAttributes theme={modalThemeAttributesOpen} />
-      </Dialog>)}
+      </Modal>
     </React.Fragment>
   )
 }
