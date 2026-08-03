@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { Button } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
 import { getRenderPixel } from 'ol/render';
 
-import { i18n as i18nUtils } from '../../components';
+import { i18n as i18nUtils, MainMenuButton } from '../../components';
 
 import LayerCompare from './LayerCompare';
 
@@ -18,13 +18,12 @@ export function MainMenu({ className, config, actions, record }) {
   const title = record?.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("layerCompare", "LayerCompare");
 
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={className}
       icon="pi pi-pause"
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
-    >
-    </Button>
+    />
   )
 }
 
@@ -320,25 +319,30 @@ export default function Main({ as, config, actions, core, record, utils }) {
               className="card layercompare-main-control"
               style={opened ? { opacity: '0', visibility: 'hidden' } : { opacity: '1', visibility: 'visible' }}>
               <Button
-                rounded severity="warning"
-                label="Layer Compare"
-                iconPos="right"
-                icon="pi pi-angle-down"
+                type="button"
+                radius="xl"
+                color="warning"
+                rightSection={<i className="pi pi-angle-down" aria-hidden="true" />}
                 title="Abrir"
-                onClick={e => setOpened(true)} />
+                aria-expanded={opened}
+                onClick={e => setOpened(true)}>
+                Layer Compare
+              </Button>
             </div>
             <div className='card layercompare-control-content layercompare-control-content-opened'
               style={!opened ? { opacity: '0', visibility: 'hidden' } : { opacity: '1', visibility: 'visible' }}
             >
 
               <Button
-                style={{ width: '100%' }}
-                severity="warning"
-                label="Layer Compare"
-                iconPos="right"
-                icon="pi pi-angle-up"
+                type="button"
+                fullWidth
+                color="warning"
+                rightSection={<i className="pi pi-angle-up" aria-hidden="true" />}
                 title="Fechar"
-                onClick={e => setOpened(false)} />
+                aria-expanded={opened}
+                onClick={e => setOpened(false)}>
+                Layer Compare
+              </Button>
 
 
               <LayerCompare
@@ -382,11 +386,11 @@ export default function Main({ as, config, actions, core, record, utils }) {
     )
   }
 
-  // Render as primereact Panel
+  // Render as panel
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       {renderContent()}
-    </Panel>
+    </CollapsiblePanel>
   )
 
   // Default render

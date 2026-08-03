@@ -23,20 +23,23 @@
     background: rgba(0, 0, 0, 0);
 }
 
-.map-slider.p-slider {
+/* The comparison handle rides an invisible rail across the whole map: only
+   the 30px grab thumb is visible, on the warning hue the toggle buttons wear. */
+.map-slider .mantine-Slider-track,
+.map-slider .mantine-Slider-track::before {
     background: transparent;
 }
 
-.map-slider .p-slider-range {
+.map-slider .mantine-Slider-bar {
     background: transparent !important;
 }
 
-.map-slider .p-slider-handle {
+.map-slider .mantine-Slider-thumb {
     cursor: w-resize;
     height: 30px !important;
     width: 30px !important;
-    background: #FF9800;
-    margin-left: -15px !important;
+    background: var(--mantine-color-warning-6);
+    border: none;
 }
 
 @media only screen and (max-width: 768px) {
@@ -46,7 +49,7 @@
 }
 
 @media only screen and (max-width: 768px) {
-    .map-slider-layers-control .p-dropdown {
+    .map-slider-layers-control .mantine-Select-root {
         max-width: 95%;
     }
 }

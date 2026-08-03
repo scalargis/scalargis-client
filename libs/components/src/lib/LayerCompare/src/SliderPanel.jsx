@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dropdown } from 'primereact/dropdown';
-import { SelectButton } from 'primereact/selectbutton';
-import { Slider } from 'primereact/slider'
-import { Chip } from 'primereact/chip';
+import { Badge, SegmentedControl, Select, Slider } from '@mantine/core';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -35,17 +32,31 @@ export default function SliderPanel({
         );
     }
 
+    // Selects hold the layer objects in state; the controls speak string ids
+    // at the boundary (wave-1 rule). The option picked on the other side is
+    // disabled, like Prime's optionDisabled did.
+    const leftData = layers.map(l => ({
+        value: String(l.id),
+        label: l.item_name,
+        disabled: l.id === selectedSliderLayer?.id
+    }));
+    const rightData = layers.map(l => ({
+        value: String(l.id),
+        label: l.item_name,
+        disabled: l.id === selectedLayer?.id
+    }));
+
     return (
 
         <div className='grid p-2' >
             <div className='col-12'>
-                <SelectButton
-                    unselectable={false}
-                    value={compareTool}
-                    options={compareToolOptions}
-                    optionLabel="name"
-                    itemTemplate={toolOptionTemplate}
-                    onChange={(e) => setCompareTool(e.value)} />
+                <SegmentedControl
+                    value={String(compareTool)}
+                    data={compareToolOptions.map(option => ({
+                        value: String(option.value),
+                        label: toolOptionTemplate(option)
+                    }))}
+                    onChange={(value) => setCompareTool(Number(value))} />
             </div>
 
             <div className='grid col-12'>
@@ -57,18 +68,16 @@ export default function SliderPanel({
                     }
                 </div>
                 <div className={compareTool === 1 ? 'col-11 flex justify-content-end' : 'col-11 flex justify-content-start'}>
-                    <Dropdown
-                        showClear={true}
-                        value={selectedLayer}
-                        options={layers}
-                        optionLabel="item_name"
-                        optionDisabled={e => (e.id === selectedSliderLayer?.id ? true : false)}
-                        onChange={(e) => selectLayer(e.value)}
-                        placeholder={compareTool === 1 ? i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda") 
+                    <Select
+                        clearable
+                        value={selectedLayer ? String(selectedLayer.id) : null}
+                        data={leftData}
+                        onChange={(value) => selectLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
+                        placeholder={compareTool === 1 ? i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda")
                             : i18nUtils.translateValue("selectTopTheme", "Selecionar tema de topo")}
                     />
                     { compareTool === 2 && selectedLayer ?
-                        <Chip label={String(opacitySliderValue.toFixed()) + ' %'} className="ml-2"></Chip>
+                        <Badge variant="light" className="ml-2">{String(opacitySliderValue.toFixed()) + ' %'}</Badge>
                         : null }
                 </div>
 
@@ -78,18 +87,16 @@ export default function SliderPanel({
                     </div>
                     : null}
                 <div className={compareTool === 1 ? 'col-11 flex justify-content-end' : 'col-11 flex justify-content-start'}>
-                    <Dropdown
-                        showClear={true}
-                        value={selectedSliderLayer}
-                        options={layers}
-                        optionDisabled={e => (e.id === selectedLayer?.id ? true : false)}
-                        onChange={(e) => selectSliderLayer(e.value)}
-                        optionLabel="item_name"
-                        placeholder={compareTool === 1 ? i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita") : 
+                    <Select
+                        clearable
+                        value={selectedSliderLayer ? String(selectedSliderLayer.id) : null}
+                        data={rightData}
+                        onChange={(value) => selectSliderLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
+                        placeholder={compareTool === 1 ? i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita") :
                             i18nUtils.translateValue("selectBottomTheme", "Selecionar tema de baixo")}
                     />
                     {compareTool === 2 && selectedSliderLayer ?
-                        <Chip label={String(100 - opacitySliderValue.toFixed()) + ' %'} className="ml-2"></Chip>
+                        <Badge variant="light" className="ml-2">{String(100 - opacitySliderValue.toFixed()) + ' %'}</Badge>
                         : null}
                 </div>
 
@@ -104,10 +111,11 @@ export default function SliderPanel({
                 <div className='col-12 p-4'>
                     <Slider
                         step={0.1}
+                        size="sm"
+                        label={null}
                         value={opacitySliderValue}
-                        onChange={(e) => setOpacitySliderValue(e.value)}
+                        onChange={(value) => setOpacitySliderValue(value)}
                         disabled={!selectedLayer && !selectedSliderLayer}
-                        orientation='horizontal'
                     />
                 </div>
                 : null}
@@ -116,4 +124,3 @@ export default function SliderPanel({
 
     );
 }
-

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Slider } from 'primereact/slider'
+import { Slider } from '@mantine/core';
 
 import SliderPanel from './SliderPanel'
 import SliderLayersMapControl from './SliderLayersMapControl';
@@ -20,7 +20,6 @@ export default function LayerCompare({
     const [sliderIsActive, toggleSliderIsActive] = useState(true)
     const [slider, set_slider] = useState(50);
     sliderValue.current = slider
-    const [layoutOption, setLayoutOption] = useState('vertical')
 
 
     function setSlider(value) {
@@ -36,9 +35,9 @@ export default function LayerCompare({
             <Slider
                 step={0.1}
                 className='map-slider'
+                label={null}
                 value={slider}
-                onChange={(e) => setSlider(e.value)}
-                orientation={layoutOption === 'vertical' ? 'horizontal' : 'vertical'}
+                onChange={(value) => setSlider(value)}
             />
         </div>
 

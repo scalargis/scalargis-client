@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Dropdown } from 'primereact/dropdown';
+import { Select } from '@mantine/core';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -31,26 +31,30 @@ export default function SliderLayersMapControl({
             <div className='grid' >
                 <div className='col'
                     style={{ display: "flex", justifyContent: "right", alignItems: "center" }}>
-                    <Dropdown
-                        value={selectedLayer}
-                        options={layers}
-                        optionDisabled={e => (e.id === selectedSliderLayer?.id ? true : false)}
-                        onChange={(e) => selectLayer(e.value)}
-                        optionLabel="item_name"
+                    <Select
+                        clearable
+                        value={selectedLayer ? String(selectedLayer.id) : null}
+                        data={layers.map(l => ({
+                            value: String(l.id),
+                            label: l.item_name,
+                            disabled: l.id === selectedSliderLayer?.id
+                        }))}
+                        onChange={(value) => selectLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
                         placeholder={`<- ${i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda")}`}
-                        showClear={true}
                     />
                 </div>
                 <div className='col'
                     style={{ display: "flex", justifyContent: "left", alignItems: "center" }}>
-                    <Dropdown
-                        value={selectedSliderLayer}
-                        options={layers}
-                        optionDisabled={e => (e.id === selectedLayer?.id ? true : false)}
-                        onChange={(e) => selectSliderLayer(e.value)}
-                        optionLabel="item_name"
+                    <Select
+                        clearable
+                        value={selectedSliderLayer ? String(selectedSliderLayer.id) : null}
+                        data={layers.map(l => ({
+                            value: String(l.id),
+                            label: l.item_name,
+                            disabled: l.id === selectedLayer?.id
+                        }))}
+                        onChange={(value) => selectSliderLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
                         placeholder={`${i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita")} ->`}
-                        showClear={true}
                     />
                 </div>
 
@@ -61,4 +65,3 @@ export default function SliderLayersMapControl({
 
     );
 }
-

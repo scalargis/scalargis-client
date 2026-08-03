@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TabMenu } from 'primereact/tabmenu';
+import { Tabs } from '@mantine/core';
 
 /* Define manager components in ManagerComponents folder and import here */
 
@@ -11,19 +11,19 @@ export default function Manager({ className, config, actions, record }) {
 
   const title = record?.title || 'Layer compare'
 
-  const [activeIndex, set_activeIndex] = useState(0)
-
-  const items = [
-    { label: 'Configurações', icon: 'pi pi-fw pi-cog' }
-  ];
-
-
+  const [activeTab, setActiveTab] = useState('settings')
 
   return (
     <React.Fragment>
-      <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => set_activeIndex(e.index)} />
+      <Tabs value={activeTab} onChange={setActiveTab}>
+        <Tabs.List>
+          <Tabs.Tab value="settings" leftSection={<i className="pi pi-fw pi-cog" aria-hidden="true" />}>
+            Configurações
+          </Tabs.Tab>
+        </Tabs.List>
+      </Tabs>
 
-      {activeIndex === 0 ?
+      {activeTab === 'settings' ?
         <div className="card dashboard">TODO</div>
         : null}
 
