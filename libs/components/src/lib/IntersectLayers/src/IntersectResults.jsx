@@ -1,11 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Toolbar } from 'primereact/toolbar';
-import { Button } from 'primereact/button';
-import { Checkbox } from 'primereact/checkbox';
-import { SplitButton } from 'primereact/splitbutton';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Toast } from 'primereact/toast';
+import React, { useState, useEffect } from 'react';
+import { Button, Checkbox, Group, Menu } from '@mantine/core';
+import { DataGrid, notify } from '@scalargis/ui';
 import OlWKT from "ol/format/WKT";
 import OlFeature from 'ol/Feature';
 
@@ -20,17 +15,13 @@ export default function IntersectResults(props) {
 
     const { viewer_add_dialog_window, viewer_update_dialog_window } = actions;
 
-    const { showOnPortal } = Models.Utils;
-
     const [showGeometry, setShowGeometry] = useState(false);
     const [items, setItems] = useState([]);
-    const [expandedRows, setExpandedRows] = useState(null);
+    const [expandedKeys, setExpandedKeys] = useState([]);
     const [selectAll, setSelectAll] = useState({});
     const [selectedRows, setSelectedRows] = useState({});
     const [downloadingFile, setDownloadingFile] = useState(false);
     const [downloadingFormat, setDownloadingFormat] = useState(false);
-
-    const toastDialog = useRef(null);
 
     const t = i18n.translateValue;
 
@@ -122,7 +113,7 @@ export default function IntersectResults(props) {
         const query = new URLSearchParams({...searchParams, format, export_srid: export_srid, viewerId: viewer.id});
 
         url = `${url}?${query.toString()}`;
-        
+
         const headers = new Headers({});
         const fetchBlob = core.services.data.fetchAll;
 
@@ -137,13 +128,13 @@ export default function IntersectResults(props) {
             a.href = url;
             a.download = `intersecao_resultados.${format == "csv" ? "zip" : format}`
             document.body.appendChild(a);
-            a.click();    
+            a.click();
             a.remove();
 
-            toastDialog.current.show({ severity: 'success', summary: t("information", "Informação"), detail: `${t("successFileGenerateMsg", "O ficheiro foi gerado com sucesso")}.` });
+            notify.success(t("information", "Informação"), `${t("successFileGenerateMsg", "O ficheiro foi gerado com sucesso")}.`);
         })
         .catch(e => {
-            toastDialog.current.show({ severity: 'warn', summary: t("error", "Error"), detail: `${t("errorFileGenerateMsg", "Ocorreu um erro ao gerar o ficheiro")}.` });
+            notify.warn(t("error", "Error"), `${t("errorFileGenerateMsg", "Ocorreu um erro ao gerar o ficheiro")}.`);
         })
         .finally(d => {
             setDownloadingFile(false);
@@ -246,13 +237,11 @@ export default function IntersectResults(props) {
     }, [selectedRows]);
 
     const expandAll = () => {
-        const _expandedRows = {};
-        items.forEach((p) => (_expandedRows[`${p.key}`] = true));
-        setExpandedRows(_expandedRows);
+        setExpandedKeys(items.map((p) => p.key));
     };
 
     const collapseAll = () => {
-        setExpandedRows(null);
+        setExpandedKeys([]);
     };
 
     const showTable = () => {
@@ -264,26 +253,26 @@ export default function IntersectResults(props) {
 
         if (viewer?.dialogWindows?.length > 0) {
             const dw = viewer.dialogWindows.find(w => w.key === key);
-            if (dw) {           
-                const config = { 
+            if (dw) {
+                const config = {
                     ...dw.config,
                     header: header,
                     className: 'sg-intersect-layers-results-table-dialog'
                 }
-                
+
                 const childKey = new Date().getTime();
-                const child = <ResultsTablesTabs 
+                const child = <ResultsTablesTabs
                     groups={results?.groups || []}
                     layers={results?.layers || []}
                     showResultMeasure={showResultMeasure}
                     showResultPercentage={showResultPercentage}
                     />
-    
+
                 dispatch(viewer_update_dialog_window({config: config, child: child, visible: true }));
                 return;
             }
         }
-    
+
         const data = {};
 
         const config = Object.assign({}, data?.dialogOptions);
@@ -292,25 +281,21 @@ export default function IntersectResults(props) {
         config.maximizable = true;
         config.style={ width: '75vw', height: '75vh' };
         config.className ='sg-intersect-layers-results-table-dialog'
-    
+
         const childKey = new Date().getTime();
-        const child = <ResultsTablesTabs 
+        const child = <ResultsTablesTabs
             groups={results?.groups || []}
             layers={results?.layers || []}
             showResultMeasure={showResultMeasure}
             showResultPercentage={showResultPercentage}
             />;
-    
+
         dispatch(viewer_add_dialog_window({config, child, onClose: data?.onClose}));
     }
 
-    const allowExpansion = (rowData) => {
-        return rowData.results.length > 0;
-    };
-
-    const onSelectionChange = (event, data) => {
+    const onSelectionChange = (records, data) => {
         const _selectedRows = {...selectedRows}
-        _selectedRows[data.key] = event.value;
+        _selectedRows[data.key] = records;
         setSelectedRows(_selectedRows);
 
         const _selectAll = {...selectAll}
@@ -318,13 +303,13 @@ export default function IntersectResults(props) {
         setSelectAll(_selectAll);
     };
 
-    const onSelectAllChange = (event, data) => {
+    const onSelectAllChange = (checked, data) => {
         const _selectAll = {...selectAll}
-        _selectAll[data.key] = event.checked;
+        _selectAll[data.key] = checked;
         setSelectAll(_selectAll);
 
         const _selectedRows = {...selectedRows}
-        if (event.checked) {
+        if (checked) {
             _selectedRows[data.key] = [...data.results];
         } else {
             _selectedRows[data.key] = [];
@@ -337,10 +322,10 @@ export default function IntersectResults(props) {
 
         const fields = rowData?.fields || cfg?.fields || [];
 
-        const showAreaTable = rowData?.dimension == 2 && 
+        const showAreaTable = rowData?.dimension == 2 &&
             (intersectConfig?.showResultMeasure !== false || intersectConfig?.showResultPercentage !== false);
 
-        const showLengthTable = rowData?.dimension == 1 && 
+        const showLengthTable = rowData?.dimension == 1 &&
             (intersectConfig?.showResultMeasure !== false || intersectConfig?.showResultPercentage !== false);
 
         return (
@@ -363,8 +348,8 @@ export default function IntersectResults(props) {
                             { showResultPercentage !== false ? <th>%</th> : null }
                         </tr>
                         <tr>
-                        { showResultMeasure !== false ? 
-                            <td>{rowData.area != null ? (Math.round(rowData.area  * precision)  / precision) : rowData.area}</td> 
+                        { showResultMeasure !== false ?
+                            <td>{rowData.area != null ? (Math.round(rowData.area  * precision)  / precision) : rowData.area}</td>
                             : null }
                         { showResultPercentage !== false ?
                             <td>{rowData.percent != null ? (Math.round(rowData.percent * precision)  / precision) : rowData.percent}</td>
@@ -381,8 +366,8 @@ export default function IntersectResults(props) {
                             { showResultPercentage !== false ? <th>%</th> : null }
                         </tr>
                         <tr>
-                        { showResultMeasure !== false ? 
-                            <td>{rowData.length != null ? (Math.round(rowData.length  * precision)  / precision) : rowData.length}</td> 
+                        { showResultMeasure !== false ?
+                            <td>{rowData.length != null ? (Math.round(rowData.length  * precision)  / precision) : rowData.length}</td>
                             : null }
                         { showResultPercentage !== false ?
                             <td>{rowData.percent != null ? (Math.round(rowData.percent * precision)  / precision) : rowData.percent}</td>
@@ -410,61 +395,97 @@ export default function IntersectResults(props) {
         let header = null;
         if (data?.results?.length > 1) {
             header = (
-                <div className="flex justify-content-end mt-2 mr-2 font-normal">
-                    <Checkbox name="selectAll" onChange={(e) => onSelectAllChange(e, data)} checked={selectAll[data.key]} />
-                    <label htmlFor="selectAll" className="ml-1">{t("showAll", "Ver todos")}</label>
-                </div>
+                <Group justify="flex-end" gap="xs" className="mt-2 mr-2 font-normal">
+                    <Checkbox
+                        name="selectAll"
+                        label={t("showAll", "Ver todos")}
+                        onChange={(e) => onSelectAllChange(e.currentTarget.checked, data)}
+                        checked={selectAll[data.key] || false}
+                    />
+                </Group>
             );
         }
 
         if (intersectConfig?.showResultGeometries === false) {
             return (
-                <DataTable value={data.results} className='sg-intersect-results-table'>
-                    <Column header="Ver todos" body={(rowData) => recordBodyTemplate(rowData, data.key, { fields: data?.fields})} headerStyle={{ display: 'none' }}></Column>
-                </DataTable>
+                <DataGrid
+                    idAccessor="key"
+                    records={data.results}
+                    noHeader
+                    className='sg-intersect-results-table'
+                    columns={[
+                        { accessor: 'record', render: (rowData) => recordBodyTemplate(rowData, data.key, { fields: data?.fields}) },
+                    ]}
+                />
             );
         }
 
         return (
-            <DataTable value={data.results} selection={selectedRows[data.key]}
-                selectionMode="checkbox"
-                onSelectionChange={(event) => onSelectionChange(event, data)}
-                header={header}
-                className='sg-intersect-results-table'>
-                <Column selectionMode="multiple" headerStyle={{ width: '1rem', display: 'none' }} />
-                <Column header="Ver todos" body={(rowData) => recordBodyTemplate(rowData, data.key, {...data})} headerStyle={{ display: 'none' }}></Column>
-            </DataTable>
+            <>
+                {header}
+                <DataGrid
+                    idAccessor="key"
+                    records={data.results}
+                    noHeader
+                    className='sg-intersect-results-table'
+                    selectedRecords={selectedRows[data.key] || []}
+                    onSelectedRecordsChange={(records) => onSelectionChange(records, data)}
+                    columns={[
+                        { accessor: 'record', render: (rowData) => recordBodyTemplate(rowData, data.key, {...data}) },
+                    ]}
+                />
+            </>
         );
 
     };
 
     const exportToolbar = exportFormats?.length > 3 ? (
-        <SplitButton label={t("export", "Exportar")} icon="pi pi-upload" size="small" outlined 
-            disabled={downloadingFile}
-            loading={downloadingFile}            
-            model={exportFormats.map((format) => {
-                return {
-                    label: fileFormats?.[format]?.label || format.toUpperCase(),
-                    icon: `pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "p-file" }`,
-                    command: () => {
-                        exportResults(format);
-                    }
-                }
-            })}
-         />
+        <Menu>
+            <Menu.Target>
+                <Button
+                    type="button"
+                    size="xs"
+                    variant="outline"
+                    leftSection={<i className="pi pi-upload" aria-hidden="true" />}
+                    rightSection={<i className="pi pi-chevron-down" aria-hidden="true" />}
+                    disabled={downloadingFile}
+                    loading={downloadingFile}
+                >
+                    {t("export", "Exportar")}
+                </Button>
+            </Menu.Target>
+            <Menu.Dropdown>
+                {exportFormats.map((format) => (
+                    <Menu.Item
+                        key={format}
+                        leftSection={<i className={`pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "pi-file" }`} aria-hidden="true" />}
+                        onClick={() => exportResults(format)}
+                    >
+                        {fileFormats?.[format]?.label || format.toUpperCase()}
+                    </Menu.Item>
+                ))}
+            </Menu.Dropdown>
+        </Menu>
     ) : (
         <React.Fragment>
-            { 
+            {
                 exportFormats.map((format, index) => {
                     return (
-                        <Button key={index} icon={`pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "p-file" }`} className="mr-2"
-                            label={format.toUpperCase()} link
+                        <Button
+                            key={index}
+                            type="button"
+                            size="xs"
+                            variant="subtle"
+                            className="mr-2"
+                            leftSection={<i className={`pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "pi-file" }`} aria-hidden="true" />}
                             disabled={downloadingFile}
                             loading={downloadingFile && downloadingFormat == format}
                             onClick={() =>  {
                                 exportResults(format);
                             }
-                        }/>
+                        }>
+                            {format.toUpperCase()}
+                        </Button>
                     );
                 })
             }
@@ -474,38 +495,57 @@ export default function IntersectResults(props) {
     const header = (
         <div className="flex justify-content-between flex-wrap">
             { showTablesButton && <div className="flex flex-wrap justify-content-end gap-2 my-1">
-                <Button icon="pi pi-table" label={t("tables", "Tabelas")} onClick={showTable} text size="small" />
+                <Button type="button" size="xs" variant="subtle" leftSection={<i className="pi pi-table" aria-hidden="true" />} onClick={showTable}>{t("tables", "Tabelas")}</Button>
             </div> }
             <div className="flex flex-wrap justify-content-end gap-2 my-1">
-                <Button icon="pi pi-plus" label={t("expand", "Expandir")} onClick={expandAll} text size="small" />
-                <Button icon="pi pi-minus" label={t("collapse", "Recolher")} onClick={collapseAll} text size="small" />
+                <Button type="button" size="xs" variant="subtle" leftSection={<i className="pi pi-plus" aria-hidden="true" />} onClick={expandAll}>{t("expand", "Expandir")}</Button>
+                <Button type="button" size="xs" variant="subtle" leftSection={<i className="pi pi-minus" aria-hidden="true" />} onClick={collapseAll}>{t("collapse", "Recolher")}</Button>
             </div>
         </div>
     )
 
     return (
         <div className="mt-4">
-            {showOnPortal(<Toast ref={toastDialog} />)}
             <h3>{t("results", "Resultados")}</h3>
 
-            { intersectConfig?.showExport !== false ? <Toolbar end={exportToolbar} /> : null }
+            { intersectConfig?.showExport !== false ?
+                <Group justify="flex-end" className="sg-intersect-toolbar">{exportToolbar}</Group> : null }
 
             <div className="text-right mb-2">
 
             </div>
 
             <div className="flex align-items-center my-3">
-                <Checkbox name="showGeometry" value={showGeometry} onChange={(e) => setShowGeometry(!e.value)} checked={showGeometry} />
-                <label htmlFor="showGeometry" className="ml-2">{t("showIntersectionGeometry", "Ver Geometria da Confrontação")}</label>
+                <Checkbox
+                    name="showGeometry"
+                    label={t("showIntersectionGeometry", "Ver Geometria da Confrontação")}
+                    onChange={(e) => setShowGeometry(e.currentTarget.checked)}
+                    checked={showGeometry}
+                />
             </div>
 
             <div className="mt-2">
-                <DataTable value={items} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
-                        rowExpansionTemplate={rowExpansionTemplate}
-                        dataKey="key" header={header} className='sg-intersect-results-table' showHeaders={false} >
-                    <Column expander={allowExpansion} style={{ width: '1rem' }} />
-                    <Column body={itemBodyTemplate} />
-                </DataTable>
+                {header}
+                <DataGrid
+                    idAccessor="key"
+                    records={items}
+                    noHeader
+                    className='sg-intersect-results-table'
+                    columns={[
+                        {
+                            accessor: 'expander',
+                            width: '1rem',
+                            render: (rowData) => (rowData?.results?.length > 0 ?
+                                <i className={expandedKeys.includes(rowData.key) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'} aria-hidden="true" /> : null),
+                        },
+                        { accessor: 'title', render: itemBodyTemplate },
+                    ]}
+                    rowExpansion={{
+                        allowMultiple: true,
+                        expanded: { recordIds: expandedKeys, onRecordIdsChange: setExpandedKeys },
+                        content: ({ record }) => rowExpansionTemplate(record),
+                    }}
+                />
             </div>
 
         </div>

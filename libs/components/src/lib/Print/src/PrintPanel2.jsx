@@ -9,7 +9,7 @@ import OlInteractionSelect from "ol/interaction/Select";
 import Feature from 'ol/Feature';
 import { singleClick } from "ol/events/condition";
 
-import DrawingToolbar from './DrawingToolbar';
+import { DrawingToolbar } from '../../components';
 import PrintFormFields from './PrintFormFields';
 import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
 

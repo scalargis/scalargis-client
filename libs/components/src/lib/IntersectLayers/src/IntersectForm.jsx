@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Button } from 'primereact/button';
-import { Toolbar } from 'primereact/toolbar';
-import { Message } from 'primereact/message';
-import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import { Toast } from 'primereact/toast';
-import { InputNumber } from 'primereact/inputnumber';
-import { Card } from 'primereact/card';
+import { Alert, Button, Group, NumberInput, Paper } from '@mantine/core';
+import { confirm, notify } from '@scalargis/ui';
 import OlInteractionDraw from "ol/interaction/Draw";
 import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
@@ -25,11 +20,11 @@ import {
 import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser';
 import {BufferOp} from 'jsts/org/locationtech/jts/operation/buffer';
 
-import { i18n } from '../../components';
+import { i18n, DrawingToolbar } from '../../components';
 
 import IntersectResults from './IntersectResults';
 
-import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
+import { DEFAULT_DRAWING_TOOLS } from './utils';
 
 import './style.css';
 
@@ -38,7 +33,6 @@ export default function IntersectForm(props) {
 
   const { core, intersectLayer, config, actions, componentId, intersectConfig, setBlockedPanel } = props;
   const { viewer, mainMap, dispatch, Models } = config;
-  const { showOnPortal } = Models.Utils;
   const { getProjectionSrid } = Models.MapModel;
   const { exclusive_mapcontrol } = viewer;
 
@@ -64,30 +58,12 @@ export default function IntersectForm(props) {
   const [results, setResults] = useState([]);
   const [showNoResultsMsg, setShowNoResultsMsg] = useState(false);
 
-  const toastDialog = useRef(null);
-
   const geometryCol = useRef(new Collection([]));
 
   const drawingOptionsTools = useMemo(() => {
-    const _tools = intersectConfig?.drawTools || DEFAULT_DRAWING_TOOLS;      
+    const _tools = intersectConfig?.drawTools || DEFAULT_DRAWING_TOOLS;
     return _tools.map(t => t.toLowerCase());
   }, [intersectConfig?.drawTools]);
-
-  let drawTools = [
-    { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
-    { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
-    { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
-    { value: "Copy", title: "copyFeature", "defaultTitle": "Copiar geometria", icon: "pi pi-copy" },
-    { value: "Select", title: "selectElement", "defaultTitle": "Selecionar elemento", icon: "fas fa-mouse-pointer" },
-    { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: "pi pi-pencil" }     
-  ];
-
-  if (intersectConfig?.drawTools?.length) {
-    const _tools = intersectConfig.drawTools.map((t) => t.toLowerCase());
-    drawTools = drawTools.filter((tool) => {
-      return  _tools.includes(tool.value.toLowerCase());
-    });
-  }
 
   function selectDrawTool(e, tool) {
     e.preventDefault();
@@ -134,15 +110,13 @@ export default function IntersectForm(props) {
   }
 
   const confirmCopyFeatureGeometry = (feature) => {
-    confirmDialog({
-      group: `${MAPCONTROL_NAME}-${componentId}`,
+    confirm({
       message: ` ${t("copyGeometryConfirmation", "Deseja copiar a geometria selecionada?")}`,
       header: t("confirmation", "Confirmação"),
-      icon: 'pi pi-exclamation-triangle',
+      severity: 'warning',
       acceptLabel: t("yes", "Sim"),
       rejectLabel: t("no", "Não"),
-      defaultFocus: "reject",
-      accept: () => {       
+      accept: () => {
         intersectLayer.current.getSource().getFeatures().forEach((f) => {
           if (f.get('_componentId') == componentId && f != feature) intersectLayer.current.getSource().removeFeature(f);
         });
@@ -173,18 +147,18 @@ export default function IntersectForm(props) {
   }
 
   const confirmDeleteAll = (features) => {
-    confirmDialog({
+    confirm({
         message: ` ${t("deleteAllElments", "Deseja eliminar todos os elementos?")}`,
         header: t("confirmation", "Confirmação"),
-        icon: 'pi pi-exclamation-triangle',
+        severity: 'danger',
         acceptLabel: t("yes", "Sim"),
         rejectLabel: t("no", "Não"),
         accept: () => {
           setGeometryIntersection([]);
         },
-        reject: () =>  { /* noop */ }      
+        reject: () =>  { /* noop */ }
     });
-  }  
+  }
 
   function deletedSelectedFeature() {
     setGeometryIntersection([]);
@@ -228,7 +202,7 @@ export default function IntersectForm(props) {
     const outProj = 'EPSG:4326';
 
     if (geometryCol?.current?.getLength && !geometryCol.current.getLength()) {
-      toastDialog.current.show({ severity: 'warn', summary: t("error", "Error"), detail: t("geometryRequiredMsg", "É obrigatório definir a geometria") }); 
+      notify.warn(t("error", "Error"), t("geometryRequiredMsg", "É obrigatório definir a geometria"));
       return;
     }
 
@@ -278,7 +252,7 @@ export default function IntersectForm(props) {
 
     if (!isValid) {
       const msg = t("geometryMaxAreaMsg", "A geometria não pode ultrapassar a área máxima permitida: {{maxArea}}", undefined, undefined, undefined, { maxArea: `${intersectConfig.maxArea} m².` });
-      toastDialog.current.show({ severity: 'warn', summary: t("error", "Error"), detail: msg });
+      notify.warn(t("error", "Error"), msg);
       return
     }
 
@@ -301,7 +275,7 @@ export default function IntersectForm(props) {
       setShowNoResultsMsg(true);
       setResults(result?.data);
     }).catch(error => {
-      toastDialog.current.show({ severity: 'error', summary: 'Error', detail: 'Ocorreu um erro ao executar a análise.' });
+      notify.error('Error', 'Ocorreu um erro ao executar a análise.');
       console.log('error', error);
     }).finally(()=>{
       setBlockedPanel(false);
@@ -384,10 +358,10 @@ export default function IntersectForm(props) {
             mainMap.render();
           }, 500);
 
-          toastDialog.current.show({
-            severity: 'warn', summary:  t("copyGeometry", "Copiar geometria"),
-            detail: t("copyGeometryNotSupportedMsg", "O tipo de geometria não é permitido ({{type}}).", undefined, undefined, undefined, { type: feature.getGeometry().getType()}), life: 3000
-          });
+          notify.warn(
+            t("copyGeometry", "Copiar geometria"),
+            t("copyGeometryNotSupportedMsg", "O tipo de geometria não é permitido ({{type}}).", undefined, undefined, undefined, { type: feature.getGeometry().getType()})
+          );
 
           return true;
         }
@@ -455,80 +429,56 @@ export default function IntersectForm(props) {
   }, [geometryIntersection]);
 
 
-  const toolbarLeftContents = (
-    <React.Fragment>
-      {drawTools.filter( opt => {
-        if (drawingOptionsTools.length === 0) return true;
-        return drawingOptionsTools.includes(opt.value.toLowerCase());
-       }).map(opt => <Button
-          key={opt.value}
-          icon={opt.icon}
-          label={opt.label ? opt.label : ''}
-          title={t(opt.title, opt.defaultTitle)}
-          size="small" className={"mr-1 tool" + (opt.value === drawTool ? " active" : "")}
-          onClick={(e) => selectDrawTool(e, opt.value)}
-        />
-      )}
-    </React.Fragment>
-  );
-
-  const toolbarRightContents = (
-    <React.Fragment>
-        <Button 
-          icon="pi pi-trash"
-          title={t("deleteSelectedElment", "Eliminar elemento selecionado")}
-          size="small"
-          className="p-button mr-1 tool"
-          onClick={(e) => deletedSelectedFeature() }
-        />
-        <Button 
-          icon="fas fa-search-plus"
-          title={t("viewAllElements", "Ver todos os elementos")}
-          size="small"
-          className="p-button tool"
-          onClick={(e) => zoomFeaturesExtent() }
-        />        
-    </React.Fragment>
-  );
-
   const geometryError = !geometryIntersection?.length ? true : false;
 
   return (
     <div>
-      {showOnPortal(<Toast ref={toastDialog} />)}
-      <ConfirmDialog group={`${MAPCONTROL_NAME}-${componentId}`} />
-
       { intersectConfig?.content?.title && <h3 className="my-2">{t(intersectConfig.content.title, intersectConfig.content.title)}</h3> }
 
-      { intersectConfig?.content?.description && <Card className="mt-2">
+      { intersectConfig?.content?.description && <Paper shadow="sm" p="sm" className="mt-2">
         <div dangerouslySetInnerHTML={{__html: t(intersectConfig.content.description, intersectConfig.content.description)}}></div>
-      </Card> }
+      </Paper> }
 
       <div className="p-fluid">
         <h4>{t("locationMarking", "Marcação do Local")}</h4>
-        <div>
-          <Toolbar start={toolbarLeftContents} end={toolbarRightContents} className="px-1 py-2" />
-        </div>
-        <Message className="mt-2" severity={ geometryError === true ? "warn" : "info" } text={`${t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")}.`} />
+        <DrawingToolbar
+          availableTools={drawingOptionsTools}
+          activeTool={drawTool}
+          onSelectTool={selectDrawTool}
+          onDeleteSelected={deletedSelectedFeature}
+          onZoomAll={zoomFeaturesExtent}
+          deleteTitle={t("deleteSelectedElment", "Eliminar elemento selecionado")}
+        />
+        <Alert className="mt-2" color={ geometryError === true ? "warning" : "informative" } py="xs">
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <i className={geometryError === true ? "pi pi-exclamation-triangle" : "pi pi-info-circle"} />
+            <span>{`${t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")}.`}</span>
+          </Group>
+        </Alert>
       </div>
 
       { intersectConfig?.bufferOption !== false && <div className="p-fluid mt-3">
         <div className="field">
             <label htmlFor="buffer">{`${t("areaOfInfluence", "Área de influência")} (${t("meters", "Metros").toLowerCase()})`}</label>
-            <InputNumber id="buffer"  value={buffer} onValueChange={(e) => setBuffer(e.value)} useGrouping={false} />
+            <NumberInput
+              id="buffer"
+              hideControls
+              value={buffer != null ? buffer : ''}
+              onChange={(value) => setBuffer(typeof value === 'number' ? value : (value === '' || value == null ? null : Number(value)))}
+            />
         </div>
       </div> }
 
       <div className="text-center mt-1">
-        
+
       </div>
 
       <div className="grid mt-2">
         <div className="col text-center">
-          <Button label={t("clear", "Limpar")} severity="secondary" onClick={(e) => clearAll([])} />
+          <Button type="button" variant="default" onClick={(e) => clearAll([])}>{t("clear", "Limpar")}</Button>
         </div>
         <div className="col text-center">
-          <Button label={t("execute", "Executar")} className="p-button-primary" onClick={(e) => doSearch({"buffer": buffer })} />
+          <Button type="button" onClick={(e) => doSearch({"buffer": buffer })}>{t("execute", "Executar")}</Button>
         </div>
       </div>
 
@@ -551,10 +501,12 @@ export default function IntersectForm(props) {
           setShowGeometry={setShowGeometry}
         /> :
         showNoResultsMsg && <div className="p-fluid mt-4">
-          <Message
-            severity="info"
-            text={(t( "noResults", "Sem resultados"))}
-          />
+          <Alert color="informative" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-info-circle" />
+              <span>{(t( "noResults", "Sem resultados"))}</span>
+            </Group>
+          </Alert>
         </div>
       }
 

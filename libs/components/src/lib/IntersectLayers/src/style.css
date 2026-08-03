@@ -1,10 +1,6 @@
 /*----*/
 
-.sg-intersect-layers .p-panel-content .p-toolbar button.tool.active {
-    background-color: #004175;
-}
-
-.sg-intersect-layers .p-panel-content h4 {
+.sg-intersect-layers h4 {
     border-bottom: #9e9d9e;
     border-bottom-style: solid;
     border-bottom-width: 1px;
@@ -13,31 +9,18 @@
     margin-bottom: 5px;
 }
 
-.sg-intersect-layers .p-panel-content .p-card-body {
-    padding: 0.5rem 1rem;
+/* The Prime Toolbar chrome restated for the export / groups strips */
+.sg-intersect-toolbar {
+    border: 1px solid #dee2e6;
+    background: #f8f9fa;
+    border-radius: 3px;
+    padding: 0.5rem;
 }
 
-.sg-intersect-layers .p-panel-content .p-card-content {
-    padding: 0.5rem 0;
-}
-
-.sg-intersect-layers .sg-intersect-results-table .p-datatable-header {
-    padding: 0.2rem 0;
-}
-
-.sg-intersect-layers .sg-intersect-results-table .p-datatable-table .p-datatable-thead tr th,
-.sg-intersect-layers .sg-intersect-results-table .p-datatable-table .p-datatable-tbody tr td {
+.sg-intersect-layers .sg-intersect-results-table th,
+.sg-intersect-layers .sg-intersect-results-table td {
     padding: 0.2rem;
     padding-right: 0.3rem;
-}
-
-.sg-intersect-layers .sg-intersect-results-table .p-datatable .p-datatable-tbody > tr.p-highlight {
-    background: None;
-}
-
-.sg-intersect-layers .sg-intersect-results-table .p-datatable .p-datatable-tbody > tr:hover {
-    background: #f5f9fb;
-    color: #495057;
 }
 
 .sg-intersect-layers .sg-intersect-results-table-record {
@@ -63,13 +46,9 @@
     font-weight: normal;
 }
 
-.sg-intersect-layers .p-panel-content .p-toolbar button.tool.p-button-sm {
-    padding: 0.49rem 0.49rem !important;
-}
-
-.sg-intersect-layers-results-table-dialog .p-tabview-nav {
+.sg-intersect-layers-results-table-dialog .mantine-Tabs-list {
     overflow: auto;
     overflow-y: hidden;
     padding-bottom: 2px;
+    flex-wrap: nowrap;
 }
-

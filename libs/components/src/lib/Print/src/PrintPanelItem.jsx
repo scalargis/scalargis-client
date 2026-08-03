@@ -14,7 +14,7 @@ import Feature from 'ol/Feature';
 import { extend, createEmpty } from 'ol/extent';
 import { singleClick, platformModifierKeyOnly } from 'ol/events/condition';
 
-import DrawingToolbar from './DrawingToolbar';
+import { DrawingToolbar } from '../../components';
 import PrintFormFields from './PrintFormFields';
 import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
 

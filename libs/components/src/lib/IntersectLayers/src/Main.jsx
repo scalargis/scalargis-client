@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
-import { ProgressSpinner } from 'primereact/progressspinner';
+import React, { useState } from 'react';
+import { Box, LoadingOverlay } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
 
-import { i18n } from '../../components';
+import { i18n, MainMenuButton } from '../../components';
 
 import Intersect from './Intersect';
 
@@ -14,8 +13,6 @@ import './style.css';
  */
 export function MainMenu({ className, config, actions, record }) {
 
-  const { viewer, mainMap, dispatch } = config;
-
   const t = i18n.translateValue;
 
   const title = t(record?.title || "Interseção de Temas", record?.title || "Interseção de Temas");
@@ -24,10 +21,9 @@ export function MainMenu({ className, config, actions, record }) {
 
       if (record?.config_json?.btn_image) {
         return (
-          <Button
+          <MainMenuButton
             title={title}
             className={className ? className + ' intersect-layers-main-menu-btn' : null}
-            icon="pi"
             style={{ backgroundImage: `url("${record.config_json.btn_image}")` }}
             onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
           />
@@ -35,12 +31,12 @@ export function MainMenu({ className, config, actions, record }) {
       }
 
       return (
-          <Button
+          <MainMenuButton
             title={title}
             className={className}
             icon={record?.config_json?.btn_icon ? record.config_json.btn_icon : "pi pi-objects-column"}
             onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
-          />         
+          />
       )
     } else {
       return null;
@@ -48,7 +44,7 @@ export function MainMenu({ className, config, actions, record }) {
 }
 
 export default function Main(props) {
-  
+
   const {as, core, config, actions, record, utils} = props;
   const { viewer, mainMap, dispatch } = config;
 
@@ -57,34 +53,9 @@ export default function Main(props) {
   const component_cfg = record.config_json || {};
   const header = t(component_cfg.header, component_cfg.header);
 
-  const ref = useRef(null);
   const [blockedPanel, setBlockedPanel] = useState(false);
-  
+
   const className = config?.classname ? `sg-intersect-layers ${config?.classname}` : 'sg-intersect-layers';
-
-
-  const getBlockFullHeight = () => {
-
-    const oDiv = ref.current;
-    
-    let clientHeight = 0;
-    let height = 0;
-    
-    try {
-      clientHeight = oDiv.clientHeight;
-    
-      const sOriginalOverflow = oDiv.style.overflow;
-      const sOriginalHeight = oDiv.style.height;
-      oDiv.style.overflow = "";
-      oDiv.style.height = "";
-
-      height = oDiv.offsetHeight;
-      oDiv.style.height = sOriginalHeight;
-      oDiv.style.overflow = sOriginalOverflow;
-    } catch { /* empty */ }
-        
-    return clientHeight > height ? clientHeight : height;
-  }
 
   function renderContent() {
     return (
@@ -99,20 +70,17 @@ export default function Main(props) {
         componentId={record?.id}
         setBlockedPanel={setBlockedPanel}
       />
-    ) 
+    )
   }
 
   if (as === 'panel') return (
-    <div ref={ref} className="p-blockui-container" style={{height: 'calc(100%)'}}>
-      <Panel header={header} className={className}>
+    <Box pos="relative" style={{height: 'calc(100%)'}}>
+      <CollapsiblePanel header={header} className={className} toggleable={false}>
         { renderContent() }
-      </Panel>
-      { blockedPanel && <div className="p-blockui p-component-overlay p-component-overlay-enter" style={{zIndex: 1003, height: getBlockFullHeight()}}>
-        <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="8" fill="#EEEEEE" animationDuration=".5s"/>
-      </div> }
-    </div>
-
-  )  
+      </CollapsiblePanel>
+      <LoadingOverlay visible={blockedPanel} zIndex={1003} />
+    </Box>
+  )
 
   // Render component
   return renderContent()

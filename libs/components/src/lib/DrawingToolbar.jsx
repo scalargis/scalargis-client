@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from "react-i18next";
 import { ActionIcon, Group } from '@mantine/core';
 
-import './style.css';
+import './drawing-toolbar.css';
 
 const DRAW_TOOLS = [
   { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
@@ -14,15 +14,15 @@ const DRAW_TOOLS = [
 ];
 
 /**
- * The location-marking toolbar PrintPanel2 and PrintPanelItem share: the
- * drawing tools on the left (filled = active, aria-pressed for keyboard
- * users), delete and zoom-all on the right.
+ * The location-marking toolbar shared by Print (PrintPanel2, PrintPanelItem)
+ * and IntersectLayers: the drawing tools on the left (filled = active,
+ * aria-pressed for keyboard users), delete and zoom-all on the right.
  */
 export default function DrawingToolbar({ availableTools, activeTool, onSelectTool, onDeleteSelected, onZoomAll, deleteTitle }) {
   const { t } = useTranslation();
 
   return (
-    <Group justify="space-between" wrap="nowrap" className="print-drawing-toolbar">
+    <Group justify="space-between" wrap="nowrap" className="drawing-toolbar">
       <Group gap={4} wrap="nowrap">
         {DRAW_TOOLS.filter(opt => {
           if (!availableTools || availableTools.length === 0) return true;
