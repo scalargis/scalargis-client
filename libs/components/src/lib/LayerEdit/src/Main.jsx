@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
+import { ActionIcon, Modal } from '@mantine/core';
 import EditNode from './EditNode';
 
 export default function Main(props) {
 
   const { config } = props;
   const { layer, actions, models, viewer } = config;
-  const { getWindowSize, showOnPortal, isComponentExcludedForLayer } = models.Utils;
+  const { getWindowSize, isComponentExcludedForLayer } = models.Utils;
 
   const [modalEditOpen, setModalEditOpen] = useState(null);
 
-  const { t } = useTranslation();  
+  const { t } = useTranslation();
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
@@ -20,24 +19,27 @@ export default function Main(props) {
   const exclude = isComponentExcludedForLayer(viewer, layer, "LayerEdit");
 
   if (exclude) return null;
-  
+
   return (
     <React.Fragment>
 
-      <Button icon="pi pi-pencil"
-        title={t("personalizarTema", "Personalizar Tema")}
-        color="green"
-        size="small" rounded text
+      <ActionIcon
+        variant="subtle"
+        size="md"
+        radius="xl"
         className="tool"
+        title={t("personalizarTema", "Personalizar Tema")}
+        aria-label={t("personalizarTema", "Personalizar Tema")}
         onClick={e => setModalEditOpen({...layer})}
-      />
+      >
+        <i className="pi pi-pencil" aria-hidden="true" />
+      </ActionIcon>
 
-      {showOnPortal(<Dialog 
-        header={t("personalizarTema", "Personalizar Tema")}
-        visible={!!modalEditOpen} 
-        style={{width: isMobile ? '90%' : '50vw' }} 
-        modal 
-        onHide={e => setModalEditOpen(false)}>
+      <Modal
+        title={t("personalizarTema", "Personalizar Tema")}
+        opened={!!modalEditOpen}
+        size={isMobile ? '90%' : '50vw'}
+        onClose={e => setModalEditOpen(false)}>
         <EditNode
           edit={modalEditOpen}
           onSave={(e, theme) => {
@@ -45,7 +47,7 @@ export default function Main(props) {
             actions.applyThemeChanges(theme);
           }}
         />
-      </Dialog>)}
+      </Modal>
     </React.Fragment>
   )
 }
