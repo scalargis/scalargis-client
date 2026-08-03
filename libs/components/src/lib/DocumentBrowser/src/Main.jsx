@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { CollapsiblePanel } from '@scalargis/ui';
 
-import { i18n } from '../../components';
+import { i18n, MainMenuButton } from '../../components';
 
 import DocumentList from './DocumentList';
-
-import './style.css';
 
 /**
  * Main menu component
@@ -33,7 +30,7 @@ export function MainMenu({ className, core, config, actions, record }) {
 
     const cfg = Object.assign({}, component_cfg?.dialogOptions);
     cfg.key = key;
-    cfg.header = component_cfg?.dialogOptions?.header || header; 
+    cfg.header = component_cfg?.dialogOptions?.header || header;
 
     const childKey = new Date().getTime();
     const child = <DocumentList key={childKey} core={core} documentList={component_cfg} />
@@ -44,15 +41,14 @@ export function MainMenu({ className, core, config, actions, record }) {
   if (record.as === 'popup') {
     return (
       <React.Fragment>
-        { component_cfg?.btn_image ? 
-            <Button
+        { component_cfg?.btn_image ?
+            <MainMenuButton
               title={title}
               className={className ? className + ' main-menu-btn-image' : null}
-              icon="pi"
               style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
               onClick={e => showPopup() /*setShowPopup(true)*/}
             /> :
-            <Button
+            <MainMenuButton
               title={title}
               className={className}
               icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
@@ -63,10 +59,9 @@ export function MainMenu({ className, core, config, actions, record }) {
   }  else {
     if (component_cfg?.btn_image) {
       return (
-        <Button
+        <MainMenuButton
           title={title}
           className={className ? className + ' main-menu-btn-image' : null}
-          icon="pi"
           style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
           onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
         />
@@ -74,12 +69,12 @@ export function MainMenu({ className, core, config, actions, record }) {
     }
 
     return (
-        <Button
+        <MainMenuButton
         title={title}
         className={className}
         icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
-      /> 
+      />
     )
   }
 }
@@ -115,9 +110,9 @@ export default function Main({ as, core, config, actions, record }) {
   )
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   return null

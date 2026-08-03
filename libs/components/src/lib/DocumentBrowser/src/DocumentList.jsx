@@ -1,17 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 
-import { TreeTable } from 'primereact/treetable';
-import { Message } from 'primereact/message';
-import { Column } from 'primereact/column';
-import { InputText } from 'primereact/inputtext';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
-import { Button } from 'primereact/button';
+import { Alert, Button, Group, TextInput } from '@mantine/core';
+import { TreeView, useTree } from '@scalargis/ui';
 
 import { i18n, utils, ProgressControl } from '../../components';
-
-import './style.css';
 
 
 const buildTree = (items, level = 0) => {
@@ -35,6 +28,28 @@ const buildTree = (items, level = 0) => {
   return tree;
 }
 
+// Lenient filter, the ThemesTree idiom: a node whose name matches keeps its
+// whole subtree; a folder is kept when any descendant survives.
+const pruneTree = (nodes, query) => {
+  if (!query) return nodes;
+  const q = String(query).toLowerCase();
+  const prune = (items) => {
+    const kept = [];
+    items.forEach((item) => {
+      if (String(item?.data?.name || '').toLowerCase().includes(q)) {
+        kept.push(item);
+        return;
+      }
+      if (item.children?.length) {
+        const children = prune(item.children);
+        if (children.length) kept.push({ ...item, children });
+      }
+    });
+    return kept;
+  };
+  return prune(nodes);
+}
+
 export default function DocumentList({ core, documentList }) {
 
   const { buildUrlPath } = utils;
@@ -45,24 +60,9 @@ export default function DocumentList({ core, documentList }) {
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState([]);
   const [error, setError] = useState();
-  const [expandedKeys, setExpandedKeys] = useState({});
-  const [filter, setFilter] = useState(null);
+  const [filter, setFilter] = useState('');
 
-  const allKeys = useMemo(() => {
-    const getKeys = (items, keys = []) => {
-      const _keys = keys || [];
-      items.forEach((item, index) => {
-        if (item?.data?.type === "folder") {
-          _keys.push(item.key);
-          getKeys(item.children, _keys);
-        }
-      });
-      return _keys;
-    }
-
-    const keys = getKeys(data);
-    return keys;
-  }, [data]);
+  const tree = useTree();
 
   useEffect(() => {
     let url;
@@ -82,7 +82,7 @@ export default function DocumentList({ core, documentList }) {
       fetch(url).then(res => {
         if (res.status == 404) {
           throw Error({status: res.status, message: res?.statusText});
-        }  
+        }
         return res.json();
       }).then(result => {
         const tree = buildTree(result.children || []);
@@ -92,7 +92,7 @@ export default function DocumentList({ core, documentList }) {
       }).finally(()=> {
         setLoaded(true);
       })
-    }  
+    }
   }, []);
 
   const translatedText = useMemo(() => {
@@ -104,6 +104,32 @@ export default function DocumentList({ core, documentList }) {
       "emptyFolder": i18n.translateValue("emptyFolder", "Pasta vazia")
     }
   }, [i18n.getResolvedLanguage()]);
+
+  // The filtered documents mapped to the TreeView contract: the node label is
+  // the file link (or folder name) with the external-link icon riding the row
+  // end for files, what the old TreeTable's second column rendered.
+  const treeData = useMemo(() => {
+    const mapNode = (item) => ({
+      value: item.key,
+      label: item?.data?.type === "file" ? (
+        <Group gap="xs" wrap="nowrap">
+          <a target="_blank" rel="noreferrer" href={`${documentList.baseUrl || ''}${item.data.url}`}>{item.data.name}</a>
+          <a target="_blank" rel="noreferrer" href={`${documentList.baseUrl || ''}${item.data.url}`} title={item.data.name} tabIndex={-1}>
+            <i className="pi pi-external-link" aria-hidden="true"></i>
+          </a>
+        </Group>
+      ) : (
+        <span>{item?.data?.name}</span>
+      ),
+      children: item.children?.length ? item.children.map(mapNode) : undefined,
+    });
+    return pruneTree(data, filter).map(mapNode);
+  }, [data, filter, documentList.baseUrl]);
+
+  // Typing a filter expands the survivors so the matches are visible.
+  useEffect(() => {
+    if (filter) tree.expandAllNodes();
+  }, [filter]);
 
   if (!loaded) {
     return (
@@ -122,7 +148,12 @@ export default function DocumentList({ core, documentList }) {
     return (
       <div>
         <div className="mt-4 mb-4 text-left">
-          <Message severity="error" text={translatedText.folderNotFound} className="col-12" />
+          <Alert color="danger" py="xs" className="col-12">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-times-circle" />
+              <span>{translatedText.folderNotFound}</span>
+            </Group>
+          </Alert>
         </div>
       </div>
     );
@@ -132,7 +163,12 @@ export default function DocumentList({ core, documentList }) {
     return (
       <div>
         <div className="mt-4 mb-4 text-left">
-          <Message severity="warn" text={translatedText.emptyFolder}  className="col-12" />
+          <Alert color="warning" py="xs" className="col-12">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-exclamation-triangle" />
+              <span>{translatedText.emptyFolder}</span>
+            </Group>
+          </Alert>
         </div>
       </div>
     );
@@ -141,53 +177,37 @@ export default function DocumentList({ core, documentList }) {
   const header = (documentList?.showExpandButtons || documentList?.showFilter) &&
     <div className='grid'>
       {documentList?.showFilter && <div className="flex col-12 justify-content-end">
-        <IconField iconPosition="left">
-            <InputIcon className="pi pi-search"> </InputIcon>
-            <InputText value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={`${translatedText.filter}...`} />
-        </IconField>
+        <TextInput
+          leftSection={<i className="pi pi-search" aria-hidden="true" />}
+          value={filter || ''}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder={`${translatedText.filter}...`}
+          aria-label={translatedText.filter}
+        />
       </div>}
       {documentList?.showExpandButtons && <div className="col-12">
-        <div className="p-buttonset" style={{"display": "inline-flex"}}>
-          <Button label={translatedText.expand} icon="pi pi-plus-circle" outlined size="small"
+        <Button.Group style={{"display": "inline-flex"}}>
+          <Button type="button" size="xs" variant="outline" leftSection={<i className="pi pi-plus-circle" aria-hidden="true" />}
             onClick={() => {
-              const _expandedKeys = {};
-              allKeys.forEach(v => _expandedKeys[v] = true);
-              setExpandedKeys(_expandedKeys);    
-            }} />
-          <Button label={translatedText.collapse} icon="pi pi-minus-circle" outlined size="small"
+              tree.expandAllNodes();
+            }}>
+            {translatedText.expand}
+          </Button>
+          <Button type="button" size="xs" variant="outline" leftSection={<i className="pi pi-minus-circle" aria-hidden="true" />}
             onClick={() => {
-              setExpandedKeys({});
+              tree.collapseAllNodes();
             }}
-          />
-        </div>
+          >
+            {translatedText.collapse}
+          </Button>
+        </Button.Group>
       </div>}
     </div>;
 
   return (
     <React.Fragment>
       {header}
-      <TreeTable value={data} globalFilter={filter} expandedKeys={expandedKeys}
-        onToggle={e => setExpandedKeys(e.value)} className="sg-document-list" >
-        <Column
-          field="name"
-          body={(d) => {
-            if (d?.data?.type === "file") {
-              return <a target="_blank" href={`${documentList.baseUrl || ''}${d.data.url}`}>{d.data.name}</a>
-            }
-            return <span>{d?.data?.name}</span>
-          }}
-          expander
-        />
-        <Column 
-          body={(d) => {
-            if (d?.data?.type === "file") {
-              return <a target="_blank" href={`${documentList.baseUrl || ''}${d.data.url}`} title={d.data.name}><i className="pi pi-external-link"></i></a>
-            }
-            return null;
-          }}
-          style={{textAlign:'center', width: '4em'}}
-        />
-      </TreeTable>
+      <TreeView className="sg-document-list" data={treeData} tree={tree} />
     </React.Fragment>
   )
 
