@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import { Message } from 'primereact/message';
-import { Button } from 'primereact/button';
-import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Accordion, ActionIcon, Alert, Button, Group, Table } from '@mantine/core';
 import OlCollection from 'ol/Collection';
 import OlFeature from 'ol/Feature';
 import OlFormatGeoJSON from "ol/format/GeoJSON";
@@ -65,14 +61,10 @@ export default function FeatureResults({ core, config, features, layers, actions
     setShowExportRecord(showExportRecord);
   }, []);
 
-  // Update accordion active items
+  // Update accordion active items: every result group opens on new results.
+  // The Accordion items are keyed by layer id, not Prime's numeric indices.
   useEffect(() => {
-    const active = Object.keys(grouped).map((layerId, i) => i);
-    if (active && active.length) {
-      setActiveIndex(active);
-    } else {
-      setActiveIndex([0]);
-    }
+    setActiveIndex(Object.keys(grouped));
   }, [features.length]);
 
   // Zoom to feature
@@ -145,13 +137,18 @@ export default function FeatureResults({ core, config, features, layers, actions
       const action = rowData.action || {};
 
       if (action.show_null === true || rowData.value != null) {
-        val = <Button label={i18n.translateValue(action.label)} icon={action.icon}
+        val = <Button
+            type="button"
+            size="xs"
+            leftSection={action.icon ? <i className={action.icon} aria-hidden="true" /> : undefined}
             className={action.classname || action.className}
             title={i18n.translateValue(action.tooltip)}
             onClick={(e) => {
               publish(action.type, action.data);
             }}
-          />
+          >
+            {i18n.translateValue(action.label)}
+          </Button>
       } else {
         val = null;
       }
@@ -168,51 +165,57 @@ export default function FeatureResults({ core, config, features, layers, actions
     return val;
   }
 
+  const infoMessage = (text) => (
+    <Alert color="informative" py="xs">
+      <Group justify="center" gap="xs" wrap="nowrap">
+        <i className="pi pi-info-circle" />
+        <span>{text}</span>
+      </Group>
+    </Alert>
+  );
+
   if (Object.keys(grouped).length === 0) {
     let msg = t("identifyNoResults", "Sem resultados. Clique no mapa para identificar.");
     if (isInactive) msg = `${t("noResults", "Sem resultados")}. ${t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.")}`;
-    return (
-      <Message
-        severity="info"
-        text={msg}
-      />
-    )
+    return infoMessage(msg);
   }
 
   return (
     <div>
 
       { isInactive &&
-        <Message
-          severity="info"
-          text={t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.")} 
-        />
+        infoMessage(t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos."))
       }
 
-      <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
+      <Group justify="flex-end" gap="xs" py="xs" px="md">
         <Button
+          type="button"
+          size="xs"
+          variant="outline"
           title={t("clearResults", "Limpar resultados")}
-          label={t("clear", "Limpar")}
-          icon="pi pi-times"
-          outlined size="small"
+          leftSection={<i className="pi pi-times" aria-hidden="true" />}
           onClick={e => removeAll()}
-        />
+        >
+          {t("clear", "Limpar")}
+        </Button>
         { (showExport && showExportAll && showExportAllFeatures) ?
         <Button
+          type="button"
+          size="xs"
+          variant="outline"
           title={t("exportResults", "Exportar resultados")}
-          label={t("export", "Exportar")}
-          icon="pi pi-download"
-          outlined size="small"
-          className="ml-2"
+          leftSection={<i className="pi pi-download" aria-hidden="true" />}
           onClick={e => exportAll()}
-        /> : null }
-      </div>
+        >
+          {t("export", "Exportar")}
+        </Button> : null }
+      </Group>
 
       <Accordion
         className="pt-2"
         multiple
-        activeIndex={activeIndex} 
-        onTabChange={(e) => setActiveIndex(e.index)}>
+        value={activeIndex || []}
+        onChange={setActiveIndex}>
           { Object.keys(grouped).map(layerId => {
             // Validate layer
             let layer = layers.find(l => l.id === layerId);
@@ -238,11 +241,15 @@ export default function FeatureResults({ core, config, features, layers, actions
               }
             }
             
+            const cellStyle = { whiteSpace: "pre-wrap", overflowWrap: "break-word" };
+
             return (
-              <AccordionTab key={layerId} header={i18n.translateValue(grouped[layerId].layerName)}>
+              <Accordion.Item key={layerId} value={layerId}>
+                <Accordion.Control>{i18n.translateValue(grouped[layerId].layerName)}</Accordion.Control>
+                <Accordion.Panel>
                 { grouped[layerId].features.map((feat, i) => {
-                    
-                  let key;                  
+
+                  let key;
                   if (feat.getId) key = feat.getId();
                   else if (feat.get) key = feat.get('id') || feat.get('uid') || feat.get('fid');
                   else if (feat.id) key = feat.id;
@@ -256,44 +263,57 @@ export default function FeatureResults({ core, config, features, layers, actions
                     <div key={key} className="fi-result-feat">
                       <div className="fi-result-tools">
                         {hasGeometry &&
-                        <Button
+                        <ActionIcon
+                          variant="filled"
+                          size="md"
                           title={t("zoomToElement", "Aproximar ao elemento")}
-                          icon="pi pi-search"
+                          aria-label={t("zoomToElement", "Aproximar ao elemento")}
                           onClick={e => zoomFeature(feat)}
-                        />}
+                        >
+                          <i className="pi pi-search" aria-hidden="true" />
+                        </ActionIcon>}
                         {(!isText && showExport && showExportRecord && layerRecordExport) &&
-                        <Button
+                        <ActionIcon
+                          variant="filled"
+                          size="md"
                           title={t("exportElement", "Exportar elemento")}
-                          icon="pi pi-download"
+                          aria-label={t("exportElement", "Exportar elemento")}
                           onClick={e => exportItem(feat)}
-                        />}
-                        <Button
+                        >
+                          <i className="pi pi-download" aria-hidden="true" />
+                        </ActionIcon>}
+                        <ActionIcon
+                          variant="filled"
+                          size="md"
                           title={t("removeElement", "Remover elemento")}
-                          icon="pi pi-times"
+                          aria-label={t("removeElement", "Remover elemento")}
                           onClick={e => removeItem(feat)}
-                        />
+                        >
+                          <i className="pi pi-times" aria-hidden="true" />
+                        </ActionIcon>
                       </div>
-                      <DataTable
-                        value={rows}
-                        className="p-datatable-striped">
-                          {!isText &&
-                          <Column
-                            header="&nbsp;"
-                            field="name"
-                            style={{whiteSpace: "pre-wrap", overflowWrap: "break-word"}}
-                          />}
-                          <Column
-                            header="&nbsp;"
-                            field="value"
-                            body={valueTemplate}
-                            style={{whiteSpace: "pre-wrap", overflowWrap: "break-word"}}
-                          />
-                      </DataTable>
+                      <Table className="fi-result-table">
+                        <Table.Thead>
+                          <Table.Tr>
+                            {!isText && <Table.Th>&nbsp;</Table.Th>}
+                            <Table.Th>&nbsp;</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                          {rows.map((row, ri) => (
+                            <Table.Tr key={row.key ?? ri}>
+                              {!isText && <Table.Td style={cellStyle}>{row.name}</Table.Td>}
+                              <Table.Td style={cellStyle}>{valueTemplate(row)}</Table.Td>
+                            </Table.Tr>
+                          ))}
+                        </Table.Tbody>
+                      </Table>
                     </div>
                   )
-                
-                })} 
-              </AccordionTab>
+
+                })}
+                </Accordion.Panel>
+              </Accordion.Item>
             )
           }) }
       </Accordion>

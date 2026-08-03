@@ -15,26 +15,24 @@
   padding-bottom: 0.5em;
 }
 
-.feature-info .p-panel {
-  margin-bottom: 1em;
-}
-
-.feature-info .p-datatable {
+.feature-info .fi-result-table {
   margin-bottom: 1em;
   border-bottom: 1px dashed #f0f0f0;
   border-top: 1px dashed #f0f0f0;
   background-color: #fafafa;
 }
 
-.feature-info .p-datatable .p-datatable-thead > tr > th,
-.feature-info .p-datatable .p-datatable-tbody > tr
+.feature-info .fi-result-table thead > tr > th,
+.feature-info .fi-result-table tbody > tr
 {
   background: transparent;
 }
 
-.feature-info .p-datatable .p-datatable-thead > tr > th {
-  background-color: #2196f3;
-  color: #ffffff;
+/* The band the result tools sit on: Prime's hardcoded #2196f3 becomes the
+   theme primary, so a client re-brand recolours it too. */
+.feature-info .fi-result-table thead > tr > th {
+  background-color: var(--mantine-color-primary-6);
+  color: var(--mantine-color-white);
 }
 
 .feature-info .fi-result-feat {
@@ -46,20 +44,4 @@
   top: 1px;
   z-index: 1;
   right: 0;
-}
-
-.feature-info .fi-result-feat .fi-result-tools .p-button {
-  border-radius: 0;
-}
-
-.feature-info .p-inline-message {
-  display: block;
-  width: 100%;
-}
-
-.feature-info .remove-all,
-.feature-info .export-all
-{
-  display: block;
-  width: 100%;
 }

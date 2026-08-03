@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react'
 import { useTranslation} from "react-i18next"
-import { Button } from 'primereact/button'
 import OLGroupLayer from "ol/layer/Group"
-import { Panel } from 'primereact/panel'
-
-import componentMessages from './messages'
+import { CollapsiblePanel } from '@scalargis/ui'
+import { MainMenuButton, MapToolButton } from '../../components'
 
 import { MAPCONTROL_NAME } from './utils'
 import FeatureResults from './FeatureResults'
@@ -37,7 +35,7 @@ export function MainMenu({ className, config, actions, record }) {
   if (record?.showMainButton === false) return null;
 
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
       icon="pi pi-info-circle"
@@ -58,7 +56,7 @@ export default function Main({type, region, as, core, config, actions, record, u
   const { viewer, dispatch, Models, mainMap } = config;
   //const { publish, subscribe } = core.pubsub ? core.pubsub : {}
   const { featureinfo, exclusive_mapcontrol } = viewer;
-  const { getWindowSize, showOnPortal } = Models ? Models.Utils : utils;//Models.Utils;
+  const { getWindowSize } = Models ? Models.Utils : utils;
   const { selected_menu, layers } = viewer.config_json;
 
   const component_cfg = record.config_json || {};
@@ -106,10 +104,10 @@ export default function Main({type, region, as, core, config, actions, record, u
   }
 
   if (type === 'link' && region === record.links) {
-    return <Button
+    return <MapToolButton
       title={title}
       icon="pi pi-info-circle"
-      className={`p-button-rounded p-button-raised ${exclusive_mapcontrol == MAPCONTROL_NAME ? "active" : ""}`}
+      active={exclusive_mapcontrol == MAPCONTROL_NAME}
       onClick={e => {
         if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
         if (exclusive_mapcontrol !== MAPCONTROL_NAME) {
@@ -123,9 +121,9 @@ export default function Main({type, region, as, core, config, actions, record, u
   }
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   return null
