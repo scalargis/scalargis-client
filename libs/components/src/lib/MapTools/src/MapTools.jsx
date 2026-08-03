@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation} from "react-i18next";
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { SelectButton } from 'primereact/selectbutton';
+import { Button, Group, Modal, TextInput } from '@mantine/core';
 import { unByKey } from 'ol/Observable';
 import Overlay from 'ol/Overlay';
 import * as OlSphere from 'ol/sphere';
@@ -54,7 +51,7 @@ const drawStyle = new OlStyle({
 export default function MapTools({ selectedControl, onControlSelect, core, viewer, actions, dispatch, mainMap, utils, record }) {
   
   const { exclusive_mapcontrol } = viewer;
-  const { showOnPortal, getWindowSize } = utils;
+  const { getWindowSize } = utils;
 
   const { t } = useTranslation();
 
@@ -400,35 +397,38 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
       <div style={{ height: '100%' }}>
         <div id="map-tools" className="plugin-main p-2">
           
-          <SelectButton 
-            optionLabel="name"
-            optionValue="key"
-            value={selectedControl || ''}
-            options={controlOptions}
-            onChange={(e) => onControlSelect(e.value)}
-            itemTemplate={option => (
-              <React.Fragment>
-                <i className={option.icon}>&nbsp;</i>{' '}
-                { option.label }
-              </React.Fragment>
-            )}
-          />
+          <Button.Group>
+            {controlOptions.map(option => (
+              <Button
+                key={option.key}
+                type="button"
+                variant={selectedControl === option.key ? 'filled' : 'default'}
+                aria-pressed={selectedControl === option.key}
+                leftSection={<i className={option.icon} aria-hidden="true" />}
+                onClick={() => onControlSelect(selectedControl === option.key ? null : option.key)}
+              >
+                {option.label}
+              </Button>
+            ))}
+          </Button.Group>
 
           <div className="mt-2">
 
             { selectedControl === 'length' ? (
-              <InputText
-                label={t("length", "Comprimento")}
+              <TextInput
+                readOnly
                 value={length || ''}
                 placeholder={t("length", "Comprimento")}
+                aria-label={t("length", "Comprimento")}
               />
             ) : null }
 
             { selectedControl === 'area' ? (
-              <InputText
-                label={t("area", "Área")}
+              <TextInput
+                readOnly
                 value={area || ''}
                 placeholder={t("area", "Área")}
+                aria-label={t("area", "Área")}
               />
             ) : null }
 
@@ -436,21 +436,11 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
 
         </div>
 
-        {showOnPortal(<Dialog 
-          header={selectedControl === 'length' ? t("measureDistance", "Medir Distância") : t("measureArea", "Medir Área")}
-          visible={helpModal}
-          _style={{width: '50vw'}}
-          style={{ width: isMobile ? '90%' : null }} 
-          modal
-          footer={(
-            <Button 
-              severity="info"
-              icon="pi pi-check"
-              label="OK"
-              onClick={closeHelp}
-            />
-          )}
-          onHide={e => closeHelp()}>
+        <Modal
+          title={selectedControl === 'length' ? t("measureDistance", "Medir Distância") : t("measureArea", "Medir Área")}
+          opened={helpModal}
+          size={isMobile ? '90%' : undefined}
+          onClose={closeHelp}>
           <div>
             { selectedControl === 'length' ? <div>
               <p dangerouslySetInnerHTML={{__html: t("measureInfoDistance", "1. para começar a medição clique no mapa na localização inicial<br /> 2. para medir um trajeto clique nas localizações intermédias<br /> 3. para terminar faça duplo-clique")}}
@@ -461,7 +451,16 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
               />
             </div> : null}
           </div>
-        </Dialog>)}
+          <Group justify="flex-end" mt="md">
+            <Button
+              type="button"
+              leftSection={<i className="pi pi-check" aria-hidden="true" />}
+              onClick={closeHelp}
+            >
+              OK
+            </Button>
+          </Group>
+        </Modal>
 
       </div>
     );

@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation} from "react-i18next";
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { CollapsiblePanel } from '@scalargis/ui';
+import { MainMenuButton, MapToolButton } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
 import MapTools from './MapTools';
@@ -18,13 +18,12 @@ export function MainMenu({ className, config, actions, record }) {
 
   const { t } = useTranslation();
 
-  const component_cfg = record.config_json || {};
   const title = record.title || t("measurementTools", "Ferramentas de Medição");
 
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
 
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
       icon="fas fa-ruler"
@@ -47,7 +46,7 @@ export default function Main(props) {
   const core = props.core;
 
   const { dispatch, viewer, mainMap } = config;
-  const { selected_menu, layers } = viewer.config_json;
+  const { selected_menu } = viewer.config_json;
   const { getWindowSize } = Models ? Models.Utils : utils;
 
   const { t } = useTranslation();
@@ -80,30 +79,26 @@ export default function Main(props) {
           selectedControl={selectedControl}
           onControlSelect={(control)=> setSelectedControl(control)}
         />
-      </div>  
-    )  
+      </div>
+    )
   }
 
   if (type === 'link' && region === record.links) {
-
-    const classname = (viewer?.exclusive_mapcontrol === MAPCONTROL_NAME &&  selectedControl) ? 'active' : '';
-
-    return <Button
+    return <MapToolButton
       title={title}
       icon="fas fa-ruler"
-      rounded
-      className={classname ? "p-button-raised " + classname : "p-button-raised"}
+      active={!!(viewer?.exclusive_mapcontrol === MAPCONTROL_NAME && selectedControl)}
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));
       }}
     />
-  }  
+  }
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   return null;
