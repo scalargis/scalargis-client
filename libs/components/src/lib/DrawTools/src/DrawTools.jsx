@@ -1,10 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import i18next from "i18next";
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+import { ActionIcon, Button, Group, Paper, Select, Stack, TextInput } from '@mantine/core';
+import { DataGrid } from '@scalargis/ui';
 import OlFormatWKT from "ol/format/WKT";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import OlInteractionDragPan from "ol/interaction/DragPan";
@@ -99,7 +96,9 @@ class DrawTools extends React.Component {
       displayFillPicker: false,
       displayStrokePicker: false,
       editing: null,
-      selectedTool: null
+      selectedTool: null,
+      page: 1,
+      pageSize: 10
     }
 
     this.sizeOptions = [
@@ -218,7 +217,7 @@ class DrawTools extends React.Component {
     this.format = new OlFormatWKT();
   }
 
-  changeSize = ({ value }) => {
+  changeSize = (value) => {
     this.setState({ ...this.state, size: value }, () => {
       const selected = this.select.getFeatures();
       if (selected.getLength()) this.updateStyle(selected.item(0));
@@ -239,28 +238,28 @@ class DrawTools extends React.Component {
     });
   }
 
-  changeSymbol = ({ value }) => {
+  changeSymbol = (value) => {
     this.setState({ ...this.state, symbol_type: value }, () => {
       const selected = this.select.getFeatures();
       if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
-  changeTextStyle = ({ value }) => {
+  changeTextStyle = (value) => {
     this.setState({ ...this.state, text_style: value }, () => {
       const selected = this.select.getFeatures();
       if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
-  changeTextSize = ({ value }) => {
+  changeTextSize = (value) => {
     this.setState({ ...this.state, text_size: value }, () => {
       const selected = this.select.getFeatures();
       if (selected.getLength()) this.updateStyle(selected.item(0));
     });
   }
 
-  changeTextFont = ({ value }) => {
+  changeTextFont = (value) => {
     this.setState({ ...this.state, text_font: value }, () => {
       const selected = this.select.getFeatures();
       if (selected.getLength()) this.updateStyle(selected.item(0));
@@ -870,7 +869,6 @@ class DrawTools extends React.Component {
 
   render() {
     const {
-      enabled,
       draw_text,
       draw_symbol,
       size,
@@ -882,9 +880,18 @@ class DrawTools extends React.Component {
       text_font,
       text_value,
       editing,
-      selectedTool
+      selectedTool,
+      pageSize
     } = this.state;
     const { viewer } = this.props;
+
+    const drawings = viewer.config_json.drawings;
+
+    // Client-side paging: the page is clamped on derive, so deleting the
+    // last row of the last page never strands the grid on an empty page.
+    const totalPages = Math.max(1, Math.ceil(drawings.length / pageSize));
+    const page = Math.min(this.state.page, totalPages);
+    const pageRecords = drawings.slice((page - 1) * pageSize, page * pageSize);
 
     const styles = () => {
       return {
@@ -919,120 +926,148 @@ class DrawTools extends React.Component {
     return (
       <div id="drawtools">
 
-        <div className="p-shadow-5 toolbar">
+        <Paper shadow="md" p="md" className="toolbar">
+          <Stack gap="xs">
 
-          {drawElementsOptions.map(opt =>
-            <Button
-              key={opt.value}
-              icon={opt.icon}
-              label={opt.label ? opt.label : ''}
-              title={i18next.t(opt.title, opt.defaultTitle)}
-              severity="secondary" className={"tool " + (opt.value === selectedTool ? "active" : "")}
-              onClick={(e) => this.startDraw(e, opt.value)}
-            />
-          )}
+            <Group gap="sm" wrap="wrap">
+              <Group gap={4} wrap="nowrap">
+                {drawElementsOptions.map(opt =>
+                  <ActionIcon
+                    key={opt.value}
+                    size="md"
+                    variant={opt.value === selectedTool ? 'filled' : 'default'}
+                    aria-pressed={opt.value === selectedTool}
+                    title={i18next.t(opt.title, opt.defaultTitle)}
+                    aria-label={i18next.t(opt.title, opt.defaultTitle)}
+                    onClick={(e) => this.startDraw(e, opt.value)}
+                  >
+                    {opt.icon()}
+                  </ActionIcon>
+                )}
+              </Group>
 
-          {' '}
+              <Group gap={4} wrap="nowrap">
+                {selectTools.map(opt =>
+                  <ActionIcon
+                    key={opt.value}
+                    size="md"
+                    variant={opt.value === selectedTool ? 'filled' : 'default'}
+                    aria-pressed={opt.value === selectedTool}
+                    title={i18next.t(opt.title, opt.defaultTitle)}
+                    aria-label={i18next.t(opt.title, opt.defaultTitle)}
+                    onClick={(e) => this.startDraw(e, opt.value)}
+                  >
+                    {opt.icon()}
+                  </ActionIcon>
+                )}
+              </Group>
+            </Group>
 
-          {selectTools.map(opt =>
-            <Button
-              key={opt.value}
-              icon={opt.icon}
-              title={i18next.t(opt.title, opt.defaultTitle)}
-              severity="secondary" className={"tool " + (opt.value === selectedTool ? "active" : "")}
-              onClick={(e) => this.startDraw(e, opt.value)}
-            />
-          )}
+            <Group gap={4} wrap="wrap">
+              {colorTools.map(opt =>
+                <ActionIcon
+                  key={opt.value}
+                  size="md"
+                  variant="default"
+                  title={i18next.t(opt.title, opt.defaultTitle)}
+                  aria-label={i18next.t(opt.title, opt.defaultTitle)}
+                  style={this.getButtonStyle(opt)}
+                  onClick={(e) => {
+                    switch (opt.value) {
+                      case 'fill': this.toggleFillPicker(e); break;
+                      case 'stroke': this.toggleStrokePicker(e); break;
+                      default: ;
+                    }
+                  }}
+                >
+                  <i className={opt.icon} aria-hidden="true" />
+                </ActionIcon>
+              )}
 
-          <br />
+              <Select
+                size="xs"
+                w={72}
+                title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
+                aria-label={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
+                value={size}
+                data={this.sizeOptions}
+                onChange={value => this.changeSize(value)}
+                allowDeselect={false}
+              />
+            </Group>
 
-          {colorTools.map(opt =>
-            <Button
-              key={opt.value}
-              icon={opt.icon}
-              title={i18next.t(opt.title, opt.defaultTitle)}
-              severity="secondary" className={"tool " + (opt.value === selectedTool ? "p-highlight" : "")}
-              style={this.getButtonStyle(opt)}
-              onClick={(e) => {
-                switch (opt.value) {
-                  case 'fill': this.toggleFillPicker(e); break;
-                  case 'stroke': this.toggleStrokePicker(e); break;
-                  default: ;
-                }
-              }}
-            />
-          )}
+            {this.state.displayFillPicker ? <div style={styles().popover}>
+              <div style={styles().cover} onClick={this.closeFillPicker.bind(this)} />
+              <CompactPicker color={fill} onChange={this.changeFill.bind(this)} />
+            </div> : null}
 
-          {this.state.displayFillPicker ? <div style={styles().popover}>
-            <div style={styles().cover} onClick={this.closeFillPicker.bind(this)} />
-            <CompactPicker color={fill} onChange={this.changeFill.bind(this)} />
-          </div> : null}
+            {this.state.displayStrokePicker ? <div style={styles().popover}>
+              <div style={styles().cover} onClick={this.closeStrokePicker.bind(this)} />
+              <CompactPicker color={stroke} onChange={this.changeStroke.bind(this)} />
+            </div> : null}
 
-          {this.state.displayStrokePicker ? <div style={styles().popover}>
-            <div style={styles().cover} onClick={this.closeStrokePicker.bind(this)} />
-            <CompactPicker color={stroke} onChange={this.changeStroke.bind(this)} />
-          </div> : null}
+            <Group gap={4} wrap="nowrap">
+              {historyTools.map(opt =>
+                <ActionIcon
+                  key={opt.value}
+                  size="md"
+                  variant={opt.value !== "clear" ? "default" : "filled"}
+                  color={opt.value !== "clear" ? undefined : "danger"}
+                  title={i18next.t(opt.title, opt.defaultTitle)}
+                  aria-label={i18next.t(opt.title, opt.defaultTitle)}
+                  onClick={(e) => {
+                    switch (opt.value) {
+                      case 'undo': this.clickUndo(e); break;
+                      case 'redo': this.clickRedo(e); break;
+                      case 'clear': this.clickDelete(e); break;
+                      default: ;
+                    }
+                  }}
+                >
+                  <i className={opt.icon} aria-hidden="true" />
+                </ActionIcon>
+              )}
+            </Group>
 
-          <Dropdown
-            text={size}
-            title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
-            value={size}
-            options={this.sizeOptions}
-            onChange={opt => this.changeSize(opt)}
-            style={{ marginBottom: '1px' }}
-          />
-
-          <br /><br />
-
-          {historyTools.map(opt =>
-            <Button
-              key={opt.value}
-              icon={opt.icon}
-              title={i18next.t(opt.title, opt.defaultTitle)}
-              severity={opt.value !== "clear" ? "info" : "danger"} className="tool"
-              onClick={(e) => {
-                switch (opt.value) {
-                  case 'undo': this.clickUndo(e); break;
-                  case 'redo': this.clickRedo(e); break;
-                  case 'clear': this.clickDelete(e); break;
-                  default: ;
-                }
-              }}
-            />
-          )}
-
-        </div>
+          </Stack>
+        </Paper>
 
         {editing ? (
           <React.Fragment>
             <h5>{` ${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</h5>
-            <div>
+            <Group gap="xs">
               <Button
-                onClick={e => this.finishEditing()}
-                icon="pi pi-save"
-                label="Aplicar"
+                type="button"
+                leftSection={<i className="pi pi-save" aria-hidden="true" />}
                 title="Aplicar alterações"
-              />
-              <Button
-                onClick={e => this.removeFeature()}
-                icon="pi pi-trash"
-                severity="danger"
+                onClick={e => this.finishEditing()}
+              >
+                Aplicar
+              </Button>
+              <ActionIcon
+                size="input-sm"
+                variant="filled"
+                color="danger"
                 title="Apagar desenho"
-              />
-            </div>
+                aria-label="Apagar desenho"
+                onClick={e => this.removeFeature()}
+              >
+                <i className="pi pi-trash" aria-hidden="true" />
+              </ActionIcon>
+            </Group>
           </React.Fragment>
         ) : null}
 
         {draw_symbol ? (
           <div>
             <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
-            <Dropdown
-              text={symbol_type}
+            <Select
               title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
+              aria-label={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
               value={symbol_type}
-              options={this.symbolOptions.map(o => { return { ...o, "label": i18next.t(o.label, o.labelDefault) } })}
+              data={this.symbolOptions.map(o => { return { ...o, "label": i18next.t(o.label, o.labelDefault) } })}
               onChange={this.changeSymbol.bind(this)}
-              style={{ minWidth: '120px' }}
+              allowDeselect={false}
             />
           </div>
         ) : null}
@@ -1040,32 +1075,40 @@ class DrawTools extends React.Component {
         {draw_text ? (
           <div>
             <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
-            <Dropdown text={text_style}
-              title={i18next.t("textStyle", "Estilo do Texto")}
-              value={text_style}
-              options={this.textStyleOptions}
-              onChange={this.changeTextStyle.bind(this)}
-            />
+            <Group gap="xs" grow>
+              <Select
+                title={i18next.t("textStyle", "Estilo do Texto")}
+                aria-label={i18next.t("textStyle", "Estilo do Texto")}
+                value={text_style}
+                data={this.textStyleOptions}
+                onChange={this.changeTextStyle.bind(this)}
+                allowDeselect={false}
+              />
 
-            <Dropdown text={text_size}
-              title={i18next.t("textSize", "Tamanho do Texto")}
-              value={text_size}
-              options={this.textSizeOptions}
-              onChange={this.changeTextSize.bind(this)}
-            />
+              <Select
+                title={i18next.t("textSize", "Tamanho do Texto")}
+                aria-label={i18next.t("textSize", "Tamanho do Texto")}
+                value={text_size}
+                data={this.textSizeOptions}
+                onChange={this.changeTextSize.bind(this)}
+                allowDeselect={false}
+              />
 
-            <Dropdown text={text_font}
-              title={i18next.t("fontType", "Tipo de Letra")}
-              value={text_font}
-              options={this.textFontOptions}
-              onChange={this.changeTextFont.bind(this)}
-            />
-            <br />
-            <InputText
-              className="drawtools-text-input"
+              <Select
+                title={i18next.t("fontType", "Tipo de Letra")}
+                aria-label={i18next.t("fontType", "Tipo de Letra")}
+                value={text_font}
+                data={this.textFontOptions}
+                onChange={this.changeTextFont.bind(this)}
+                allowDeselect={false}
+              />
+            </Group>
+            <TextInput
+              mt="md"
               value={text_value}
               onChange={this.changeTextValue.bind(this)}
               title={i18next.t("textLabel", "Texto para a etiqueta")}
+              aria-label={i18next.t("textLabel", "Texto para a etiqueta")}
               placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
               onClick={e => e.target.select()}
             />
@@ -1075,17 +1118,20 @@ class DrawTools extends React.Component {
         <hr />
 
         <div>
-          {viewer.config_json.drawings.length > 0 &&
+          {drawings.length > 0 &&
             this.exportFormats.map(opt =>
               <Button
                 key={opt.value}
-                icon={opt.icon}
-                label={opt.title}
+                type="button"
+                size="xs"
+                variant="outline"
+                className="mr-2 mb-2"
+                leftSection={<i className={opt.icon} aria-hidden="true" />}
                 title={opt.tooltip}
-                outlined size="small" severity="info"
-                className="format-tool"
                 onClick={(e) => this.download(opt.value)}
-              />
+              >
+                {opt.title}
+              </Button>
             )
           }
         </div>
@@ -1093,48 +1139,65 @@ class DrawTools extends React.Component {
         <hr />
 
         <h5>{i18next.t("drawings", "Desenhos")}</h5>
-        {viewer.config_json.drawings.length === 0 ? (
+        {drawings.length === 0 ? (
           <p>{i18next.t("noDrawings", "Não existem desenhos")}</p>
         ) : (
-          <DataTable
-            value={viewer.config_json.drawings}
-            dataKey="id"
-            paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate={i18next.t("drawingElementsPageInfo", "Mostrando {first} a {last} de {totalRecords} items")}
-          >
-            <Column
-              field="properties.id"
-              header="ID"
-              body={(row, props) => props.rowIndex + 1}
-            />
-            <Column
-              field="properties.type"
-              header={i18next.t("type", "Tipo")}
-              body={row => i18next.t(typeLabels[row.properties.type], row.properties.type)}
-            />
-            <Column
-              align="right"
-              body={row => (
-                <React.Fragment>
-                  <Button
-                    icon="pi pi-search"
-                    className="mr-2"
-                    onClick={() => this.zoom(row)}
-                    title={i18next.t("locate", "Localizar")}
-                  />
-                  <Button
-                    icon="pi pi-trash"
-                    severity="danger"
-                    onClick={() => this.deleteItem(row)}
-                    title={i18next.t("delete", "Eliminar")}
-                  />
-                </React.Fragment>
-              )}
-            />
-          </DataTable>
+          <DataGrid
+            idAccessor="id"
+            records={pageRecords}
+            columns={[
+              {
+                accessor: 'properties.id',
+                title: 'ID',
+                render: (row, index) => (page - 1) * pageSize + index + 1,
+              },
+              {
+                accessor: 'properties.type',
+                title: i18next.t("type", "Tipo"),
+                render: row => i18next.t(typeLabels[row.properties.type], row.properties.type),
+              },
+              {
+                accessor: 'actions',
+                title: '',
+                textAlign: 'right',
+                render: row => (
+                  <Group gap={4} justify="flex-end" wrap="nowrap">
+                    <ActionIcon
+                      variant="subtle"
+                      radius="xl"
+                      size="md"
+                      title={i18next.t("locate", "Localizar")}
+                      aria-label={i18next.t("locate", "Localizar")}
+                      onClick={() => this.zoom(row)}
+                    >
+                      <i className="pi pi-search" aria-hidden="true" />
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="subtle"
+                      color="danger"
+                      radius="xl"
+                      size="md"
+                      title={i18next.t("delete", "Eliminar")}
+                      aria-label={i18next.t("delete", "Eliminar")}
+                      onClick={() => this.deleteItem(row)}
+                    >
+                      <i className="pi pi-trash" aria-hidden="true" />
+                    </ActionIcon>
+                  </Group>
+                ),
+              },
+            ]}
+            totalRecords={drawings.length}
+            page={page}
+            onPageChange={(p) => this.setState({ page: p })}
+            recordsPerPage={pageSize}
+            recordsPerPageOptions={[5, 10, 25]}
+            onRecordsPerPageChange={(size) => this.setState({ pageSize: size, page: 1 })}
+            recordsPerPageLabel="Registos"
+            paginationText={({ from, to, totalRecords: total }) =>
+              i18next.t("drawingElementsPageInfo", "Mostrando {first} a {last} de {totalRecords} items")
+                .replace('{first}', from).replace('{last}', to).replace('{totalRecords}', total)}
+          />
         )}
 
       </div>

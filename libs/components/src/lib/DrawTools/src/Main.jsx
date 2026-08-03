@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useTranslation} from "react-i18next"
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { CollapsiblePanel } from '@scalargis/ui'
+import { MainMenuButton, MapToolButton } from '../../components'
 import DrawTools from './DrawTools'
 
 /**
@@ -15,14 +15,12 @@ export function MainMenu({ className, config, actions, record }) {
 
   const { t } = useTranslation();
 
-  const component_cfg = record.config_json || {};
   const title = record.title || t("drawingTools", "Ferramentas de Desenho");
-  const header = component_cfg.header || title;
 
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== 'DrawTools';
 
   return (
-    <Button
+    <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
       icon="pi pi-palette"
@@ -35,7 +33,7 @@ export default function Main({ type, region, as, config, actions, record, utils 
 
   const { core, mainMap, viewer, dispatch, Models } = config;
   const { selected_menu } = viewer.config_json;
-  const { getWindowSize } = Models ? Models.Utils : utils;  
+  const { getWindowSize } = Models ? Models.Utils : utils;
 
   const component_cfg = record.config_json || {};
 
@@ -45,11 +43,11 @@ export default function Main({ type, region, as, config, actions, record, utils 
   const header = component_cfg.header || title;
 
   const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;  
+  const isMobile = wsize[0] <= 768;
 
   useEffect(() => {
     if (selected_menu === 'drawtools') dispatch(actions.viewer_set_exclusive_mapcontrol(null));
-  }, [selected_menu])   
+  }, [selected_menu])
 
 
   if (!viewer?.loaded) return null;
@@ -66,16 +64,14 @@ export default function Main({ type, region, as, config, actions, record, utils 
           mainMap={mainMap}
           utils={utils}
         />
-      </div>  
-    )  
+      </div>
+    )
   }
 
   if (type === 'link' && region === record.links) {
-    return <Button
+    return <MapToolButton
       title={title}
       icon="pi pi-palette"
-      rounded
-      className="p-button-raised"
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));
@@ -84,9 +80,9 @@ export default function Main({ type, region, as, config, actions, record, utils 
   }
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   // Render component
