@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
-import { Button } from 'primereact/button'
+import { Button, Switch } from '@mantine/core'
 import { Feature } from 'ol'
 import Point from 'ol/geom/Point'
 import OLGroupLayer from "ol/layer/Group"
 import Select from 'ol/interaction/Select'
-import {InputSwitch} from 'primereact/inputswitch'
 import VectorSource from "ol/source/Vector"
 import './index.css'
 
@@ -83,7 +82,7 @@ export default function Main({ config }) {
           <tr>
             <th>Selecionar Elementos</th>
             <th>
-              <InputSwitch checked={active} onChange={(e) => setActive(!active)} />
+              <Switch size="md" checked={active} onChange={(e) => setActive(!active)} />
             </th>
           </tr>
           
@@ -94,16 +93,16 @@ export default function Main({ config }) {
           <tr>
             <td>Ponto</td>
             <td>
-              <Button size="small" onClick={exportCoord} label="Exportar" icon="pi pi-arrow-circle-down" />
+              <Button type="button" size="xs" onClick={exportCoord} leftSection={<i className="pi pi-arrow-circle-down" aria-hidden="true" />}>Exportar</Button>
             </td>
           </tr>
           ) }
 
           { selected.items.map((feat, i) => (
-          <tr>
+          <tr key={i}>
             <td>Geometria</td>
             <td>
-              <Button size="small" onClick={exportSelected} label="Exportar" icon="pi pi-arrow-circle-down" />
+              <Button type="button" size="xs" onClick={exportSelected} leftSection={<i className="pi pi-arrow-circle-down" aria-hidden="true" />}>Exportar</Button>
             </td>
           </tr>
           )) }

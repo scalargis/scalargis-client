@@ -1,13 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
-import { Slider } from 'primereact/slider';
-import { Message } from 'primereact/message';
+import { ActionIcon, Alert, Group, Select, Slider } from '@mantine/core';
 
 import { Legend } from '../../components';
-
-import './style.css';
 
 
 function parseTimeValues (data) {
@@ -423,9 +418,9 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
     }
   }, [currentPos, timeData, mainMap, theme]);
 
-  const options = (timeData || []).map((v, idx) => { 
+  const options = (timeData || []).map((v, idx) => {
     const format = record?.config_json?.displayFormat;
-    return { value: idx, label: formatDate(v, format) }
+    return { value: String(idx), label: formatDate(v, format) }
   });
   const hasTimeData = !!timeData?.length;
 
@@ -433,8 +428,13 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
 
   if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
     return (
-      <div style={{width: "100%"}}> 
-        <Message severity="info" text={`O tema "${theme?.title}" não está visível`} className="mt-2" style={{width: "100%" }} />
+      <div style={{width: "100%"}}>
+        <Alert color="informative" py="xs" className="mt-2" style={{width: "100%" }}>
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <i className="pi pi-info-circle" />
+            <span>{`O tema "${theme?.title}" não está visível`}</span>
+          </Group>
+        </Alert>
       </div>
     )
   }
@@ -444,26 +444,62 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   return (
     <div style={{padding: "10px 10px"}}>
       { showLegend && <div className="mb-2"><Legend viewer={viewer} data={theme} core={core} actions={actions} models={Models}/></div> }
-      <div className="scalargis-timeline-dropdown text-center mb-3">
-        <Dropdown value={currentPos} options={options} filter={options?.length > 20}
-          onChange={(e) => { setCurrentPos(e.value) }} optionLabel="label" showClear filterBy="label" placeholder="Escolha uma data" disabled={!hasTimeData} />
+      <div className="text-center mb-3">
+        <Select
+          value={currentPos != null ? String(currentPos) : null}
+          data={options}
+          searchable={options?.length > 20}
+          clearable
+          placeholder="Escolha uma data"
+          disabled={!hasTimeData}
+          onChange={(value) => { setCurrentPos(value != null ? Number(value) : null) }}
+        />
       </div>
-      <Slider className="mb-3" value={currentPos} onChange={(e) => { setCurrentPos(e.value) }} max={hasTimeData ? timeData.length - 1 : 100} disabled={!hasTimeData} />
-      <div className="scalargis-timeline text-center">
-        <div className="p-inputgroup scalargis-timeline">
-          <Button icon="pi pi-angle-double-left" onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}></Button>
-          <Button icon="pi pi-angle-left" 
-            onClick={(e) => { 
+      <Slider
+        className="mb-3"
+        size="sm"
+        label={null}
+        value={currentPos || 0}
+        onChange={(value) => { setCurrentPos(value) }}
+        max={hasTimeData ? timeData.length - 1 : 100}
+        disabled={!hasTimeData}
+      />
+      <Group justify="center" gap={0} wrap="nowrap" className="scalargis-timeline">
+        <ActionIcon.Group>
+          <ActionIcon
+            variant="filled" size="lg"
+            title="Primeira data" aria-label="Primeira data"
+            onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}>
+            <i className="pi pi-angle-double-left" aria-hidden="true" />
+          </ActionIcon>
+          <ActionIcon
+            variant="filled" size="lg"
+            title="Data anterior" aria-label="Data anterior"
+            onClick={(e) => {
               if (currentPos) setCurrentPos(currentPos - 1);
             }}
             disabled={!hasTimeData}
-          />
-          { intervalId ? 
-            <Button icon="pi pi-pause" onClick={(e) => { stopIntervalHandler(); }}></Button> :
-            <Button icon="pi pi-play" onClick={(e) => { startIntervalHandler(); }} disabled={!hasTimeData}></Button>
+          >
+            <i className="pi pi-angle-left" aria-hidden="true" />
+          </ActionIcon>
+          { intervalId ?
+            <ActionIcon
+              variant="filled" size="lg"
+              title="Pausar" aria-label="Pausar"
+              onClick={(e) => { stopIntervalHandler(); }}>
+              <i className="pi pi-pause" aria-hidden="true" />
+            </ActionIcon> :
+            <ActionIcon
+              variant="filled" size="lg"
+              title="Reproduzir" aria-label="Reproduzir"
+              onClick={(e) => { startIntervalHandler(); }} disabled={!hasTimeData}>
+              <i className="pi pi-play" aria-hidden="true" />
+            </ActionIcon>
           }
-          <Button icon="pi pi-angle-right" 
-            onClick={(e) => { 
+          <ActionIcon
+            variant="filled" size="lg"
+            title="Data seguinte" aria-label="Data seguinte"
+            onClick={(e) => {
               if (timeData?.length) {
                 if (currentPos + 1 < timeData.length) {
                   setCurrentPos(currentPos + 1);
@@ -473,10 +509,17 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
               }
             }}
             disabled={!hasTimeData}
-          />
-          <Button icon="pi pi-angle-double-right" onClick={(e) => { if (timeData?.length) setCurrentPos(timeData.length - 1); }} disabled={!hasTimeData}></Button>
-        </div>
-      </div>
+          >
+            <i className="pi pi-angle-right" aria-hidden="true" />
+          </ActionIcon>
+          <ActionIcon
+            variant="filled" size="lg"
+            title="Última data" aria-label="Última data"
+            onClick={(e) => { if (timeData?.length) setCurrentPos(timeData.length - 1); }} disabled={!hasTimeData}>
+            <i className="pi pi-angle-double-right" aria-hidden="true" />
+          </ActionIcon>
+        </ActionIcon.Group>
+      </Group>
     </div>
   )
 }

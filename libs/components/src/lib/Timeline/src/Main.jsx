@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
-import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
+import { Button } from '@mantine/core';
+import { CollapsiblePanel } from '@scalargis/ui';
 import TimelineControl from './TimelineControl';
 import { WMSCapabilities } from 'ol/format';
 
@@ -161,13 +161,15 @@ export default function Main(props) {
       <div style={{backgroundColor: "white", padding: "10px", borderRadius: "10px"}}>
 
       <Button
-          style={{ width: '100%' }}
-          severity="warning"
-          label={theme?.title || title}
-          iconPos="right"
-          icon={opened ? "pi pi-angle-up" : "pi pi-angle-down"}
+          type="button"
+          fullWidth
+          color="warning"
+          rightSection={<i className={opened ? "pi pi-angle-up" : "pi pi-angle-down"} aria-hidden="true" />}
           title="Fechar"
-          onClick={e => setOpened(!opened)} />
+          aria-expanded={opened}
+          onClick={e => setOpened(!opened)}>
+        {theme?.title || title}
+      </Button>
 
         <TimelineControl
           core={core}
@@ -186,9 +188,9 @@ export default function Main(props) {
   }
 
   if (as === 'panel') return (
-    <Panel header={header}>
+    <CollapsiblePanel header={header} toggleable={false}>
       { renderContent() }
-    </Panel>
+    </CollapsiblePanel>
   )
 
   // Render component
