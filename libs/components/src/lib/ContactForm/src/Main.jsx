@@ -56,7 +56,7 @@ export function MainMenu({ className, core, config, actions, record }) {
         <MainMenuButton
           title={title}
           className={className}
-          icon="far fa-question-circle"
+          icon="pi pi-question-circle"
           onClick={e => setShowPopup(true)}
         />
 
@@ -81,7 +81,7 @@ export function MainMenu({ className, core, config, actions, record }) {
       <MainMenuButton
         title={title}
         className={className}
-        icon="far fa-question-circle"
+        icon="pi pi-question-circle"
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )
@@ -138,7 +138,7 @@ export default function Main({ region, as, core, config, actions, record }) {
         <React.Fragment>
           <button className="p-link" onClick={e => setShowForm(true)} title={t("contact", "Contacto")}>
             <span className="layout-topbar-item-text"></span>
-            <span className="layout-topbar-icon far fa-envelope" />
+            <span className="layout-topbar-icon pi pi-envelope" />
           </button>
 
           <Modal

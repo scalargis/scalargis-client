@@ -5,7 +5,7 @@ import { ActionIcon, Group } from '@mantine/core';
 import './drawing-toolbar.css';
 
 const DRAW_TOOLS = [
-  { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "fas fa-circle" },
+  { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "pi pi-circle-fill" },
   { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
   { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
   { value: "Copy", title: "copyFeature", "defaultTitle": "Copiar geometria", icon: "pi pi-copy" },
@@ -59,7 +59,7 @@ export default function DrawingToolbar({ availableTools, activeTool, onSelectToo
           aria-label={t("viewAllElements", "Ver todos os elementos")}
           onClick={() => onZoomAll()}
         >
-          <i className="fas fa-search-plus" aria-hidden="true" />
+          <i className="pi pi-search-plus" aria-hidden="true" />
         </ActionIcon>
       </Group>
     </Group>

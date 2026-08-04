@@ -173,7 +173,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
       return (!!coordinates_control && !!coordinates_control.show_button) ?
         <MapToolButton key={type}
           title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
-          icon="fas fa-bullseye"
+          icon="pi pi-bullseye"
           active={exclusive_mapcontrol === 'Coordinates'}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}
         /> : null;

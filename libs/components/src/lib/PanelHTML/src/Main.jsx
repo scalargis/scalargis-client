@@ -36,7 +36,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={className}
-      icon={component_cfg?.btn_icon ? component_cfg?.btn_icon : "far fa-question-circle"}
+      icon={component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-question-circle"}
       onClick={e => record.as === 'popup' ? setShowPopup(true) : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   );

@@ -28,7 +28,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
-      icon="fas fa-bullseye"
+      icon="pi pi-bullseye"
       onClick={e => {
         if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
         if (exclusive_mapcontrol !== MAPCONTROL_NAME) {

@@ -40,7 +40,7 @@ export function MainMenu({ className, config, actions, record }) {
         <MainMenuButton
           title={title}
           className={className}
-          icon="far fa-question-circle"
+          icon="pi pi-question-circle"
           onClick={e => setShowPopup(true)}
         />
 
@@ -82,7 +82,7 @@ export function MainMenu({ className, config, actions, record }) {
       <MainMenuButton
         title={title}
         className={className}
-        icon="far fa-question-circle"
+        icon="pi pi-question-circle"
         onClick={e => window.open(help_url)} />
     )
   }  else {
@@ -90,7 +90,7 @@ export function MainMenu({ className, config, actions, record }) {
       <MainMenuButton
         title={title}
         className={className}
-        icon="far fa-question-circle"
+        icon="pi pi-question-circle"
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )
@@ -147,10 +147,10 @@ export default function Main({ type, as, config, actions, record }) {
         { type != 'menu' ?
           <UnstyledButton className="p-link" onClick={e => setShowPopup(true)} title={title}>
             <span className="layout-topbar-item-text"></span>
-            <span className="layout-topbar-icon far far fa-question-circle" />
+            <span className="layout-topbar-icon pi pi-question-circle" />
           </UnstyledButton> :
           <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => setShowPopup(true)} >
-            <span className="p-menuitem-icon far far fa-question-circle"></span><span className="p-menuitem-text">Ajuda</span>
+            <span className="p-menuitem-icon pi pi-question-circle"></span><span className="p-menuitem-text">Ajuda</span>
           </a> }
 
         <Dialog
