@@ -27,6 +27,82 @@
   padding-inline-end: var(--button-padding-x);
 }
 
+/* A label wider than its button is sliced mid-glyph: Mantine's label is a
+   nowrap flex box the root clips. text-overflow does nothing on a flex box, so
+   block + min-width 0 is what buys the ellipsis (height auto keeps the inner's
+   align-items centring it). Fitting the label stays the call site's job.
+
+   Untrimming is not optional here: Mantine trims the box to the cap line and
+   the baseline for optical centring, which is harmless at height 100% and a
+   guillotine once the box shrinks to its content — overflow:hidden then clips
+   exactly the ink the trim excluded (accents, descenders). The line box also
+   needs room the root's `line-height: 1` does not give it.
+   -------------------------------------------------------------------- */
+.mantine-Button-label {
+  display: block;
+  height: auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-box-trim: none;
+  line-height: 1.5;
+}
+
+/* ─── Icon-font glyphs inside an ActionIcon ────────────────────────────
+   Icons here are `<i class="pi …">` / `<i class="fas …">` — an icon FONT has
+   no intrinsic size and Mantine sets no font-size on the ActionIcon root, so
+   the glyph took the ambient body size (14px from primeicons' own `.pi` rule,
+   16 for FontAwesome) whether the button around it was 28px or 44px. Size it
+   off the control instead, so `size=` alone decides how big an icon button
+   reads. SVG children size themselves and are untouched.
+   -------------------------------------------------------------------- */
+.mantine-ActionIcon-root > i {
+  font-size: calc(var(--ai-size) * 0.55);
+  line-height: 1;
+}
+
+/* ─── Stepper ──────────────────────────────────────────────────────────
+   Mantine puts the label BESIDE the circle (34→52px) and defaults to `wrap`,
+   which in the 288px viewer panel broke the wizard's three steps onto two
+   rows. Restore Prime's Steps for horizontal steppers — circle over label, ADS
+   scale — leaving vertical ones alone. `iconSize` still overrides: no
+   !important here.
+   -------------------------------------------------------------------- */
+.mantine-Stepper-root {
+  --stepper-icon-size-xs: 24px;
+  --stepper-icon-size-sm: 28px;
+  --stepper-icon-size-md: 32px;
+  --stepper-icon-size-lg: 36px;
+  --stepper-icon-size-xl: 40px;
+}
+
+/* Top-aligned, so the connector meets the circles and not the centre of the
+   taller icon + label column. */
+.mantine-Stepper-steps[data-orientation='horizontal'] {
+  align-items: flex-start;
+}
+
+.mantine-Stepper-steps[data-orientation='horizontal'] .mantine-Stepper-step {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Mantine's spacing-sm offset clears an icon that is beside the body; stacked,
+   the gap is vertical and much smaller. */
+.mantine-Stepper-steps[data-orientation='horizontal'] .mantine-Stepper-stepBody {
+  margin-inline-start: 0;
+  margin-top: calc(0.25rem * var(--mantine-scale)); /* 4px, half-step */
+  align-items: center;
+}
+
+/* --stepper-icon-size is set on the root by size=/iconSize=, so the connector
+   tracks whatever circle the caller picked. */
+.mantine-Stepper-steps[data-orientation='horizontal'] .mantine-Stepper-separator {
+  margin-top: calc(var(--stepper-icon-size) / 2);
+  margin-inline: var(--mantine-spacing-xs);
+}
+
 /* ─── TimePicker (inside DateTimePicker) ───────────────────────────────
    @mantine/dates clips the row that holds the hour/minute/second fields
    (`.mantine-TimePicker-fieldsRoot { overflow: hidden }`), which eats the

@@ -1,5 +1,7 @@
+/* SVG, so it sizes itself instead of tracking --ai-size the way the icon fonts
+   do (ads-components.css): hold it level with a `pi` glyph in the same lg. */
 #drawtools .draw-tool-icon {
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
   display: block;
 }

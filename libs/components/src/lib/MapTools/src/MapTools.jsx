@@ -397,11 +397,19 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
       <div style={{ height: '100%' }}>
         <div id="map-tools" className="plugin-main p-2">
           
-          <Button.Group>
+          {/* The pair takes the ~288px panel's width and splits it: the ADS md
+              baseline spends ~180px per button and cut the labels. sm + xs
+              padding fits "Medir Distância"; a longer locale ellipsizes, hence
+              the title. */}
+          <Button.Group w="100%">
             {controlOptions.map(option => (
               <Button
                 key={option.key}
                 type="button"
+                size="sm"
+                px="xs"
+                style={{ flex: 1 }}
+                title={option.label}
                 variant={selectedControl === option.key ? 'filled' : 'default'}
                 aria-pressed={selectedControl === option.key}
                 leftSection={<i className={option.icon} aria-hidden="true" />}

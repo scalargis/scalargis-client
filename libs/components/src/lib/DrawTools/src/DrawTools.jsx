@@ -926,7 +926,7 @@ class DrawTools extends React.Component {
     return (
       <div id="drawtools">
 
-        <Paper shadow="md" p="md" className="toolbar">
+        <Paper shadow="md" p="sm" className="toolbar">
           <Stack gap="xs">
 
             <Group gap="sm" wrap="wrap">
@@ -934,7 +934,7 @@ class DrawTools extends React.Component {
                 {drawElementsOptions.map(opt =>
                   <ActionIcon
                     key={opt.value}
-                    size="md"
+                    size="lg"
                     variant={opt.value === selectedTool ? 'filled' : 'default'}
                     aria-pressed={opt.value === selectedTool}
                     title={i18next.t(opt.title, opt.defaultTitle)}
@@ -950,7 +950,7 @@ class DrawTools extends React.Component {
                 {selectTools.map(opt =>
                   <ActionIcon
                     key={opt.value}
-                    size="md"
+                    size="lg"
                     variant={opt.value === selectedTool ? 'filled' : 'default'}
                     aria-pressed={opt.value === selectedTool}
                     title={i18next.t(opt.title, opt.defaultTitle)}
@@ -967,7 +967,7 @@ class DrawTools extends React.Component {
               {colorTools.map(opt =>
                 <ActionIcon
                   key={opt.value}
-                  size="md"
+                  size="lg"
                   variant="default"
                   title={i18next.t(opt.title, opt.defaultTitle)}
                   aria-label={i18next.t(opt.title, opt.defaultTitle)}
@@ -985,7 +985,7 @@ class DrawTools extends React.Component {
               )}
 
               <Select
-                size="xs"
+                size="sm"
                 w={72}
                 title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
                 aria-label={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
@@ -1010,7 +1010,7 @@ class DrawTools extends React.Component {
               {historyTools.map(opt =>
                 <ActionIcon
                   key={opt.value}
-                  size="md"
+                  size="lg"
                   variant={opt.value !== "clear" ? "default" : "filled"}
                   color={opt.value !== "clear" ? undefined : "danger"}
                   title={i18next.t(opt.title, opt.defaultTitle)}
@@ -1038,6 +1038,7 @@ class DrawTools extends React.Component {
             <Group gap="xs">
               <Button
                 type="button"
+                size="sm"
                 leftSection={<i className="pi pi-save" aria-hidden="true" />}
                 title="Aplicar alterações"
                 onClick={e => this.finishEditing()}
@@ -1062,6 +1063,7 @@ class DrawTools extends React.Component {
           <div>
             <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
             <Select
+              size="sm"
               title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
               aria-label={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
               value={symbol_type}
@@ -1075,8 +1077,12 @@ class DrawTools extends React.Component {
         {draw_text ? (
           <div>
             <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
+            {/* Three side-by-side pickers in a ~288px panel land on ~88px each,
+                which the ADS md baseline spends on padding and the chevron
+                alone ("normal" came out "norm"). sm is the sidebar size. */}
             <Group gap="xs" grow>
               <Select
+                size="sm"
                 title={i18next.t("textStyle", "Estilo do Texto")}
                 aria-label={i18next.t("textStyle", "Estilo do Texto")}
                 value={text_style}
@@ -1086,6 +1092,7 @@ class DrawTools extends React.Component {
               />
 
               <Select
+                size="sm"
                 title={i18next.t("textSize", "Tamanho do Texto")}
                 aria-label={i18next.t("textSize", "Tamanho do Texto")}
                 value={text_size}
@@ -1095,6 +1102,7 @@ class DrawTools extends React.Component {
               />
 
               <Select
+                size="sm"
                 title={i18next.t("fontType", "Tipo de Letra")}
                 aria-label={i18next.t("fontType", "Tipo de Letra")}
                 value={text_font}
@@ -1104,6 +1112,7 @@ class DrawTools extends React.Component {
               />
             </Group>
             <TextInput
+              size="sm"
               mt="md"
               value={text_value}
               onChange={this.changeTextValue.bind(this)}
