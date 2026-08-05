@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
 import { Button, Switch } from '@mantine/core'
 import { Feature } from 'ol'
@@ -23,9 +23,13 @@ export default function Main({ config }) {
   const [active, setActive] = useState(false);
   const [selected, setSelected] = useState({ items: [], coord: null });
 
-  // Resolve the OL layer in render (was a module-scope `let` set only in an
-  // effect, so the first render always hit the null gate and never re-rendered,
-  // and instances shared the same global). Per-instance select lives in a ref.
+  // Resolve the OL layer on every render. A useMemo keyed on [mainMap, layer.id]
+  // (like the previous fix) goes stale: these tools mount when the theme enters
+  // the TOC — before its OL layer is added to the map — so the first resolve is
+  // undefined and, since neither dep changes when the layer appears, it never
+  // recomputes. The TOC re-renders when themes change, so a plain per-render
+  // lookup picks the layer up as soon as it exists; the OL instance is stable,
+  // so the effect below still runs exactly once. Per-instance select in a ref.
   const selectSingleClick = useRef();
 
   function findOlLayer(id) {
@@ -36,7 +40,7 @@ export default function Main({ config }) {
     return found;
   }
 
-  const olLayer = useMemo(() => findOlLayer(layer.id), [mainMap, layer.id]);
+  const olLayer = findOlLayer(layer.id);
 
   function exportSelected() {
     const format = new GeoJSON();

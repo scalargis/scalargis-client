@@ -1,0 +1,31 @@
+{
+    "_comment": "ExportMapFeatures monta-se por-camada na árvore do TOC. Vive na região 'layer_tools_block' (o bloco full-width por baixo dos ícones da row, visível quando a engrenagem está expandida). NÃO usar 'layer_tools' (a fila de ícones é flex e esmaga a tabela). IMPORTANTE: o id deste componente TEM de constar na lista 'children' do componente TOC, senão o renderComponents filtra-o e nunca monta (ver README.md).",
+
+    "id": "ExportMapFeatures",
+    "type": "ExportMapFeatures",
+    "target": "layer_tools_block",
+    "config_json": {},
+    "children": [],
+
+    "_toc_dependency": {
+        "_comment": "O componente TOC tem de listar 'ExportMapFeatures' nos seus children. Exemplo do bloco TOC:",
+        "id": "toc",
+        "type": "TOC",
+        "target": "mainmenu",
+        "children": [
+            "3",
+            "4",
+            "5",
+            "7",
+            "2",
+            "ExportMapFeatures"
+        ]
+    },
+
+    "_notes": [
+        "Só se mostra para camadas cuja fonte OpenLayers é um VectorSource (GeoJSON/WFS/KML/GML/desenho). Numa camada raster (WMS/WMTS/Tile) devolve null — sem UI.",
+        "A camada tem de ser NÃO-system: o bloco de ferramentas da row é gated por !data.system no TOC/Node.jsx, por isso camadas system (ex. a 'Camada do Utilizador' de rascunho) não expõem estas tools.",
+        "Resolve a camada OL do mapa por id (layer.id === olLayer.get('id')) no render — não precisa de config extra.",
+        "Exporta a geometria selecionada para 'selecao.geojson' e o ponto clicado para 'coordenada.geojson', ambos client-side (sem servidor)."
+    ]
+}

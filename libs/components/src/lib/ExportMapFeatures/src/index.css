@@ -1,10 +1,11 @@
 .export-map-features {
-  margin-left: 33px;
+  width: 100%;
   padding: 0.5em;
   background-color: #f9f9f9;
 }
 
 .export-map-features table {
+  width: 100%;
   font-size: 0.8em;
 }
 
@@ -14,4 +15,9 @@
 
 .export-map-features table th {
   padding-bottom: 1em;
+}
+
+.export-map-features table th:first-child {
+  text-align: left;
+  white-space: nowrap;
 }
