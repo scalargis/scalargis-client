@@ -35,7 +35,7 @@ export default function MainMenuButton({
   return (
     <ActionIcon
       type="button"
-      variant={isActive ? 'filled' : 'default'}
+      variant={isActive ? 'filled' : 'outline'}
       size={38}
       radius="xl"
       className={passthrough || undefined}

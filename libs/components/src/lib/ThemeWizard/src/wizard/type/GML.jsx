@@ -96,10 +96,6 @@ export default function GML(props) {
               uploadLabel={t("load", "Carregar")}
               cancelLabel={t("cancel", "Cancelar")}
               onUpload={async (files) => loadGMLFile({ files })}
-              onReject={(rejections) => {
-                const msg = t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)});
-                rejections.forEach(r => notify.error(r.file.name, msg));
-              }}
             />
             { (props.maxFileSize && props.maxFileSize > 0) ?
             <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>

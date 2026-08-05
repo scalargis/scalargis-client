@@ -11,7 +11,7 @@
 
 .ol-control button {
     color: #ffffff;
-    background: #2196f3;
+    background: var(--mantine-color-primary-5);
     border: 0 none;
     padding: 0.571rem 0.49rem;
     font-size: 1rem;
@@ -52,12 +52,12 @@
 .ol-control button:hover, .ol-control button:focus {
     text-decoration: none;
     color: #ffffff;
-    background-color: rgba(33, 150, 243);
-    outline: 0;
+    /* ADS action ladder, matching MapToolButton: active/focus = primary-7. */
+    background-color: var(--mantine-color-primary-7);
 }
 
 .ol-control button:hover {
-    background-color: rgba(33, 150, 243, 0.92);
+    background-color: var(--mantine-color-primary-6);
 }
 
 .ol-touch .ol-control button {

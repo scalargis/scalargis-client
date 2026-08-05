@@ -78,7 +78,7 @@ export default function ArcGISMap(props) {
     const { wmsTiled } = data;
     return (
       <React.Fragment>
-        <Group gap={0} wrap="nowrap" align="stretch">
+        <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
           <TextInput placeholder='https://...'
             value={data.url}
             list='urlhistory'

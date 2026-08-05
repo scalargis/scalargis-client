@@ -67,6 +67,7 @@ export function FileUpload({
   cancelLabel = uiText('upload.cancel', 'Cancel'),
   placeholder = uiText('upload.placeholder', 'Drag and drop files here, or use Choose.'),
   multiple = true,
+  onReject: onRejectProp,
   ...dropzoneProps
 }: FileUploadProps) {
   const [files, setFiles] = useState<File[]>([]);
@@ -114,6 +115,32 @@ export function FileUpload({
     onFilesChange?.([]);
   };
 
+  // Reject message keyed on the actual reason, not a blanket "too large":
+  // @mantine/dropzone tags each error with a code (file-too-large /
+  // file-invalid-type / …). Callers used to override onReject with a
+  // size-only message that fired even for wrong file types (C-10).
+  type Rejections = Parameters<NonNullable<DropzoneProps['onReject']>>[0];
+  const rejectMessage = (r: Rejections[number]) => {
+    const codes = r.errors.map((e) => e.code);
+    if (codes.includes('file-too-large') && dropzoneProps.maxSize) {
+      return `${r.file.name}: ${uiText('upload.tooLarge', 'File is too large (max {{size}})', {
+        size: formatBytes(dropzoneProps.maxSize),
+      })}`;
+    }
+    if (codes.includes('file-invalid-type')) {
+      return `${r.file.name}: ${uiText('upload.invalidType', 'File type not allowed')}`;
+    }
+    return `${r.file.name}: ${r.errors.map((e) => e.message).join(', ')}`;
+  };
+
+  const handleReject = (rejections: Rejections) => {
+    notify.error(
+      uiText('upload.rejected', 'File rejected'),
+      rejections.map(rejectMessage).join('\n')
+    );
+    onRejectProp?.(rejections);
+  };
+
   return (
     <Box>
       <Group className="ads-fileupload__toolbar" gap="xs">
@@ -155,14 +182,7 @@ export function FileUpload({
         className="ads-fileupload__dropzone"
         openRef={openPicker}
         onDrop={handleDrop}
-        onReject={(rejections) =>
-          notify.error(
-            uiText('upload.rejected', 'File rejected'),
-            rejections
-              .map((r) => `${r.file.name}: ${r.errors.map((e) => e.message).join(', ')}`)
-              .join('\n')
-          )
-        }
+        onReject={handleReject}
         multiple={multiple}
         disabled={uploading}
         {...dropzoneProps}

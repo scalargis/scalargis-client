@@ -4,6 +4,7 @@ import { Anchor, TextInput } from '@mantine/core';
 import { TreeView, useTree } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../i18n/index';
+import { foldDiacritics } from '../../../utils/common';
 
 /* Prime Tree node ({key,label,children}) → Mantine TreeNodeData. Values are
    the layer ids as strings — the same strings the wizard's `selected` map is
@@ -19,12 +20,12 @@ function toTreeData(nodes) {
 /* Prime "lenient" filtering: a node stays when its own label matches (whole
    subtree kept) or when any descendant matches (pruned to matching branches). */
 function filterTreeData(nodes, query) {
-  const q = (query || '').trim().toLowerCase();
+  const q = foldDiacritics((query || '').trim());
   if (!q) return nodes;
   const walk = (list) =>
     list
       .map((n) => {
-        if (String(n.label || '').toLowerCase().includes(q)) return n;
+        if (foldDiacritics(n.label || '').includes(q)) return n;
         const children = n.children ? walk(n.children) : [];
         return children.length ? { ...n, children } : null;
       })

@@ -28,6 +28,8 @@ const en = {
     complete: 'Upload complete',
     failed: 'Upload failed',
     rejected: 'File rejected',
+    tooLarge: 'File is too large (max {{size}})',
+    invalidType: 'File type not allowed',
     placeholder: 'Drag and drop files here, or use Choose.',
     remove: 'Remove',
   },
@@ -47,6 +49,8 @@ const pt: typeof en = {
     complete: 'Carregamento concluído',
     failed: 'Falha no carregamento',
     rejected: 'Ficheiro rejeitado',
+    tooLarge: 'O ficheiro é demasiado grande (máx. {{size}})',
+    invalidType: 'Tipo de ficheiro não permitido',
     placeholder: 'Arraste ficheiros para aqui ou use Escolher.',
     remove: 'Remover',
   },
@@ -71,9 +75,18 @@ export function registerUiTranslations(): void {
 }
 
 /** Resolve a recipe default in the active language, falling back to the
- *  built-in string when i18next is not initialised (unit tests). */
-export function uiText(key: string, fallback: string): string {
+ *  built-in string when i18next is not initialised (unit tests). `vars`
+ *  feeds i18next's `{{name}}` interpolation (and the fallback path too). */
+export function uiText(
+  key: string,
+  fallback: string,
+  vars?: Record<string, string | number>
+): string {
   registerUiTranslations();
-  if (!i18next.isInitialized) return fallback;
-  return i18next.t(`${UI_NAMESPACE}:${key}`, { defaultValue: fallback });
+  if (!i18next.isInitialized) {
+    return vars
+      ? fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars[k] ?? ''))
+      : fallback;
+  }
+  return i18next.t(`${UI_NAMESPACE}:${key}`, { defaultValue: fallback, ...vars });
 }

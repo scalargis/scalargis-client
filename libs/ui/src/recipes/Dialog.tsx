@@ -19,7 +19,7 @@
    onShow/onResize/onMaximize handlers becomes CSS.
    ===================================================================== */
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActionIcon,
   Box,
@@ -65,6 +65,53 @@ export function Dialog({
   const theme = useMantineTheme();
   const [maximized, setMaximized] = useState(false);
 
+  // Drag-by-header — Prime's <Dialog> was draggable by default; the Modal.Root
+  // is not, so every consumer (StreetView, help, results, documents) lost it.
+  // Restored centrally here (C-21). The offset is applied as a translate on
+  // Modal.Content; centering stays the initial position, and dragging is
+  // disabled while maximized.
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const drag = useRef<{ startX: number; startY: number; baseX: number; baseY: number } | null>(null);
+
+  // Every fresh open re-centres.
+  useEffect(() => {
+    if (opened) setOffset({ x: 0, y: 0 });
+  }, [opened]);
+
+  const onHeaderPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (maximized) return;
+      // Only the header background drags — not the maximize/close controls.
+      if ((e.target as HTMLElement).closest('button')) return;
+      drag.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        baseX: offset.x,
+        baseY: offset.y,
+      };
+    },
+    [maximized, offset.x, offset.y]
+  );
+
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      if (!drag.current) return;
+      setOffset({
+        x: drag.current.baseX + (e.clientX - drag.current.startX),
+        y: drag.current.baseY + (e.clientY - drag.current.startY),
+      });
+    };
+    const up = () => {
+      drag.current = null;
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+  }, []);
+
   // Modal.Root does not inherit the theme's `Modal` defaultProps (they only
   // apply to the compound component), so the ADS dialog rung is restated here.
   const z = zIndex ?? theme.other?.zLadder?.dialog ?? 6000;
@@ -87,11 +134,23 @@ export function Dialog({
           to shrink-to-fit width, maximize only grows downward, and the body
           never distributes height (blank StreetView pano). `h` is a Box style
           prop and reaches the content alone, so it is safe. */}
+      {/* The offset rides the per-slot `styles.content`, never the plain
+          `style` prop: Modal.Content copies `style` onto the inner centring
+          wrapper too, which would double the translate. */}
       <Modal.Content
         h={maximized ? undefined : height}
         classNames={{ content: 'ads-dialog__content' }}
+        styles={{
+          content:
+            maximized || (offset.x === 0 && offset.y === 0)
+              ? undefined
+              : { transform: `translate(${offset.x}px, ${offset.y}px)` },
+        }}
       >
-        <Modal.Header>
+        <Modal.Header
+          onPointerDown={onHeaderPointerDown}
+          style={maximized ? undefined : { cursor: 'move', touchAction: 'none' }}
+        >
           <Modal.Title>{title}</Modal.Title>
           <Group gap={4} wrap="nowrap">
             {maximizable && (

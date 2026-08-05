@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
 import { Button, Switch } from '@mantine/core'
 import { Feature } from 'ol'
@@ -15,9 +15,6 @@ export function traverseOlLayers(collection, cb) {
   })
 }
 
-let selectSingleClick;
-let olLayer;
-
 export default function Main({ config }) {
 
   //console.log('ExportMapFeatures', config);
@@ -25,6 +22,21 @@ export default function Main({ config }) {
 
   const [active, setActive] = useState(false);
   const [selected, setSelected] = useState({ items: [], coord: null });
+
+  // Resolve the OL layer in render (was a module-scope `let` set only in an
+  // effect, so the first render always hit the null gate and never re-rendered,
+  // and instances shared the same global). Per-instance select lives in a ref.
+  const selectSingleClick = useRef();
+
+  function findOlLayer(id) {
+    let found;
+    traverseOlLayers(mainMap.getLayers(), l => {
+      if (l.get('id') === id) found = l;
+    });
+    return found;
+  }
+
+  const olLayer = useMemo(() => findOlLayer(layer.id), [mainMap, layer.id]);
 
   function exportSelected() {
     const format = new GeoJSON();
@@ -43,30 +55,24 @@ export default function Main({ config }) {
     download('coordenada.geojson', text);
   }
 
-  function findOlLayer(id) {
-    let layer;
-    traverseOlLayers(mainMap.getLayers(), l => {
-      if (l.get('id') === id) layer = l;
-    });
-    return layer;
-  }
-
   useEffect(() => {
-    olLayer = findOlLayer(layer.id);
-    selectSingleClick = new Select({
+    if (!olLayer) return;
+    const select = new Select({
       layers: [olLayer]
     });
-    selectSingleClick.on('select', e => {
+    select.on('select', e => {
       if (e.selected.length) setSelected({ items: e.selected, coord: e.mapBrowserEvent.coordinate });
     })
-    mainMap.addInteraction(selectSingleClick);
+    mainMap.addInteraction(select);
+    selectSingleClick.current = select;
     return () => {
-      mainMap.removeInteraction(selectSingleClick)
+      mainMap.removeInteraction(select);
+      selectSingleClick.current = undefined;
     }
-  }, []);
+  }, [olLayer, mainMap]);
 
   useEffect(() => {
-    selectSingleClick.setActive(active);
+    if (selectSingleClick.current) selectSingleClick.current.setActive(active);
   }, [active]);
 
   // Filter by layer type

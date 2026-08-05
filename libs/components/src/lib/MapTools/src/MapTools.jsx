@@ -147,8 +147,14 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
     if (!mainMap) return;
     if (!layer.current) return;
 
+    // Any selection change starts clean: switching distance<->area (both
+    // truthy) must wipe the previous measurement + readout, not just the
+    // deselect path below (C-04).
+    clearMeasureFeature();
+    setLength(0);
+    setArea(0);
+
     if(!selectedControl) {
-      clearMeasureFeature();
       clearHelpTooltip();
       if (exclusive_mapcontrol === 'MapTools') {
         dispatch(actions.viewer_set_exclusive_mapcontrol(null));

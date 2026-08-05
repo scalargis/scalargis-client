@@ -48,6 +48,19 @@
   line-height: 1.5;
 }
 
+/* ─── Attached input + button group ────────────────────────────────────
+   A TextInput butted flush against a Button/ActionIcon (a `Group gap={0}
+   wrap="nowrap"` — the Prime InputGroup idiom: TOC filter, the wizard's URL
+   loaders). The global magenta focus ring (ads-globals.css) sits 2px OUTSIDE
+   the input, so the opaque neighbour paints over the strip between them and
+   the ring reads as clipped. Lift the focused control above its sibling so
+   its ring wins, without breaking the attached look.
+   -------------------------------------------------------------------- */
+.ads-input-group :focus-visible {
+  position: relative;
+  z-index: 1;
+}
+
 /* ─── Icon-font glyphs inside an ActionIcon ────────────────────────────
    Icons here are `<i class="pi …">` / `<i class="fas …">` — an icon FONT has
    no intrinsic size and Mantine sets no font-size on the ActionIcon root, so

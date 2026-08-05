@@ -3,7 +3,7 @@
 }
 
 .ol-control button:focus {
-  background-color: #2196f3;
+  background-color: var(--mantine-color-primary-7);
 }
 
 /* Same opaque ADS action-hover step as the MapToolButton in the same strip

@@ -1,7 +1,8 @@
 import React from 'react';
 import i18next from "i18next";
-import { ActionIcon, Button, Group, Paper, Select, Stack, TextInput } from '@mantine/core';
-import { DataGrid } from '@scalargis/ui';
+import { ActionIcon, Button, Group, Paper, Popover, Select, Stack, TextInput } from '@mantine/core';
+import { DataGrid, notify } from '@scalargis/ui';
+import { getAppRootPath } from '../../utils/common';
 import OlFormatWKT from "ol/format/WKT";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import OlInteractionDragPan from "ol/interaction/DragPan";
@@ -782,40 +783,34 @@ class DrawTools extends React.Component {
       }
     };
     json.crs = crsinfo;
-    const data = JSON.stringify(json)
 
-    // Build file
-    const file = new Blob([data], { type: 'application/json' });
-    FileSaver.saveAs(file, 'geojson');
+    // GeoJSON is written in the browser; GML/ShapeFile/KML have no browser
+    // writer, so they go through the spatial_toolbox export endpoint (fiona)
+    // which returns the converted file (ShapeFile as a zip).
+    if (format === 'geojson') {
+      const file = new Blob([JSON.stringify(json)], { type: 'application/json' });
+      FileSaver.saveAs(file, 'export.geojson');
+      return;
+    }
 
-    // TODO: upload and convert
-    /*
-    // Upload data
-    const endpoint = import.meta.env.VITE_APP_SERVER_URL || import.meta.env.VITE_APP_PUBLIC_URL;
-    const upload = new FormData();
-    upload.append('upload', file);
-    upload.append('ext', 'geojson');
-    fetch(endpoint + '/resource', { method: 'POST', body: upload })
-    .then(res => res.json())
-    .then(res => {
-      if (!res.success) {
-        console.log(res.error);
-        return;
-      }
-
-      // Convert to format
-      const url = endpoint + '/convert/' + res.filename + '/' + format
-      fetch(url, { responseType: 'blob' })
-        .then(res => res.blob())
-        .then(res => {
-
-          // Download result
-          FileSaver.saveAs(res, format)
-        }).catch((error) => {
-          console.error(error);
-        });
+    const url = `${getAppRootPath()}/spatial_toolbox/api/export`;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ geojson: json, format, crs })
+    }).then(res => {
+      if (!res.ok) throw new Error('export failed');
+      return res.blob();
+    }).then(blob => {
+      const ext = format === 'shape' ? 'zip' : format;
+      FileSaver.saveAs(blob, `export.${ext}`);
+    }).catch((error) => {
+      console.error(error);
+      notify.error(
+        i18next.t("error", "Erro"),
+        i18next.t("exportError", "Não foi possível exportar os elementos.")
+      );
     });
-    */
   }
 
   getButtonStyle(opt) {
@@ -893,33 +888,6 @@ class DrawTools extends React.Component {
     const page = Math.min(this.state.page, totalPages);
     const pageRecords = drawings.slice((page - 1) * pageSize, page * pageSize);
 
-    const styles = () => {
-      return {
-        swatch: {
-          padding: '5px',
-          background: '#fff',
-          borderRadius: '1px',
-          boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-          display: 'inline-block',
-          cursor: 'pointer',
-        },
-        popover: {
-          position: 'absolute',
-          zIndex: '2',
-        },
-        cover: {
-          position: 'fixed',
-          top: '0px',
-          right: '0px',
-          bottom: '0px',
-          left: '0px',
-        }
-      }
-    }
-
-
-
-
 
 
 
@@ -964,25 +932,44 @@ class DrawTools extends React.Component {
             </Group>
 
             <Group gap={4} wrap="wrap">
-              {colorTools.map(opt =>
-                <ActionIcon
-                  key={opt.value}
-                  size="lg"
-                  variant="default"
-                  title={i18next.t(opt.title, opt.defaultTitle)}
-                  aria-label={i18next.t(opt.title, opt.defaultTitle)}
-                  style={this.getButtonStyle(opt)}
-                  onClick={(e) => {
-                    switch (opt.value) {
-                      case 'fill': this.toggleFillPicker(e); break;
-                      case 'stroke': this.toggleStrokePicker(e); break;
-                      default: ;
-                    }
-                  }}
-                >
-                  <i className={opt.icon} aria-hidden="true" />
-                </ActionIcon>
-              )}
+              {colorTools.map(opt => {
+                // Anchor the react-color picker under its button (Mantine
+                // Popover) instead of the old free-floating absolute div that
+                // covered the toolbar (C-03).
+                const isFill = opt.value === 'fill';
+                const opened = isFill ? this.state.displayFillPicker : this.state.displayStrokePicker;
+                const pickerColor = isFill ? fill : stroke;
+                const onToggle = isFill ? this.toggleFillPicker : this.toggleStrokePicker;
+                const onClose = isFill ? this.closeFillPicker : this.closeStrokePicker;
+                const onColorChange = isFill ? this.changeFill : this.changeStroke;
+                return (
+                  <Popover
+                    key={opt.value}
+                    opened={opened}
+                    onClose={onClose.bind(this)}
+                    position="bottom-start"
+                    withinPortal
+                    shadow="md"
+                    trapFocus={false}
+                  >
+                    <Popover.Target>
+                      <ActionIcon
+                        size="lg"
+                        variant="default"
+                        title={i18next.t(opt.title, opt.defaultTitle)}
+                        aria-label={i18next.t(opt.title, opt.defaultTitle)}
+                        style={this.getButtonStyle(opt)}
+                        onClick={() => onToggle()}
+                      >
+                        <i className={opt.icon} aria-hidden="true" />
+                      </ActionIcon>
+                    </Popover.Target>
+                    <Popover.Dropdown p={0}>
+                      <CompactPicker color={pickerColor} onChange={onColorChange.bind(this)} />
+                    </Popover.Dropdown>
+                  </Popover>
+                );
+              })}
 
               <Select
                 size="sm"
@@ -995,16 +982,6 @@ class DrawTools extends React.Component {
                 allowDeselect={false}
               />
             </Group>
-
-            {this.state.displayFillPicker ? <div style={styles().popover}>
-              <div style={styles().cover} onClick={this.closeFillPicker.bind(this)} />
-              <CompactPicker color={fill} onChange={this.changeFill.bind(this)} />
-            </div> : null}
-
-            {this.state.displayStrokePicker ? <div style={styles().popover}>
-              <div style={styles().cover} onClick={this.closeStrokePicker.bind(this)} />
-              <CompactPicker color={stroke} onChange={this.changeStroke.bind(this)} />
-            </div> : null}
 
             <Group gap={4} wrap="nowrap">
               {historyTools.map(opt =>

@@ -7,11 +7,15 @@ import { TreeView, useTree } from '@scalargis/ui';
 import { i18n, utils, ProgressControl } from '../../components';
 
 
-const buildTree = (items, level = 0) => {
+const buildTree = (items, parentKey = '') => {
   const tree = [];
   items.forEach((item, index) => {
+    // Key must be unique across the whole tree: TreeView identifies nodes by
+    // value=key, so a depth+index key collided between sibling folders and the
+    // last folder's children won (C-15). Prefix the parent's key per level.
+    const key = parentKey ? `${parentKey}-${index}` : `${index}`;
     const obj = {
-      key: `${level}-${index}`,
+      key,
       data: {
         name: item.name,
         url: item.resource_url,
@@ -20,7 +24,7 @@ const buildTree = (items, level = 0) => {
     };
     if (item.type === 'folder') {
         // Recursively build the children of the current item
-        const children = buildTree(item.children || [], level + 1);
+        const children = buildTree(item.children || [], key);
         obj.children = children;
     }
     tree.push(obj);
@@ -32,11 +36,11 @@ const buildTree = (items, level = 0) => {
 // whole subtree; a folder is kept when any descendant survives.
 const pruneTree = (nodes, query) => {
   if (!query) return nodes;
-  const q = String(query).toLowerCase();
+  const q = utils.foldDiacritics(query);
   const prune = (items) => {
     const kept = [];
     items.forEach((item) => {
-      if (String(item?.data?.name || '').toLowerCase().includes(q)) {
+      if (utils.foldDiacritics(item?.data?.name || '').includes(q)) {
         kept.push(item);
         return;
       }
@@ -176,8 +180,9 @@ export default function DocumentList({ core, documentList }) {
 
   const header = (documentList?.showExpandButtons || documentList?.showFilter) &&
     <div className='grid'>
-      {documentList?.showFilter && <div className="flex col-12 justify-content-end">
+      {documentList?.showFilter && <div className="flex col-12">
         <TextInput
+          w="100%"
           leftSection={<i className="pi pi-search" aria-hidden="true" />}
           value={filter || ''}
           onChange={(e) => setFilter(e.target.value)}

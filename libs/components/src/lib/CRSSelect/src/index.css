@@ -10,6 +10,9 @@
 .footer-right .crsselect input {
   height: 30px;
   min-height: 30px;
+  /* size="xs" dropped the value text below the rest of the rodapé; restore
+     the footer's reading size while keeping the compact 30px height (C-17). */
+  font-size: var(--mantine-font-size-sm);
 }
 
 .footer-right .crsselect .cursor-coords .viewer-mouse-position {

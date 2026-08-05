@@ -63,9 +63,12 @@ export default function FeatureResults({ core, config, features, layers, actions
 
   // Update accordion active items: every result group opens on new results.
   // The Accordion items are keyed by layer id, not Prime's numeric indices.
+  // Keying on the grouped-id set (not features.length) re-opens the panels
+  // even when a new identify returns the same count on different layers (C-05).
+  const groupedKey = Object.keys(grouped).join(',');
   useEffect(() => {
     setActiveIndex(Object.keys(grouped));
-  }, [features.length]);
+  }, [groupedKey]);
 
   // Zoom to feature
   function zoomFeature(feat) {

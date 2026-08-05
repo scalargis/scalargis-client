@@ -191,3 +191,12 @@ export const getWindowSize = () => {
     return url;
   }
   
+// Diacritic-insensitive folding for filters: "analise" matches "Análise".
+// NFD splits accented letters into base + combining mark, then the marks are
+// stripped. Used by the TOC / ThemeWizard / DocumentBrowser filters (C-07).
+export const foldDiacritics = (str) => {
+  return String(str ?? '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
+}

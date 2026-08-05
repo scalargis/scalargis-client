@@ -148,10 +148,6 @@ export default function KML(props) {
                   uploadLabel={t("load", "Carregar")}
                   cancelLabel={t("cancel", "Cancelar")}
                   onUpload={async (files) => loadKMLFile({ files })}
-                  onReject={(rejections) => {
-                    const msg = t("maxFileSizeError", "O ficheiro não pode ter mais de {{size}} MB", {size: (Math.round((props.maxFileSize/1024) * 100) / 100)});
-                    rejections.forEach(r => notify.error(r.file.name, msg));
-                  }}
                 />
                 { (props.maxFileSize && props.maxFileSize > 0) ?
                 <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>
@@ -161,7 +157,7 @@ export default function KML(props) {
             <Tabs.Panel value="url" pt="sm">
               <div className="field">
                 <label>URL - KML</label>
-                <Group gap={0} wrap="nowrap" align="stretch">
+                <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
                   <TextInput placeholder='https://...'
                     value={data.url}
                     onChange={e => changeURL(e.target.value)}

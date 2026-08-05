@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Badge, SegmentedControl, Select, Slider } from '@mantine/core';
+import { Group, SegmentedControl, Select, Slider, Text } from '@mantine/core';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -46,11 +46,23 @@ export default function SliderPanel({
         disabled: l.id === selectedLayer?.id
     }));
 
+    // Full-width stacked rows: direction as a label above each Select (no more
+    // cramped col-1 arrow column), Selects at full width so theme names get the
+    // most room, and the % as its own value on the label line so it never gets
+    // crushed by the Select (C-19/C-20).
+    const firstLabel = compareTool === 1
+        ? `◄ ${i18nUtils.translateValue("left", "Esquerda")}`
+        : `▲ ${i18nUtils.translateValue("top", "Cima")}`;
+    const secondLabel = compareTool === 1
+        ? `${i18nUtils.translateValue("right", "Direita")} ►`
+        : `▼ ${i18nUtils.translateValue("bottom", "Baixo")}`;
+
     return (
 
         <div className='grid p-2' >
             <div className='col-12'>
                 <SegmentedControl
+                    fullWidth
                     value={String(compareTool)}
                     data={compareToolOptions.map(option => ({
                         value: String(option.value),
@@ -59,56 +71,44 @@ export default function SliderPanel({
                     onChange={(value) => setCompareTool(Number(value))} />
             </div>
 
-            <div className='grid col-12'>
-                <div className='col-1 pt-3'>
-                    {compareTool === 1 ?
-                        <i className="pi pi-arrow-left" ></i>
-                        :
-                        <i className="pi pi-arrow-up" ></i>
-                    }
-                </div>
-                <div className={compareTool === 1 ? 'col-11 flex justify-content-end' : 'col-11 flex justify-content-start'}>
-                    <Select
-                        clearable
-                        value={selectedLayer ? String(selectedLayer.id) : null}
-                        data={leftData}
-                        onChange={(value) => selectLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
-                        placeholder={compareTool === 1 ? i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda")
-                            : i18nUtils.translateValue("selectTopTheme", "Selecionar tema de topo")}
-                    />
-                    { compareTool === 2 && selectedLayer ?
-                        <Badge variant="light" className="ml-2">{String(opacitySliderValue.toFixed()) + ' %'}</Badge>
-                        : null }
-                </div>
-
-                {compareTool === 2 ?
-                    <div className='col-1 pt-3'>
-                        < i className="pi pi-arrow-down" ></i>
-                    </div>
-                    : null}
-                <div className={compareTool === 1 ? 'col-11 flex justify-content-end' : 'col-11 flex justify-content-start'}>
-                    <Select
-                        clearable
-                        value={selectedSliderLayer ? String(selectedSliderLayer.id) : null}
-                        data={rightData}
-                        onChange={(value) => selectSliderLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
-                        placeholder={compareTool === 1 ? i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita") :
-                            i18nUtils.translateValue("selectBottomTheme", "Selecionar tema de baixo")}
-                    />
-                    {compareTool === 2 && selectedSliderLayer ?
-                        <Badge variant="light" className="ml-2">{String(100 - opacitySliderValue.toFixed()) + ' %'}</Badge>
+            <div className='col-12'>
+                <Group justify="space-between" gap="xs" mb={4} wrap="nowrap">
+                    <Text size="sm">{firstLabel}</Text>
+                    {compareTool === 2 && selectedLayer ?
+                        <Text size="sm" fw={500}>{String(opacitySliderValue.toFixed()) + ' %'}</Text>
                         : null}
-                </div>
+                </Group>
+                <Select
+                    clearable
+                    title={selectedLayer?.item_name}
+                    value={selectedLayer ? String(selectedLayer.id) : null}
+                    data={leftData}
+                    onChange={(value) => selectLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
+                    placeholder={compareTool === 1 ? i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda")
+                        : i18nUtils.translateValue("selectTopTheme", "Selecionar tema de topo")}
+                />
+            </div>
 
-                {compareTool === 1 ?
-                    <div className='col-1 pt-3'>
-                        <i className="pi pi-arrow-right" ></i>
-                    </div>
-                    : null}
+            <div className='col-12'>
+                <Group justify="space-between" gap="xs" mb={4} wrap="nowrap">
+                    <Text size="sm">{secondLabel}</Text>
+                    {compareTool === 2 && selectedSliderLayer ?
+                        <Text size="sm" fw={500}>{String(100 - opacitySliderValue.toFixed()) + ' %'}</Text>
+                        : null}
+                </Group>
+                <Select
+                    clearable
+                    title={selectedSliderLayer?.item_name}
+                    value={selectedSliderLayer ? String(selectedSliderLayer.id) : null}
+                    data={rightData}
+                    onChange={(value) => selectSliderLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
+                    placeholder={compareTool === 1 ? i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita") :
+                        i18nUtils.translateValue("selectBottomTheme", "Selecionar tema de baixo")}
+                />
             </div>
 
             {compareTool === 2 ?
-                <div className='col-12 p-4'>
+                <div className='col-12 px-2 pt-2'>
                     <Slider
                         step={0.1}
                         size="sm"

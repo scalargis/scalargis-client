@@ -113,7 +113,7 @@ export default function WMS(props) {
 
     return (
       <React.Fragment>
-        <Group gap={0} wrap="nowrap" align="stretch">
+        <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
           <TextInput placeholder='https://...'
             value={data.url}
             list='urlhistory'
@@ -152,9 +152,11 @@ export default function WMS(props) {
 
             <div className="p-fluid">
 
+              {/* Label stacked above the control so "Não Especificado" gets the
+                  full panel width and stops truncating in the ~288px panel (C-09). */}
               <div className="field grid">
-                <label className="col-12 md:col-4">{t("serverType", "Tipo de servidor")}</label>
-                <div className="col-12 md:col-8">
+                <label className="col-12">{t("serverType", "Tipo de servidor")}</label>
+                <div className="col-12">
                   <Select placeholder={t("selectServerType", "Escolha o tipo de servidor")}
                     data={wmsServerTypeOtions.map(o => ({ value: o.value, label: o.label }))}
                     value={wmsServerType || ''}

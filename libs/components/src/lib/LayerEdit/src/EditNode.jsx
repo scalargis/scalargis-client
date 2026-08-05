@@ -81,13 +81,16 @@ class EditNode extends React.Component {
       const map_formats = edit.get_map_formats || '';
       const finfo_formats = edit.get_feature_info_formats || '';
       const wstyles = edit.wms_styles || '';
-      wmsFormatOptions = map_formats.split(',').map((i, j) => {
+      // Mantine's Select rejects duplicate option values; an empty string
+      // splits to [''] and would push a second value="" beside the seeded
+      // "Não Especificado", so drop empties before building the options.
+      wmsFormatOptions = map_formats.split(',').filter(Boolean).map((i, j) => {
         return { key: j, value: i, label: i};
       });
-      wmsFeatureFormatOptions = finfo_formats.split(',').map((i, j) => {
+      wmsFeatureFormatOptions = finfo_formats.split(',').filter(Boolean).map((i, j) => {
         return { key: j, value: i, label: i};
       });
-      wstyles.split(',').forEach((i, j) => {
+      wstyles.split(',').filter(Boolean).forEach((i, j) => {
         wmsStyleOptions.push({ key: j, value: i, label: i})
         return i;
       });
@@ -102,10 +105,10 @@ class EditNode extends React.Component {
       .map((i, j) => {
         return { key: j, value: i, label: i};
       });
-      wmtsFeatureFormatOptions = wmts_finfo_formats.split(',').map((i, j) => {
+      wmtsFeatureFormatOptions = wmts_finfo_formats.split(',').filter(Boolean).map((i, j) => {
         return { key: j, value: i, label: i};
       });
-      wstyles.split(',').forEach((i, j) => {
+      wstyles.split(',').filter(Boolean).forEach((i, j) => {
         wmtsStyleOptions.push({ key: j, value: i, label: i})
         return i;
       });

@@ -146,15 +146,15 @@ export default function IntersectForm(props) {
     });
   }
 
-  const confirmDeleteAll = (features) => {
+  const confirmClearAll = () => {
     confirm({
-        message: ` ${t("deleteAllElments", "Deseja eliminar todos os elementos?")}`,
+        message: ` ${t("clearAllConfirmation", "Tem a certeza que deseja limpar tudo?")}`,
         header: t("confirmation", "Confirmação"),
         severity: 'danger',
         acceptLabel: t("yes", "Sim"),
         rejectLabel: t("no", "Não"),
         accept: () => {
-          setGeometryIntersection([]);
+          clearAll();
         },
         reject: () =>  { /* noop */ }
     });
@@ -475,7 +475,7 @@ export default function IntersectForm(props) {
 
       <div className="grid mt-2">
         <div className="col text-center">
-          <Button type="button" variant="default" onClick={(e) => clearAll([])}>{t("clear", "Limpar")}</Button>
+          <Button type="button" variant="default" onClick={(e) => confirmClearAll()}>{t("clear", "Limpar")}</Button>
         </div>
         <div className="col text-center">
           <Button type="button" onClick={(e) => doSearch({"buffer": buffer })}>{t("execute", "Executar")}</Button>

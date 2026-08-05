@@ -42,6 +42,16 @@
     border: none;
 }
 
+/* Keep the ADS magenta focus ring on the round 30px thumb — the full-width
+   rail/wrappers must not catch it, or the ring paints as horizontal lines
+   across the whole map (C-18). The thumb keeps its ring via the global rule. */
+.map-slider-layers-control:focus-visible,
+.map-slider:focus-visible,
+.map-slider .mantine-Slider-track:focus-visible,
+.map-slider .mantine-Slider-bar:focus-visible {
+    outline: none !important;
+}
+
 @media only screen and (max-width: 768px) {
     .map-slider-layers-control .grid>.col, .map-slider-layers-control .grid>[class*=col] {
         max-width: 50%;

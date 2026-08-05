@@ -5,6 +5,7 @@ import { CollapsiblePanel, notify } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 import { translateValue } from '../../utils/i18n';
+import { foldDiacritics } from '../../utils/common';
 import Tree from './TOC/Tree';
 import { traverseTree, findAllParents, findAllChildren } from './TOC/Model';
 
@@ -219,13 +220,17 @@ class Main extends React.Component {
 
   filterThemes(themes, filter) {
     const filterDone = [];
-    const filterRegEx = new RegExp(filter, "i");
+    // Accent- and case-insensitive substring match: fold both sides so
+    // "analise" finds "Análise" (C-07). Fold (not regex) also sidesteps the
+    // old raw-into-RegExp crash on regex metacharacters typed in the filter.
+    const needle = foldDiacritics(filter);
     themes.forEach(n => {
       if (filterDone.includes(n.id)) return;
       if (!filter) {
         n.filtered = false
       } else {
-        n.filtered = filterRegEx.test(translateValue(n.title)) || filterRegEx.test(translateValue(n.description)) ? false : true;
+        const hay = foldDiacritics(translateValue(n.title)) + ' ' + foldDiacritics(translateValue(n.description));
+        n.filtered = hay.includes(needle) ? false : true;
       }
       filterDone.push(n.id);
       if (!n.filtered) {
@@ -403,7 +408,7 @@ class Main extends React.Component {
           { tree.length ? (
             <>
             { component_cfg.show_filter !== false ? (
-              <Group gap={0} wrap="nowrap" align="stretch" mb="xs">
+              <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch" mb="xs">
                 <TextInput
                   size="sm"
                   placeholder={`${this.props.t('filter', "Filtro")}...`}
