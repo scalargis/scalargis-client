@@ -6,6 +6,7 @@ import SliderPanel from './SliderPanel'
 import SliderLayersMapControl from './SliderLayersMapControl';
 
 export default function LayerCompare({
+    active,
     layers, actions, config,
     selectedLayer, setSelectedLayer,
     selectedSliderLayer, setSelectedSliderLayer,
@@ -28,7 +29,10 @@ export default function LayerCompare({
         mainMap.render()
     }
 
-    const map = document.getElementById("map");
+    const [map, setMap] = useState(null);
+    useEffect(() => {
+        setMap(document.getElementById("map"));
+    }, []);
 
     const slider_el =
         <div>
@@ -57,13 +61,14 @@ export default function LayerCompare({
 
     return (
         <div style={{ height: '100%' }}>
-            {compareTool === 1 && sliderIsActive && config?.showMapSelectControls !== false ? ReactDOM.createPortal(slider_map_controls, map) : null}
-            {compareTool === 1 && (selectedLayer || selectedSliderLayer) && sliderIsActive ? ReactDOM.createPortal(slider_el, map) : null}
+            {active && map && compareTool === 1 && sliderIsActive && config?.showMapSelectControls !== false ? ReactDOM.createPortal(slider_map_controls, map) : null}
+            {active && map && compareTool === 1 && (selectedLayer || selectedSliderLayer) && sliderIsActive ? ReactDOM.createPortal(slider_el, map) : null}
 
 
             {sliderIsActive ?
                 // <div className='card'> // FOR ptceu ui
                     <SliderPanel
+                        active={active}
                         layers={layers}
                         selectedLayer={selectedLayer}
                         setSelectedLayer={setSelectedLayer}

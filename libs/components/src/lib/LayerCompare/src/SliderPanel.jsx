@@ -6,6 +6,7 @@ import { i18n as i18nUtils } from '../../components';
 import './style.css';
 
 export default function SliderPanel({
+    active,
     layers,
     selectedLayer, setSelectedLayer,
     selectedSliderLayer, setSelectedSliderLayer,
@@ -62,6 +63,7 @@ export default function SliderPanel({
         <div className='grid p-2' >
             <div className='col-12'>
                 <SegmentedControl
+                    key={active ? 'active' : 'inactive'}
                     fullWidth
                     value={String(compareTool)}
                     data={compareToolOptions.map(option => ({

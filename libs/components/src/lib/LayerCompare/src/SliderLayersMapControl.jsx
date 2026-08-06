@@ -33,6 +33,8 @@ export default function SliderLayersMapControl({
                     style={{ display: "flex", justifyContent: "right", alignItems: "center" }}>
                     <Select
                         clearable
+                        w={260}
+                        title={selectedLayer?.item_name}
                         value={selectedLayer ? String(selectedLayer.id) : null}
                         data={layers.map(l => ({
                             value: String(l.id),
@@ -47,6 +49,8 @@ export default function SliderLayersMapControl({
                     style={{ display: "flex", justifyContent: "left", alignItems: "center" }}>
                     <Select
                         clearable
+                        w={260}
+                        title={selectedSliderLayer?.item_name}
                         value={selectedSliderLayer ? String(selectedSliderLayer.id) : null}
                         data={layers.map(l => ({
                             value: String(l.id),

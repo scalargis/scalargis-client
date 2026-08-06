@@ -54,6 +54,8 @@ export default function Main({ as, config, actions, core, record, utils }) {
   const { viewer, dispatch, mainMap } = config;
   const component_cfg = record.config_json || {};
 
+  const active = viewer?.config_json?.selected_menu === record?.id;
+
   const title = record?.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("layerCompare", "LayerCompare");
   const header = component_cfg?.header ? i18nUtils.translateValue(component_cfg.header, component_cfg.header) : title;
 
@@ -68,6 +70,8 @@ export default function Main({ as, config, actions, core, record, utils }) {
   const rightMapSide = useRef()
   const rightMapSideEvent_pre = useRef()
   const rightMapSideEvent_post = useRef()
+
+  const activeRef = useRef(active)
 
 
   //compare tool
@@ -120,6 +124,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
   useEffect(() => {
 
     leftMapSideEvent_pre.current = (event) => {
+      if (!activeRef.current) return
       const ctx = event.context
       const mapSize = mainMap.getSize()
       const width = mapSize[0] * (sliderValue.current / 100)
@@ -142,6 +147,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
     }
 
     rightMapSideEvent_pre.current = (event) => {
+      if (!activeRef.current) return
       const ctx = event.context
       const mapSize = mainMap.getSize()
       const width = mapSize[0] * (sliderValue.current / 100)
@@ -164,11 +170,13 @@ export default function Main({ as, config, actions, core, record, utils }) {
     }
 
     leftMapSideEvent_post.current = (event) => {
+      if (!activeRef.current) return
       const ctx = event.context;
       ctx.restore();
     }
 
     rightMapSideEvent_post.current = (event) => {
+      if (!activeRef.current) return
       const ctx = event.context;
       ctx.restore();
     }
@@ -223,7 +231,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
     }
 
     if (selectedLayer && compareTool == 2 && leftMapSide.current) { //opacity
-      leftMapSide.current.setOpacity(opacitySliderValue / 100)  // NO DISPATCH 
+      leftMapSide.current.setOpacity(opacitySliderValue / 100)  // NO DISPATCH
     }
 
   }, [selectedLayer, compareTool])
@@ -286,6 +294,18 @@ export default function Main({ as, config, actions, core, record, utils }) {
   }, [opacitySliderValue])
 
 
+  useEffect(() => {
+    activeRef.current = active
+    if (leftMapSide.current) {
+      leftMapSide.current.setOpacity(active && compareTool == 2 ? opacitySliderValue / 100 : 1)
+    }
+    if (rightMapSide.current) {
+      rightMapSide.current.setOpacity(active && compareTool == 2 ? (1 - opacitySliderValue / 100) : 1)
+    }
+    if (mainMap) mainMap.render()
+  }, [active])
+
+
 
   function clipContext(ctx, tl, tr, bl, br) {
     ctx.save();
@@ -346,6 +366,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
 
               <LayerCompare
+                active={active}
                 layers={layers}
                 config={config}
                 actions={actions}
@@ -368,6 +389,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
         :
 
         <LayerCompare
+          active={active}
           layers={layers}
           config={config}
           actions={actions}
