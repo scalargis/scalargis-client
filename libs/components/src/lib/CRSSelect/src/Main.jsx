@@ -171,6 +171,10 @@ export default function Main({ core, config, actions, record }) {
       <Select
         size="xs"
         w={250}
+        // size="xs" shrinks the dropdown options too; the input font was lifted
+        // to sm in index.css, but the options portal out of .footer-right so CSS
+        // can't reach them. Match them here so the open list reads at footer size (C-17).
+        styles={{ option: { fontSize: 'var(--mantine-font-size-sm)' } }}
         value={String(display_crs)}
         data={listCRS.map(i => {
           return {
