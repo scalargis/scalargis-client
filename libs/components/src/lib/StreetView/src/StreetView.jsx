@@ -357,13 +357,20 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
     // 0×0 on this first commit and Google paints blank until told to remeasure.
     // ResizeObserver fires an initial notification on observe() and again on
     // maximize/restore; each triggers the pano's self-measure so it repaints.
+    // A trailing re-trigger on the next frame catches the settled size — on
+    // maximize the observer can fire mid-layout, leaving the pano measured at an
+    // intermediate width (a black band down the right edge) until it repaints.
+    let raf = 0;
     const resizeObserver = new ResizeObserver(() => {
       window.google.maps.event.trigger(pan, 'resize');
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => window.google.maps.event.trigger(pan, 'resize'));
     });
     resizeObserver.observe(panoNode);
 
     return () => {
       resizeObserver.disconnect();
+      cancelAnimationFrame(raf);
     };
   }, [modalStreetViewOpen, panoNode, position]);
 
