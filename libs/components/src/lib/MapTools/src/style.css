@@ -30,3 +30,15 @@
   .tooltip-static:before {
     border-top-color: #ffcc33;
   }
+  .maptools-conversions {
+    margin-top: 4px;
+    padding: 4px 8px;
+    font-size: 0.950rem;
+    line-height: 1.4;
+    color: #555;
+  }
+  .maptools-conversions > div {
+    display: flex;
+    justify-content: flex-end;
+    font-variant-numeric: tabular-nums;
+  }

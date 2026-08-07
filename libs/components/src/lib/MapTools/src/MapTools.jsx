@@ -57,6 +57,9 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
 
   const [length, setLength] = useState(0);
   const [area, setArea] = useState(0);
+  // Raw measurement values (metres / square metres) used for the conversions panel
+  const [lengthRaw, setLengthRaw] = useState(null);
+  const [areaRaw, setAreaRaw] = useState(null);
   const [helpModal, setHelpModal] = useState(false);
   const [helpLengthShowed, setHelpLengthShowed] = useState(false);
   const [helpAreaShowed, setHelpAreaShowed] = useState(false);
@@ -153,6 +156,8 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
     clearMeasureFeature();
     setLength(0);
     setArea(0);
+    setLengthRaw(null);
+    setAreaRaw(null);
 
     if(!selectedControl) {
       clearHelpTooltip();
@@ -253,6 +258,9 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
       }
     }
 
+    // Keep the raw length (metres) for the conversions panel
+    setLengthRaw(length);
+
     let output = length;
     if (record?.config_json?.length?.format) {
       const format = record.config_json.length.format;
@@ -315,6 +323,9 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
       }
     }      
     
+    // Keep the raw area (square metres) for the conversions panel
+    setAreaRaw(area);
+
     let output = area;
     if (record?.config_json?.area?.format) {
       const format = record.config_json.area.format;
@@ -392,6 +403,14 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
     if (helpTooltipElement.current) helpTooltipElement.current.classList.add('hidden');
   }
 
+  /**
+   * Format a raw number for the conversions panel (up to 3 decimals, grouped).
+   */
+  const formatConvValue = (value) => {
+    const rounded = value.toLocaleString('en-US', { maximumFractionDigits: 3 });
+    return rounded.replace(/,/g, ' ');
+  };
+
   const render = () => {
     //const { control, helpModal } = this.state;
     const controlOptions = [
@@ -429,21 +448,38 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
           <div className="mt-2">
 
             { selectedControl === 'length' ? (
-              <TextInput
-                readOnly
-                value={length || ''}
-                placeholder={t("length", "Comprimento")}
-                aria-label={t("length", "Comprimento")}
-              />
+              <>
+                <TextInput
+                  readOnly
+                  value={length || ''}
+                  placeholder={t("length", "Comprimento")}
+                  aria-label={t("length", "Comprimento")}
+                />
+                { lengthRaw != null ? (
+                  <div className="maptools-conversions">
+                    <div>{formatConvValue(lengthRaw)} m</div>
+                    <div>{formatConvValue(lengthRaw / 1000)} km</div>
+                  </div>
+                ) : null }
+              </>
             ) : null }
 
             { selectedControl === 'area' ? (
-              <TextInput
-                readOnly
-                value={area || ''}
-                placeholder={t("area", "Área")}
-                aria-label={t("area", "Área")}
-              />
+              <>
+                <TextInput
+                  readOnly
+                  value={area || ''}
+                  placeholder={t("area", "Área")}
+                  aria-label={t("area", "Área")}
+                />
+                { areaRaw != null ? (
+                  <div className="maptools-conversions">
+                    <div>{formatConvValue(areaRaw)} m²</div>
+                    <div>{formatConvValue(areaRaw / 10000)} ha</div>
+                    <div>{formatConvValue(areaRaw / 1000000)} km²</div>
+                  </div>
+                ) : null }
+              </>
             ) : null }
 
           </div>
