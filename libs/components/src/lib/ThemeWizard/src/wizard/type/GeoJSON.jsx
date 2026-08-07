@@ -173,7 +173,7 @@ export default function GeoJSON (props) {
                     style={{ flex: 1 }}
                   />
                   <ActionIcon
-                    size="input-sm" variant="filled" type="button"
+                    size="input-md" variant="filled" type="button"
                     title={t("load", "Carregar")}
                     aria-label={t("load", "Carregar")}
                     loading={loading}

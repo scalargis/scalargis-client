@@ -1,6 +1,9 @@
 .footer-right .crsselect {
   display: inline-flex;
   align-items: center;
+  /* Breathing room between the coordinate readout and the CRS Select so they
+     don't read as one glued block. */
+  gap: 0.5em;
 }
 
 @media screen and (max-width: 768px) {

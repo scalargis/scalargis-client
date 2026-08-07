@@ -946,7 +946,10 @@ class DrawTools extends React.Component {
                   <Popover
                     key={opt.value}
                     opened={opened}
-                    onClose={onClose.bind(this)}
+                    // Controlled Popover (Mantine v9): a click outside / Escape
+                    // signals intent through onChange(false), not onClose — so the
+                    // picker only ever dismissed by re-clicking its button (C-03).
+                    onChange={(isOpened) => { if (!isOpened) onClose(); }}
                     position="bottom-start"
                     withinPortal
                     shadow="md"

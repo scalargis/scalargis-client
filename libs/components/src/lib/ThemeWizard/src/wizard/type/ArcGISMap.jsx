@@ -86,7 +86,7 @@ export default function ArcGISMap(props) {
             onChange={e => editField('url', e.target.value.trim())}
           />
           <ActionIcon
-            size="input-sm" variant="filled" type="button"
+            size="input-md" variant="filled" type="button"
             title={t("load", "Carregar")}
             aria-label={t("load", "Carregar")}
             loading={loading}
