@@ -360,17 +360,25 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
     // A trailing re-trigger on the next frame catches the settled size — on
     // maximize the observer can fire mid-layout, leaving the pano measured at an
     // intermediate width (a black band down the right edge) until it repaints.
-    let raf = 0;
+    let rafOuter = 0;
+    let rafInner = 0;
     const resizeObserver = new ResizeObserver(() => {
       window.google.maps.event.trigger(pan, 'resize');
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => window.google.maps.event.trigger(pan, 'resize'));
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      // Double rAF: the first frame lets the maximized layout commit, the second
+      // fires post-paint against the settled size, so the pano fills instantly
+      // instead of measuring an intermediate width (the trailing black band).
+      rafOuter = requestAnimationFrame(() => {
+        rafInner = requestAnimationFrame(() => window.google.maps.event.trigger(pan, 'resize'));
+      });
     });
     resizeObserver.observe(panoNode);
 
     return () => {
       resizeObserver.disconnect();
-      cancelAnimationFrame(raf);
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
     };
   }, [modalStreetViewOpen, panoNode, position]);
 
