@@ -24,7 +24,7 @@ export default function GeoJSON (props) {
     const file = e.files[0];
     const upload = new FormData();
     upload.append('files', file);
-    upload.append('ext', 'json');
+    upload.append('ext', 'geojson');
 
     setLoading(true);
     const options = { method: 'POST', body: upload };
