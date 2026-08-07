@@ -15,6 +15,7 @@ export default function MapToolButton({
   title,
   active,
   className,
+  style,
   onClick,
   children,
   ...rest
@@ -23,8 +24,14 @@ export default function MapToolButton({
     <ActionIcon
       type="button"
       variant="filled"
-      size={34}
       radius="xl"
+      /* Size comes from the shared --map-control-size knob (defined once in
+         mainmap.css) so every button in the map control strip stays uniform
+         and the size is a one-line change there. Set inline so it beats
+         Mantine's default --ai-size regardless of CSS layer/specificity;
+         the --ai-size-lg fallback (34px) keeps the button sized when the
+         knob isn't defined (component used outside the viewer map). */
+      style={{ '--ai-size': 'var(--map-control-size, var(--ai-size-lg))', ...style }}
       className={['map-tool-btn', active ? 'active' : '', className || '']
         .filter(Boolean)
         .join(' ')}
