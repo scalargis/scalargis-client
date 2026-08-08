@@ -2,15 +2,17 @@
    Dialog — the Prime <Dialog> twin for windowed content.
 
    A raw Mantine Modal covers the plain title+body dialogs (the whole
-   backoffice converted on it). The viewer's dialogs carry two extras
-   Modal's flat API cannot express:
+   backoffice converted on it). The viewer's dialogs carry extras Modal's
+   flat API cannot express:
 
    - `maximizable` — a header control that toggles full-screen, which
      Prime's Dialog offered and the help/results/document windows use;
    - `footer` — an action bar OUTSIDE the scroll region, pinned to the
-     dialog's bottom edge.
+     dialog's bottom edge;
+   - drag-by-header and corner-resize while windowed (C-21/C-29), which
+     Prime's Dialog gave for free and the Modal.Root composition drops.
 
-   Both require the Modal.Root composition; this recipe owns that
+   These require the Modal.Root composition; this recipe owns that
    boilerplate so call sites stay a prop-rename away from the old Prime
    markup. The content column is a flex layout with the body as the
    scrolling `flex: 1` cell, so percentage/`100%`-height children
@@ -31,6 +33,10 @@ import {
 
 import { IconWindowMaximize, IconWindowMinimize } from './icons';
 import { uiText } from './i18n';
+
+// Floor for corner-resize so the dialog can never be dragged to nothing.
+const MIN_DIALOG_W = 240;
+const MIN_DIALOG_H = 160;
 
 export interface DialogProps extends Omit<ModalRootProps, 'title'> {
   /** Header title (Prime's `header`). */
@@ -73,9 +79,30 @@ export function Dialog({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const drag = useRef<{ startX: number; startY: number; baseX: number; baseY: number } | null>(null);
 
-  // Every fresh open re-centres.
+  // Resize-by-corner (C-29) — Prime's <Dialog> could be resized; Modal cannot.
+  // A grip in the bottom-right corner drags the windowed dialog's width/height.
+  // Only the bottom and right edges may move: on resize start we anchor the
+  // dialog by its current top-left (measured from the live rect), switching the
+  // centring `inner` to top-left alignment, so from then on the offset IS the
+  // absolute top-left position and growing w/h leaves top-left untouched — no
+  // centre-compensation guessing. Once resized the dialog stays top-left
+  // anchored (drag keeps working as an absolute move); a fresh open drops the
+  // manual size and returns to the centred model. Disabled while maximized.
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const resize = useRef<{
+    startX: number;
+    startY: number;
+    baseW: number;
+    baseH: number;
+  } | null>(null);
+
+  // Every fresh open re-centres and drops any manual resize.
   useEffect(() => {
-    if (opened) setOffset({ x: 0, y: 0 });
+    if (opened) {
+      setOffset({ x: 0, y: 0 });
+      setSize(null);
+    }
   }, [opened]);
 
   // Capture the pointer on the header so the drag survives the dialog body's
@@ -103,6 +130,43 @@ export function Dialog({
 
   const onHeaderPointerUp = useCallback(() => {
     drag.current = null;
+  }, []);
+
+  // Anchor by the live top-left the instant a resize begins: the rect already
+  // reflects any drag translate, so pinning offset to rect.left/top and size to
+  // rect.w/h keeps the dialog exactly where it is while switching it out of the
+  // centred model. Capture the pointer on the grip so the resize survives the
+  // body's iframe, exactly like the drag.
+  const onResizePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (maximized) return;
+      const node = contentRef.current;
+      if (!node) return;
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      const rect = node.getBoundingClientRect();
+      setOffset({ x: rect.left, y: rect.top });
+      setSize({ w: rect.width, h: rect.height });
+      resize.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        baseW: rect.width,
+        baseH: rect.height,
+      };
+    },
+    [maximized]
+  );
+
+  // Top-left is anchored (offset frozen), so only w/h grow — bottom/right move.
+  const onResizePointerMove = useCallback((e: React.PointerEvent) => {
+    const r = resize.current;
+    if (!r) return;
+    const w = Math.min(window.innerWidth - 16, Math.max(MIN_DIALOG_W, r.baseW + (e.clientX - r.startX)));
+    const h = Math.min(window.innerHeight - 16, Math.max(MIN_DIALOG_H, r.baseH + (e.clientY - r.startY)));
+    setSize({ w, h });
+  }, []);
+
+  const onResizePointerUp = useCallback(() => {
+    resize.current = null;
   }, []);
 
   // Modal.Root does not inherit the theme's `Modal` defaultProps (they only
@@ -135,13 +199,38 @@ export function Dialog({
           Per-slot `styles`, never the plain `style` prop, which Modal.Content
           copies onto both content and inner. */}
       <Modal.Content
-        h={maximized ? undefined : height}
+        ref={contentRef}
+        pos="relative"
+        h={maximized ? undefined : (size?.h ?? height)}
         classNames={{ content: 'ads-dialog__content' }}
         styles={{
-          inner:
-            maximized || (offset.x === 0 && offset.y === 0)
-              ? undefined
-              : { transform: `translate(${offset.x}px, ${offset.y}px)` },
+          // Width lives on flex-basis: the content is a flex item in the
+          // centring row, where `flex: 0 0 var(--modal-size)` owns the main
+          // (horizontal) size, so a plain `width`/`w` is ignored. When resized,
+          // override the basis to the manual width and lift the size caps.
+          content:
+            size && !maximized
+              ? { flex: `0 0 ${size.w}px`, maxWidth: 'none', maxHeight: 'none' }
+              : undefined,
+          // Centred model (no manual size): translate the centred dialog by the
+          // drag offset. Anchored model (after a resize, `size` set): drop the
+          // centring AND the inner padding so `inner`'s top-left is the true
+          // viewport origin and the offset is the dialog's absolute top-left —
+          // without zeroing the padding, translate(rect.left) double-counts it
+          // and the dialog jumps on the first click. Growing w/h then moves
+          // only the bottom/right edges. Maximized: neither.
+          inner: maximized
+            ? undefined
+            : size
+              ? {
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  padding: 0,
+                  transform: `translate(${offset.x}px, ${offset.y}px)`,
+                }
+              : offset.x === 0 && offset.y === 0
+                ? undefined
+                : { transform: `translate(${offset.x}px, ${offset.y}px)` },
         }}
       >
         <Modal.Header
@@ -180,6 +269,29 @@ export function Dialog({
           {children}
         </Modal.Body>
         {footer && <Box className="ads-dialog__footer">{footer}</Box>}
+        {/* Corner resize grip (C-29). Absolute in the content box (hence
+            pos="relative" above); captures the pointer so the resize survives
+            the body iframe. Hidden while maximized. */}
+        {!maximized && (
+          <Box
+            onPointerDown={onResizePointerDown}
+            onPointerMove={onResizePointerMove}
+            onPointerUp={onResizePointerUp}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: 2,
+              bottom: 2,
+              width: 16,
+              height: 16,
+              cursor: 'nwse-resize',
+              touchAction: 'none',
+              zIndex: 3,
+              background:
+                'repeating-linear-gradient(-45deg, var(--mantine-color-gray-5) 0 1.5px, transparent 1.5px 4px)',
+            }}
+          />
+        )}
       </Modal.Content>
     </Modal.Root>
   );
