@@ -475,8 +475,7 @@ export default function IntersectResults(props) {
                             key={index}
                             type="button"
                             size="xs"
-                            variant="subtle"
-                            className="mr-2"
+                            variant="default"
                             leftSection={<i className={`pi ${ fileFormats?.[format]?.icon ? fileFormats[format].icon : "pi-file" }`} aria-hidden="true" />}
                             disabled={downloadingFile}
                             loading={downloadingFile && downloadingFormat == format}
@@ -509,7 +508,7 @@ export default function IntersectResults(props) {
             <h3>{t("results", "Resultados")}</h3>
 
             { intersectConfig?.showExport !== false ?
-                <Group justify="flex-end" className="sg-intersect-toolbar">{exportToolbar}</Group> : null }
+                <Group justify="center" gap="xs" wrap="wrap" className="sg-intersect-export my-2">{exportToolbar}</Group> : null }
 
             <div className="text-right mb-2">
 
