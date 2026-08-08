@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
-import { Button, Switch } from '@mantine/core'
+import { Button, Switch, Tooltip } from '@mantine/core'
 import { Feature } from 'ol'
 import Point from 'ol/geom/Point'
 import OLGroupLayer from "ol/layer/Group"
@@ -42,9 +42,9 @@ export default function Main({ config }) {
 
   const olLayer = findOlLayer(layer.id);
 
-  function exportSelected() {
+  function exportSelected(items) {
     const format = new GeoJSON();
-    const text = format.writeFeatures(selected.items);
+    const text = format.writeFeatures(items);
     //console.log(text);
     download('selecao.geojson', text);
   }
@@ -65,7 +65,11 @@ export default function Main({ config }) {
       layers: [olLayer]
     });
     select.on('select', e => {
-      if (e.selected.length) setSelected({ items: e.selected, coord: e.mapBrowserEvent.coordinate });
+      // read the full selection, not this event's delta (see README)
+      setSelected({
+        items: select.getFeatures().getArray().slice(),
+        coord: e.mapBrowserEvent.coordinate,
+      });
     })
     mainMap.addInteraction(select);
     selectSingleClick.current = select;
@@ -101,7 +105,11 @@ export default function Main({ config }) {
           
           { !!selected.coord && selected.coord.length && (
           <tr>
-            <td>Ponto</td>
+            <td>
+              <Tooltip label="O ponto onde clicou no mapa" withArrow>
+                <span className="export-map-features-label">Ponto <i className="pi pi-info-circle" aria-hidden="true" /></span>
+              </Tooltip>
+            </td>
             <td>
               <Button type="button" size="xs" onClick={exportCoord} leftSection={<i className="pi pi-arrow-circle-down" aria-hidden="true" />}>Exportar</Button>
             </td>
@@ -110,9 +118,13 @@ export default function Main({ config }) {
 
           { selected.items.map((feat, i) => (
           <tr key={i}>
-            <td>Geometria</td>
             <td>
-              <Button type="button" size="xs" onClick={exportSelected} leftSection={<i className="pi pi-arrow-circle-down" aria-hidden="true" />}>Exportar</Button>
+              <Tooltip label="A geometria que selecionou no mapa" withArrow>
+                <span className="export-map-features-label">Geometria <i className="pi pi-info-circle" aria-hidden="true" /></span>
+              </Tooltip>
+            </td>
+            <td>
+              <Button type="button" size="xs" onClick={() => exportSelected([feat])} leftSection={<i className="pi pi-arrow-circle-down" aria-hidden="true" />}>Exportar</Button>
             </td>
           </tr>
           )) }

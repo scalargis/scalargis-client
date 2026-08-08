@@ -10,9 +10,25 @@ Ferramenta por-camada do TOC que deixa o utilizador **selecionar geometrias clic
 
 1. Um **Switch "Selecionar Elementos"** liga/desliga um `ol/interaction/Select` limitado à camada da row.
 2. Com o switch ligado, cada clique numa feature adiciona uma row à tabela:
-   - **Geometria** → botão *Exportar* → descarrega `selecao.geojson` (as features selecionadas).
+   - **Geometria** → botão *Exportar* → descarrega `selecao.geojson` (a geometria **dessa** row).
    - **Ponto** → botão *Exportar* → descarrega `coordenada.geojson` (a coordenada clicada como ponto).
+   - Cada label tem um ícone de ajuda (ⓘ) com tooltip: *"O ponto onde clicou no mapa"* / *"A geometria que selecionou no mapa"*, para o utilizador perceber que **"Ponto" é a coordenada do clique** (não uma geometria dos dados) e **"Geometria" é a feature selecionada**.
 3. A exportação é **inteiramente client-side** (`ol/format/GeoJSON` + um `<a download>` com data-URI); não toca no servidor.
+
+### Seleção múltipla e export por-row (nota de manutenção)
+
+A tabela renderiza **uma row "Geometria" por feature selecionada** (`selected.items.map`). Com clique simples o `Select` substitui a seleção (1 feature = 1 row); com **shift+clique** a seleção acumula e aparecem várias rows. Cada botão exporta a **sua própria** feature: `onClick={() => exportSelected([feat])}`.
+
+Dois bugs pré-existentes (iguais na versão Prime) impediam isto de funcionar, corrigidos juntos:
+
+1. **A seleção lia o delta do evento, não a coleção.** O handler fazia `setSelected({ items: e.selected })`, mas num `SelectEvent` o `e.selected`/`e.deselected` são só o **delta daquele clique** — a seleção corrente vive em `select.getFeatures()`. Resultado: cada shift+clique substituía a linha pela última feature e **nunca acumulava** (selecionar 3 mostrava sempre 1 row). Além disso o `if (e.selected.length)` ignorava eventos de **desseleção**, deixando estado stale. Passou a ler `select.getFeatures().getArray()` em cada evento, por isso a tabela reflete a seleção completa e a desseleção remove a row.
+2. **O botão exportava a seleção toda.** `exportSelected` escrevia `selected.items` inteiro e ignorava o `feat` da row — todas as rows exportavam tudo. Passou a `exportSelected([feat])`, cada row exporta a sua geometria.
+
+Só se notavam com seleção múltipla (shift+clique), por isso passaram despercebidos até ao re-teste do cluster C.
+
+## Ativação: config-driven, não automático
+
+**A ferramenta nunca aparece sozinha** — nem antes nem depois da migração Mantine. Tem de ser declarada na config do viewer (um componente `type: "ExportMapFeatures"` com `target: "layer_tools_block"`) **e** o seu id tem de constar nos `children` do componente TOC (ver secção abaixo). Sem isso, não monta. O mecanismo de montagem (`Core.renderComponents`) é o mesmo em Prime e em Mantine; a migração só trocou os widgets (`InputSwitch`→`Switch`, `Button` Prime→Mantine), não a forma como o componente se liga às camadas. Onde está declarado, mostra-se para **qualquer camada vetorial não-system** dessa árvore.
 
 ## Onde monta (contrato)
 
@@ -62,7 +78,7 @@ const olLayer = findOlLayer(layer.id);   // percorre mainMap.getLayers() (recurs
 
 ## Carregar uma camada de teste
 
-Para exercitar o componente é preciso uma camada vetorial não-system. A via mais rápida é o **ThemeWizard → GeoJSON → aba URL** (carrega no cliente, sem servidor). A aba **Ficheiro** faz upload ao `spatial_toolbox` e, à data, o fiona recusa a extensão `.json` — usar a aba URL.
+Para exercitar o componente é preciso uma camada vetorial não-system. Serve o **ThemeWizard → GeoJSON**, seja pela aba **URL** (carrega no cliente, sem servidor) ou pela aba **Ficheiro** (upload ao `spatial_toolbox`; o C-26 corrigiu o servidor a aceitar `.json`, que o fiona antes recusava). Para testar o export por-row com seleção múltipla, carrega um ficheiro com várias features e usa **shift+clique** no mapa.
 
 ## Referências
 

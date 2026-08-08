@@ -21,3 +21,15 @@
   text-align: left;
   white-space: nowrap;
 }
+
+.export-map-features-label {
+  cursor: help;
+  white-space: nowrap;
+}
+
+.export-map-features-label .pi-info-circle {
+  font-size: 0.85em;
+  color: #868e96;
+  margin-left: 0.25em;
+  vertical-align: middle;
+}
