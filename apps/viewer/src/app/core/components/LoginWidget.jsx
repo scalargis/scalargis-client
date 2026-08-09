@@ -1,12 +1,7 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 
-import { InputText } from 'primereact/inputtext';
-import { Password } from 'primereact/password';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { classNames } from 'primereact/utils';
+import { Alert, Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -16,7 +11,7 @@ import { getFormValidationErrorMessage } from './../utils';
 function LoginWidget(props) {
 
     const { auth, core, dispatch, onLogin, onShowRegistration, onShowResetPassword } = props;
-    const { actions, utils, siteConfig } = core;
+    const { actions, siteConfig } = core;
 
     // Redux actions
     const { login_clear_error } = actions;
@@ -26,22 +21,15 @@ function LoginWidget(props) {
       password: ''
     }
 
-    const { control, formState: { errors }, trigger, getValues, handleSubmit } = useForm({ defaultLoginValues });
+    const { control, formState: { errors }, handleSubmit } = useForm({ defaultLoginValues });
 
     useEffect(() => {
         dispatch(login_clear_error());
     }, []);
 
-    const checkKeyDown =  async (e) => {
-    if (e.code === 'Enter') {
-        e.preventDefault();
-        const result = await trigger(["username", "password"]);
-        if (result) {
-        onSubmit(getValues());
-        }
-    }
-    };
-
+    // Enter submits natively: the footer button is type="submit" and
+    // handleSubmit validates before onSubmit — the old manual keydown
+    // interception reproduced exactly this and left with the conversion.
     const onSubmit = (data) => {
        onLogin(data);
     }
@@ -55,64 +43,67 @@ function LoginWidget(props) {
                 { showUserRegistration &&
                 <React.Fragment>
                     <span className="text-600 font-medium line-height-3">{i18nUtils.translateValue("noAccount", "Não tem uma conta?")}</span>
-                    <a className="font-medium no-underline ml-2 text-blue-500 cursor-pointer" onClick={(e) => onShowRegistration()}>{i18nUtils.translateValue("registerHere", "Registe-se aqui!")}</a>
+                    <Anchor component="button" type="button" className="font-medium ml-2" onClick={(e) => onShowRegistration()}>{i18nUtils.translateValue("registerHere", "Registe-se aqui!")}</Anchor>
                 </React.Fragment>
                 }
             </div>
 
             <div>
-                <label htmlFor="username" className="block text-900 font-medium my-2">Username/Email</label>
                 <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
-                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
+                    <TextInput id={field.name} {...field} autoFocus label="Username/Email" error={fieldState.invalid} className="w-full mb-1"
                         autoComplete="off"
-                        aria-autocomplete="none"
-                        onKeyPress={checkKeyDown} />
+                        aria-autocomplete="none" />
                 )} />
                 {getFormValidationErrorMessage(errors, 'username')}
 
-                <label htmlFor="password" className="block text-900 font-medium my-2">Password</label>
                 <Controller name="password" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
-                    <Password id={field.name} {...field} 
-                        toggleMask 
-                        feedback={false} 
-                        className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
-                        inputClassName="w-full"
-                        pt={{ iconField: { root: { className: 'w-full' } } }}
+                    <PasswordInput id={field.name} {...field}
+                        label="Password"
+                        error={fieldState.invalid}
+                        className="w-full mb-1 mt-2"
                         autoComplete="off"
-                        aria-autocomplete="none"
-                        onKeyPress={checkKeyDown} />                  
+                        aria-autocomplete="none" />
                 )} />
                 {getFormValidationErrorMessage(errors, 'password')}
-                
+
                 { showResetPassword &&
-                <div className="flex align-items-center justify-content-between mt-4 mb-4">
-                    <div className="flex align-items-center"></div>
-                    <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+                <Group justify="flex-end" mt="md" mb="md">
+                    <Anchor component="button" type="button" className="font-medium"
                         onClick={ (e) => { e.preventDefault(); onShowResetPassword() }}>
                             {i18nUtils.translateValue("forgotPassword", "Esqueceu-se da password?")}
-                    </a>
-                </div>
+                    </Anchor>
+                </Group>
                 }
 
                 { auth.http_error && !auth.response &&
-                    <div className="p-fluid w-full my-4">
-                        <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                    <div className="w-full my-4">
+                        <Alert color="danger" py="xs">
+                            <Group justify="center" gap="xs" wrap="nowrap">
+                                <i className="pi pi-times-circle" />
+                                <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
+                            </Group>
+                        </Alert>
                     </div>
                 }
 
                 { auth.response && !!auth.response && !!auth.response.message &&
-                    <div className="p-fluid w-full my-4">
-                        <Message severity="error" text={auth?.response?.message}></Message>
+                    <div className="w-full my-4">
+                        <Alert color="danger" py="xs">
+                            <Group justify="center" gap="xs" wrap="nowrap">
+                                <i className="pi pi-times-circle" />
+                                <span>{auth?.response?.message}</span>
+                            </Group>
+                        </Alert>
                     </div>
-                }                        
-                
-                <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
-                    <Button 
-                        label={i18nUtils.translateValue("login", "Entrar")}
-                        icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-user" }
-                        className="w-full"
-                        disabled={auth.loading}
-                    />                            
+                }
+
+                <div className="mt-4 mb-4">
+                    <Button
+                        type="submit"
+                        fullWidth
+                        leftSection={<i className="pi pi-user" />}
+                        loading={auth.loading}
+                    >{i18nUtils.translateValue("login", "Entrar")}</Button>
                 </div>
             </div>
         </form>

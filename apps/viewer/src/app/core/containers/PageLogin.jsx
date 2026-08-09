@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { Button } from 'primereact/button';
+import { Anchor } from '@mantine/core';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -66,11 +66,10 @@ function PageLogin(props) {
                         <div>
                             <p>{i18nUtils.translateValue("hello_user", "Olá {{username}}", undefined, undefined, undefined, {username})}.</p>
                             <p>
-                            {i18nUtils.translateValue("clickTo", "Clique para")}
-                            <Button
-                                className="p-button-link" onClick={e => dispatch(logout())}
-                                label={i18nUtils.translateValue("endSession", "Terminar sessão")}
-                            />.
+                            {i18nUtils.translateValue("clickTo", "Clique para")}{' '}
+                            <Anchor component="button" type="button" onClick={e => dispatch(logout())}>
+                                {i18nUtils.translateValue("endSession", "Terminar sessão")}
+                            </Anchor>.
                             </p>
                         </div>
                     </div>

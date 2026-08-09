@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { classNames } from 'primereact/utils';
+import { Alert, Anchor, Button, Group, TextInput } from '@mantine/core';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -14,7 +10,7 @@ import { getFormValidationErrorMessage } from './../utils';
 
 function ResetPasswordWidget(props) {
     const { auth, core, dispatch, onShowLogin, onResetPassword } = props;
-    const { actions, utils, siteConfig } = core;
+    const { actions } = core;
 
     // Redux actions
     const { login_clear_error } = actions;
@@ -23,23 +19,11 @@ function ResetPasswordWidget(props) {
         username: ''
     }
 
-    const logo = utils.buildRelativeUrlPath(siteConfig?.logo || 'assets/images/logo.png');
-
-    const { control, formState: { errors }, trigger, getValues, setValue, handleSubmit } = useForm({ defaultLoginValues });
+    const { control, formState: { errors }, handleSubmit } = useForm({ defaultLoginValues });
 
     useEffect(() => {
         dispatch(login_clear_error());
     }, []);
-
-    const checkKeyDown =  async (e) => {
-        if (e.code === 'Enter') {
-          e.preventDefault();
-          const result = await trigger(["username", "password"]);
-          if (result) {
-            onSubmit(getValues());
-          }
-        }
-    };
 
     const onSubmit = (data) => {
         onResetPassword(data);
@@ -53,11 +37,11 @@ function ResetPasswordWidget(props) {
                     <p>{i18nUtils.translateValue("passwordResetRequestInfoMsg", "Caso não receba o email com as instruções para recuperação da palavra-passe durante os próximos minutos, verifique se este não foi direcionado para a área de SPAM do seu correio eletrónico.")}</p>
                 </div>
 
-                { onShowLogin &&<div className="flex justify-content-end mt-4 mb-4 p-dialog-myfooter">
-                    <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer" onClick={onShowLogin}>
+                { onShowLogin && <Group justify="flex-end" mt="md" mb="md">
+                    <Anchor component="button" type="button" className="font-medium" onClick={onShowLogin}>
                         {i18nUtils.translateValue("login", "Login")}
-                    </a>                         
-                </div> }
+                    </Anchor>
+                </Group> }
             </React.Fragment>
         )
     }
@@ -65,42 +49,50 @@ function ResetPasswordWidget(props) {
     return (
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
             <div>
-                <label htmlFor="email" className="block text-900 font-medium my-2">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
                 <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
-                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid, 'w-full mb-1': true })}
+                    <TextInput id={field.name} {...field} autoFocus label={`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`} error={fieldState.invalid} className="w-full mb-1"
                         autoComplete="off"
-                        aria-autocomplete="none"
-                        onKeyPress={checkKeyDown} />
+                        aria-autocomplete="none" />
                 )} />
                 {getFormValidationErrorMessage(errors, 'username')}
 
                 { onShowLogin &&
-                    <div className="flex justify-content-end mt-4 mb-4">
-                        <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer" onClick={onShowLogin}>
+                    <Group justify="flex-end" mt="md" mb="md">
+                        <Anchor component="button" type="button" className="font-medium" onClick={onShowLogin}>
                             {i18nUtils.translateValue("back", "Back")}
-                        </a>                         
-                    </div>
+                        </Anchor>
+                    </Group>
                 }
-                
+
                 { auth.http_error && !auth.response &&
-                    <div className="p-fluid w-full my-4">
-                        <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                    <div className="w-full my-4">
+                        <Alert color="danger" py="xs">
+                            <Group justify="center" gap="xs" wrap="nowrap">
+                                <i className="pi pi-times-circle" />
+                                <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
+                            </Group>
+                        </Alert>
                     </div>
                 }
 
                 { auth.response && !!auth.response && !!auth.response.message &&
-                    <div className="p-fluid w-full my-4">
-                        <Message severity="error" text={auth?.response?.message}></Message>
+                    <div className="w-full my-4">
+                        <Alert color="danger" py="xs">
+                            <Group justify="center" gap="xs" wrap="nowrap">
+                                <i className="pi pi-times-circle" />
+                                <span>{auth?.response?.message}</span>
+                            </Group>
+                        </Alert>
                     </div>
                 }
 
-                <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
-                    <Button 
-                        label={i18nUtils.translateValue("send", "Enviar")}
-                        icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                        className="w-full" 
-                        disabled={auth.loading}
-                    />                            
+                <div className="mt-4 mb-4">
+                    <Button
+                        type="submit"
+                        fullWidth
+                        leftSection={<i className="pi pi-check" />}
+                        loading={auth.loading}
+                    >{i18nUtils.translateValue("send", "Enviar")}</Button>
                 </div>
             </div>
         </form>

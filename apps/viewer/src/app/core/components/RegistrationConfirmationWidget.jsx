@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { ProgressSpinner } from 'primereact/progressspinner';
+
+import { Alert, Anchor, Button, Group, Loader, TextInput } from '@mantine/core';
 
 import { i18n as i18nUtils } from '@scalargis/components';
 
@@ -17,7 +15,6 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
   // Enable redux actions
   const dispatch = useDispatch();
 
-  const { utils, siteConfig } = core;
   const { registration_confirmation, registration_send_confirmation, login, logout } = core.actions;
 
   useEffect(() => {
@@ -35,30 +32,28 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
   // Render user
   if (auth?.data?.token) {
     const { username } = auth.data;
-    
+
     return (
         <div>
             <p dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("activeUserSession", "Existe uma sessão ativa para o utilizador <i><strong>{{username}}</strong></i>", undefined, undefined, undefined, {username: username})}} />
             <p>
               {i18nUtils.translateValue("clickTo", "Clique para ")}
-              <Button
-                className="p-button-link"
-                label={i18nUtils.translateValue("endSession", "terminar sessão").toLowerCase()}
-                onClick={e => dispatch(logout())}
-              />{i18nUtils.translateValue("andFinishUserRegistration", "e concluir registo de novo utilizador")}.
+              <Anchor component="button" type="button" onClick={e => dispatch(logout())}>
+                {i18nUtils.translateValue("endSession", "terminar sessão").toLowerCase()}
+              </Anchor>{i18nUtils.translateValue("andFinishUserRegistration", "e concluir registo de novo utilizador")}.
             </p>
           </div>
     )
   }
 
-  const sendEmailConfirmation = () => {    
+  const sendEmailConfirmation = () => {
     dispatch(registration_send_confirmation({ email: emailConfirmation }, history, redirect));
   }
 
   if (validating) {
     return (
       <div className="flex align-items-center justify-content-center flex-column px-3 py-5">
-        <ProgressSpinner style={{ width: '50px', height: '50px' }} />
+        <Loader size={50} />
         <p className="mt-3" style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("validatingRegistration", "A validar registo")}...</p>
       </div>
     );
@@ -69,16 +64,17 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
       <div>
           <div className="flex align-items-center justify-content-center flex-column px-3">
             <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
-            <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
+            <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }}></i>
             <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
-            <Button className=" my-3" 
-              label={i18nUtils.translateValue("continue", "Continuar")} 
+            <Button className="my-3"
+              type="button"
+              leftSection={<i className="pi pi-check" />}
+              loading={goRedirect}
               onClick={ e => {
                 setGoRedirect(true);
                 dispatch(login(registration.response, history, redirect, urlRedirect));
               }}
-              icon={ goRedirect ? "pi pi-spin pi-spinner": "pi pi-check" }
-              disabled={goRedirect} />
+            >{i18nUtils.translateValue("continue", "Continuar")}</Button>
           </div>
         </div>
     )
@@ -92,44 +88,58 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
       </div>
 
       <div>
-        <label htmlFor="username" className="block text-900 font-medium my-2">{i18nUtils.translateValue("email", "Email")}</label>
-        <InputText value={emailConfirmation} onChange={(e) => setEmailConfirmation(e.target.value)} className="w-full mb-1" />
+        <TextInput value={emailConfirmation} onChange={(e) => setEmailConfirmation(e.target.value)} label={i18nUtils.translateValue("email", "Email")} className="w-full mb-1" />
 
-        <div className="flex justify-content-end mt-4 mb-4">
-            <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+        <Group justify="flex-end" mt="md" mb="md">
+            <Anchor component="button" type="button" className="font-medium"
               onClick={() => {
                 history.navigate('/login?redirect=' + (redirect || '/'));
               }} >
                 {i18nUtils.translateValue("login", "Login")}
-            </a>                         
-        </div>
+            </Anchor>
+        </Group>
 
         { auth.http_error && auth.response && !!auth.response.message &&
-          <div className="p-fluid w-full my-4">
-            <Message style={{ width: '100%' }} severity="error" text={auth.response.message}></Message> 
+          <div className="w-full my-4">
+            <Alert color="danger" py="xs">
+              <Group justify="center" gap="xs" wrap="nowrap">
+                <i className="pi pi-times-circle" />
+                <span>{auth.response.message}</span>
+              </Group>
+            </Alert>
           </div>
         }
 
         { auth.http_error && !auth.response &&
-          <div className="p-fluid w-full my-4">
-            <Message style={{ width: '100%' }} severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}></Message>
+          <div className="w-full my-4">
+            <Alert color="danger" py="xs">
+              <Group justify="center" gap="xs" wrap="nowrap">
+                <i className="pi pi-times-circle" />
+                <span>{i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}</span>
+              </Group>
+            </Alert>
           </div>
         }
 
         { !auth.http_error && auth.response && !!auth.response.message &&
-          <div className="p-fluid w-full my-4">
-            <Message style={{ width: '100%' }} severity="info" text={auth.response.message}></Message>
+          <div className="w-full my-4">
+            <Alert color="informative" py="xs">
+              <Group justify="center" gap="xs" wrap="nowrap">
+                <i className="pi pi-info-circle" />
+                <span>{auth.response.message}</span>
+              </Group>
+            </Alert>
           </div>
         }
 
-        <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
-          <Button 
-            icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-            label={i18nUtils.translateValue("send", "Enviar")}
+        <div className="mt-4 mb-4">
+          <Button
+            type="button"
+            fullWidth
+            leftSection={<i className="pi pi-check" />}
+            loading={auth.loading}
             onClick={sendEmailConfirmation}
-            className="w-full"
-            disabled={auth.loading}
-          />
+          >{i18nUtils.translateValue("send", "Enviar")}</Button>
         </div>
       </div>
     </React.Fragment>
