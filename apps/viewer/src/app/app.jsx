@@ -1,17 +1,16 @@
-// CSS order rule (migration2/mantine plan, kit 05): Prime globals first,
-// then the Mantine block (@scalargis/ui: Mantine core → ads-tokens → ads-globals).
+// CSS order rule (migration2/mantine plan, kit 05): global CSS first, then
+// the Mantine block (@scalargis/ui: Mantine core → ads-tokens → ads-globals).
 // These lines own that order for the whole viewer — keep them at the top.
-import 'primereact/resources/primereact.min.css';
+// primeicons stays by plan decision (the recipe icons ARE primeicons);
+// primeflex utility classnames are still used and leave in Phase 5.
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 
 import { AdsProviders } from '@scalargis/ui';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router';
 import { Provider } from 'react-redux';
-import { useTranslation} from "react-i18next";
-import { locale, addLocale } from 'primereact/api';
 
 import AppContext, { core, mainMap } from './AppContext';
 import RGPD from './core/components/RGPD';
@@ -23,8 +22,6 @@ import { getAppBaseUrl } from './core/utils';
 const App = () => {
   const [pagesLoaded, setPagesLoaded] = useState(false);
   const [pages, setPages] = useState([]);
-
-  const { i18n } = useTranslation();
 
   const base_url = getAppBaseUrl();
 
@@ -88,11 +85,6 @@ const App = () => {
 
     }));
   }, []);
-
-  useEffect(() => {
-    if (!i18n.resolvedLanguage) return;
-    locale(i18n.resolvedLanguage);
-  }, [i18n.resolvedLanguage]);
 
   return (
     <AdsProviders>
