@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation} from "react-i18next";
 import { useNavigate } from 'react-router';
-import { Button } from 'primereact/button';
+import { Button, Group } from '@mantine/core';
 
 function Page404({ history }) {
 
@@ -15,9 +15,9 @@ function Page404({ history }) {
         <h1>{t("pageNotFound", "Página não encontrada")}</h1>
         <p>{t("viewerNotFound", "O visualizador solicitado não existe.")}</p>
         <p>{t("goHomeMsg", "Clique para ir para a página inicial")}</p>
-        <p className="text-center pt-4">
-          <Button label={t("Home", "Página Inicial")} onClick={e => navigate("/")}></Button>
-        </p>
+        <Group justify="center" pt="md">
+          <Button onClick={e => navigate("/")}>{t("Home", "Página Inicial")}</Button>
+        </Group>
       </div>
   </div>
   )

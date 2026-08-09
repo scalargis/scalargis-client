@@ -1,13 +1,13 @@
 import React from 'react';
-import { ProgressBar } from 'primereact/progressbar';
+import { Progress } from '@mantine/core';
 
 function LoadingScreen(props) {
   return (
     <div className="loadingscreen">
       <div>
-        <ProgressBar mode="indeterminate" style={{ height: '6px' }}></ProgressBar>
+        <Progress value={100} animated size="sm" aria-label="loading" />
       </div>
-    </div>    
+    </div>
   )
 }
 

@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { Menu } from 'primereact/menu';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Menu, UnstyledButton } from '@mantine/core';
 
 import MapModel from '../model/MapModel';
 import OWSModel from '../model/OWSModel';
@@ -11,13 +12,10 @@ export default function TopbarRight(props) {
 
   const { core, viewer, dispatch, mainMap } = props;
 
-  const [showMenu, setShowMenu] = useState(false);
+  const { t } = useTranslation();
 
   const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
   const isMobileSmall = wsize[0] <= 440;
-
-  const menuRef = useRef();
 
   if (isMobileSmall) {
     let mobileMenu = viewer?.config_json?.topbar_right?.menu_mobile?.children?.length ? viewer.config_json.topbar_right.menu_mobile.children : [];
@@ -31,7 +29,7 @@ export default function TopbarRight(props) {
       region: 'topbar_right',
       mobileMenu: mobileMenu,
       props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } },
-    }).map((c, k) => { return { template: <div className='p-menuitem-content'>{c}</div>} }); 
+    });
 
     return(
       <React.Fragment>
@@ -40,13 +38,24 @@ export default function TopbarRight(props) {
           mobileMenu: mobileMenu,
           props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } }
         })}
-  
+
         { mobileMenu?.length ?
           <div className="topbar-menu-button-container">
-            <Menu model={menuItems} popup ref={menuRef} id="topbar_right_menu" /> 
-            <button className="p-link layout-menu-button" onClick={(event) => menuRef.current.toggle(event)}>
-              <span className="pi pi-chevron-circle-down"/>
-            </button>
+            {/* The dropdown holds whole components (each renders its own
+                interactive row), so they mount as plain children, not
+                Menu.Item — a Menu.Item is itself a button and would nest
+                interactives. Outside clicks (incl. any dialog a row opens)
+                close the menu, matching the Prime popup. */}
+            <Menu position="bottom-end" shadow="md">
+              <Menu.Target>
+                <UnstyledButton className="layout-menu-button" aria-label={t("options", "Opções")}>
+                  <span className="pi pi-chevron-circle-down"/>
+                </UnstyledButton>
+              </Menu.Target>
+              <Menu.Dropdown id="topbar_right_menu">
+                {(menuItems || []).map((c, k) => <div key={k} className="sg-topbar-menuitem">{c}</div>)}
+              </Menu.Dropdown>
+            </Menu>
           </div> : null }
       </React.Fragment>
     );
@@ -59,7 +68,7 @@ export default function TopbarRight(props) {
         region: 'topbar_right',
         props: { viewer, dispatch, mainMap, Models: { MapModel, OWSModel, Utils } }
       })}
-      
+
     </React.Fragment>
   )
 }

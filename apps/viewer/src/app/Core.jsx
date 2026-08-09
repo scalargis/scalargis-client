@@ -334,7 +334,12 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
           // Validate dynamic import is loaded
           if (!PluginComponent) return null;
 
-          const className = selected_menu === c.id ?
+          // The p-button-* tokens are the legacy active-state contract the
+          // still-Prime plugin components read; `active` is the semantic prop
+          // (MainMenuButton prefers it). The tokens leave when the last
+          // decoupled component migrates (Phase 5).
+          const active = selected_menu === c.id;
+          const className = active ?
           "p-button-raised p-button-rounded" :
           "p-button-raised p-button-rounded p-button-outlined";
 
@@ -342,8 +347,9 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
             <li key={c.id}>
               <PluginComponent
                 className={className}
+                active={active}
                 record={c}
-                config={{ className, ...props, ...c.config_json }}
+                config={{ className, active, ...props, ...c.config_json }}
                 core={this}
                 actions={this.actions}
                 utils={utils}

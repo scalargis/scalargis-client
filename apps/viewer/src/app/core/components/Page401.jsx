@@ -1,14 +1,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router';
-import { Button } from 'primereact/button';
+import { Button, Group } from '@mantine/core';
 
 function Page401(props) {
 
-  const { core } = props;
-
   const navigate = useNavigate();
-
-  console.log(props);
 
   return (
     <div className="flex justify-content-center" style={{ height: '100%' }}>
@@ -16,10 +12,10 @@ function Page401(props) {
         <h1>Ops...</h1>
         <p>Não está autorizado a aceder ao visualizador pedido.</p>
         <p>Clique para voltar a página inicial ou clique para efetuar login</p>
-        <p className="text-center pt-4">
-          <Button label="Página Inicial" onClick={e => navigate("/")}></Button>{' '}
-          <Button label="Entrar" onClick={e => navigate("/login")}></Button>
-        </p>
+        <Group justify="center" pt="md">
+          <Button onClick={e => navigate("/")}>Página Inicial</Button>
+          <Button onClick={e => navigate("/login")}>Entrar</Button>
+        </Group>
       </div>
   </div>
   )

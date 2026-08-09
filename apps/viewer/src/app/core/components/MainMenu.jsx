@@ -1,4 +1,5 @@
 import React from 'react'
+import { UnstyledButton } from '@mantine/core';
 import MapModel from '../model/MapModel';
 import OWSModel from '../model/OWSModel';
 import * as Utils from '../utils';
@@ -20,16 +21,15 @@ export default function MainMenu(props) {
         onClick={onMenuClick}
         >
         { mode === 'embedded' && <div style={{"backgroundColor": "rgba(33, 150, 243, 0.92)", "textAlign": "center", "padding": "15px"}}>
-          <button className="p-link layout-menu-button" style={{"fontSize": "9px", color: "white"}} 
+          <UnstyledButton className="layout-menu-button" style={{"fontSize": "9px", color: "white"}} aria-label="Menu"
             onClick={e => {
               e.preventDefault();
-              console.log("Teste");
               dispatch(layout_toggle_menu(true));
               //dispatch(layout_toggle_staticmenu());
             }}
           >
             <span className="pi pi-bars" style={{"fontSize": "2em"}}></span>
-          </button>
+          </UnstyledButton>
         </div>}
         <div>
           { core.renderMainMenu({

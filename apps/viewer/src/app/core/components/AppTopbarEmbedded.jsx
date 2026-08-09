@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import { UnstyledButton } from '@mantine/core';
 
 export class AppTopbarEmbedded extends Component {
 
@@ -16,9 +17,9 @@ export class AppTopbarEmbedded extends Component {
     render() {
         return (
             <div className="layout-topbar clearfix">
-                <button className="p-link layout-menu-button" onClick={this.props.onToggleMenu}>
+                <UnstyledButton className="layout-menu-button" onClick={this.props.onToggleMenu} aria-label="Menu">
                     <span className="pi pi-bars"/>
-                </button>
+                </UnstyledButton>
                 {this.props.logo}
             </div>
         );
