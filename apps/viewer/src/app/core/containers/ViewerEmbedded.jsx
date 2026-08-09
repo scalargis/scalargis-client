@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { ConfirmDialog } from 'primereact/confirmdialog'
 import Layout from './Layout'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import AppContext from '../../AppContext'
@@ -181,8 +180,6 @@ function ViewerEmbedded(props) {
         })}
 
       </MainMap>
-
-      <ConfirmDialog tagKey='viewer' />
 
       <DialogWindows core={core} dialogWindows={viewer?.dialogWindows} />
 

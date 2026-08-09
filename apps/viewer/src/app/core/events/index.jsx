@@ -1,4 +1,4 @@
-import { confirmDialog } from 'primereact/confirmdialog';
+import { confirm } from '@scalargis/ui';
 import { v4 as uuid } from 'uuid';
 
 import defaults from '../components/Layers/defaults';
@@ -85,13 +85,12 @@ export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => 
     }
 
     if (data?.showConfirm) {
-        confirmDialog({
-            tagKey: 'viewer',
+        confirm({
             message: t("confirmAction", "Tem a certeza que deseja continuar?"),
             header: t("addTheme", "Adicionar Tema"),
+            severity: 'warning',
             acceptLabel: t("yes", "Sim"),
             rejectLabel: t("no", "Não"),
-            icon: 'pi pi-exclamation-triangle',
             accept: () => doAction()
         });
     } else {
@@ -130,14 +129,13 @@ export const viewer_remove_theme = ({data, mainMap, viewer, core, dispatch, t}) 
         }
     }
 
-    if (data?.showConfirm) {    
-        confirmDialog({
-            tagKey: 'viewer',
+    if (data?.showConfirm) {
+        confirm({
             message: t("confirmAction", "Tem a certeza que deseja continuar?"),
             header: t("removeTheme", "Remover Tema"),
+            severity: 'warning',
             acceptLabel: t("yes", "Sim"),
             rejectLabel: t("no", "Não"),
-            icon: 'pi pi-exclamation-triangle',
             accept: () => doAction()
         });
     } else {

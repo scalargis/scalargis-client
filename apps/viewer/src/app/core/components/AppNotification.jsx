@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect } from "react";
 
-import { Toast } from 'primereact/toast';
+import { notify } from '@scalargis/ui';
 
+// Bridges the redux notifications list to the notify recipe (the Prime Toast
+// this component mounted is gone; Notifications is app-wide via AdsProviders,
+// so there is nothing to render). `life` maps to autoClose; without it each
+// severity keeps the recipe default.
 const AppNotification = (props) => {
-
-    const toast = useRef(null);
-
-    const position = props?.position || "top-right";
 
     useEffect(() => {
         if (!props?.notifications?.length) return;
@@ -14,20 +14,13 @@ const AppNotification = (props) => {
         const notification = props.notifications.slice(-1)[0];
         const message = notification.message;
 
-        const life = message.life != null ? message.life : 3000;
+        if (props?.filterGroups?.length && !props.filterGroups.includes(notification.group)) return;
 
-        if (props?.filterGroups?.length) {
-            if (props.filterGroups.includes(notification.group)) {
-                toast.current.show({severity: message.severity, summary: message.summary, detail:message.detail, life: life});
-            }
-        } else {
-            toast.current.show({severity: message.severity, summary: message.summary, detail:message.detail, life: life});
-        }
+        const show = notify[message.severity] || notify.info;
+        show(message.summary, message.detail, message.life != null ? { autoClose: message.life } : undefined);
     }, [props?.notifications]);
 
-    return (
-        <Toast ref={toast} position={position} />
-    );
+    return null;
 };
 
 export default AppNotification;
