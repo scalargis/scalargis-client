@@ -1,21 +1,25 @@
 import React, { useMemo} from 'react';
 import { useTranslation } from "react-i18next";
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
+import { Menu, UnstyledButton } from '@mantine/core';
 
 
-const defaultMode = 'dropddown';
+const defaultMode = 'dropdown';
 
 
+// The login/splash/password pages' locale picker — the viewer twin lives in
+// libs/components/LocaleSelector and additionally writes the redux locale;
+// this one only talks to i18next (no viewer store exists on these pages).
+// The old `type === 'menu'` markup was unreachable from every caller and left
+// with the conversion.
 export default function LocaleSelector({ type, core, dispatch,  actions, componentConfig, className }) {
-  
-  const { i18n } = useTranslation();
+
+  const { t, i18n } = useTranslation();
 
   let locale = i18n.resolvedLanguage || i18n.language;
   if (locale.split("-").length > 1) {
     locale = locale.split("-")[0];
   }
-  
+
   const localesList = useMemo(() => {
     let locales = [];
 
@@ -24,7 +28,7 @@ export default function LocaleSelector({ type, core, dispatch,  actions, compone
     }
     if (locales?.length) {
       if (typeof locales[0] === 'object') {
-        locales = locales.map(l => { return { label: l, value: l.values } });
+        locales = locales.map(l => { return { label: l.label ?? String(l.value ?? l.values ?? ''), value: l.value ?? l.values } });
       } else {
         locales =locales.map(l => { return { label: l, value: l.toLowerCase() } });
       }
@@ -46,6 +50,7 @@ export default function LocaleSelector({ type, core, dispatch,  actions, compone
   });
 
   const handleChange = (val) => {
+    if (!val) return;
     i18n.changeLanguage(val);
   }
 
@@ -56,66 +61,49 @@ export default function LocaleSelector({ type, core, dispatch,  actions, compone
 
   if (mode === 'inline') {
     return (
-      <React.Fragment>
-        { type != 'menu' ?
-          <div style={{ marginLeft: '15px' }} className={className ? `flex align-items-center justigt-content-end locale-selector ${className}` : 'locale-selector'}>
-            {localesList.map((item, index) => {
-              return (
-                <React.Fragment key={item.value} >
-                  <Button
-                    key={item.value}
-                    label={item.label}
-                    text
-                    className={i18n.resolvedLanguage === item.value ? 'locale-selected' : undefined}
-                    onClick={(e) => handleChange(item.value)}
-                  />
-                  {(index < localesList.length - 1) && <span>|</span>}
-                </React.Fragment>
-              );
-            })}
-          </div> :
-          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" >
-            <span className="p-menuitem-icon pi pi-flag"></span>
-            <div className={className ? `locale-selector ${className}` : 'locale-selector'}>
-              {localesList.map((item, index) => {
-                return (
-                  <React.Fragment key={item.value} >
-                    <Button
-                      key={item.value}
-                      label={item.label}
-                      text
-                      className={i18n.resolvedLanguage === item.value ? 'locale-selected' : undefined}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleChange(item.value);
-                      }}
-                    />
-                    {(index < localesList.length - 1) && <span>|</span>}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          </a> }
-      </React.Fragment>
+      <div style={{ marginLeft: '15px' }} className={className ? `locale-selector ${className}` : 'locale-selector'}>
+        {localesList.map((item, index) => {
+          return (
+            <React.Fragment key={item.value} >
+              <UnstyledButton
+                className={i18n.resolvedLanguage === item.value ? 'locale-btn locale-selected' : 'locale-btn'}
+                onClick={(e) => handleChange(item.value)}
+              >
+                {item.label}
+              </UnstyledButton>
+              {(index < localesList.length - 1) && <span>|</span>}
+            </React.Fragment>
+          );
+        })}
+      </div>
     );
   }
 
+  const currentLabel =
+    localesList.find(item => String(item.value).toLowerCase() === locale.toLowerCase())?.label
+    ?? locale.toUpperCase();
+
   return (
-    <React.Fragment>
-      { type != 'menu' ?
-      <Dropdown value={locale.toLowerCase()} options={localesList} 
-        onChange={(e)=> handleChange(e.value)} 
-        className={className ? `locale-selector ${className}` : 'locale-selector'} /> :
-      <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" >
-        <span className="p-menuitem-icon pi pi-flag"></span>
-        <Dropdown value={locale.toLowerCase()} options={localesList} 
-          onChange={(e)=>{
-            e.preventDefault();
-            handleChange(e.value);
-          }}
-          className={className ? `locale-selector ${className}` : 'locale-selector'} />
-      </a> }
-    </React.Fragment>
+    <Menu shadow="md" position="bottom-end">
+      <Menu.Target>
+        <UnstyledButton
+          className={className ? `locale-selector ${className}` : 'locale-selector'}
+          aria-label={t("language", "Idioma")}
+        >
+          {currentLabel} <span aria-hidden="true">▾</span>
+        </UnstyledButton>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {localesList.map(item => (
+          <Menu.Item
+            key={item.value}
+            onClick={() => handleChange(String(item.value))}
+          >
+            {item.label}
+          </Menu.Item>
+        ))}
+      </Menu.Dropdown>
+    </Menu>
   );
 
 }
