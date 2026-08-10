@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation} from "react-i18next";
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { InputSwitch } from 'primereact/inputswitch';
-import { Dialog } from 'primereact/dialog';
+
+import { ActionIcon, Alert, Button, Group, Modal, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
 
 import { getViewerSessionConfig } from '../model/MapModel';
 
@@ -14,7 +10,7 @@ import { getViewerSessionConfig } from '../model/MapModel';
 function ShareViewerWidget({ auth, core, type, viewer, record }) {
 
   const { utils } = core;
-  const { getWindowSize, showOnPortal, getViewerPublicUrl } = utils;
+  const { getWindowSize, getViewerPublicUrl } = utils;
 
   const [showForm, setShowForm] = useState(false);
   const [id, setId] = useState(null);
@@ -30,7 +26,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
-  
+
   // Enable redux actions
   const dispatch = useDispatch();
   const { viewer_save_record, viewer_save_response } = core.actions;
@@ -71,7 +67,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
   }
 
   function submit(e) {
-    e.preventDefault();
+    e?.preventDefault?.();
 
     if (!title || title.length===0) {
       return false;
@@ -112,43 +108,43 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
 
   return (
     <React.Fragment>
-      { type != 'menu' ? 
-        <button className="p-link" onClick={e => openForm()} title={t("shareMap", "Partilhar mapa")}>
+      { type != 'menu' ?
+        <UnstyledButton onClick={e => openForm()} title={t("shareMap", "Partilhar mapa")}>
           <span className="layout-topbar-item-text">{t("share", "Partilhar")}</span>
           <span className="layout-topbar-icon pi pi-share-alt"/>
-        </button> :
-        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => {e.preventDefault(); openForm();}} >
-          <span className="p-menuitem-icon pi pi-share-alt"></span><span className="p-menuitem-text">{t("share", "Partilhar")}</span>
-        </a> }
+        </UnstyledButton> :
+        <UnstyledButton className="sg-menuitem" onClick={e => openForm()}>
+          <span className="pi pi-share-alt"></span><span>{t("share", "Partilhar")}</span>
+        </UnstyledButton> }
 
-      {showOnPortal(<Dialog
-        header={t("shareMap", "Partilhar mapa")}
-        visible={showForm}
-        style={{width: isMobile ? '90%' : '35vw' }} 
-        modal 
-        onHide={e => setShowForm(false)}>
-
-          <form onSubmit={e => submit()}>
+      <Modal
+        opened={showForm}
+        onClose={() => setShowForm(false)}
+        title={t("shareMap", "Partilhar mapa")}
+        size={isMobile ? '90%' : '35vw'}
+        closeOnClickOutside={false}
+      >
+          <form onSubmit={submit}>
             <div className="p-fluid">
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("title", "Título")}</label>
                 <div className="col-12 md:col-8">
-                  <InputText
-                    className={(!title || title.length === 0 ? 'p-invalid' : '')}
-                    value={title}
+                  <TextInput
+                    error={(!title || title.length === 0) || undefined}
+                    value={title ?? ''}
                     placeholder={t("title", "Título")}
                     onChange={e => setTitle(e.target.value)}
                   />
                   { (!title || title.length == 0) &&
-                  <small className="p-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }
+                  <small className="sg-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }
                 </div>
               </div>
 
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("description", "Descrição")}</label>
                 <div className="col-12 md:col-8">
-                  <InputTextarea rows={3}
-                    value={description}
+                  <Textarea rows={3}
+                    value={description ?? ''}
                     placeholder={t("description", "Descrição")}
                     onChange={e => setDescription(e.target.value)}
                   />
@@ -158,18 +154,20 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               { record?.config_json?.show_allow_add_layers !== false && <div className="grid field">
                 <label className="col-12 md:col-4">{t("allowAddThemes", "Permitir adicionar temas ao mapa")}?</label>
                 <div className="col-12 md:col-8">
-                  <InputSwitch
-                    checked={allow_add_layers}
+                  <Switch
+                    size="md"
+                    checked={!!allow_add_layers}
                     onChange={(e) => setAllowAddLayers(!allow_add_layers)}
                   />
                 </div>
               </div> }
 
               { auth?.data?.token && record?.config_json?.show_allow_user_session !== false && <div className="grid field">
-                <label className="col-12 md_col-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
+                <label className="col-12 md:col-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
                 <div className="col-12 md:col-8">
-                  <InputSwitch
-                    checked={allow_user_session}
+                  <Switch
+                    size="md"
+                    checked={!!allow_user_session}
                     onChange={(e) => setAllowUserSession(!allow_user_session)}
                   />
                 </div>
@@ -178,15 +176,16 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               { auth?.data?.token && record?.config_json?.show_allow_anonymous !== false && <div className="grid field">
                 <label className="col-12 md:col-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
                 <div className="col-12 md:col-8">
-                  <InputSwitch
-                    checked={allow_anonymous}
+                  <Switch
+                    size="md"
+                    checked={!!allow_anonymous}
                     onChange={(e) => setAllowAnonymous(!allow_anonymous)}
                   />
                 </div>
               </div> }
             </div>
 
-            { viewer.save_response &&  
+            { viewer.save_response &&
             <div className="grid">
                 <label className="col-12 pb-0"><strong>Url</strong></label>
                 <div className="col-12 md:col-10 align-content-center">
@@ -194,41 +193,52 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
                       target="_blank" rel="noopener noreferrer">{getViewerPublicUrl(viewer.save_response.uuid)}</a>
                 </div>
                 <div className="col-12 md:col-2 pr-3 text-right">
-                    <Button
-                        style={{marginLeft:"0px", color: "#2196F"}} 
-                        icon="pi pi-copy"
-                        rounded outlined severity="help"
-                        className="p-button p-component p-button-icon-only"
+                    <ActionIcon
+                        type="button"
+                        variant="outline"
+                        radius="xl"
+                        size="md"
+                        title={t("copyUrl", "Copiar Url")}
+                        aria-label={t("copyUrl", "Copiar Url")}
                         onClick={(e) => { e.preventDefault(); e.currentTarget.blur(); copyToClipboard(getViewerPublicUrl(viewer.save_response.uuid)) }}
-                        title={t("copyUrl", "Copiar Url")} tooltipOptions={{position: 'top'}}
-                    />
+                    >
+                        <i className="pi pi-copy" aria-hidden="true" />
+                    </ActionIcon>
                 </div>
             </div>
-            }            
+            }
 
-            <div className="p-dialog-myfooter">
-              <Button 
-                color='green'
-                icon={ viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                label={t("getLink", "Obter Link")} 
-                onClick={submit}
-                disabled={(viewer.save_loading)}
-              />
-            </div>
+            <Group justify="flex-end" mt="md">
+              <Button
+                type="submit"
+                leftSection={<i className="pi pi-check" />}
+                loading={viewer.save_loading}
+              >{t("getLink", "Obter Link")}</Button>
+            </Group>
 
-            { viewer.save_error && 
-              <div className="p-fluid">
-                <Message severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
+            { viewer.save_error &&
+              <div className="mt-3">
+                <Alert color="danger" py="xs">
+                  <Group justify="center" gap="xs" wrap="nowrap">
+                    <i className="pi pi-times-circle" />
+                    <span>{t("unavailableService", "Serviço Indisponível")}</span>
+                  </Group>
+                </Alert>
               </div>
             }
 
             { viewer.save_response && !!viewer.save_response.message &&
-              <div className="p-fluid">
-                <Message severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
+              <div className="mt-3">
+                <Alert color="danger" py="xs">
+                  <Group justify="center" gap="xs" wrap="nowrap">
+                    <i className="pi pi-times-circle" />
+                    <span>{t("unexpectedError", "Ocorreu um erro inesperado")}</span>
+                  </Group>
+                </Alert>
               </div>
-            }           
+            }
           </form>
-      </Dialog>)}
+      </Modal>
 
     </React.Fragment>
   )

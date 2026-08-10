@@ -1,11 +1,15 @@
 import React from "react";
 
-import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
+import { Button, Group } from '@mantine/core';
+import { Dialog } from '@scalargis/ui';
 
 import { utils, i18n } from '@scalargis/components';
 
 
+// Producers (events glue, DocumentBrowser, IntersectLayers, plugin
+// components) dispatch Prime-Dialog-shaped configs: header, maximizable,
+// style {width, height}, className, modal. Translate that surface onto the
+// Dialog recipe here so no producer has to change.
 const DialogWindows = (props) => {
 
     const { core } = props;
@@ -27,23 +31,26 @@ const DialogWindows = (props) => {
         <React.Fragment>
             {dialogs.map( item => {
                 const { key, config, child } = item;
+                const { header, maximizable, style, className, modal } = config || {};
 
                 const closeLabel = item.closeLabel ? i18n.translateValue(item.closeLabel) : i18n.translateValue("close", "Fechar");
-                const header = i18n.translateValue(config.header, config.header);
+                const title = i18n.translateValue(header, header);
 
                 return <Dialog
-                    visible={item.visible}
-                    style={{width: isMobile ? '90%' : '35vw' }}
-                    {...{...config, header}}
-                    key={item.key}
+                    key={key}
+                    opened={!!item.visible}
+                    onClose={e => onDialogClose(item)}
+                    title={title}
+                    maximizable={!!maximizable}
+                    size={style?.width || (isMobile ? '90%' : '35vw')}
+                    height={style?.height}
+                    withOverlay={modal !== false}
+                    className={className}
                     footer={(
-                    <div className="grid">
-                        <div className="col">
-                            <Button label={closeLabel} onClick={e => onDialogClose(item)} />
-                        </div>
-                    </div>
-                    )}
-                    onHide={e => onDialogClose(item)}>
+                        <Group justify="flex-end">
+                            <Button type="button" onClick={e => onDialogClose(item)}>{closeLabel}</Button>
+                        </Group>
+                    )}>
 
                     {child}
 

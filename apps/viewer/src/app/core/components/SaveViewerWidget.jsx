@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
 import { connect, useDispatch } from 'react-redux';
-import { InputText } from 'primereact/inputtext'
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { InputSwitch } from 'primereact/inputswitch';
-import { Dialog } from 'primereact/dialog';
+
+import { Alert, Button, Group, Modal, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
 
 import { getViewerSessionConfig } from '../model/MapModel';
 
@@ -14,7 +10,7 @@ import { getViewerSessionConfig } from '../model/MapModel';
 function SaveViewerWidget({ auth, core, type, viewer }) {
 
   const { utils } = core;
-  const { getWindowSize, showOnPortal } = utils;
+  const { getWindowSize } = utils;
 
   const [showForm, setShowForm] = useState(false);
   const [id, setId] = useState(null);
@@ -30,7 +26,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
 
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
-  
+
   // Enable redux actions
   const dispatch = useDispatch();
   const { viewer_save_record, viewer_add_notification } = core.actions;
@@ -46,12 +42,12 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
     setAllowAnonymous(viewer.allow_anonymous == null ? true : viewer.allow_anonymous);
     setShowForm(true);
   }
-  
+
   // Render user
   if (!auth?.data?.token || !viewer.is_owner) return null;
 
   function submit(e) {
-    e.preventDefault();
+    e?.preventDefault?.();
 
     if (!name || name.length==0 || !title || title.length==0) {
       return false;
@@ -86,70 +82,71 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
   // Render save button
   return (
     <React.Fragment>
-      { type != 'menu' ? 
-      <button className="p-link" onClick={e => openForm()}>
+      { type != 'menu' ?
+      <UnstyledButton onClick={e => openForm()} title={t("saveMap", "Gravar mapa")}>
         <span className="layout-topbar-item-text">{t("save", "Gravar")}</span>
         <span className="layout-topbar-icon pi pi-save"/>
-      </button> :
-        <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => {e.preventDefault(); openForm();}} >
-          <span className="p-menuitem-icon pi pi-save"></span><span className="p-menuitem-text">{t("save", "Gravar")}</span>
-        </a> }
+      </UnstyledButton> :
+        <UnstyledButton className="sg-menuitem" onClick={e => openForm()}>
+          <span className="pi pi-save"></span><span>{t("save", "Gravar")}</span>
+        </UnstyledButton> }
 
-      {showOnPortal(<Dialog
-        header={t("saveMap", "Gravar mapa")}
-        visible={showForm}
-        style={{width: isMobile ? '90%' : '35vw' }} 
-        modal 
-        onHide={e => setShowForm(false)}>
-
-          <form onSubmit={e => submit()}>
+      <Modal
+        opened={showForm}
+        onClose={() => setShowForm(false)}
+        title={t("saveMap", "Gravar mapa")}
+        size={isMobile ? '90%' : '35vw'}
+        closeOnClickOutside={false}
+      >
+          <form onSubmit={submit}>
 
             <div className="p-fluid">
 
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("name", "Nome")}</label>
                 <div className="col-12 md:col-8">
-                  <InputText
-                    className={(!name || name.length == 0 ? 'p-invalid' : '')}
-                    value={name}
+                  <TextInput
+                    error={(!name || name.length == 0) || undefined}
+                    value={name ?? ''}
                     placeholder="Nome do Visualizador"
                     onChange={e => setName(e.target.value)}
                   />
                   { (!name || name.length == 0) &&
-                  <small className="p-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
+                  <small className="sg-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }
                 </div>
               </div>
 
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("title", "Título")}</label>
                 <div className="col-12 md:col-8">
-                  <InputText
-                    className={(!title || title.length == 0 ? 'p-invalid' : '')}
-                    value={title}
+                  <TextInput
+                    error={(!title || title.length == 0) || undefined}
+                    value={title ?? ''}
                     placeholder={t("title", "Título")}
                     onChange={e => setTitle(e.target.value)}
                   />
                   { (!title || title.length == 0) &&
-                  <small className="p-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }                  
+                  <small className="sg-error block">{t("requiredField", "Campo de preenchimento obrigatório")}</small> }
                 </div>
               </div>
 
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("description", "Descrição")}</label>
                 <div className="col-12 md:col-8">
-                  <InputTextarea rows={3}
-                    value={description}
+                  <Textarea rows={3}
+                    value={description ?? ''}
                     placeholder={t("description", "Descrição")}
                     onChange={e => setDescription(e.target.value)}
                   />
                 </div>
-              </div>              
+              </div>
 
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("isActive", "Está ativo")}?</label>
                 <div className="col-12 md:col-8">
-                  <InputSwitch
-                    checked={is_active}
+                  <Switch
+                    size="md"
+                    checked={!!is_active}
                     onChange={(e) => setIsActive(!is_active)}
                   />
                 </div>
@@ -158,8 +155,9 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("allowSaveSession", "Permitir gravar sessão")}?</label>
                 <div className="col-12 md:col-8">
-                  <InputSwitch
-                    checked={allow_user_session}
+                  <Switch
+                    size="md"
+                    checked={!!allow_user_session}
                     onChange={(e) => setAllowUserSession(!allow_user_session)}
                   />
                 </div>
@@ -168,39 +166,48 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
               <div className="grid field">
                 <label className="col-12 md:col-4">{t("allowAnonymousAccess", "Permitir acesso anónimo")}?</label>
                 <div className="col-12 md:col-8">
-                  <InputSwitch
-                    checked={allow_anonymous}
+                  <Switch
+                    size="md"
+                    checked={!!allow_anonymous}
                     onChange={(e) => setAllowAnonymous(!allow_anonymous)}
                   />
                 </div>
-              </div>              
+              </div>
 
             </div>
 
-            <div className="p-dialog-myfooter">
-              <Button 
-                color='green'
-                icon={ viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                label={t("save", "Gravar")} 
-                onClick={submit}
-                disabled={(viewer.save_loading)}
-              />
-            </div>
+            <Group justify="flex-end" mt="md">
+              <Button
+                type="submit"
+                leftSection={<i className="pi pi-check" />}
+                loading={viewer.save_loading}
+              >{t("save", "Gravar")}</Button>
+            </Group>
 
             { viewer.save_error &&
-              <div className="p-fluid"> 
-                <Message severity="error" text={t("unavailableService", "Serviço Indisponível")}></Message>
+              <div className="mt-3">
+                <Alert color="danger" py="xs">
+                  <Group justify="center" gap="xs" wrap="nowrap">
+                    <i className="pi pi-times-circle" />
+                    <span>{t("unavailableService", "Serviço Indisponível")}</span>
+                  </Group>
+                </Alert>
               </div>
             }
 
             { viewer.save_response && !!viewer.save_response.message &&
-              <div className="p-fluid">
-                <Message severity="error" text={t("unexpectedError", "Ocorreu um erro inesperado")}></Message>
+              <div className="mt-3">
+                <Alert color="danger" py="xs">
+                  <Group justify="center" gap="xs" wrap="nowrap">
+                    <i className="pi pi-times-circle" />
+                    <span>{t("unexpectedError", "Ocorreu um erro inesperado")}</span>
+                  </Group>
+                </Alert>
               </div>
             }
 
           </form>
-      </Dialog>)}
+      </Modal>
 
     </React.Fragment>
   )
