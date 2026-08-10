@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
-import { classNames } from 'primereact/utils';
+
+import { Alert, Anchor, Button, Group, TextInput } from '@mantine/core';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -21,21 +18,11 @@ function ResetPasswordWidget(props) {
     // Redux actions
     const { login_clear_error, login_reset_password } = actions;
 
-    const { control, formState: { errors }, trigger, getValues, setValue, handleSubmit } = useForm({ defaultLoginValues });
+    const { control, formState: { errors }, handleSubmit } = useForm({ defaultLoginValues });
 
     useEffect(() => {
         dispatch(login_clear_error());
       }, []);
-
-    const checkKeyDown =  async (e) => {
-        if (e.code === 'Enter') {
-          e.preventDefault();
-          const result = await trigger(["username", "password"]);
-          if (result) {
-            onSubmit(getValues());
-          }
-        }
-    };
 
     const onSubmit = (data) => {
         if (record?.config_json?.actions?.reset_password) {
@@ -48,22 +35,17 @@ function ResetPasswordWidget(props) {
     if (auth?.response?.reset_password === true && !auth?.response?.error) {
         return (
             <React.Fragment>
-                <div className="p-fluid">
-
-                    <div className="flex align-items-center flex-column pt-2 px-3">
-                        <h3>{i18nUtils.translateValue("passwordReset", "Recuperação de palavra-passe")}</h3>
-                        <p>{i18nUtils.translateValue("passwordResetRequestSuccessMsg", "Foi enviado um email com as instruções para recuperação da palavra-passe.")}</p>
-                        <p>{i18nUtils.translateValue("passwordResetRequestInfoMsg", "Caso não receba o email com as instruções para recuperação da palavra-passe durante os próximos minutos, verifique se este não foi direcionado para a área de SPAM do seu correio eletrónico.")}</p>
-                    </div>
+                <div className="flex align-items-center flex-column pt-2 px-3">
+                    <h3>{i18nUtils.translateValue("passwordReset", "Recuperação de palavra-passe")}</h3>
+                    <p>{i18nUtils.translateValue("passwordResetRequestSuccessMsg", "Foi enviado um email com as instruções para recuperação da palavra-passe.")}</p>
+                    <p>{i18nUtils.translateValue("passwordResetRequestInfoMsg", "Caso não receba o email com as instruções para recuperação da palavra-passe durante os próximos minutos, verifique se este não foi direcionado para a área de SPAM do seu correio eletrónico.")}</p>
                 </div>
 
-                <div className="p-dialog-myfooter">
-                    <Button
-                        className="p-button-link"
-                        label={i18nUtils.translateValue("login", "Login")}
-                        onClick={onShowLogin}
-                    />
-                </div>
+                <Group justify="flex-end" mt="md">
+                    <Anchor component="button" type="button" onClick={onShowLogin}>
+                        {i18nUtils.translateValue("login", "Login")}
+                    </Anchor>
+                </Group>
             </React.Fragment>
         )
     }
@@ -75,10 +57,9 @@ function ResetPasswordWidget(props) {
                     <label htmlFor="username" className="col-12 md:col-4">{`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`}</label>
                     <div className="col-12 md:col-8">
                     <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
-                        <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })}
+                        <TextInput id={field.name} {...field} autoFocus error={fieldState.invalid}
                             autoComplete="off"
-                            aria-autocomplete="none"
-                            onKeyPress={checkKeyDown} />
+                            aria-autocomplete="none" />
                         )} />
                     {getFormValidationErrorMessage(errors, 'username')}
                     </div>
@@ -88,36 +69,44 @@ function ResetPasswordWidget(props) {
             { onShowLogin && <div className="p-fluid">
                 <div className="field grid">
                     <div className="col-12">
-                        <Button
-                            className="p-button-link"
-                            label = {i18nUtils.translateValue("login", "Login")}
+                        <Anchor component="button" type="button"
                             onClick={(e) => {
                                 e.preventDefault();
                                 onShowLogin();
-                            }}
-                        />
+                            }}>
+                            {i18nUtils.translateValue("login", "Login")}
+                        </Anchor>
                     </div>
-                </div>          
+                </div>
             </div> }
 
-            <div className="p-dialog-myfooter">
+            <Group justify="flex-end" mt="md">
                 <Button
                     type="submit"
-                    icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-                    label={i18nUtils.translateValue("send", "Enviar")}
-                    disabled={auth.loading}
-                />
-            </div>
-            
+                    leftSection={<i className="pi pi-check" />}
+                    loading={auth.loading}
+                >{i18nUtils.translateValue("send", "Enviar")}</Button>
+            </Group>
+
             { auth.http_error && !auth.response &&
-                <div className="p-fluid">
-                    <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço indisponível")}></Message>
+                <div className="mt-3">
+                    <Alert color="danger" py="xs">
+                        <Group justify="center" gap="xs" wrap="nowrap">
+                            <i className="pi pi-times-circle" />
+                            <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
+                        </Group>
+                    </Alert>
                 </div>
             }
 
             { auth.response && !!auth.response && !!auth.response.message &&
-                <div className="p-fluid">
-                    <Message severity="error" text={auth?.response?.message}></Message>
+                <div className="mt-3">
+                    <Alert color="danger" py="xs">
+                        <Group justify="center" gap="xs" wrap="nowrap">
+                            <i className="pi pi-times-circle" />
+                            <span>{auth?.response?.message}</span>
+                        </Group>
+                    </Alert>
                 </div>
             }
 

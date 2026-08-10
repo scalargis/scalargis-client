@@ -1,15 +1,7 @@
-import React, { useMemo } from 'react';
-import { connect } from 'react-redux';
+import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
-import { Password } from 'primereact/password';
-import { Button } from 'primereact/button';
-import { Checkbox } from 'primereact/checkbox';
-import { Message } from 'primereact/message';
-import { FloatLabel } from 'primereact/floatlabel';
-import { classNames } from 'primereact/utils';
+
+import { Alert, Anchor, Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -20,9 +12,9 @@ function RegistrationWidget(props) {
 
   const { auth, viewer, history, redirect, core, dispatch, actions, record, onShowLogin } = props;
   const { siteConfig } = core;
-  
-  // Redux redux actions
-  const { login_user_registration, logout } = actions;
+
+  // Redux actions
+  const { login_user_registration } = actions;
 
   const defaultValues = {
     name: null,
@@ -32,14 +24,6 @@ function RegistrationWidget(props) {
     confirmPassword: '',
     accept: false
   }
-
-  const passwordStrengthLabels = useMemo(() => {
-    return {
-      weakLabel: i18nUtils.translateValue("weakPasswordLabel", "Fraca"),
-      mediumLabel: i18nUtils.translateValue("mediumPasswordLabel", "Média"),
-      strongLabel: i18nUtils.translateValue("strongPasswordLabel", "Forte")
-    }
-  }, [i18nUtils.getResolvedLanguage()]);
 
   const { control, watch, formState: { errors }, handleSubmit } = useForm({ defaultValues });
   const watchFields = watch(["password"]);
@@ -56,41 +40,23 @@ function RegistrationWidget(props) {
     dispatch(login_user_registration(core, payload, apiUrl, redirect));
   }
 
-  {/*
-  const passwordFooter = (
-    <React.Fragment>
-        <Divider className="mt-2" />
-        <p className="mt-2">{i18nUtils.translateValue("suggestions", "Sugestões")}:</p>
-        <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
-            <li>{i18nUtils.translateValue("passwordLowerRule", "Pelo menos uma minúscula")}</li>
-            <li>{i18nUtils.translateValue("passwordUpperRule", "Pelo menos uma maiúscula")}</li>
-            <li>{i18nUtils.translateValue("passwordDigitRule", "Pelo menos um dígito")}</li>
-            <li>{i18nUtils.translateValue("passwordSizeRule", "Pelo menos 8 caracteres")}</li>
-        </ul>
-    </React.Fragment>
-  );
-  */}
-   
-
   if (auth?.response?.register_user === true && !auth?.response?.error) {
     return (
       <div className="pt-6 px-3">
         <div className="text-center mb-5">
-          <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
+          <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }}></i>
           <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
         </div>
         <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
-<       div className='text-center py-2'>
-          <Button
-            className="p-button-link"
-            style={{width: 'auto'}}
-            label = "Login"
-            onClick={ (e) => { e.preventDefault(); onShowLogin() }}
-          />
-        </div>        
-      </div>      
-    ) 
-  } 
+        <div className='text-center py-2'>
+          <Anchor component="button" type="button"
+            onClick={ (e) => { e.preventDefault(); onShowLogin() }}>
+            Login
+          </Anchor>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
@@ -98,121 +64,110 @@ function RegistrationWidget(props) {
         <h3>{i18nUtils.translateValue("userRegistrationData", "Dados de registo")}</h3>
 
         <div className="field pt-2">
-          <FloatLabel>
-            <Controller name="name" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
-                <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-            )} />
-            <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>{i18nUtils.translateValue("userRegistrationDataName", "Nome")}*</label>
-          </FloatLabel>
+          <Controller name="name" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
+              <TextInput id={field.name} {...field} value={field.value ?? ''} autoFocus error={fieldState.invalid}
+                label={`${i18nUtils.translateValue("userRegistrationDataName", "Nome")}*`} />
+          )} />
           {getFormValidationErrorMessage(errors, 'name')}
         </div>
         <div className="field">
-            <FloatLabel className="mt-4">
-              <IconField iconPosition="right">
-                <InputIcon className="pi pi-envelope" />
-                  <Controller name="email" control={control}
-                      rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório"), pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: i18nUtils.translateValue("invalidEmailFormat", "Email inválido. E.g. exemplo@email.pt") }}}
-                      render={({ field, fieldState }) => (
-                          <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                  )} />
-                </IconField>
-              <label htmlFor="email" className={classNames({ 'p-error': !!errors.email })}>{i18nUtils.translateValue("userRegistrationDataEmail", "Email")}*</label>
-            </FloatLabel>
+          <Controller name="email" control={control}
+              rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório"), pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: i18nUtils.translateValue("invalidEmailFormat", "Email inválido. E.g. exemplo@email.pt") }}}
+              render={({ field, fieldState }) => (
+                  <TextInput id={field.name} {...field} value={field.value ?? ''} error={fieldState.invalid}
+                    label={`${i18nUtils.translateValue("userRegistrationDataEmail", "Email")}*`}
+                    rightSection={<i className="pi pi-envelope" aria-hidden="true" />} />
+          )} />
           {getFormValidationErrorMessage(errors, 'email')}
-        </div>              
-        <div className="field pt-2">
-          <span className="p-float-label">
-            <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
-                <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} 
-                autoComplete="off" />
-            )} />
-            <label htmlFor="username" className={classNames({ 'p-error': errors.username })}>{i18nUtils.translateValue("userRegistrationDataUsername", "Nome de utilizador")}*</label>
-          </span>
-          {getFormValidationErrorMessage(errors, 'username')}
         </div>
         <div className="field pt-2">
-          <span className="p-float-label">
-              <Controller name="password" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
-                  <Password id={field.name} {...field}
-                    toggleMask
-                    promptLabel={i18nUtils.translateValue("enterPassword", "Introduza a password")}
-                    {...passwordStrengthLabels}
-                    className={classNames({ 'p-invalid': fieldState.invalid })} 
-                    /*footer={passwordFooter}*/ 
-                    autoComplete="off"
-                    aria-autocomplete="none" />
-              )} />
-              <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>{i18nUtils.translateValue("userRegistrationDataPassword", "Password")}*</label>
-          </span>
+          <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
+              <TextInput id={field.name} {...field} value={field.value ?? ''} error={fieldState.invalid}
+                label={`${i18nUtils.translateValue("userRegistrationDataUsername", "Nome de utilizador")}*`}
+                autoComplete="off" />
+          )} />
+          {getFormValidationErrorMessage(errors, 'username')}
+        </div>
+        {/* Prime's Password strength meter (weak/medium/strong) has no Mantine
+            twin — the visibility toggle stays, the meter does not. */}
+        <div className="field pt-2">
+          <Controller name="password" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
+              <PasswordInput id={field.name} {...field} error={fieldState.invalid}
+                label={`${i18nUtils.translateValue("userRegistrationDataPassword", "Password")}*`}
+                autoComplete="off"
+                aria-autocomplete="none" />
+          )} />
           {getFormValidationErrorMessage(errors, 'password')}
         </div>
         <div className="field pt-2">
-          <span className="p-float-label">
-              <Controller name="confirmPassword" control={control} 
-                rules={{ 
-                  required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
-                  validate: (value) => {
-                      if (value && watchFields[0] && value != watchFields[0]) {
-                          return i18nUtils.translateValue("noMatchingPasswords", "As passwords instroduzidas não são iguais");
-                      }
-                      return true;
-                  } 
-                }} 
-                render={({ field, fieldState }) => (
-                  <Password id={field.name} {...field}
-                    feedback={false}
-                    toggleMask
-                    promptLabel={i18nUtils.translateValue("confirmPassword", "Confirmar password")}
-                    className={classNames({ 'p-invalid': fieldState.invalid })} 
-                    autoComplete="off"
-                    aria-autocomplete="none" />
-              )} />
-              <label htmlFor="confirmPassword" className={classNames({ 'p-error': errors.password })}>{i18nUtils.translateValue("userRegistrationDataConfirmPassword", "Confirmar password")}*</label>
-          </span>
+          <Controller name="confirmPassword" control={control}
+            rules={{
+              required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
+              validate: (value) => {
+                  if (value && watchFields[0] && value != watchFields[0]) {
+                      return i18nUtils.translateValue("noMatchingPasswords", "As passwords instroduzidas não são iguais");
+                  }
+                  return true;
+              }
+            }}
+            render={({ field, fieldState }) => (
+              <PasswordInput id={field.name} {...field} error={fieldState.invalid}
+                label={`${i18nUtils.translateValue("userRegistrationDataConfirmPassword", "Confirmar password")}*`}
+                autoComplete="off"
+                aria-autocomplete="none" />
+          )} />
           {getFormValidationErrorMessage(errors, 'confirmPassword')}
         </div>
         <div className="field-checkbox">
             <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
-                <Checkbox inputId={field.name} onChange={(e) => field.onChange(e.checked)} checked={field.value} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                <Checkbox
+                  id={field.name}
+                  checked={!!field.value}
+                  onChange={(e) => field.onChange(e.currentTarget.checked)}
+                  error={fieldState.invalid || undefined}
+                  label={<span>{i18nUtils.translateValue("acceptThe", "Aceito os")} <a href={TERMS_OF_SERVICE_URL} target="_blank" rel="noopener noreferrer">{i18nUtils.translateValue("termsAndConditions", "termos e condições de utilização")}</a>*</span>}
+                />
             )} />
-            <label htmlFor="accept" className={classNames({ 'p-error': errors.accept })}>{i18nUtils.translateValue("acceptThe", "Aceito os")} <a href={TERMS_OF_SERVICE_URL} target="_blank" rel="noopener noreferrer" className={classNames({ 'p-error': errors.accept })}>{i18nUtils.translateValue("termsAndConditions", "termos e condições de utilização")}</a>*</label>
-        </div>        
+        </div>
       </div>
 
-      { onShowLogin && <div className="p-fluid">
-          <div className="field grid">
-            <div className="col-2 col-offset-5">
-              <Button
-                className="p-button-link"
-                label = {i18nUtils.translateValue("login", "Entrar")}
-                onClick={(e) => {
-                  e.preventDefault();
-                  onShowLogin();
-                }}
-              />
-            </div>
-          </div>          
+      { onShowLogin && <div className="text-center">
+          <Anchor component="button" type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onShowLogin();
+            }}>
+            {i18nUtils.translateValue("login", "Entrar")}
+          </Anchor>
         </div> }
-      
-      <div className="p-dialog-myfooter">        
-        <Button 
-          color='green'
-          icon={ auth.loading ? "pi pi-spin pi-spinner": "pi pi-check" }
-          label={i18nUtils.translateValue("createUser","Criar utilizador")} 
+
+      <Group justify="flex-end" mt="md">
+        <Button
           type="submit"
-          disabled={auth.loading}
-        />
-      </div>
-      
+          leftSection={<i className="pi pi-check" />}
+          loading={auth.loading}
+        >{i18nUtils.translateValue("createUser","Criar utilizador")}</Button>
+      </Group>
+
       { auth.http_error && !auth.response &&
-        <div className="p-fluid">
-          <Message severity="error" text={i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}></Message>
+        <div className="mt-3">
+          <Alert color="danger" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-times-circle" />
+              <span>{i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}</span>
+            </Group>
+          </Alert>
         </div>
       }
 
       { auth.response && !!auth.response && !!auth.response.message &&
-        <div className="p-fluid">
-          <Message severity="error" text={auth.response.message}></Message>
+        <div className="mt-3">
+          <Alert color="danger" py="xs">
+            <Group justify="center" gap="xs" wrap="nowrap">
+              <i className="pi pi-times-circle" />
+              <span>{auth.response.message}</span>
+            </Group>
+          </Alert>
         </div>
       }
 
