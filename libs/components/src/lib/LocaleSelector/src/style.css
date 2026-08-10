@@ -21,19 +21,15 @@
   text-decoration: underline;
 }
 
-/* Inside the (still Prime-styled) mobile menu: dark text, no topbar nudge. */
+/* Inside the mobile menu (TopbarRight's Mantine Menu rows): dark text, no
+   topbar nudge. */
 
-.p-menu .locale-selector {
+.sg-menuitem .locale-selector {
   margin-top: 0;
   margin-left: 0;
-  color: rgba(0, 0, 0, 0.87);
 }
 
-.p-menu .locale-selector,
-.p-menu .locale-selector .locale-btn {
-  color: rgba(0, 0, 0, 0.87);
-}
-
-.layout-topbar .layout-topbar-icons .p-menu button {
+.sg-menuitem .locale-selector,
+.sg-menuitem .locale-selector .locale-btn {
   color: rgba(0, 0, 0, 0.87);
 }

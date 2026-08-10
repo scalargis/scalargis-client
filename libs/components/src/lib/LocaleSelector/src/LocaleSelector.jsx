@@ -83,8 +83,8 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
           <div style={{ marginLeft: '15px' }} className={className ? `locale-selector ${className}` : 'locale-selector'}>
             {buttons}
           </div> :
-          <span className="p-menuitem-link">
-            <span className="p-menuitem-icon pi pi-flag"></span>
+          <span className="sg-menuitem">
+            <span className="pi pi-flag"></span>
             <div className={className ? `locale-selector ${className}` : 'locale-selector'}>
               {buttons}
             </div>
@@ -131,8 +131,8 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
     <React.Fragment>
       { type != 'menu' ?
       menu :
-      <span className="p-menuitem-link">
-        <span className="p-menuitem-icon pi pi-flag"></span>{menu}
+      <span className="sg-menuitem">
+        <span className="pi pi-flag"></span>{menu}
       </span> }
     </React.Fragment>
   );

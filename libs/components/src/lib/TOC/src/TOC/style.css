@@ -124,29 +124,6 @@
   display: block;
 }
 
-.sb-show-main .p-field-checkbox,
-.sb-show-main .p-field-radiobutton {
-  margin-bottom: 1rem;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.p-dialog-content {
-  overflow-y: unset;
-}
-
-.p-dialog-myfooter {
-  border-top: 1px solid #c8c8c8;
-  background: #ffffff;
-  color: #333333;
-  padding: 0.571rem 1rem;
-  text-align: right;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
-
 #layer-switcher .activate {
   width: 52px !important;
 }
@@ -179,10 +156,6 @@
   font-weight: bold;
 }
 
-.p-button.p-button-sm {
-  padding: 0.33rem 0.25rem;
-}
-
 .toc-check {
   margin-left: 4px;
 }
@@ -196,9 +169,4 @@
   margin-top: 0.8em;
   margin-left: 5px;
   margin-right: 5px;
-}
-
-#layer-switcher .p-button.p-button-icon-only {
-  width: 1.8rem !important;
-  height: 1.8rem !important;
 }

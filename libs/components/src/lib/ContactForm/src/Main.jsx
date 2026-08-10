@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
-import { Button, Group, Modal } from '@mantine/core';
+import { Button, Group, Modal, UnstyledButton } from '@mantine/core';
 import { CollapsiblePanel } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
@@ -136,10 +136,10 @@ export default function Main({ region, as, core, config, actions, record }) {
    } else {
       return (
         <React.Fragment>
-          <button className="p-link" onClick={e => setShowForm(true)} title={t("contact", "Contacto")}>
+          <UnstyledButton onClick={e => setShowForm(true)} title={t("contact", "Contacto")}>
             <span className="layout-topbar-item-text"></span>
             <span className="layout-topbar-icon pi pi-envelope" />
-          </button>
+          </UnstyledButton>
 
           <Modal
             title={header}

@@ -145,13 +145,13 @@ export default function Main({ type, as, config, actions, record }) {
     return (
       <React.Fragment>
         { type != 'menu' ?
-          <UnstyledButton className="p-link" onClick={e => setShowPopup(true)} title={title}>
+          <UnstyledButton onClick={e => setShowPopup(true)} title={title}>
             <span className="layout-topbar-item-text"></span>
             <span className="layout-topbar-icon pi pi-question-circle" />
           </UnstyledButton> :
-          <a href="#" className="p-menuitem-link" role="menuitem" tabIndex="0" onClick={e => setShowPopup(true)} >
-            <span className="p-menuitem-icon pi pi-question-circle"></span><span className="p-menuitem-text">Ajuda</span>
-          </a> }
+          <UnstyledButton className="sg-menuitem" onClick={e => setShowPopup(true)}>
+            <span className="pi pi-question-circle"></span><span>Ajuda</span>
+          </UnstyledButton> }
 
         <Dialog
           title={header}
@@ -192,8 +192,8 @@ export default function Main({ type, as, config, actions, record }) {
 
     if (type === 'menu') {
       return (
-        <a href={help_url} target="_blank" className="p-menuitem-link" role="menuitem" tabIndex="0" >
-          <span className="p-menuitem-icon pi pi-question-circle"></span><span className="p-menuitem-text">{title}</span>
+        <a href={help_url} target="_blank" rel="noreferrer" className="sg-menuitem">
+          <span className="pi pi-question-circle"></span><span>{title}</span>
         </a>
       )
     }
@@ -206,7 +206,7 @@ export default function Main({ type, as, config, actions, record }) {
         target="_blank"
         rel="noreferrer"
         title={title}
-        className={component_cfg?.elementType === 'link' ? "p-link sg-help-button-link" : "p-link sg-help-button-external"}
+        className={component_cfg?.elementType === 'link' ? "sg-help-button-link" : "sg-help-button-external"}
         style={{"color": "#ffffff"}}
       >
         { component_cfg?.elementType !== 'link' &&

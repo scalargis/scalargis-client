@@ -90,80 +90,11 @@
   .layercompare-control .layercompare-main-control-menu:hover {
     background-color: rgba(255, 255, 255, 0.9);
   }
-  
-  .layercompare-control .p-menuitem.layercompare-menu-selected {
-    background-color: rgb(255, 255, 255);
-  }
-  
-  .layercompare-control .p-menuitem.layercompare-menu-selected .p-menuitem-link .p-menuitem-text,
-  .layercompare-control .p-menuitem.layercompare-menu-selected .p-menuitem-link .p-menuitem-icon {
-    color: rgb(84, 165, 105);
-  }
-  
-  .layercompare-control .p-speeddial>button,
-  .layercompare-control .p-speeddial>button.p-button.p-button-icon-only.p-button-rounded {
-    height: 5rem;
-    width: 5rem;
-  }
-  
-  .layercompare-control .p-speeddial>ul {
-    --item-diff-x: .5px !important;
-    --item-diff-y: .5px !important;
-  }
-  
-  .layercompare-control .p-speeddial-action {
-    width: 2.5rem;
-    height: 2.5rem;
-    background: #495057;
-    color: #fff;
-  }
-  
-  .layercompare-control .p-speeddial-action.p-speeddial-action-active {
-    background-color: #FBC02D;
-  }
-  
-  .layercompare-control .p-button.layercompare-menu-selected {
-    line-height: 1.27em;
-  }
-  
+
   .layercompare-control .layercompare-control-content .grid {
     margin-right: unset;
   }
-  
-  
-  .layercompare-control .layercompare-control-content .p-divider.p-divider-horizontal {
-    margin: 1.25rem 0;
-    padding: 0 1.25rem;
-    color: #d3d3d3;
-  }
-  
-  .layercompare-control .layercompare-control-content .p-divider-dashed.p-divider-horizontal:before {
-    border-width: thin;
-  }
-  
-  .layercompare-control .layercompare-control-content .p-tag {
-    font-size: 1rem;
-  }
-  
-  .layercompare-control .layercompare-control-content .p-divider.p-component {
-    margin-top: 5px;
-    margin-bottom: 5px;
-  }
-  
-  .layercompare-control .layercompare-control-content .layercompare-stats-groups .p-dropdown.p-component {  
-    width: -webkit-fill-available !important;
-    margin-left: 0px !important;
-    margin-bottom: 5px;
-  }
-  
-  .layercompare-control .layercompare-control-content .p-button.btn-zoom-admin-unit {
-    background-color: rgb(131, 131, 131);
-  }
-  
-  .layercompare-control .layercompare-control-content .p-button.btn-zoom-admin-unit:enabled:hover {
-    background: rgb(84, 165, 105);
-  }
-  
+
   .layercompare-stats-serie {
     cursor: pointer;
   }
@@ -219,18 +150,7 @@
   .layercompare-control .layercompare-legend-control>div:hover {
     background-color: rgba(255, 255, 255, 0.9);
   }
-  
-  .layercompare-control .layercompare-legend-control .p-tabview-panels {
-    padding: 0.2rem;
-    padding-top: 0.5rem;
-  }
-  
-  .layercompare-control .layercompare-legend-control .p-tabview-panel {
-    overflow-y: scroll;
-    max-height: 220px;
-    font-size: .9rem;
-  }
-  
+
   .layercompare-control .layercompare-legend-control .layercompare-legend-control-title {
     text-align: center;
     font-size: 1rem;
@@ -251,23 +171,14 @@
     padding-bottom: 0px;
   }
   
-  .layercompare-control .layercompare-legend-control .p-field-checkbox.layercompare-legend-checkbox {
-    margin-bottom: .5rem;
-  }
-  
   .layercompare-control .layercompare-legend-control .layercompare-legend-class {
     min-width: 20px;
   }
-  
+
   .layercompare-control .layercompare-legend-control .layercompare-legend-buttons {
     text-align: center;
   }
-  
-  .layercompare-control .layercompare-legend-control .layercompare-legend-buttons .p-button.p-component.p-button-text {
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-  
+
   .layercompare-control .layercompare-legend-control .legend-empty-message {
     margin: 1rem;
   }

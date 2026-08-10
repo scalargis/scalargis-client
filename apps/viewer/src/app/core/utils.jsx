@@ -550,16 +550,18 @@ export const isComponentExcludedForLayer = (viewer, layer, componentClass) => {
   return exclude;
 }
 
+// Still-Prime components (AuthAMA, KeycloakSSO) call this through the `utils`
+// prop, so the export must stay; sg-error is styled in the theme layout.scss.
 export const getFormValidationErrorMessage = (errors, name) => {
   if (errors && errors[name]) {
     if (errors[name].type === 'required') {
-      return <small className="p-error">{errors[name].message || 'Campo obrigatório'}</small>
+      return <small className="sg-error">{errors[name].message || 'Campo obrigatório'}</small>
     } else if (errors[name].type === 'maxLength') {
-       return <small className="p-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
+       return <small className="sg-error">{errors[name].message || 'O número de caracteres é superior à dimensão máxima permitida'}</small>
     } else if (errors[name].type === 'pattern') {
-      return <small className="p-error">{errors[name].message || 'Formato inválido'}</small>
+      return <small className="sg-error">{errors[name].message || 'Formato inválido'}</small>
     } else {
-      return <small className="p-error">{errors[name].message}</small>
+      return <small className="sg-error">{errors[name].message}</small>
     }
-  }      
+  }
 };

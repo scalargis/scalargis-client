@@ -273,7 +273,7 @@ body .p-dropdown {
 .footer-left > div {
   float: right;
 }
-.footer-left button.p-link {
+.footer-left button {
   font-size: 1.4em;
   color: white;
 }
@@ -337,7 +337,8 @@ body .p-dropdown {
   display: none;
 }
 
-.layout-topbar .layout-topbar-icons button span.layout-topbar-icon {
+.layout-topbar .layout-topbar-icons button span.layout-topbar-icon,
+.layout-topbar .layout-topbar-icons a span.layout-topbar-icon {
   font-size: 1em;
 }
 
@@ -484,34 +485,6 @@ body .p-multiselect {
   background: rgba(103, 58, 183, 0.76);
 }
 
-.p-dialog-myfooter {
-  border-top: 1px solid #c8c8c8;
-  background: #fff;
-  color: #333;
-  padding: 0.571rem 1rem;
-  text-align: right;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
-
-#user_menu {
-  position: absolute;
-  transform: translateX(-145px);
-  max-width: fit-content;
-  min-width: 200px;
-  z-index: 9;
-  margin-top: 5px;
-}
-
-#user_menu .p-menu .p-menuitem-link {
-  padding: 0.2rem 0.75rem;
-}
-
-.p-button.p-button-link {
-  color: rgba(103, 58, 183, 0.76) !important;
-  padding: 0 0.49rem !important;
-}
-
 #login-page label {
   font-size: 1.1em;
 }
@@ -523,11 +496,6 @@ body .p-multiselect {
 
 #login-page .login-logo img {
   max-width: 300px;
-}
-
-#login-page .p-dialog-myfooter {
-  text-align: center;
-  margin-bottom: 1em;
 }
 
 .splashscreen {
@@ -587,21 +555,35 @@ body .p-multiselect {
   left: 35%;
 }
 
-#topbar_right_menu {
-  transform: translate(10px, 10px);
+/* Menu-mode rows — the old hand-written p-menuitem-link markup, swept at the
+   shell pass. Components render one .sg-menuitem per mobile/user menu entry;
+   .sg-topbar-menuitem is the wrapper TopbarRight's Mantine Menu puts around
+   each component in the small-screen overflow menu. */
+.sg-topbar-menuitem {
+  min-width: 180px;
 }
 
-.popup-locale-selector.p-dropdown {
-  border: none;
+.sg-menuitem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  color: var(--mantine-color-text);
+  text-decoration: none;
 }
 
-.popup-locale-selector.p-dropdown .p-hidden-accessible.p-dropdown-hidden-select,
-.popup-locale-selector.p-dropdown .p-dropdown.p-dropdown-label,
-.popup-locale-selector.p-dropdown .p-dropdown-label.p-inputtext,
-.popup-locale-selector.p-dropdown .p-dropdown-trigger {
+.sg-menuitem:hover {
+  background: var(--mantine-color-gray-1);
+}
+
+/* Splash/login pages' locale trigger (Mantine Menu text trigger). */
+button.locale-selector.popup-locale-selector {
   color: #2196f3;
 }
 
-.popup-locale-selector.p-dropdown .p-dropdown-trigger {
-  border-left: 1px solid #2196f3;
+/* Form validation message (getFormValidationErrorMessage — also rendered by
+   still-Prime auth components through the utils prop). */
+.sg-error {
+  color: var(--mantine-color-danger-6);
 }
