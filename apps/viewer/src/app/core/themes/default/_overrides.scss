@@ -1,17 +1,23 @@
 //Suggested location to add your overrides so that migration would be easy by just updating the SASS folder in the future
 
+// primeflex's colour utilities (.surface-card, .text-900, .text-600, …) read
+// --p-surface-*. These used to bridge to --surface-*, but only the saga-blue
+// theme defined those; dropping the Prime theme left them undefined, so every
+// colour utility silently dropped its declaration (transparent panels, no
+// heading colour). Map straight onto the ADS/Mantine neutral palette instead —
+// no revival of the dead --surface-* hop.
 :root {
-    --p-surface-0: var(--surface-0);
-    --p-surface-50: var(--surface-50);
-    --p-surface-100: var(--surface-100);
-    --p-surface-200: var(--surface-200);
-    --p-surface-300: var(--surface-300);
-    --p-surface-400: var(--surface-400);
-    --p-surface-500: var(--surface-500);
-    --p-surface-600: var(--surface-600);
-    --p-surface-700: var(--surface-700);
-    --p-surface-800: var(--surface-800);
-    --p-surface-900: var(--surface-900);
+    --p-surface-0: var(--mantine-color-white);
+    --p-surface-50: var(--mantine-color-neutral-0);
+    --p-surface-100: var(--mantine-color-neutral-1);
+    --p-surface-200: var(--mantine-color-neutral-2);
+    --p-surface-300: var(--mantine-color-neutral-3);
+    --p-surface-400: var(--mantine-color-neutral-4);
+    --p-surface-500: var(--mantine-color-neutral-5);
+    --p-surface-600: var(--mantine-color-neutral-6);
+    --p-surface-700: var(--mantine-color-neutral-7);
+    --p-surface-800: var(--mantine-color-neutral-8);
+    --p-surface-900: var(--mantine-color-neutral-9);
 }
 
 body {
