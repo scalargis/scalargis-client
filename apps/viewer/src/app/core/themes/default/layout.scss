@@ -555,6 +555,27 @@ body .p-multiselect {
   left: 35%;
 }
 
+/* Indeterminate loading bar: Mantine's Progress has no indeterminate mode, so a
+   narrow section sweeps the track, reproducing Prime's ProgressBar. */
+.loadingscreen .loading-indeterminate-bar {
+  animation: loading-indeterminate-sweep 1.2s ease-in-out infinite;
+}
+
+@keyframes loading-indeterminate-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(340%); }
+}
+
+/* The global reduced-motion kill (ads-globals.css) freezes animations; a frozen
+   loading bar reads as a hang, so re-state the sweep as that block does for the
+   Loader. */
+@media (prefers-reduced-motion: reduce) {
+  .loadingscreen .loading-indeterminate-bar {
+    animation-duration: 1.2s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
 /* Menu-mode rows — the old hand-written p-menuitem-link markup, swept at the
    shell pass. Components render one .sg-menuitem per mobile/user menu entry;
    .sg-topbar-menuitem is the wrapper TopbarRight's Mantine Menu puts around
