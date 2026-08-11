@@ -58,7 +58,7 @@ function PageLogin(props) {
                 <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
                     <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
                         <div className="flex justify-content-end">
-                            <LocaleSelector core={core} componentConfig={siteConfig} />
+                            <LocaleSelector core={core} componentConfig={siteConfig} className="popup-locale-selector" />
                         </div>
                         <div className="text-center mb-3">
                             <img src={logo} alt="logo" className="mb-3" style={{maxHeight: "180px", maxWidth: "-webkit-fill-available"}} />
@@ -83,7 +83,7 @@ function PageLogin(props) {
             <div className="flex align-items-center justify-content-center lg:w-4 md:w-6 w-12">
                 <div className="surface-card p-4 pt-6 shadow-2 border-round w-full">
                     <div className="flex justify-content-end">
-                        <LocaleSelector core={core} componentConfig={siteConfig} />
+                        <LocaleSelector core={core} componentConfig={siteConfig} className="popup-locale-selector" />
                     </div>
                     <div className="text-center mb-3">
                         <img src={logo} alt="logo" className="mb-3" style={{maxHeight: "180px", maxWidth: "-webkit-fill-available"}} />

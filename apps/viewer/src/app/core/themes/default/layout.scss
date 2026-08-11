@@ -577,8 +577,12 @@ body .p-multiselect {
   background: var(--mantine-color-gray-1);
 }
 
-/* Splash/login pages' locale trigger (Mantine Menu text trigger). */
-button.locale-selector.popup-locale-selector {
+/* Splash/login pages' locale picker: the dropdown text trigger AND the inline
+   PT|EN|FR buttons. The lib LocaleSelector stylesheet paints .locale-btn white
+   for the blue topbar; on the white auth panel that leaves them invisible, so
+   the splash marker recolours them to the same blue as the trigger. */
+button.locale-selector.popup-locale-selector,
+.locale-selector.popup-locale-selector .locale-btn {
   color: #2196f3;
 }
 
