@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { Anchor } from '@mantine/core';
 
 import { i18n as i18nUtils } from '@scalargis/components';
@@ -15,6 +16,13 @@ function PageLogin(props) {
 
     const { auth, core, dispatch } = props;
     const { actions, utils, siteConfig } = core;
+
+    // This page renders through i18nUtils.translateValue(), a plain function
+    // that never subscribes to i18next, so a locale switch from the
+    // LocaleSelector changed the language but left the page frozen. Subscribing
+    // to 'languageChanged' here repaints the whole tree (and its widgets) on
+    // switch; the return value is intentionally unused.
+    useTranslation();
 
     // Redux actions
     const { login_post, login_user_registration, login_reset_password, logout } = actions;
