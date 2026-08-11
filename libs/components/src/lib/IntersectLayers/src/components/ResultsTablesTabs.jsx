@@ -57,14 +57,17 @@ export default function ResultsTablesTabs(props) {
     return (
         <>
 
-            <Group className='sg-intersect-toolbar mb-2'>
+            <Group className='sg-intersect-toolbar mb-2' align="center" wrap="nowrap">
                 <label className='pr-2'>{t('groups', 'Grupos')}:</label>
                 <MultiSelect
                     value={selectedGroups}
                     onChange={(value) => setSelectedGroups(value)}
                     data={groupsOptions.map(g => ({ value: g.code, label: g.name }))}
-                    placeholder="Select Groups"
-                    className="w-full md:w-20rem"
+                    // The placeholder shares the input row with the pills, so it
+                    // only earns its line while nothing is picked.
+                    placeholder={selectedGroups?.length ? undefined : t('selectGroups', 'Selecionar grupos')}
+                    flex="1"
+                    maw={360}
                 />
             </Group>
 
