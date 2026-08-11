@@ -6,6 +6,7 @@ import { Alert, Anchor, Button, Checkbox, Group, PasswordInput, TextInput } from
 import { i18n as i18nUtils } from '@scalargis/components';
 
 import { getFormValidationErrorMessage } from './../utils';
+import PasswordSuggestions from './PasswordSuggestions';
 
 
 function RegistrationWidget(props) {
@@ -81,9 +82,12 @@ function RegistrationWidget(props) {
                 )} />
                 {getFormValidationErrorMessage(errors, 'username')}
 
-                {/* Prime's Password strength meter (weak/medium/strong) has no
-                    Mantine twin — the visibility toggle stays, the meter does
-                    not. Validation is unchanged (required only). */}
+                {/* Prime's Password strength meter (weak/medium/strong) had no
+                    Mantine twin. Rather than restore a meter that scored against
+                    its own regex (not the server's rule), the shared
+                    PasswordSuggestions block below states the real rules the
+                    server enforces. Client validation is unchanged (required
+                    only); set_password decides. */}
                 <Controller name="password" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
                     <PasswordInput id={field.name} {...field}
                         label="Password"
@@ -114,6 +118,8 @@ function RegistrationWidget(props) {
                     )}
                 />
                 {getFormValidationErrorMessage(errors, 'confirmPassword')}
+
+                <PasswordSuggestions />
 
                 <div className="w-full mt-3 mb-1">
                     <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (

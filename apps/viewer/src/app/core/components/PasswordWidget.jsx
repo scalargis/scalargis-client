@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 
-import { Alert, Anchor, Button, Divider, Group, PasswordInput, TextInput } from '@mantine/core';
+import { Alert, Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core';
 
 import { i18n as i18nUtils } from '@scalargis/components';
+
+import PasswordSuggestions from './PasswordSuggestions';
 
 
 function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect }) {
@@ -25,20 +27,6 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
     newPassword: '',
     confirmPassword: ''
   }
-
-  const passwordSuggestions = useMemo(() => (
-    <React.Fragment>
-      <Divider className="mt-2" />
-      <p className="mt-2">{i18nUtils.translateValue("suggestions", "Sugestões")}:</p>
-      <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
-        <li>{i18nUtils.translateValue("passwordLowerRule", "Pelo menos uma minúscula")}</li>
-        <li>{i18nUtils.translateValue("passwordUpperRule", "Pelo menos uma maiúscula")}</li>
-        <li>{i18nUtils.translateValue("passwordDigitRule", "Pelo menos um dígito")}</li>
-        <li>{i18nUtils.translateValue("passwordSpecialRule", "Pelo menos um caractere especial")}</li>
-        <li>{i18nUtils.translateValue("passwordSizeRule", "Pelo menos 12 caracteres")}</li>
-      </ul>
-    </React.Fragment>
-  ), [i18nUtils.getResolvedLanguage()]);
 
   useEffect(() => {
     if (auth?.data?.token)  return;
@@ -241,7 +229,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
             />
             {getFormValidationErrorMessage(errors, 'confirmPassword')}
 
-            {passwordSuggestions}
+            <PasswordSuggestions />
 
             <Group justify="flex-end" mt="md" mb="md">
                 <Anchor component="button" type="button" className="font-medium"
