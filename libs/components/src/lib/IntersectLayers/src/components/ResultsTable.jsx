@@ -3,6 +3,7 @@ import { NumberInput, TextInput } from '@mantine/core';
 import { DataGrid } from '@scalargis/ui';
 
 import { i18n } from '../../../components';
+import { foldDiacritics } from '../../../utils/common';
 
 
 export default function ResultsTable(props) {
@@ -35,8 +36,8 @@ export default function ResultsTable(props) {
     (fields || []).forEach((item) => {
         const value = filterValue(item.field);
         if (value != null && value !== '') {
-            const q = String(value).toLowerCase();
-            data = data.filter(r => String(r[item.field] ?? '').toLowerCase().includes(q));
+            const q = foldDiacritics(value);
+            data = data.filter(r => foldDiacritics(r[item.field]).includes(q));
         }
     });
     ['area', 'length', 'percent'].forEach((field) => {
