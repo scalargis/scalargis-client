@@ -8,13 +8,19 @@
     color: #ffffff;
     z-index: 999;
     right: 0;
-    @include m.clearfix();
     @include m.linear-gradient-left(v.$topbarLeftBgColor,v.$topbarRightBgColor);
     @include m.transition(left v.$transitionDuration);
 
+    // The strip rode a float. A float that runs out of room drops out of the
+    // bar (which is in flow and 50px tall, see the flex note in layout.scss),
+    // and .layout-main is a block formatting context, so it refused to sit
+    // under the escapee and shrank to the sliver beside it — the map reduced to
+    // a stripe with the wrapper's background bleeding over the rest. It is the
+    // row's own item now: a flex item has nowhere to escape to.
     .layout-topbar-icons {
-        float: right;
-        display: block;
+        display: flex;
+        align-items: center;
+        margin-left: auto;
         -moz-animation-duration: .5s;
         -webkit-animation-duration: .5s;
         animation-duration: .5s;

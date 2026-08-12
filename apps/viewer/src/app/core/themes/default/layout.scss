@@ -231,8 +231,15 @@ body .p-dropdown {
   margin: 5px 5px 5px 12px;
 }
 
+// Each component wraps itself in a div; they are flex items of the strip now,
+// which ignores float, so the row they used to make by floating left is the
+// flex line itself. They stay plain blocks inside: the items are inline-block
+// and share a baseline, which making these flex would blockify and break apart.
+// An item never compresses — its icon and label are one thing, and shrinking is
+// what tore the label onto a second line under the icon.
 .layout-topbar .topbar-right>div {
-  float: left;
+  flex: none;
+  white-space: nowrap;
 }
 
 .layout-footer {
@@ -292,10 +299,18 @@ body .p-dropdown {
   color: #ffffff !important;
 }
 
+// `position: unset` is load-bearing, not a leftover: the bar stays in flow so
+// that it takes the 50px `.layout-main` deducts from its own height. In flow is
+// also why the strip's old float could reach `.layout-main` at all, so the row
+// is a flex line instead — the items cannot leave it, whatever the viewer puts
+// in the region. The padding moves to the cross axis: the top-only padding was
+// how a float got itself off the top edge.
 .layout-topbar {
+  display: flex;
+  align-items: center;
   position: unset;
-  padding: 1.1em 1.5em 0em 1.5em;
-  z-index: 1000; 
+  padding: 0em 1.5em;
+  z-index: 1000;
 }
 
 .layout-embedded .layout-topbar {
