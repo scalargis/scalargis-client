@@ -77,7 +77,7 @@ function Layout(props) {
   });
 
   // Use window width for sidebar in mobile
-  const size = utils.getWindowSize();
+  const size = utils.useWindowSize();
 
   let logo = viewer.layoutColorMode === 'dark' ?
     utils.buildRelativeUrlPath('assets/images/logo-light.png') :

@@ -4,7 +4,7 @@ import { Menu, UnstyledButton } from '@mantine/core';
 
 import MapModel from '../model/MapModel';
 import OWSModel from '../model/OWSModel';
-import { getWindowSize } from '../utils'
+import { useWindowSize } from '../utils'
 import * as Utils from '../utils';
 
 
@@ -14,7 +14,7 @@ export default function TopbarRight(props) {
 
   const { t } = useTranslation();
 
-  const wsize = getWindowSize();
+  const wsize = useWindowSize();
   const isMobileSmall = wsize[0] <= 440;
 
   if (isMobileSmall) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useViewportSize } from '@mantine/hooks';
 import { v4 as uuidv4 } from 'uuid';
 import OLGroupLayer from "ol/layer/Group";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
@@ -97,6 +98,16 @@ export const getWindowSize = () => {
   x = w.innerWidth || e.clientWidth || g.clientWidth,
   y = w.innerHeight|| e.clientHeight|| g.clientHeight;
   return [x, y];
+}
+
+// getWindowSize reads the live window on every call, so a component that gates
+// its layout on it is only ever as current as its last render — nothing here
+// subscribes to resize. This hook re-renders the caller when the viewport
+// changes, in the same [width, height] shape, so a call site swaps one for the
+// other and its children's getWindowSize reads come back fresh with it.
+export const useWindowSize = () => {
+  const { width, height } = useViewportSize();
+  return [width, height];
 }
 
 export const isDesktop = () => {
