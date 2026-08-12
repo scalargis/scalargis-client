@@ -46,6 +46,7 @@ export default function Main({ as, core, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { getWindowSize, showOnPortal } = Models.Utils;
   const { selected_menu } = viewer.config_json;
+  const { exclusive_mapcontrol } = viewer;
 
   const component_cfg = record.config_json || {};
 
@@ -57,8 +58,12 @@ export default function Main({ as, core, config, actions, record }) {
   const wsize = getWindowSize();
   const isMobile = wsize[0] <= 768;
 
+  // Arming on the way in is only half of it: whoever armed the control has to
+  // release it on the way out, or the tool stays live on the map under the next
+  // menu. Only ever released when it is still ours to release.
   useEffect(() => {
     if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
+    else if (exclusive_mapcontrol === MAPCONTROL_NAME) dispatch(actions.viewer_set_exclusive_mapcontrol(null));
   }, [selected_menu]);
 
   useEffect(() => {
