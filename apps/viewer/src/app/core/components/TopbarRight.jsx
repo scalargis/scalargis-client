@@ -44,9 +44,16 @@ export default function TopbarRight(props) {
             {/* The dropdown holds whole components (each renders its own
                 interactive row), so they mount as plain children, not
                 Menu.Item — a Menu.Item is itself a button and would nest
-                interactives. Outside clicks (incl. any dialog a row opens)
-                close the menu, matching the Prime popup. */}
-            <Menu position="bottom-end" shadow="md">
+                interactives.
+
+                Rows own the open state of the dialogs they launch, so the
+                dropdown has to stay mounted: a dialog portals out to the body,
+                its own clicks then read as outside clicks here, and unmounting
+                the dropdown on close would take the row — and the dialog it is
+                still showing — with it. display-none hiding keeps the row's
+                state and effects alive; the Activity default would drop the
+                effects. */}
+            <Menu position="bottom-end" shadow="md" keepMounted keepMountedMode="display-none">
               <Menu.Target>
                 <UnstyledButton className="layout-menu-button" aria-label={t("options", "Opções")}>
                   <span className="pi pi-chevron-circle-down"/>
