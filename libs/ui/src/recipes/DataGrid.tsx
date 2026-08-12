@@ -100,6 +100,12 @@ const ADS_DEFAULTS = {
   paginationSize: 'sm',
   paginationWithEdges: true,
   paginationWithControls: true,
+  // An empty table has no rows, so its body has no height, and the empty state
+  // is centred into it absolutely — with nothing to centre in, the icon and its
+  // text end up crushed against the header. This is the floor that gives them
+  // somewhere to be. It is the body that needs the room, not the state: adding
+  // spacing inside the state instead pushes it out of a body this short.
+  minHeight: 180,
 } as const satisfies Partial<DataTableProps<never>>;
 
 const ADS_CLASS_NAMES = {
