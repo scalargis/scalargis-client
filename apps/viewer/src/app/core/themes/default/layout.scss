@@ -380,6 +380,15 @@ body .p-dropdown {
   height: -webkit-calc(100% - 35px);
 }
 
+// The normal viewer gets its control strip clear of the topbar for free: the
+// bar is in flow, so the map starts below it. Embedded floats the bar as a
+// 55x50 square over a map that starts at the very top, so the strip comes up
+// under it. Give the strip the height the square would have taken — the square
+// is there at every width, so this is not a phone case.
+.layout-embedded .map-controls {
+  margin-top: 50px;
+}
+
 /*
 #themewizard .p-steps .p-steps-item:before {
   top: 120%;
