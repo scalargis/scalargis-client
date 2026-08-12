@@ -149,8 +149,13 @@
   cursor: pointer;
 }
 
+/* The footer used to carry its own neutral-0 (#F7F8FA), which put a third
+   colour under a grid whose rows are --mantine-color-body and whose card is
+   white: it read as a stray band across the bottom of the card. The rows are
+   the surface here, and the footer is part of it — the header keeps the only
+   tint, which is the point of it (see `striped: false` in the recipe). */
 .ads-datagrid__pagination {
-  background-color: var(--mantine-color-neutral-0);
+  background-color: var(--mantine-color-body);
   border-top: 1px solid var(--mantine-color-neutral-2);
   font-size: var(--mantine-font-size-sm);
 }
