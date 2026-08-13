@@ -51,6 +51,13 @@ function Layout(props) {
     if (config && config.config_json && config.config_json.theme) {
       theme = config.config_json.theme;
     }
+    // Demo/test override: ?theme=<name> previews any palette preset on any
+    // viewer without touching its config (B2 palette; an unknown name falls
+    // back to the default theme inside ThemeSelector).
+    const urlTheme = new URLSearchParams(window.location.search).get('theme');
+    if (urlTheme) {
+      theme = urlTheme;
+    }
     setActiveTheme(theme);
 
     // -- Override document properties --//
