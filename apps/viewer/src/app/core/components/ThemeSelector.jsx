@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useApplyClientTheme } from '@scalargis/ui';
+
 import ThemeDefault from '../../core/themes/default/main';
 
 const ThemeDefaultWrapper = () => <ThemeDefault />;
@@ -50,7 +52,39 @@ const getThemeComponent = (theme) => {
 export default function ThemeSelector(props) {
   const { theme, children } = props;
 
-  //const theme = 'mapaspt';
+  // The Mantine half of the theme: resolved here, applied at the app-root
+  // provider through the @scalargis/ui client-theme registry (a nested
+  // provider would leave portaled overlays unbranded). undefined while a
+  // module theme is still loading, so switches never flash the base theme.
+  const [clientTheme, setClientTheme] = React.useState(undefined);
+
+  React.useEffect(() => {
+    if (!theme || theme === 'default') {
+      setClientTheme(null);
+      return undefined;
+    }
+
+    // Every named theme is a module in themes/ (the shipped palette folders
+    // and the client submodules alike — see themes/README.md). A module of
+    // the post-B2 contract exports `mantineTheme` (built with
+    // createClientTheme); Prime-era modules don't and explicitly fall back
+    // to the base Mantine theme — their CSS still applies via the component.
+    // An unknown name lands on loadTheme's default fallback: no export, so
+    // the base theme, i.e. plain ADS.
+    let cancelled = false;
+    loadTheme(theme).then((mod) => {
+      if (cancelled) return;
+      setClientTheme(
+        mod?.mantineTheme ? { name: theme, theme: mod.mantineTheme } : null
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [theme]);
+
+  useApplyClientTheme(clientTheme);
+
   const Theme = getThemeComponent(theme);
 
   return (
