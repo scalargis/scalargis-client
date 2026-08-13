@@ -1,82 +1,89 @@
 {
-    "id": "IntersectLayers",
-    "type": "IntersectLayers",
-    "target": "mainmenu",
-    "title": "Interseção de Temas",
-    "config_json": {
-      "header": {
-        "pt": "Confrontação do PDM",
-        "en": "sdfsdfsd",
-        "fr": "ddddd",
-        "default": "sss"
+  "_comment": "Sample do IntersectLayers: a entrada para viewer.config_json.components[]. Duas peças a mais sao obrigatorias: (1) uma row em scalargis.site_settings com code = config_id (ver server.config.example.json), (2) a funcao intersects_layers na DB, instalada pelo plugin spatial_toolbox. Chaves explicadas no README.md ao lado; montagem ponta-a-ponta no guia references/guides/component_configure/configure-intersectlayers.md",
+  "_note_as_popup": "O IntersectLayers NAO suporta as:'popup' nem dialogOptions - Main.jsx so distingue as==='panel'. O unico dialogo e o das tabelas (showTables), e as dimensoes dele sao fixas em codigo.",
+
+  "id": "IntersectLayers",
+  "type": "IntersectLayers",
+  "target": "mainmenu",
+  "title": "Interseção de Temas",
+  "config_json": {
+    "config_id": "cc_intersect",
+    "apiUrl": "/spatial_toolbox/api/intersect",
+
+    "header": {
+      "pt": "Divisão Administrativa",
+      "en": "Administrative Divisions",
+      "default": "Divisão Administrativa"
+    },
+    "btn_icon": "pi pi-table",
+    "content": {
+      "title": {
+        "pt": "Confrontação com a CAOP",
+        "en": "Intersection with CAOP",
+        "default": "Confrontação com a CAOP"
       },
-      "btn_icon": "pi pi-table",
-      "config_id": "teste_intersect",
-      "apiUrl": "/spatial_toolbox/api/intersect",
-      "content": {
-        "title": {
-          "pt": "testettt",
-          "en": "dsddd",
-          "default": "stetetetetetet"
-        },
-        "description": {
-          "pt": "<div>Esta ferramenta permite fazer a confrontação com os temas do Plano Diretor Municipal e obter um relatório das classes de espacço e condicionantes que existentes na área definida pelo utilizador</div>",
-          "en": "<div>Hello! Esta ferramenta permite fazer a confrontação com os temas do Plano Diretor Municipal e obter um relatório das classes de espacço e condicionantes que existentes na área definida pelo utilizador</div>",
-          "default": "Hellho"
+      "description": {
+        "pt": "<div>Marque no mapa a área pretendida para obter os concelhos e freguesias (CAOP) que a intersetam, com a respetiva área e percentagem.</div>",
+        "en": "<div>Draw the area of interest on the map to list the intersecting municipalities and parishes (CAOP), with area and percentage.</div>",
+        "default": "<div>Marque no mapa a área pretendida para obter os concelhos e freguesias (CAOP) que a intersetam, com a respetiva área e percentagem.</div>"
+      }
+    },
+
+    "_comment_drawTools": "Copy = copiar a geometria de uma camada do mapa (e o util). Select so apanha a camada do Print - ver o gotcha 2 do README.",
+    "drawTools": ["Point", "LineString", "Polygon", "Copy", "Modify"],
+    "bufferOption": true,
+
+    "_comment_srid": "A geometria vai sempre em 4326. O dataSrid so serve para o maxArea (m2, no dataSrid) e para o buffer ser em metros.",
+    "dataSrid": 3763,
+    "maxArea": 100000000,
+
+    "groupResults": true,
+    "showResultMeasure": true,
+    "showResultPercentage": true,
+    "showResultGeometries": true,
+    "highlightFeatures": true,
+    "zoomToFeatures": true,
+
+    "_comment_showTables": "Destranca o botao 'Tabelas' (dialogo 75vw x 75vh, maximizavel, com uma tab por camada). O filtro de grupos do dialogo depende do array groups do site_settings.",
+    "showTables": true,
+
+    "_comment_export": "Com mais de 3 formatos a barra vira dropdown. O pdf exige um print template no backend - sem isso, tirar da lista.",
+    "showExport": true,
+    "exportFormats": ["xls", "csv"],
+    "export_crs": 3763,
+    "_export": {
+      "pdf": {
+        "apiUrl": "/spatial_toolbox/api/intersect/export"
+      }
+    },
+
+    "_comment_styles": "Opcional. Sobrepoe-se ao src/config/styles.json: arrays acumulam sobre os default, valores soltos substituem.",
+    "styles": {
+      "output": {
+        "filter": ["==", ["get", "_type"], "output"],
+        "style": {
+          "stroke-color": "magenta",
+          "stroke-width": 3,
+          "circle-radius": 5,
+          "circle-fill-color": "magenta",
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 2
         }
       },
-      "drawTools": [
-        "Point",
-        "LineString",
-        "Polygon",
-        "Select",
-        "Modify"
-      ],
-      "bufferOption": true,
-      "maxArea": 1000,
-      "groupResults": true,
-      "dataSrid": 3763,
-      "showExport": false,
-      "showResultGeometries": false,
-      "showResultMeasure": false,
-      "showResultPercentage": false,
-      "highlightFeatures": true,
-      "zoomToFeatures": true,
-      "exportFormats": [
-        "xls",
-        "csv",
-        "pdf"
-      ],
-      "export_crs": 3763,
-      "export": {
-        "pdf": { 
-          "apiUrl": "/spatial_toolbox/api/intersect/export"
-        }
-      },
-      "styles": {
-        "output": {
-          "filter": ["==", ["get", "_type"], "output"],
-          "style": {
-            "stroke-color": "magenta",
-            "stroke-width": 9,
-            "circle-radius": 5,
-            "circle-fill-color": "magenta",
-            "circle-stroke-color": "white",
-            "circle-stroke-width": 2
-          }
-        },
-        "results": [{
-          "filter": ["all", ["==", ["get", "_type"], "results"], ["==", ["get", "subtema_o"], "Rede elétrica"]],
+      "results": [
+        {
+          "filter": ["all", ["==", ["get", "_type"], "results"], ["==", ["get", "distrito"], "Lisboa"]],
           "style": {
             "fill-color": "rgba(0, 0, 255, 0.5)",
             "stroke-color": "blue",
-            "stroke-width": 6,
+            "stroke-width": 2,
             "circle-radius": 5,
             "circle-fill-color": "blue",
             "circle-stroke-color": "white",
             "circle-stroke-width": 2
           }
-        }]
-      }
+        }
+      ]
     }
   }
+}
