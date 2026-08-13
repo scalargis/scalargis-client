@@ -39,6 +39,34 @@ describe('createClientTheme (kit 05 override contract)', () => {
     );
   });
 
+  it('carries a brand font to body AND headings, keeping ADS heading sizes', () => {
+    const theme = createClientTheme({
+      primary: BRAND as never,
+      fontFamily: 'Saira, sans-serif',
+    });
+    expect(theme.fontFamily).toBe('Saira, sans-serif');
+    expect(theme.headings?.fontFamily).toBe('Saira, sans-serif');
+    // The font clause moves the FAMILY only — type sizing stays ADS.
+    expect(theme.headings?.sizes?.h1).toEqual(adsBaseTheme.headings?.sizes?.h1);
+    expect(theme.fontSizes).toEqual(adsBaseTheme.fontSizes);
+  });
+
+  it('lets headings diverge and rejects an empty family', () => {
+    const theme = createClientTheme({
+      fontFamily: 'Saira, sans-serif',
+      headingsFontFamily: 'Georgia, serif',
+    });
+    expect(theme.fontFamily).toBe('Saira, sans-serif');
+    expect(theme.headings?.fontFamily).toBe('Georgia, serif');
+    expect(() => createClientTheme({ fontFamily: '  ' })).toThrow(/font-family/);
+  });
+
+  it('keeps ADS type when no font override is given', () => {
+    const theme = createClientTheme({ primary: BRAND as never });
+    expect(theme.fontFamily).toBe(adsBaseTheme.fontFamily);
+    expect(theme.headings?.fontFamily).toBe(adsBaseTheme.headings?.fontFamily);
+  });
+
   it('throws on a partial palette — shade-indexed pairings would break', () => {
     expect(() =>
       createClientTheme({ primary: ['#FF6B6B', '#FA5252'] as never })
