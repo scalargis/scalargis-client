@@ -1,0 +1,35 @@
+/* Trigger do ContactForm no rodapé (targets `footer_left` / `footer_right`).
+   Escopado às regiões do rodapé, como o `.footer-right .crsselect` do CRSSelect:
+   fora delas o componente usa o markup do topbar e nada disto se aplica. */
+
+.footer-left .contactform-footer-button,
+.footer-right .contactform-footer-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  /* A tira do rodapé tem 35px. O `.footer-left button { font-size: 1.4em }`
+     do layout.scss é para os botões de ícone grande da entidade; aqui perde
+     por especificidade e o trigger fica à escala do texto do rodapé. */
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1;
+  color: inherit;
+}
+
+.footer-left .contactform-footer-button:hover,
+.footer-right .contactform-footer-button:hover {
+  text-decoration: underline;
+}
+
+.footer-left .contactform-footer-icon,
+.footer-right .contactform-footer-icon {
+  font-size: 1em;
+}
+
+/* Ao lado do "© ... ScalarGIS" o label é o que estoira primeiro em ecrãs
+   estreitos; o ícone sozinho continua a abrir o formulário. */
+@media screen and (max-width: 667px) {
+  .footer-left .contactform-footer-label,
+  .footer-right .contactform-footer-label {
+    display: none;
+  }
+}

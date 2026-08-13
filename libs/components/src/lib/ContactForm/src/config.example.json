@@ -5,12 +5,15 @@
   "config_json": {
       "hideForm": false,
       "hideContactInfo": false,
-      "contact_info": "<div>Informação de contacto</div>",      
+      "header": "Formulário de Contacto",
+      "closeLabel": "Fechar",
+      "footerLabel": "Contacto",
+      "contact_info": "<div>Informação de contacto</div>",
       "requiredFieldMessage": "Campo de preenchimento obrigatório",
       "upload": {
           "enabled": true,
           "minFiles": 0,
-          "maxFiles": 3,          
+          "maxFiles": 3,
           "maxFileSize": 3000000,
           "accept": "",
           "invalidFileSizeMessageSummary": "",
@@ -23,4 +26,4 @@
   "regions": [],
   "target": "mainmenu",
   "children": []
-} 
+}
