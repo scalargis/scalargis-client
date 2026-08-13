@@ -7,6 +7,12 @@ export type { AdsBaseTheme } from './theme/ads-mantine-theme';
 export { createClientTheme } from './theme/client-theme';
 export type { ClientThemeOverride } from './theme/client-theme';
 
+export { clientThemePresets, resolveClientThemePreset } from './theme/presets';
+export type { ClientThemePreset } from './theme/presets';
+
+export { useApplyClientTheme } from './theme/client-theme-registry';
+export type { ClientThemeEntry } from './theme/client-theme-registry';
+
 /* ─── Recipes (plan §1c) ─────────────────────────────────────────────── */
 export { DataGrid, exportGridCSV } from './recipes/DataGrid';
 export type { DataGridColumn, DataGridProps } from './recipes/DataGrid';

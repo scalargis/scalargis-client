@@ -2,14 +2,21 @@
  * AdsProviders document-language contract (kit 04 §screen-reader / WCAG
  * 3.1.1): <html lang> is stamped with the active i18next language on mount
  * and follows every live language switch.
+ *
+ * Plus the client-theme registry contract (B2): a theme applied deep in the
+ * tree re-themes the ROOT provider (so portaled overlays inherit it) and
+ * stamps data-sg-theme; nested contributions let the inner selector win.
  */
 import React from 'react';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { act, render } from '@testing-library/react';
+import { useMantineTheme } from '@mantine/core';
+import { act, render, screen } from '@testing-library/react';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { AdsProviders } from './AdsProviders';
+import { resolveClientThemePreset } from './theme/presets';
+import { useApplyClientTheme, type ClientThemeEntry } from './theme/client-theme-registry';
 
 beforeAll(async () => {
   // The host-shell shape: react-i18next bound to the i18next singleton,
@@ -49,5 +56,70 @@ describe('AdsProviders <html lang>', () => {
       await i18next.changeLanguage('pt-PT');
     });
     expect(document.documentElement.lang).toBe('pt');
+  });
+});
+
+/* ─── client-theme registry ──────────────────────────────────────────── */
+
+function Contribute({ entry }: { entry: ClientThemeEntry | null | undefined }) {
+  useApplyClientTheme(entry);
+  return null;
+}
+
+function ThemeProbe() {
+  const theme = useMantineTheme();
+  return (
+    <span data-testid="probe">
+      {theme.colors.primary[5]}|{String(theme.primaryShade)}
+    </span>
+  );
+}
+
+describe('AdsProviders client-theme registry', () => {
+  const lime = resolveClientThemePreset('lime')!;
+  const red = resolveClientThemePreset('red')!;
+
+  it('re-themes the root provider and stamps data-sg-theme; unmount restores', () => {
+    const { rerender } = render(
+      <AdsProviders>
+        <Contribute entry={{ name: lime.name, theme: lime.theme }} />
+        <ThemeProbe />
+      </AdsProviders>
+    );
+    expect(screen.getByTestId('probe').textContent).toBe('#9EC222|7');
+    expect(document.documentElement.dataset.sgTheme).toBe('lime');
+
+    rerender(
+      <AdsProviders>
+        <ThemeProbe />
+      </AdsProviders>
+    );
+    expect(screen.getByTestId('probe').textContent).toBe('#1A65FA|5');
+    expect(document.documentElement.dataset.sgTheme).toBeUndefined();
+  });
+
+  it('lets the inner (viewer-level) contribution win over the outer (site) one', () => {
+    // The RGPD/Layout nesting: site theme registers first, viewer theme
+    // second — the viewer's wins while mounted, the site's returns after.
+    const { rerender } = render(
+      <AdsProviders>
+        <Contribute entry={{ name: red.name, theme: red.theme }} />
+        <div>
+          <Contribute entry={{ name: lime.name, theme: lime.theme }} />
+        </div>
+        <ThemeProbe />
+      </AdsProviders>
+    );
+    expect(screen.getByTestId('probe').textContent).toBe('#9EC222|7');
+    expect(document.documentElement.dataset.sgTheme).toBe('lime');
+
+    rerender(
+      <AdsProviders>
+        <Contribute entry={{ name: red.name, theme: red.theme }} />
+        <ThemeProbe />
+      </AdsProviders>
+    );
+    expect(screen.getByTestId('probe').textContent).toBe('#C62828|5');
+    expect(document.documentElement.dataset.sgTheme).toBe('red');
   });
 });

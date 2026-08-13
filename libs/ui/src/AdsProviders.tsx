@@ -42,6 +42,10 @@ import { Notifications } from '@mantine/notifications';
 import 'dayjs/locale/pt';
 
 import { adsBaseTheme, adsCssVariablesResolver } from './theme/ads-mantine-theme';
+import {
+  ClientThemeRegistryProvider,
+  useClientThemeManager,
+} from './theme/client-theme-registry';
 import { registerUiTranslations } from './recipes/i18n';
 
 export interface AdsProvidersProps {
@@ -49,6 +53,11 @@ export interface AdsProvidersProps {
 }
 
 export function AdsProviders({ children }: AdsProvidersProps) {
+  // Client-theme channel (B2): a ThemeSelector deep in the tree registers
+  // the deploy's palette preset (or a theme module's override) here, and it
+  // must land on THIS provider — a nested MantineProvider would leave every
+  // body-portaled overlay (modals, dropdowns, toasts) on the base theme.
+  const { registry, active: activeClientTheme } = useClientThemeManager();
   // Follows the app language live (i18next); @mantine/dates runs on dayjs.
   // resolvedLanguage only materialises once translations for the language
   // are loaded (the shells init with resources:{} and add bundles after),
@@ -73,7 +82,7 @@ export function AdsProviders({ children }: AdsProvidersProps) {
     // ADS is a light-only system — a dark scheme would be its own spec,
     // not a client override (kit 05 §what this mapping does NOT do).
     <MantineProvider
-      theme={adsBaseTheme}
+      theme={activeClientTheme?.theme ?? adsBaseTheme}
       cssVariablesResolver={adsCssVariablesResolver}
       forceColorScheme="light"
     >
@@ -84,7 +93,9 @@ export function AdsProviders({ children }: AdsProvidersProps) {
         <ModalsProvider modalProps={{ centered: true, zIndex: 6000 }}>
           {/* ADS toast layer: z 7000, above dialogs (6000), below tooltips. */}
           <Notifications position="top-right" zIndex={7000} />
-          {children}
+          <ClientThemeRegistryProvider registry={registry}>
+            {children}
+          </ClientThemeRegistryProvider>
         </ModalsProvider>
       </DatesProvider>
     </MantineProvider>
