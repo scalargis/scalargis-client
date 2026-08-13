@@ -1,0 +1,36 @@
+/* =====================================================================
+   Brand chrome for the client-theme palette (Phase 4 / Batch 2).
+
+   Scoped under the data-sg-theme attribute the @scalargis/ui client-theme
+   registry stamps on <html> while a client theme is active — inert on the
+   default/ADS theme, and removing the attribute un-brands the chrome with
+   no stylesheet unloading (that is what makes ?theme= switching clean).
+
+   The chrome deliberately paints with the BRIGHT brand 500
+   (--mantine-color-primary-5, always the true brand hex in a preset), NOT
+   the AA-bumped primaryShade: topbar/footer/splash are brand surfaces and
+   this is how the real COScid/COSvgi deploys look. Interactive and text
+   surfaces take their colour from the Mantine theme at primaryShade
+   instead. Per-hue white-on-500 ratios are recorded in the adherence
+   kit's 06-theme-support.md — the two COS brights fail there by brand
+   decision; the sellable red/dark-green pass AA outright.
+   ===================================================================== */
+
+:root[data-sg-theme] .layout-topbar,
+:root[data-sg-theme] .layout-footer,
+:root[data-sg-theme] .splash-screen {
+  /* The shorthand also clears the default blue→black gradient image. */
+  background: var(--mantine-color-primary-5);
+}
+
+/* Per-theme brand font. The @fontsource/saira files ship with the
+   @scalargis/ui presets; being @font-face rules they only download when a
+   Saira theme is actually active. Mantine components take the family from
+   the theme object — this covers the shell chrome around them. A future
+   theme module carrying its own font should add the same kind of scoped
+   block in its own CSS. */
+:root[data-sg-theme='lime'] body,
+:root[data-sg-theme='cyan'] body {
+  font-family: Saira, 'Noto Sans', 'Roboto', 'Helvetica Neue', Helvetica,
+    Arial, sans-serif;
+}
