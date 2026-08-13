@@ -46,6 +46,14 @@ import MapToolButton from './MapToolButton'
 import ProgressControl from './ProgressControl'
 import ScriptHtmlContent from './ScriptHtmlContent'
 
+import PasswordRules, {
+  fetchPasswordPolicy,
+  resetPasswordPolicyCache,
+  usePasswordPolicy,
+  getPasswordRules,
+  validatePasswordAgainstPolicy
+} from './PasswordRules'
+
 import { 
   JsonForm, 
   JsonFormContext,
@@ -111,6 +119,13 @@ export {
   MapToolButton,
   ProgressControl,
   ScriptHtmlContent,
+
+  PasswordRules,
+  fetchPasswordPolicy,
+  resetPasswordPolicyCache,
+  usePasswordPolicy,
+  getPasswordRules,
+  validatePasswordAgainstPolicy,
 
   JsonForm,
   JsonFormContext,

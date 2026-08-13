@@ -4,9 +4,9 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { Alert, Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils, PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 
-import PasswordSuggestions from './PasswordSuggestions';
+import { getAppApiUrl } from '../utils';
 
 
 function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect }) {
@@ -16,6 +16,10 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
   const [username, setUsername] = useState();
   const [password, setPassword] = useState('');
   const [goRedirect, setGoRedirect] = useState(false);
+
+  // The server's password rules, fetched once — they drive both the live
+  // requirements checklist and the pre-submit check below.
+  const passwordPolicy = usePasswordPolicy(getAppApiUrl());
 
   // Enable redux actions
   const dispatch = useDispatch();
@@ -194,9 +198,22 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
           </div>
           <div>
             {/* Prime's Password strength meter and overlay footer have no
-                Mantine twin — the suggestions render below the field instead,
-                always visible; the visibility toggle stays. */}
-            <Controller name="newPassword" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
+                Mantine twin — the live requirements checklist renders below the
+                field instead; the visibility toggle stays. Both it and the
+                validate below come from the server's password_policy. */}
+            <Controller name="newPassword" control={control}
+                rules={{
+                    required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
+                    validate: (value) => {
+                        // Catches a non-compliant password before the API call.
+                        // No policy fetched → no verdict here; set_password decides.
+                        if (validatePasswordAgainstPolicy(passwordPolicy, value).length) {
+                            return i18nUtils.translateValue("password_policy_violation", "A palavra-passe não cumpre os requisitos de segurança.");
+                        }
+                        return true;
+                    }
+                }}
+                render={({ field, fieldState }) => (
                 <PasswordInput id={field.name} {...field}
                     label={i18nUtils.translateValue("newPassword", "Nova password")}
                     error={fieldState.invalid}
@@ -229,7 +246,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
             />
             {getFormValidationErrorMessage(errors, 'confirmPassword')}
 
-            <PasswordSuggestions />
+            <PasswordRules policy={passwordPolicy} password={watchFields[0]} />
 
             <Group justify="flex-end" mt="md" mb="md">
                 <Anchor component="button" type="button" className="font-medium"

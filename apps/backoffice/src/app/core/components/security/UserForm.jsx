@@ -20,6 +20,7 @@ import {
 import { DateTimePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { notify } from '@scalargis/ui';
+import { PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 import { v4 as uuidV4 } from 'uuid'
 
 import AppContext from '../../../AppContext';
@@ -38,18 +39,6 @@ const PASSWORD_SPECIAL = '!@#$%^&*()-_=+[]{}';
 // model keeps the Date the API/UserEdit hands over, so the saved payload is
 // unchanged (JSON-serialized UTC ISO, as before).
 const PICKER_FORMAT = 'YYYY-MM-DD HH:mm:ss';
-
-// Returns true when the password satisfies all platform complexity rules,
-// otherwise a pt-PT message naming the first failing rule.
-const validatePassword = (value) => {
-  if (!value) return true; // 'required' rule handles the empty case
-  if (!/[a-z]/.test(value)) return 'A password deve conter pelo menos uma minúscula.';
-  if (!/[A-Z]/.test(value)) return 'A password deve conter pelo menos uma maiúscula.';
-  if (!/[0-9]/.test(value)) return 'A password deve conter pelo menos um dígito.';
-  if (!/[^A-Za-z0-9]/.test(value)) return 'A password deve conter pelo menos um caractere especial.';
-  if (value.length < PASSWORD_MIN_LENGTH) return `A password deve ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`;
-  return true;
-};
 
 // Picks a random character from a set using crypto for unbiased selection.
 const randomChar = (set) => {
@@ -165,6 +154,12 @@ function UserForm(props) {
   const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
     defaultValues: {...data}
   });
+
+  // The server's password rules, shared with the viewer via @scalargis/components.
+  // They drive the live checklist and the pre-submit check below; the password
+  // is watched so the checklist ticks as it is typed.
+  const passwordPolicy = usePasswordPolicy(API_URL);
+  const password = watch('password');
 
   useEffect(() => {
     const params = {
@@ -349,7 +344,15 @@ function UserForm(props) {
               <Controller
                 control={control}
                 name="password"
-                rules={{ required: 'Campo obrigatório.', validate: validatePassword }}
+                rules={{
+                  required: 'Campo obrigatório.',
+                  // Catches a non-compliant password before the API call; no
+                  // policy fetched -> no verdict here, the server still decides.
+                  validate: (value) =>
+                    validatePasswordAgainstPolicy(passwordPolicy, value).length
+                      ? 'A password não cumpre os requisitos de segurança.'
+                      : true
+                }}
                 render={({ field }) => (
                   <PasswordInput
                     id="password"
@@ -362,26 +365,22 @@ function UserForm(props) {
                   />
                 )}
               />
-              <div className="flex align-items-center flex-wrap mt-2" style={{ gap: '0.5rem 1rem' }}>
-                <small className="text-500 line-height-3" style={{ maxWidth: '15rem' }}>
-                  Mínimo 12 caracteres, com maiúsculas, minúsculas, dígitos e símbolos.
-                </small>
-                <div className="flex align-items-end ml-auto" style={{ gap: '0.5rem' }}>
-                  <NumberInput
-                    label="Tamanho"
-                    value={passwordLength}
-                    onChange={setPasswordLength}
-                    min={PASSWORD_MIN_LENGTH} max={PASSWORD_MAX_LENGTH}
-                    style={{ width: '6rem' }}
-                  />
-                  <Button type="button" leftSection={<i className="pi pi-key" />}
-                    onClick={() => {
-                      const pwd = generatePassword(passwordLength);
-                      setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
-                      setRevealPassword(true);
-                    }}>Gerar</Button>
-                </div>
+              <div className="flex align-items-end justify-content-end flex-wrap mt-2" style={{ gap: '0.5rem' }}>
+                <NumberInput
+                  label="Tamanho"
+                  value={passwordLength}
+                  onChange={setPasswordLength}
+                  min={PASSWORD_MIN_LENGTH} max={PASSWORD_MAX_LENGTH}
+                  style={{ width: '6rem' }}
+                />
+                <Button type="button" leftSection={<i className="pi pi-key" />}
+                  onClick={() => {
+                    const pwd = generatePassword(passwordLength);
+                    setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
+                    setRevealPassword(true);
+                  }}>Gerar</Button>
               </div>
+              <PasswordRules policy={passwordPolicy} password={password} />
             </>
             :
             <Controller

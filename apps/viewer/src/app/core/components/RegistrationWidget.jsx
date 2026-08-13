@@ -3,10 +3,9 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { Alert, Anchor, Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils, PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 
-import { getFormValidationErrorMessage } from './../utils';
-import PasswordSuggestions from './PasswordSuggestions';
+import { getFormValidationErrorMessage, getAppApiUrl } from './../utils';
 
 
 function RegistrationWidget(props) {
@@ -30,6 +29,10 @@ function RegistrationWidget(props) {
 
     const { control, watch, formState: { errors }, handleSubmit } = useForm({ defaultRegistrationValues });
     const watchFields = watch(["password"]);
+
+    // The server's password rules, fetched once — they drive both the live
+    // requirements checklist and the pre-submit check below.
+    const passwordPolicy = usePasswordPolicy(getAppApiUrl());
 
 
     useEffect(() => {
@@ -83,12 +86,24 @@ function RegistrationWidget(props) {
                 {getFormValidationErrorMessage(errors, 'username')}
 
                 {/* Prime's Password strength meter (weak/medium/strong) had no
-                    Mantine twin. Rather than restore a meter that scored against
-                    its own regex (not the server's rule), the shared
-                    PasswordSuggestions block below states the real rules the
-                    server enforces. Client validation is unchanged (required
-                    only); set_password decides. */}
-                <Controller name="password" control={control} rules={{ required: i18nUtils.translateValue("requiredField", "Campo obrigatório") }} render={({ field, fieldState }) => (
+                    Mantine twin, and it scored against its own regex rather than
+                    the server's rule. The live PasswordRules checklist below
+                    states the real rules and ticks them as they are met, and the
+                    validate here pre-checks against the same fetched policy, so
+                    the form no longer has to submit to find out. register_user
+                    still decides. */}
+                <Controller name="password" control={control}
+                    rules={{
+                        required: i18nUtils.translateValue("requiredField", "Campo obrigatório"),
+                        validate: (value) => {
+                            // No policy fetched → no verdict here; the server rejects as before.
+                            if (validatePasswordAgainstPolicy(passwordPolicy, value).length) {
+                                return i18nUtils.translateValue("password_policy_violation", "A palavra-passe não cumpre os requisitos de segurança.");
+                            }
+                            return true;
+                        }
+                    }}
+                    render={({ field, fieldState }) => (
                     <PasswordInput id={field.name} {...field}
                         label="Password"
                         error={fieldState.invalid}
@@ -119,7 +134,7 @@ function RegistrationWidget(props) {
                 />
                 {getFormValidationErrorMessage(errors, 'confirmPassword')}
 
-                <PasswordSuggestions />
+                <PasswordRules policy={passwordPolicy} password={watchFields[0]} />
 
                 <div className="w-full mt-3 mb-1">
                     <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (

@@ -3,11 +3,10 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Group, Modal, PasswordInput } from '@mantine/core';
 import { notify } from '@scalargis/ui';
+import { PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 
 import dataProvider from '../../../service/DataProvider';
 
-
-const PASSWORD_RULES = 'Pelo menos 12 caracteres, com maiúsculas, minúsculas, dígitos e um caractere especial.';
 
 export default function PasswordChange(props) {
 
@@ -19,6 +18,10 @@ export default function PasswordChange(props) {
     const [isSaving, setIsSaving] = useState(false);
 
     const API_URL = core.API_URL;
+
+    // The server's password rules, shared with the viewer via
+    // @scalargis/components; drives the live checklist and the pre-submit check.
+    const passwordPolicy = usePasswordPolicy(API_URL);
 
     const fieldError = (errors, name) => {
         if (errors && errors[name]) {
@@ -92,11 +95,18 @@ export default function PasswordChange(props) {
                     autoComplete="off">
                         <div className="field">
                             <Controller name="newPassword" control={control}
-                                rules={{ required: "Campo obrigatório" }}
+                                rules={{
+                                    required: "Campo obrigatório",
+                                    // Catches a non-compliant password before the API call;
+                                    // no policy fetched -> no verdict, the server still decides.
+                                    validate: (value) =>
+                                        validatePasswordAgainstPolicy(passwordPolicy, value).length
+                                            ? 'A password não cumpre os requisitos de segurança.'
+                                            : true
+                                }}
                                 render={({ field }) => (
                                     <PasswordInput id={field.name}
                                         label="Nova password"
-                                        description={PASSWORD_RULES}
                                         value={field.value || ''}
                                         onChange={(e) => field.onChange(e.currentTarget.value)}
                                         error={fieldError(errors, 'newPassword')}
@@ -104,6 +114,7 @@ export default function PasswordChange(props) {
                                         data-autofocus />
                                 )}
                             />
+                            <PasswordRules policy={passwordPolicy} password={watchFields[0]} />
                         </div>
 
                         <div className="field">
