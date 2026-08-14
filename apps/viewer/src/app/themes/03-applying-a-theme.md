@@ -2,18 +2,20 @@
 
 A theme is applied by **name** — the folder name in this directory
 (`lime`, `cyan`, `red`, `dark-green`, `brown`, a client theme's name, or
-`default`). There are four places the name can come from; later ones win:
+`default`). There are three places the name can come from — config only,
+exactly as in the Prime-era builds; later ones win:
 
 | # | where | scope | wins over |
 |---|---|---|---|
 | 1 | `VITE_APP_DEFAULT_THEME` (build env) | whole build | — (it's the fallback) |
 | 2 | `SITE_CONFIG.theme` | whole site, incl. splash/login pages | 1 |
 | 3 | the viewer's `config_json.theme` | one viewer, while open | 1–2 |
-| 4 | `?theme=<name>` on the URL | that browser tab, until removed | everything |
 
-An unknown name falls back to `default` (and logs a console error). While
-a viewer with its own theme is open, that theme wins; close it and the
-site-level theme takes back over.
+There is deliberately no URL parameter or other runtime override: what a
+deploy is configured to look like is what everyone sees. An unknown name
+falls back to `default` (and logs a console error). While a viewer with
+its own theme is open, that theme wins; close it and the site-level theme
+takes back over.
 
 ## Per viewer — through the backoffice
 
@@ -60,18 +62,13 @@ VITE_APP_DEFAULT_THEME=cyan
 
 It's only the fallback for when neither SITE_CONFIG nor the viewer says
 anything — useful for single-brand deploys where the DB shouldn't need to
-carry the choice.
+carry the choice. In dev it doubles as the quickest way to look at a
+theme, since it needs no backoffice round-trip:
 
-## Preview — `?theme=` on any viewer
-
+```powershell
+$env:VITE_APP_DEFAULT_THEME = 'brown'
+npx nx serve viewer
 ```
-http://localhost:4200/mapa/mantine?theme=brown
-```
-
-Overrides everything, persists nothing, needs no permissions. This is the
-intended way to demo the palette to a client and to test a theme before
-wiring it into config. The mantine test viewer (`/mapa/mantine`) with each
-of the six names is the standard check.
 
 ## What about the backoffice app itself?
 
@@ -85,6 +82,6 @@ requirement.)
 
 The viewer form's **UI tab** has a *Style* editor (`custom_style`) that
 injects raw CSS when that one viewer loads. That's a per-viewer tweak
-layer, not a theme — it doesn't switch with `?theme=` and applies on top
-of whatever theme is active. See the note at the end of
+layer, not a theme — it doesn't switch with the theme and applies on top
+of whichever one is active. See the note at the end of
 [02](02-how-theming-works.md).

@@ -20,14 +20,16 @@ a theme name doesn't resolve).
 
 ## Try one right now
 
-Open any viewer and add `?theme=` to the URL:
+Set the build default and serve — no database involved:
 
-```
-http://localhost:4200/mapa/mantine?theme=red
+```powershell
+$env:VITE_APP_DEFAULT_THEME = 'red'
+npx nx serve viewer
 ```
 
-Nothing is saved — remove the parameter and the viewer is back to normal.
-To set a theme for real, see [03-applying-a-theme.md](03-applying-a-theme.md).
+Remove the variable, restart the serve, and the viewer is back to normal.
+The other two ways to select a theme — per viewer and site-wide, through
+the backoffice — are in [03-applying-a-theme.md](03-applying-a-theme.md).
 
 ## The shipped palette
 

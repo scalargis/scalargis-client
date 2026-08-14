@@ -95,14 +95,17 @@ genuinely yours — a logo, the font, a chrome detail.
 
 ## 5. Try it, then wire it
 
-```
-http://localhost:4200/mapa/mantine?theme=acme
+```powershell
+$env:VITE_APP_DEFAULT_THEME = 'acme'
+npx nx serve viewer
 ```
 
+(or set `"theme": "acme"` on a test viewer's `config_json` through the
+backoffice — the selection vectors are in [03](03-applying-a-theme.md)).
 Walk the chrome (topbar/footer/splash colour), a dialog and a dropdown
 (they should carry the brand — they portal to `<body>`), a filled button
-and a link (the `primaryShade` colour), and the map-button strip. Then set
-the name for real per [03](03-applying-a-theme.md).
+and a link (the `primaryShade` colour), and the map-button strip. Then
+wire the name into the target deploy per [03](03-applying-a-theme.md).
 
 ## Checklist
 
@@ -113,8 +116,8 @@ the name for real per [03](03-applying-a-theme.md).
 - [ ] font: family in the override **and** `@fontsource` imports **and**
       a scoped `body` rule (branded themes only)
 - [ ] every CSS rule scoped under `:root[data-sg-theme='<slug>']`
-- [ ] `?theme=<slug>` walkthrough: chrome, dialog, dropdown, button, link,
-      map strip
+- [ ] walkthrough with the theme configured ([03](03-applying-a-theme.md)):
+      chrome, dialog, dropdown, button, link, map strip
 - [ ] shipped themes only: preset added to `presets.ts` (the AA test now
       guards it) and a row in the README palette table
 
