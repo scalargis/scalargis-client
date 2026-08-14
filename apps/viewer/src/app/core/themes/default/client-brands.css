@@ -9,11 +9,11 @@
    The chrome deliberately paints with the BRIGHT brand 500
    (--mantine-color-primary-5, always the true brand hex in a preset), NOT
    the AA-bumped primaryShade: topbar/footer/splash are brand surfaces and
-   this is how the real COScid/COSvgi deploys look. Interactive and text
-   surfaces take their colour from the Mantine theme at primaryShade
-   instead. Per-hue white-on-500 ratios are recorded in the adherence
-   kit's 06-theme-support.md — the two COS brights fail there by brand
-   decision; the sellable red/dark-green pass AA outright.
+   this is how the bright-brand deploys have always looked. Interactive
+   and text surfaces take their colour from the Mantine theme at
+   primaryShade instead. Per-hue white-on-500 ratios are recorded in the
+   adherence kit's 06-theme-support.md — the two bright hues fail there by
+   brand decision; the red/dark-green presets pass AA outright.
    ===================================================================== */
 
 :root[data-sg-theme] .layout-topbar,

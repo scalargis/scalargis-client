@@ -1,6 +1,6 @@
 /* =====================================================================
-   createClientTheme — the ONLY way a client re-skin (themes/snic3,
-   themes/mapaspt — Phase 4) or a palette preset (theme/presets.ts — B2)
+   createClientTheme — the ONLY way a client re-skin (a themes/<name>
+   module — Phase 4) or a palette preset (theme/presets.ts — B2)
    derives its theme from the ADS base.
 
    The kit's override contract (ads-adherence-restrictions/
@@ -16,7 +16,7 @@
    more is an escalation, not a merge.
 
    THE FONT CLAUSE (B2, 2026-07-16 decision): a brand theme may carry
-   its own family (the Prime-era coscid/cosvgi shipped Saira), which
+   its own family (the Prime-era brand themes shipped Saira), which
    deviates from the ADS "typography immutable" rule. That is sanctioned
    ONLY because client-branded themes never claim ADS adherence — the
    default/ADS theme keeps ADS type, and a theme that wants the Selo

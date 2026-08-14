@@ -56,7 +56,7 @@ apps/backoffice/src/app/components/*
 # themes: per-deploy client mounts stay ignored, but the shipped palette
 # themes and the folder's README are product code (B2)
 apps/viewer/src/app/themes/*
-!apps/viewer/src/app/themes/README.md
+!apps/viewer/src/app/themes/*.md
 !apps/viewer/src/app/themes/lime
 !apps/viewer/src/app/themes/cyan
 !apps/viewer/src/app/themes/red
