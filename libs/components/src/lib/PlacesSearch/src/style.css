@@ -122,7 +122,9 @@
 }
 
 .layout-topbar .layout-topbar-icons .places-search-option.selected {
-  background: #e3f2fd;
+  /* Selected-option tint, not text: a low ramp index keeps it a wash the
+     dark option text stays readable on, and it follows the theme. */
+  background: var(--mantine-color-primary-1);
 }
 
 .layout-topbar .layout-topbar-icons .layout-topbar-search-results .place-list-item {

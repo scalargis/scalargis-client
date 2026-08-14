@@ -1,14 +1,16 @@
 /* The popup's locale selector sits on a white Modal, not the topbar:
-   undo the topbar nudge and repaint the old primary-blue look onto the
-   Mantine Select structure. */
+   undo the topbar nudge and paint the selector in the theme's own accent
+   on the Mantine Select structure. The colour follows primaryShade, so it
+   re-brands with the theme and clears 4.5:1 on the white Modal in every
+   preset — the literal it replaced was the Prime-era blue, fixed at 3.12. */
 
 .locale-selector.popupinfo-locale-selector {
   display: inline-block;
   margin-top: 0;
   margin-left: 0;
-  color: #2196f3;
+  color: var(--mantine-color-primary-filled);
 }
 
 .locale-selector.popupinfo-locale-selector input {
-  color: #2196f3;
+  color: var(--mantine-color-primary-filled);
 }

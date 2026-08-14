@@ -34,7 +34,11 @@ div.coordinates h4 {
 }
 
 .coordinates-item .coordinates-item-tools {
-  background: #2196f3;
+  /* The tools band carries white icons, so it follows the theme at the
+     AA-passing shade rather than a literal (the FeatureInfo band does the
+     same). --mantine-color-primary-filled resolves to each preset's
+     primaryShade: the bright hues land on their bumped shade 7. */
+  background: var(--mantine-color-primary-filled);
 }
 
 .coordinates-item .coordinates-item-tools button {
