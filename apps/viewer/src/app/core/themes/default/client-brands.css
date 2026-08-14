@@ -4,7 +4,7 @@
    Scoped under the data-sg-theme attribute the @scalargis/ui client-theme
    registry stamps on <html> while a client theme is active — inert on the
    default/ADS theme, and removing the attribute un-brands the chrome with
-   no stylesheet unloading (that is what makes ?theme= switching clean).
+   no stylesheet unloading (that is what makes theme switching clean).
 
    The chrome deliberately paints with the BRIGHT brand 500
    (--mantine-color-primary-5, always the true brand hex in a preset), NOT
