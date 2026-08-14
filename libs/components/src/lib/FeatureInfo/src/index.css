@@ -29,9 +29,12 @@
 }
 
 /* The band the result tools sit on: Prime's hardcoded #2196f3 becomes the
-   theme primary, so a client re-brand recolours it too. */
+   theme primary, so a client re-brand recolours it too. The -filled token
+   (primary at primaryShade) rather than a fixed index: this band carries
+   white TEXT, and primaryShade is the shade every theme guarantees AA for
+   — a fixed -6 fails white text on the bumped-shade brands (lime/cyan). */
 .feature-info .fi-result-table thead > tr > th {
-  background-color: var(--mantine-color-primary-6);
+  background-color: var(--mantine-color-primary-filled);
   color: var(--mantine-color-white);
 }
 

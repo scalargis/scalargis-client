@@ -5,6 +5,13 @@
      here — a class value would lose to Mantine's own root default. */
   box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%),
     0 1px 5px 0 rgb(0 0 0 / 12%);
+  /* Idle pins to primary-5, not the filled variant's primaryShade: the map
+     strip is BRAND chrome, and it must match the .ol-control buttons beside
+     it (mainmap.css), which idle at primary-5. On the default theme the two
+     are the same colour; on a bumped-shade brand theme (lime/cyan/brown
+     sit at primaryShade 7) the variant would go dark while the OL controls
+     stayed bright, splitting the strip in two. */
+  background-color: var(--mantine-color-primary-5);
 }
 
 /* Idle is primary-5 (from variant="filled"); the states climb the ADS action
