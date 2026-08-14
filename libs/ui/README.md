@@ -8,11 +8,15 @@ What lives here — and the only things allowed to (plan §1c anti-goal:
 
 - **`adsBaseTheme`** — the ADS-anchored base theme (living copy; the spec is
   the adherence kit at `references/projects/client/migration2/ads-adherence-restrictions/`).
-  Client themes may override `colors.primary`/`colors.secondary` (and, with
-  written justification, `primaryShade`) — nothing else. **`createClientTheme()`**
+  Client themes may override `colors.primary`/`colors.secondary`, with
+  written justification `primaryShade`, and — client-BRANDED themes only,
+  the B2 font clause — the font family. Nothing else. **`createClientTheme()`**
   is the only sanctioned way to build one: it merges over the base and throws
   on any key outside that contract, so the ADS-immutable boundary is enforced
-  by construction, not by review (kit 05 §override contract).
+  by construction, not by review (kit 06 §override contract, extending kit 05).
+  The shipped six-preset palette (`src/theme/presets.ts`, AA-gated by its
+  test) is the data behind the viewer's theme folders — the how-to for theme
+  authors is `apps/viewer/src/app/themes/README.md`.
 - **`AdsProviders`** — the single provider mount (MantineProvider + Dates +
   Modals + Notifications), used by both app shells. Shells must import their
   Prime global CSS *before* importing from this lib (CSS order rule).
