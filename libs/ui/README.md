@@ -20,6 +20,15 @@ What lives here — and the only things allowed to (plan §1c anti-goal:
 - **`AdsProviders`** — the single provider mount (MantineProvider + Dates +
   Modals + Notifications), used by both app shells. Shells must import their
   Prime global CSS *before* importing from this lib (CSS order rule).
+- **Motion** (`src/theme/motion.ts`) — the central animation control. All
+  durations/easings originate there: the theme states every overlay's
+  `transitionProps` off the tokens, and the resolver emits them as
+  `--sg-motion-*` CSS variables for hand-written CSS (both shells'
+  `$transitionDuration` reads them). `FORCE_REDUCED_MOTION` is the one-line
+  project switch (stamped as `data-sg-motion` on `<html>`, killed in
+  `ads-globals.css`); the OS `prefers-reduced-motion` path stays independent
+  and always wins. Durations must never be zeroed in JS — the Combobox
+  positioning gate needs its window; the module header has the full story.
 - **Recipes** (`src/recipes/`) — thin, pattern-level wrappers with the
   accessibility bar baked in, each covering a PrimeReact widget we actually
   use. Screens import these, not the underlying library:

@@ -185,8 +185,11 @@
   --shadow-bottom-higher: 0px 16px 16px 0px rgba(0, 0, 0, 0.32);
   --shadow-inner:         0px 4px 4px 0px rgba(0, 0, 0, 0.32) inset;
 
-  /* ─── TRANSITIONS ─────────────────────────────────── */
-  --transition-duration: 200ms;
+  /* ─── TRANSITIONS ─────────────────────────────────────
+     Per the kit spec (03 §9): the duration aliases onto the central
+     motion tokens (theme/motion.ts → --sg-motion-* via the resolver) so
+     kit-token consumers follow the one motion control. Same 200ms. */
+  --transition-duration: var(--sg-motion-normal, 200ms);
   --transition-easing:   ease-in-out;
   --transition-default:  all var(--transition-duration) var(--transition-easing);
 

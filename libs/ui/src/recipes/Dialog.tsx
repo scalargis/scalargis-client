@@ -31,6 +31,7 @@ import {
   type ModalRootProps,
 } from '@mantine/core';
 
+import { motionTransitionProps } from '../theme/motion';
 import { IconWindowMaximize, IconWindowMinimize } from './icons';
 import { uiText } from './i18n';
 
@@ -170,7 +171,9 @@ export function Dialog({
   }, []);
 
   // Modal.Root does not inherit the theme's `Modal` defaultProps (they only
-  // apply to the compound component), so the ADS dialog rung is restated here.
+  // apply to the compound component), so the ADS dialog rung is restated
+  // here — and the same goes for the motion default (pop, off the central
+  // tokens), stated before {...rootProps} so a call site can still override.
   const z = zIndex ?? theme.other?.zLadder?.dialog ?? 6000;
 
   return (
@@ -180,6 +183,7 @@ export function Dialog({
       centered={centered}
       zIndex={z}
       fullScreen={maximized}
+      transitionProps={motionTransitionProps.dialog}
       {...rootProps}
     >
       {withOverlay && <Modal.Overlay />}

@@ -1,5 +1,7 @@
 import React,  {useState, useEffect} from 'react'
 import { useTranslation } from "react-i18next"
+import { Transition } from '@mantine/core'
+import { motionDurations } from '@scalargis/ui'
 import classNames from 'classnames'
 import {AppTopbar} from './AppTopbar'
 import {AppTopbarEmbedded} from './AppTopbarEmbedded'
@@ -178,7 +180,12 @@ function Layout(props) {
 
         <div className="layout-mask"></div>
 
-        { !loaded && <LoadingScreen /> }
+        {/* mounted from the first render, so there is no enter animation —
+            only the exit fade over the ready map (pace: central motion
+            tokens; both reduced-motion paths make it effectively instant). */}
+        <Transition mounted={!loaded} transition="fade" duration={motionDurations.normal}>
+          {(transitionStyle) => <LoadingScreen style={transitionStyle} />}
+        </Transition>
 
         { (config && config.scripts) ? config.scripts.map((k, i) => {
             if (typeof k === 'object' && k !== null) {

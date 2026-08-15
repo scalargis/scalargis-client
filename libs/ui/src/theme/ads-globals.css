@@ -75,7 +75,17 @@
   --segmented-control-outline: 2px solid var(--ads-focus, #F408FC) !important;
 }
 
-/* ─── REDUCED MOTION (WCAG 2.3.3 / user preference) ──────────────────── */
+/* ─── REDUCED MOTION (WCAG 2.3.3 / user preference) ────────────────────
+   Two independent kill paths, same body (keep the bodies identical):
+   1. the OS preference below — always honoured, never overridable;
+   2. the project switch: :root[data-sg-motion='reduced'], stamped by
+      AdsProviders from FORCE_REDUCED_MOTION in theme/motion.ts — THE
+      central motion control. Everything that moves reads the motion
+      tokens (--sg-motion-*, emitted from the same module), so both
+      paths reduce the whole platform at once.
+   The 0.01ms !important beats Mantine's inline transition styles, which
+   is deliberate: the JS transition state machines keep their (invisible)
+   window — the Combobox positioning gate depends on it. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -96,6 +106,25 @@
     animation-duration: 0.8s !important;
     animation-iteration-count: infinite !important;
   }
+}
+
+/* The project-switch twin of the media block above (path 2 in the note).
+   CSS cannot OR a media query with a selector, hence the duplication. */
+:root[data-sg-motion='reduced'] *,
+:root[data-sg-motion='reduced'] *::before,
+:root[data-sg-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+:root[data-sg-motion='reduced'] .mantine-Loader-root,
+:root[data-sg-motion='reduced'] .mantine-Loader-root *,
+:root[data-sg-motion='reduced'] .mantine-Loader-root::before,
+:root[data-sg-motion='reduced'] .mantine-Loader-root::after {
+  animation-duration: 0.8s !important;
+  animation-iteration-count: infinite !important;
 }
 
 /* ─── BASE DOCUMENT — DEFERRED (see ACTIVATION in the header note) ─────

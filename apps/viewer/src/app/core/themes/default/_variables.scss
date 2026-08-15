@@ -5,7 +5,10 @@ $textColor:#333333;
 $textSecondaryColor:#707070;
 $borderRadius:0px;
 $dividerColor:#e3e3e3;
-$transitionDuration:.2s;
+/* Central motion token (libs/ui theme/motion.ts, emitted on :root by the
+   provider); fallback = the .2s this always was. Every chrome transition
+   built on this variable follows the one motion control. */
+$transitionDuration:var(--sg-motion-normal, 200ms);
 $maskBgColor:#424242;
 
 /* Menu Common */

@@ -126,6 +126,10 @@
 
             .layout-mask {
                 display: block;
+                // display:none→block cannot transition; the entry animation
+                // fades the backdrop up to its .7 opacity instead (keyframes
+                // in layout.scss, pace from the central motion tokens).
+                animation: sg-fade-in var(--sg-motion-normal, 200ms) var(--sg-motion-ease, ease);
             }
         }
     }

@@ -6,10 +6,11 @@ import { Progress } from '@mantine/core';
 // with a narrow section that a CSS keyframe sweeps across the track (the sweep is
 // re-stated under prefers-reduced-motion in layout.scss, since a frozen loading
 // bar reads as a hang). Progress.Root clips its sections, so the sweep is masked
-// at the track edges.
-function LoadingScreen(props) {
+// at the track edges. `style` comes from the Layout's exit <Transition> — the
+// screen fades out over the map instead of cutting.
+function LoadingScreen({ style }) {
   return (
-    <div className="loadingscreen">
+    <div className="loadingscreen" style={style}>
       <div>
         <Progress.Root size="sm" aria-label="loading">
           <Progress.Section value={30} className="loading-indeterminate-bar" />

@@ -43,6 +43,11 @@ import 'dayjs/locale/pt';
 
 import { adsBaseTheme, adsCssVariablesResolver } from './theme/ads-mantine-theme';
 import {
+  applyMotionPreference,
+  motionDurations,
+  motionTransitionProps,
+} from './theme/motion';
+import {
   ClientThemeRegistryProvider,
   useClientThemeManager,
 } from './theme/client-theme-registry';
@@ -75,6 +80,13 @@ export function AdsProviders({ children }: AdsProvidersProps) {
     if (activeLanguage) document.documentElement.lang = activeLanguage;
   }, [activeLanguage]);
 
+  // data-sg-motion on <html>: the project-level motion switch (theme/motion.ts
+  // — THE central control). ads-globals.css reduces all motion under
+  // "reduced"; the OS prefers-reduced-motion path works regardless.
+  React.useEffect(() => {
+    applyMotionPreference();
+  }, []);
+
   // Recipe default strings (scalargis_ui namespace) onto the host i18next.
   registerUiTranslations();
 
@@ -89,10 +101,22 @@ export function AdsProviders({ children }: AdsProvidersProps) {
       <DatesProvider settings={{ locale }}>
         {/* Modals opened imperatively (modals.openConfirmModal, our confirm()
             recipe) bypass the theme's Modal defaultProps — ModalsProvider
-            constructs them itself. Re-state the ADS ladder + centring here. */}
-        <ModalsProvider modalProps={{ centered: true, zIndex: 6000 }}>
-          {/* ADS toast layer: z 7000, above dialogs (6000), below tooltips. */}
-          <Notifications position="top-right" zIndex={7000} />
+            constructs them itself. Re-state the ADS ladder + centring here,
+            and the central motion default with them. */}
+        <ModalsProvider
+          modalProps={{
+            centered: true,
+            zIndex: 6000,
+            transitionProps: motionTransitionProps.dialog,
+          }}
+        >
+          {/* ADS toast layer: z 7000, above dialogs (6000), below tooltips.
+              Slide pace from the motion tokens (Prime's Toast entered at .3s). */}
+          <Notifications
+            position="top-right"
+            zIndex={7000}
+            transitionDuration={motionDurations.slow}
+          />
           <ClientThemeRegistryProvider registry={registry}>
             {children}
           </ClientThemeRegistryProvider>

@@ -4,6 +4,16 @@ export type { AdsProvidersProps } from './AdsProviders';
 export { adsBaseTheme, adsCssVariablesResolver } from './theme/ads-mantine-theme';
 export type { AdsBaseTheme } from './theme/ads-mantine-theme';
 
+/* Motion — the central animation control (see theme/motion.ts). */
+export {
+  FORCE_REDUCED_MOTION,
+  applyMotionPreference,
+  motionCssVariables,
+  motionDurations,
+  motionEasing,
+  motionTransitionProps,
+} from './theme/motion';
+
 export { createClientTheme } from './theme/client-theme';
 export type { ClientThemeOverride } from './theme/client-theme';
 

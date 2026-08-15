@@ -26,6 +26,12 @@ import {
   type MantineColorsTuple,
 } from '@mantine/core';
 
+import {
+  motionCssVariables,
+  motionDurations,
+  motionTransitionProps,
+} from './motion';
+
 /* ─── ROOT FONT-SIZE COMPENSATION ──────────────────────────────────
    The viewer/backoffice shells pin `html { font-size: 14px }` (viewer
    apps/viewer/src/app/core/themes/default/layout.scss, loaded on every
@@ -231,6 +237,15 @@ export const adsBaseTheme = createTheme({
     // Bigger hit area for icon-only controls. Callers MUST pass aria-label.
     ActionIcon: { defaultProps: { size: 'lg' } },
 
+    /* ─── MOTION (see theme/motion.ts — THE central control) ────────
+       Every overlay's enter/exit transition is stated here, off the
+       motion tokens, so no call site ever hardcodes a duration. Mantine
+       would animate most of these by default anyway; making them
+       explicit is what puts them under the one switch. */
+    Collapse: {
+      defaultProps: { transitionDuration: motionDurations.normal },
+    },
+
     /* ─── ADS z-index ladder (kit 03 §8) ───────────────────────────
        Mantine's own defaults (popover 300, modal 200) sit far below the
        ladder and would render under app chrome — and, during the
@@ -240,10 +255,22 @@ export const adsBaseTheme = createTheme({
         zIndex: 6000,
         // Prime's Dialog is viewport-centred; Mantine's Modal is top-anchored.
         centered: true,
+        // Scale-in like Prime's Dialog (Mantine default is fade-down).
+        transitionProps: motionTransitionProps.dialog,
       },
     },
-    Drawer: { defaultProps: { zIndex: 5000 } },
-    Tooltip: { defaultProps: { zIndex: 8000 } },
+    Drawer: {
+      defaultProps: {
+        zIndex: 5000,
+        transitionProps: motionTransitionProps.drawer,
+      },
+    },
+    Tooltip: {
+      defaultProps: {
+        zIndex: 8000,
+        transitionProps: motionTransitionProps.tooltip,
+      },
+    },
     /* Transient dropdown overlays (Popover/Menu/Combobox/Select/HoverCard)
        ride ABOVE the dialog rung, not on the ADS --z-dropdown token (1000).
        Reason: Mantine portals these to document.body, so a Select opened
@@ -257,8 +284,20 @@ export const adsBaseTheme = createTheme({
     // (F2 mounts one in the topbar) or Popover on the default 'absolute' strategy
     // positions in document coordinates and, on the frame before floating-ui
     // measures it, extends the document: scrollbars appear, the map reflows.
-    Popover: { defaultProps: { zIndex: 6100, floatingStrategy: 'fixed' } },
-    Menu: { defaultProps: { zIndex: 6100, floatingStrategy: 'fixed' } },
+    Popover: {
+      defaultProps: {
+        zIndex: 6100,
+        floatingStrategy: 'fixed',
+        transitionProps: motionTransitionProps.dropdown,
+      },
+    },
+    Menu: {
+      defaultProps: {
+        zIndex: 6100,
+        floatingStrategy: 'fixed',
+        transitionProps: motionTransitionProps.menu,
+      },
+    },
     /* Popover's centred `bottom` default makes x depend on the panel's own
        width, which Combobox measures as 0 while the dropdown is display:none —
        hence bottom-start. Where it opens is then floating-ui's call: `flip`
@@ -288,11 +327,19 @@ export const adsBaseTheme = createTheme({
            at opacity:0 ('pre-entering'); it gains height, gets remeasured and
            repositioned INSIDE that invisible window, so it is never seen
            mispositioned. Do NOT "optimise" this back to 0 — the jump returns.
-           (respectReducedMotion is false, so this holds for every user.) */
-        transitionProps: { transition: 'fade', duration: 120 },
+           (respectReducedMotion is false, so this holds for every user.)
+           The 120 is motionDurations.fast — same value, now sourced from the
+           central tokens; motion.ts documents why it must stay > 0 even when
+           motion is switched off (the kill is CSS-side). */
+        transitionProps: { transition: 'fade', duration: motionDurations.fast },
       },
     },
-    HoverCard: { defaultProps: { zIndex: 6100 } },
+    HoverCard: {
+      defaultProps: {
+        zIndex: 6100,
+        transitionProps: motionTransitionProps.dropdown,
+      },
+    },
   },
 
   /* ─── ESCAPE HATCH: raw ADS tokens for hand-written CSS ─────────── */
@@ -306,7 +353,7 @@ export const adsBaseTheme = createTheme({
       dropdown: 1000, backdrop: 2000, sticky: 3000, fixed: 4000,
       drawer: 5000, dialog: 6000, toast: 7000, tooltip: 8000,
     },
-    transition: 'all 200ms ease-in-out',
+    transition: `all ${motionDurations.normal}ms ease-in-out`,
   },
 });
 
@@ -322,7 +369,12 @@ export type AdsBaseTheme = typeof adsBaseTheme;
    Passed to <MantineProvider cssVariablesResolver={...}> in AdsProviders.
    ------------------------------------------------------------------ */
 export const adsCssVariablesResolver: CSSVariablesResolver = () => ({
-  variables: {},
+  // Motion tokens (theme/motion.ts) surfaced to hand-written CSS: the shell
+  // sass and the component stylesheets transition on var(--sg-motion-*), so
+  // one TS module stays the single source of truth for every duration.
+  // Emitted per-provider but theme-independent — identical for all client
+  // themes, which is what keeps motion consistent across the six presets.
+  variables: { ...motionCssVariables },
   light: {
     // Mantine default: gray-6 (#8893AA) = 3.1:1 on white. The kit rates that
     // "AA large/UI only — never body text" (02 §verified pairings), yet it is

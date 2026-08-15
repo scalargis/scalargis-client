@@ -12,6 +12,35 @@
    calc(... * var(--mantine-scale)), the same way Mantine's rem() does.
    ===================================================================== */
 
+/* ─── Hover feedback (motion tokens — see theme/motion.ts) ─────────────
+   Prime's theme transitioned every control's colours (.p-button et al.,
+   background/color/shadow .2s); Mantine paints hover states with no
+   transition at all, which is a large part of why converted screens read
+   as static. One zero-specificity rule restores the soft colour hover on
+   the interactive surfaces that snap. :where() keeps it overridable by
+   anything, and a transition can never change a final style. Deliberately
+   NOT included: SegmentedControl/Switch/Checkbox (they animate their own
+   indicator) and the focus ring (outline stays instant — a keyboard user
+   should never wait for their focus marker). Both reduced-motion paths in
+   ads-globals.css zero this like everything else.
+   -------------------------------------------------------------------- */
+:where(
+  .mantine-Button-root,
+  .mantine-ActionIcon-root,
+  .mantine-CloseButton-root,
+  .mantine-NavLink-root,
+  .mantine-Menu-item,
+  .mantine-Tabs-tab,
+  .mantine-Pagination-control,
+  .ads-tree__node
+) {
+  transition:
+    background-color var(--sg-motion-fast, 120ms) var(--sg-motion-ease, ease),
+    color var(--sg-motion-fast, 120ms) var(--sg-motion-ease, ease),
+    border-color var(--sg-motion-fast, 120ms) var(--sg-motion-ease, ease),
+    box-shadow var(--sg-motion-fast, 120ms) var(--sg-motion-ease, ease);
+}
+
 /* ─── Button ───────────────────────────────────────────────────────────
    Mantine trims the padding on a side that carries a section to
    padding-x / 1.5, so an icon+label button sits visibly tighter on the

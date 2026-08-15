@@ -15,7 +15,10 @@
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
-    @include m.transition(left v.$transitionDuration);
+    // width joins left: desktop static mode toggles the sidebar 400px↔55px
+    // by WIDTH (sass/_responsive.scss), and with only `left` transitioned the
+    // mainmenu panel snapped shut while topbar/main/footer margins slid.
+    @include m.transition(left v.$transitionDuration, width v.$transitionDuration);
     @include m.shadow(0 0 6px 0 rgba(0, 0, 0, 0.16));
 
     .layout-logo {

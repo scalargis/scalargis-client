@@ -59,6 +59,21 @@ describe('AdsProviders <html lang>', () => {
   });
 });
 
+describe('AdsProviders motion switch', () => {
+  // The delivery half of the central motion control (theme/motion.ts):
+  // ads-globals.css keys its project-level reduced-motion block on this
+  // attribute, so an unstamped document would make the switch a no-op.
+  it('stamps the project motion preference on <html>', () => {
+    render(
+      <AdsProviders>
+        <span>content</span>
+      </AdsProviders>
+    );
+
+    expect(document.documentElement.dataset.sgMotion).toBe('full');
+  });
+});
+
 /* ─── client-theme registry ──────────────────────────────────────────── */
 
 function Contribute({ entry }: { entry: ClientThemeEntry | null | undefined }) {

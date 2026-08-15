@@ -10,7 +10,12 @@
 import { DEFAULT_THEME, mergeThemeOverrides, type MantineTheme } from '@mantine/core';
 import { describe, expect, it } from 'vitest';
 
-import { adsBaseTheme } from './ads-mantine-theme';
+import { adsBaseTheme, adsCssVariablesResolver } from './ads-mantine-theme';
+import {
+  motionCssVariables,
+  motionDurations,
+  motionTransitionProps,
+} from './motion';
 
 /** The theme as MantineProvider will actually see it. */
 const theme = mergeThemeOverrides(DEFAULT_THEME, adsBaseTheme) as MantineTheme;
@@ -198,5 +203,60 @@ describe('overlay ladder (kit 03 §8)', () => {
     expect(theme.components.Combobox?.defaultProps).toMatchObject({
       transitionProps: { transition: 'fade', duration: 120 },
     });
+  });
+});
+
+/* ─── Motion (theme/motion.ts — THE central control) ─────────────────── */
+
+describe('central motion control', () => {
+  // Reduced motion is a CSS-side kill (ads-globals.css); the JS numbers must
+  // never be zeroed — the Combobox gate above positions dropdowns inside its
+  // non-zero transition window. A 0 here would resurrect that mispaint.
+  it('keeps every JS duration above zero', () => {
+    for (const duration of Object.values(motionDurations)) {
+      expect(duration).toBeGreaterThan(0);
+    }
+    for (const props of Object.values(motionTransitionProps)) {
+      expect(props.duration).toBeGreaterThan(0);
+    }
+  });
+
+  // Every overlay's transition is stated in the theme OFF the tokens, so no
+  // component ships a duration of its own — the whole point of the control.
+  it('drives every overlay transition from the motion tokens', () => {
+    expect(theme.components.Modal?.defaultProps?.transitionProps).toEqual(
+      motionTransitionProps.dialog
+    );
+    expect(theme.components.Drawer?.defaultProps?.transitionProps).toEqual(
+      motionTransitionProps.drawer
+    );
+    expect(theme.components.Popover?.defaultProps?.transitionProps).toEqual(
+      motionTransitionProps.dropdown
+    );
+    expect(theme.components.Menu?.defaultProps?.transitionProps).toEqual(
+      motionTransitionProps.menu
+    );
+    expect(theme.components.HoverCard?.defaultProps?.transitionProps).toEqual(
+      motionTransitionProps.dropdown
+    );
+    expect(theme.components.Tooltip?.defaultProps?.transitionProps).toEqual(
+      motionTransitionProps.tooltip
+    );
+    expect(theme.components.Combobox?.defaultProps?.transitionProps).toEqual({
+      transition: 'fade',
+      duration: motionDurations.fast,
+    });
+    expect(theme.components.Collapse?.defaultProps?.transitionDuration).toBe(
+      motionDurations.normal
+    );
+  });
+
+  // The CSS half: hand-written transitions (shell sass, ads-components.css)
+  // read var(--sg-motion-*), emitted by the resolver on :root for every
+  // client theme alike.
+  it('emits the tokens as --sg-motion-* CSS variables', () => {
+    const resolved = adsCssVariablesResolver(theme);
+    expect(resolved.variables).toMatchObject(motionCssVariables);
+    expect(motionCssVariables['--sg-motion-normal']).toBe('200ms');
   });
 });

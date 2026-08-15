@@ -206,6 +206,28 @@ body .p-dropdown {
   // bar puts its buttons hard against the right edge; the inset buys the ring
   // room to paint. #content, one level up, already has 5px and is fine.
   padding-inline: 4px;
+  // Panels show/hide via `display` (MainMenu.jsx getStyle + the inactive rule
+  // below), which cannot transition — an entry animation gives the swap its
+  // motion instead: it (re)runs whenever a panel joins the render tree, i.e.
+  // on menu open and on switching between menu entries. Exit stays instant by
+  // design. Driven by the central motion tokens; both reduced-motion paths in
+  // ads-globals.css zero it.
+  animation: sg-panel-in var(--sg-motion-normal, 200ms) var(--sg-motion-ease, ease);
+}
+
+@keyframes sg-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+}
+
+/* Shared entry fade — used by the mobile menu backdrop (sass/_responsive.scss);
+   animates from 0 up to whatever opacity the element ends at. */
+@keyframes sg-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #content {
@@ -592,12 +614,18 @@ body .p-multiselect {
 
 /* The global reduced-motion kill (ads-globals.css) freezes animations; a frozen
    loading bar reads as a hang, so re-state the sweep as that block does for the
-   Loader. */
+   Loader — under both kill paths: the OS preference and the project switch
+   (data-sg-motion, from the central control in libs/ui theme/motion.ts). */
 @media (prefers-reduced-motion: reduce) {
   .loadingscreen .loading-indeterminate-bar {
     animation-duration: 1.2s !important;
     animation-iteration-count: infinite !important;
   }
+}
+
+:root[data-sg-motion='reduced'] .loadingscreen .loading-indeterminate-bar {
+  animation-duration: 1.2s !important;
+  animation-iteration-count: infinite !important;
 }
 
 /* Menu-mode rows — the old hand-written p-menuitem-link markup, swept at the
@@ -616,6 +644,7 @@ body .p-multiselect {
   padding: 0.5rem 0.75rem;
   color: var(--mantine-color-text);
   text-decoration: none;
+  transition: background-color var(--sg-motion-fast, 120ms) var(--sg-motion-ease, ease);
 }
 
 .sg-menuitem:hover {
