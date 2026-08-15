@@ -101,8 +101,9 @@ never carries overrides at all.
 **Yes, a theme can ship CSS** — that never went away. Anything visual the
 theme object doesn't cover, a scoped stylesheet can: chrome backgrounds,
 logos, per-widget tweaks. The shipped bright themes use it for the Saira
-body font; the default chrome itself uses it to paint the topbar, footer and
-splash from `--mantine-color-primary-5` whenever any theme is active
+body font; the default chrome itself uses it to paint the topbar and footer
+from `--mantine-color-primary-5` (into near-black) and to tint the RGPD
+splash at `primary-2` whenever any theme is active
 (`core/themes/default/client-brands.css`).
 
 Mechanically this tier is unrestricted — Mantine exposes its whole design

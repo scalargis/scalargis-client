@@ -83,16 +83,25 @@ ADS type, and a theme that must claim ADS adherence must not set a font.
 :root[data-sg-theme='acme'] body {
   font-family: Saira, 'Noto Sans', sans-serif;
 }
-:root[data-sg-theme='acme'] .splash-screen {
+:root[data-sg-theme='acme'] .splashscreen {
   background-image: url(...);
 }
 ```
 
 You get the basics for free whenever your theme is active
 (`core/themes/default/client-brands.css`): the topbar and footer run your
-`primary-5` into near-black, and the map-button strip takes your
-`primary-5`. Only add CSS for what's genuinely yours — a logo, the font, a
-chrome detail.
+`primary-5` into near-black, the map-button strip takes your `primary-5`,
+and the RGPD splash tints at your `primary-2`. Only add CSS for what's
+genuinely yours — a logo, the font, a chrome detail.
+
+Check your selectors against the live DOM, not against the old stylesheets.
+The Prime-era `sass/` files are still in the tree and some of their classes
+are dead: `.splash-screen` was the old *loading* splash (today it's
+`.loadingscreen`, which brands itself through the Mantine progress bar),
+while the RGPD card is `.splashscreen`, no hyphen. A rule aimed at a dead
+class fails silently — no build error, no console warning, just chrome that
+never changes. That is exactly how this system shipped a splash nobody
+noticed was unbranded.
 
 ### Flat chrome, if the client wants it
 

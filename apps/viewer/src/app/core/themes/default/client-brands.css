@@ -45,8 +45,19 @@
   );
 }
 
-:root[data-sg-theme] .splash-screen {
-  background: var(--mantine-color-primary-5);
+/* The RGPD splash takes a tint from the top of the brand ramp, not the 500.
+   It is a white card on an open field: the 500 there reads as a full-bleed
+   brand wash and overwhelms the card, so the brand registers at primary-2
+   and the card keeps the page. Nothing here carries text — the copy all
+   sits inside the card — so this is a look decision, not a contrast one.
+
+   Note for anyone tracing history: this surface is NOT the Prime-era
+   .splash-screen. That class was the old LOADING splash (a gradient with
+   two bouncing dots); its successor is .loadingscreen, which already brands
+   itself through the Mantine progress bar. The RGPD card has never carried
+   a brand background in any era — this paints it for the first time. */
+:root[data-sg-theme] .splashscreen {
+  background: var(--mantine-color-primary-2);
 }
 
 /* Per-theme brand font. The @fontsource/saira files ship with the
