@@ -113,9 +113,16 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
     // Add event
     dragBoxInteraction.on('boxend', zoomToBox);
+
+    // mainMap is a module singleton that outlives this component, so remove
+    // exactly what this effect added - a remount would stack a duplicate set
+    // and each extra DragPan multiplies the pan. The module vars are
+    // reassigned by the next mount, so capture this run's collections.
+    const addedControls = mapControls;
+    const addedInteractions = mapInteractions;
     return () => {
-      if (dragBoxInteraction) mainMap.removeInteraction(dragBoxInteraction);
-      if (zoomToExtentControl) mainMap.removeControl(zoomToExtentControl);
+      addedInteractions.forEach(i => mainMap.removeInteraction(i));
+      addedControls.forEach(c => mainMap.removeControl(c));
     }
   }, [mainMap, viewer?.loaded]);
 
