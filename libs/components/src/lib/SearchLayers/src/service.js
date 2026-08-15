@@ -157,9 +157,10 @@ export const getFeatures = async (options) => {
             conditions.push(equalToFilter(key, value));
           } else {
             // Wrap in wildcards so a bare term is a case-insensitive "contains"
-            // (matchCase already false). NOTE: shared with snic3/mapaspt — this
-            // widens their search semantics too. singleChar '.' / escapeChar '!'
-            // already read a dotted value as a pattern; wrapping only broadens.
+            // (matchCase already false). NOTE: this module is shared by the
+            // deploys' own search panels — the change widens their semantics
+            // too. singleChar '.' / escapeChar '!' already read a dotted value
+            // as a pattern; wrapping only broadens.
             conditions.push(likeFilter(key, `*${value}*`, '*', '.','!', false));
           }
         } else {

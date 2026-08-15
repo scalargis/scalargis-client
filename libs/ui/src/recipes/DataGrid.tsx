@@ -54,9 +54,9 @@ export type DataGridColumn<T> = DataTableColumn<T> & {
  * (grouped header rows). DataGrid supports the `columns` branch only, because
  * carrying the union through makes every call site's props unassignable.
  *
- * ONE in-scope consumer does use grouped headers today: SNICCart's
- * MonitoringList.jsx (`headerColumnGroup`). When that screen migrates
- * (Phase 4), extend DataGrid with a `groups` variant — do not work around
+ * ONE in-scope consumer does use grouped headers today: a decoupled
+ * component's monitoring list (`headerColumnGroup`). When that screen
+ * migrates, extend DataGrid with a `groups` variant — do not work around
  * the recipe at the call site. Recorded in qa/phase-1.md.
  */
 export type DataGridProps<T> = Omit<DataTableProps<T>, 'columns' | 'groups'> & {

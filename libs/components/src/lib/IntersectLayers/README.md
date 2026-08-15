@@ -6,7 +6,9 @@ tema — o que cruza com essa geometria, com área/comprimento e percentagem por
 **barra de menu esquerda** (é um `MainMenuButton`, não tem slot próprio) e está registado em
 `libs/components/src/lib/components.tsx`.
 
-Este é o IntersectLayers **de base**, não o do MapasPT.
+Este é o IntersectLayers **de base**. Há deploys que embarcam uma variante própria como componente
+desacoplado — se estás a debugar um comportamento que não existe aqui, confirma primeiro qual dos dois
+o viewer monta.
 
 - `src/Main.jsx` — o `MainMenu` (botão) e o `default` (o painel)
 - `src/Intersect.jsx` — cria a camada OL `intersect` e aplica os `styles`

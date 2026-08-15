@@ -48,7 +48,7 @@ const ADS_BASE_FONT_SIZE = 16;
 
 /* ─── PALETTES (ADS 50→900 == Mantine tuple index 0→9) ─────────────── */
 
-// BRANDABLE — a client theme (snic3, mapaspt) may override these two only.
+// BRANDABLE — a client theme may override these two only.
 const primary: MantineColorsTuple = [
   '#FAFCFF', '#F2F6FF', '#E5EEFF', '#BBD1FD', '#5F93FC',
   '#1A65FA', '#034AD8', '#0338A2', '#002B82', '#021C51',

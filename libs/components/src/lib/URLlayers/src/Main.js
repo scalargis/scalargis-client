@@ -23,7 +23,7 @@ const addLayer = (data, dispatch, actions, viewer) => {
         active: false,
         open: false,
         opacity: 1,
-        url: data.url, //"https://demo.scalargis.wkt.pt/geoserver/wms",
+        url: data.url, //"https://geo.example.com/geoserver/wms",
         layers: data.layers || "", //"cm_castro_verde:cadastralparcel",
         children: [],
         servertype: data.servertype || "geoserver",

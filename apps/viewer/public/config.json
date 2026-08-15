@@ -350,7 +350,7 @@
         "tiled": true,
         "title": "São Brás de Alportel",
         "type": "WMS",
-        "url": "https://dgt.wkt.pt/geoserver/cp/wms?",
+        "url": "https://geo.example.com/geoserver/cp/wms?",
         "version": "1.3.0",
         "legend_type": "wms",
         "selectable": true,
@@ -361,7 +361,7 @@
         "get_map_formats": "image/jpeg,image/png",
         "datasource": {
           "type": "WFS",
-          "url": "https://dgt.wkt.pt/geoserver/cp/wfs?",
+          "url": "https://geo.example.com/geoserver/cp/wfs?",
           "typeNames": "cp:mv_0812_publicar",
           "geomName": "the_geom",
           "crs": "EPSG:3763"
