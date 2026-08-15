@@ -132,7 +132,11 @@
   
   .layercompare-control .layercompare-legend-control .layercompare-legend-control-button {
     color: white;
-    background-color: rgb(158 194 34);
+    /* Was rgb(158 194 34) — one client's brand hex hardcoded into a shared
+       component, so every other deploy's legend button came out lime, and
+       white on it is 2.06:1. It is an interactive control, so it takes the
+       theme at primaryShade like every other filled control. */
+    background-color: var(--mantine-color-primary-filled);
     border-radius: 4px;
   }
   
