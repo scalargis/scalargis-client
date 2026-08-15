@@ -52,9 +52,11 @@ A brand's true colour is often too light for white text (`#9EC222` lime on
 white is ~2:1 — far below the 4.5:1 accessibility floor). The old themes
 ignored that; this system splits the problem:
 
-- **Brand chrome** — topbar, footer, splash, the map-button strip — always
-  paints with the *true* brand colour (tuple index 5, `primary-5`). This is
-  what makes a lime deploy look lime.
+- **Brand chrome** — topbar, footer, the map-button strip — carries the
+  *true* brand colour (tuple index 5, `primary-5`). This is what makes a
+  lime deploy look lime. The topbar and footer run it as a gradient into
+  near-black, mirroring the ADS chrome: the bar opens on the real brand hex
+  and darkens to the right, where the white readouts sit.
 - **Interactive surfaces** — filled buttons, links, text accents — follow
   **`primaryShade`**: index 5 when the brand passes the contrast check,
   a darker index (usually 7) when it doesn't.
@@ -63,6 +65,13 @@ For dark-enough brands the two are the same colour and you never notice.
 For bright brands the topbar stays bright while buttons darken to stay
 readable. The shipped ratios are locked by a test
 (`libs/ui/src/theme/presets.test.ts`) that fails if a tuple changes.
+
+The split has a limit worth knowing, because it is where this system's one
+real bug came from: **the chrome deviation covers chrome, not text that
+happens to sit on chrome.** A bright `primary-5` is a fine bar; it is not a
+fine background for the 14px readout in the footer's corner. That is why the
+chrome gradient ends dark rather than staying flat — the text pinned to that
+corner needs a substrate the brand cannot be trusted to provide.
 
 ## What a theme can and cannot change
 
@@ -92,7 +101,7 @@ never carries overrides at all.
 **Yes, a theme can ship CSS** — that never went away. Anything visual the
 theme object doesn't cover, a scoped stylesheet can: chrome backgrounds,
 logos, per-widget tweaks. The shipped bright themes use it for the Saira
-body font; the default chrome itself uses it to paint the topbar/footer/
+body font; the default chrome itself uses it to paint the topbar, footer and
 splash from `--mantine-color-primary-5` whenever any theme is active
 (`core/themes/default/client-brands.css`).
 

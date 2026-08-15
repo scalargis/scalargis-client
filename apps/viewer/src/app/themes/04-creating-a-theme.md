@@ -88,10 +88,38 @@ ADS type, and a theme that must claim ADS adherence must not set a font.
 }
 ```
 
-You get the basics for free: the topbar, footer and splash already paint
-with your `primary-5` whenever your theme is active
-(`core/themes/default/client-brands.css`). Only add CSS for what's
-genuinely yours — a logo, the font, a chrome detail.
+You get the basics for free whenever your theme is active
+(`core/themes/default/client-brands.css`): the topbar and footer run your
+`primary-5` into near-black, and the map-button strip takes your
+`primary-5`. Only add CSS for what's genuinely yours — a logo, the font, a
+chrome detail.
+
+### Flat chrome, if the client wants it
+
+The gradient is a default, not a rule. Your theme's stylesheet loads after
+`client-brands.css` at the same specificity, so a flat bar is one rule:
+
+```css
+:root[data-sg-theme='acme'] .layout-topbar,
+:root[data-sg-theme='acme'] .layout-footer {
+  background: var(--mantine-color-primary-5);
+}
+```
+
+**One condition, and it is the reason the default has a gradient at all.**
+The footer's right corner holds the coordinate readout and the topbar holds
+the locale picker — both white text at 14–16px, i.e. text people read, not
+chrome. The gradient's dark end is what makes them legible. Flatten the bar
+and they inherit your brand 500: fine at `#C62828` (5.62:1), illegible at
+`#9EC222` (2.06:1). So flat is yours to take **if your brand 500 carries
+white text at 4.5:1** — check yours in the table in the README. If it
+doesn't, keep the gradient, or give those two corners their own dark
+substrate; what you cannot do is flatten a light brand and leave the text
+on it. That exact move is the bug this system shipped and had to fix.
+
+Use an opaque colour. A translucent stop composites against whatever is
+behind — and the footer is `position: fixed` over the map, so "behind" is
+the basemap, which the user pans.
 
 ## 5. Try it, then wire it
 
