@@ -422,10 +422,12 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
       <div style={{ height: '100%' }}>
         <div id="map-tools" className="plugin-main p-2">
           
-          {/* The pair takes the ~288px panel's width and splits it: the ADS md
-              baseline spends ~180px per button and cut the labels. sm + xs
-              padding fits "Medir Distância"; a longer locale ellipsizes, hence
-              the title. */}
+          {/* The pair splits the 400px sidebar between two buttons. At the sm
+              font "Medir Distância" fits with room at 100%, but the generous
+              icon gap left it close enough to the edge that fractional zoom
+              tipped it into the ellipsis. ads-btn-tight trims that gap (+ px
+              "xs") so both labels stay on one line, side by side, at full size
+              across zoom levels — no font shrink. */}
           <Button.Group w="100%">
             {controlOptions.map(option => (
               <Button
@@ -433,8 +435,8 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
                 type="button"
                 size="sm"
                 px="xs"
+                className="ads-btn-tight"
                 style={{ flex: 1 }}
-                title={option.label}
                 variant={selectedControl === option.key ? 'filled' : 'default'}
                 aria-pressed={selectedControl === option.key}
                 leftSection={<i className={option.icon} aria-hidden="true" />}

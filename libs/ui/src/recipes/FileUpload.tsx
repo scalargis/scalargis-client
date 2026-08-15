@@ -143,8 +143,19 @@ export function FileUpload({
 
   return (
     <Box>
-      <Group className="ads-fileupload__toolbar" gap="xs">
+      {/* Compact action bar: the full Choose / Upload / Cancel trio has to fit
+          one row inside the 400px viewer menu panel (the ThemeWizard upload
+          step). At sm the three sat right on the fit boundary and the third
+          wrapped to a second row; size="xs" shrinks height and font together
+          (proportionate — reads as a compact bar, not shrunken text) and, with
+          px="xs" + a tight icon gap (ads-btn-tight) + a tight between-button
+          gap, fits them on one line with room to spare. They still wrap
+          gracefully on a genuinely tiny screen. */}
+      <Group className="ads-fileupload__toolbar" gap="6px" justify="center">
         <Button
+          size="xs"
+          px="xs"
+          className="ads-btn-tight"
           leftSection={<IconPlus />}
           onClick={() => openPicker.current?.()}
           disabled={uploading}
@@ -156,6 +167,9 @@ export function FileUpload({
           <>
             {onUpload && (
               <Button
+                size="xs"
+                px="xs"
+                className="ads-btn-tight"
                 leftSection={<IconUpload />}
                 color="success"
                 onClick={() => void runUpload(files)}
@@ -166,6 +180,9 @@ export function FileUpload({
               </Button>
             )}
             <Button
+              size="xs"
+              px="xs"
+              className="ads-btn-tight"
               leftSection={<IconX />}
               color="danger"
               variant="outline"
@@ -187,7 +204,7 @@ export function FileUpload({
         disabled={uploading}
         {...dropzoneProps}
       >
-        <Text ta="center" py="lg" c="dimmed">
+        <Text ta="center" py="md" c="dimmed" size="sm">
           {placeholder}
         </Text>
       </Dropzone>
