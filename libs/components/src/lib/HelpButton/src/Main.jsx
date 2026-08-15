@@ -27,12 +27,17 @@ export function MainMenu({ className, config, actions, record }) {
 
   const lang = i18nUtils.getResolvedLanguage();
 
+  let help_url = component_cfg.url || component_cfg.default_url ? component_cfg.url || component_cfg.default_url : viewer?.config_json?.help_url;
+  if (help_url) {
+    if (lang) {
+      help_url = help_url.replace("{lang}", lang).replace("{language}", lang);
+    } else if (component_cfg.default_url) {
+      help_url = component_cfg.default_url;
+    }
+  }
+
   if (record.as === 'popup') {
     const closeLabel = component_cfg.closeLabel ? i18nUtils.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18nUtils.translateValue("close", "Fechar");
-
-    const url = lang ?
-      component_cfg.url.replace("{lang}", lang).replace("{language}", lang)
-      : component_cfg.url;
 
     return (
       <React.Fragment>
@@ -58,10 +63,10 @@ export function MainMenu({ className, config, actions, record }) {
           onClose={e => setShowPopup(false)}>
 
           { component_cfg.iframe === true ?
-            <iframe title={title} src={url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>
+            <iframe title={title} src={help_url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>
             :
             <HelpHtmlContent
-              config={component_cfg}
+              config={{...component_cfg, url: help_url}}
             />
           }
 
@@ -70,13 +75,7 @@ export function MainMenu({ className, config, actions, record }) {
       </React.Fragment>
     )
   } else if (record.as === 'external') {
-    let help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url ;
-
     if (!help_url) return null;
-
-    help_url = lang ?
-      help_url.replace("{lang}", lang).replace("{language}", lang)
-      : help_url;
 
     return (
       <MainMenuButton
@@ -117,11 +116,20 @@ export default function Main({ type, as, config, actions, record }) {
 
   const lang = i18nUtils.getResolvedLanguage();
 
+  let help_url = component_cfg.url || component_cfg.default_url ? component_cfg.url || component_cfg.default_url : viewer?.config_json?.help_url;
+  if (help_url) {
+    if (lang) {
+      help_url = help_url.replace("{lang}", lang).replace("{language}", lang);
+    } else if (component_cfg.default_url) {
+      help_url = component_cfg.default_url;
+    }
+  }
+
   // Render content
   function renderContent() {
     return (
       <HelpHtmlContent
-        config={component_cfg}
+        config={{...component_cfg, url: help_url}}
       />
     )
   }
@@ -133,15 +141,6 @@ export default function Main({ type, as, config, actions, record }) {
   )
 
   if (openAs === 'popup') {
-
-    let url;
-
-    if (component_cfg.url) {
-      url = lang ?
-        component_cfg.url.replace("{lang}", lang).replace("{language}", lang)
-        : component_cfg.url;
-    }
-
     return (
       <React.Fragment>
         { type != 'menu' ?
@@ -167,10 +166,10 @@ export default function Main({ type, as, config, actions, record }) {
           onClose={e => setShowPopup(false)}>
 
           { component_cfg.iframe === true ?
-            <iframe title={title} src={url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>
+            <iframe title={title} src={help_url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>
             :
             <HelpHtmlContent
-              config={component_cfg}
+              config={{...component_cfg, url: help_url}}
             />
           }
 
@@ -181,14 +180,8 @@ export default function Main({ type, as, config, actions, record }) {
   }
 
   if (openAs === 'external') {
-    let help_url = component_cfg.url ? component_cfg.url : viewer?.config_json?.help_url;
 
     if (!help_url) return null;
-
-    help_url = lang ?
-      help_url.replace("{lang}", lang).replace("{language}", lang)
-      : help_url;
-
 
     if (type === 'menu') {
       return (

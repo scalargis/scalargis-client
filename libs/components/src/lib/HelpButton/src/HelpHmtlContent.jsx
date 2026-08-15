@@ -25,16 +25,13 @@ export default function HelpHtmlContent({ config }) {
       return;
     }
 
-    const url = lang ?
-      config.url.replace("{lang}", lang).replace("{language}", lang)
-      : config.url;
-
     // See the twin in PanelHtmlContent: the fetch is aborted on unmount, so the
     // StrictMode remount stops asking for the help file twice and a late answer
     // cannot set state on a component that is gone.
     const controller = new AbortController();
 
-    fetch(url, { signal: controller.signal })
+    // The caller resolves the language in the URL and passes it in already filled.
+    fetch(config.url, { signal: controller.signal })
       .then(res => res.text())
       .then(result => {
         setDialogContent(result);
@@ -45,7 +42,7 @@ export default function HelpHtmlContent({ config }) {
       })
 
     return () => controller.abort();
-  }, []);
+  }, [lang]);
 
   return (
     <div dangerouslySetInnerHTML={{ __html: dialogContent }}></div>
