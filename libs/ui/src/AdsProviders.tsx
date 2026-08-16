@@ -42,15 +42,12 @@ import { Notifications } from '@mantine/notifications';
 import 'dayjs/locale/pt';
 
 import { adsBaseTheme, adsCssVariablesResolver } from './theme/ads-mantine-theme';
-import {
-  applyMotionPreference,
-  motionDurations,
-  motionTransitionProps,
-} from './theme/motion';
+import { applyMotionPreference, motionDurations } from './theme/motion';
 import {
   ClientThemeRegistryProvider,
   useClientThemeManager,
 } from './theme/client-theme-registry';
+import { DIALOG_DEFAULTS } from './recipes/dialogDefaults';
 import { registerUiTranslations } from './recipes/i18n';
 
 export interface AdsProvidersProps {
@@ -101,15 +98,10 @@ export function AdsProviders({ children }: AdsProvidersProps) {
       <DatesProvider settings={{ locale }}>
         {/* Modals opened imperatively (modals.openConfirmModal, our confirm()
             recipe) bypass the theme's Modal defaultProps — ModalsProvider
-            constructs them itself. Re-state the ADS ladder + centring here,
-            and the central motion default with them. */}
-        <ModalsProvider
-          modalProps={{
-            centered: true,
-            zIndex: 6000,
-            transitionProps: motionTransitionProps.dialog,
-          }}
-        >
+            constructs them itself. The ADS ladder + centring + motion come
+            from the one shared DIALOG_DEFAULTS the Dialog recipe reads too,
+            so the two can't drift (R4). */}
+        <ModalsProvider modalProps={DIALOG_DEFAULTS}>
           {/* ADS toast layer: z 7000, above dialogs (6000), below tooltips.
               Slide pace from the motion tokens (Prime's Toast entered at .3s). */}
           <Notifications

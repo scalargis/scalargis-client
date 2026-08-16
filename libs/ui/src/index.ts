@@ -67,3 +67,9 @@ export type { SkipLinkProps } from './recipes/SkipLink';
 
 export { Dialog } from './recipes/Dialog';
 export type { DialogProps } from './recipes/Dialog';
+
+export { Lightbox } from './recipes/Lightbox';
+export type { LightboxProps } from './recipes/Lightbox';
+
+/* ─── Hooks ──────────────────────────────────────────────────────────── */
+export { useIsMobile } from './hooks/useIsMobile';

@@ -31,13 +31,20 @@ import {
   type ModalRootProps,
 } from '@mantine/core';
 
-import { motionTransitionProps } from '../theme/motion';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { DIALOG_DEFAULTS } from './dialogDefaults';
 import { IconWindowMaximize, IconWindowMinimize } from './icons';
 import { uiText } from './i18n';
 
 // Floor for corner-resize so the dialog can never be dragged to nothing.
 const MIN_DIALOG_W = 240;
 const MIN_DIALOG_H = 160;
+
+// Desktop width when the caller passes no `size`. Below the ADS md
+// breakpoint the dialog collapses to 90% instead (see the size default in
+// the component). A caller `size` overrides both. Tunable — it is on
+// Miguel's end visual walkthrough list.
+const DIALOG_DESKTOP_SIZE = '35vw';
 
 export interface DialogProps extends Omit<ModalRootProps, 'title'> {
   /** Header title (Prime's `header`). */
@@ -64,13 +71,21 @@ export function Dialog({
   children,
   opened,
   onClose,
-  centered = true,
+  centered = DIALOG_DEFAULTS.centered,
   zIndex,
+  size: sizeProp,
   withOverlay = true,
   ...rootProps
 }: DialogProps) {
   const theme = useMantineTheme();
+  const isMobile = useIsMobile();
   const [maximized, setMaximized] = useState(false);
+
+  // Responsive `size` default (P0a): a caller `size` wins; with none, the
+  // dialog is 90% wide below the md breakpoint and DIALOG_DESKTOP_SIZE above,
+  // so call sites can drop the `size={isMobile ? '90%' : 'Nvw'}` ternary.
+  // (Named sizeProp — `size` below is the corner-resize width state.)
+  const resolvedSize = sizeProp ?? (isMobile ? '90%' : DIALOG_DESKTOP_SIZE);
 
   // Drag-by-header — Prime's <Dialog> was draggable by default; the Modal.Root
   // is not, so every consumer (StreetView, help, results, documents) lost it.
@@ -171,10 +186,12 @@ export function Dialog({
   }, []);
 
   // Modal.Root does not inherit the theme's `Modal` defaultProps (they only
-  // apply to the compound component), so the ADS dialog rung is restated
-  // here — and the same goes for the motion default (pop, off the central
-  // tokens), stated before {...rootProps} so a call site can still override.
-  const z = zIndex ?? theme.other?.zLadder?.dialog ?? 6000;
+  // apply to the compound component), so the ADS dialog rung comes from the
+  // shared DIALOG_DEFAULTS (also read by AdsProviders' ModalsProvider, so
+  // the two can't drift — R4). The theme's zLadder still wins when present;
+  // DIALOG_DEFAULTS.zIndex is the literal floor. Stated before {...rootProps}
+  // so a call site can still override.
+  const z = zIndex ?? theme.other?.zLadder?.dialog ?? DIALOG_DEFAULTS.zIndex;
 
   return (
     <Modal.Root
@@ -182,8 +199,9 @@ export function Dialog({
       onClose={onClose}
       centered={centered}
       zIndex={z}
+      size={resolvedSize}
       fullScreen={maximized}
-      transitionProps={motionTransitionProps.dialog}
+      transitionProps={DIALOG_DEFAULTS.transitionProps}
       {...rootProps}
     >
       {withOverlay && <Modal.Overlay />}
