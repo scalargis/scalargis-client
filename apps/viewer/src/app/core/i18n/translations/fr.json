@@ -360,5 +360,14 @@
   "password_set_expired": "La confirmation de changement de mot de passe a expiré.",
   "password_update_success": "Mot de passe modifié avec succès.",
   "account_update_error": "Une erreur s'est produite lors de la mise à jour de l'enregistrement.",
-  "password_policy_violation": "Le mot de passe ne répond pas aux exigences de sécurité."
+  "password_policy_violation": "Le mot de passe ne répond pas aux exigences de sécurité.",
+
+  "W": "O",
+  "E": "E",
+  "N": "N",
+  "S": "S",
+  "west": "Ouest",
+  "este": "Est",
+  "north": "Nord",
+  "south": "Sud"
 }

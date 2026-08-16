@@ -43,8 +43,11 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   const [showDegrees, setShowDegrees] = useState(false);
   const [optLatitude, setOptLatitude] = useState('N');
   const [optLongitude, setOptLongitude] = useState('W');
-  const [coordLon, setCoordLon] = useState(null);
-  const [coordLat, setCoordLat] = useState(null);
+  // Draft text of the DMS fields. coordX/coordY stay the single source of truth
+  // (unsigned degrees, hemisphere in optLongitude/optLatitude) - these only hold
+  // what is being typed until it is committed on blur.
+  const [dmsLon, setDmsLon] = useState('');
+  const [dmsLat, setDmsLat] = useState('');
   const [newCoord, setNewCoord] = useState(null);
   const [resultsPage, setResultsPage] = useState(1);
 
@@ -58,6 +61,15 @@ export default function Coordinates({ core, config, actions, dispatch, record })
   }, []);
 
   const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAPCONTROL_NAME;
+
+  const longitudeOptions = [
+    { value: 'E', label: t("E", "E") },
+    { value: 'W', label: t("W", "O") }
+  ];
+  const latitudeOptions = [
+    { value: 'N', label: t("N", "N") },
+    { value: 'S', label: t("S", "S") }
+  ];
 
 
   // Prime's SplitButton had an empty label and no default action — only its
@@ -232,67 +244,20 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     return csv;
   }  
 
-  function transformCoordinates () {
-    let x;
-    let y;
-
-    if (units === 'dms') {
-      if (!coordLon || !coordLat) return;
-
-      x = convertDMS2DD(optLongitude + ' ' + coordLon);
-      y = convertDMS2DD(optLatitude + ' ' + coordLat);
-      setCoordX(x);
-      setCoordY(y);
-    } else {
-      x = coordX;
-      y = coordY;
-    }
-
-    if (!(CRS && (x != null) || (x != null))) return;
-
-    const trans_coords = {};
-
-    const new_coords = transform([parseFloat(x), parseFloat(y)], CRS, mainMap.getView().getProjection());
-
-    viewer.config_json.crs_list.forEach(crs => {
-      const coords = transform(new_coords,  mainMap.getView().getProjection(), crs.code);
-
-      //Set precision for user role
-      let precision = crs.precision;
-      if (crs.precision_roles?.length && userRoles?.length) {
-        const rp = crs.precision_roles.find(elem => (elem?.roles || []).some(item => userRoles.includes(item)));
-        if (rp?.precision) {
-          precision = rp?.precision;
-        }
-      }
-
-      trans_coords[crs.code] = { code: crs.code, title: crs.title, description: crs.description, 
-        srid: crs.srid, precision: precision, coordinates: coords }
-    }); 
-
-    const item = { id: uuidV4(), coordinates: new_coords, crs: mainMap.getView().getProjection().getCode(), results: trans_coords };
-    setNewCoord(item);
-    zoomItem(item);
-  }
-
   function transformCoordinatesByApi() {
 
-    let x;
-    let y;
+    if (!CRS || coordX == null || coordY == null || coordX === '' || coordY === '') return;
 
-    if (units === 'dms') {
-      if (!coordLon || !coordLat) return;
+    let x = parseFloat(coordX);
+    let y = parseFloat(coordY);
 
-      x = convertDMS2DD(optLongitude + ' ' + coordLon);
-      y = convertDMS2DD(optLatitude + ' ' + coordLat);
-      setCoordX(x);
-      setCoordY(y);
-    } else {
-      x = coordX;
-      y = coordY;
+    if (!isFinite(x) || !isFinite(y)) return;
+
+    // Degree fields hold the magnitude only - the hemisphere selects carry the sign.
+    if (['dms', 'dd'].includes(units)) {
+      if (optLongitude === 'W' && x > 0) x = x * -1;
+      if (optLatitude === 'S' && y > 0) y = y * -1;
     }
-
-    if (!(CRS && (x != null) || (x != null))) return;
 
     const url = core.API_URL + '/app/utils/transcoord';
 
@@ -339,20 +304,19 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     })
   }   
   
+  // Returns the magnitude in decimal degrees - the sign comes from the hemisphere
+  // selects. There is no masked input here, so tolerate the parts the user left
+  // out ("8", "8º 30'") and return NaN when there are no degrees to read at all.
 	function convertDMS2DD (dms) {
-    let val = null;
+    const parts = String(dms).replace(/[º°'"]/g, ' ').trim().split(/\s+/);
 
-    const parts = dms.replace("º", "").replace("''","").replace("'","").split(" ");
+    const d = parseFloat(parts[0]);
+    const m = parseFloat(parts[1]);
+    const s = parseFloat(parts[2]);
 
-    parts[1] = parseInt(parts[1]);
-    parts[2] = parseInt(parts[2]);
-    parts[3] = parseFloat(parts[3]);
+    if (!isFinite(d)) return NaN;
 
-    val = parts[1] + parts[2]/60 + parts[3]/3600;
-    if (parts[0] == 'W' || parts[0] == 'O' || parts[0] == 'S') {
-        val = val * -1;
-    }
-    return val;
+    return Math.abs(d) + (isFinite(m) ? m : 0)/60 + (isFinite(s) ? s : 0)/3600;
   }
 
   function convertDD2DMS (deg, is_lon) {
@@ -371,8 +335,67 @@ export default function Coordinates({ core, config, actions, dispatch, record })
       }
 
       return  val;
-  }  
-  
+  }
+
+  function formatCoordValue (value, units, is_lon) {
+    if (value == null || value === '') return '';
+    if (units === 'dms') {
+      return convertDD2DMS(value, is_lon);
+    }
+    if (units === 'dd') {
+      // Half-typed values arrive as strings ("-", "8.") - leave those alone.
+      return typeof value === 'number' ? Math.abs(value) : value;
+    }
+    return value;
+  }
+
+  // Decimal degree fields: a typed minus sign picks the hemisphere instead of
+  // being stored, so the value itself stays positive.
+  function changeDegreeValue (value, is_lon) {
+    const setValue = is_lon ? setCoordX : setCoordY;
+
+    if (value === '' || value == null) {
+      setValue(null);
+      return;
+    }
+
+    if (typeof value === 'number' && value < 0) {
+      if (is_lon) setOptLongitude('W'); else setOptLatitude('S');
+      setValue(Math.abs(value));
+      return;
+    }
+
+    setValue(value);
+  }
+
+  // DMS fields commit on blur: parse the draft into coordX/coordY and write the
+  // normalized text back. Unreadable text falls back to the last good value.
+  function commitDegreeMinuteSecond (text, is_lon) {
+    const setValue = is_lon ? setCoordX : setCoordY;
+    const setDraft = is_lon ? setDmsLon : setDmsLat;
+    const current = is_lon ? coordX : coordY;
+
+    if (!text || !text.trim()) {
+      setValue(null);
+      setDraft('');
+      return;
+    }
+
+    const value = convertDMS2DD(text);
+
+    if (!isFinite(value)) {
+      setDraft(formatCoordValue(current, 'dms', is_lon));
+      return;
+    }
+
+    if (text.trim().startsWith('-')) {
+      if (is_lon) setOptLongitude('W'); else setOptLatitude('S');
+    }
+
+    setValue(value);
+    setDraft(formatCoordValue(value, 'dms', is_lon));
+  }
+
   function download(filename, text, format) {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -551,34 +574,20 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         if (units === 'degrees') isDegrees = true;
       }
     }
-    if (isDegrees) {
-      setCoordX(null);
-      setCoordY(null);
-      setCoordLat(null);
-      setCoordLon(null);
-    }    
+
+    setCoordX(null);
+    setCoordY(null);
     setShowDegrees(isDegrees);
     setUnits(isDegrees ? 'dd' : 'm');
   }, [CRS]);
 
+  // Keep the DMS drafts derived from the value: switching units reformats them,
+  // and committing one normalizes what was typed into "008º 30' 15.00''".
   useEffect(() => {
-
-    if (!showDegrees) return;
-
-    if (units==='dd' && coordLon && coordLat) {
-      const x = convertDMS2DD(optLongitude + ' ' + coordLon);
-      const y = convertDMS2DD(optLatitude + ' ' + coordLat);
-      setCoordX(x);
-      setCoordY(y);
-    } else if (units==='dms' && coordX && coordY) {
-      const lon = convertDD2DMS(Math.abs(coordX), true);
-      const lat = convertDD2DMS(Math.abs(coordY), false);
-      setCoordLon(lon);
-      setOptLongitude(coordX < 0 ? 'W': 'E');
-      setCoordLat(lat);
-      setOptLatitude(coordY < 0 ? 'S': 'N');      
-    }
-  }, [units]);
+    if (units !== 'dms') return;
+    setDmsLon(formatCoordValue(coordX, 'dms', true));
+    setDmsLat(formatCoordValue(coordY, 'dms', false));
+  }, [units, coordX, coordY]);
 
   useEffect(() => {
     if (coordinates && coordinates.length > 0) dispatch(actions.viewer_set_selectedmenu('coordinates'));
@@ -628,16 +637,50 @@ export default function Coordinates({ core, config, actions, dispatch, record })
           <div className="field col-12">
           { units === 'dd' &&
             <div className="grid formgrid">
-              <div className="field col-12 md:col-6">
-                <NumberInput label={t("longitude", "Longitude")} value={coordX ?? ''} onChange={(value) => setCoordX(value === '' ? null : value)} hideControls decimalScale={8} className="w-full" />
+              <div className="field col-12">
+                <label>{t("longitude", "Longitude")}</label>
+                <Group gap={0} wrap="nowrap">
+                  <NativeSelect
+                    value={optLongitude}
+                    onChange={e => setOptLongitude(e.target.value)}
+                    data={longitudeOptions}
+                    aria-label={t("longitude", "Longitude")}
+                    w={72}
+                  />
+                  <NumberInput
+                    value={formatCoordValue(coordX, 'dd', true)}
+                    onChange={(value) => changeDegreeValue(value, true)}
+                    aria-label={t("longitude", "Longitude")}
+                    hideControls
+                    decimalScale={8}
+                    style={{ flex: 1 }}
+                  />
+                </Group>
               </div>
-              <div className="field col-12 md:col-6">
-                <NumberInput label={t("latitude", "Latitude")} value={coordY ?? ''} onChange={(value) => setCoordY(value === '' ? null : value)} hideControls decimalScale={8} className="w-full" />
+              <div className="field col-12">
+                <label>{t("latitude", "Latitude")}</label>
+                <Group gap={0} wrap="nowrap">
+                  <NativeSelect
+                    value={optLatitude}
+                    onChange={e => setOptLatitude(e.target.value)}
+                    data={latitudeOptions}
+                    aria-label={t("latitude", "Latitude")}
+                    w={72}
+                  />
+                  <NumberInput
+                    value={formatCoordValue(coordY, 'dd', false)}
+                    onChange={(value) => changeDegreeValue(value, false)}
+                    aria-label={t("latitude", "Latitude")}
+                    hideControls
+                    decimalScale={8}
+                    style={{ flex: 1 }}
+                  />
+                </Group>
               </div>
             </div>
           }
           { units === 'dms' &&
-            // Full-width rows, not the md:col-6 halves the decimal form uses: the
+            // Full-width rows, not the md:col-6 halves the metric form uses: the
             // side panel is ~330px, so a half leaves ~85px next to the hemisphere
             // select - not enough for the select to show its letter, let alone for
             // the field to show a "008º 30' 15.00''".
@@ -648,13 +691,14 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                   <NativeSelect
                     value={optLongitude}
                     onChange={e => setOptLongitude(e.target.value)}
-                    data={['E', 'W']}
+                    data={longitudeOptions}
                     aria-label={t("longitude", "Longitude")}
                     w={72}
                   />
                   <TextInput
-                    value={coordLon || ''}
-                    onChange={(e) => setCoordLon(e.target.value)}
+                    value={dmsLon}
+                    onChange={(e) => setDmsLon(e.target.value)}
+                    onBlur={(e) => commitDegreeMinuteSecond(e.target.value, true)}
                     placeholder="008º 30' 15.00''"
                     aria-label={t("longitude", "Longitude")}
                     style={{ flex: 1 }}
@@ -667,13 +711,14 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                   <NativeSelect
                     value={optLatitude}
                     onChange={e => setOptLatitude(e.target.value)}
-                    data={['N', 'S']}
+                    data={latitudeOptions}
                     aria-label={t("latitude", "Latitude")}
                     w={72}
                   />
                   <TextInput
-                    value={coordLat || ''}
-                    onChange={(e) => setCoordLat(e.target.value)}
+                    value={dmsLat}
+                    onChange={(e) => setDmsLat(e.target.value)}
+                    onBlur={(e) => commitDegreeMinuteSecond(e.target.value, false)}
                     placeholder="39º 30' 15.00''"
                     aria-label={t("latitude", "Latitude")}
                     style={{ flex: 1 }}

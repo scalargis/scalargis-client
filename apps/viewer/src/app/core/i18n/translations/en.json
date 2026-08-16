@@ -360,5 +360,14 @@
   "password_set_expired": "Password change confirmation expired.",
   "password_update_success": "Password changed successfully.",
   "account_update_error": "An error occurred while updating the record.",
-  "password_policy_violation": "The password does not meet the security requirements."
+  "password_policy_violation": "The password does not meet the security requirements.",
+
+  "W": "W",
+  "E": "E",
+  "N": "N",
+  "S": "S",
+  "west": "West",
+  "este": "East",
+  "north": "North",
+  "south": "South"
 }
