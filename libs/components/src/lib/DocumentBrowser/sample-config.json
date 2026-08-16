@@ -1,5 +1,5 @@
 {
-  "_comment": "Sample do DocumentBrowser. Duas peças: (1) esta entrada em viewer.config_json.components[]; (2) uma row em scalargis.document_directory cujo codigo = folder abaixo, com o path para a pasta no disco. Guia: references/guides/component_configure/configure-documentbrowser.md",
+  "_comment": "Sample do DocumentBrowser. Duas peças: (1) esta entrada em viewer.config_json.components[]; (2) uma row em scalargis.document_directory cujo codigo = folder abaixo, com o path para a pasta no disco. Guia: configuração do DocumentBrowser, na documentação do ScalarGIS",
   "_document_directory_row": "INSERT INTO scalargis.document_directory (codigo, path, titulo, allow_upload, upload_anonymous, upload_overwrite, upload_generate_filename, allow_delete, delete_anonymous) VALUES ('images', '/caminho/absoluto/para/a/pasta', 'Documentos', false, false, false, false, false, false);",
   "id": "docs",
   "type": "DocumentBrowser",

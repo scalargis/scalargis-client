@@ -23,9 +23,8 @@ o viewer monta.
 
 A interseção é ponta-a-ponta. A config do componente **sozinha não chega** — precisa do `site_settings`
 com o `code = config_id` e da função `intersects_layers` na DB. Isso, o fluxo do pedido, o schema do
-`setting_value` e os gotchas do backend estão todos no guia, e **não** se repetem aqui:
-
-→ **`references/guides/component_configure/configure-intersectlayers.md`**
+`setting_value` e os gotchas do backend estão todos no **guia de configuração do IntersectLayers** (na
+documentação do ScalarGIS), e **não** se repetem aqui.
 
 Este README cobre só o que é do lado do componente: as chaves do `config_json` e o que cada uma faz.
 
@@ -114,9 +113,9 @@ mão. Para dados nacionais (CAOP) `1e8` (100 km²) é um valor sensato.
 [`src/config.example.json`](src/config.example.json) — a montagem do viewer, na versão que corresponde ao
 setup de teste `cc_intersect` (Concelhos + Freguesias CAOP, SRID 3763), verificado contra o endpoint.
 O par do backend está em [`src/server.config.example.json`](src/server.config.example.json) e o
-`setting_value` de teste completo em `references/configs/site/cc_intersect.site_setting.json`.
+`setting_value` de teste completo no sample `cc_intersect.site_setting.json` (nos configs de exemplo do ScalarGIS).
 
 ## Referências
 
-- Guia de configuração ponta-a-ponta: `references/guides/component_configure/configure-intersectlayers.md`
-- Guia geral de componentes/extensões: `references/architecture/BUILDING_COMPONENTS_AND_EXTENSIONS.md`
+- **Guia de configuração do IntersectLayers** — a montagem ponta-a-ponta, na documentação do ScalarGIS.
+- **Guia geral de componentes/extensões do ScalarGIS.**

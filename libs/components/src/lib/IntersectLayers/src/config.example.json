@@ -1,5 +1,5 @@
 {
-  "_comment": "Sample do IntersectLayers: a entrada para viewer.config_json.components[]. Duas peças a mais sao obrigatorias: (1) uma row em scalargis.site_settings com code = config_id (ver server.config.example.json), (2) a funcao intersects_layers na DB, instalada pelo plugin spatial_toolbox. Chaves explicadas no README.md ao lado; montagem ponta-a-ponta no guia references/guides/component_configure/configure-intersectlayers.md",
+  "_comment": "Sample do IntersectLayers: a entrada para viewer.config_json.components[]. Duas peças a mais sao obrigatorias: (1) uma row em scalargis.site_settings com code = config_id (ver server.config.example.json), (2) a funcao intersects_layers na DB, instalada pelo plugin spatial_toolbox. Chaves explicadas no README.md ao lado; montagem ponta-a-ponta no guia de configuração do IntersectLayers (documentação do ScalarGIS)",
   "_note_as_popup": "O IntersectLayers NAO suporta as:'popup' nem dialogOptions - Main.jsx so distingue as==='panel'. O unico dialogo e o das tabelas (showTables), e as dimensoes dele sao fixas em codigo.",
 
   "id": "IntersectLayers",
