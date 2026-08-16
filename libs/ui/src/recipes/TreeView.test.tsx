@@ -102,3 +102,44 @@ describe('TreeView — React-element labels', () => {
     expect(checkboxByName('pt').checked).toBe(true);
   });
 });
+
+/**
+ * renderLabel escape hatch + R2 canary. The twin exists only to keep JSX
+ * `label`s out of the data Mantine JSON.stringifies for its isNodeChecked
+ * memo. renderLabel removes that root cause: the caller passes a plain STRING
+ * `label` (serializable) and pushes JSX through renderLabel instead. If a
+ * future Mantine bump changed the memo behaviour the twin compensates for,
+ * the observable contract asserted here is what would break loudly.
+ */
+describe('TreeView — renderLabel (R2 canary)', () => {
+  const stringData: TreeNodeData[] = [
+    { value: 'europe', label: 'Europe', children: [{ value: 'pt', label: 'Portugal' }] },
+  ];
+
+  it('leaves the caller data JSON-serializable — the circular root cause is gone', () => {
+    // The whole point of pushing JSX through renderLabel: unlike a JSX
+    // `label`, string-labelled data survives the JSON.stringify Mantine keys
+    // its memo on. A regression to JSX labels would reintroduce the throw.
+    expect(() => JSON.stringify(stringData)).not.toThrow();
+  });
+
+  it('renders JSX pushed through renderLabel and still cascades checks', () => {
+    renderTree(
+      <TreeView
+        data={stringData}
+        checkboxes
+        defaultExpandAll
+        renderLabel={(node) => <b data-testid={`lbl-${node.value}`}>{node.label}</b>}
+      />
+    );
+
+    expect(screen.getByTestId('lbl-europe').tagName).toBe('B');
+    // Checking a string-label node drives Mantine's isNodeChecked memo
+    // (JSON.stringify of the whole data): it must not throw and must cascade.
+    expect(() =>
+      fireEvent.keyDown(treeitemByValue('europe'), { key: 'Enter' })
+    ).not.toThrow();
+    expect(checkboxByName('Europe').checked).toBe(true);
+    expect(checkboxByName('Portugal').checked).toBe(true);
+  });
+});

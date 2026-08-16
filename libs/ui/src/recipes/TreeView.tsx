@@ -106,6 +106,15 @@ export interface TreeViewProps
    * seed that controller's `initialExpandedState` instead (see TreeSelect).
    */
   defaultExpandAll?: boolean;
+  /**
+   * Render the row's label from the node. The escape hatch that lets a
+   * caller pass a plain STRING `label` (serializable — Mantine's
+   * isNodeChecked memo key is JSON.stringify of the whole data) and still
+   * push JSX into the row. Prefer this over a JSX `label`: it removes the
+   * circular-JSON root cause the shape-only twin exists to defeat. When
+   * omitted, the node's own `label` is rendered as today.
+   */
+  renderLabel?: (node: TreeNodeData) => React.ReactNode;
 }
 
 export function TreeView({
@@ -115,6 +124,7 @@ export function TreeView({
   bordered = true,
   levelOffset = 'md',
   defaultExpandAll = false,
+  renderLabel,
   onKeyDown,
   ...treeProps
 }: TreeViewProps) {
@@ -175,8 +185,13 @@ export function TreeView({
     const checked = checkboxes && t.isNodeChecked(node.value);
     const indeterminate = checkboxes && t.isNodeIndeterminate(node.value);
 
-    // `node` is the shape-only twin, so the label comes back from the map.
+    // `node` is the shape-only twin, so the caller's label comes back from
+    // the map. renderLabel (given a plain-string label) takes precedence and
+    // is what a caller uses to push JSX without a circular `label`.
     const label = labels.get(node.value);
+    const content = renderLabel
+      ? renderLabel({ value: node.value, label })
+      : label;
 
     const toggleChecked = () =>
       checked ? t.uncheckNode(node.value) : t.checkNode(node.value);
@@ -224,7 +239,7 @@ export function TreeView({
           />
         )}
 
-        <span>{label}</span>
+        <span>{content}</span>
       </Group>
     );
   };
