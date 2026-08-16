@@ -86,6 +86,11 @@
 .ads-btn-tight .mantine-Button-section[data-position='left'] {
   margin-inline-end: 0.375rem;
 }
+/* A hair under sm so the longest label ("Medir Distância") clears the edge in
+   the production build too, not just dev; both ads-btn-tight consumers get it. */
+.ads-btn-tight .mantine-Button-label {
+  font-size: 0.8125rem;
+}
 
 /* ─── Attached input + button group ────────────────────────────────────
    A TextInput butted flush against a Button/ActionIcon (a `Group gap={0}
