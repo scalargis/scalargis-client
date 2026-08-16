@@ -186,11 +186,13 @@
   --shadow-inner:         0px 4px 4px 0px rgba(0, 0, 0, 0.32) inset;
 
   /* ─── TRANSITIONS ─────────────────────────────────────
-     Per the kit spec (03 §9): the duration aliases onto the central
-     motion tokens (theme/motion.ts → --sg-motion-* via the resolver) so
-     kit-token consumers follow the one motion control. Same 200ms. */
+     Per the kit spec (03 §9): both duration AND easing alias onto the
+     central motion tokens (theme/motion.ts → --sg-motion-* via the
+     resolver) so every kit-token consumer follows the one motion control.
+     Easing was ease-in-out here while hover feedback ran `ease` (the
+     motion token) — aliasing kills that divergence (R5). Same 200ms. */
   --transition-duration: var(--sg-motion-normal, 200ms);
-  --transition-easing:   ease-in-out;
+  --transition-easing:   var(--sg-motion-ease, ease);
   --transition-default:  all var(--transition-duration) var(--transition-easing);
 
   /* ─── Z-INDEX (ADS ladder — see ../03 §8) ─────────── */

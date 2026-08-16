@@ -353,7 +353,9 @@ export const adsBaseTheme = createTheme({
       dropdown: 1000, backdrop: 2000, sticky: 3000, fixed: 4000,
       drawer: 5000, dialog: 6000, toast: 7000, tooltip: 8000,
     },
-    transition: `all ${motionDurations.normal}ms ease-in-out`,
+    // Easing via the central motion token, not a literal — single-sourced
+    // with --transition-easing so hover/chevrons can't diverge (R5).
+    transition: `all ${motionDurations.normal}ms var(--sg-motion-ease)`,
   },
 });
 

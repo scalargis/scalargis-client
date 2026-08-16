@@ -7,6 +7,9 @@
    references/projects/client/migration2/ads-adherence-restrictions/.
    ===================================================================== */
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { DEFAULT_THEME, mergeThemeOverrides, type MantineTheme } from '@mantine/core';
 import { describe, expect, it } from 'vitest';
 
@@ -14,6 +17,7 @@ import { adsBaseTheme, adsCssVariablesResolver } from './ads-mantine-theme';
 import {
   motionCssVariables,
   motionDurations,
+  motionEasing,
   motionTransitionProps,
 } from './motion';
 
@@ -258,5 +262,79 @@ describe('central motion control', () => {
     const resolved = adsCssVariablesResolver(theme);
     expect(resolved.variables).toMatchObject(motionCssVariables);
     expect(motionCssVariables['--sg-motion-normal']).toBe('200ms');
+  });
+});
+
+/* ─── CSS ↔ theme-object token sync (B-15 / R5) ──────────────────────────
+   ads-tokens.css and ads-mantine-theme.ts each hold the ADS palette, shadows
+   and z-ladder; the only thing keeping them equal is a "keep in sync" comment.
+   This block enforces it — a future edit to one that forgets the other fails
+   here, hex-for-hex. It also pins the easing single-source (R5): the kit
+   --transition-easing must alias the central motion token, not restate a
+   literal, so hover feedback and chevrons can never diverge again. */
+
+/** ads-tokens.css :root custom properties, as a name → value map.
+   Read from disk (vitest stubs CSS imports to empty; the app ships this same
+   file, so parsing it is what keeps the two token sources honest). */
+const cssTokens: Map<string, string> = (() => {
+  const css = readFileSync(join(import.meta.dirname, 'ads-tokens.css'), 'utf8');
+  const map = new Map<string, string>();
+  const re = /--([a-z0-9-]+)\s*:\s*([^;]+);/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(css)) !== null) map.set(m[1], m[2].trim());
+  return map;
+})();
+
+const norm = (v: string) => v.trim().toUpperCase();
+
+describe('CSS ↔ theme token sync (R5)', () => {
+  // ADS 50→900 maps onto Mantine tuple index 0→9.
+  const STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
+  const SCALES = [
+    'primary',
+    'secondary',
+    'neutral',
+    'informative',
+    'success',
+    'warning',
+    'danger',
+  ] as const;
+  const colors = adsBaseTheme.colors as Record<string, readonly string[]>;
+
+  it.each(SCALES)('%s palette matches ads-tokens.css hex-for-hex', (scale) => {
+    STEPS.forEach((step, index) => {
+      const cssValue = cssTokens.get(`color-${scale}-${step}`);
+      expect(cssValue, `--color-${scale}-${step} present`).toBeTruthy();
+      expect(norm(cssValue as string)).toBe(norm(colors[scale][index]));
+    });
+  });
+
+  it('shadows match the ADS bottom-* tokens', () => {
+    const shadows = adsBaseTheme.shadows as Record<string, string>;
+    const pairs: Array<[string, string]> = [
+      ['shadow-bottom-lower', shadows.xs],
+      ['shadow-bottom-low', shadows.sm],
+      ['shadow-bottom-medium', shadows.md],
+      ['shadow-bottom-high', shadows.lg],
+      ['shadow-bottom-higher', shadows.xl],
+    ];
+    for (const [token, themeValue] of pairs) {
+      expect(cssTokens.get(token)).toBe(themeValue);
+    }
+  });
+
+  it('z-ladder rungs match theme.other.zLadder', () => {
+    const zLadder = (adsBaseTheme.other as Record<string, Record<string, number>>)
+      .zLadder;
+    for (const [rung, value] of Object.entries(zLadder)) {
+      expect(Number(cssTokens.get(`z-${rung}`))).toBe(value);
+    }
+  });
+
+  it('single-sources the transition easing onto the motion token', () => {
+    // The kit token aliases the central motion ease — not a literal.
+    expect(cssTokens.get('transition-easing')).toContain('--sg-motion-ease');
+    // And that motion ease is what the resolver emits, so both resolve equal.
+    expect(motionCssVariables['--sg-motion-ease']).toBe(motionEasing);
   });
 });
