@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { ActionIcon, Anchor, Button, Group, Modal, TextInput } from '@mantine/core';
-import { DataGrid, confirm, notify } from '@scalargis/ui';
+import { ActionIcon, Anchor, Button, Group, TextInput } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { DataGrid, confirm, notify, Dialog } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
@@ -32,7 +33,7 @@ function ParameterList(props) {
   const [records, setRecords] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedRecords, setSelectedRecords] = useState([]);
-  const [displayFieldValue, setDisplayFieldValue] = useState(false);
+  const [displayFieldValue, { open: openFieldValue, close: closeFieldValue }] = useDisclosure(false);
   const [fieldValue, setFieldValue] = useState();
 
   // One object so the list⇄form navigation round-trip (previousSearchParams)
@@ -231,7 +232,7 @@ function ParameterList(props) {
         render: (record) =>
           (record.setting_value || '') === '' ? null : (
             <Anchor component="button" type="button"
-              onClick={() => { setFieldValue(record.setting_value); setDisplayFieldValue(true); }}>
+              onClick={() => { setFieldValue(record.setting_value); openFieldValue(); }}>
               Ver
             </Anchor>
           )
@@ -292,10 +293,10 @@ function ParameterList(props) {
               columns={columns}
               noRecordsText="Não foram encontrados registos."
             />
-            <Modal title="Valor" opened={displayFieldValue} size="50vw"
-              onClose={() => setDisplayFieldValue(false)}>
+            <Dialog title="Valor" opened={displayFieldValue} size="50vw"
+              onClose={closeFieldValue}>
               <div dangerouslySetInnerHTML={{__html: fieldValue }} />
-            </Modal>
+            </Dialog>
         </div>
       </div>
     </React.Fragment>

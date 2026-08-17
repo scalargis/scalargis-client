@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { ActionIcon, Anchor, Button, Group, Modal, TextInput } from '@mantine/core';
-import { DataGrid, confirm, notify } from '@scalargis/ui';
+import { ActionIcon, Anchor, Button, Group, TextInput } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { DataGrid, confirm, notify, Dialog } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
@@ -30,7 +31,7 @@ function CoordinateSystemList(props) {
   const [records, setRecords] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedRecords, setSelectedRecords] = useState([]);
-  const [displayFieldValue, setDisplayFieldValue] = useState(false);
+  const [displayFieldValue, { open: openFieldValue, close: closeFieldValue }] = useDisclosure(false);
   const [fieldValue, setFieldValue] = useState();
 
   // One object so the list⇄form navigation round-trip (previousSearchParams)
@@ -229,7 +230,7 @@ function CoordinateSystemList(props) {
         render: (record) =>
           (record?.config_json?.defs || '') === '' ? null : (
             <Anchor component="button" type="button"
-              onClick={() => { setFieldValue(record?.config_json?.defs); setDisplayFieldValue(true); }}>
+              onClick={() => { setFieldValue(record?.config_json?.defs); openFieldValue(); }}>
               Ver
             </Anchor>
           )
@@ -290,10 +291,10 @@ function CoordinateSystemList(props) {
               columns={columns}
               noRecordsText="Não foram encontrados registos."
             />
-            <Modal title="Definição" opened={displayFieldValue} size="50vw"
-              onClose={() => setDisplayFieldValue(false)}>
+            <Dialog title="Definição" opened={displayFieldValue} size="50vw"
+              onClose={closeFieldValue}>
               <div dangerouslySetInnerHTML={{__html: fieldValue }} />
-            </Modal>
+            </Dialog>
         </div>
       </div>
     </React.Fragment>

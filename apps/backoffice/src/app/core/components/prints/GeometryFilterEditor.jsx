@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Alert, Button, Group, Modal, NumberInput, Select, Tabs, Textarea } from '@mantine/core';
+import { Alert, Button, Group, NumberInput, Select, Tabs, Textarea } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog, useIsMobile } from '@scalargis/ui';
 import { useForm, Controller } from 'react-hook-form';
 
 import OlWKT from "ol/format/WKT";
@@ -24,7 +26,6 @@ import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser';
 import {BufferOp} from 'jsts/org/locationtech/jts/operation/buffer';
 
 import MapWrapper from '../common/MapWrapper';
-import { getWindowSize } from '../../utils';
 
 // Add projections
 const addProjections = (projections) => {
@@ -67,13 +68,12 @@ const getWKTFromGeometry = function (geom) {
 const GeometryFilterEditor = props => {
   const [data, setData] = useState(props.data ? {...props.data} : {});
   const [coordinateSystems, setCoordinateSystems] = useState();
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, { open: openForm, close: closeForm }] = useDisclosure(false);
 
   // set intial state
   const [ features, setFeatures ] = useState([]);
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const { register, watch, setValue, handleSubmit, clearErrors, control, formState: { errors } } = useForm({
     defaultValues: {...props.data}
@@ -101,7 +101,7 @@ const GeometryFilterEditor = props => {
         if (geom) {
           const final_geom_wkt = getWKTFromGeometry(geom.clone());
           props.onSave({geometryWKT: final_geom_wkt, geometrySRID: formData.geometrySRID, tolerance: formData.tolerance});
-          setShowForm(false);
+          closeForm();
         } else {
           console.log('error');
         }
@@ -125,7 +125,7 @@ const GeometryFilterEditor = props => {
     setValue('geometryWKT', props?.data.geometryWKT, { shouldValidate: false });
     setValue('tolerance', props?.data.tolerance, { shouldValidate: false });
     clearErrors();
-    setShowForm(false);
+    closeForm();
   }
 
   const refreshFeatures = (geom_data) =>  {
@@ -246,11 +246,11 @@ const GeometryFilterEditor = props => {
           onClick={(e)=> {e.preventDefault(); onRemove();}}>Remover</Button>
         }
         <Button type="button" variant="outline" leftSection={<i className="pi pi-pencil" />}
-          onClick={(e)=> {e.preventDefault(); setShowForm(true)}}>Editar</Button>
+          onClick={(e)=> {e.preventDefault(); openForm()}}>Editar</Button>
       </Group>
 
       { showForm &&
-      <Modal title="Edição de Filtro Espacial" opened={showForm} size={isMobile ? '95%' : '45vw'} onClose={onHide}>
+      <Dialog title="Edição de Filtro Espacial" opened={showForm} size={isMobile ? '95%' : '45vw'} onClose={onHide}>
         <form>
           <div className="grid formgrid">
             <div className="field col-12">
@@ -306,7 +306,7 @@ const GeometryFilterEditor = props => {
               onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
           </Group>
         </form>
-      </Modal>
+      </Dialog>
       }
     </React.Fragment>
   );

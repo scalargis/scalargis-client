@@ -1,16 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { ActionIcon, Button, Group, Input, Modal, Select } from '@mantine/core';
-import { CodeEditor, DataGrid, ConfirmPopover } from '@scalargis/ui';
+import { ActionIcon, Button, Group, Input, Select } from '@mantine/core';
+import { CodeEditor, DataGrid, ConfirmPopover, Dialog, useIsMobile } from '@scalargis/ui';
 import { useForm, Controller } from 'react-hook-form';
-
-import { utils } from '@scalargis/components';
 
 const LayoutEditor = props => {
 
-  const { getWindowSize } = utils;
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {...(props.data ?? {})}
@@ -32,7 +27,7 @@ const LayoutEditor = props => {
   };
 
   return (
-    <Modal title="Edição de Layout" opened size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
+    <Dialog title="Edição de Layout" opened size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
       <form>
         <div className="grid formgrid">
           <div className="field col-12 md:col-6">
@@ -89,7 +84,7 @@ const LayoutEditor = props => {
             onClick={handleSubmit((d) => props.onSave(d))}>Gravar</Button>
         </Group>
       </form>
-    </Modal>
+    </Dialog>
   );
 }
 

@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
-import { ActionIcon, Badge, Group, Modal, Select, TextInput } from '@mantine/core';
-import { DataGrid, notify } from '@scalargis/ui';
+import { ActionIcon, Badge, Group, Select, TextInput } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { DataGrid, notify, Dialog } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -23,7 +24,7 @@ function ViewersList(props) {
 
   const { core } = useContext(AppContext);
 
-  const [visible, setVisible] = useState(false);
+  const [visible, { open: openViewers, close: closeViewers }] = useDisclosure(false);
 
   const [fetching, setFetching] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -79,7 +80,7 @@ function ViewersList(props) {
         setRecords(d.data);
         setFetching(false);
 
-        setVisible(true);
+        openViewers();
       }).catch(e => {
         setFetching(false);
         notify.error('Pesquisa de Visualizadores', 'Ocorreu um erro na pesquisa');
@@ -88,7 +89,7 @@ function ViewersList(props) {
   }
 
   const onHide = () => {
-    setVisible(false);
+    closeViewers();
     setSearchParams({ ...initialSearchParams });
     setFilterDraft({ ...initialSearchParams.filters });
     setFetching(false);
@@ -210,7 +211,7 @@ function ViewersList(props) {
         <i className="pi pi-bars" />
       </ActionIcon>
 
-      <Modal title={props.header || ''} opened={visible} size="75vw" onClose={onHide}>
+      <Dialog title={props.header || ''} opened={visible} size="75vw" onClose={onHide}>
         <Group justify="space-between" wrap="wrap" className="mb-2">
           <span>Lista Visualizadores</span>
           <span>Total de registos: {totalRecords}</span>
@@ -228,7 +229,7 @@ function ViewersList(props) {
           columns={columns}
           noRecordsText="Não foram encontrados registos"
         />
-      </Modal>
+      </Dialog>
     </React.Fragment>
   )
 }

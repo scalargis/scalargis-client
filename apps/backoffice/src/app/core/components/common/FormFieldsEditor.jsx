@@ -1,9 +1,8 @@
 import React, { useState, useEffect, Component } from "react";
-import { ActionIcon, Button, Checkbox, Group, Modal, TextInput, Tooltip, Alert } from '@mantine/core';
-import { CollapsiblePanel, ConfirmPopover } from '@scalargis/ui';
+import { ActionIcon, Button, Checkbox, Group, TextInput, Tooltip, Alert } from '@mantine/core';
+import { CollapsiblePanel, ConfirmPopover, Dialog, useIsMobile } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useForm, Controller } from 'react-hook-form';
-import { utils } from '@scalargis/components';
 import { ReorderGroups, ReorderFields, getItemStyle, getGroupListStyle, getFieldListStyle } from "./utils";
 
 
@@ -32,10 +31,7 @@ const InfoMessage = ({ text }) => (
 );
 
 const FieldFormEditor = props => {
-  const { getWindowSize } = utils;
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const [field, setField] = useState(props.data ? {...props.data} : {});
 
@@ -52,7 +48,7 @@ const FieldFormEditor = props => {
   }, [props.data]);
 
   return (
-    <Modal title="Edição de Campo" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
+    <Dialog title="Edição de Campo" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
       <form>
         <div className="grid formgrid">
           <div className="field col-12">
@@ -119,15 +115,12 @@ const FieldFormEditor = props => {
             onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
         </Group>
       </form>
-    </Modal>
+    </Dialog>
   );
 }
 
 const GroupFormEditor = props => {
-  const { getWindowSize } = utils;
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const [group, setGroup] = useState(props.data ? {...props.data} : {});
 
@@ -144,7 +137,7 @@ const GroupFormEditor = props => {
   }, [props.data]);
 
   return (
-  <Modal title="Edição de Grupo" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
+  <Dialog title="Edição de Grupo" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
     <form>
       <div className="grid formgrid">
         <div className="field col-12">
@@ -188,7 +181,7 @@ const GroupFormEditor = props => {
           onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
       </Group>
     </form>
-  </Modal>
+  </Dialog>
   );
 
 };

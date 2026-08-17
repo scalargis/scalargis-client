@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
 import { connect, useDispatch } from 'react-redux';
 
-import { Alert, Button, Group, Modal, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
+import { Alert, Button, Group, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog } from '@scalargis/ui';
 
 import { getViewerSessionConfig } from '../model/MapModel';
 
@@ -10,9 +12,8 @@ import { getViewerSessionConfig } from '../model/MapModel';
 function SaveViewerWidget({ auth, core, type, viewer }) {
 
   const { utils } = core;
-  const { getWindowSize } = utils;
 
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null);
   const [name, setName] = useState('');
   const [title, setTitle] = useState('');
@@ -23,9 +24,6 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
   const [allow_anonymous, setAllowAnonymous] = useState(true);
 
   const { t } = useTranslation();
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
 
   // Enable redux actions
   const dispatch = useDispatch();
@@ -40,7 +38,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
     setAllowAddLayers(viewer.allow_add_layers);
     setAllowUserSession(viewer.allow_user_session == null ? false : viewer.allow_user_session);
     setAllowAnonymous(viewer.allow_anonymous == null ? true : viewer.allow_anonymous);
-    setShowForm(true);
+    open();
   }
 
   // Render user
@@ -91,11 +89,10 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
           <span className="pi pi-save"></span><span>{t("save", "Gravar")}</span>
         </UnstyledButton> }
 
-      <Modal
+      <Dialog
         opened={showForm}
-        onClose={() => setShowForm(false)}
+        onClose={close}
         title={t("saveMap", "Gravar mapa")}
-        size={isMobile ? '90%' : '35vw'}
         closeOnClickOutside={false}
       >
           <form onSubmit={submit}>
@@ -207,7 +204,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
             }
 
           </form>
-      </Modal>
+      </Dialog>
 
     </React.Fragment>
   )

@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation} from "react-i18next";
 
-import { ActionIcon, Alert, Button, Group, Modal, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog } from '@scalargis/ui';
 
 import { getViewerSessionConfig } from '../model/MapModel';
 
@@ -10,9 +12,9 @@ import { getViewerSessionConfig } from '../model/MapModel';
 function ShareViewerWidget({ auth, core, type, viewer, record }) {
 
   const { utils } = core;
-  const { getWindowSize, getViewerPublicUrl } = utils;
+  const { getViewerPublicUrl } = utils;
 
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null);
   const [name, setName] = useState('');
   const [title, setTitle] = useState('');
@@ -23,9 +25,6 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
   const [allow_anonymous, setAllowAnonymous] = useState(true);
 
   const { t } = useTranslation();
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
 
   // Enable redux actions
   const dispatch = useDispatch();
@@ -63,7 +62,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
     if (record?.config_json?.allow_user_session === true) {
       setAllowUserSession(true);
     }
-    setShowForm(true);
+    open();
   }
 
   function submit(e) {
@@ -117,11 +116,10 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
           <span className="pi pi-share-alt"></span><span>{t("share", "Partilhar")}</span>
         </UnstyledButton> }
 
-      <Modal
+      <Dialog
         opened={showForm}
-        onClose={() => setShowForm(false)}
+        onClose={close}
         title={t("shareMap", "Partilhar mapa")}
-        size={isMobile ? '90%' : '35vw'}
         closeOnClickOutside={false}
       >
           <form onSubmit={submit}>
@@ -238,7 +236,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               </div>
             }
           </form>
-      </Modal>
+      </Dialog>
 
     </React.Fragment>
   )

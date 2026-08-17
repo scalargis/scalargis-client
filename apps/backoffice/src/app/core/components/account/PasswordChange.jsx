@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Group, Modal, PasswordInput } from '@mantine/core';
-import { notify } from '@scalargis/ui';
+import { Button, Group, PasswordInput } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notify, Dialog } from '@scalargis/ui';
 import { PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 
 import dataProvider from '../../../service/DataProvider';
@@ -14,7 +15,7 @@ export default function PasswordChange(props) {
     const { refresh_auth } = core?.actions ?? {};
     const { dispatch } = core?.store ?? {};
 
-    const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+    const [showPasswordDialog, { open, close }] = useDisclosure(false);
     const [isSaving, setIsSaving] = useState(false);
 
     const API_URL = core.API_URL;
@@ -66,7 +67,7 @@ export default function PasswordChange(props) {
                 dispatch(refresh_auth(new_auth));
             }
 
-            setShowPasswordDialog(false);
+            close();
         }).catch(e => {
             notify.error('Alterar Password', e.body?.message || e.message || 'Ocorreu um erro ao alterar a password');
         }).finally(() => {
@@ -81,10 +82,10 @@ export default function PasswordChange(props) {
             <Button type="button" variant="outline" leftSection={<i className="pi pi-user-edit" />} onClick={e => {
                 e.preventDefault();
                 reset();
-                setShowPasswordDialog(true);
+                open();
             }}>Alterar password</Button>
-            <Modal title="Alterar password" opened={showPasswordDialog} size="35vw"
-                onClose={() => setShowPasswordDialog(false)}>
+            <Dialog title="Alterar password" opened={showPasswordDialog}
+                onClose={close}>
                 <div className="mt-2">
 
                     <form onSubmit={(e) => {
@@ -141,7 +142,7 @@ export default function PasswordChange(props) {
 
                         <Group justify="flex-end" className="mt-4">
                             <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
-                                onClick={() => setShowPasswordDialog(false)}
+                                onClick={() => close()}
                                 disabled={isSaving}>Cancelar</Button>
                             <Button type="submit"
                                 leftSection={<i className="pi pi-save" />}
@@ -150,7 +151,7 @@ export default function PasswordChange(props) {
 
                     </form>
                 </div>
-            </Modal>
+            </Dialog>
         </React.Fragment>
     )
 }
