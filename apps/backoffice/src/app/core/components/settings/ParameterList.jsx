@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { ActionIcon, Anchor, Button, Group, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Group, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DataGrid, confirm, notify, Dialog } from '@scalargis/ui';
 
@@ -231,10 +231,10 @@ function ParameterList(props) {
         exportable: false,
         render: (record) =>
           (record.setting_value || '') === '' ? null : (
-            <Anchor component="button" type="button"
+            <ActionIcon variant="subtle" aria-label="Ver valor" title="Ver valor"
               onClick={() => { setFieldValue(record.setting_value); openFieldValue(); }}>
-              Ver
-            </Anchor>
+              <i className="pi pi-eye" />
+            </ActionIcon>
           )
       },
       {
@@ -295,7 +295,22 @@ function ParameterList(props) {
             />
             <Dialog title="Valor" opened={displayFieldValue} size="50vw"
               onClose={closeFieldValue}>
-              <div dangerouslySetInnerHTML={{__html: fieldValue }} />
+              {(() => {
+                const raw = fieldValue ?? '';
+                // Pretty-print JSON values (SITE_CONFIG etc.); fall back to the
+                // HTML render for non-JSON (rich-text) settings.
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (parsed && typeof parsed === 'object') {
+                    return (
+                      <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '60vh', overflow: 'auto', margin: 0 }}>
+                        {JSON.stringify(parsed, null, 2)}
+                      </pre>
+                    );
+                  }
+                } catch { /* not JSON */ }
+                return <div dangerouslySetInnerHTML={{ __html: raw }} />;
+              })()}
             </Dialog>
         </div>
       </div>

@@ -19,7 +19,7 @@ import {
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
-import { notify } from '@scalargis/ui';
+import { notify, confirm } from '@scalargis/ui';
 import { PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 import { v4 as uuidV4 } from 'uuid'
 
@@ -260,10 +260,9 @@ function UserForm(props) {
       groups: groups ? groups.map(g => g.id) : []
     }
 
-    setIsSaving(true);
-
-    const provider = dataProvider(API_URL + '/security');
-    if (data.id) {
+    const doUpdate = () => {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/security');
       const params = {
         id: data.id,
         data: {...new_data}
@@ -279,7 +278,11 @@ function UserForm(props) {
       }).finally(() => {
         setIsSaving(false);
       });
-    } else {
+    };
+
+    const doCreate = () => {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/security');
       const params = {
         data: {...new_data}
       }
@@ -291,6 +294,24 @@ function UserForm(props) {
       }).finally(() => {
         setIsSaving(false);
       });
+    };
+
+    if (data.id) {
+      // Changing an existing user's password is a deliberate action -> confirm.
+      if (formData.password) {
+        confirm({
+          message: 'Vai alterar a password deste utilizador. Deseja continuar?',
+          header: 'Confirmação',
+          severity: 'warning',
+          acceptLabel: 'Sim',
+          rejectLabel: 'Não',
+          accept: doUpdate
+        });
+      } else {
+        doUpdate();
+      }
+    } else {
+      doCreate();
     }
   };
 
@@ -339,63 +360,52 @@ function UserForm(props) {
             })} />
         </div>
         <div className={`field col-12 ${isCreate ? 'md:col-5' : 'md:col-4'}`}>
-          { isCreate ?
-            <>
-              <Controller
-                control={control}
-                name="password"
-                rules={{
-                  required: 'Campo obrigatório.',
-                  // Catches a non-compliant password before the API call; no
-                  // policy fetched -> no verdict here, the server still decides.
-                  validate: (value) =>
-                    validatePasswordAgainstPolicy(passwordPolicy, value).length
-                      ? 'A password não cumpre os requisitos de segurança.'
-                      : true
-                }}
-                render={({ field }) => (
-                  <PasswordInput
-                    id="password"
-                    label="Password"
-                    value={field.value || ''}
-                    onChange={(e) => field.onChange(e.currentTarget.value)}
-                    visible={revealPassword}
-                    onVisibilityChange={setRevealPassword}
-                    error={fieldError(errors, 'password')}
-                  />
-                )}
+          <Controller
+            control={control}
+            name="password"
+            rules={{
+              required: isCreate ? 'Campo obrigatório.' : false,
+              // Only validate when a value is entered — on edit a blank field
+              // keeps the current password. No policy fetched -> no verdict
+              // here, the server still decides.
+              validate: (value) =>
+                !value
+                  ? true
+                  : validatePasswordAgainstPolicy(passwordPolicy, value).length
+                    ? 'A password não cumpre os requisitos de segurança.'
+                    : true
+            }}
+            render={({ field }) => (
+              <PasswordInput
+                id="password"
+                label="Password"
+                value={field.value || ''}
+                onChange={(e) => field.onChange(e.currentTarget.value)}
+                visible={revealPassword}
+                onVisibilityChange={setRevealPassword}
+                error={fieldError(errors, 'password')}
               />
-              <div className="flex align-items-end justify-content-end flex-wrap mt-2" style={{ gap: '0.5rem' }}>
-                <NumberInput
-                  label="Tamanho"
-                  value={passwordLength}
-                  onChange={setPasswordLength}
-                  min={PASSWORD_MIN_LENGTH} max={PASSWORD_MAX_LENGTH}
-                  style={{ width: '6rem' }}
-                />
-                <Button type="button" leftSection={<i className="pi pi-key" />}
-                  onClick={() => {
-                    const pwd = generatePassword(passwordLength);
-                    setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
-                    setRevealPassword(true);
-                  }}>Gerar</Button>
-              </div>
-              <PasswordRules policy={passwordPolicy} password={password} />
-            </>
-            :
-            <Controller
-              control={control}
-              name="password"
-              render={({ field }) => (
-                <PasswordInput
-                  id="password"
-                  label="Password"
-                  value={field.value || ''}
-                  onChange={(e) => field.onChange(e.currentTarget.value)}
-                />
-              )}
+            )}
+          />
+          { !isCreate &&
+            <small className="block mt-1" style={{ opacity: 0.7 }}>Deixe em branco para manter a password atual.</small> }
+          <div className="flex align-items-end justify-content-end flex-wrap mt-2" style={{ gap: '0.5rem' }}>
+            <NumberInput
+              label="Tamanho"
+              value={passwordLength}
+              onChange={setPasswordLength}
+              min={PASSWORD_MIN_LENGTH} max={PASSWORD_MAX_LENGTH}
+              style={{ width: '6rem' }}
             />
-          }
+            <Button type="button" leftSection={<i className="pi pi-key" />}
+              onClick={() => {
+                const pwd = generatePassword(passwordLength);
+                setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
+                setRevealPassword(true);
+              }}>Gerar</Button>
+          </div>
+          { (isCreate || !!password) &&
+            <PasswordRules policy={passwordPolicy} password={password} /> }
         </div>
 
         <div className="field col-12">
