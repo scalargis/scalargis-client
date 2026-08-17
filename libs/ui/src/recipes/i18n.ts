@@ -37,6 +37,7 @@ const en = {
   skiplink: { label: 'Skip to main content' },
   datagrid: { reorder: 'Reorder row' },
   dialog: { maximize: 'Maximize', restore: 'Restore', close: 'Close' },
+  field: { required: 'This field is required' },
 };
 
 const pt: typeof en = {
@@ -58,6 +59,7 @@ const pt: typeof en = {
   skiplink: { label: 'Saltar para o conteúdo principal' },
   datagrid: { reorder: 'Reordenar linha' },
   dialog: { maximize: 'Maximizar', restore: 'Restaurar', close: 'Fechar' },
+  field: { required: 'Campo de preenchimento obrigatório' },
 };
 
 /** Idempotent; safe to call on every render. `pt-PT` resolves to the `pt`

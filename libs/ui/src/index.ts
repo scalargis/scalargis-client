@@ -71,5 +71,8 @@ export type { DialogProps } from './recipes/Dialog';
 export { Lightbox } from './recipes/Lightbox';
 export type { LightboxProps } from './recipes/Lightbox';
 
+export { Field } from './recipes/Field';
+export type { FieldProps } from './recipes/Field';
+
 /* ─── Hooks ──────────────────────────────────────────────────────────── */
 export { useIsMobile } from './hooks/useIsMobile';
