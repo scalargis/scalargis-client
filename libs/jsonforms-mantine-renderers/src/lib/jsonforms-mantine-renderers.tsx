@@ -119,9 +119,10 @@ export const mantineRenderers: JsonFormsRendererRegistryEntry[] = [
   },
   { tester: mantineRadioGroupControlTester, renderer: MantineRadioGroupControl },
   { tester: mantineTextControlTester, renderer: MantineTextControl },
-  // complex: object/primitive arrays in a table. Rank 3, so the array
-  // layout below (rank 4) still takes the ones with a detail uischema, and
-  // JsonForm's own format=photo/file array renderers (rank 4) still win.
+  // complex: object/primitive arrays in a table. Rank 3, so the array layout
+  // below (rank 4) still takes the ones with a detail uischema. JsonForm's own
+  // format=photo/file array renderers are rank 5 (a rank-4 tie with the layout
+  // below loses on registration order), so they win.
   { tester: mantineArrayControlTester, renderer: MantineArrayControlRenderer },
   // layouts
   { tester: mantineGroupTester, renderer: MantineGroupLayout },

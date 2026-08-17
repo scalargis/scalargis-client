@@ -27,7 +27,8 @@ export default function FileForm(props) {
   }
 
   const onSave = (e) => {
-    if (!formData?.file?.data || !formData?.file?.filename) {
+    // A file is present either inline (data) or persisted server-side (file_url).
+    if (!(formData?.file?.data || formData?.file?.file_url) || !formData?.file?.filename) {
       const prefix = "PhotoForm";
       const elem = `${locale}.${prefix}`;
       const fallbackElem = `${locale}.controls`;

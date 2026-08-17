@@ -165,8 +165,11 @@ export const ArrayFileControlRenderer = (props) => {
 
 };
 
+// Rank 5 (not 4): see the note in ArrayPhotoControlRenderer — the generic
+// rank-4 `mantineArrayLayoutTester` matches our nested item schema too, and a
+// tie loses on registration order. 5 wins.
 export const arrayFileControlTester = rankWith(
-  4,
+  5,
   and(
     or(isObjectArrayControl, isPrimitiveArrayControl),
     optionIs('format', 'file')

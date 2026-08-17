@@ -179,8 +179,11 @@ export const ArrayPhotoControlRenderer = (props) => {
 
 };
 
+// Rank 5 (not 4): the Mantine set's generic `mantineArrayLayoutTester` is
+// rank 4 for any object array *with nesting*, and our item schema nests a
+// `file` object — a rank-4 tie there loses on registration order. 5 wins.
 export const arrayPhotoControlTester = rankWith(
-  4,
+  5,
   and(
     or(isObjectArrayControl, isPrimitiveArrayControl),
     optionIs('format', 'photo')
