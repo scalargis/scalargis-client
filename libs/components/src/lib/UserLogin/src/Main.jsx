@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux';
 import { useLocation } from 'react-router';
 
-import { Menu, Modal, UnstyledButton } from '@mantine/core';
+import { Menu, UnstyledButton } from '@mantine/core';
+import { Dialog } from '@scalargis/ui';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -35,8 +36,6 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   const passwordHeader = record?.config_json?.header_password ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("passwordReset", "Redefinir password")} - ${appEntityNameAbrev || "ScalarGIS"}`;
 
   const closable = record?.config_json?.closable === false ? false : true;
-
-  const dialogSize = wsize[0] < 768 ? '90%' : '35vw';
 
 
   let CompLoginWidget = LoginWidget;
@@ -121,12 +120,10 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
         <span className="pi pi-unlock"></span><span>{i18nUtils.translateValue("login", "Entrar")}</span>
       </UnstyledButton> }
 
-      <Modal
+      <Dialog
         opened={mode==1}
         onClose={() => { if (closable) setMode(0); }}
         title={loginHeader}
-        size={dialogSize}
-        withCloseButton={closable}
         closeOnEscape={closable}
         closeOnClickOutside={false}
       >
@@ -153,14 +150,12 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
                setMode(3);
               }}
             />
-      </Modal>
+      </Dialog>
 
-      <Modal
+      <Dialog
         opened={mode==2}
         onClose={() => { if (closable) setMode(0); }}
         title={registrationHeader}
-        size={dialogSize}
-        withCloseButton={closable}
         closeOnEscape={closable}
         closeOnClickOutside={false}
       >
@@ -174,14 +169,12 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               redirect={location?.pathname || `/${viewer?.name}`}
               onShowLogin={() => setMode(1)}
             />
-      </Modal>
+      </Dialog>
 
-      <Modal
+      <Dialog
         opened={mode==3}
         onClose={() => { if (closable) setMode(0); }}
         title={passwordHeader}
-        size={dialogSize}
-        withCloseButton={closable}
         closeOnEscape={closable}
         closeOnClickOutside={false}
       >
@@ -195,7 +188,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               redirect={location?.pathname || `/${viewer?.name}`}
               onShowLogin={() => setMode(1)}
             />
-      </Modal>
+      </Dialog>
 
     </React.Fragment>
 
