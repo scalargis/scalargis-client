@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { CollapsiblePanel } from '@scalargis/ui';
 import { getRenderPixel } from 'ol/render';
 
@@ -87,7 +88,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
 
 
   //----------------------------------------------------------------------
-  const [opened, setOpened] = useState(true)
+  const [opened, { open, close }] = useDisclosure(true)
   const [layers, setLayers] = useState([]);
   const [selectedLayer, setSelectedLayer] = useState();
   const [selectedSliderLayer, setSelectedSliderLayer] = useState();
@@ -345,7 +346,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
                 rightSection={<i className="pi pi-angle-down" aria-hidden="true" />}
                 title="Abrir"
                 aria-expanded={opened}
-                onClick={e => setOpened(true)}>
+                onClick={e => open()}>
                 Layer Compare
               </Button>
             </div>
@@ -360,7 +361,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
                 rightSection={<i className="pi pi-angle-up" aria-hidden="true" />}
                 title="Fechar"
                 aria-expanded={opened}
-                onClick={e => setOpened(false)}>
+                onClick={e => close()}>
                 Layer Compare
               </Button>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dialog } from '@scalargis/ui';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog, useIsMobile } from '@scalargis/ui';
 
 import { MapToolButton } from '../../components';
 
@@ -27,9 +28,8 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
 
   const streetview_control = record;
   const { viewer_update_mapcontrol, viewer_set_selectedmenu, map_set_extent, viewer_set_exclusive_mapcontrol, viewer_add_notification } = actions;
-  const { getWindowSize } = utils;
 
-  const [modalStreetViewOpen, setModalStreetViewOpen] = useState(false);
+  const [modalStreetViewOpen, { open: openStreetView, close: closeStreetView }] = useDisclosure(false);
 
   const [position, setPosition] = useState();
   const [pov, setPov] = useState();
@@ -48,8 +48,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
   const helpTooltipElement = useRef();
   const helpTooltip = useRef(null);
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const component_cfg = record.config_json || {};
   const title = record.title || 'Google StreetView';
@@ -265,7 +264,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
         panorama.current.setPosition(newPos);
       } else {
         setPosition(lonlat);
-        setModalStreetViewOpen(true);
+        openStreetView();
       }
     }
   }
@@ -412,7 +411,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
             if (source) source.clear();
           }
           if (panorama?.current) panorama.current = null;
-          setModalStreetViewOpen(false);
+          closeStreetView();
           if (exclusive_mapcontrol === 'StreetView') {
             dispatch(viewer_set_exclusive_mapcontrol(null));
           }

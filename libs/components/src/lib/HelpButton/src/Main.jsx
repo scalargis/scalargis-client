@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Group, UnstyledButton } from '@mantine/core';
-import { CollapsiblePanel, Dialog } from '@scalargis/ui';
+import { useDisclosure } from '@mantine/hooks';
+import { CollapsiblePanel, Dialog, useIsMobile } from '@scalargis/ui';
 
 import { i18n as i18nUtils, MainMenuButton } from '../../components';
 
@@ -14,16 +15,14 @@ import './style.css';
 export function MainMenu({ className, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize } = Models.Utils;
 
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, { open, close }] = useDisclosure(false);
 
   const component_cfg = record.config_json || {};
   const title = record.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("help", "Ajuda");
   const header = component_cfg?.header ? i18nUtils.translateValue(component_cfg.header, component_cfg.header) : title;
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const lang = i18nUtils.getResolvedLanguage();
 
@@ -46,7 +45,7 @@ export function MainMenu({ className, config, actions, record }) {
           title={title}
           className={className}
           icon="pi pi-question-circle"
-          onClick={e => setShowPopup(true)}
+          onClick={e => open()}
         />
 
         <Dialog
@@ -57,10 +56,10 @@ export function MainMenu({ className, config, actions, record }) {
           maximizable
           footer={(
             <Group justify="flex-end">
-              <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
+              <Button onClick={close}>{closeLabel}</Button>
             </Group>
           )}
-          onClose={e => setShowPopup(false)}>
+          onClose={close}>
 
           { component_cfg.iframe === true ?
             <iframe title={title} src={help_url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>
@@ -99,16 +98,14 @@ export function MainMenu({ className, config, actions, record }) {
 export default function Main({ type, as, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize } = Models.Utils;
 
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, { open, close }] = useDisclosure(false);
 
   const component_cfg = record.config_json || {};
   const title = record.title ? i18nUtils.translateValue(record.title, record.title) : i18nUtils.translateValue("help", "Ajuda");
   const header = component_cfg?.header ? i18nUtils.translateValue(component_cfg.header, component_cfg.header) : title;
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const closeLabel = component_cfg.closeLabel ? i18nUtils.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18nUtils.translateValue("close", "Fechar");
 
@@ -144,11 +141,11 @@ export default function Main({ type, as, config, actions, record }) {
     return (
       <React.Fragment>
         { type != 'menu' ?
-          <UnstyledButton onClick={e => setShowPopup(true)} title={title}>
+          <UnstyledButton onClick={e => open()} title={title}>
             <span className="layout-topbar-item-text"></span>
             <span className="layout-topbar-icon pi pi-question-circle" />
           </UnstyledButton> :
-          <UnstyledButton className="sg-menuitem" onClick={e => setShowPopup(true)}>
+          <UnstyledButton className="sg-menuitem" onClick={e => open()}>
             <span className="pi pi-question-circle"></span><span>Ajuda</span>
           </UnstyledButton> }
 
@@ -160,10 +157,10 @@ export default function Main({ type, as, config, actions, record }) {
           maximizable
           footer={(
             <Group justify="flex-end">
-              <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
+              <Button onClick={close}>{closeLabel}</Button>
             </Group>
           )}
-          onClose={e => setShowPopup(false)}>
+          onClose={close}>
 
           { component_cfg.iframe === true ?
             <iframe title={title} src={help_url} style={{ border: 'none', width: '100%', height: '100%' }}></iframe>

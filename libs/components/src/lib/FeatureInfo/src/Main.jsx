@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useTranslation} from "react-i18next"
 import OLGroupLayer from "ol/layer/Group"
-import { CollapsiblePanel } from '@scalargis/ui'
+import { CollapsiblePanel, useIsMobile } from '@scalargis/ui'
 import { MainMenuButton, MapToolButton } from '../../components'
 
 import { MAPCONTROL_NAME } from './utils'
@@ -56,7 +56,6 @@ export default function Main({type, region, as, core, config, actions, record, u
   const { viewer, dispatch, Models, mainMap } = config;
   //const { publish, subscribe } = core.pubsub ? core.pubsub : {}
   const { featureinfo, exclusive_mapcontrol } = viewer;
-  const { getWindowSize } = Models ? Models.Utils : utils;
   const { selected_menu, layers } = viewer.config_json;
 
   const component_cfg = record.config_json || {};
@@ -66,8 +65,7 @@ export default function Main({type, region, as, core, config, actions, record, u
   const title = record.title || t("identifyElements", "Identificar elementos");
   const header = component_cfg.header ? t(component_cfg.header, component_cfg.header) : title;
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;  
+  const isMobile = useIsMobile();
 
   // Arming on the way in is only half of it: whoever armed the control has to
   // release it on the way out, or the tool stays live on the map under the next

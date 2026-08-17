@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
 import { Button } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { CollapsiblePanel } from '@scalargis/ui';
 import TimelineControl from './TimelineControl';
 import { WMSCapabilities } from 'ol/format';
@@ -26,7 +27,7 @@ export default function Main(props) {
   const header = component_cfg.header || title;
 
 
-  const [opened, setOpened] = useState(true);
+  const [opened, { toggle }] = useDisclosure(true);
   const [theme, setTheme] = useState();
   const [dimension, setDimension] = useState();
 
@@ -167,7 +168,7 @@ export default function Main(props) {
           rightSection={<i className={opened ? "pi pi-angle-up" : "pi pi-angle-down"} aria-hidden="true" />}
           title="Fechar"
           aria-expanded={opened}
-          onClick={e => setOpened(!opened)}>
+          onClick={toggle}>
         {theme?.title || title}
       </Button>
 

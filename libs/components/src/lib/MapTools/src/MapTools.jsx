@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation} from "react-i18next";
-import { Button, Group, Modal, TextInput } from '@mantine/core';
+import { Button, Group, TextInput } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog } from '@scalargis/ui';
 import { unByKey } from 'ol/Observable';
 import Overlay from 'ol/Overlay';
 import * as OlSphere from 'ol/sphere';
@@ -51,7 +53,6 @@ const drawStyle = new OlStyle({
 export default function MapTools({ selectedControl, onControlSelect, core, viewer, actions, dispatch, mainMap, utils, record }) {
   
   const { exclusive_mapcontrol } = viewer;
-  const { getWindowSize } = utils;
 
   const { t } = useTranslation();
 
@@ -60,12 +61,9 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
   // Raw measurement values (metres / square metres) used for the conversions panel
   const [lengthRaw, setLengthRaw] = useState(null);
   const [areaRaw, setAreaRaw] = useState(null);
-  const [helpModal, setHelpModal] = useState(false);
+  const [helpModal, { open: openHelp, close: closeHelpModal }] = useDisclosure(false);
   const [helpLengthShowed, setHelpLengthShowed] = useState(false);
   const [helpAreaShowed, setHelpAreaShowed] = useState(false);
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
 
   const layer = useRef();
   const draw = useRef();
@@ -168,9 +166,9 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
     }
 
     // Show length tool help
-    if (selectedControl === 'length' && !helpLengthShowed) setHelpModal(true);
+    if (selectedControl === 'length' && !helpLengthShowed) openHelp();
     // Show area tool help
-    if (selectedControl === 'area' && !helpAreaShowed) setHelpModal(true);
+    if (selectedControl === 'area' && !helpAreaShowed) openHelp();
 
     dispatch(actions.viewer_set_exclusive_mapcontrol('MapTools'));
 
@@ -236,7 +234,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
   }, [selectedControl]);
 
   const closeHelp = () => {
-    setHelpModal(false);
+    closeHelpModal();
     if (selectedControl === 'length') setHelpLengthShowed(true);
     if (selectedControl === 'area') setHelpAreaShowed(true);
   }
@@ -488,11 +486,21 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
 
         </div>
 
-        <Modal
+        <Dialog
           title={selectedControl === 'length' ? t("measureDistance", "Medir Distância") : t("measureArea", "Medir Área")}
           opened={helpModal}
-          size={isMobile ? '90%' : undefined}
-          onClose={closeHelp}>
+          onClose={closeHelp}
+          footer={
+            <Group justify="flex-end">
+              <Button
+                type="button"
+                leftSection={<i className="pi pi-check" aria-hidden="true" />}
+                onClick={closeHelp}
+              >
+                OK
+              </Button>
+            </Group>
+          }>
           <div>
             { selectedControl === 'length' ? <div>
               <p dangerouslySetInnerHTML={{__html: t("measureInfoDistance", "1. para começar a medição clique no mapa na localização inicial<br /> 2. para medir um trajeto clique nas localizações intermédias<br /> 3. para terminar faça duplo-clique")}}
@@ -503,16 +511,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
               />
             </div> : null}
           </div>
-          <Group justify="flex-end" mt="md">
-            <Button
-              type="button"
-              leftSection={<i className="pi pi-check" aria-hidden="true" />}
-              onClick={closeHelp}
-            >
-              OK
-            </Button>
-          </Group>
-        </Modal>
+        </Dialog>
 
       </div>
     );

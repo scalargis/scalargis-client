@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Alert, Button, Group, NumberInput, Paper } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { confirm, notify } from '@scalargis/ui';
 import OlInteractionDraw from "ol/interaction/Draw";
 import OlInteractionModify from "ol/interaction/Modify";
@@ -56,7 +57,7 @@ export default function IntersectForm(props) {
 
   const [searchParams, setSearchParams] = useState(null);
   const [results, setResults] = useState([]);
-  const [showNoResultsMsg, setShowNoResultsMsg] = useState(false);
+  const [showNoResultsMsg, { open: openNoResultsMsg, close: closeNoResultsMsg }] = useDisclosure(false);
 
   const geometryCol = useRef(new Collection([]));
 
@@ -272,7 +273,7 @@ export default function IntersectForm(props) {
     setBlockedPanel(true);
 
     provider.getSimple(path, data).then(result => {
-      setShowNoResultsMsg(true);
+      openNoResultsMsg();
       setResults(result?.data);
     }).catch(error => {
       notify.error('Error', 'Ocorreu um erro ao executar a análise.');
@@ -286,7 +287,7 @@ export default function IntersectForm(props) {
   const clearAll = () => {
     setDrawTool(null);
     setResults([]);
-    setShowNoResultsMsg(false);
+    closeNoResultsMsg();
     setGeometryIntersection([]);
     setShowGeometry(false);
     setBuffer(0);

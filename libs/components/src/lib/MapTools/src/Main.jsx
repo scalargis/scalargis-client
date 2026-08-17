@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation} from "react-i18next";
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, useIsMobile } from '@scalargis/ui';
 import { MainMenuButton, MapToolButton } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
@@ -47,7 +47,6 @@ export default function Main(props) {
 
   const { dispatch, viewer, mainMap } = config;
   const { selected_menu } = viewer.config_json;
-  const { getWindowSize } = Models ? Models.Utils : utils;
 
   const { t } = useTranslation();
 
@@ -55,8 +54,7 @@ export default function Main(props) {
   const title = record.title || t("measurementTools", "Ferramentas de Medição");
   const header = component_cfg.header || title;
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const [selectedControl, setSelectedControl] = useState();
 

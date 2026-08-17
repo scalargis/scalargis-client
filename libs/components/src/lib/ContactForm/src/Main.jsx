@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
-import { Button, Group, Modal, UnstyledButton } from '@mantine/core';
-import { CollapsiblePanel } from '@scalargis/ui';
+import { Button, Group, UnstyledButton } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { CollapsiblePanel, Dialog, useIsMobile } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 
@@ -22,18 +23,16 @@ const FOOTER_REGIONS = ['footer_left', 'footer_right'];
 export function MainMenu({ className, core, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize } = Models.Utils;
 
   const { t } = useTranslation();
 
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, { open, close }] = useDisclosure(false);
 
   const component_cfg = record.config_json || {};
   const title = record.title || '';
   const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   function renderContent() {
     return (
@@ -65,22 +64,19 @@ export function MainMenu({ className, core, config, actions, record }) {
           title={title}
           className={className}
           icon="pi pi-question-circle"
-          onClick={e => setShowPopup(true)}
+          onClick={e => open()}
         />
 
-        <Modal
+        <Dialog
           title={header}
           opened={showPopup}
           size={isMobile ? '90%' : '45vw'}
-          onClose={e => setShowPopup(false)}>
+          onClose={close}
+          footer={<Button onClick={close}>{closeLabel}</Button>}>
 
           { renderContent() }
 
-          <Group justify="flex-end" mt="md">
-            <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
-          </Group>
-
-        </Modal>
+        </Dialog>
 
       </React.Fragment>
     )
@@ -102,15 +98,13 @@ export default function Main({ region, as, core, config, actions, record }) {
 
   const { t } = useTranslation();
 
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, { open, close }] = useDisclosure(false);
 
   const component_cfg = record.config_json || {};
   const title = record.title || '';
   const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
 
-  const { getWindowSize } = Models.Utils;
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const closeLabel = component_cfg.closeLabel || t("close", "Fechar");
 
@@ -156,7 +150,7 @@ export default function Main({ region, as, core, config, actions, record }) {
   const trigger = isFooter ? (
     <UnstyledButton
       className="contactform-footer-button"
-      onClick={e => setShowForm(true)}
+      onClick={e => open()}
       title={footerLabel || t("contact", "Contacto")}
       aria-label={footerLabel || t("contact", "Contacto")}
     >
@@ -164,7 +158,7 @@ export default function Main({ region, as, core, config, actions, record }) {
       { footerLabel && <span className="contactform-footer-label">{footerLabel}</span> }
     </UnstyledButton>
   ) : (
-    <UnstyledButton onClick={e => setShowForm(true)} title={t("contact", "Contacto")}>
+    <UnstyledButton onClick={e => open()} title={t("contact", "Contacto")}>
       <span className="layout-topbar-item-text"></span>
       <span className="layout-topbar-icon pi pi-envelope" />
     </UnstyledButton>
@@ -174,19 +168,16 @@ export default function Main({ region, as, core, config, actions, record }) {
     <React.Fragment>
       { trigger }
 
-      <Modal
+      <Dialog
         title={header}
         opened={showForm}
         size={isMobile ? '90%' : '45vw'}
-        onClose={e => setShowForm(false)}>
+        onClose={close}
+        footer={<Button onClick={close}>{closeLabel}</Button>}>
 
         { renderContent() }
 
-        <Group justify="flex-end" mt="md">
-          <Button onClick={e => setShowForm(false)}>{closeLabel}</Button>
-        </Group>
-
-      </Modal>
+      </Dialog>
 
     </React.Fragment>
   )
