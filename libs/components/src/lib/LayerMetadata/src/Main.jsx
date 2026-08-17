@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation} from "react-i18next";
 
-import { ActionIcon, Modal } from '@mantine/core';
+import { ActionIcon } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog, useIsMobile } from '@scalargis/ui';
 
 import ThemeInfo from './ThemeInfo';
 
@@ -9,14 +11,13 @@ import ThemeInfo from './ThemeInfo';
 export default function Main({ core, config }) {
 
   const { layer, viewer, mainMap, actions, models } = config;
-  const { getWindowSize, isComponentExcludedForLayer } = models.Utils;
+  const { isComponentExcludedForLayer } = models.Utils;
 
   const { t } = useTranslation(["common", "custom"]);
 
-  const [modalThemeInfoOpen, setModalThemeInfoOpen] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const exclude = isComponentExcludedForLayer(viewer, layer, "LayerMetadata");
 
@@ -32,25 +33,25 @@ export default function Main({ core, config }) {
         className="tool"
         title={t("metadataInfo", "Informação de Metadados")}
         aria-label={t("metadataInfo", "Informação de Metadados")}
-        onClick={e => setModalThemeInfoOpen(layer)}
+        onClick={e => open()}
       >
         <i className="pi pi-info-circle" aria-hidden="true" />
       </ActionIcon>
 
-      <Modal
+      <Dialog
         title={t("themeInfo", "Informação do Tema")}
-        opened={!!modalThemeInfoOpen}
+        opened={opened}
         size={isMobile ? '90%' : '50vw'}
-        onClose={e => setModalThemeInfoOpen(false)}>
+        onClose={close}>
         <ThemeInfo
           viewer={viewer}
           mainMap={mainMap}
           core={core}
           models={models}
-          theme={modalThemeInfoOpen}
+          theme={layer}
           downloadTheme={theme => actions.downloadTheme(theme)}
         />
-      </Modal>
+      </Dialog>
     </React.Fragment>
   )
 }

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { ActionIcon, Modal } from '@mantine/core';
+import React from 'react';
+import { ActionIcon } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog, useIsMobile } from '@scalargis/ui';
 import ThemeAttributes from './ThemeAttributes';
 
 function hasAttributes(theme) {
@@ -20,11 +22,9 @@ export default function Main(props) {
 
   const { config } = props;
   const { layer, dispatch, actions, models } = config;
-  const { getWindowSize } = models.Utils;
-  const [modalThemeAttributesOpen, setModalThemeAttributesOpen] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const target = layer?.datatable?.target || props?.config?.target;
 
@@ -50,19 +50,19 @@ export default function Main(props) {
         onClick={e => {
           dispatch(actions.searchlayers_set_layer(target, layer));
           dispatch(actions.viewer_set_selectedmenu(target));
-          //setModalThemeAttributesOpen(layer)
+          //open()
         }}
       >
         <i className="pi pi-table" aria-hidden="true" />
       </ActionIcon>
 
-      <Modal
+      <Dialog
         title="Tabela de Atributos"
-        opened={!!modalThemeAttributesOpen}
+        opened={opened}
         size={isMobile ? '90%' : '50vw'}
-        onClose={e => setModalThemeAttributesOpen(false)}>
-        <ThemeAttributes theme={modalThemeAttributesOpen} />
-      </Modal>
+        onClose={close}>
+        <ThemeAttributes theme={layer} />
+      </Dialog>
     </React.Fragment>
   )
 }

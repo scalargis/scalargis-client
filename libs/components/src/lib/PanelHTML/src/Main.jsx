@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Button, Group, Modal } from '@mantine/core';
-import { CollapsiblePanel } from '@scalargis/ui';
+import React from 'react';
+import { Button } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { CollapsiblePanel, Dialog } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 
@@ -13,16 +14,12 @@ import './style.css'
 export function MainMenu({ className, config, actions, record }) {
 
   const { viewer, dispatch, Models } = config;
-  const { getWindowSize } = Models.Utils;
 
-  const [showPopup, setShowPopup] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const component_cfg = record.config_json || {};
   const title = record.title || '';
   const header = component_cfg.header || title;
-
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
 
   const menuButton = component_cfg?.btn_image ? (
     <MainMenuButton
@@ -30,14 +27,14 @@ export function MainMenu({ className, config, actions, record }) {
       className={className ? className + ' main-menu-btn-image' : 'main-menu-btn-image'}
       icon="pi"
       style={{ backgroundImage: `url("${component_cfg.btn_image}")` }}
-      onClick={e => record.as === 'popup' ? setShowPopup(true) : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+      onClick={e => record.as === 'popup' ? open() : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   ) : (
     <MainMenuButton
       title={title}
       className={className}
       icon={component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-question-circle"}
-      onClick={e => record.as === 'popup' ? setShowPopup(true) : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
+      onClick={e => record.as === 'popup' ? open() : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   );
 
@@ -47,21 +44,17 @@ export function MainMenu({ className, config, actions, record }) {
       <React.Fragment>
         {menuButton}
 
-        <Modal
+        <Dialog
           title={header}
-          opened={showPopup}
-          size={isMobile ? '90%' : '35vw'}
-          onClose={e => setShowPopup(false)}>
+          opened={opened}
+          onClose={close}
+          footer={<Button onClick={close}>{closeLabel}</Button>}>
 
           <PanelHtmlContent
             config={component_cfg}
           />
 
-          <Group justify="flex-end" mt="md">
-            <Button onClick={e => setShowPopup(false)}>{closeLabel}</Button>
-          </Group>
-
-        </Modal>
+        </Dialog>
 
       </React.Fragment>
     )

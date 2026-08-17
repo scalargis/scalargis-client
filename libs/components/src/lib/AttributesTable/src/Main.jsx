@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { ActionIcon, Modal, TextInput } from '@mantine/core'
-import { DataGrid } from '@scalargis/ui'
+import { ActionIcon, TextInput } from '@mantine/core'
+import { DataGrid, Dialog } from '@scalargis/ui'
 
 export default function Main({ open, as, onOpen, onClose, data, fields }) {
 
@@ -80,7 +80,7 @@ export default function Main({ open, as, onOpen, onClose, data, fields }) {
   }));
 
   return (
-      <Modal
+      <Dialog
           title="Tabela de Attributos"
           opened={open}
           size="50vw"
@@ -101,6 +101,6 @@ export default function Main({ open, as, onOpen, onClose, data, fields }) {
               sortStatus={sortStatus || undefined}
               onSortStatusChange={(status) => { setSortStatus(status); setPage(1); }}
             />
-          </Modal>
+          </Dialog>
   )
 }

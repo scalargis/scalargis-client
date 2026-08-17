@@ -1,7 +1,9 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import Cookies from 'universal-cookie';
-import { Button, Group, Modal, Switch } from '@mantine/core';
+import { Button, Group, Switch } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog, useIsMobile } from '@scalargis/ui';
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
 import { LocaleSelectorComponent } from '../../components';
@@ -29,11 +31,10 @@ export default function Main({ config, as, core, actions, utils, record }) {
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
-  const [showPopup, setShowPopup] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const [permanent, setPermanent] = useState(false);
 
-  const wsize = utils.getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
 
   function getInitialState() {
@@ -60,7 +61,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
   }
 
   function hidePopup() {
-    setShowPopup(false);
+    close();
     const data = JSON.stringify(0);
     const cookies = new Cookies();
     let maxAge = 1;
@@ -74,7 +75,7 @@ export default function Main({ config, as, core, actions, utils, record }) {
 
   useEffect(() => {
     const state = getInitialState();
-    setShowPopup(state);
+    if (state) open();
 
     if (!state) {
       setTimeout(() => {
@@ -113,24 +114,16 @@ export default function Main({ config, as, core, actions, utils, record }) {
 
   return (
     <Fragment>
-      <Modal
+      <Dialog
         title={header}
-        opened={showPopup}
+        opened={opened}
         size={isMobile ? config?.modileDialogWidth ||'90%' : config?.dialogWidth || '35vw'}
         withOverlay={modal}
         lockScroll={modal}
         trapFocus={modal}
-        onClose={e => hidePopup()}>
-          <div>
-            { record?.config_json?.showLocaleSelector === true &&
-            <div className="col-12 pt-0" style={{ textAlign: 'right'}}>
-              <LocaleSelectorComponent config={config} actions={actions} componentConfig={localeSelectorCfg} className="popupinfo-locale-selector" />
-            </div>
-            }
-            <div dangerouslySetInnerHTML={{ __html: html }}></div>
-          </div>
-
-          <Group justify="space-between" mt="md">
+        onClose={e => hidePopup()}
+        footer={
+          <Group justify="space-between" w="100%">
             {(!config.hideOption &&
               <Switch
                 size="md"
@@ -140,7 +133,16 @@ export default function Main({ config, as, core, actions, utils, record }) {
               />) || <span />}
             <Button onClick={e => hidePopup() }>{closeLabel}</Button>
           </Group>
-      </Modal>
+        }>
+          <div>
+            { record?.config_json?.showLocaleSelector === true &&
+            <div className="col-12 pt-0" style={{ textAlign: 'right'}}>
+              <LocaleSelectorComponent config={config} actions={actions} componentConfig={localeSelectorCfg} className="popupinfo-locale-selector" />
+            </div>
+            }
+            <div dangerouslySetInnerHTML={{ __html: html }}></div>
+          </div>
+      </Dialog>
     </Fragment>
   )
 }
