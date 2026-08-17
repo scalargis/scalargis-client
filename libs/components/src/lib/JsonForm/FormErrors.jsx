@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { Button, Group, Modal } from '@mantine/core';
+import React from "react";
+import { Button, Group } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog } from '@scalargis/ui';
 
 const displayModes = {
   STATIC: 'static',
@@ -10,7 +12,7 @@ const displayModes = {
 function FormErrors(props) {
   const { errors, data, show, displayMode, t } = props;
 
-  const [showErrors, setShowErrors] = useState(false);
+  const [showErrors, { toggle, close }] = useDisclosure(false);
 
   if (!show || !errors?.length) return null;
 
@@ -39,19 +41,21 @@ function FormErrors(props) {
     <>
       {<div className="text-right">
         <Button variant="subtle" color="danger"
-          onClick={(e) => setShowErrors(!showErrors)}>
+          onClick={toggle}>
           {lblErrorsBtn}
         </Button>
       </div>}
         { props?.displayMode === displayModes.DIALOG ?
-          <Modal title={props?.title || "Erros do formulário"} opened={showErrors} size="50vw" onClose={() => setShowErrors(false)}>
+          <Dialog title={props?.title || "Erros do formulário"} opened={showErrors} size="50vw" onClose={close}
+            footer={
+              <Group justify="flex-end">
+                <Button onClick={close}>{t("close", "Fechar")}</Button>
+              </Group>
+            }>
             <div aria-live="polite" className="dataform-inline-message p-component dataform-inline-message-error mt-2 mb-2" role="alert">
               {buildErrorsList()}
             </div>
-            <Group justify="flex-end" mt="md">
-              <Button onClick={()=>setShowErrors(false)}>{t("close", "Fechar")}</Button>
-            </Group>
-          </Modal> :
+          </Dialog> :
           showErrors &&
             <div aria-live="polite" className="dataform-inline-message p-component dataform-inline-message-error mt-2 mb-2" role="alert">
               {buildErrorsList()}

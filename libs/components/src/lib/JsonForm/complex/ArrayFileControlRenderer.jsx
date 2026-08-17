@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 
 import { ActionIcon, Alert, Badge, Button, Group } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { confirm } from '@scalargis/ui';
 
 import {
@@ -39,7 +40,7 @@ export const ArrayFileControlRenderer = (props) => {
 
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
-  const [showFileForm, setShowFileForm] = useState(false);
+  const [showFileForm, { open: openFileForm, close: closeFileForm }] = useDisclosure(false);
 
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
@@ -59,7 +60,7 @@ export const ArrayFileControlRenderer = (props) => {
           index={rowIndex}
           utils={ctx.utils}
           showForm={showFileForm}
-          setShowForm={setShowFileForm}
+          setShowForm={(v) => (v ? openFileForm() : closeFileForm())}
           onChange={(data) => {
             // TODO
           }}
@@ -71,7 +72,7 @@ export const ArrayFileControlRenderer = (props) => {
               newData[rowIndex] = {...data};
             }
             props.handleChange(props.path, newData);
-            setShowFileForm(false);
+            closeFileForm();
           }}
         />
       )}
@@ -103,7 +104,7 @@ export const ArrayFileControlRenderer = (props) => {
                             aria-label={translateMsg("common.editFile", "editFile", "Editar ficheiro", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
-                              setShowFileForm(true);
+                              openFileForm();
                               setRowIndex(index);
                               setRowData(item);
                             }}>
@@ -151,7 +152,7 @@ export const ArrayFileControlRenderer = (props) => {
         <Button variant="subtle" style={{width: 'auto'}}
           onClick={(e) => {
             e.preventDefault();
-            setShowFileForm(true);
+            openFileForm();
             setRowIndex(null);
             setRowData(null);
           }}>

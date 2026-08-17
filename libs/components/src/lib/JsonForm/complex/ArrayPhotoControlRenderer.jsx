@@ -1,7 +1,8 @@
 import React, { useCallback, useContext, useState } from 'react';
 
-import { ActionIcon, Alert, Badge, Button, Group, Image, Modal, UnstyledButton } from '@mantine/core';
-import { confirm } from '@scalargis/ui';
+import { ActionIcon, Alert, Badge, Button, Group, Image, UnstyledButton } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { confirm, Lightbox } from '@scalargis/ui';
 
 import {
   isObjectArrayControl,
@@ -23,15 +24,13 @@ import { translateMsg } from './../util/i18n';
 /** Prime Image `preview` twin: the thumbnail is a real button that opens the
  *  full-size photo in a modal. */
 const PhotoPreview = ({ src, alt, title }) => {
-  const [opened, setOpened] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
   return (
     <>
-      <UnstyledButton type="button" onClick={() => setOpened(true)} title={title} aria-label={title}>
+      <UnstyledButton type="button" onClick={open} title={title} aria-label={title}>
         <Image src={src} alt={alt} w={100} fit="contain" />
       </UnstyledButton>
-      <Modal opened={opened} onClose={() => setOpened(false)} title={alt} size="auto">
-        <Image src={src} alt={alt} fit="contain" mah="75vh" />
-      </Modal>
+      <Lightbox opened={opened} onClose={close} title={alt} src={src} alt={alt} />
     </>
   );
 };
@@ -55,7 +54,7 @@ export const ArrayPhotoControlRenderer = (props) => {
 
   const [rowIndex, setRowIndex] = useState(undefined);
   const [rowData, setRowData] = useState(undefined);
-  const [showPhotoForm, setShowPhotoForm] = useState(false);
+  const [showPhotoForm, { open: openPhotoForm, close: closePhotoForm }] = useDisclosure(false);
 
   const deleteConfirm = useCallback((index) => {
     removeItems(props.path, [index])();
@@ -75,7 +74,7 @@ export const ArrayPhotoControlRenderer = (props) => {
           index={rowIndex}
           utils={ctx.utils}
           showForm={showPhotoForm}
-          setShowForm={setShowPhotoForm}
+          setShowForm={(v) => (v ? openPhotoForm() : closePhotoForm())}
           onChange={(data) => {
             // TODO
           }}
@@ -87,7 +86,7 @@ export const ArrayPhotoControlRenderer = (props) => {
               newData[rowIndex] = {...data};
             }
             props.handleChange(props.path, newData);
-            setShowPhotoForm(false);
+            closePhotoForm();
           }}
         />
       )}
@@ -120,7 +119,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                             aria-label={translateMsg("common.editPhoto", "editPhoto", "Editar fotografia", i18Props)}
                             onClick={(e) => {
                               e.preventDefault();
-                              setShowPhotoForm(true);
+                              openPhotoForm();
                               setRowIndex(index);
                               setRowData(item);
                             }}>
@@ -167,7 +166,7 @@ export const ArrayPhotoControlRenderer = (props) => {
         <Button variant="subtle" style={{width: 'auto'}}
           onClick={(e) => {
             e.preventDefault();
-            setShowPhotoForm(true);
+            openPhotoForm();
             setRowIndex(null);
             setRowData(null);
           }}>

@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
-import { ActionIcon, Modal } from '@mantine/core';
+import { ActionIcon } from '@mantine/core';
+import { Dialog, useIsMobile } from '@scalargis/ui';
 import EditNode from './EditNode';
 
 export default function Main(props) {
 
   const { config } = props;
   const { layer, actions, models, viewer } = config;
-  const { getWindowSize, isComponentExcludedForLayer } = models.Utils;
+  const { isComponentExcludedForLayer } = models.Utils;
 
   const [modalEditOpen, setModalEditOpen] = useState(null);
 
   const { t } = useTranslation();
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const exclude = isComponentExcludedForLayer(viewer, layer, "LayerEdit");
 
@@ -35,7 +35,7 @@ export default function Main(props) {
         <i className="pi pi-pencil" aria-hidden="true" />
       </ActionIcon>
 
-      <Modal
+      <Dialog
         title={t("personalizarTema", "Personalizar Tema")}
         opened={!!modalEditOpen}
         size={isMobile ? '90%' : '50vw'}
@@ -47,7 +47,7 @@ export default function Main(props) {
             actions.applyThemeChanges(theme);
           }}
         />
-      </Modal>
+      </Dialog>
     </React.Fragment>
   )
 }

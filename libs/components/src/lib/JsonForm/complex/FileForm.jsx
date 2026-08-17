@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Button, Group, Modal } from '@mantine/core';
+import { Button, Group } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Dialog, useIsMobile } from '@scalargis/ui';
 
 import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '../../components';
 
@@ -9,17 +11,14 @@ export default function FileForm(props) {
 
   const { schema, path, label, t, locale } = props;
 
-  const { getWindowSize } = props.utils;
-
   const [isSaving, setIsSaving] = useState(false);
 
   const [formErrors, setFormErrors] = useState();
   const [formData, setFormData] = useState({...(props?.data || {})});
 
-  const [showFormErrors, setShowFormErrors] = useState(false);
+  const [showFormErrors, { open: openFormErrors, close: closeFormErrors }] = useDisclosure(false);
 
-  const wsize = getWindowSize();
-  const isMobile = wsize[0] <= 768;
+  const isMobile = useIsMobile();
 
   const uischema = props.uischema.elements[0];
 
@@ -34,12 +33,12 @@ export default function FileForm(props) {
       const fallbackElem = `${locale}.controls`;
       const message = translateMsg(`${elem}.addFileRequired`, `${fallbackElem}.addFileRequired`, 'You need to add a file.', {t, schema, uischema, path});
       setFormErrors([{message}]);
-      setShowFormErrors(true);
+      openFormErrors();
       return;
     }
 
     if (formErrors?.length > 0) {
-      setShowFormErrors(true);
+      openFormErrors();
       return;
     }
 
@@ -58,29 +57,14 @@ export default function FileForm(props) {
   }, [locale, schema, uischema, path]);
 
   return (
-    <Modal
+    <Dialog
       title={labels.title}
       opened={!!props.showForm}
       className="jsonform-file-form-editor"
       size={isMobile ? '90%' : '50vw'}
       onClose={() => props.setShowForm(false)}
-      >
-        <div>
-          <JsonForm
-            data={props.data}
-            onChange={({errors, data}) => {
-              setFormErrors(errors);
-              setFormData(data);
-              setShowFormErrors(false);
-            }}
-            schema={schema}
-            uischema={uischema}
-            renderers={JsonFormDefaultRenderers}
-            locale={locale}
-          />
-          <FormErrors errors={formErrors} data={formData} show={showFormErrors} displayMode="static" />
-        </div>
-        <Group justify="flex-end" mt="md">
+      footer={
+        <Group justify="flex-end">
           <Button variant="subtle"
             leftSection={<i className="pi pi-times" aria-hidden="true" />}
             disabled={isSaving}
@@ -95,6 +79,23 @@ export default function FileForm(props) {
             {labels.save}
           </Button>
         </Group>
-    </Modal>
+      }
+      >
+        <div>
+          <JsonForm
+            data={props.data}
+            onChange={({errors, data}) => {
+              setFormErrors(errors);
+              setFormData(data);
+              closeFormErrors();
+            }}
+            schema={schema}
+            uischema={uischema}
+            renderers={JsonFormDefaultRenderers}
+            locale={locale}
+          />
+          <FormErrors errors={formErrors} data={formData} show={showFormErrors} displayMode="static" />
+        </div>
+    </Dialog>
   )
 }
