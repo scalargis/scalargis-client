@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation} from "react-i18next"
 import { transform } from 'ol/proj'
-import { Alert, Button, Checkbox, Group, Switch, Table } from '@mantine/core'
+import { Alert, Button, Checkbox, Group, Switch } from '@mantine/core'
+import { AttributeTable } from '@scalargis/ui'
 
 const StatusMessage = ({ color, icon, text }) => (
   <Alert color={color} py="xs">
@@ -175,16 +176,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
 
       { geolocation &&
       <div className="card pt-2 p-0">
-          <Table>
-            <Table.Tbody>
-              {results.map(r => (
-                <Table.Tr key={r.field}>
-                  <Table.Td>{r.field}</Table.Td>
-                  <Table.Td>{r.value}</Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
+          <AttributeTable rows={results.map(r => ({ key: r.field, label: r.field, value: r.value }))} />
       </div> }
   </div>
   )

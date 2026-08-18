@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Accordion, ActionIcon, Alert, Button, Group, Table } from '@mantine/core';
+import { Accordion, ActionIcon, Alert, Button, Group } from '@mantine/core';
+import { AttributeTable } from '@scalargis/ui';
 import OlCollection from 'ol/Collection';
 import OlFeature from 'ol/Feature';
 import OlFormatGeoJSON from "ol/format/GeoJSON";
@@ -244,8 +245,6 @@ export default function FeatureResults({ core, config, features, layers, actions
               }
             }
             
-            const cellStyle = { whiteSpace: "pre-wrap", overflowWrap: "break-word" };
-
             return (
               <Accordion.Item key={layerId} value={layerId}>
                 <Accordion.Control>{i18n.translateValue(grouped[layerId].layerName)}</Accordion.Control>
@@ -295,22 +294,15 @@ export default function FeatureResults({ core, config, features, layers, actions
                           <i className="pi pi-times" aria-hidden="true" />
                         </ActionIcon>
                       </div>
-                      <Table className="fi-result-table">
-                        <Table.Thead>
-                          <Table.Tr>
-                            {!isText && <Table.Th>&nbsp;</Table.Th>}
-                            <Table.Th>&nbsp;</Table.Th>
-                          </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                          {rows.map((row, ri) => (
-                            <Table.Tr key={row.key ?? ri}>
-                              {!isText && <Table.Td style={cellStyle}>{row.name}</Table.Td>}
-                              <Table.Td style={cellStyle}>{valueTemplate(row)}</Table.Td>
-                            </Table.Tr>
-                          ))}
-                        </Table.Tbody>
-                      </Table>
+                      <AttributeTable
+                        className="fi-result-table"
+                        hideLabels={isText}
+                        rows={rows.map((row, ri) => ({
+                          key: row.key ?? ri,
+                          label: isText ? undefined : row.name,
+                          value: valueTemplate(row),
+                        }))}
+                      />
                     </div>
                   )
 

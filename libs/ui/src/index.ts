@@ -74,5 +74,8 @@ export type { LightboxProps } from './recipes/Lightbox';
 export { Field } from './recipes/Field';
 export type { FieldProps } from './recipes/Field';
 
+export { AttributeTable } from './recipes/AttributeTable';
+export type { AttributeTableProps, AttributeRow } from './recipes/AttributeTable';
+
 /* ─── Hooks ──────────────────────────────────────────────────────────── */
 export { useIsMobile } from './hooks/useIsMobile';
