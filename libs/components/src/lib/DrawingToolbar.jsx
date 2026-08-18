@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import { ActionIcon, Group } from '@mantine/core';
+import { Group } from '@mantine/core';
 
+import MapToolButton from './MapToolButton';
 import './drawing-toolbar.css';
 
 const DRAW_TOOLS = [
@@ -28,39 +29,33 @@ export default function DrawingToolbar({ availableTools, activeTool, onSelectToo
           if (!availableTools || availableTools.length === 0) return true;
           return availableTools.includes(opt.value.toLowerCase());
         }).map(opt => (
-          <ActionIcon
+          <MapToolButton
             key={opt.value}
             size="md"
             variant={opt.value === activeTool ? 'filled' : 'default'}
-            aria-pressed={opt.value === activeTool}
+            active={opt.value === activeTool}
+            icon={opt.icon}
             title={t(opt.title, opt.defaultTitle)}
-            aria-label={t(opt.title, opt.defaultTitle)}
             onClick={(e) => onSelectTool(e, opt.value)}
-          >
-            <i className={opt.icon} aria-hidden="true" />
-          </ActionIcon>
+          />
         ))}
       </Group>
       <Group gap={4} wrap="nowrap">
-        <ActionIcon
+        <MapToolButton
           size="md"
           variant="filled"
           color="danger"
+          icon="pi pi-trash"
           title={deleteTitle}
-          aria-label={deleteTitle}
           onClick={() => onDeleteSelected()}
-        >
-          <i className="pi pi-trash" aria-hidden="true" />
-        </ActionIcon>
-        <ActionIcon
+        />
+        <MapToolButton
           size="md"
           variant="default"
+          icon="pi pi-search-plus"
           title={t("viewAllElements", "Ver todos os elementos")}
-          aria-label={t("viewAllElements", "Ver todos os elementos")}
           onClick={() => onZoomAll()}
-        >
-          <i className="pi pi-search-plus" aria-hidden="true" />
-        </ActionIcon>
+        />
       </Group>
     </Group>
   );

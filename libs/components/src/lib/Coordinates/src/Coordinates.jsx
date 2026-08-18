@@ -20,6 +20,7 @@ import OlPoint from 'ol/geom/Point'
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import * as OlProj from 'ol/proj';
 
+import { MapToolButton } from '../../components';
 import { MAPCONTROL_NAME } from './utils';
 
 import './style.css';
@@ -468,25 +469,19 @@ export default function Coordinates({ core, config, actions, dispatch, record })
     return (data ? (
       <div className="col-12 coordinates-item">
         <Group className="coordinates-item-tools" justify="flex-end" gap={0}>
-          <ActionIcon
-            type="button"
+          <MapToolButton
             radius={0}
+            icon="pi pi-search"
             title={t("zoomToElement", "Aproximar ao elemento")}
-            aria-label={t("zoomToElement", "Aproximar ao elemento")}
             onClick={e => zoomItem(data)}
-          >
-            <i className="pi pi-search" aria-hidden="true" />
-          </ActionIcon>
+          />
           {renderSaveBtn(data)}
-          <ActionIcon
-            type="button"
+          <MapToolButton
             radius={0}
+            icon="pi pi-times"
             title={t("removeElement","Remover elemento")}
-            aria-label={t("removeElement","Remover elemento")}
             onClick={e => removeItem(data)}
-          >
-            <i className="pi pi-times" aria-hidden="true" />
-          </ActionIcon>
+          />
         </Group>
         <table>
           <tbody>

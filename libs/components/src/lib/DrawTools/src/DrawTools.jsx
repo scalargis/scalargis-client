@@ -2,6 +2,7 @@ import React from 'react';
 import i18next from "i18next";
 import { ActionIcon, Button, Group, Paper, Popover, Select, Stack, TextInput } from '@mantine/core';
 import { DataGrid, notify } from '@scalargis/ui';
+import { MapToolButton } from '../../components';
 import { getAppRootPath } from '../../utils/common';
 import OlFormatWKT from "ol/format/WKT";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
@@ -900,33 +901,31 @@ class DrawTools extends React.Component {
             <Group gap="sm" wrap="wrap">
               <Group gap={4} wrap="nowrap">
                 {drawElementsOptions.map(opt =>
-                  <ActionIcon
+                  <MapToolButton
                     key={opt.value}
                     size="lg"
                     variant={opt.value === selectedTool ? 'filled' : 'default'}
-                    aria-pressed={opt.value === selectedTool}
+                    active={opt.value === selectedTool}
                     title={i18next.t(opt.title, opt.defaultTitle)}
-                    aria-label={i18next.t(opt.title, opt.defaultTitle)}
                     onClick={(e) => this.startDraw(e, opt.value)}
                   >
                     {opt.icon()}
-                  </ActionIcon>
+                  </MapToolButton>
                 )}
               </Group>
 
               <Group gap={4} wrap="nowrap">
                 {selectTools.map(opt =>
-                  <ActionIcon
+                  <MapToolButton
                     key={opt.value}
                     size="lg"
                     variant={opt.value === selectedTool ? 'filled' : 'default'}
-                    aria-pressed={opt.value === selectedTool}
+                    active={opt.value === selectedTool}
                     title={i18next.t(opt.title, opt.defaultTitle)}
-                    aria-label={i18next.t(opt.title, opt.defaultTitle)}
                     onClick={(e) => this.startDraw(e, opt.value)}
                   >
                     {opt.icon()}
-                  </ActionIcon>
+                  </MapToolButton>
                 )}
               </Group>
             </Group>
@@ -988,13 +987,13 @@ class DrawTools extends React.Component {
 
             <Group gap={4} wrap="nowrap">
               {historyTools.map(opt =>
-                <ActionIcon
+                <MapToolButton
                   key={opt.value}
                   size="lg"
                   variant={opt.value !== "clear" ? "default" : "filled"}
                   color={opt.value !== "clear" ? undefined : "danger"}
+                  icon={opt.icon}
                   title={i18next.t(opt.title, opt.defaultTitle)}
-                  aria-label={i18next.t(opt.title, opt.defaultTitle)}
                   onClick={(e) => {
                     switch (opt.value) {
                       case 'undo': this.clickUndo(e); break;
@@ -1003,9 +1002,7 @@ class DrawTools extends React.Component {
                       default: ;
                     }
                   }}
-                >
-                  <i className={opt.icon} aria-hidden="true" />
-                </ActionIcon>
+                />
               )}
             </Group>
 
@@ -1025,16 +1022,14 @@ class DrawTools extends React.Component {
               >
                 Aplicar
               </Button>
-              <ActionIcon
+              <MapToolButton
                 size="input-sm"
                 variant="filled"
                 color="danger"
+                icon="pi pi-trash"
                 title="Apagar desenho"
-                aria-label="Apagar desenho"
                 onClick={e => this.removeFeature()}
-              >
-                <i className="pi pi-trash" aria-hidden="true" />
-              </ActionIcon>
+              />
             </Group>
           </React.Fragment>
         ) : null}
@@ -1151,27 +1146,23 @@ class DrawTools extends React.Component {
                 textAlign: 'right',
                 render: row => (
                   <Group gap={4} justify="flex-end" wrap="nowrap">
-                    <ActionIcon
+                    <MapToolButton
                       variant="subtle"
                       radius="xl"
                       size="md"
+                      icon="pi pi-search"
                       title={i18next.t("locate", "Localizar")}
-                      aria-label={i18next.t("locate", "Localizar")}
                       onClick={() => this.zoom(row)}
-                    >
-                      <i className="pi pi-search" aria-hidden="true" />
-                    </ActionIcon>
-                    <ActionIcon
+                    />
+                    <MapToolButton
                       variant="subtle"
                       color="danger"
                       radius="xl"
                       size="md"
+                      icon="pi pi-trash"
                       title={i18next.t("delete", "Eliminar")}
-                      aria-label={i18next.t("delete", "Eliminar")}
                       onClick={() => this.deleteItem(row)}
-                    >
-                      <i className="pi pi-trash" aria-hidden="true" />
-                    </ActionIcon>
+                    />
                   </Group>
                 ),
               },

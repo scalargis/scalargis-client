@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 
-import { ActionIcon, Alert, Group, Select, Slider } from '@mantine/core';
+import { Alert, Group, Select, Slider } from '@mantine/core';
 
-import { Legend } from '../../components';
+import { Legend, MapToolButton } from '../../components';
 
 
 function parseTimeValues (data) {
@@ -465,40 +465,40 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
         disabled={!hasTimeData}
       />
       <Group justify="center" gap={0} wrap="nowrap" className="scalargis-timeline">
-        <ActionIcon.Group>
-          <ActionIcon
+        <MapToolButton.Group>
+          <MapToolButton
             variant="filled" size="lg"
-            title="Primeira data" aria-label="Primeira data"
-            onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}>
-            <i className="pi pi-angle-double-left" aria-hidden="true" />
-          </ActionIcon>
-          <ActionIcon
+            icon="pi pi-angle-double-left"
+            title="Primeira data"
+            onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}
+          />
+          <MapToolButton
             variant="filled" size="lg"
-            title="Data anterior" aria-label="Data anterior"
+            icon="pi pi-angle-left"
+            title="Data anterior"
             onClick={(e) => {
               if (currentPos) setCurrentPos(currentPos - 1);
             }}
             disabled={!hasTimeData}
-          >
-            <i className="pi pi-angle-left" aria-hidden="true" />
-          </ActionIcon>
+          />
           { intervalId ?
-            <ActionIcon
+            <MapToolButton
               variant="filled" size="lg"
-              title="Pausar" aria-label="Pausar"
-              onClick={(e) => { stopIntervalHandler(); }}>
-              <i className="pi pi-pause" aria-hidden="true" />
-            </ActionIcon> :
-            <ActionIcon
+              icon="pi pi-pause"
+              title="Pausar"
+              onClick={(e) => { stopIntervalHandler(); }}
+            /> :
+            <MapToolButton
               variant="filled" size="lg"
-              title="Reproduzir" aria-label="Reproduzir"
-              onClick={(e) => { startIntervalHandler(); }} disabled={!hasTimeData}>
-              <i className="pi pi-play" aria-hidden="true" />
-            </ActionIcon>
+              icon="pi pi-play"
+              title="Reproduzir"
+              onClick={(e) => { startIntervalHandler(); }} disabled={!hasTimeData}
+            />
           }
-          <ActionIcon
+          <MapToolButton
             variant="filled" size="lg"
-            title="Data seguinte" aria-label="Data seguinte"
+            icon="pi pi-angle-right"
+            title="Data seguinte"
             onClick={(e) => {
               if (timeData?.length) {
                 if (currentPos + 1 < timeData.length) {
@@ -509,16 +509,14 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
               }
             }}
             disabled={!hasTimeData}
-          >
-            <i className="pi pi-angle-right" aria-hidden="true" />
-          </ActionIcon>
-          <ActionIcon
+          />
+          <MapToolButton
             variant="filled" size="lg"
-            title="Última data" aria-label="Última data"
-            onClick={(e) => { if (timeData?.length) setCurrentPos(timeData.length - 1); }} disabled={!hasTimeData}>
-            <i className="pi pi-angle-double-right" aria-hidden="true" />
-          </ActionIcon>
-        </ActionIcon.Group>
+            icon="pi pi-angle-double-right"
+            title="Última data"
+            onClick={(e) => { if (timeData?.length) setCurrentPos(timeData.length - 1); }} disabled={!hasTimeData}
+          />
+        </MapToolButton.Group>
       </Group>
     </div>
   )
