@@ -238,9 +238,9 @@ function UserList(props) {
         textAlign: 'center',
         render: (record) =>
           record.active ? (
-            <i className="pi pi-check" style={{ fontWeight: 'bold', color: '#28a745' }} />
+            <i className="pi pi-check" style={{ fontWeight: 'bold', color: 'var(--mantine-color-success-filled)' }} />
           ) : (
-            <i className="pi pi-times" style={{ fontWeight: 'bold', color: '#D32F2F' }} />
+            <i className="pi pi-times" style={{ fontWeight: 'bold', color: 'var(--mantine-color-danger-filled)' }} />
           ),
         filter: (
           <Select

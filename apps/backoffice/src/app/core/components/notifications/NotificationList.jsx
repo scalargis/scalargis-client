@@ -152,7 +152,7 @@ function NotificationList(props) {
           <>
             {record.name && <span>{record.name}</span>}
             {record.name && record.email ? <br /> : null}
-            {record.email && <span style={{color: '#707070', fontSize: '.9rem'}}>{record.email}</span>}
+            {record.email && <span style={{color: 'var(--mantine-color-dimmed)', fontSize: '.9rem'}}>{record.email}</span>}
           </>
         ),
         exportRender: (record) => (record.name + (record.email ? ` (${record.email})` : ''))

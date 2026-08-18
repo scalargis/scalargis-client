@@ -54,7 +54,7 @@ export default function ModuleManager(props) {
 
       </div>
 
-      <div id="content" style={{ backgroundColor: 'white', color: '#303030', overflowY: 'auto', flex: '1', width: '100%', padding: '5px' }}>
+      <div id="content" style={{ backgroundColor: 'var(--mantine-color-body)', color: 'var(--mantine-color-text)', overflowY: 'auto', flex: '1', width: '100%', padding: '5px' }}>
       
         { core.renderComponents({
           id: selected_menu,
