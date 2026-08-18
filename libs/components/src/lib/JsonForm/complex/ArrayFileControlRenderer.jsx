@@ -96,7 +96,7 @@ export const ArrayFileControlRenderer = (props) => {
                       <tr key={index}>
                         <td className="col-9" style={{"verticalAlign": "top", "wordBreak": "break-all"}}>
                           <div>{(f?.original_filename || f?.filename)}</div>
-                          <div className="file-description" style={{"fontSize": "0.9rem","color": "#b7bdbb"}}>{(item?.description)}</div>
+                          <div className="file-description" style={{"fontSize": "0.9rem","color": "var(--mantine-color-dimmed)"}}>{(item?.description)}</div>
                         </td>
                         <td className="col-1" style={{"verticalAlign": "middle", "textAlign": "center"}}>
                           <ActionIcon variant="outline" radius="xl" size="md" mb="xs"

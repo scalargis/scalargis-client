@@ -274,7 +274,7 @@ export default function PrintPanel4(props) {
                   <div className="col">
                     { print.processed ?
                       <a href={print.url} target="_blank" title={t("openPrint", "Abrir planta")}
-                        style={ { textDecoration: "none", color: "#2196f3"} } rel="noreferrer">
+                        style={ { textDecoration: "none", color: "var(--mantine-color-primary-filled)"} } rel="noreferrer">
                         <i className="pi pi-external-link pl-2"></i>
                       </a> : null
                     }
@@ -288,7 +288,7 @@ export default function PrintPanel4(props) {
 
       { mergedFile ?
         <div className="card text-center">
-          <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "#2196f3"} } rel="noreferrer">
+          <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "var(--mantine-color-primary-filled)"} } rel="noreferrer">
             <i className="pi pi-external-link pl-2"></i> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
           </a>
         </div> :

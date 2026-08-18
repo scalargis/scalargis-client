@@ -197,7 +197,7 @@ export default function Main({ type, as, config, actions, record }) {
         rel="noreferrer"
         title={title}
         className={component_cfg?.elementType === 'link' ? "sg-help-button-link" : "sg-help-button-external"}
-        style={{"color": "#ffffff"}}
+        style={{ color: 'var(--mantine-color-white)' }}
       >
         { component_cfg?.elementType !== 'link' &&
           <span className="layout-topbar-item-text">{title}</span> }
