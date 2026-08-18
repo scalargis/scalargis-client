@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation} from "react-i18next";
 import { Alert, Button, Group, Select } from '@mantine/core';
+import { Field } from '@scalargis/ui';
 import PrintGroupItem from "./PrintGroupItem";
 
 import './style.css'
 
 export default function PrintPanel3(props) {
 
-  const { printGroup, printDetails, setFinalPrints, fields, handleFieldChange, config, actions } = props;
+  // formControl/setFieldValue come off the RHF useForm() Print.jsx owns (B-08);
+  // named to avoid colliding with the pre-existing `control` prop (the viewer record).
+  const { printGroup, printDetails, setFinalPrints, formControl, setFieldValue, config, actions } = props;
 
   const { t } = useTranslation();
 
@@ -88,7 +91,7 @@ export default function PrintPanel3(props) {
 
     setFormats(ff);
 
-    if (ff.length > 0) handleFieldChange({ target: { id: 'layout', value: ff[0] } });
+    if (ff.length > 0) setFieldValue('layout', ff[0], { shouldValidate: true, shouldDirty: true });
 
   }, []);
 
@@ -105,16 +108,21 @@ export default function PrintPanel3(props) {
 
       <div className="p-fluid">
         <h4>Formato</h4>
-        <Select id="layout"
-          aria-label="Formato"
-          data={(formats || []).map(f => ({ value: f.format + '|' + f.orientation, label: f.label }))}
-          value={fields.layout ? fields.layout.format + '|' + fields.layout.orientation : null}
-          onChange={(v) => {
-            const f = (formats || []).find(x => x.format + '|' + x.orientation === v);
-            if (f) handleFieldChange({ target: { id: 'layout', value: f } });
-          }}
-          allowDeselect={false}
-          placeholder={t("selectFormat", "Selecione um Formato")} />
+        <Field name="layout" control={formControl}>
+          {(field) => (
+            <Select
+              id={field.id}
+              aria-label="Formato"
+              data={(formats || []).map(f => ({ value: f.format + '|' + f.orientation, label: f.label }))}
+              value={field.value ? field.value.format + '|' + field.value.orientation : null}
+              onChange={(v) => {
+                const f = (formats || []).find(x => x.format + '|' + x.orientation === v);
+                if (f) field.onChange(f);
+              }}
+              allowDeselect={false}
+              placeholder={t("selectFormat", "Selecione um Formato")} />
+          )}
+        </Field>
       </div>
 
       <div className="p-fluid">

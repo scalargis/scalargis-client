@@ -1,28 +1,46 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
+import { useFormContext } from 'react-hook-form';
 import { TextInput } from '@mantine/core';
+import { Field } from '@scalargis/ui';
 
 /**
  * The config-driven form fields PrintPanel2 and PrintPanelItem share:
  * `form_fields.groups` renders titled groups of fields, `form_fields.fields`
- * a flat list. Required fields show their message through the error prop.
+ * a flat list. `control` comes off the RHF <FormProvider> Print.jsx mounts
+ * (not threaded as a prop, since PrintPanel2/PrintPanelItem — unconverted
+ * this session — still pass their own `fields`/`handleFieldChange` pair
+ * down for their OWN validation logic and no longer for this component).
+ * Required fields now validate through <Field>/RHF, not the hand-rolled
+ * `error={(field.required && !fields[field_key]) ? … : undefined}` idiom
+ * this replaces (B-08, findings/02 theme 4).
  */
-export default function PrintFormFields({ formFields, fields, handleFieldChange }) {
+export default function PrintFormFields({ formFields }) {
   const { t } = useTranslation();
+  const { control } = useFormContext();
 
   if (!formFields) return null;
 
   const renderField = (field_key, field) => (
     <div key={field_key} className="field">
       { field.header && <h4>{field.header}</h4> }
-      <TextInput id={field_key}
+      <Field
+        name={field_key}
+        control={control}
         label={field.showLabel ? field.title : undefined}
-        placeholder={!field.header && !field.showLabel ? field.title : ''}
-        title={!field.header && !field.showLabel ? field.title : ''}
-        value={fields[field_key] || ''}
-        onChange={handleFieldChange}
-        error={(field.required && !fields[field_key]) ? `${t("requiredField", "Campo de preenchimento obrigatório")}.` : undefined}
-      />
+        required={!!field.required}
+        rules={field.required ? { required: `${t("requiredField", "Campo de preenchimento obrigatório")}.` } : undefined}
+      >
+        {(rhfField, fieldState) => (
+          <TextInput
+            {...rhfField}
+            value={rhfField.value || ''}
+            placeholder={!field.header && !field.showLabel ? field.title : ''}
+            title={!field.header && !field.showLabel ? field.title : ''}
+            error={fieldState.error?.message}
+          />
+        )}
+      </Field>
     </div>
   );
 

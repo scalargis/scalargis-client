@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useForm, FormProvider } from 'react-hook-form'
 import 'ol/ol.css';
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
@@ -9,8 +10,29 @@ import PrintPanel2 from './PrintPanel2';
 import PrintPanel3 from './PrintPanel3';
 import PrintPanel4 from './PrintPanel4';
 import PrintPanelItem from './PrintPanelItem';
-import useFormFields from "./useFormFields";
 import './style.css';
+
+
+// PrintPanel2/PrintPanel4/PrintPanelItem (unconverted this session) still read a
+// flat `fields` object keyed by literal strings like "identification.nif" (the old
+// useFormFields contract) and still call `handleFieldChange({ target: { id, value } })`.
+// RHF's own store nests any dotted `name` (`identification.nif` -> `{identification:{nif}}`),
+// so `watch()` alone would silently break their `fields[field_key]` reads. `layout` is the one
+// field whose VALUE is itself an object ({format, orientation}, set by PrintPanel3/PrintPanelItem)
+// and is never dotted — so it's excluded from the flatten below and kept as a leaf.
+function flattenFieldValues(values) {
+  const out = {};
+  Object.entries(values || {}).forEach(([key, value]) => {
+    if (key !== 'layout' && value && typeof value === 'object' && !Array.isArray(value)) {
+      Object.entries(value).forEach(([subKey, subValue]) => {
+        out[`${key}.${subKey}`] = subValue;
+      });
+    } else {
+      out[key] = value;
+    }
+  });
+  return out;
+}
 
 
 const printStyle = new Style({
@@ -37,8 +59,17 @@ export default function Print({core, config, actions, dispatch, record}) {
   const [printItem, setPrintItem] = useState(null);
   const [printDetails, setPrintDetails] = useState(null);
   const [finalPrints, setFinalPrints] = useState(null);
-  const [fields, handleFieldChange] = useFormFields({});
   const [geometries, setGeometries] = useState([]);
+
+  // Replaces the old useFormFields synthetic-event bag (B-08). PrintFormFields (nested
+  // inside PrintPanel2/PrintPanelItem) reads `control` off the <FormProvider> below via
+  // useFormContext(); PrintPanel3 gets `formControl`/`setFieldValue` as explicit props
+  // (it's a direct child here). PrintPanel1/2/4/PrintPanelItem (unconverted this session)
+  // keep receiving `fields`/`handleFieldChange` shimmed to the exact old calling convention.
+  const formMethods = useForm({ mode: 'onChange', defaultValues: {} });
+  const { control, watch, setValue } = formMethods;
+  const fields = flattenFieldValues(watch());
+  const handleFieldChange = ({ target }) => setValue(target.id, target.value, { shouldValidate: true, shouldDirty: true });
 
   const printLayer = useRef();
 
@@ -112,6 +143,7 @@ export default function Print({core, config, actions, dispatch, record}) {
   if (!printLayer.current) return null;
 
   return (
+    <FormProvider {...formMethods}>
     <div style={{ height: '100%' }}>
 
       {activePanel === "p-noprints" ?
@@ -180,8 +212,8 @@ export default function Print({core, config, actions, dispatch, record}) {
           printLayer={printLayer}
           printDetails={printDetails}
           setFinalPrints={setFinalPrints}
-          fields={fields}
-          handleFieldChange={handleFieldChange}          
+          formControl={control}
+          setFieldValue={setValue}
         />
       : null}
 
@@ -225,9 +257,10 @@ export default function Print({core, config, actions, dispatch, record}) {
           handleFieldChange={handleFieldChange}           
           geometries={geometries}
         />
-      : null}    
+      : null}
 
     </div>
+    </FormProvider>
   )
 
 }
