@@ -38,6 +38,7 @@ import * as Timeline from './Timeline/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
 import * as URLparams from './URLparams/src/Main'
 import * as IntersectLayers from './IntersectLayers/src/Main'
+import IntersectResults from './IntersectLayers/src/IntersectResults'
 import * as URLlayers from './URLlayers/src/Main'
 
 import DrawingToolbar from './DrawingToolbar'
@@ -110,6 +111,7 @@ export {
   DocumentBrowser,
   DocumentList,
   IntersectLayers,
+  IntersectResults,
   URLlayers,
 
   Legend,

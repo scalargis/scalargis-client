@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Checkbox, Group, Menu } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { DataGrid, notify } from '@scalargis/ui';
 import OlWKT from "ol/format/WKT";
 import OlFeature from 'ol/Feature';
@@ -15,7 +16,10 @@ export default function IntersectResults(props) {
 
     const { viewer_add_dialog_window, viewer_update_dialog_window } = actions;
 
-    const [showGeometry, setShowGeometry] = useState(false);
+    // Whether the confrontation's output geometry is drawn on the map — a
+    // plain show/hide display toggle, so it's a genuine useDisclosure, unlike
+    // the useState(false) below it (those hold data, not visibility).
+    const [showGeometry, { toggle: toggleShowGeometry, close: closeShowGeometry }] = useDisclosure(false);
     const [items, setItems] = useState([]);
     const [expandedKeys, setExpandedKeys] = useState([]);
     const [selectAll, setSelectAll] = useState({});
@@ -160,7 +164,7 @@ export default function IntersectResults(props) {
 
         setSelectedRows({});
         setSelectAll({});
-        setShowGeometry(false);
+        closeShowGeometry();
 
         setDownloadingFile(false);
         setDownloadingFormat(null);
@@ -518,7 +522,7 @@ export default function IntersectResults(props) {
                 <Checkbox
                     name="showGeometry"
                     label={t("showIntersectionGeometry", "Ver Geometria da Confrontação")}
-                    onChange={(e) => setShowGeometry(e.currentTarget.checked)}
+                    onChange={toggleShowGeometry}
                     checked={showGeometry}
                 />
             </div>

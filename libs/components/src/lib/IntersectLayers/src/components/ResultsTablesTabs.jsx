@@ -104,6 +104,8 @@ export default function ResultsTablesTabs(props) {
                     const group = groups.find((item) => item.name === layer.group);
                     const groupTitle = t(group?.title, group?.title || layer.group);
 
+                    const layerTitle = t(layer?.title, layer?.title);
+
                     return (
                         <TabPanel key={layerIndex} active={currentTab === String(layerIndex)} mount="unmount">
 
@@ -112,7 +114,8 @@ export default function ResultsTablesTabs(props) {
                             <ResultsTable records={records} fields={fields} filters={tableFilters}
                                 showResultMeasure={props?.showResultMeasure}
                                 showResultPercentage={props?.showResultPercentage}
-                                onFiltersChange={onTableFiltersChange}  />
+                                onFiltersChange={onTableFiltersChange}
+                                exportFilename={layerTitle || undefined}  />
                         </TabPanel>
                     );
                 })}
