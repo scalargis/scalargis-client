@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { NumberInput, TextInput } from '@mantine/core';
-import { DataGrid } from '@scalargis/ui';
+import { Button, Group, NumberInput, TextInput } from '@mantine/core';
+import { DataGrid, exportGridCSV } from '@scalargis/ui';
 
 import { i18n } from '../../../components';
 import { foldDiacritics } from '../../../utils/common';
@@ -100,24 +100,43 @@ export default function ResultsTable(props) {
 
     if (showAreaColumn && props?.showResultMeasure) {
         const title = `${t("area", "Área")} (m²)`;
-        columns.push({ accessor: 'area', title, sortable: true, render: rowData => numericValueTemplate(rowData.area), ...numericFilter('area', title) });
+        columns.push({ accessor: 'area', title, sortable: true, render: rowData => numericValueTemplate(rowData.area), exportRender: rowData => numericValueTemplate(rowData.area), ...numericFilter('area', title) });
     }
     if (showLengthColumn && props?.showResultMeasure) {
         const title = `${t("length", "Comprimento")} (m)`;
-        columns.push({ accessor: 'length', title, sortable: true, render: rowData => numericValueTemplate(rowData.length), ...numericFilter('length', title) });
+        columns.push({ accessor: 'length', title, sortable: true, render: rowData => numericValueTemplate(rowData.length), exportRender: rowData => numericValueTemplate(rowData.length), ...numericFilter('length', title) });
     }
     if ((showAreaColumn || showLengthColumn) && props?.showResultPercentage) {
-        columns.push({ accessor: 'percent', title: '%', sortable: true, render: rowData => numericValueTemplate(rowData.percent), ...numericFilter('percent', '%') });
+        columns.push({ accessor: 'percent', title: '%', sortable: true, render: rowData => numericValueTemplate(rowData.percent), exportRender: rowData => numericValueTemplate(rowData.percent), ...numericFilter('percent', '%') });
     }
 
+    // The "Tabelas" dialog has no export of its own (unlike the inline results,
+    // which export the full server-side dataset via IntersectResults' format
+    // toolbar) — this exports exactly what's on screen: current sort + filters.
+    const exportFilename = props?.exportFilename || 'resultados.csv';
+
     return (
-        <DataGrid
-            idAccessor={(record) => data.indexOf(record)}
-            records={data}
-            columns={columns}
-            sortStatus={sortStatus || undefined}
-            onSortStatusChange={setSortStatus}
-        />
+        <>
+            <Group justify="flex-end" mb="xs">
+                <Button
+                    type="button"
+                    size="xs"
+                    variant="outline"
+                    leftSection={<i className="pi pi-upload" aria-hidden="true" />}
+                    onClick={() => exportGridCSV(data, columns, { filename: exportFilename })}
+                    disabled={!data.length}
+                >
+                    {t("export", "Exportar")}
+                </Button>
+            </Group>
+            <DataGrid
+                idAccessor={(record) => data.indexOf(record)}
+                records={data}
+                columns={columns}
+                sortStatus={sortStatus || undefined}
+                onSortStatusChange={setSortStatus}
+            />
+        </>
     );
 
 }
