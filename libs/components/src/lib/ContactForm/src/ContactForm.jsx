@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { Alert, Button, Group, Textarea, TextInput } from '@mantine/core';
-import { FileUpload, notify } from '@scalargis/ui';
+import { Field, FileUpload, notify } from '@scalargis/ui';
 
 import ContactInfo from './ContactInfo';
 
@@ -67,16 +68,28 @@ export default function ContactFrom(props) {
 
   const showCaptcha = (!viewer?.user_info?.name && viewer.captcha_key) ? true : false;
 
-  const [name, setName] = useState(viewer?.user_info?.name ? viewer.user_info.name : null);
-  const [email, setEmail] = useState(viewer?.user_info?.email  ? viewer.user_info.email : null);
+  // name/email/description converge on react-hook-form (B-08): the required-ness and its
+  // error now come from RHF/<Field>, not the hand-rolled `error={(!name || name.length===0)
+  // ? requiredMessage : undefined}` idiom this replaces (findings/02 theme 4).
+  const { control, handleSubmit } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      name: viewer?.user_info?.name || '',
+      email: viewer?.user_info?.email || '',
+      description: '',
+    },
+  });
+
   const [captchaResponse, setCaptchaResponse] = useState(null);
   const [files, setFiles] = useState([]);
-  const [description, setDescription] = useState(null);
   const [infoMessage, setInfoMessage] = useState(null);
   const [enableSubmit, setEnableSubmit] = useState(showCaptcha ? false: true);
   const [isProcessingFiles, setIsProcessingFiles] =  useState(false);
   const [sending, setSending] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  // Snapshot of the submitted values, for the read-only view below — the fields
+  // themselves are RHF-managed now, not plain state the completed view can keep reading.
+  const [submittedValues, setSubmittedValues] = useState(null);
 
   // The staged File objects mirror what FileUpload shows; `files` keeps the
   // parsed base64 payloads the submit sends.
@@ -103,18 +116,22 @@ export default function ContactFrom(props) {
     setEnableSubmit(false);
   }
 
-  function submit(e) {
-    if (e) e.preventDefault();
+  // RHF blocks onSubmit until name/email/description all pass their <Field required>
+  // rule, same as the old `if (!name || !email || !description)` guard did — onInvalid
+  // reproduces the summary banner that guard used to raise alongside the per-field errors.
+  function onInvalid() {
+    setInfoMessage({
+      type: 'error',
+      message: 'Campos obrigatórios não preenchidos'
+    });
+  }
+
+  function onSubmit(data) {
+    const { name, email, description } = data;
 
     const final_files = stagedFiles.current.map(f => f.name);
 
-    if (!name || !email || !description) {
-      setInfoMessage({
-        type: 'error',
-        message: 'Campos obrigatórios não preenchidos'
-      });
-      return false;
-    } else if (!validateEmail(email)) {
+    if (!validateEmail(email)) {
       setInfoMessage({
         type: 'error',
         message: 'Formato de email incorreto'
@@ -177,6 +194,7 @@ export default function ContactFrom(props) {
             type: 'success',
             message: res.message
           });
+          setSubmittedValues({ name, email, description });
           setIsComplete(true);
         } else {
           setInfoMessage({
@@ -201,7 +219,7 @@ export default function ContactFrom(props) {
         <TextInput
           id="contact_name"
           label="Nome"
-          value={name || ''}
+          value={submittedValues?.name || ''}
           placeholder="Nome"
           disabled
           mb="sm"
@@ -209,7 +227,7 @@ export default function ContactFrom(props) {
         <TextInput
           id="contact_email"
           label="Email"
-          value={email || ''}
+          value={submittedValues?.email || ''}
           placeholder="Email"
           disabled
           mb="sm"
@@ -217,7 +235,7 @@ export default function ContactFrom(props) {
         <Textarea rows={3}
           id="contact_description"
           label="Descrição"
-          value={description || ''}
+          value={submittedValues?.description || ''}
           placeholder="Descrição"
           disabled
           mb="sm"
@@ -234,37 +252,43 @@ export default function ContactFrom(props) {
   const requiredMessage = config.requiredFieldMessage || 'Campo de preenchimento obrigatório';
 
   return (
-    <form onSubmit={e => submit(e)}>
+    <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
 
-        <TextInput
-          id="contact_name"
-          label="Nome"
-          value={name || ''}
-          placeholder="Nome"
-          disabled={!!viewer?.user_info?.name}
-          error={(!name || name.length === 0) ? requiredMessage : undefined}
-          onChange={e => {setName(e.target.value); setInfoMessage(null);}}
-          mb="sm"
-        />
-        <TextInput
-          id="contact_email"
-          label="Email"
-          value={email || ''}
-          placeholder="Email"
-          disabled={!!viewer?.user_info?.email}
-          error={(!email || email.length === 0) ? requiredMessage : undefined}
-          onChange={e => {setEmail(e.target.value); setInfoMessage(null);}}
-          mb="sm"
-        />
-        <Textarea rows={3}
-          id="contact_description"
-          label="Descrição"
-          value={description || ''}
-          placeholder="Descrição"
-          error={(!description || description.length === 0) ? requiredMessage : undefined}
-          onChange={e => {setDescription(e.target.value); setInfoMessage(null);}}
-          mb="sm"
-        />
+        <Field name="name" control={control} label="Nome" required rules={{ required: requiredMessage }}>
+          {(field, fieldState) => (
+            <TextInput
+              {...field}
+              placeholder="Nome"
+              disabled={!!viewer?.user_info?.name}
+              error={fieldState.error?.message}
+              onChange={e => { field.onChange(e); setInfoMessage(null); }}
+              mb="sm"
+            />
+          )}
+        </Field>
+        <Field name="email" control={control} label="Email" required rules={{ required: requiredMessage }}>
+          {(field, fieldState) => (
+            <TextInput
+              {...field}
+              placeholder="Email"
+              disabled={!!viewer?.user_info?.email}
+              error={fieldState.error?.message}
+              onChange={e => { field.onChange(e); setInfoMessage(null); }}
+              mb="sm"
+            />
+          )}
+        </Field>
+        <Field name="description" control={control} label="Descrição" required rules={{ required: requiredMessage }}>
+          {(field, fieldState) => (
+            <Textarea rows={3}
+              {...field}
+              placeholder="Descrição"
+              error={fieldState.error?.message}
+              onChange={e => { field.onChange(e); setInfoMessage(null); }}
+              mb="sm"
+            />
+          )}
+        </Field>
 
         { upload_cfg.enabled &&
         <div className="field">
