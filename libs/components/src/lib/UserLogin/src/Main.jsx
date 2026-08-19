@@ -24,7 +24,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
 
   const [mode, setMode] = useState();
 
-  const { logout } = actions;
+  const { logout, login_post, login_user_registration, login_reset_password, login_clear_error } = actions;
 
   const location = useLocation();
 
@@ -36,6 +36,16 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   const passwordHeader = record?.config_json?.header_password ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("passwordReset", "Redefinir password")} - ${appEntityNameAbrev || "ScalarGIS"}`;
 
   const closable = record?.config_json?.closable === false ? false : true;
+
+  // The dialog container owns the app-specific wiring; the widgets are pure and
+  // receive it as callbacks + the link-visibility booleans computed here from
+  // this surface's config source (record.config_json).
+  const componentCfg = record?.config_json || {};
+  const showRegistration = !!componentCfg.user_registration;
+  const showResetPassword = !!(componentCfg.reset_password || (componentCfg.reset_password_login_error && auth?.response && auth?.response?.message));
+  const redirect = location?.pathname || `/${viewer?.name}`;
+  const apiUrl = core?.API_URL;
+  const termsOfServiceUrl = viewer?.config_json?.terms_of_service_url;
 
 
   let CompLoginWidget = LoginWidget;
@@ -133,7 +143,19 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               dispatch={dispatch}
               actions={actions}
               record={record}
-              redirect={location?.pathname || `/${viewer?.name}` }
+              redirect={redirect}
+              layout="dialog"
+              showRegistration={showRegistration}
+              showResetPassword={showResetPassword}
+              onClearError={() => dispatch(login_clear_error())}
+              onLogin={(data) => {
+                if (record?.config_json?.actions?.login) {
+                  core.pubsub.publish(record?.config_json?.actions?.login, null);
+                  return;
+                }
+                const loginApiUrl = siteConfig?.authentication?.endpoints?.login;
+                dispatch(login_post(core, { username: data.username, password: data.password }, loginApiUrl, null, redirect));
+              }}
               onHide={() => {
                 if (closable) {
                   setMode(0);
@@ -146,9 +168,8 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
                 }
                 setMode(2);
               }}
-              onShowPasswordReset={() => {
-               setMode(3);
-              }}
+              onShowResetPassword={() => setMode(3)}
+              onShowPasswordReset={() => setMode(3)}
             />
       </Dialog>
 
@@ -166,7 +187,14 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               actions={actions}
               viewer={viewer}
               record={record}
-              redirect={location?.pathname || `/${viewer?.name}`}
+              redirect={redirect}
+              layout="dialog"
+              apiUrl={apiUrl}
+              termsOfServiceUrl={termsOfServiceUrl}
+              onRegistration={(payload) => {
+                const registrationApiUrl = siteConfig?.authentication?.endpoints?.registration;
+                dispatch(login_user_registration(core, { ...payload, redirect }, registrationApiUrl, redirect));
+              }}
               onShowLogin={() => setMode(1)}
             />
       </Dialog>
@@ -185,7 +213,16 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
               actions={actions}
               viewer={viewer}
               record={record}
-              redirect={location?.pathname || `/${viewer?.name}`}
+              redirect={redirect}
+              layout="dialog"
+              onClearError={() => dispatch(login_clear_error())}
+              onResetPassword={(data) => {
+                if (record?.config_json?.actions?.reset_password) {
+                  core.pubsub.publish(record?.config_json?.actions?.reset_password, { post: { username: data.username, redirect }, history: null, redirect });
+                  return;
+                }
+                dispatch(login_reset_password({ username: data.username, redirect }, null, redirect));
+              }}
               onShowLogin={() => setMode(1)}
             />
       </Dialog>

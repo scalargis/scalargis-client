@@ -11,27 +11,106 @@ const defaultLoginValues = {
     username: ''
 }
 
+
+/**
+ * Shared "request password reset" form for both viewer surfaces — the
+ * full-page `/login` container (`layout="page"`) and the topbar login dialog
+ * (`layout="dialog"`). Pure and callback-delegated: `onResetPassword(data)`
+ * carries the username to the container, which owns the dispatch;
+ * `onClearError()` clears a stale error on mount.
+ */
 function ResetPasswordWidget(props) {
 
-    const { auth, viewer, history, redirect, core, dispatch, actions, record, onShowLogin } = props;
-
-    // Redux actions
-    const { login_clear_error, login_reset_password } = actions;
+    const {
+        auth,
+        layout = 'dialog',
+        onResetPassword,
+        onClearError,
+        onShowLogin,
+    } = props;
 
     const { control, formState: { errors }, handleSubmit } = useForm({ defaultLoginValues });
 
     useEffect(() => {
-        dispatch(login_clear_error());
-      }, []);
+        onClearError && onClearError();
+    }, []);
 
     const onSubmit = (data) => {
-        if (record?.config_json?.actions?.reset_password) {
-            core.pubsub.publish(record?.config_json?.actions?.reset_password, {post: { username: data.username, redirect }, history, redirect});
-            return;
-        }
-        dispatch(login_reset_password({ username: data.username, redirect }, history, redirect));
+        onResetPassword && onResetPassword(data);
     }
 
+    if (layout === 'page') {
+        if (auth?.response?.reset_password === true && !auth?.response?.error) {
+            return (
+                <React.Fragment>
+                    <div className="px-3">
+                        <p>{i18nUtils.translateValue("passwordResetRequestSuccessMsg", "Foi enviado um email com as instruções para recuperação da palavra-passe.")}</p>
+                        <p>{i18nUtils.translateValue("passwordResetRequestInfoMsg", "Caso não receba o email com as instruções para recuperação da palavra-passe durante os próximos minutos, verifique se este não foi direcionado para a área de SPAM do seu correio eletrónico.")}</p>
+                    </div>
+
+                    { onShowLogin && <Group justify="flex-end" mt="md" mb="md">
+                        <Anchor component="button" type="button" className="font-medium" onClick={onShowLogin}>
+                            {i18nUtils.translateValue("login", "Login")}
+                        </Anchor>
+                    </Group> }
+                </React.Fragment>
+            )
+        }
+
+        return (
+            <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+                <div>
+                    <Controller name="username" control={control} rules={{ required: i18nUtils.translateValue("required", "Preenchimento obrigatório") }} render={({ field, fieldState }) => (
+                        <TextInput id={field.name} {...field} autoFocus label={`${i18nUtils.translateValue("user", "Utilizador")} / E-mail`} error={fieldState.invalid} className="w-full mb-1"
+                            autoComplete="off"
+                            aria-autocomplete="none" />
+                    )} />
+                    {getFormValidationErrorMessage(errors, 'username')}
+
+                    { onShowLogin &&
+                        <Group justify="flex-end" mt="md" mb="md">
+                            <Anchor component="button" type="button" className="font-medium" onClick={onShowLogin}>
+                                {i18nUtils.translateValue("back", "Back")}
+                            </Anchor>
+                        </Group>
+                    }
+
+                    { auth.http_error && !auth.response &&
+                        <div className="w-full my-4">
+                            <Alert color="danger" py="xs">
+                                <Group justify="center" gap="xs" wrap="nowrap">
+                                    <i className="pi pi-times-circle" />
+                                    <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
+                                </Group>
+                            </Alert>
+                        </div>
+                    }
+
+                    { auth.response && !!auth.response && !!auth.response.message &&
+                        <div className="w-full my-4">
+                            <Alert color="danger" py="xs">
+                                <Group justify="center" gap="xs" wrap="nowrap">
+                                    <i className="pi pi-times-circle" />
+                                    <span>{auth?.response?.message}</span>
+                                </Group>
+                            </Alert>
+                        </div>
+                    }
+
+                    <div className="mt-4 mb-4">
+                        <Button
+                            type="submit"
+                            fullWidth
+                            leftSection={<i className="pi pi-check" />}
+                            loading={auth.loading}
+                        >{i18nUtils.translateValue("send", "Enviar")}</Button>
+                    </div>
+                </div>
+            </form>
+        )
+    }
+
+    // layout === 'dialog'
     if (auth?.response?.reset_password === true && !auth?.response?.error) {
         return (
             <React.Fragment>

@@ -36,6 +36,9 @@ import DocumentList from './DocumentBrowser/src/DocumentList'
 import Legend from './TOC/src/TOC/Legend'
 import * as Timeline from './Timeline/src/Main'
 import * as UserLogin from './UserLogin/src/Main'
+import LoginWidget from './UserLogin/src/LoginWidget'
+import RegistrationWidget from './UserLogin/src/RegistrationWidget'
+import ResetPasswordWidget from './UserLogin/src/ResetPasswordWidget'
 import * as URLparams from './URLparams/src/Main'
 import * as IntersectLayers from './IntersectLayers/src/Main'
 import IntersectResults from './IntersectLayers/src/IntersectResults'
@@ -106,6 +109,9 @@ export {
   ThemeWizard,
   TOC,
   UserLogin,
+  LoginWidget,
+  RegistrationWidget,
+  ResetPasswordWidget,
   URLparams,
   Timeline,
   DocumentBrowser,
