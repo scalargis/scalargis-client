@@ -4,7 +4,7 @@ import { connect, useDispatch } from 'react-redux';
 
 import { Alert, Button, Group, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Dialog } from '@scalargis/ui';
+import { Dialog, IconCheck, IconSave, IconXCircle } from '@scalargis/ui';
 
 import { getViewerSessionConfig } from '../model/MapModel';
 
@@ -83,10 +83,10 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
       { type != 'menu' ?
       <UnstyledButton onClick={e => openForm()} title={t("saveMap", "Gravar mapa")}>
         <span className="layout-topbar-item-text">{t("save", "Gravar")}</span>
-        <span className="layout-topbar-icon pi pi-save"/>
+        <IconSave className="layout-topbar-icon" />
       </UnstyledButton> :
         <UnstyledButton className="sg-menuitem" onClick={e => openForm()}>
-          <span className="pi pi-save"></span><span>{t("save", "Gravar")}</span>
+          <IconSave /><span>{t("save", "Gravar")}</span>
         </UnstyledButton> }
 
       <Dialog
@@ -176,7 +176,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
             <Group justify="flex-end" mt="md">
               <Button
                 type="submit"
-                leftSection={<i className="pi pi-check" />}
+                leftSection={<IconCheck />}
                 loading={viewer.save_loading}
               >{t("save", "Gravar")}</Button>
             </Group>
@@ -185,7 +185,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
-                    <i className="pi pi-times-circle" />
+                    <IconXCircle />
                     <span>{t("unavailableService", "Serviço Indisponível")}</span>
                   </Group>
                 </Alert>
@@ -196,7 +196,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
-                    <i className="pi pi-times-circle" />
+                    <IconXCircle />
                     <span>{t("unexpectedError", "Ocorreu um erro inesperado")}</span>
                   </Group>
                 </Alert>

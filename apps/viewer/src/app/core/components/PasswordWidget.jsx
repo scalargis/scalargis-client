@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { Alert, Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core';
 
+import { IconCheck, IconCheckCircle, IconInfoCircle, IconXCircle } from '@scalargis/ui';
 import { i18n as i18nUtils, PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 
 import { getAppApiUrl } from '../utils';
@@ -81,11 +82,11 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
     return (
         <div>
           <div className="w-full my-4 text-center">
-            <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }}></i>
+            <IconCheckCircle style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }} />
             <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("changePasswordConfirmationSuccess", "A Palavra-passe foi alterada com sucesso")}!</p>
             <Button
               type="button"
-              leftSection={<i className="pi pi-check" />}
+              leftSection={<IconCheck />}
               loading={goRedirect}
               onClick={ e => {
                 setGoRedirect(true);
@@ -105,7 +106,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
           <div className="w-full my-4">
             <Alert color="informative" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
-                <i className="pi pi-info-circle" />
+                <IconInfoCircle />
                 <span>{auth.response.message}</span>
               </Group>
             </Alert>
@@ -148,7 +149,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
                 <div className="w-full my-4">
                   <Alert color="danger" py="xs">
                     <Group justify="center" gap="xs" wrap="nowrap">
-                      <i className="pi pi-times-circle" />
+                      <IconXCircle />
                       <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
                     </Group>
                   </Alert>
@@ -159,7 +160,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
               <div className="w-full my-4">
                 <Alert color={auth.http_error ? "danger" : "informative"} py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
-                    <i className={auth.http_error ? "pi pi-times-circle" : "pi pi-info-circle"} />
+                    {auth.http_error ? <IconXCircle /> : <IconInfoCircle />}
                     <span>{auth?.response?.message}</span>
                   </Group>
                 </Alert>
@@ -170,7 +171,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
                 <Button
                     type="button"
                     fullWidth
-                    leftSection={<i className="pi pi-check" />}
+                    leftSection={<IconCheck />}
                     loading={auth.loading}
                     onClick={(e)=> {
                       e.preventDefault();
@@ -259,7 +260,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
                 <div className="w-full my-4">
                   <Alert color="danger" py="xs">
                     <Group justify="center" gap="xs" wrap="nowrap">
-                      <i className="pi pi-times-circle" />
+                      <IconXCircle />
                       <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
                     </Group>
                   </Alert>
@@ -270,7 +271,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
                 <div className="w-full my-4">
                   <Alert color="danger" py="xs">
                     <Group justify="center" gap="xs" wrap="nowrap">
-                      <i className="pi pi-times-circle" />
+                      <IconXCircle />
                       <span>{pwd?.response?.message}</span>
                     </Group>
                   </Alert>
@@ -281,7 +282,7 @@ function PasswordWidget({ core, token, auth, pwd, history, redirect, urlRedirect
                 <Button
                     type="submit"
                     fullWidth
-                    leftSection={<i className="pi pi-check" />}
+                    leftSection={<IconCheck />}
                     loading={pwd.loading}
                 >{i18nUtils.translateValue("accept", "Aceitar")}</Button>
             </div>

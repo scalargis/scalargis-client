@@ -4,7 +4,7 @@ import { useTranslation} from "react-i18next";
 
 import { ActionIcon, Alert, Button, Group, Switch, Textarea, TextInput, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Dialog } from '@scalargis/ui';
+import { Dialog, IconCheck, IconCopy, IconShare, IconXCircle } from '@scalargis/ui';
 
 import { getViewerSessionConfig } from '../model/MapModel';
 
@@ -110,10 +110,10 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
       { type != 'menu' ?
         <UnstyledButton onClick={e => openForm()} title={t("shareMap", "Partilhar mapa")}>
           <span className="layout-topbar-item-text">{t("share", "Partilhar")}</span>
-          <span className="layout-topbar-icon pi pi-share-alt"/>
+          <IconShare className="layout-topbar-icon" />
         </UnstyledButton> :
         <UnstyledButton className="sg-menuitem" onClick={e => openForm()}>
-          <span className="pi pi-share-alt"></span><span>{t("share", "Partilhar")}</span>
+          <IconShare /><span>{t("share", "Partilhar")}</span>
         </UnstyledButton> }
 
       <Dialog
@@ -200,7 +200,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
                         aria-label={t("copyUrl", "Copiar Url")}
                         onClick={(e) => { e.preventDefault(); e.currentTarget.blur(); copyToClipboard(getViewerPublicUrl(viewer.save_response.uuid)) }}
                     >
-                        <i className="pi pi-copy" aria-hidden="true" />
+                        <IconCopy />
                     </ActionIcon>
                 </div>
             </div>
@@ -209,7 +209,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
             <Group justify="flex-end" mt="md">
               <Button
                 type="submit"
-                leftSection={<i className="pi pi-check" />}
+                leftSection={<IconCheck />}
                 loading={viewer.save_loading}
               >{t("getLink", "Obter Link")}</Button>
             </Group>
@@ -218,7 +218,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
-                    <i className="pi pi-times-circle" />
+                    <IconXCircle />
                     <span>{t("unavailableService", "Serviço Indisponível")}</span>
                   </Group>
                 </Alert>
@@ -229,7 +229,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
-                    <i className="pi pi-times-circle" />
+                    <IconXCircle />
                     <span>{t("unexpectedError", "Ocorreu um erro inesperado")}</span>
                   </Group>
                 </Alert>

@@ -3,6 +3,7 @@ import { connect, useDispatch } from 'react-redux';
 
 import { Alert, Anchor, Button, Group, Loader, TextInput } from '@mantine/core';
 
+import { IconCheck, IconCheckCircle, IconInfoCircle, IconXCircle } from '@scalargis/ui';
 import { i18n as i18nUtils } from '@scalargis/components';
 
 
@@ -64,11 +65,11 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
       <div>
           <div className="flex align-items-center justify-content-center flex-column px-3">
             <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
-            <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }}></i>
+            <IconCheckCircle style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }} />
             <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
             <Button className="my-3"
               type="button"
-              leftSection={<i className="pi pi-check" />}
+              leftSection={<IconCheck />}
               loading={goRedirect}
               onClick={ e => {
                 setGoRedirect(true);
@@ -103,7 +104,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
           <div className="w-full my-4">
             <Alert color="danger" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
-                <i className="pi pi-times-circle" />
+                <IconXCircle />
                 <span>{auth.response.message}</span>
               </Group>
             </Alert>
@@ -114,7 +115,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
           <div className="w-full my-4">
             <Alert color="danger" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
-                <i className="pi pi-times-circle" />
+                <IconXCircle />
                 <span>{i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}</span>
               </Group>
             </Alert>
@@ -125,7 +126,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
           <div className="w-full my-4">
             <Alert color="informative" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
-                <i className="pi pi-info-circle" />
+                <IconInfoCircle />
                 <span>{auth.response.message}</span>
               </Group>
             </Alert>
@@ -136,7 +137,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
           <Button
             type="button"
             fullWidth
-            leftSection={<i className="pi pi-check" />}
+            leftSection={<IconCheck />}
             loading={auth.loading}
             onClick={sendEmailConfirmation}
           >{i18nUtils.translateValue("send", "Enviar")}</Button>
