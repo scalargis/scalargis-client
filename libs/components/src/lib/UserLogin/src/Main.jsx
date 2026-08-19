@@ -43,13 +43,13 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   let CompResetPasswordWidget = ResetPasswordWidget;
 
   if (record?.config_json?.widgets?.login || siteConfig?.authentication?.widgets?.login) {
-      CompLoginWidget = core.getComponentWidget(record?.config_json?.widgets?.login || siteConfig?.authentication?.widgets?.login)
+      CompLoginWidget = core.getComponentWidget(record?.config_json?.widgets?.login || siteConfig?.authentication?.widgets?.login) || CompLoginWidget
   }
   if (record?.config_json?.widgets?.registration || siteConfig?.authentication?.widgets?.registration) {
-      CompRegistrationWidget = core.getComponentWidget(record?.config_json?.widgets?.registration || siteConfig?.authentication?.widgets?.registration)
+      CompRegistrationWidget = core.getComponentWidget(record?.config_json?.widgets?.registration || siteConfig?.authentication?.widgets?.registration) || CompRegistrationWidget
   }
   if (record?.config_json?.widgets?.password || siteConfig?.authentication?.widgets?.password) {
-      CompResetPasswordWidget = core.getComponentWidget(record?.config_json?.widgets?.password || siteConfig?.authentication?.widgets?.password)
+      CompResetPasswordWidget = core.getComponentWidget(record?.config_json?.widgets?.password || siteConfig?.authentication?.widgets?.password) || CompResetPasswordWidget
   }
 
   useEffect(() => {

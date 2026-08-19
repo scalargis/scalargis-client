@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
+import { useFormContext } from 'react-hook-form';
 import { Alert, Button, Checkbox, Group, Loader, NumberInput, Select, Tabs } from '@mantine/core';
 import { confirm, notify } from '@scalargis/ui';
 import OlInteractionDraw from 'ol/interaction/Draw';
@@ -34,6 +35,8 @@ export default function PrintPanelItem(props) {
   const { selected_menu } = viewer.config_json;
 
   const { i18n, t } = useTranslation();
+
+  const { trigger } = useFormContext();
 
   const paperBoxLayer = useRef();
   const [paperBox, setPaperBox] = useState(false);
@@ -204,9 +207,14 @@ export default function PrintPanelItem(props) {
     props.changeActivePanel('p1');
   }
 
-  function doPrint() {  //---------------------------------------------------------------------------------- DO PRINT
+  async function doPrint() {  //---------------------------------------------------------------------------------- DO PRINT
 
-    let isFormInvalid = false;
+    // trigger() forces react-hook-form to validate the (still-untouched) fields
+    // so their required errors actually paint — the flat `fields` gate below only
+    // decides whether to print, it never surfaces the "Campo obrigatório" UI.
+    const fieldsValid = await trigger();
+
+    let isFormInvalid = !fieldsValid;
 
     setPrintFile(null);
 

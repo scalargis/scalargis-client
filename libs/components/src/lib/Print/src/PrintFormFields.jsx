@@ -21,7 +21,16 @@ export default function PrintFormFields({ formFields }) {
 
   if (!formFields) return null;
 
-  const renderField = (field_key, field) => (
+  const renderField = (field_key, field) => {
+    // Placeholder-only fields (no header, no showLabel) never get the <Field>
+    // label asterisk, so their required marker rides the placeholder text
+    // instead — otherwise a required NIF/Nome looks optional until submit.
+    const placeholderOnly = !field.header && !field.showLabel;
+    const placeholder = placeholderOnly
+      ? `${field.title}${field.required ? ' *' : ''}`
+      : '';
+
+    return (
     <div key={field_key} className="field">
       { field.header && <h4>{field.header}</h4> }
       <Field
@@ -35,14 +44,15 @@ export default function PrintFormFields({ formFields }) {
           <TextInput
             {...rhfField}
             value={rhfField.value || ''}
-            placeholder={!field.header && !field.showLabel ? field.title : ''}
-            title={!field.header && !field.showLabel ? field.title : ''}
+            placeholder={placeholder}
+            title={placeholderOnly ? field.title : ''}
             error={fieldState.error?.message}
           />
         )}
       </Field>
     </div>
-  );
+    );
+  };
 
   return (
     <>

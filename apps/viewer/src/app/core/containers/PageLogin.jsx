@@ -50,13 +50,13 @@ function PageLogin(props) {
     let CompResetPasswordWidget = ResetPasswordWidget;
 
     if (siteConfig?.authentication?.widgets?.login) {
-        CompLoginWidget = core.getComponentWidget(siteConfig?.authentication?.widgets?.login)
+        CompLoginWidget = core.getComponentWidget(siteConfig?.authentication?.widgets?.login) || CompLoginWidget
     }
-    if (siteConfig?.authentication?.widgets?.registration) { 
-        CompRegistrationWidget = core.getComponentWidget(siteConfig?.authentication?.widgets?.registration)
+    if (siteConfig?.authentication?.widgets?.registration) {
+        CompRegistrationWidget = core.getComponentWidget(siteConfig?.authentication?.widgets?.registration) || CompRegistrationWidget
     }
-    if (siteConfig?.authentication?.widgets?.password) { 
-        CompResetPasswordWidget = core.getComponentWidget(siteConfig?.authentication?.widgets?.password)
+    if (siteConfig?.authentication?.widgets?.password) {
+        CompResetPasswordWidget = core.getComponentWidget(siteConfig?.authentication?.widgets?.password) || CompResetPasswordWidget
     }
 
     if (auth?.data?.token) {

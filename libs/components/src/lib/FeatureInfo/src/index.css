@@ -42,9 +42,13 @@
   position: relative;
 }
 
+/* The read-only AttributeTable recipe is headerless (no <thead> band), so the
+   tools can no longer overlay a header row — absolute positioning made them sit
+   on top of the first data row's value. They flow as a right-aligned row above
+   the table instead. */
 .feature-info .fi-result-feat .fi-result-tools {
-  position: absolute;
-  top: 1px;
-  z-index: 1;
-  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
 }

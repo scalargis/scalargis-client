@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
+import { useFormContext } from 'react-hook-form';
 import { v4 as uuidV4 } from 'uuid';
 import { Alert, Button, Group } from '@mantine/core';
 import { confirm, notify } from '@scalargis/ui';
@@ -23,6 +24,8 @@ export default function PrintPanel2(props) {
   const { exclusive_mapcontrol } = viewer;
 
   const { t } = useTranslation();
+
+  const { trigger } = useFormContext();
 
   const [drawTool, setDrawTool] = useState(null);
   const [draw , setDraw] = useState(null);
@@ -165,9 +168,14 @@ export default function PrintPanel2(props) {
     props.changeActivePanel('p1');
   }
 
-  function goPanelPrintNext() {
+  async function goPanelPrintNext() {
 
-    let isFormInvalid = false;
+    // trigger() forces react-hook-form to validate the (still-untouched) fields
+    // so their required errors actually paint — the flat `fields` gate below only
+    // decides whether to advance, it never surfaces the "Campo obrigatório" UI.
+    const fieldsValid = await trigger();
+
+    let isFormInvalid = !fieldsValid;
 
     const formData = {};
     if (printGroup.form_fields && printGroup.form_fields.groups) {
