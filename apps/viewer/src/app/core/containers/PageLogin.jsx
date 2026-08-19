@@ -4,12 +4,9 @@ import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Anchor } from '@mantine/core';
 
-import { i18n as i18nUtils } from '@scalargis/components';
+import { i18n as i18nUtils, LoginWidget, RegistrationWidget, ResetPasswordWidget } from '@scalargis/components';
 
 import LocaleSelector from './../components/LocaleSelector';
-import LoginWidget from './../components/LoginWidget';
-import ResetPasswordWidget from './../components/ResetPasswordWidget';
-import RegistrationWidget from './../components/RegistrationWidget';
 
 
 function PageLogin(props) {
@@ -25,7 +22,7 @@ function PageLogin(props) {
     useTranslation();
 
     // Redux actions
-    const { login_post, login_user_registration, login_reset_password, logout } = actions;
+    const { login_post, login_user_registration, login_reset_password, login_clear_error, logout } = actions;
 
     // Routing
     const location = useLocation();
@@ -44,6 +41,11 @@ function PageLogin(props) {
     const [mode, setMode] = useState(1);
 
     const logo = utils.buildRelativeUrlPath(siteConfig?.logo || 'assets/images/logo.png');
+
+    // The full-page container drives the pure widgets' link visibility from
+    // siteConfig (the dialog surface reads record.config_json instead).
+    const showRegistration = siteConfig?.authentication?.user_registration === true;
+    const showResetPassword = siteConfig?.authentication?.reset_password === true || (siteConfig?.authentication?.reset_password_login_error && auth.response && !!auth.response && !!auth.response.message);
 
     let CompLoginWidget = LoginWidget;
     let CompRegistrationWidget = RegistrationWidget;
@@ -108,6 +110,10 @@ function PageLogin(props) {
                                 dispatch={dispatch}
                                 actions={actions}
                                 redirect={redirect}
+                                layout="page"
+                                showRegistration={showRegistration}
+                                showResetPassword={showResetPassword}
+                                onClearError={() => dispatch(login_clear_error())}
                                 onLogin={(data) => {
                                     //TODO
                                     if (siteConfig?.authentication?.actions?.login) {
@@ -131,6 +137,8 @@ function PageLogin(props) {
                                 core={core}
                                 dispatch={dispatch}
                                 actions={actions}
+                                layout="page"
+                                onClearError={() => dispatch(login_clear_error())}
                                 onResetPassword={(data) => {
                                     //TODO
                                     /*
@@ -156,6 +164,10 @@ function PageLogin(props) {
                                 dispatch={dispatch}
                                 actions={actions}
                                 redirect={redirect}
+                                layout="page"
+                                apiUrl={core?.API_URL}
+                                termsOfServiceUrl={siteConfig?.terms_of_service_url}
+                                onClearError={() => dispatch(login_clear_error())}
                                 onRegistration={(data) => {
                                     const payload = {
                                         ...data,
