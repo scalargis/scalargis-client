@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
 import { Collapse, UnstyledButton } from '@mantine/core';
+import { IconCog, IconUser, IconInbox, IconPowerOff } from '@scalargis/ui';
 
 export const AppProfile = (props) => {
 
@@ -21,23 +22,23 @@ export const AppProfile = (props) => {
             </div>
             <UnstyledButton className="layout-profile-link" onClick={() => setExpanded(prevState => !prevState)} aria-expanded={expanded}>
                 <span className="username">{name || username || ''}</span>
-                <i className="pi pi-fw pi-cog" aria-hidden="true" />
+                <IconCog fixedWidth />
             </UnstyledButton>
             <Collapse expanded={expanded}>
                 <ul>
                     <li>
                         <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/account">
-                            <i className="pi pi-fw pi-user" aria-hidden="true" /><span>Conta</span>
+                            <IconUser fixedWidth /><span>Conta</span>
                         </NavLink>
                     </li>
                     <li>
                         <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/notifications/list">
-                            <i className="pi pi-fw pi-inbox" aria-hidden="true" /><span>Notificações</span><span className="menuitem-badge">{cfg?.notifications?.total || 0}</span>
+                            <IconInbox fixedWidth /><span>Notificações</span><span className="menuitem-badge">{cfg?.notifications?.total || 0}</span>
                         </NavLink>
                     </li>
                     <li>
                         <UnstyledButton onClick={e => dispatch(logout())}>
-                            <i className="pi pi-fw pi-power-off" aria-hidden="true" /><span>Sair</span>
+                            <IconPowerOff fixedWidth /><span>Sair</span>
                         </UnstyledButton>
                     </li>
                 </ul>

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { Alert, Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core';
+import { IconCheck, IconXCircle } from '@scalargis/ui';
 
 import AppContext from '../../AppContext';
 
@@ -66,7 +67,7 @@ function LoginWidget({ auth, history, redirect }) {
       <div className="dialog-footer">
         <Button
           type="submit"
-          leftSection={<i className="pi pi-check" />}
+          leftSection={<IconCheck />}
           loading={auth.loading}>Entrar</Button>
       </div>
 
@@ -74,7 +75,7 @@ function LoginWidget({ auth, history, redirect }) {
         <div className="pt-4">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-times-circle" />
+              <IconXCircle />
               <span>Serviço Indisponível</span>
             </Group>
           </Alert>
@@ -85,7 +86,7 @@ function LoginWidget({ auth, history, redirect }) {
         <div className="pt-4">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-times-circle" />
+              <IconXCircle />
               <span>Nome de Utilizador ou Palavra-passe inválido</span>
             </Group>
           </Alert>

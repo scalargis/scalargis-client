@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
 import { Collapse, UnstyledButton } from '@mantine/core';
+import { IconAngleDown } from '@scalargis/ui';
 import classNames from 'classnames';
 
 const AppSubmenu = (props) => {
@@ -38,7 +39,7 @@ const AppSubmenu = (props) => {
     }
 
     const renderLinkContent = (item) => {
-        const submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon" aria-hidden="true"></i>;
+        const submenuIcon = item.items && <IconAngleDown fixedWidth className="menuitem-toggle-icon" />;
         const badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
 
         return (
