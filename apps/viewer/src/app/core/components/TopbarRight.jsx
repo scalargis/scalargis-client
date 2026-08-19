@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Menu, UnstyledButton } from '@mantine/core';
+import { IconChevronCircleDown } from '@scalargis/ui';
 
 import MapModel from '../model/MapModel';
 import OWSModel from '../model/OWSModel';
@@ -111,7 +112,7 @@ export default function TopbarRight(props) {
             <Menu position="bottom-end" shadow="md" keepMounted keepMountedMode="display-none">
               <Menu.Target>
                 <UnstyledButton className="layout-menu-button" aria-label={t("options", "Opções")}>
-                  <span className="pi pi-chevron-circle-down"/>
+                  <IconChevronCircleDown style={{"fontSize": "2em"}}/>
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown id="topbar_right_menu">

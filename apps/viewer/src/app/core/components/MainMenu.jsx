@@ -1,5 +1,6 @@
 import React from 'react'
 import { UnstyledButton } from '@mantine/core';
+import { IconMenu } from '@scalargis/ui';
 import MapModel from '../model/MapModel';
 import OWSModel from '../model/OWSModel';
 import * as Utils from '../utils';
@@ -28,7 +29,7 @@ export default function MainMenu(props) {
               //dispatch(layout_toggle_staticmenu());
             }}
           >
-            <span className="pi pi-bars" style={{"fontSize": "2em"}}></span>
+            <IconMenu style={{"fontSize": "2em"}} />
           </UnstyledButton>
         </div>}
         <div>

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { UnstyledButton } from '@mantine/core';
+import { IconMenu } from '@scalargis/ui';
 
 export class AppTopbar extends Component {
 
@@ -18,7 +19,7 @@ export class AppTopbar extends Component {
         return (
             <div className="layout-topbar clearfix">
                 <UnstyledButton className="layout-menu-button" onClick={this.props.onToggleMenu} aria-label="Menu">
-                    <span className="pi pi-bars"/>
+                    <IconMenu style={{"fontSize": "2em"}}/>
                 </UnstyledButton>
                 {this.props.logo}
                 <div className="layout-topbar-icons topbar-right">

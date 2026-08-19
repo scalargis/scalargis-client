@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {NavLink} from 'react-router'
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { IconAngleDown } from '@scalargis/ui';
 
 class AppSubmenu extends Component {
 
@@ -50,7 +51,7 @@ class AppSubmenu extends Component {
     }
 
 	renderLinkContent(item) {
-		const submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
+		const submenuIcon = item.items && <IconAngleDown fixedWidth className="menuitem-toggle-icon" />;
 		const badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
 
 		return (
