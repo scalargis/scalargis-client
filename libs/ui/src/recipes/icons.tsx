@@ -91,6 +91,8 @@ export const IconUndo = piIcon('pi pi-undo');
 export const IconPlay = piIcon('pi pi-play');
 export const IconPause = piIcon('pi pi-pause');
 export const IconPowerOff = piIcon('pi pi-power-off');
+// A busy/loading glyph — pair with the `spin` modifier prop.
+export const IconSpinner = piIcon('pi pi-spinner');
 
 // Search / view
 export const IconSearch = piIcon('pi pi-search');
@@ -111,6 +113,7 @@ export const IconUnlock = piIcon('pi pi-unlock');
 export const IconKey = piIcon('pi pi-key');
 
 // Objects
+export const IconHome = piIcon('pi pi-home');
 export const IconGlobe = piIcon('pi pi-globe');
 export const IconEnvelope = piIcon('pi pi-envelope');
 export const IconInbox = piIcon('pi pi-inbox');
