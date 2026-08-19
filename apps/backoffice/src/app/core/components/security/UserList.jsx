@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { ActionIcon, Button, Group, Select, TextInput } from '@mantine/core';
-import { DataGrid, confirm, notify } from '@scalargis/ui';
+import { DataGrid, confirm, notify, IconCheck, IconX, IconPencil, IconTrash, IconPlus } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
@@ -238,9 +238,9 @@ function UserList(props) {
         textAlign: 'center',
         render: (record) =>
           record.active ? (
-            <i className="pi pi-check" style={{ fontWeight: 'bold', color: 'var(--mantine-color-success-filled)' }} />
+            <IconCheck title="Ativo" style={{ fontWeight: 'bold', color: 'var(--mantine-color-success-filled)' }} />
           ) : (
-            <i className="pi pi-times" style={{ fontWeight: 'bold', color: 'var(--mantine-color-danger-filled)' }} />
+            <IconX title="Inativo" style={{ fontWeight: 'bold', color: 'var(--mantine-color-danger-filled)' }} />
           ),
         filter: (
           <Select
@@ -268,10 +268,10 @@ function UserList(props) {
           ) : (
             <Group gap="xs" wrap="nowrap">
               <ActionIcon color="success" aria-label="Editar" onClick={() => editRecord(record)}>
-                <i className="pi pi-pencil" />
+                <IconPencil />
               </ActionIcon>
               <ActionIcon color="warning" aria-label="Eliminar" onClick={() => deleteRecord(record)}>
-                <i className="pi pi-trash" />
+                <IconTrash />
               </ActionIcon>
             </Group>
           )
@@ -288,11 +288,11 @@ function UserList(props) {
           <div className="card col-12">
             <Group justify="space-between" wrap="wrap" className="mb-4">
               <Group gap="xs">
-                <Button color="success" leftSection={<i className="pi pi-plus" />} onClick={newRecord}>Novo</Button>
-                <Button color="danger" leftSection={<i className="pi pi-trash" />} onClick={deleteSelectedRecords}
+                <Button color="success" leftSection={<IconPlus />} onClick={newRecord}>Novo</Button>
+                <Button color="danger" leftSection={<IconTrash />} onClick={deleteSelectedRecords}
                   disabled={!selectedRecords.length}>Eliminar</Button>
               </Group>
-              <Button variant="outline" color="secondary" leftSection={<i className="pi pi-times" />} onClick={onFilterClear}>Limpar</Button>
+              <Button variant="outline" color="secondary" leftSection={<IconX />} onClick={onFilterClear}>Limpar</Button>
             </Group>
 
             <DataGrid

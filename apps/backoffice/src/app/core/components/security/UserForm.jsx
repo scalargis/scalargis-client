@@ -19,7 +19,7 @@ import {
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
-import { notify, confirm } from '@scalargis/ui';
+import { notify, confirm, IconKey, IconCheck, IconX, IconAlertTriangle, IconArrowLeft, IconSave } from '@scalargis/ui';
 import { PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 import { v4 as uuidV4 } from 'uuid'
 
@@ -397,7 +397,7 @@ function UserForm(props) {
               min={PASSWORD_MIN_LENGTH} max={PASSWORD_MAX_LENGTH}
               style={{ width: '6rem' }}
             />
-            <Button type="button" leftSection={<i className="pi pi-key" />}
+            <Button type="button" leftSection={<IconKey />}
               onClick={() => {
                 const pwd = generatePassword(passwordLength);
                 setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
@@ -429,13 +429,13 @@ function UserForm(props) {
 
         <div className="field col-12 md:col-6">
           <Group gap="xs" align="flex-end" wrap="nowrap">
-            <Button type="button" leftSection={<i className="pi pi-check" />}
+            <Button type="button" leftSection={<IconCheck />}
               onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
             <TextInput id="auth_token" label="Token de Autenticação" placeholder="Token não definido"
               style={{ flex: 1 }} {...register('auth_token')} />
             <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar token"
               onClick={() => { setValue('auth_token', null); setValue('auth_token_expire', null); }}>
-              <i className="pi pi-times" />
+              <IconX />
             </ActionIcon>
           </Group>
         </div>
@@ -457,7 +457,7 @@ function UserForm(props) {
             />
             <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar data de validade"
               onClick={() => setValue('auth_token_expire', null)}>
-              <i className="pi pi-times" />
+              <IconX />
             </ActionIcon>
           </Group>
         </div>
@@ -506,7 +506,7 @@ function UserForm(props) {
                 <div className="col-12 mt-4 mb-2">
                   <Alert color="warning" py="xs">
                     <Group justify="center" gap="xs" wrap="nowrap">
-                      <i className="pi pi-exclamation-triangle" />
+                      <IconAlertTriangle />
                       <span>Adicione um ou mais Perfis</span>
                     </Group>
                   </Alert>
@@ -560,7 +560,7 @@ function UserForm(props) {
                 <div className="col-12 mt-4 mb-2">
                   <Alert color="warning" py="xs">
                     <Group justify="center" gap="xs" wrap="nowrap">
-                      <i className="pi pi-exclamation-triangle" />
+                      <IconAlertTriangle />
                       <span>Adicione um ou mais Grupos</span>
                     </Group>
                   </Alert>
@@ -576,12 +576,12 @@ function UserForm(props) {
         <Button
           type="button"
           variant="default"
-          leftSection={<i className="pi pi-arrow-left" />}
+          leftSection={<IconArrowLeft />}
           disabled={isSaving}
           onClick={goBack}>Voltar</Button>
         <Button
           type="submit"
-          leftSection={<i className="pi pi-save" />}
+          leftSection={<IconSave />}
           loading={isSaving}>Gravar</Button>
       </Group>
 

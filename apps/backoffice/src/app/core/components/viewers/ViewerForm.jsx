@@ -20,7 +20,7 @@ import {
   TagsInput,
   TextInput
 } from '@mantine/core';
-import { CodeEditor, DataGrid, notify } from '@scalargis/ui';
+import { CodeEditor, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -82,10 +82,10 @@ const SelectionList = ({ options, value, onChange, ariaLabel }) => (
 );
 
 const tabItems = [
-  { value: 'base', label: 'Dados Base', icon: 'pi pi-fw pi-home' },
-  { value: 'ui', label: 'UI', icon: 'pi pi-fw pi-home' },
-  { value: 'config', label: 'Configuração', icon: 'pi pi-fw pi-cog' },
-  { value: 'prints', label: 'Plantas', icon: 'pi pi-fw pi-print' }
+  { value: 'base', label: 'Dados Base', icon: IconHome },
+  { value: 'ui', label: 'UI', icon: IconHome },
+  { value: 'config', label: 'Configuração', icon: IconCog },
+  { value: 'prints', label: 'Plantas', icon: IconPrint }
 ];
 
 
@@ -356,7 +356,7 @@ function ViewerForm(props) {
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
           {tabItems.map((item) => (
-            <Tabs.Tab key={item.value} value={item.value} leftSection={<i className={item.icon} />}>
+            <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
               {item.label}
             </Tabs.Tab>
           ))}
@@ -444,7 +444,7 @@ function ViewerForm(props) {
                   { (selectedOwner?.id > 0) &&
                     <ActionIcon type="button" size="input-md" color="danger" aria-label="Remover dono"
                       onClick={() => { setSelectedOwner(null); }}>
-                      <i className="pi pi-times" />
+                      <IconX />
                     </ActionIcon>
                   }
                 </Group>
@@ -517,7 +517,7 @@ function ViewerForm(props) {
                       <div className="col-12 mt-4 mb-2">
                         <Alert color="warning" py="xs">
                           <Group justify="center" gap="xs" wrap="nowrap">
-                            <i className="pi pi-exclamation-triangle" />
+                            <IconAlertTriangle />
                             <span>Adicione um ou mais Perfis</span>
                           </Group>
                         </Alert>
@@ -565,21 +565,21 @@ function ViewerForm(props) {
                       e.preventDefault();
                       customStyleEditor.current?.undo();
                     }}>
-                    <i className="pi pi-undo" />
+                    <IconUndo />
                   </ActionIcon>
                   <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
                     onClick={e => {
                       e.preventDefault();
                       customStyleEditor.current?.redo();
                     }}>
-                    <i className="pi pi-refresh" />
+                    <IconRefresh />
                   </ActionIcon>
                   <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
                     onClick={e => {
                       e.preventDefault();
                       customStyleEditor.current?.openSearch();
                     }}>
-                    <i className="pi pi-search" />
+                    <IconSearch />
                   </ActionIcon>
                 </Group>
                 <Input.Label>Style (Código)</Input.Label>
@@ -604,21 +604,21 @@ function ViewerForm(props) {
                   e.preventDefault();
                   jsonConfigEditor.current?.undo();
                 }}>
-                <i className="pi pi-undo" />
+                <IconUndo />
               </ActionIcon>
               <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
                 onClick={e => {
                   e.preventDefault();
                   jsonConfigEditor.current?.redo();
                 }}>
-                <i className="pi pi-refresh" />
+                <IconRefresh />
               </ActionIcon>
               <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
                 onClick={e => {
                   e.preventDefault();
                   jsonConfigEditor.current?.openSearch();
                 }}>
-                <i className="pi pi-search" />
+                <IconSearch />
               </ActionIcon>
             </Group>
             <CodeEditor
@@ -648,12 +648,12 @@ function ViewerForm(props) {
           <Button
             type="button"
             variant="default"
-            leftSection={<i className="pi pi-arrow-left" />}
+            leftSection={<IconArrowLeft />}
             disabled={isSaving}
             onClick={goBack}>Voltar</Button>
           <Button
             type="submit"
-            leftSection={<i className="pi pi-save" />}
+            leftSection={<IconSave />}
             loading={isSaving}>Gravar</Button>
         </Group>
 

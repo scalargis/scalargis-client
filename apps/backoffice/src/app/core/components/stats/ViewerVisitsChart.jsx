@@ -13,6 +13,7 @@ import { defaults } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import { Button, Loader, Select } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
+import { IconDownload } from '@scalargis/ui';
 import dayjs from 'dayjs';
 
 import dataProvider from '../../../service/DataProvider';
@@ -361,7 +362,7 @@ export default function ViewerVisitsChart(props) {
                 <div className="col-12 text-right">
                     <Button
                         variant="outline"
-                        leftSection={<i className="pi pi-download" />}
+                        leftSection={<IconDownload />}
                         onClick={exportCSV}
                         disabled={!data_values?.length}>Exportar CSV</Button>
                 </div>

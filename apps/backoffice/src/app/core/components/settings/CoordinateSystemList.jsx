@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { ActionIcon, Anchor, Button, Group, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { DataGrid, confirm, notify, Dialog } from '@scalargis/ui';
+import { DataGrid, confirm, notify, Dialog, IconPencil, IconTrash, IconPlus, IconX } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
@@ -248,10 +248,10 @@ function CoordinateSystemList(props) {
           ) : (
             <Group gap="xs" wrap="nowrap">
               <ActionIcon color="success" aria-label="Editar" onClick={() => editRecord(record)}>
-                <i className="pi pi-pencil" />
+                <IconPencil />
               </ActionIcon>
               <ActionIcon color="warning" aria-label="Eliminar" onClick={() => deleteRecord(record)}>
-                <i className="pi pi-trash" />
+                <IconTrash />
               </ActionIcon>
             </Group>
           )
@@ -268,11 +268,11 @@ function CoordinateSystemList(props) {
           <div className="card col-12">
             <Group justify="space-between" wrap="wrap" className="mb-4">
               <Group gap="xs">
-                <Button color="success" leftSection={<i className="pi pi-plus" />} onClick={newRecord}>Novo</Button>
-                <Button color="danger" leftSection={<i className="pi pi-trash" />} onClick={deleteSelectedRecords}
+                <Button color="success" leftSection={<IconPlus />} onClick={newRecord}>Novo</Button>
+                <Button color="danger" leftSection={<IconTrash />} onClick={deleteSelectedRecords}
                   disabled={!selectedRecords.length}>Eliminar</Button>
               </Group>
-              <Button variant="outline" color="secondary" leftSection={<i className="pi pi-times" />} onClick={onFilterClear}>Limpar</Button>
+              <Button variant="outline" color="secondary" leftSection={<IconX />} onClick={onFilterClear}>Limpar</Button>
             </Group>
 
             <DataGrid

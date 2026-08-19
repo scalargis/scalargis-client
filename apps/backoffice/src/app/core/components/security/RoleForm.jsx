@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { Button, Group, TextInput } from '@mantine/core';
-import { notify } from '@scalargis/ui';
+import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -115,12 +115,12 @@ function RoleForm(props) {
           <Button
             type="button"
             variant="default"
-            leftSection={<i className="pi pi-arrow-left" />}
+            leftSection={<IconArrowLeft />}
             disabled={isSaving}
             onClick={goBack}>Voltar</Button>
           <Button
             type="submit"
-            leftSection={<i className="pi pi-save" />}
+            leftSection={<IconSave />}
             loading={isSaving}>Gravar</Button>
         </Group>
 
