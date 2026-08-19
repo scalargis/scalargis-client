@@ -77,5 +77,8 @@ export type { FieldProps } from './recipes/Field';
 export { AttributeTable } from './recipes/AttributeTable';
 export type { AttributeTableProps, AttributeRow } from './recipes/AttributeTable';
 
+/* Icon seam — primeicons behind one indirection (see recipes/icons.tsx). */
+export * from './recipes/icons';
+
 /* ─── Hooks ──────────────────────────────────────────────────────────── */
 export { useIsMobile } from './hooks/useIsMobile';
