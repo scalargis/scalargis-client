@@ -160,7 +160,7 @@ export default function Main({ region, as, core, config, actions, record }) {
   ) : (
     <UnstyledButton onClick={e => open()} title={t("contact", "Contacto")}>
       <span className="layout-topbar-item-text"></span>
-      <IconEnvelope className="layout-topbar-icon" style={{ fontSize: '2em' }} />
+      <IconEnvelope className="layout-topbar-icon" />
     </UnstyledButton>
   );
 

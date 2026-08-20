@@ -143,7 +143,7 @@ export default function Main({ type, as, config, actions, record }) {
         { type != 'menu' ?
           <UnstyledButton onClick={e => open()} title={title}>
             <span className="layout-topbar-item-text"></span>
-            <IconQuestionCircle className="layout-topbar-icon" style={{ fontSize: '2em' }} />
+            <IconQuestionCircle className="layout-topbar-icon" />
           </UnstyledButton> :
           <UnstyledButton className="sg-menuitem" onClick={e => open()}>
             <IconQuestionCircle /><span>Ajuda</span>
@@ -201,7 +201,7 @@ export default function Main({ type, as, config, actions, record }) {
       >
         { component_cfg?.elementType !== 'link' &&
           <span className="layout-topbar-item-text">{title}</span> }
-        <IconQuestionCircle className="layout-topbar-icon" style={{ fontSize: '2em' }} />
+        <IconQuestionCircle className="layout-topbar-icon" />
       </a>
     )
   }

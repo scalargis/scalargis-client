@@ -91,7 +91,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
       (showLoginButton ?
         <UnstyledButton>
           <span className="layout-topbar-item-text">{ !isMobileSmall ? username : '' }</span>
-          <IconUser className="layout-topbar-icon" style={{ fontSize: '2em' }} />
+          <IconUser className="layout-topbar-icon" />
           {' '}{ !isMobileSmall ? username : '' }
         </UnstyledButton> : null) :
       <UnstyledButton className="sg-menuitem">
@@ -124,7 +124,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
     { type != 'menu' ?
       <UnstyledButton onClick={e => setMode(1)} title={config.tooltip_login || ''}>
         <span className="layout-topbar-item-text">{i18nUtils.translateValue("user", "Utilizador")}</span>
-        <IconUnlock className="layout-topbar-icon" style={{ fontSize: '2em' }} />
+        <IconUnlock className="layout-topbar-icon" />
       </UnstyledButton> :
       <UnstyledButton className="sg-menuitem" onClick={e => setMode(1)} title={config.tooltip_login || ''}>
         <IconUnlock /><span>{i18nUtils.translateValue("login", "Entrar")}</span>
