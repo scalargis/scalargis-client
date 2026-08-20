@@ -19,8 +19,12 @@ import type { OnboardingStep } from '@scalargis/ui';
 import { registerOnboardingTranslations } from './i18n';
 import { selectBaseTourSteps, enabledComponentTypes } from './membership';
 import type { ConditionContext } from './conditions';
-import { attachRevealHooks } from './hooks';
+import { attachRevealHooks, attachPanelRevealForType } from './hooks';
 import type { RevealHooksContext } from './hooks';
+
+function byOrder(a: OnboardingStep, b: OnboardingStep): number {
+  return (a.order ?? 100) - (b.order ?? 100);
+}
 
 interface ViewerLike {
   id?: string | number | null;
@@ -36,6 +40,8 @@ interface CoreLike {
     viewer_set_selectedmenu?: (id: string) => unknown;
     layout_show_menu?: (isDesktop: boolean) => unknown;
   };
+  /** Phase 5: self onboarding steps by component type. */
+  getOnboardingSelfSteps?: () => Record<string, OnboardingStep[]>;
 }
 
 export function useOnboardingSteps(
@@ -55,11 +61,32 @@ export function useOnboardingSteps(
   const isOwner = !!viewer?.is_owner;
   const viewerId = viewer?.id ?? null;
 
+  // Self steps register asynchronously as each outside component's Main.jsx
+  // import resolves (Core.addComponent). The registry object is stable, so its
+  // keys are the signal: when a self component registers, selfKey changes and
+  // the memo rebuilds with the now-present self steps.
+  const selfMap = core?.getOnboardingSelfSteps?.() ?? {};
+  const selfKey = Object.keys(selfMap).sort().join('|');
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => {
     const types = enabledComponentTypes(viewer?.config_json?.components);
+    const enabledSet = new Set(types);
     const ctx: ConditionContext = { auth, viewer };
-    const steps = selectBaseTourSteps(types, ctx);
+    const baseSteps = selectBaseTourSteps(types, ctx);
+
+    // Self steps: keep only enabled component types, clone each step so the
+    // per-viewer reveal hooks never mutate the component's shared exported
+    // array (the same array serves every viewer this session).
+    const selfByType: Record<string, OnboardingStep[]> = {};
+    const selfSteps: OnboardingStep[] = [];
+    for (const [type, steps] of Object.entries(selfMap)) {
+      if (!enabledSet.has(type)) continue;
+      if (!Array.isArray(steps)) continue;
+      const cloned = steps.map((s) => ({ ...s }));
+      selfByType[type] = cloned;
+      selfSteps.push(...cloned);
+    }
 
     if (core?.store && core?.actions?.viewer_set_selectedmenu) {
       const revealCtx: RevealHooksContext = {
@@ -85,9 +112,16 @@ export function useOnboardingSteps(
             && (v as Record<string, unknown> | undefined)?.layoutMode === 'static';
         },
       };
-      attachRevealHooks(steps, revealCtx);
+      attachRevealHooks(baseSteps, revealCtx);
+      // Each self component's steps spotlight its own mainmenu panel. Reveal
+      // that panel before each of its steps, keyed on the component type.
+      for (const [type, steps] of Object.entries(selfByType)) {
+        attachPanelRevealForType(steps, type, revealCtx);
+      }
     }
 
-    return steps;
-  }, [viewerId, typesKey, token, isOwner, core]);
+    // Merge base + self and sort by order (the controller sorts too, but the
+    // launcher reads this list, so keep it ordered).
+    return [...baseSteps, ...selfSteps].sort(byOrder);
+  }, [viewerId, typesKey, token, isOwner, selfKey, core]);
 }

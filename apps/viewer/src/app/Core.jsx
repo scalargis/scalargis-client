@@ -177,9 +177,16 @@ function Core(config, reducers) {
   this.__mainmenu = {};
 
   /**
+   * Hold self onboarding steps by component type (Phase 5). An outside
+   * component ships its own steps from its onboardingSteps export. addComponent
+   * registers them here. useOnboardingSteps merges them with the base steps.
+   */
+  this.__onboardingSteps = {};
+
+  /**
    * Secure app props
    */
-  this.__secureProps = ['config', 'actions', 'store', 'Renderer', '__components', '__widgets', '__mainmenu'];
+  this.__secureProps = ['config', 'actions', 'store', 'Renderer', '__components', '__widgets', '__mainmenu', '__onboardingSteps'];
 }
 
 // Set core site config
@@ -248,8 +255,13 @@ Core.prototype.addComponent = function(core, component, done) {
       this.__widgets[component.type] = c?.widgets;
     }
 
+    // Self onboarding steps registry (Phase 5)
+    if (Array.isArray(c.onboardingSteps) && !this.__onboardingSteps[component.type]) {
+      this.__onboardingSteps[component.type] = c.onboardingSteps;
+    }
+
     done();
-    
+
   } else {
     // Add plugin components
     (async () => {
@@ -301,7 +313,12 @@ Core.prototype.addComponent = function(core, component, done) {
       if (!!c.widgets && !this.__widgets[component.type]) {
         this.__widgets[component.type] = c?.widgets;
       }
-      
+
+      // Self onboarding steps registry (Phase 5)
+      if (Array.isArray(c.onboardingSteps) && !this.__onboardingSteps[component.type]) {
+        this.__onboardingSteps[component.type] = c.onboardingSteps;
+      }
+
       done();
     }).catch(err => {
       console.log('Error loading module:', err);
@@ -312,6 +329,17 @@ Core.prototype.addComponent = function(core, component, done) {
 
 Core.prototype.unloadComponents = function() {
   this.__components = {}
+  this.__onboardingSteps = {}
+}
+
+/**
+ * Self onboarding steps by component type (Phase 5). Returns the raw registry
+ * { type: OnboardingStep[] } filled by addComponent from each component's
+ * onboardingSteps export. useOnboardingSteps reads it, keeps the enabled types,
+ * clones the steps, attaches the panel-reveal hooks, and merges with the base.
+ */
+Core.prototype.getOnboardingSelfSteps = function() {
+  return this.__onboardingSteps || {};
 }
 
 Core.prototype.registerComponentWidgets = function (componentType, widgets) {

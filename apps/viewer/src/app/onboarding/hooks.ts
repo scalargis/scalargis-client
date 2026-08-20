@@ -38,6 +38,34 @@ export interface RevealHooksContext {
 }
 
 /**
+ * Attach a reveal before/after pair to one step. The before hook opens the
+ * sidebar drawer when collapsed, then selects the menu that shows the panel.
+ * The after hook restores the prior selection.
+ */
+function attachOnePanelReveal(
+  step: OnboardingStep,
+  menuId: string,
+  ctx: RevealHooksContext,
+): void {
+  let prior: string | null = null;
+  step.before = () => {
+    prior = ctx.getSelectedMenu();
+    // Open the sidebar drawer first when it is collapsed, so the panel
+    // content inside #content is no longer display:none and measures to
+    // a non-zero rect (layout.scss :233).
+    if (ctx.isSidebarClosed()) {
+      ctx.showMenu();
+    }
+    ctx.dispatch(ctx.setSelectedMenu(menuId));
+  };
+  step.after = () => {
+    if (prior != null) {
+      ctx.dispatch(ctx.setSelectedMenu(prior));
+    }
+  };
+}
+
+/**
  * Attach before/after hooks to every panel step so the menu panel is visible
  * before the spotlight measurement. Skips steps whose id is not in
  * panelRevealByStepId, and skips when the viewer has no mainmenu mount for the
@@ -58,21 +86,32 @@ export function attachRevealHooks(
     const menuId = comp?.id;
     if (menuId == null) continue;
 
-    let prior: string | null = null;
-    step.before = () => {
-      prior = ctx.getSelectedMenu();
-      // Open the sidebar drawer first when it is collapsed, so the panel
-      // content inside #content is no longer display:none and measures to
-      // a non-zero rect (layout.scss :233).
-      if (ctx.isSidebarClosed()) {
-        ctx.showMenu();
-      }
-      ctx.dispatch(ctx.setSelectedMenu(menuId as string));
-    };
-    step.after = () => {
-      if (prior != null) {
-        ctx.dispatch(ctx.setSelectedMenu(prior));
-      }
-    };
+    attachOnePanelReveal(step, menuId as string, ctx);
+  }
+}
+
+/**
+ * Self-step reveal (Phase 5).
+ *
+ * A self component (for example CatalogoSNIG) ships its own steps that
+ * spotlight elements inside its own mainmenu panel. That panel is hidden by
+ * display:none while another menu is selected. So every self step of a
+ * mainmenu component needs the same panel reveal as a base panel step. This
+ * attaches the reveal to all the given steps, keyed on the component TYPE, not
+ * on a static step-id map. Safe no-op when the component has no mainmenu mount.
+ */
+export function attachPanelRevealForType(
+  steps: OnboardingStep[],
+  revealType: string,
+  ctx: RevealHooksContext,
+): void {
+  const comp = ctx.components.find(
+    (c) => c.type === revealType && c.target === 'mainmenu',
+  );
+  const menuId = comp?.id;
+  if (menuId == null) return;
+
+  for (const step of steps) {
+    attachOnePanelReveal(step, menuId as string, ctx);
   }
 }
