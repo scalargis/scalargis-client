@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { ActionIcon, Badge, Group, Select, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { DataGrid, notify, Dialog } from '@scalargis/ui';
+import { DataGrid, notify, Dialog, IconMenu } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -208,7 +208,7 @@ function ViewersList(props) {
     <React.Fragment>
       <ActionIcon variant="outline" aria-label="Ver visualizadores" loading={fetching && !visible}
         onClick={() => loadData()}>
-        <i className="pi pi-bars" />
+        <IconMenu />
       </ActionIcon>
 
       <Dialog title={props.header || ''} opened={visible} size="75vw" onClose={onHide}>

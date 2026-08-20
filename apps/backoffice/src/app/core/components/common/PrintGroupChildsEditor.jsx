@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Component } from "react";
 import { ActionIcon, Alert, Button, Group, MultiSelect } from '@mantine/core';
-import { CollapsiblePanel, ConfirmPopover } from '@scalargis/ui';
+import { CollapsiblePanel, ConfirmPopover, IconInfoCircle, IconX } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { getItemStyle, getFieldListStyle } from "./utils";
 
@@ -80,7 +80,7 @@ const ListChilds = props => {
       <div>
         <Alert color="informative" py="xs">
           <Group justify="center" gap="xs" wrap="nowrap">
-            <i className="pi pi-info-circle" />
+            <IconInfoCircle />
             <span>Selecione uma ou mais opções e clique em 'Adicionar'</span>
           </Group>
         </Alert>
@@ -144,7 +144,7 @@ const ListChilds = props => {
                           }}
                         >
                           <ActionIcon type="button" variant="subtle" color="danger" aria-label="Remover" title="Remover">
-                            <i className="pi pi-times" />
+                            <IconX />
                           </ActionIcon>
                         </ConfirmPopover>
                         </div>

@@ -16,7 +16,7 @@ import {
   Tabs,
   TextInput
 } from '@mantine/core';
-import { CodeEditor, CollapsiblePanel, notify, TabPanel } from '@scalargis/ui';
+import { CodeEditor, CollapsiblePanel, notify, TabPanel, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import FormFieldsEditor from "../common/FormFieldsEditor";
@@ -31,10 +31,10 @@ const buildScaleList = (list1, list2) => {
 }
 
 const tabItems = [
-  { value: 'base', label: 'Dados Base', icon: 'pi pi-fw pi-home' },
-  { value: 'config', label: 'Configuração', icon: 'pi pi-fw pi-cog' },
-  { value: 'form', label: 'Formulário', icon: 'pi pi-fw pi-home' },
-  { value: 'layouts', label: 'Layouts', icon: 'pi pi-fw pi-home' }
+  { value: 'base', label: 'Dados Base', icon: IconHome },
+  { value: 'config', label: 'Configuração', icon: IconCog },
+  { value: 'form', label: 'Formulário', icon: IconHome },
+  { value: 'layouts', label: 'Layouts', icon: IconHome }
 ];
 
 const pageFormatList = ['A4', 'A3', 'A2', 'A1', 'A0'];
@@ -209,7 +209,7 @@ function PrintForm(props) {
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
           {tabItems.map((item) => (
-            <Tabs.Tab key={item.value} value={item.value} leftSection={<i className={item.icon} />}>
+            <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
               {item.label}
             </Tabs.Tab>
           ))}
@@ -403,7 +403,7 @@ function PrintForm(props) {
                           <Popover.Target>
                             <ActionIcon type="button" size="input-md" aria-label="Adicionar escala" title="Adicionar escala"
                               onClick={() => setScalePickerOpened((o) => !o)}>
-                              <i className="pi pi-ellipsis-v" />
+                              <IconEllipsisV />
                             </ActionIcon>
                           </Popover.Target>
                           <Popover.Dropdown>
@@ -551,12 +551,12 @@ function PrintForm(props) {
           <Button
             type="button"
             variant="default"
-            leftSection={<i className="pi pi-arrow-left" />}
+            leftSection={<IconArrowLeft />}
             disabled={isSaving}
             onClick={goBack}>Voltar</Button>
           <Button
             type="submit"
-            leftSection={<i className="pi pi-save" />}
+            leftSection={<IconSave />}
             loading={isSaving}>Gravar</Button>
         </Group>
 

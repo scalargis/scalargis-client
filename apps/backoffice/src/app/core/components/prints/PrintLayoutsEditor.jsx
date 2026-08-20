@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { ActionIcon, Button, Group, Input, Select } from '@mantine/core';
-import { CodeEditor, DataGrid, ConfirmPopover, Dialog, useIsMobile } from '@scalargis/ui';
+import { CodeEditor, DataGrid, ConfirmPopover, Dialog, useIsMobile, IconX, IconCheck, IconPencil, IconTrash, IconPlus } from '@scalargis/ui';
 import { useForm, Controller } from 'react-hook-form';
 
 const LayoutEditor = props => {
@@ -78,9 +78,9 @@ const LayoutEditor = props => {
         </div>
 
         <Group justify="flex-end" gap="xs" className="mt-4">
-          <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+          <Button type="button" variant="subtle" leftSection={<IconX />}
             onClick={() => props.onHide()}>Fechar</Button>
-          <Button type="button" leftSection={<i className="pi pi-check" />}
+          <Button type="button" leftSection={<IconCheck />}
             onClick={handleSubmit((d) => props.onSave(d))}>Gravar</Button>
         </Group>
       </form>
@@ -141,7 +141,7 @@ const PrintLayoutsEditor = props => {
         render: (record) => (
           <Group gap="xs" wrap="nowrap" justify="flex-end">
             <ActionIcon type="button" color="success" aria-label="Editar" onClick={() => setEditing(record)}>
-              <i className="pi pi-pencil" />
+              <IconPencil />
             </ActionIcon>
             <ConfirmPopover
               message="Tem a certeza que pretende eliminar?"
@@ -151,7 +151,7 @@ const PrintLayoutsEditor = props => {
               onConfirm={() => deleteRecord(record)}
             >
               <ActionIcon type="button" color="warning" aria-label="Eliminar">
-                <i className="pi pi-trash" />
+                <IconTrash />
               </ActionIcon>
             </ConfirmPopover>
           </Group>
@@ -174,7 +174,7 @@ const PrintLayoutsEditor = props => {
       <div className="grid">
         <div className="card col-12">
           <Group justify="flex-end" gap="xs" className="mb-4">
-            <Button type="button" color="success" leftSection={<i className="pi pi-plus" />}
+            <Button type="button" color="success" leftSection={<IconPlus />}
               onClick={() => setEditing(null)}>Novo</Button>
             <ConfirmPopover
               message="Tem a certeza que pretende eliminar todos os layouts selecionados?"
@@ -183,7 +183,7 @@ const PrintLayoutsEditor = props => {
               rejectLabel="Não"
               onConfirm={deleteSelectedRecords}
             >
-              <Button type="button" color="danger" leftSection={<i className="pi pi-trash" />}
+              <Button type="button" color="danger" leftSection={<IconTrash />}
                 disabled={!selectedRecords.length}>Eliminar</Button>
             </ConfirmPopover>
           </Group>

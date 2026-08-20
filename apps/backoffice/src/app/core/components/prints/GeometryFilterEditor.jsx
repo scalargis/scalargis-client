@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Alert, Button, Group, NumberInput, Select, Tabs, Textarea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Dialog, useIsMobile } from '@scalargis/ui';
+import { Dialog, useIsMobile, IconInfoCircle, IconAlertTriangle, IconTrash, IconPencil, IconX, IconCheck } from '@scalargis/ui';
 import { useForm, Controller } from 'react-hook-form';
 
 import OlWKT from "ol/format/WKT";
@@ -226,14 +226,14 @@ const GeometryFilterEditor = props => {
         { data.geometryWKT ?
           <Alert color="informative" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-info-circle" />
+              <IconInfoCircle />
               <span>Clique em 'Editar' para configurar o filtro espacial.</span>
             </Group>
           </Alert>
           :
           <Alert color="warning" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-exclamation-triangle" />
+              <IconAlertTriangle />
               <span>Sem filtro espacial definido. Clique em 'Editar' para definir um filtro espacial.</span>
             </Group>
           </Alert>
@@ -242,10 +242,10 @@ const GeometryFilterEditor = props => {
 
       <Group justify="flex-end" gap="xs" className="m-2">
         { data.geometryWKT &&
-        <Button type="button" variant="outline" color="danger" leftSection={<i className="pi pi-trash" />}
+        <Button type="button" variant="outline" color="danger" leftSection={<IconTrash />}
           onClick={(e)=> {e.preventDefault(); onRemove();}}>Remover</Button>
         }
-        <Button type="button" variant="outline" leftSection={<i className="pi pi-pencil" />}
+        <Button type="button" variant="outline" leftSection={<IconPencil />}
           onClick={(e)=> {e.preventDefault(); openForm()}}>Editar</Button>
       </Group>
 
@@ -300,9 +300,9 @@ const GeometryFilterEditor = props => {
           </div>
 
           <Group justify="flex-end" gap="xs" className="mt-4">
-            <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+            <Button type="button" variant="subtle" leftSection={<IconX />}
               onClick={onHide}>Fechar</Button>
-            <Button type="button" leftSection={<i className="pi pi-check" />}
+            <Button type="button" leftSection={<IconCheck />}
               onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
           </Group>
         </form>

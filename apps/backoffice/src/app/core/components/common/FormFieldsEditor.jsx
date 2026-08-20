@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Component } from "react";
 import { ActionIcon, Button, Checkbox, Group, TextInput, Tooltip, Alert } from '@mantine/core';
-import { CollapsiblePanel, ConfirmPopover, Dialog, useIsMobile } from '@scalargis/ui';
+import { CollapsiblePanel, ConfirmPopover, Dialog, useIsMobile, IconInfoCircle, IconX, IconCheck, IconTrash, IconPencil, IconList, IconPlusCircle } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useForm, Controller } from 'react-hook-form';
 import { ReorderGroups, ReorderFields, getItemStyle, getGroupListStyle, getFieldListStyle } from "./utils";
@@ -24,7 +24,7 @@ const fieldError = (errors, name) => {
 const InfoMessage = ({ text }) => (
   <Alert color="informative" py="xs" className="w-full">
     <Group justify="center" gap="xs" wrap="nowrap">
-      <i className="pi pi-info-circle" />
+      <IconInfoCircle />
       <span>{text}</span>
     </Group>
   </Alert>
@@ -61,7 +61,7 @@ const FieldFormEditor = props => {
                   Deverá ser preenchido com uma cadeia de caracteres, sem espaços.</span>}>
                 <ActionIcon type="button" variant="subtle" size="input-md" aria-label="Ajuda sobre o campo chave"
                   onClick={(e)=>e.preventDefault()}>
-                  <i className="pi pi-info-circle" />
+                  <IconInfoCircle />
                 </ActionIcon>
               </Tooltip>
             </Group>
@@ -109,9 +109,9 @@ const FieldFormEditor = props => {
         </div>
 
         <Group justify="flex-end" gap="xs" className="mt-4">
-          <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+          <Button type="button" variant="subtle" leftSection={<IconX />}
             onClick={() => props.onHide()}>Fechar</Button>
-          <Button type="button" leftSection={<i className="pi pi-check" />}
+          <Button type="button" leftSection={<IconCheck />}
             onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
         </Group>
       </form>
@@ -150,7 +150,7 @@ const GroupFormEditor = props => {
                 Deverá ser preenchido com uma cadeia de caracteres, sem espaços.</span>}>
               <ActionIcon type="button" variant="subtle" size="input-md" aria-label="Ajuda sobre o campo chave"
                 onClick={(e)=>e.preventDefault()}>
-                <i className="pi pi-info-circle" />
+                <IconInfoCircle />
               </ActionIcon>
             </Tooltip>
           </Group>
@@ -175,9 +175,9 @@ const GroupFormEditor = props => {
       </div>
 
       <Group justify="flex-end" gap="xs" className="mt-4">
-        <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+        <Button type="button" variant="subtle" leftSection={<IconX />}
           onClick={() => props.onHide()}>Fechar</Button>
-        <Button type="button" leftSection={<i className="pi pi-check" />}
+        <Button type="button" leftSection={<IconCheck />}
           onClick={handleSubmit((d) => onSave(d))}>Gravar</Button>
       </Group>
     </form>
@@ -271,7 +271,7 @@ const GroupFields = props => {
                             }}
                           >
                             <ActionIcon type="button" variant="subtle" color="danger" aria-label="Eliminar campo" title="Eliminar campo">
-                              <i className="pi pi-trash" />
+                              <IconTrash />
                             </ActionIcon>
                           </ConfirmPopover>
                           <ActionIcon type="button" variant="subtle" color="warning" aria-label="Editar campo" title="Editar campo"
@@ -280,7 +280,7 @@ const GroupFields = props => {
                               setFieldEdition({...field, groupId: group.id, key: field.id});
                               setShowFieldForm(true);
                             }}>
-                            <i className="pi pi-pencil" />
+                            <IconPencil />
                           </ActionIcon>
                           </div>
                         </div>
@@ -423,7 +423,7 @@ const Fields = props => {
                         }}
                       >
                         <ActionIcon type="button" variant="subtle" color="danger" aria-label="Eliminar campo" title="Eliminar campo">
-                          <i className="pi pi-trash" />
+                          <IconTrash />
                         </ActionIcon>
                       </ConfirmPopover>
                       <ActionIcon type="button" variant="subtle" color="warning" aria-label="Editar campo" title="Editar campo"
@@ -432,7 +432,7 @@ const Fields = props => {
                           setFieldEdition({...field.data, key: field.id});
                           setShowFieldForm(true);
                         }}>
-                        <i className="pi pi-pencil" />
+                        <IconPencil />
                       </ActionIcon>
                       </div>
                     </div>
@@ -660,7 +660,7 @@ class FormFieldsEditor extends Component {
                     <Button
                       type="button"
                       variant="outline"
-                      leftSection={<i className="pi pi-list" />}
+                      leftSection={<IconList />}
                       onClick={()=> {
                         this.fieldEdition = { key: null, active: true, title: null, header: null, showLabel: false};
                         this.setState({
@@ -697,7 +697,7 @@ class FormFieldsEditor extends Component {
                   <Button
                     type="button"
                     variant="outline"
-                    leftSection={<i className="pi pi-list" />}
+                    leftSection={<IconList />}
                     onClick={()=> {
                       this.groupEdition = { key: null, active: true, title: null, fields: {}};
                       this.setState({
@@ -761,7 +761,7 @@ class FormFieldsEditor extends Component {
                                       showFieldForm: true
                                     });
                                   }}>
-                                  <i className="pi pi-plus-circle" />
+                                  <IconPlusCircle />
                                 </ActionIcon>
 
                                 <ConfirmPopover
@@ -776,7 +776,7 @@ class FormFieldsEditor extends Component {
                                   }}
                                 >
                                   <ActionIcon type="button" variant="subtle" color="danger" aria-label="Eliminar grupo" title="Eliminar grupo">
-                                    <i className="pi pi-trash" />
+                                    <IconTrash />
                                   </ActionIcon>
                                 </ConfirmPopover>
                                 <ActionIcon type="button" variant="subtle" color="warning" aria-label="Editar grupo" title="Editar grupo"
@@ -788,7 +788,7 @@ class FormFieldsEditor extends Component {
                                       showGroupForm: true
                                     });
                                   }}>
-                                  <i className="pi pi-pencil" />
+                                  <IconPencil />
                                 </ActionIcon>
                               </div>
                             </div>
