@@ -1,6 +1,7 @@
 import React from 'react';
 import { withTranslation } from "react-i18next";
 import { Accordion, Button, ColorInput, Group, Select, Switch, Textarea, TextInput } from '@mantine/core';
+import { IconCheck } from '@scalargis/ui';
 
 import { i18n } from '../../components';
 
@@ -305,7 +306,7 @@ class EditNode extends React.Component {
         <Group justify="flex-end" mt="md">
           <Button
             type="button"
-            leftSection={<i className="pi pi-check" aria-hidden="true" />}
+            leftSection={<IconCheck />}
             onClick={e => this.props.onSave(e, edit)}
           >
             {this.props.t("apply", "Aplicar")}

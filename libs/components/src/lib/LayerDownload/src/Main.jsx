@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from "react-i18next"
 import { Button } from '@mantine/core';
-import { notify } from '@scalargis/ui';
+import { notify, IconFile, IconExternalLink } from '@scalargis/ui';
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 
 /*
@@ -25,13 +25,13 @@ export default function Main({ core, config, record }) {
   const { t } = useTranslation();
 
   const defaultExportFormats = [
-    { value: "geojson", title: "GeoJSON", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "GeoJSON"}),
+    { value: "geojson", title: "GeoJSON", icon: <IconFile />, tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "GeoJSON"}),
       outputFormat: "application/json" },
-    { value: "gml", title: "GML", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "GML"}),
+    { value: "gml", title: "GML", icon: <IconFile />, tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "GML"}),
       outputFormat: "text/xml; subtype=gml/2.1.2" },
-    { value: "shape", title: "ShapeFile", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "Shapefile"}),
+    { value: "shape", title: "ShapeFile", icon: <IconFile />, tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "Shapefile"}),
       outputFormat: "SHAPE-ZIP" },
-    { value: "kml", title: "KML", icon: "pi pi-file", tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "KML"}),
+    { value: "kml", title: "KML", icon: <IconFile />, tooltip: t("exportToFileFormat", "Exportar para ficheiro GeoJSON", {format: "KML"}),
       outputFormat: "application/vnd.google-earth.kml+xml" }
   ];
 
@@ -262,7 +262,7 @@ export default function Main({ core, config, record }) {
                 <Button
                   size="xs"
                   className="mr-2 mb-2"
-                  leftSection={<i className="pi pi-external-link" aria-hidden="true" />}
+                  leftSection={<IconExternalLink />}
                   loading={isDownloading && downloadFormat=='link'}
                   onClick={e => downloadLink(linkDownload.filename, linkDownload.url)}
                   disabled={isDownloading}
@@ -274,7 +274,7 @@ export default function Main({ core, config, record }) {
                 <Button
                   size="xs"
                   className="mr-2 mb-2"
-                  leftSection={<i className="pi pi-external-link" aria-hidden="true" />}
+                  leftSection={<IconExternalLink />}
                   loading={isDownloading && downloadFormat=='external'}
                   onClick={e => window.open(externalDownload.url, "_blank")}
                   disabled={isDownloading}
@@ -288,7 +288,7 @@ export default function Main({ core, config, record }) {
                       key={opt.value}
                       size="xs"
                       className="mr-2 mb-2"
-                      leftSection={<i className="pi pi-file" aria-hidden="true" />}
+                      leftSection={<IconFile />}
                       loading={isDownloading && downloadFormat==opt.value}
                       onClick={e => downloadDatasource(layer, opt.outputFormat)}
                       disabled={isDownloading}
@@ -300,7 +300,7 @@ export default function Main({ core, config, record }) {
                     key={opt.value}
                     size="xs"
                     className="mr-2 mb-2"
-                    leftSection={<i className="pi pi-file" aria-hidden="true" />}
+                    leftSection={<IconFile />}
                     loading={isDownloading && downloadFormat==opt.value}
                     onClick={e => downloadTheme(layer, opt.value)}
                     disabled={isDownloading}

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Button, Group } from '@mantine/core';
-import { TreeView, useTree, getTreeExpandedState } from '@scalargis/ui';
+import { TreeView, useTree, getTreeExpandedState, IconPlus, IconMinus } from '@scalargis/ui';
 
 import RenderComponent from './RenderComponent';
 
@@ -73,12 +73,12 @@ export const TreeComponent = (props) => {
         <div>
             {props?.options?.showExpandButtons && <Group justify="center" gap="xs" mb="md">
                 <Button type="button" size="xs" variant="outline"
-                    leftSection={<i className="pi pi-plus" aria-hidden="true" />}
+                    leftSection={<IconPlus />}
                     onClick={() => tree.expandAllNodes()}>
                     Abrir todos
                 </Button>
                 <Button type="button" size="xs" variant="outline"
-                    leftSection={<i className="pi pi-minus" aria-hidden="true" />}
+                    leftSection={<IconMinus />}
                     onClick={() => tree.collapseAllNodes()}>
                     Fechar todos
                 </Button>

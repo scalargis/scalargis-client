@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel, Dialog } from '@scalargis/ui';
+import { CollapsiblePanel, Dialog, IconQuestionCircle } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 
@@ -33,7 +33,7 @@ export function MainMenu({ className, config, actions, core, record }) {
     <MainMenuButton
       title={title}
       className={className}
-      icon={component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-question-circle"}
+      icon={component_cfg?.btn_icon ? component_cfg?.btn_icon : <IconQuestionCircle />}
       onClick={e => record.as === 'popup' ? open() : config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   );

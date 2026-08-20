@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, LoadingOverlay } from '@mantine/core';
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, IconObjectsColumn } from '@scalargis/ui';
 
 import { i18n, MainMenuButton } from '../../components';
 
@@ -34,7 +34,7 @@ export function MainMenu({ className, config, actions, record }) {
           <MainMenuButton
             title={title}
             className={className}
-            icon={record?.config_json?.btn_icon ? record.config_json.btn_icon : "pi pi-objects-column"}
+            icon={record?.config_json?.btn_icon ? record.config_json.btn_icon : <IconObjectsColumn />}
             onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
           />
       )

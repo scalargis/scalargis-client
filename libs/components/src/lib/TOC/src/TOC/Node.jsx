@@ -2,6 +2,7 @@ import React from "react";
 import { withTranslation } from "react-i18next";
 import Tree from "./Tree";
 import { ActionIcon, Checkbox, Radio } from '@mantine/core';
+import { IconChevronDown, IconChevronRight, IconSquare, IconCog, IconSearch } from '@scalargis/ui';
 import DraggableItem from './DraggableItem';
 import Legend from "./Legend";
 
@@ -118,7 +119,7 @@ class Node extends React.Component {
                       aria-expanded={this.isOpen()}
                       onClick={e => actions.open(e, data.id)}
                     >
-                      <i className={this.isOpen() ? "pi pi-chevron-down" : "pi pi-chevron-right"} aria-hidden="true" />
+                      {this.isOpen() ? <IconChevronDown /> : <IconChevronRight />}
                     </ActionIcon>
                   </div>
                 )}
@@ -150,7 +151,7 @@ class Node extends React.Component {
 
                   <div className="flex flex-row justify-content-between">
                     <div>
-                      {data.style_color ? <i className='pi pi-square' style={{ color: `rgba(${data.style_color})` }} /> : null}
+                      {data.style_color ? <IconSquare style={{ color: `rgba(${data.style_color})` }} /> : null}
                       <label style={tocTextStyle} htmlFor={data.id} className={"label" + (isGroup ? " label-grp" : "") }>
                         {i18n.translateValue(data.title)}
                       </label>
@@ -165,7 +166,7 @@ class Node extends React.Component {
                             aria-pressed={detailsOpen}
                             onClick={e => this.setState({ ...this.state, detailsOpen: !detailsOpen })}
                           >
-                            <i className="pi pi-cog" aria-hidden="true" />
+                            <IconCog />
                           </ActionIcon> : null}
                         {' '}
                         {data.bbox && data.show_zoom_extent !== false ? (
@@ -175,7 +176,7 @@ class Node extends React.Component {
                             aria-label={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
                             onClick={e => this.onClickZoom(e, data)}
                           >
-                            <i className="pi pi-search" aria-hidden="true" />
+                            <IconSearch />
                           </ActionIcon>
                         ) : null}
                       </div>

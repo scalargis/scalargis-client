@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ActionIcon, TextInput } from '@mantine/core'
-import { DataGrid, Dialog } from '@scalargis/ui'
+import { DataGrid, Dialog, IconTable, IconExternalLink } from '@scalargis/ui'
 
 export default function Main({ open, as, onOpen, onClose, data, fields }) {
 
@@ -19,7 +19,7 @@ export default function Main({ open, as, onOpen, onClose, data, fields }) {
       aria-label="Tabela de atributos"
       onClick={e => onOpen(true)}
     >
-      <i className="pi pi-table" aria-hidden="true" />
+      <IconTable />
     </ActionIcon>
   )
 
@@ -73,7 +73,7 @@ export default function Main({ open, as, onOpen, onClose, data, fields }) {
       field.type === 'url' ?
         <div>
           <a href={row[field.name]} title={row[field.name]} target="_blank" rel="noopener noreferrer">
-            <i className="pi pi-external-link"></i>
+            <IconExternalLink />
           </a>
         </div>
       : row[field.name],

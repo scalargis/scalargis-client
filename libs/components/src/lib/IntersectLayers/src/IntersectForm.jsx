@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Alert, Button, Group, NumberInput, Paper } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { confirm, notify } from '@scalargis/ui';
+import { confirm, notify, IconAlertTriangle, IconInfoCircle } from '@scalargis/ui';
 import OlInteractionDraw from "ol/interaction/Draw";
 import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
@@ -452,7 +452,7 @@ export default function IntersectForm(props) {
         />
         <Alert className="mt-2" color={ geometryError === true ? "warning" : "informative" } py="xs">
           <Group justify="center" gap="xs" wrap="nowrap">
-            <i className={geometryError === true ? "pi pi-exclamation-triangle" : "pi pi-info-circle"} />
+            {geometryError === true ? <IconAlertTriangle /> : <IconInfoCircle />}
             <span>{`${t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")}.`}</span>
           </Group>
         </Alert>
@@ -504,7 +504,7 @@ export default function IntersectForm(props) {
         showNoResultsMsg && <div className="p-fluid mt-4">
           <Alert color="informative" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-info-circle" />
+              <IconInfoCircle />
               <span>{(t( "noResults", "Sem resultados"))}</span>
             </Group>
           </Alert>

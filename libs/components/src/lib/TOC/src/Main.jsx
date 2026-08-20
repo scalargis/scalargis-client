@@ -1,7 +1,7 @@
 import React from 'react';
 import { withTranslation, useTranslation} from "react-i18next";
 import { Alert, Badge, Button, Group, TextInput } from '@mantine/core';
-import { CollapsiblePanel, notify } from '@scalargis/ui';
+import { CollapsiblePanel, notify, IconList, IconCheck, IconFolderOpen, IconSave, IconX, IconInfoCircle } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 import { translateValue } from '../../utils/i18n';
@@ -32,7 +32,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={className}
-      icon="pi pi-list"
+      icon={<IconList />}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )
@@ -381,7 +381,7 @@ class Main extends React.Component {
               <div>
                 {config.viewer.is_session &&
                   <Badge variant="light" color="informative" radius="xl"
-                    leftSection={<i className="pi pi-check" aria-hidden="true" />}
+                    leftSection={<IconCheck />}
                     title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
                     {this.props.t("session", "Sessão")}
                   </Badge>}
@@ -389,14 +389,14 @@ class Main extends React.Component {
               <Group gap={4} wrap="nowrap">
                 {(config.viewer.session && !config.viewer.is_session) &&
                   <Button variant="subtle" size="compact-sm" type="button"
-                    leftSection={<i className="pi pi-folder-open" aria-hidden="true" />}
+                    leftSection={<IconFolderOpen />}
                     onClick={e => this.loadSession()}
                     disabled={(config.viewer.save_loading)}
                     title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
                     {this.props.t("loadSession","Abrir sessão")}
                   </Button>}
                 <Button variant="subtle" size="compact-sm" type="button"
-                  leftSection={<i className="pi pi-save" aria-hidden="true" />}
+                  leftSection={<IconSave />}
                   loading={config.viewer.save_loading}
                   onClick={e => this.saveSession()}>
                   {this.props.t("saveSession", "Gravar sessão")}
@@ -418,7 +418,7 @@ class Main extends React.Component {
                 />
                 <Button
                   size="sm" type="button"
-                  leftSection={<i className="pi pi-times" aria-hidden="true" />}
+                  leftSection={<IconX />}
                   onClick={this.clearFilter.bind(this)}
                 >
                   {this.props.t('clear', "Limpar")}
@@ -429,7 +429,7 @@ class Main extends React.Component {
           ) : (
             <Alert color="informative" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
-                <i className="pi pi-info-circle" aria-hidden="true" />
+                <IconInfoCircle />
                 <span>{this.props.t("noTocThemesMsg", "Não existem temas. Clique no menu + para adicionar.")}</span>
               </Group>
             </Alert>

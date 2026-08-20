@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActionIcon } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Dialog, useIsMobile } from '@scalargis/ui';
+import { Dialog, useIsMobile, IconTable } from '@scalargis/ui';
 import ThemeAttributes from './ThemeAttributes';
 
 function hasAttributes(theme) {
@@ -53,7 +53,7 @@ export default function Main(props) {
           //open()
         }}
       >
-        <i className="pi pi-table" aria-hidden="true" />
+        <IconTable />
       </ActionIcon>
 
       <Dialog

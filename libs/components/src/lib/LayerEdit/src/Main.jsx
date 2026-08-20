@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation} from "react-i18next";
 import { ActionIcon } from '@mantine/core';
-import { Dialog, useIsMobile } from '@scalargis/ui';
+import { Dialog, useIsMobile, IconPencil } from '@scalargis/ui';
 import EditNode from './EditNode';
 
 export default function Main(props) {
@@ -32,7 +32,7 @@ export default function Main(props) {
         aria-label={t("personalizarTema", "Personalizar Tema")}
         onClick={e => setModalEditOpen({...layer})}
       >
-        <i className="pi pi-pencil" aria-hidden="true" />
+        <IconPencil />
       </ActionIcon>
 
       <Dialog

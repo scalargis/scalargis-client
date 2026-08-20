@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Group, NumberInput, TextInput } from '@mantine/core';
-import { DataGrid, exportGridCSV } from '@scalargis/ui';
+import { DataGrid, exportGridCSV, IconUpload } from '@scalargis/ui';
 
 import { i18n } from '../../../components';
 import { foldDiacritics } from '../../../utils/common';
@@ -122,7 +122,7 @@ export default function ResultsTable(props) {
                     type="button"
                     size="xs"
                     variant="outline"
-                    leftSection={<i className="pi pi-upload" aria-hidden="true" />}
+                    leftSection={<IconUpload />}
                     onClick={() => exportGridCSV(data, columns, { filename: exportFilename })}
                     disabled={!data.length}
                 >

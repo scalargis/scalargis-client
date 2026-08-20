@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation} from "react-i18next";
 import { ActionIcon } from '@mantine/core';
-import { confirm } from '@scalargis/ui';
+import { confirm, IconXCircle } from '@scalargis/ui';
 
 export default function Main(props) {
 
@@ -32,7 +32,7 @@ export default function Main(props) {
         accept: () => actions.removeThemes([layer.id])
       })}
     >
-      <i className="pi pi-times-circle" aria-hidden="true" />
+      <IconXCircle />
     </ActionIcon>
   )
 }

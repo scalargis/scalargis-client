@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, IconFolderOpen } from '@scalargis/ui';
 
 import { i18n, MainMenuButton } from '../../components';
 
@@ -51,7 +51,7 @@ export function MainMenu({ className, core, config, actions, record }) {
             <MainMenuButton
               title={title}
               className={className}
-              icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
+              icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : <IconFolderOpen />}
               onClick={e => showPopup() /*setShowPopup(true)*/}
             /> }
       </React.Fragment>
@@ -72,7 +72,7 @@ export function MainMenu({ className, core, config, actions, record }) {
         <MainMenuButton
         title={title}
         className={className}
-        icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : "pi pi-folder-open"}
+        icon= {component_cfg?.btn_icon ? component_cfg?.btn_icon : <IconFolderOpen />}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )

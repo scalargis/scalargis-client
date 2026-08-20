@@ -2,6 +2,7 @@ import React from 'react';
 import i18next from 'i18next';
 
 import { i18n } from '../../components';
+import { IconExternalLink } from '@scalargis/ui';
 
 
 const formatMetadataValue = (element) => {
@@ -10,7 +11,7 @@ const formatMetadataValue = (element) => {
     } else if (element.type === 'hyperlink') {
         return (
             <a href={element.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}>
-                <i className="pi pi-external-link mr-2"></i>{ element.value || element.url }
+                <IconExternalLink className="mr-2" />{ element.value || element.url }
             </a>
         );
     } else {
@@ -50,7 +51,7 @@ class ThemeInfo extends React.Component {
         { (theme.metadata && theme.metadata.url) ?
         <div className="field grid">
             <div className="col-4">{i18next.t("metadata", "Metadados")}</div>
-            <div className="col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><i className="pi pi-external-link mr-2"></i>{i18next.t("openMetadataDetails","Abrir Ficha")}</a></div>
+            <div className="col-8"><a href={theme.metadata.url} target="_blank" rel="noopener noreferrer" style={{"textDecoration": "none"}}><IconExternalLink className="mr-2" />{i18next.t("openMetadataDetails","Abrir Ficha")}</a></div>
         </div> : null }
         { (theme.metadata && theme.metadata.data) ?
             theme.metadata.data.map(d => {

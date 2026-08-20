@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 
 import { Alert, Button, Group, TextInput } from '@mantine/core';
-import { TreeView, useTree } from '@scalargis/ui';
+import { TreeView, useTree, IconExternalLink, IconXCircle, IconAlertTriangle, IconSearch, IconPlusCircle, IconMinusCircle } from '@scalargis/ui';
 
 import { i18n, utils, ProgressControl } from '../../components';
 
@@ -119,7 +119,7 @@ export default function DocumentList({ core, documentList }) {
         <Group gap="xs" wrap="nowrap">
           <a target="_blank" rel="noreferrer" href={`${documentList.baseUrl || ''}${item.data.url}`}>{item.data.name}</a>
           <a target="_blank" rel="noreferrer" href={`${documentList.baseUrl || ''}${item.data.url}`} title={item.data.name} tabIndex={-1}>
-            <i className="pi pi-external-link" aria-hidden="true"></i>
+            <IconExternalLink />
           </a>
         </Group>
       ) : (
@@ -154,7 +154,7 @@ export default function DocumentList({ core, documentList }) {
         <div className="mt-4 mb-4 text-left">
           <Alert color="danger" py="xs" className="col-12">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-times-circle" />
+              <IconXCircle />
               <span>{translatedText.folderNotFound}</span>
             </Group>
           </Alert>
@@ -169,7 +169,7 @@ export default function DocumentList({ core, documentList }) {
         <div className="mt-4 mb-4 text-left">
           <Alert color="warning" py="xs" className="col-12">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-exclamation-triangle" />
+              <IconAlertTriangle />
               <span>{translatedText.emptyFolder}</span>
             </Group>
           </Alert>
@@ -183,7 +183,7 @@ export default function DocumentList({ core, documentList }) {
       {documentList?.showFilter && <div className="flex col-12">
         <TextInput
           w="100%"
-          leftSection={<i className="pi pi-search" aria-hidden="true" />}
+          leftSection={<IconSearch />}
           value={filter || ''}
           onChange={(e) => setFilter(e.target.value)}
           placeholder={`${translatedText.filter}...`}
@@ -192,13 +192,13 @@ export default function DocumentList({ core, documentList }) {
       </div>}
       {documentList?.showExpandButtons && <div className="col-12">
         <Button.Group style={{"display": "inline-flex"}}>
-          <Button type="button" size="xs" variant="outline" leftSection={<i className="pi pi-plus-circle" aria-hidden="true" />}
+          <Button type="button" size="xs" variant="outline" leftSection={<IconPlusCircle />}
             onClick={() => {
               tree.expandAllNodes();
             }}>
             {translatedText.expand}
           </Button>
-          <Button type="button" size="xs" variant="outline" leftSection={<i className="pi pi-minus-circle" aria-hidden="true" />}
+          <Button type="button" size="xs" variant="outline" leftSection={<IconMinusCircle />}
             onClick={() => {
               tree.collapseAllNodes();
             }}

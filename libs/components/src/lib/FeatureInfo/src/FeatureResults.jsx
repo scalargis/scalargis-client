@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Accordion, ActionIcon, Alert, Button, Group } from '@mantine/core';
-import { AttributeTable } from '@scalargis/ui';
+import { AttributeTable, IconInfoCircle, IconX, IconDownload, IconSearch } from '@scalargis/ui';
 import OlCollection from 'ol/Collection';
 import OlFeature from 'ol/Feature';
 import OlFormatGeoJSON from "ol/format/GeoJSON";
@@ -172,7 +172,7 @@ export default function FeatureResults({ core, config, features, layers, actions
   const infoMessage = (text) => (
     <Alert color="informative" py="xs">
       <Group justify="center" gap="xs" wrap="nowrap">
-        <i className="pi pi-info-circle" />
+        <IconInfoCircle />
         <span>{text}</span>
       </Group>
     </Alert>
@@ -197,7 +197,7 @@ export default function FeatureResults({ core, config, features, layers, actions
           size="xs"
           variant="outline"
           title={t("clearResults", "Limpar resultados")}
-          leftSection={<i className="pi pi-times" aria-hidden="true" />}
+          leftSection={<IconX />}
           onClick={e => removeAll()}
         >
           {t("clear", "Limpar")}
@@ -208,7 +208,7 @@ export default function FeatureResults({ core, config, features, layers, actions
           size="xs"
           variant="outline"
           title={t("exportResults", "Exportar resultados")}
-          leftSection={<i className="pi pi-download" aria-hidden="true" />}
+          leftSection={<IconDownload />}
           onClick={e => exportAll()}
         >
           {t("export", "Exportar")}
@@ -272,7 +272,7 @@ export default function FeatureResults({ core, config, features, layers, actions
                           aria-label={t("zoomToElement", "Aproximar ao elemento")}
                           onClick={e => zoomFeature(feat)}
                         >
-                          <i className="pi pi-search" aria-hidden="true" />
+                          <IconSearch />
                         </ActionIcon>}
                         {(!isText && showExport && showExportRecord && layerRecordExport) &&
                         <ActionIcon
@@ -282,7 +282,7 @@ export default function FeatureResults({ core, config, features, layers, actions
                           aria-label={t("exportElement", "Exportar elemento")}
                           onClick={e => exportItem(feat)}
                         >
-                          <i className="pi pi-download" aria-hidden="true" />
+                          <IconDownload />
                         </ActionIcon>}
                         <ActionIcon
                           variant="filled"
@@ -291,7 +291,7 @@ export default function FeatureResults({ core, config, features, layers, actions
                           aria-label={t("removeElement", "Remover elemento")}
                           onClick={e => removeItem(feat)}
                         >
-                          <i className="pi pi-times" aria-hidden="true" />
+                          <IconX />
                         </ActionIcon>
                       </div>
                       <AttributeTable

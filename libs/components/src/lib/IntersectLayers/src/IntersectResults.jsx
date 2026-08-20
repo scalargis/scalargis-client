@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Checkbox, Group, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { DataGrid, notify } from '@scalargis/ui';
+import { DataGrid, notify, IconUpload, IconChevronDown, IconChevronRight, IconTable, IconPlus, IconMinus } from '@scalargis/ui';
 import OlWKT from "ol/format/WKT";
 import OlFeature from 'ol/Feature';
 
@@ -450,8 +450,8 @@ export default function IntersectResults(props) {
                     type="button"
                     size="xs"
                     variant="outline"
-                    leftSection={<i className="pi pi-upload" aria-hidden="true" />}
-                    rightSection={<i className="pi pi-chevron-down" aria-hidden="true" />}
+                    leftSection={<IconUpload />}
+                    rightSection={<IconChevronDown />}
                     disabled={downloadingFile}
                     loading={downloadingFile}
                 >
@@ -498,11 +498,11 @@ export default function IntersectResults(props) {
     const header = (
         <div className="flex justify-content-between flex-wrap">
             { showTablesButton && <div className="flex flex-wrap justify-content-end gap-2 my-1">
-                <Button type="button" size="xs" variant="subtle" leftSection={<i className="pi pi-table" aria-hidden="true" />} onClick={showTable}>{t("tables", "Tabelas")}</Button>
+                <Button type="button" size="xs" variant="subtle" leftSection={<IconTable />} onClick={showTable}>{t("tables", "Tabelas")}</Button>
             </div> }
             <div className="flex flex-wrap justify-content-end gap-2 my-1">
-                <Button type="button" size="xs" variant="subtle" leftSection={<i className="pi pi-plus" aria-hidden="true" />} onClick={expandAll}>{t("expand", "Expandir")}</Button>
-                <Button type="button" size="xs" variant="subtle" leftSection={<i className="pi pi-minus" aria-hidden="true" />} onClick={collapseAll}>{t("collapse", "Recolher")}</Button>
+                <Button type="button" size="xs" variant="subtle" leftSection={<IconPlus />} onClick={expandAll}>{t("expand", "Expandir")}</Button>
+                <Button type="button" size="xs" variant="subtle" leftSection={<IconMinus />} onClick={collapseAll}>{t("collapse", "Recolher")}</Button>
             </div>
         </div>
     )
@@ -539,7 +539,7 @@ export default function IntersectResults(props) {
                             accessor: 'expander',
                             width: '1rem',
                             render: (rowData) => (rowData?.results?.length > 0 ?
-                                <i className={expandedKeys.includes(rowData.key) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'} aria-hidden="true" /> : null),
+                                (expandedKeys.includes(rowData.key) ? <IconChevronDown /> : <IconChevronRight />) : null),
                         },
                         { accessor: 'title', render: itemBodyTemplate },
                     ]}

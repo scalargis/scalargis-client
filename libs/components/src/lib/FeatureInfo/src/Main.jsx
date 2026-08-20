@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useTranslation} from "react-i18next"
 import OLGroupLayer from "ol/layer/Group"
-import { CollapsiblePanel, useIsMobile } from '@scalargis/ui'
+import { CollapsiblePanel, useIsMobile, IconInfoCircle } from '@scalargis/ui'
 import { MainMenuButton, MapToolButton } from '../../components'
 
 import { MAPCONTROL_NAME } from './utils'
@@ -38,7 +38,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
-      icon="pi pi-info-circle"
+      icon={<IconInfoCircle />}
       onClick={e => {
         if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
         if (exclusive_mapcontrol !== MAPCONTROL_NAME) {
@@ -108,7 +108,7 @@ export default function Main({type, region, as, core, config, actions, record, u
   if (type === 'link' && region === record.links) {
     return <MapToolButton
       title={title}
-      icon="pi pi-info-circle"
+      icon={<IconInfoCircle />}
       active={exclusive_mapcontrol == MAPCONTROL_NAME}
       onClick={e => {
         if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));

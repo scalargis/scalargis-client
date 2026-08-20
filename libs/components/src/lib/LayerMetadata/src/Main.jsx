@@ -3,7 +3,7 @@ import { useTranslation} from "react-i18next";
 
 import { ActionIcon } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Dialog, useIsMobile } from '@scalargis/ui';
+import { Dialog, useIsMobile, IconInfoCircle } from '@scalargis/ui';
 
 import ThemeInfo from './ThemeInfo';
 
@@ -35,7 +35,7 @@ export default function Main({ core, config }) {
         aria-label={t("metadataInfo", "Informação de Metadados")}
         onClick={e => open()}
       >
-        <i className="pi pi-info-circle" aria-hidden="true" />
+        <IconInfoCircle />
       </ActionIcon>
 
       <Dialog
