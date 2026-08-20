@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { ActionIcon, Button, Group, Input, TextInput } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
-import { notify } from '@scalargis/ui';
+import { notify, IconCheck, IconX, IconPowerOff, IconSave, IconPencil } from '@scalargis/ui';
 import { v4 as uuidV4 } from 'uuid';
 
 import AppContext from '../../../AppContext';
@@ -125,13 +125,13 @@ function AccountForm(props) {
 
         <div className="field col-12 md:col-6">
           <Group gap="xs" align="flex-end" wrap="nowrap">
-            <Button type="button" leftSection={<i className="pi pi-check" />} disabled={!isEditMode}
+            <Button type="button" leftSection={<IconCheck />} disabled={!isEditMode}
               onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
             <TextInput id="auth_token" label="Token de Autenticação" placeholder="Token não definido"
               style={{ flex: 1 }} disabled={!isEditMode} {...register('auth_token')} />
             <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar token" disabled={!isEditMode}
               onClick={() => { setValue('auth_token', null); setValue('auth_token_expire', null); }}>
-              <i className="pi pi-times" />
+              <IconX />
             </ActionIcon>
           </Group>
         </div>
@@ -154,7 +154,7 @@ function AccountForm(props) {
             />
             <ActionIcon type="button" size="input-md" color="danger" aria-label="Limpar data de validade" disabled={!isEditMode}
               onClick={() => setValue('auth_token_expire', null)}>
-              <i className="pi pi-times" />
+              <IconX />
             </ActionIcon>
           </Group>
         </div>
@@ -167,7 +167,7 @@ function AccountForm(props) {
           <Button
             type="button"
             color="danger"
-            leftSection={<i className="pi pi-power-off" />}
+            leftSection={<IconPowerOff />}
             onClick={e => { e.preventDefault(); dispatch(logout()); }}>Sair</Button>
           }
         </div>
@@ -187,13 +187,13 @@ function AccountForm(props) {
               disabled={isSaving}>Cancelar</Button>
             <Button
               type="submit"
-              leftSection={<i className="pi pi-save" />}
+              leftSection={<IconSave />}
               loading={isSaving}>Gravar</Button>
           </Group>
           :
           <Button
             type="button"
-            leftSection={<i className="pi pi-pencil" />}
+            leftSection={<IconPencil />}
             onClick={e => { e.preventDefault(); setIsEditMode(true)} }>Editar</Button>
         }
       </Group>

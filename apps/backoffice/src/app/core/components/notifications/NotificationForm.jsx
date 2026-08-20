@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { Alert, Badge, Button, Group, Input, Textarea, TextInput } from '@mantine/core';
-import { notify } from '@scalargis/ui';
+import { notify, IconArrowLeft } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -161,7 +161,7 @@ function NotificationForm(props) {
             <Button
               type="button"
               variant="default"
-              leftSection={<i className="pi pi-arrow-left" />}
+              leftSection={<IconArrowLeft />}
               disabled={isSaving}
               onClick={goBack}>Voltar</Button>
             { data?.status?.value === 0 && <Button
@@ -189,7 +189,7 @@ function NotificationForm(props) {
             <Button
                 type="button"
                 variant="default"
-                leftSection={<i className="pi pi-arrow-left" />}
+                leftSection={<IconArrowLeft />}
                 onClick={goBack}>Voltar</Button>
           </Group>
         </React.Fragment> }

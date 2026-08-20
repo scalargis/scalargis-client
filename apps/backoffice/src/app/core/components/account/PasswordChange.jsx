@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Group, PasswordInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { notify, Dialog } from '@scalargis/ui';
+import { notify, Dialog, IconUserEdit, IconX, IconSave } from '@scalargis/ui';
 import { PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
 
 import dataProvider from '../../../service/DataProvider';
@@ -79,7 +79,7 @@ export default function PasswordChange(props) {
 
     return (
         <React.Fragment>
-            <Button type="button" variant="outline" leftSection={<i className="pi pi-user-edit" />} onClick={e => {
+            <Button type="button" variant="outline" leftSection={<IconUserEdit />} onClick={e => {
                 e.preventDefault();
                 reset();
                 open();
@@ -141,11 +141,11 @@ export default function PasswordChange(props) {
                         </div>
 
                         <Group justify="flex-end" className="mt-4">
-                            <Button type="button" variant="subtle" leftSection={<i className="pi pi-times" />}
+                            <Button type="button" variant="subtle" leftSection={<IconX />}
                                 onClick={() => close()}
                                 disabled={isSaving}>Cancelar</Button>
                             <Button type="submit"
-                                leftSection={<i className="pi pi-save" />}
+                                leftSection={<IconSave />}
                                 loading={isSaving}>Aceitar</Button>
                         </Group>
 

@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { ActionIcon, Badge, Button, Group, MultiSelect, TextInput } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import dayjs from 'dayjs';
-import { CollapsiblePanel, DataGrid, exportGridCSV, notify } from '@scalargis/ui';
+import { CollapsiblePanel, DataGrid, exportGridCSV, notify, IconPencil, IconUpload } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
@@ -192,7 +192,7 @@ function NotificationList(props) {
         exportable: false,
         render: (record) => (
           <ActionIcon variant="outline" color="secondary" aria-label="Editar" onClick={() => editRecord(record)}>
-            <i className="pi pi-pencil" />
+            <IconPencil />
           </ActionIcon>
         )
       }
@@ -291,7 +291,7 @@ function NotificationList(props) {
 
             <Group justify="space-between" wrap="wrap" className="mt-2 mb-4">
               <span><b>Total:</b> {totalRecords}</span>
-              <Button variant="outline" color="secondary" leftSection={<i className="pi pi-upload" />}
+              <Button variant="outline" color="secondary" leftSection={<IconUpload />}
                 onClick={() => exportGridCSV(records, columns, { filename: 'notificacoes.csv' })}
                 disabled={!totalRecords}>Exportar</Button>
             </Group>
