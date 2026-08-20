@@ -9,9 +9,23 @@ import * as services from './core/service';
 import * as pubsub from './core/pubsub';
 
 import { initTranslations } from './core/i18n';
+import { TourTarget } from '@scalargis/ui';
+import { mainmenuButtonStep, mainmenuPanelStep, regionStep } from './onboarding/targets';
 
 // Init translations
 initTranslations();
+
+/* -----------------------------------------------------------------------
+   Target-binding helper (Phase 3).
+
+   withTarget wraps element in a <TourTarget> when stepId resolves, or
+   returns it unchanged otherwise. The key param goes on the wrapper so
+   React can reconcile the array when TourTarget is the .map() child.
+   ----------------------------------------------------------------------- */
+function withTarget(stepId, element, key) {
+  if (!stepId) return element;
+  return React.createElement(TourTarget, { key, id: stepId }, element);
+}
 
 export function createReducerManager(initialReducers) {
   // Create an object which maps keys to reducers
@@ -343,17 +357,22 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
           "p-button-raised p-button-rounded" :
           "p-button-raised p-button-rounded p-button-outlined";
 
+          const stepId = mainmenuButtonStep(c.type);
+          const buttonEl = (
+            <PluginComponent
+              className={className}
+              active={active}
+              record={c}
+              config={{ className, active, ...props, ...c.config_json }}
+              core={this}
+              actions={this.actions}
+              utils={utils}
+            />
+          );
+
           return (
             <li key={c.id}>
-              <PluginComponent
-                className={className}
-                active={active}
-                record={c}
-                config={{ className, active, ...props, ...c.config_json }}
-                core={this}
-                actions={this.actions}
-                utils={utils}
-              />
+              {withTarget(stepId, buttonEl, c.id)}
             </li>
           )
         })}
@@ -419,7 +438,11 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
     const classNameType = c.type ? `sg-type-${c.type.toLowerCase()}` : '';
     const classNameId = c.id ? `sg-id-${c.id}` : '';
 
-    return (
+    const stepId = region === 'mainmenu'
+      ? mainmenuPanelStep(c.type)
+      : regionStep(c.type, region);
+
+    const cell = (
       <div key={c.id} className={`${className} ${classNameType} ${classNameId}`} style={style ? style(c) : null }>
         <PluginComponent
           record={c}
@@ -432,7 +455,8 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
         />
         { separator }
       </div>
-    )
+    );
+    return withTarget(stepId, cell, c.id);
   })
 }
 
@@ -468,7 +492,10 @@ Core.prototype.renderComponentsMenu = function({ region, as = '', mobileMenu = [
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
-    return (
+
+    const stepId = regionStep(c.type, region);
+
+    const cell = (
       <div key={c.id} className={className} style={style ? style(c) : null }>
         <PluginComponent
           type="menu"
@@ -482,7 +509,8 @@ Core.prototype.renderComponentsMenu = function({ region, as = '', mobileMenu = [
         />
         { separator }
       </div>
-    )
+    );
+    return withTarget(stepId, cell, c.id);
   })
 }
 
@@ -507,7 +535,10 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
 
     // Validate dynamic import is loaded
     if (!PluginComponent) return null;
-    return (
+
+    const stepId = regionStep(c.type, region);
+
+    const cell = (
       <div key={c.id} className={className} style={style ? style(c) : null }>
         <PluginComponent
           type="link"
@@ -521,7 +552,8 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
         />
         { separator }
       </div>
-    )
+    );
+    return withTarget(stepId, cell, c.id);
   })
 }
 

@@ -146,8 +146,8 @@ function Viewer(props) {
 
   // Base onboarding tour for the open viewer: membership from
   // config_json.components[], gated by step conditions, mapped to runtime
-  // steps with locale-following copy (Phase 2).
-  const onboardingSteps = useOnboardingSteps(viewer, auth);
+  // steps with locale-following copy (Phase 3 adds the reveal hooks).
+  const onboardingSteps = useOnboardingSteps(viewer, auth, core);
 
   // TODO: improve loading UI
   if (loading) return null;

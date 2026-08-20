@@ -22,3 +22,14 @@ export {
 
 export { registerOnboardingTranslations } from './i18n';
 export { useOnboardingSteps } from './useOnboardingSteps';
+
+export {
+  PANEL_STEPS,
+  panelRevealByStepId,
+  mainmenuButtonStep,
+  mainmenuPanelStep,
+  regionStep,
+} from './targets';
+
+export { attachRevealHooks } from './hooks';
+export type { RevealHooksContext } from './hooks';

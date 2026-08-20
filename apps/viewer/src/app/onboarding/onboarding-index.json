@@ -13,7 +13,7 @@
   { "id": "locale:intro", "components": ["LocaleSelector"], "target": "topbar_right", "order": 110, "flow": "viewer", "i18n": "onboarding.locale", "also_on": [] },
   { "id": "login:intro", "components": ["UserLogin"], "target": "topbar_right", "order": 120, "flow": "viewer", "i18n": "onboarding.login", "also_on": [] },
   { "id": "help:intro", "components": ["HelpButton"], "target": "topbar_right", "order": 130, "flow": "viewer", "i18n": "onboarding.help", "also_on": [] },
-  { "id": "scale:intro", "components": ["MapScaleLine", "MapScaleInput"], "target": "footer_right", "order": 140, "flow": "viewer", "i18n": "onboarding.scale", "also_on": [], "primary_component": "MapScaleLine" },
+  { "id": "scale:intro", "components": ["MapScaleLine", "MapScaleInput"], "target": "footer_right", "order": 140, "flow": "viewer", "i18n": "onboarding.scale", "also_on": [], "primary_component": "MapScaleInput" },
   { "id": "crs:intro", "components": ["CRSSelect"], "target": "footer_right", "order": 150, "flow": "viewer", "i18n": "onboarding.crs", "also_on": [] },
   { "id": "contact:intro", "components": ["ContactForm"], "target": "footer_left", "order": 160, "flow": "viewer", "i18n": "onboarding.contact", "also_on": [] },
   { "id": "basemaps:intro", "components": ["Basemaps"], "target": "map_controls_top_left", "order": 170, "flow": "viewer", "i18n": "onboarding.basemaps", "also_on": [] },

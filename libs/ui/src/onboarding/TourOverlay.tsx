@@ -84,6 +84,41 @@ function resolveNode(
 }
 
 /* --------------------------------------------------------------------------
+   Popover position heuristic (Phase 3 visual-test fix).
+
+   The static default 'bottom' works for topbar buttons but puts the card
+   off-screen for tall right-side panels (the TOC panel). resolvePopoverPosition
+   picks a side that keeps the card visible based on where the target sits
+   in the viewport. An explicit step.popover.position always wins.
+   -------------------------------------------------------------------------- */
+
+function resolvePopoverPosition(
+  rect: Rect | null,
+  viewportW: number,
+  viewportH: number,
+  explicit: string | undefined,
+): string {
+  if (explicit) return explicit;
+  if (!rect) return 'bottom';
+
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  // Vertical edges checked first so footer items (both sides) get 'top'
+  // and topbar items stay 'bottom', regardless of horizontal position.
+  // Near the bottom edge → popover above
+  if (cy > viewportH * 0.7) return 'top';
+  // Near the top edge → popover below
+  if (cy < viewportH * 0.2) return 'bottom';
+  // Right-side (mid-screen panel or control) → popover to the left
+  if (cx > viewportW * 0.55) return 'left';
+  // Left-side → popover to the right
+  if (cx < viewportW * 0.45) return 'right';
+  // Default: below
+  return 'bottom';
+}
+
+/* --------------------------------------------------------------------------
    Component
    -------------------------------------------------------------------------- */
 
@@ -149,6 +184,12 @@ export default function TourOverlay() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // Track whether the tour overlay has ever become active so the
+  // first-activation branch runs only once per tour session.  A ref
+  // keeps ready/rect out of the effect deps — otherwise every rect
+  // change from ResizeObserver would re-schedule the rAF.
+  const wasActiveRef = useRef(false);
+
   // Measure after step change — wait one rAF so the DOM settles (D12).
   // The controller already awaited step.before() before setting currentIndex,
   // so by the time we see the new step the target should be revealed.
@@ -156,9 +197,18 @@ export default function TourOverlay() {
     if (!active || !currentStep) {
       setRect(null);
       setReady(false);
+      wasActiveRef.current = false;
       return;
     }
-    // Reset for the new step — popover hides until measured.
+    // First activation: also null the stale rect from a previous session.
+    if (!wasActiveRef.current) {
+      wasActiveRef.current = true;
+      setRect(null);
+    }
+    // Toggle ready off so opened={ready} closes the dropdown.  One rAF
+    // later we measure and reopen.  This forces floating-ui to compute
+    // the position from the new target rect.  autoUpdate alone misses
+    // pure CSS left/top changes (no resize, no scroll).
     setReady(false);
     const raf = requestAnimationFrame(() => {
       setRect(measureTarget(targetEl));
@@ -196,7 +246,12 @@ export default function TourOverlay() {
   const padding = spotlight?.padding ?? DEFAULT_SPOTLIGHT_PADDING;
   const radius = spotlight?.radius ?? DEFAULT_SPOTLIGHT_RADIUS;
   const popover = currentStep?.popover;
-  const popoverPosition = popover?.position ?? 'bottom';
+  const resolvedPos = resolvePopoverPosition(
+    rect,
+    viewport.w,
+    viewport.h,
+    popover?.position,
+  );
   const popoverOffset = popover?.offset ?? DEFAULT_POPOVER_OFFSET;
   const popoverWidth = popover?.width ?? DEFAULT_POPOVER_WIDTH;
 
@@ -212,6 +267,17 @@ export default function TourOverlay() {
   activeRef.current = active;
   const ctrlRef = useRef<OnboardingController | null>(controller);
   ctrlRef.current = controller;
+
+  // Ref to focus the Next/Complete button after the popover appears.
+  // FocusTrap auto-focuses the first tabbable element (CloseButton, which
+  // is first in DOM order). We override that to focus Next instead.
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (ready && nextButtonRef.current) {
+      nextButtonRef.current.focus();
+    }
+  }, [ready, currentIndex]);
 
   useHotkeys([
     ['ArrowRight', () => { if (activeRef.current) ctrlRef.current?.next(); }],
@@ -289,16 +355,14 @@ export default function TourOverlay() {
       </svg>
 
       {/* ── Popover card — hidden until the rect is measured ────────── */}
-      {ready && (
         <Popover
-          opened
-          position={popoverPosition}
+          opened={ready}
+          position={resolvedPos}
           offset={popoverOffset}
           width={popoverWidth}
           shadow="md"
           zIndex={POPOVER_Z}
           floatingStrategy="fixed"
-          middlewares={{ flip: true, shift: true }}
         >
           <Popover.Target>
             {/* Invisible anchor at the target rect */}
@@ -315,7 +379,7 @@ export default function TourOverlay() {
           </Popover.Target>
 
           <Popover.Dropdown>
-            <FocusTrap active>
+            <FocusTrap active={ready}>
               <div>
                 {/* Header */}
                 <div
@@ -368,6 +432,7 @@ export default function TourOverlay() {
                       </Button>
                     )}
                     <Button
+                      ref={nextButtonRef}
                       variant="filled"
                       size="sm"
                       onClick={() => c.next()}
@@ -380,7 +445,6 @@ export default function TourOverlay() {
             </FocusTrap>
           </Popover.Dropdown>
         </Popover>
-      )}
     </Portal>
   );
 }
