@@ -352,6 +352,7 @@ export const adsBaseTheme = createTheme({
     zLadder: {
       dropdown: 1000, backdrop: 2000, sticky: 3000, fixed: 4000,
       drawer: 5000, dialog: 6000, toast: 7000, tooltip: 8000,
+      tour: 9000,
     },
     // Easing via the central motion token, not a literal — single-sourced
     // with --transition-easing so hover/chevrons can't diverge (R5).

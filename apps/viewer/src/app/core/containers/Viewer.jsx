@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { TourProvider, TourTarget, useTour } from '@scalargis/ui'
 import Layout from './Layout'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import AppContext from '../../AppContext'
@@ -22,6 +23,49 @@ import OlControls from '../map_control'
 import DialogWindows from './DialogWindows'
 import { mapStateToProps } from '../utils'
 import {PageView, initGA} from '../components/Tracking'
+
+/* ─── Smoke-step definition (Phase 1 gate, removed in Phase 3) ──────── */
+const SMOKE_STEPS = [
+  {
+    id: 'smoke',
+    order: 0,
+    title: 'Tour engine smoke',
+    content:
+      'The overlay dims, the spotlight cuts out, and the popover shows. ' +
+      'Press Next or use the arrow keys. Press Escape to skip.',
+    spotlight: { padding: 8, radius: 8 },
+    popover: { position: 'bottom', offset: 12, width: 320 },
+  },
+];
+
+/** Temp trigger: a visible button in the bottom-right corner.
+ *  Replaced by the HelpButton Menu launcher in Phase 3. */
+function SmokeButton() {
+  const { start, active } = useTour();
+  if (active) return null; // hide while the tour runs
+  return (
+    <button
+      type="button"
+      onClick={() => start()}
+      style={{
+        position: 'fixed',
+        bottom: 20,
+        right: 20,
+        zIndex: 9999,
+        padding: '6px 16px',
+        background: 'var(--mantine-primary-color-filled)',
+        color: 'var(--mantine-color-white)',
+        border: 'none',
+        borderRadius: 'var(--mantine-radius-sm)',
+        cursor: 'pointer',
+        fontWeight: 600,
+        fontSize: '14px',
+      }}
+    >
+      Start Tour (smoke)
+    </button>
+  );
+}
 
 /**
  * Viewer layout container
@@ -122,20 +166,35 @@ function Viewer(props) {
 
   const rootLayers = layers.filter(c => rlayers.includes(c.id)).reverse();
   return (
-    <Layout
-      history={history}
-      core={core}
-      viewer={viewer}
-      notifications={notifications}
-      dialogWindows={dialogWindows}
-      layout_wrapper_click={e => dispatch(layout_wrapper_click())}
-      layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
-      mainMenu={<MainMenu history={history} onMenuClick={isDesktop => dispatch(layout_show_menu(isDesktop))} />}
-      topbarRight={<TopbarRight />}
-      footerLeft={<FooterLeft />}
-      footerRight={<FooterRight />}
-      mainOlMap={mainMap}
-    >
+    <TourProvider viewerId={viewer.id || 'smoke-viewer'} steps={SMOKE_STEPS}>
+      <SmokeButton />
+      {/* Smoke target: a fixed-position placeholder in the topbar area.
+          The tour spotlight cuts out around this element. Phase 3 replaces
+          this with real component targets wired through Core.jsx. */}
+      <TourTarget id="smoke">
+        <div style={{
+          position: 'fixed',
+          top: 10,
+          right: 10,
+          width: 300,
+          height: 44,
+          zIndex: 1,
+        }} />
+      </TourTarget>
+      <Layout
+        history={history}
+        core={core}
+        viewer={viewer}
+        notifications={notifications}
+        dialogWindows={dialogWindows}
+        layout_wrapper_click={e => dispatch(layout_wrapper_click())}
+        layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
+        mainMenu={<MainMenu history={history} onMenuClick={isDesktop => dispatch(layout_show_menu(isDesktop))} />}
+        topbarRight={<TopbarRight />}
+        footerLeft={<FooterLeft />}
+        footerRight={<FooterRight />}
+        mainOlMap={mainMap}
+      >
       <MainMap 
         olMap={mainMap}
         config={config}
@@ -184,6 +243,7 @@ function Viewer(props) {
       <DialogWindows core={core} dialogWindows={viewer?.dialogWindows} />
 
     </Layout>
+    </TourProvider>
   );
 }
 

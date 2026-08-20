@@ -80,5 +80,25 @@ export type { AttributeTableProps, AttributeRow } from './recipes/AttributeTable
 /* Icon seam — primeicons behind one indirection (see recipes/icons.tsx). */
 export * from './recipes/icons';
 
+/* ─── Onboarding tour engine ───────────────────────────────────────── */
+export {
+  TourProvider,
+  TourTarget,
+  useTour,
+  OVERLAY_Z,
+  POPOVER_Z,
+  createController,
+  TourContext,
+} from './onboarding';
+export type {
+  OnboardingStep,
+  OnboardingState,
+  PopoverPosition,
+  TourHandle,
+  OnboardingController,
+  ControllerListener,
+  TourContextValue,
+} from './onboarding';
+
 /* ─── Hooks ──────────────────────────────────────────────────────────── */
 export { useIsMobile } from './hooks/useIsMobile';
