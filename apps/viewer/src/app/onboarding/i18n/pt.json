@@ -1,0 +1,80 @@
+{
+  "onboarding": {
+    "toc": {
+      "title": "Temas",
+      "content": "Aqui gere os temas do mapa. Ative ou desative cada tema, mude a ordem e ajuste a transparência."
+    },
+    "themesAdd": {
+      "title": "Adicionar Temas",
+      "content": "Carregue temas de serviços WMS, WMTS ou WFS, ou de ficheiros do seu computador."
+    },
+    "measure": {
+      "title": "Medição",
+      "content": "Meça distâncias e áreas no mapa. Marque pontos e veja o resultado em tempo real."
+    },
+    "draw": {
+      "title": "Desenho",
+      "content": "Desenhe pontos, linhas, polígonos e texto no mapa. Exporte o desenho em GeoJSON."
+    },
+    "identify": {
+      "title": "Identificar",
+      "content": "Clique num ponto do mapa para ver a informação dos elementos visíveis nesse local."
+    },
+    "coordinates": {
+      "title": "Coordenadas",
+      "content": "Introduza coordenadas para ir a um ponto, ou clique no mapa para ler as coordenadas de um local."
+    },
+    "geolocation": {
+      "title": "A minha localização",
+      "content": "Depois de autorizar, o mapa vai para a sua posição atual. Útil em campo no telemóvel."
+    },
+    "print": {
+      "title": "Imprimir",
+      "content": "Gere uma planta do mapa em PDF. Escolha a escala e o formato da folha."
+    },
+    "search": {
+      "title": "Pesquisar",
+      "content": "Escreva o nome de um local. Escolha uma sugestão para ir para lá no mapa."
+    },
+    "share": {
+      "title": "Partilhar mapa",
+      "content": "Crie um link para a vista atual do mapa. Envie o link para partilhar a localização."
+    },
+    "save": {
+      "title": "Guardar visualizador",
+      "content": "Guarde a vista e os temas atuais como um visualizador seu. Pode voltar a ele mais tarde."
+    },
+    "locale": {
+      "title": "Idioma",
+      "content": "Mude o idioma da interface do visualizador."
+    },
+    "login": {
+      "title": "Entrar",
+      "content": "Entre na sua conta para aceder às funções reservadas."
+    },
+    "help": {
+      "title": "Ajuda",
+      "content": "Abra o manual do visualizador. Aqui encontra a descrição de cada ferramenta."
+    },
+    "scale": {
+      "title": "Escala do mapa",
+      "content": "Veja a escala atual. Escreva um valor como 1:25000 para ir direto a essa escala."
+    },
+    "crs": {
+      "title": "Coordenadas",
+      "content": "Veja as coordenadas do cursor. Troque o sistema de referência no seletor."
+    },
+    "contact": {
+      "title": "Contacto",
+      "content": "Envie uma mensagem ao serviço responsável. Pode anexar ficheiros."
+    },
+    "basemaps": {
+      "title": "Mapas de base",
+      "content": "Troque o fundo do mapa. Escolha entre mapa de ruas, satélite ou ortofotos."
+    },
+    "mapControls": {
+      "title": "Navegação",
+      "content": "Aproxime e afaste o mapa. Use o botão de extensão total para voltar à vista completa."
+    }
+  }
+}

@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { TourProvider, TourTarget, useTour } from '@scalargis/ui'
+import { TourProvider, useTour } from '@scalargis/ui'
+import { useOnboardingSteps } from '../../onboarding'
 import Layout from './Layout'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import AppContext from '../../AppContext'
@@ -24,22 +25,9 @@ import DialogWindows from './DialogWindows'
 import { mapStateToProps } from '../utils'
 import {PageView, initGA} from '../components/Tracking'
 
-/* ─── Smoke-step definition (Phase 1 gate, removed in Phase 3) ──────── */
-const SMOKE_STEPS = [
-  {
-    id: 'smoke',
-    order: 0,
-    title: 'Tour engine smoke',
-    content:
-      'The overlay dims, the spotlight cuts out, and the popover shows. ' +
-      'Press Next or use the arrow keys. Press Escape to skip.',
-    spotlight: { padding: 8, radius: 8 },
-    popover: { position: 'bottom', offset: 12, width: 320 },
-  },
-];
-
-/** Temp trigger: a visible button in the bottom-right corner.
- *  Replaced by the HelpButton Menu launcher in Phase 3. */
+/** Temp trigger: a visible button in the bottom-right corner. It starts the
+ *  tour built from the base catalog (Phase 2). Replaced by the HelpButton Menu
+ *  launcher in Phase 4. */
 function SmokeButton() {
   const { start, active } = useTour();
   if (active) return null; // hide while the tour runs
@@ -81,7 +69,7 @@ function Viewer(props) {
   // Get router props
   const url = location?.pathname || '';
   const { id } = params;
-  const { loading, viewer, config, notifications, dialogWindows } = props;
+  const { loading, viewer, auth, config, notifications, dialogWindows } = props;
   const { exclusive_mapcontrol } = viewer;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
@@ -156,6 +144,11 @@ function Viewer(props) {
     });
   }, [exclusive_mapcontrol]);
 
+  // Base onboarding tour for the open viewer: membership from
+  // config_json.components[], gated by step conditions, mapped to runtime
+  // steps with locale-following copy (Phase 2).
+  const onboardingSteps = useOnboardingSteps(viewer, auth);
+
   // TODO: improve loading UI
   if (loading) return null;
 
@@ -166,21 +159,11 @@ function Viewer(props) {
 
   const rootLayers = layers.filter(c => rlayers.includes(c.id)).reverse();
   return (
-    <TourProvider viewerId={viewer.id || 'smoke-viewer'} steps={SMOKE_STEPS}>
+    <TourProvider viewerId={viewer.id || 'smoke-viewer'} steps={onboardingSteps}>
       <SmokeButton />
-      {/* Smoke target: a fixed-position placeholder in the topbar area.
-          The tour spotlight cuts out around this element. Phase 3 replaces
-          this with real component targets wired through Core.jsx. */}
-      <TourTarget id="smoke">
-        <div style={{
-          position: 'fixed',
-          top: 10,
-          right: 10,
-          width: 300,
-          height: 44,
-          zIndex: 1,
-        }} />
-      </TourTarget>
+      {/* Phase 3 wraps each mounted component in <TourTarget> at the Core.jsx
+          render sites. Until then the steps show with a centered popover and
+          no spotlight (the T7 safety net). */}
       <Layout
         history={history}
         core={core}
@@ -249,5 +232,5 @@ function Viewer(props) {
 
 export default connect(state => {
   const gstate = mapStateToProps(state);
-  return ({ viewer: gstate.viewer, notifications: gstate.notifications });
+  return ({ viewer: gstate.viewer, auth: gstate.auth, notifications: gstate.notifications });
 })(Viewer);

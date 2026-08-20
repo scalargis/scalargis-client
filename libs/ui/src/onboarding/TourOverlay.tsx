@@ -19,6 +19,11 @@
    The popover card is hidden until the first rect measurement completes.
    Without this, the popover flashes at the center fallback position for one
    frame while the rAF measurement is pending.
+
+   Rules of Hooks: every hook runs before the `if (!ctx) return null` guard.
+   The controller and registry are read null-safe until that guard, the same
+   shape TourTarget uses. This lets the component mount where no provider sits
+   above without breaking the hook order.
    ========================================================================== */
 
 import React, {
@@ -33,6 +38,7 @@ import { useHotkeys } from '@mantine/hooks';
 import { Button, CloseButton, FocusTrap, Popover, Portal, Text } from '@mantine/core';
 import { TourContext } from './TourContext';
 import type { OnboardingStep } from './types';
+import type { OnboardingController } from './controller';
 import { OVERLAY_Z, POPOVER_Z } from './constants';
 
 /* --------------------------------------------------------------------------
@@ -44,6 +50,9 @@ const DEFAULT_SPOTLIGHT_RADIUS = 8;
 const DEFAULT_POPOVER_OFFSET = 12;
 const DEFAULT_POPOVER_WIDTH = 320;
 const DIM_COLOR = 'rgba(0, 0, 0, 0.5)';
+
+/** Stable empty list so a null controller never rebuilds the steps array. */
+const EMPTY_STEPS: readonly OnboardingStep[] = [];
 
 /* --------------------------------------------------------------------------
    Rect measurement
@@ -80,35 +89,35 @@ function resolveNode(
 
 export default function TourOverlay() {
   const ctx = useContext(TourContext);
-  if (!ctx) return null; // no provider
-
-  const { controller, registry } = ctx;
+  // Read null-safe. The `if (!ctx) return null` guard sits below every hook.
+  const controller: OnboardingController | null = ctx?.controller ?? null;
+  const registry = ctx?.registry ?? null;
 
   /* ---- controller state (useSyncExternalStore) ---- */
 
   const active = useSyncExternalStore(
     useCallback(
       (onChange: () => void) => {
-        const unsub = controller.subscribe(() => onChange());
-        return unsub;
+        if (!controller) return () => undefined;
+        return controller.subscribe(() => onChange());
       },
       [controller],
     ),
-    () => controller.active,
+    () => controller?.active ?? false,
   );
 
   const currentIndex = useSyncExternalStore(
     useCallback(
       (onChange: () => void) => {
-        const unsub = controller.subscribe(() => onChange());
-        return unsub;
+        if (!controller) return () => undefined;
+        return controller.subscribe(() => onChange());
       },
       [controller],
     ),
-    () => controller.currentIndex,
+    () => controller?.currentIndex ?? -1,
   );
 
-  const steps = controller.steps;
+  const steps = controller?.steps ?? EMPTY_STEPS;
   const currentStep: OnboardingStep | null =
     active && currentIndex >= 0 && currentIndex < steps.length
       ? steps[currentIndex]
@@ -116,7 +125,8 @@ export default function TourOverlay() {
 
   /* ---- target & rect ---- */
 
-  const targetEl = currentStep ? registry.get(currentStep.id) : undefined;
+  const targetEl =
+    currentStep && registry ? registry.get(currentStep.id) : undefined;
   const [rect, setRect] = useState<Rect | null>(null);
   // The popover stays hidden until the first rAF measurement lands.
   // Without this, it appears at the center fallback for one frame.
@@ -200,20 +210,22 @@ export default function TourOverlay() {
 
   const activeRef = useRef(active);
   activeRef.current = active;
-  const ctrlRef = useRef(controller);
+  const ctrlRef = useRef<OnboardingController | null>(controller);
   ctrlRef.current = controller;
 
   useHotkeys([
-    ['ArrowRight', () => { if (activeRef.current) ctrlRef.current.next(); }],
-    ['ArrowDown', () => { if (activeRef.current) ctrlRef.current.next(); }],
-    ['ArrowLeft', () => { if (activeRef.current) ctrlRef.current.prev(); }],
-    ['ArrowUp', () => { if (activeRef.current) ctrlRef.current.prev(); }],
-    ['Escape', () => { if (activeRef.current) ctrlRef.current.skip(); }],
+    ['ArrowRight', () => { if (activeRef.current) ctrlRef.current?.next(); }],
+    ['ArrowDown', () => { if (activeRef.current) ctrlRef.current?.next(); }],
+    ['ArrowLeft', () => { if (activeRef.current) ctrlRef.current?.prev(); }],
+    ['ArrowUp', () => { if (activeRef.current) ctrlRef.current?.prev(); }],
+    ['Escape', () => { if (activeRef.current) ctrlRef.current?.skip(); }],
   ]);
 
   /* ---- render ---- */
 
-  if (!active) return null;
+  // Guard AFTER every hook (Rules of Hooks). Past this line ctx is non-null.
+  if (!ctx || !active) return null;
+  const c = ctx.controller;
 
   // Compute cutout coords from the target rect.
   const hasCutout = rect !== null;
@@ -321,7 +333,7 @@ export default function TourOverlay() {
                     </Text>
                   )}
                   <CloseButton
-                    onClick={() => controller.skip()}
+                    onClick={() => c.skip()}
                     aria-label="Close tour"
                     style={{ flexShrink: 0 }}
                   />
@@ -350,7 +362,7 @@ export default function TourOverlay() {
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => controller.prev()}
+                        onClick={() => c.prev()}
                       >
                         Previous
                       </Button>
@@ -358,7 +370,7 @@ export default function TourOverlay() {
                     <Button
                       variant="filled"
                       size="sm"
-                      onClick={() => controller.next()}
+                      onClick={() => c.next()}
                     >
                       {isLast ? 'Complete' : 'Next'}
                     </Button>

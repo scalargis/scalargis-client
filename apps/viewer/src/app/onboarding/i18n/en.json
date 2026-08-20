@@ -1,0 +1,80 @@
+{
+  "onboarding": {
+    "toc": {
+      "title": "Themes",
+      "content": "Manage the map themes here. Turn each theme on or off, change the order, and adjust the transparency."
+    },
+    "themesAdd": {
+      "title": "Add Themes",
+      "content": "Load themes from WMS, WMTS or WFS services, or from files on your computer."
+    },
+    "measure": {
+      "title": "Measure",
+      "content": "Measure distances and areas on the map. Mark points and see the result in real time."
+    },
+    "draw": {
+      "title": "Draw",
+      "content": "Draw points, lines, polygons and text on the map. Export the drawing as GeoJSON."
+    },
+    "identify": {
+      "title": "Identify",
+      "content": "Click a point on the map to see the information of the features visible at that spot."
+    },
+    "coordinates": {
+      "title": "Coordinates",
+      "content": "Enter coordinates to go to a point, or click the map to read the coordinates of a location."
+    },
+    "geolocation": {
+      "title": "My location",
+      "content": "After you allow it, the map goes to your current position. Useful in the field on a phone."
+    },
+    "print": {
+      "title": "Print",
+      "content": "Generate a PDF layout of the map. Choose the scale and the sheet format."
+    },
+    "search": {
+      "title": "Search",
+      "content": "Type the name of a place. Pick a suggestion to go there on the map."
+    },
+    "share": {
+      "title": "Share map",
+      "content": "Create a link to the current map view. Send the link to share the location."
+    },
+    "save": {
+      "title": "Save viewer",
+      "content": "Save the current view and themes as your own viewer. You can return to it later."
+    },
+    "locale": {
+      "title": "Language",
+      "content": "Change the language of the viewer interface."
+    },
+    "login": {
+      "title": "Login",
+      "content": "Log in to your account to reach the restricted features."
+    },
+    "help": {
+      "title": "Help",
+      "content": "Open the viewer manual. It describes each tool."
+    },
+    "scale": {
+      "title": "Map scale",
+      "content": "See the current scale. Type a value like 1:25000 to jump straight to that scale."
+    },
+    "crs": {
+      "title": "Coordinates",
+      "content": "See the cursor coordinates. Change the reference system in the selector."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "Send a message to the responsible service. You can attach files."
+    },
+    "basemaps": {
+      "title": "Base maps",
+      "content": "Change the map background. Choose between street map, satellite or orthophotos."
+    },
+    "mapControls": {
+      "title": "Navigation",
+      "content": "Zoom the map in and out. Use the full extent button to return to the complete view."
+    }
+  }
+}
