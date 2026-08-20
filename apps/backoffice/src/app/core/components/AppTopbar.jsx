@@ -11,17 +11,17 @@ export const AppTopbar = (props) => {
     return (
         <div className="layout-topbar clearfix">
             <UnstyledButton className="layout-menu-button" onClick={props.onToggleMenu} aria-label="Mostrar/ocultar menu">
-                <IconMenu />
+                <IconMenu style={{ fontSize: '1.5em' }} />
             </UnstyledButton>
             <div className="layout-topbar-icons">
                 <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/notifications/list" title="Notificações" aria-label="Notificações">
                     <span className="layout-topbar-item-text">Notificações</span>
-                    <IconInbox className="layout-topbar-icon" />
+                    <IconInbox className="layout-topbar-icon" style={{ fontSize: '1.5em' }} />
                     <span className="layout-topbar-badge">{cfg?.notifications?.total || 0}</span>
                 </NavLink>
                 <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/account" title="Conta" aria-label="Conta">
                     <span className="layout-topbar-item-text">Conta</span>
-                    <IconUser className="layout-topbar-icon" />
+                    <IconUser className="layout-topbar-icon" style={{ fontSize: '1.5em' }} />
                 </NavLink>
             </div>
         </div>
