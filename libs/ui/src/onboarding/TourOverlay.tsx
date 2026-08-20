@@ -37,7 +37,7 @@ import React, {
 import { useHotkeys } from '@mantine/hooks';
 import { Button, CloseButton, FocusTrap, Popover, Portal, Text } from '@mantine/core';
 import { TourContext } from './TourContext';
-import type { OnboardingStep } from './types';
+import type { OnboardingStep, PopoverPosition } from './types';
 import type { OnboardingController } from './controller';
 import { OVERLAY_Z, POPOVER_Z } from './constants';
 
@@ -96,8 +96,8 @@ function resolvePopoverPosition(
   rect: Rect | null,
   viewportW: number,
   viewportH: number,
-  explicit: string | undefined,
-): string {
+  explicit: PopoverPosition | undefined,
+): PopoverPosition {
   if (explicit) return explicit;
   if (!rect) return 'bottom';
 
@@ -205,10 +205,10 @@ export default function TourOverlay() {
       wasActiveRef.current = true;
       setRect(null);
     }
-    // Toggle ready off so opened={ready} closes the dropdown.  One rAF
-    // later we measure and reopen.  This forces floating-ui to compute
-    // the position from the new target rect.  autoUpdate alone misses
-    // pure CSS left/top changes (no resize, no scroll).
+    // Hide the card for one frame while the new rect is pending; `rect` still
+    // holds the old value here. One rAF later we measure the new target and
+    // show again. The card's side follows the new region through the Popover's
+    // preventPositionChangeWhenVisible={false} (see below).
     setReady(false);
     const raf = requestAnimationFrame(() => {
       setRect(measureTarget(targetEl));
@@ -355,6 +355,14 @@ export default function TourOverlay() {
       </svg>
 
       {/* ── Popover card — hidden until the rect is measured ────────── */}
+        {/*
+          preventPositionChangeWhenVisible={false} is the cross-region fix.
+          Mantine's default (true) locks the popover side on first open and
+          never re-flips it while visible. The tour keeps one Popover for the
+          whole run and moves it between regions through `position`, so the
+          locked side froze at step 1 and cross-region steps landed the card
+          wrong. Off = flip stays active, the side follows resolvedPos.
+        */}
         <Popover
           opened={ready}
           position={resolvedPos}
@@ -363,6 +371,7 @@ export default function TourOverlay() {
           shadow="md"
           zIndex={POPOVER_Z}
           floatingStrategy="fixed"
+          preventPositionChangeWhenVisible={false}
         >
           <Popover.Target>
             {/* Invisible anchor at the target rect */}
