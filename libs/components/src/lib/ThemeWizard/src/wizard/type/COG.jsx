@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import * as GeoTIFFLib from "geotiff";
 
 import { Accordion, ActionIcon, Fieldset, Group, NumberInput, Select, Switch, TextInput } from '@mantine/core';
+import { IconSearch } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -223,7 +224,7 @@ export default function COG(props) {
               loadCOGMetadata()
             }}
           >
-            <i className="pi pi-search" aria-hidden="true" />
+            <IconSearch />
           </ActionIcon>
         </Group>
         {/*

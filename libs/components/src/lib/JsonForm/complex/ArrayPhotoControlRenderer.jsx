@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useState } from 'react';
 
 import { ActionIcon, Alert, Badge, Button, Group, Image, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { confirm, Lightbox } from '@scalargis/ui';
+import { confirm, Lightbox, IconPencil, IconTrash, IconInfoCircle } from '@scalargis/ui';
 
 import {
   isObjectArrayControl,
@@ -123,7 +123,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                               setRowIndex(index);
                               setRowData(item);
                             }}>
-                            <i className="pi pi-pencil" aria-hidden="true" />
+                            <IconPencil />
                           </ActionIcon>
                           <ActionIcon variant="outline" color="danger" radius="xl" size="md"
                             title={translateMsg("common.deletePhoto", "deletePhoto", "Eliminar fotografia", i18Props)}
@@ -144,7 +144,7 @@ export const ArrayPhotoControlRenderer = (props) => {
                               });
 
                           } }>
-                            <i className="pi pi-trash" aria-hidden="true" />
+                            <IconTrash />
                           </ActionIcon>
                         </td>
                     </tr>)
@@ -155,7 +155,7 @@ export const ArrayPhotoControlRenderer = (props) => {
           </div> :
           <Alert color="informative" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-info-circle" aria-hidden="true" />
+              <IconInfoCircle />
               <span>{translateMsg("noPhotosInfo", null, "Não existem fotografias. Pode adicioná-las através do botão 'Adicionar fotografia'.", i18Props)}</span>
             </Group>
           </Alert>

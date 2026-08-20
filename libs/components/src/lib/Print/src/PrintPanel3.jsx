@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation} from "react-i18next";
 import { Alert, Button, Group, Select } from '@mantine/core';
-import { Field } from '@scalargis/ui';
+import { Field, IconInfoCircle, IconChevronLeft } from '@scalargis/ui';
 import PrintGroupItem from "./PrintGroupItem";
 
 import './style.css'
@@ -101,7 +101,7 @@ export default function PrintPanel3(props) {
 
       <Alert color="informative" py="xs">
         <Group justify="center" gap="xs" wrap="nowrap">
-          <i className="pi pi-info-circle" aria-hidden="true" />
+          <IconInfoCircle />
           <span>{t("selectFormatAndPrints", "Selecione o formato e as plantas pretendidas e clique em Continuar")}</span>
         </Group>
       </Alert>
@@ -159,7 +159,7 @@ export default function PrintPanel3(props) {
       <Group justify="space-between" mt="md">
         <Button
           size="xs"
-          leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+          leftSection={<IconChevronLeft />}
           onClick={e => { goPanelPrintPrev(); }}
         >
           {t("back", "Voltar")}

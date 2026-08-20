@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Box, LoadingOverlay } from '@mantine/core';
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, IconSearch } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 
@@ -17,7 +17,7 @@ import './style.scss';
  */
 export function MainMenu({ className, config, actions, record }) {
   const title = record.title || 'Pesquisar Temas';
-  const icon = record.icon || "pi pi-search";
+  const icon = record.icon || <IconSearch />;
 
   if (record.mode !== 'child') {
   return (

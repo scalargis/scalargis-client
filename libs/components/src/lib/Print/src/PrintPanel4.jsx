@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation} from "react-i18next";
 import { Alert, Button, Group, Loader } from '@mantine/core';
-import { notify } from '@scalargis/ui';
+import { notify, IconInfoCircle, IconXCircle, IconCheck, IconExternalLink, IconChevronLeft } from '@scalargis/ui';
 
 import './style.css';
 
@@ -220,7 +220,7 @@ export default function PrintPanel4(props) {
 
       <Alert color="informative" py="xs">
         <Group justify="center" gap="xs" wrap="nowrap">
-          <i className="pi pi-info-circle" aria-hidden="true" />
+          <IconInfoCircle />
           <span>{ isProcessing ?
             t("generatingPrints", "A gerar as plantas...") :
             t("finishPrinting","Plantas geradas. Pode descarregar as plantas pretendidas.")
@@ -235,14 +235,14 @@ export default function PrintPanel4(props) {
               <div key={print.uuid || index} className="grid">
                 <div className="col-fixed" style={{ width: '30px' }}>
                   <div className="pl-2">
-                    <i className='pi pi-times-circle print-error'></i>
+                    <IconXCircle className="print-error" />
                   </div>
                 </div>
                 <div className="col-9">
                   { print.groupTitle ? print.groupTitle + ' - ' + print.title :  print.title }
                 </div>
                 <div className="col">
-                  <i className="pi pi-external-link pl-2"></i>
+                  <IconExternalLink className="pl-2" />
                 </div>
               </div>
             )
@@ -252,7 +252,7 @@ export default function PrintPanel4(props) {
                 <div key={print.uuid || index} className="grid">
                   <div className="col-fixed" style={{ width: '30px' }}>
                     <div className="pl-2">
-                      { print.processed ? <i className="pi pi-check print-success"></i> : <Loader size="xs" /> }
+                      { print.processed ? <IconCheck className="print-success" /> : <Loader size="xs" /> }
                     </div>
                   </div>
                   <div className="col">
@@ -265,7 +265,7 @@ export default function PrintPanel4(props) {
                 <div key={print.uuid || index} className="grid">
                   <div className="col-fixed" style={{ width: '30px' }}>
                     <div className="pl-2">
-                      { print.processed ? <i className="pi pi-check print-success"></i> : <Loader size="xs" /> }
+                      { print.processed ? <IconCheck className="print-success" /> : <Loader size="xs" /> }
                     </div>
                   </div>
                   <div className="col-9">
@@ -275,7 +275,7 @@ export default function PrintPanel4(props) {
                     { print.processed ?
                       <a href={print.url} target="_blank" title={t("openPrint", "Abrir planta")}
                         style={ { textDecoration: "none", color: "var(--mantine-color-primary-filled)"} } rel="noreferrer">
-                        <i className="pi pi-external-link pl-2"></i>
+                        <IconExternalLink className="pl-2" />
                       </a> : null
                     }
                   </div>
@@ -289,7 +289,7 @@ export default function PrintPanel4(props) {
       { mergedFile ?
         <div className="card text-center">
           <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "var(--mantine-color-primary-filled)"} } rel="noreferrer">
-            <i className="pi pi-external-link pl-2"></i> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
+            <IconExternalLink className="pl-2" /> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
           </a>
         </div> :
         null
@@ -310,7 +310,7 @@ export default function PrintPanel4(props) {
       <Group justify="flex-start" mt="md">
         <Button
             size="xs"
-            leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+            leftSection={<IconChevronLeft />}
             onClick={e => { goPanelPrintPrev(); }}
         >
           {t("back", "Voltar")}

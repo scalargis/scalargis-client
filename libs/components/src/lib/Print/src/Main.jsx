@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel, Dialog, useIsMobile } from '@scalargis/ui';
+import { CollapsiblePanel, Dialog, useIsMobile, IconPrint } from '@scalargis/ui';
 import Print from './Print'
 
 import { i18n, MainMenuButton, MapToolButton } from '../../components';
@@ -35,7 +35,7 @@ export function MainMenu({ className, core, config, actions, record }) {
         <MainMenuButton
           title={title}
           className={className}
-          icon="pi pi-print"
+          icon={<IconPrint />}
           onClick={e => open()}
         />
 
@@ -62,7 +62,7 @@ export function MainMenu({ className, core, config, actions, record }) {
       <MainMenuButton
         title={title}
         className={className}
-        icon="pi pi-print"
+        icon={<IconPrint />}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )
@@ -109,7 +109,7 @@ export default function Main({ type, region, as, core, config, actions, record, 
   if (type === 'link' && region === record.links) {
     return <MapToolButton
       title={title}
-      icon="pi pi-print"
+      icon={<IconPrint />}
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));

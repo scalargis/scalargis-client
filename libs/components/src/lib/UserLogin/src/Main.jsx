@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { useLocation } from 'react-router';
 
 import { Menu, UnstyledButton } from '@mantine/core';
-import { Dialog } from '@scalargis/ui';
+import { Dialog, IconUser, IconLock, IconUnlock } from '@scalargis/ui';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -91,11 +91,11 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
       (showLoginButton ?
         <UnstyledButton>
           <span className="layout-topbar-item-text">{ !isMobileSmall ? username : '' }</span>
-          <span className="layout-topbar-icon pi pi-user"/>
+          <IconUser className="layout-topbar-icon" style={{ fontSize: '2em' }} />
           {' '}{ !isMobileSmall ? username : '' }
         </UnstyledButton> : null) :
       <UnstyledButton className="sg-menuitem">
-        <span className="pi pi-user"></span><span>{username}</span>
+        <IconUser /><span>{username}</span>
       </UnstyledButton>;
 
     if (!trigger) return null;
@@ -109,7 +109,7 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
           { type != 'menu' && isMobileSmall &&
             <Menu.Item disabled style={{ wordBreak: 'break-all' }}>{username}</Menu.Item> }
           <Menu.Item
-            leftSection={<i className="pi pi-lock" aria-hidden="true" />}
+            leftSection={<IconLock />}
             onClick={() => dispatch(logout())}
           >
             {i18nUtils.translateValue("endSession", "Terminar sessão")}
@@ -124,10 +124,10 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
     { type != 'menu' ?
       <UnstyledButton onClick={e => setMode(1)} title={config.tooltip_login || ''}>
         <span className="layout-topbar-item-text">{i18nUtils.translateValue("user", "Utilizador")}</span>
-        <span className="layout-topbar-icon pi pi-unlock"/>
+        <IconUnlock className="layout-topbar-icon" style={{ fontSize: '2em' }} />
       </UnstyledButton> :
       <UnstyledButton className="sg-menuitem" onClick={e => setMode(1)} title={config.tooltip_login || ''}>
-        <span className="pi pi-unlock"></span><span>{i18nUtils.translateValue("login", "Entrar")}</span>
+        <IconUnlock /><span>{i18nUtils.translateValue("login", "Entrar")}</span>
       </UnstyledButton> }
 
       <Dialog

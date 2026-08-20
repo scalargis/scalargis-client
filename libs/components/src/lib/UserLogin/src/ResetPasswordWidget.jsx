@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import { Alert, Anchor, Button, Group, TextInput } from '@mantine/core';
+import { IconXCircle, IconCheck } from '@scalargis/ui';
 
 import { i18n as i18nUtils } from '../../components';
 
@@ -79,7 +80,7 @@ function ResetPasswordWidget(props) {
                         <div className="w-full my-4">
                             <Alert color="danger" py="xs">
                                 <Group justify="center" gap="xs" wrap="nowrap">
-                                    <i className="pi pi-times-circle" />
+                                    <IconXCircle />
                                     <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
                                 </Group>
                             </Alert>
@@ -90,7 +91,7 @@ function ResetPasswordWidget(props) {
                         <div className="w-full my-4">
                             <Alert color="danger" py="xs">
                                 <Group justify="center" gap="xs" wrap="nowrap">
-                                    <i className="pi pi-times-circle" />
+                                    <IconXCircle />
                                     <span>{auth?.response?.message}</span>
                                 </Group>
                             </Alert>
@@ -101,7 +102,7 @@ function ResetPasswordWidget(props) {
                         <Button
                             type="submit"
                             fullWidth
-                            leftSection={<i className="pi pi-check" />}
+                            leftSection={<IconCheck />}
                             loading={auth.loading}
                         >{i18nUtils.translateValue("send", "Enviar")}</Button>
                     </div>
@@ -162,7 +163,7 @@ function ResetPasswordWidget(props) {
             <Group justify="flex-end" mt="md">
                 <Button
                     type="submit"
-                    leftSection={<i className="pi pi-check" />}
+                    leftSection={<IconCheck />}
                     loading={auth.loading}
                 >{i18nUtils.translateValue("send", "Enviar")}</Button>
             </Group>
@@ -171,7 +172,7 @@ function ResetPasswordWidget(props) {
                 <div className="mt-3">
                     <Alert color="danger" py="xs">
                         <Group justify="center" gap="xs" wrap="nowrap">
-                            <i className="pi pi-times-circle" />
+                            <IconXCircle />
                             <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
                         </Group>
                     </Alert>
@@ -182,7 +183,7 @@ function ResetPasswordWidget(props) {
                 <div className="mt-3">
                     <Alert color="danger" py="xs">
                         <Group justify="center" gap="xs" wrap="nowrap">
-                            <i className="pi pi-times-circle" />
+                            <IconXCircle />
                             <span>{auth?.response?.message}</span>
                         </Group>
                     </Alert>

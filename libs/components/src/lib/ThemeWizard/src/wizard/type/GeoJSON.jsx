@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
 import { ActionIcon, Group, Select, Tabs, TextInput } from '@mantine/core';
-import { FileUpload, notify } from '@scalargis/ui';
+import { FileUpload, notify, IconSearch } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -182,7 +182,7 @@ export default function GeoJSON (props) {
                       loadFromUserURL()
                     }}
                   >
-                    <i className="pi pi-search" aria-hidden="true" />
+                    <IconSearch />
                   </ActionIcon>
                 </Group>
 

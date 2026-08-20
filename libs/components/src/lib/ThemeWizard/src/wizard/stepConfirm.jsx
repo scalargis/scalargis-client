@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
 import { Alert, Button, Group } from '@mantine/core';
+import { IconInfoCircle } from '@scalargis/ui';
 import ThemesSelector from './ThemesSelector';
 import WMSThemesSelector from './WMSThemesSelector';
 
@@ -34,7 +35,7 @@ export default function WizardStepConfirm(props) {
       ) :
         <Alert color="informative" py="xs">
           <Group justify="center" gap="xs" wrap="nowrap">
-            <i className="pi pi-info-circle" aria-hidden="true" />
+            <IconInfoCircle />
             <span>{t("noThemeSelectedMsg", "Não há nenhum tema selecionado. Volte à etapa anterior e selecione pelo menos um tema.")}</span>
           </Group>
         </Alert>

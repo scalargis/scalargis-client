@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 import { Menu, UnstyledButton } from '@mantine/core';
+import { IconGlobe } from '@scalargis/ui';
 
 import './style.css';
 
@@ -84,7 +85,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
             {buttons}
           </div> :
           <span className="sg-menuitem">
-            <span className="pi pi-globe"></span>
+            <IconGlobe />
             <div className={className ? `locale-selector ${className}` : 'locale-selector'}>
               {buttons}
             </div>
@@ -132,7 +133,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
       { type != 'menu' ?
       menu :
       <span className="sg-menuitem">
-        <span className="pi pi-globe"></span>{menu}
+        <IconGlobe />{menu}
       </span> }
     </React.Fragment>
   );

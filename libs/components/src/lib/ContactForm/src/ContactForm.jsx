@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Alert, Button, Group, Textarea, TextInput } from '@mantine/core';
-import { Field, FileUpload, notify } from '@scalargis/ui';
+import { Field, FileUpload, notify, IconCheck, IconAlertTriangle } from '@scalargis/ui';
 
 import ContactInfo from './ContactInfo';
 
@@ -54,7 +54,7 @@ const severityColor = {
 const InfoMessage = ({ info }) => (
   <Alert color={severityColor[info.type] || 'informative'} py="xs" style={{ width: '100%' }}>
     <Group justify="center" gap="xs" wrap="nowrap">
-      <i className={info.type === 'success' ? 'pi pi-check' : 'pi pi-exclamation-triangle'} aria-hidden="true" />
+      {info.type === 'success' ? <IconCheck /> : <IconAlertTriangle />}
       <span>{info.message}</span>
     </Group>
   </Alert>
@@ -341,7 +341,7 @@ export default function ContactFrom(props) {
           <Button
             type="submit"
             color="secondary"
-            leftSection={<i className="pi pi-check" aria-hidden="true" />}
+            leftSection={<IconCheck />}
             loading={sending}
             disabled={!enableSubmit || sending}
           >

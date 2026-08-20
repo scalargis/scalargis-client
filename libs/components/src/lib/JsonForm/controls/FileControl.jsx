@@ -9,7 +9,7 @@ import {
 } from '@jsonforms/react';
 
 import { Badge, Button, FileButton } from '@mantine/core';
-import { notify } from '@scalargis/ui';
+import { notify, IconInfoCircle, IconPlus } from '@scalargis/ui';
 
 import { translateMsg } from './../util/i18n';
 
@@ -81,7 +81,7 @@ export const FileControl = (props) => {
         <div className="field">
           { (file && file.data && file.original_filename) ?
           <div>
-            <div><strong>{labels.file}: </strong>{file.original_filename} <Badge variant="light" ml="xs" leftSection={<i className="pi pi-info-circle" aria-hidden="true" />}>{labels.newfile}</Badge></div>
+            <div><strong>{labels.file}: </strong>{file.original_filename} <Badge variant="light" ml="xs" leftSection={<IconInfoCircle />}>{labels.newfile}</Badge></div>
             <div><strong>{labels.size}: </strong>{file.file_size ? Math.round(file.file_size/1024) + " KB": ""}</div>
           </div>
           :
@@ -94,7 +94,7 @@ export const FileControl = (props) => {
         <div className="field col-12">
           <FileButton onChange={selectFile} resetRef={resetPicker}>
             {(buttonProps) => (
-              <Button {...buttonProps} leftSection={<i className="pi pi-plus" aria-hidden="true" />}>
+              <Button {...buttonProps} leftSection={<IconPlus />}>
                 {labels.choose}
               </Button>
             )}

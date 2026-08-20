@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation} from "react-i18next";
 import { Button, Group, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel, Dialog, useIsMobile } from '@scalargis/ui';
+import { CollapsiblePanel, Dialog, useIsMobile, IconQuestionCircle, IconEnvelope } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 
@@ -63,7 +63,7 @@ export function MainMenu({ className, core, config, actions, record }) {
         <MainMenuButton
           title={title}
           className={className}
-          icon="pi pi-question-circle"
+          icon={<IconQuestionCircle />}
           onClick={e => open()}
         />
 
@@ -85,7 +85,7 @@ export function MainMenu({ className, core, config, actions, record }) {
       <MainMenuButton
         title={title}
         className={className}
-        icon="pi pi-question-circle"
+        icon={<IconQuestionCircle />}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )
@@ -154,13 +154,13 @@ export default function Main({ region, as, core, config, actions, record }) {
       title={footerLabel || t("contact", "Contacto")}
       aria-label={footerLabel || t("contact", "Contacto")}
     >
-      <i className="pi pi-envelope contactform-footer-icon" aria-hidden="true" />
+      <IconEnvelope className="contactform-footer-icon" />
       { footerLabel && <span className="contactform-footer-label">{footerLabel}</span> }
     </UnstyledButton>
   ) : (
     <UnstyledButton onClick={e => open()} title={t("contact", "Contacto")}>
       <span className="layout-topbar-item-text"></span>
-      <span className="layout-topbar-icon pi pi-envelope" />
+      <IconEnvelope className="layout-topbar-icon" style={{ fontSize: '2em' }} />
     </UnstyledButton>
   );
 

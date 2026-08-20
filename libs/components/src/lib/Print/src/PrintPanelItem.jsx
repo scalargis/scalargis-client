@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
 import { useFormContext } from 'react-hook-form';
 import { Alert, Button, Checkbox, Group, Loader, NumberInput, Select, Tabs } from '@mantine/core';
-import { confirm, notify } from '@scalargis/ui';
+import { confirm, notify, IconXCircle, IconInfoCircle, IconExternalLink, IconChevronLeft, IconPrint } from '@scalargis/ui';
 import OlInteractionDraw from 'ol/interaction/Draw';
 import OlInteractionModify from 'ol/interaction/Modify';
 import OlInteractionSelect from 'ol/interaction/Select';
@@ -684,7 +684,7 @@ export default function PrintPanelItem(props) {
         {printItem.location_marking &&
           <Alert color={ geometryError === true ? "danger" : "informative" } py="xs" mt="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className={geometryError === true ? "pi pi-times-circle" : "pi pi-info-circle"} aria-hidden="true" />
+              {geometryError === true ? <IconXCircle /> : <IconInfoCircle />}
               <span>{t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")}</span>
             </Group>
           </Alert>
@@ -722,7 +722,7 @@ export default function PrintPanelItem(props) {
               <Tabs.Panel value="map" pt="xs">
                 <Alert color="informative" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
-                    <i className="pi pi-info-circle" aria-hidden="true" />
+                    <IconInfoCircle />
                     <span>{t("printMapScaleOptionMsg", "A planta será emitida em função da escala de visualização do mapa")}</span>
                   </Group>
                 </Alert>
@@ -763,7 +763,7 @@ export default function PrintPanelItem(props) {
         <Alert color="informative" py="xs" mt="lg">
           <Group justify="center" gap="xs" wrap="nowrap">
             <a href={printFile.url} target="_blank" rel="noreferrer">
-              <i className="pi pi-external-link pl-2 mr-1" aria-hidden="true"></i>{t("openPrintPdf", "Abrir PDF da planta")}
+              <IconExternalLink className="pl-2 mr-1" />{t("openPrintPdf", "Abrir PDF da planta")}
             </a>
           </Group>
         </Alert> : null
@@ -774,7 +774,7 @@ export default function PrintPanelItem(props) {
           {!standalone &&
             <Button
               size="xs"
-              leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+              leftSection={<IconChevronLeft />}
               onClick={e => { goPanelPrintPrev(); }}
             >
               {t("back", "Voltar")}
@@ -782,7 +782,7 @@ export default function PrintPanelItem(props) {
         </div>
         <Button
           size="xs"
-          leftSection={<i className="pi pi-print" aria-hidden="true" />}
+          leftSection={<IconPrint />}
           onClick={e => { doPrint(); }}
           disabled={isPrinting}
         >

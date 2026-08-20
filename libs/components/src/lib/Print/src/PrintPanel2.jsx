@@ -3,7 +3,7 @@ import { useTranslation} from "react-i18next";
 import { useFormContext } from 'react-hook-form';
 import { v4 as uuidV4 } from 'uuid';
 import { Alert, Button, Group } from '@mantine/core';
-import { confirm, notify } from '@scalargis/ui';
+import { confirm, notify, IconXCircle, IconInfoCircle, IconChevronLeft } from '@scalargis/ui';
 import OlInteractionDraw from "ol/interaction/Draw";
 import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
@@ -423,7 +423,7 @@ export default function PrintPanel2(props) {
         { printGroup.location_marking &&
           <Alert color={ geometryError === true ? "danger" : "informative" } py="xs" mt="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className={geometryError === true ? "pi pi-times-circle" : "pi pi-info-circle"} aria-hidden="true" />
+              {geometryError === true ? <IconXCircle /> : <IconInfoCircle />}
               <span>{t("locationMarkingMsg", "Deverá marcar no mapa a localização pretendida")}</span>
             </Group>
           </Alert>
@@ -441,7 +441,7 @@ export default function PrintPanel2(props) {
           {!standalone &&
           <Button
               size="xs"
-              leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+              leftSection={<IconChevronLeft />}
               onClick={e => { goPanelPrintPrev(); }}
           >
             {t("back", "Voltar")}

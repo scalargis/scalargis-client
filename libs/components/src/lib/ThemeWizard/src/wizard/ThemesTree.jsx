@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Anchor, TextInput } from '@mantine/core';
-import { TreeView, useTree } from '@scalargis/ui';
+import { TreeView, useTree, IconSearch } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../i18n/index';
 import { foldDiacritics } from '../../../utils/common';
@@ -170,7 +170,7 @@ export default function ThemesTree({ nodes, selected, setSelected, readOnly, wit
           mb="xs"
           value={filter}
           placeholder={`${t('filter', 'Filtro')}...`}
-          leftSection={<i className="pi pi-search" aria-hidden="true" />}
+          leftSection={<IconSearch />}
           onChange={(e) => setFilter(e.target.value)}
         />
       )}

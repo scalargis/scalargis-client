@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { WMSCapabilities } from 'ol/format';
 import { Accordion, ActionIcon, Group, Select, Switch, TextInput } from '@mantine/core';
+import { IconSearch } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -130,7 +131,7 @@ export default function WMS(props) {
               loadWMSCapabilities()
             }}
           >
-            <i className="pi pi-search" aria-hidden="true" />
+            <IconSearch />
           </ActionIcon>
         </Group>
         <datalist id='urlhistory'>

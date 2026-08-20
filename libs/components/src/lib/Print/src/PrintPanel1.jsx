@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation} from "react-i18next"
 import { ActionIcon, Alert, Group } from '@mantine/core'
+import { IconInfoCircle, IconChevronRight } from '@scalargis/ui'
 import './style.css'
 
 export default function PrintPanel1(props) {
@@ -23,7 +24,7 @@ export default function PrintPanel1(props) {
     <div className="print-panel1">
       <Alert color="informative" py="xs">
         <Group justify="center" gap="xs" wrap="nowrap">
-          <i className="pi pi-info-circle" aria-hidden="true" />
+          <IconInfoCircle />
           <span>{t("selectPrintTypeMsg", "Escolha o tipo de planta que pretende emitir.")}</span>
         </Group>
       </Alert>
@@ -35,7 +36,7 @@ export default function PrintPanel1(props) {
               title={group.title}
               aria-label={group.title}
               onClick={e => { goPanelPrintGroup(group) }}>
-              <i className="pi pi-chevron-right" aria-hidden="true" />
+              <IconChevronRight />
             </ActionIcon>
             <h4 className="print-link" onClick={e => { goPanelPrintGroup(group) }}>{group.title}</h4>
             <p>{group.description}</p>
@@ -49,7 +50,7 @@ export default function PrintPanel1(props) {
               title={print.title}
               aria-label={print.title}
               onClick={e => { goPanelPrintItem(print) }}>
-              <i className="pi pi-chevron-right" aria-hidden="true" />
+              <IconChevronRight />
             </ActionIcon>
             <h4 className="print-link" onClick={e => { goPanelPrintItem(print) }}>{print.title}</h4>
             <p>{print.description}</p>

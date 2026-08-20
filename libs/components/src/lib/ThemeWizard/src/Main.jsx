@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 import { Stepper } from '@mantine/core';
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, IconPlusCircle } from '@scalargis/ui';
 import { v4 as uuidV4 } from 'uuid';
 
 import { i18n, MainMenuButton } from '../../components';
@@ -70,7 +70,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={className}
-      icon="pi pi-plus-circle"
+      icon={<IconPlusCircle />}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )

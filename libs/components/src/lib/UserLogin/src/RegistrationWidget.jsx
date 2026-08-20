@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import { Alert, Anchor, Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
+import { IconCheckCircle, IconXCircle, IconEnvelope, IconUser, IconCheck } from '@scalargis/ui';
 
 import { i18n as i18nUtils } from '../../components';
 import PasswordRules, { usePasswordPolicy, validatePasswordAgainstPolicy } from '../../PasswordRules';
@@ -91,7 +92,7 @@ function RegistrationWidget(props) {
       return (
         <div>
           <div className="text-center mb-4">
-            <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }}></i>
+            <IconCheckCircle style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }} />
             <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
           </div>
           <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
@@ -115,7 +116,7 @@ function RegistrationWidget(props) {
 
           <Controller name="email" control={control} rules={emailRules} render={({ field, fieldState }) => (
             <TextInput id={field.name} {...field} value={field.value ?? ''} label="Email" error={fieldState.invalid} className="w-full mb-1 mt-2"
-              rightSection={<i className="pi pi-envelope" aria-hidden="true" />}
+              rightSection={<IconEnvelope />}
               autoComplete="off"
               aria-autocomplete="none" />
           )} />
@@ -178,7 +179,7 @@ function RegistrationWidget(props) {
           <div className="w-full my-4">
             <Alert color="danger" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
-                <i className="pi pi-times-circle" />
+                <IconXCircle />
                 <span>{i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}</span>
               </Group>
             </Alert>
@@ -188,7 +189,7 @@ function RegistrationWidget(props) {
           <div className="w-full my-4">
             <Alert color={ auth.response.success ? "success" : "danger"} py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
-                <i className={ auth.response.success ? "pi pi-check-circle" : "pi pi-times-circle" } />
+                {auth.response.success ? <IconCheckCircle /> : <IconXCircle />}
                 <span>{auth.response.message}</span>
               </Group>
             </Alert>
@@ -198,7 +199,7 @@ function RegistrationWidget(props) {
           <Button
             type="submit"
             fullWidth
-            leftSection={<i className="pi pi-user" />}
+            leftSection={<IconUser />}
             loading={auth.loading}
           >{i18nUtils.translateValue("createUser","Criar utilizador")}</Button>
         </div>
@@ -211,7 +212,7 @@ function RegistrationWidget(props) {
     return (
       <div className="pt-6 px-3">
         <div className="text-center mb-5">
-          <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }}></i>
+          <IconCheckCircle style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }} />
           <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
         </div>
         <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
@@ -241,7 +242,7 @@ function RegistrationWidget(props) {
           <Controller name="email" control={control} rules={emailRules} render={({ field, fieldState }) => (
                   <TextInput id={field.name} {...field} value={field.value ?? ''} error={fieldState.invalid}
                     label={`${i18nUtils.translateValue("userRegistrationDataEmail", "Email")}*`}
-                    rightSection={<i className="pi pi-envelope" aria-hidden="true" />} />
+                    rightSection={<IconEnvelope />} />
           )} />
           {getFormValidationErrorMessage(errors, 'email')}
         </div>
@@ -304,7 +305,7 @@ function RegistrationWidget(props) {
       <Group justify="flex-end" mt="md">
         <Button
           type="submit"
-          leftSection={<i className="pi pi-check" />}
+          leftSection={<IconCheck />}
           loading={auth.loading}
         >{i18nUtils.translateValue("createUser","Criar utilizador")}</Button>
       </Group>
@@ -313,7 +314,7 @@ function RegistrationWidget(props) {
         <div className="mt-3">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-times-circle" />
+              <IconXCircle />
               <span>{i18nUtils.translateValue("unavailableService", "Serviço Indisponível")}</span>
             </Group>
           </Alert>
@@ -324,7 +325,7 @@ function RegistrationWidget(props) {
         <div className="mt-3">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-times-circle" />
+              <IconXCircle />
               <span>{auth.response.message}</span>
             </Group>
           </Alert>

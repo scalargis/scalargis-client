@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 
 import { Alert, Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core'
+import { IconXCircle, IconUser, IconCheck } from '@scalargis/ui'
 
 import { i18n as i18nUtils } from '../../components'
 
@@ -58,7 +59,7 @@ function LoginWidget(props) {
         <div className={layout === 'page' ? 'w-full my-4' : 'mt-3'}>
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-times-circle" />
+              <IconXCircle />
               <span>{i18nUtils.translateValue("unavailableService", "Serviço indisponível")}</span>
             </Group>
           </Alert>
@@ -69,7 +70,7 @@ function LoginWidget(props) {
         <div className={layout === 'page' ? 'w-full my-4' : 'mt-3'}>
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-times-circle" />
+              <IconXCircle />
               <span>{auth?.response?.message}</span>
             </Group>
           </Alert>
@@ -123,7 +124,7 @@ function LoginWidget(props) {
             <Button
               type="submit"
               fullWidth
-              leftSection={<i className="pi pi-user" />}
+              leftSection={<IconUser />}
               loading={auth.loading}
             >{i18nUtils.translateValue("login", "Entrar")}</Button>
           </div>
@@ -179,7 +180,7 @@ function LoginWidget(props) {
       <Group justify="flex-end" mt="md">
         <Button
           type="submit"
-          leftSection={<i className="pi pi-check" />}
+          leftSection={<IconCheck />}
           loading={auth.loading}
         >{i18nUtils.translateValue("login", "Entrar")}</Button>
       </Group>

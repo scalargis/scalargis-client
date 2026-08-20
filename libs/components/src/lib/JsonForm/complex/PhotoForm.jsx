@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Dialog, useIsMobile } from '@scalargis/ui';
+import { Dialog, useIsMobile, IconX, IconCheck } from '@scalargis/ui';
 
 import { JsonForm, JsonFormDefaultRenderers, FormErrors } from '../../components';
 
@@ -67,13 +67,13 @@ export default function PhotoForm(props) {
       footer={
         <Group justify="flex-end">
           <Button variant="subtle"
-            leftSection={<i className="pi pi-times" aria-hidden="true" />}
+            leftSection={<IconX />}
             disabled={isSaving}
             onClick={() => close()}>
             {labels.close}
           </Button>
           <Button
-            leftSection={<i className={isSaving ? "pi pi-check pi-spinner" : "pi pi-check"} aria-hidden="true" />}
+            leftSection={isSaving ? <IconCheck className="pi-spinner" /> : <IconCheck />}
             disabled={isSaving}
             data-autofocus
             onClick={onSave}>

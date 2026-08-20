@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FigTreeEvaluator } from 'fig-tree-evaluator';
 import { Alert, Button, Group } from '@mantine/core';
-import { notify } from '@scalargis/ui';
+import { notify, IconChevronLeft, IconAlertTriangle, IconInfoCircle } from '@scalargis/ui';
 
 import {
   i18n,
@@ -70,7 +70,7 @@ export default function SearchLayerForm(props) {
       {goPanelSearchPrev && <div className="mt-2">
         <Button
           size="xs"
-          leftSection={<i className="pi pi-chevron-left" aria-hidden="true" />}
+          leftSection={<IconChevronLeft />}
           onClick={e => { goPanelSearchPrev(); }}>
           {i18n.translateValue("back", "Voltar")}
         </Button>
@@ -82,7 +82,7 @@ export default function SearchLayerForm(props) {
       { props?.errorSchema &&
         <Alert color="warning" py="xs">
           <Group justify="center" gap="xs" wrap="nowrap">
-            <i className="pi pi-exclamation-triangle" aria-hidden="true" />
+            <IconAlertTriangle />
             <span>{props?.errorSchema.message}</span>
           </Group>
         </Alert> }
@@ -212,7 +212,7 @@ export default function SearchLayerForm(props) {
         {(results && results[id] && results[id].total === 0) &&
           <Alert color="informative" py="xs" mt="lg">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-info-circle" aria-hidden="true" />
+              <IconInfoCircle />
               <span>{i18n.translateValue("noResultsFound", "Pesquisa sem resultados")}</span>
             </Group>
           </Alert>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Group, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel, Dialog, useIsMobile } from '@scalargis/ui';
+import { CollapsiblePanel, Dialog, useIsMobile, IconQuestionCircle } from '@scalargis/ui';
 
 import { i18n as i18nUtils, MainMenuButton } from '../../components';
 
@@ -44,7 +44,7 @@ export function MainMenu({ className, config, actions, record }) {
         <MainMenuButton
           title={title}
           className={className}
-          icon="pi pi-question-circle"
+          icon={<IconQuestionCircle />}
           onClick={e => open()}
         />
 
@@ -80,7 +80,7 @@ export function MainMenu({ className, config, actions, record }) {
       <MainMenuButton
         title={title}
         className={className}
-        icon="pi pi-question-circle"
+        icon={<IconQuestionCircle />}
         onClick={e => window.open(help_url)} />
     )
   }  else {
@@ -88,7 +88,7 @@ export function MainMenu({ className, config, actions, record }) {
       <MainMenuButton
         title={title}
         className={className}
-        icon="pi pi-question-circle"
+        icon={<IconQuestionCircle />}
         onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
       />
     )
@@ -143,10 +143,10 @@ export default function Main({ type, as, config, actions, record }) {
         { type != 'menu' ?
           <UnstyledButton onClick={e => open()} title={title}>
             <span className="layout-topbar-item-text"></span>
-            <span className="layout-topbar-icon pi pi-question-circle" />
+            <IconQuestionCircle className="layout-topbar-icon" style={{ fontSize: '2em' }} />
           </UnstyledButton> :
           <UnstyledButton className="sg-menuitem" onClick={e => open()}>
-            <span className="pi pi-question-circle"></span><span>Ajuda</span>
+            <IconQuestionCircle /><span>Ajuda</span>
           </UnstyledButton> }
 
         <Dialog
@@ -183,7 +183,7 @@ export default function Main({ type, as, config, actions, record }) {
     if (type === 'menu') {
       return (
         <a href={help_url} target="_blank" rel="noreferrer" className="sg-menuitem">
-          <span className="pi pi-question-circle"></span><span>{title}</span>
+          <IconQuestionCircle /><span>{title}</span>
         </a>
       )
     }
@@ -201,7 +201,7 @@ export default function Main({ type, as, config, actions, record }) {
       >
         { component_cfg?.elementType !== 'link' &&
           <span className="layout-topbar-item-text">{title}</span> }
-        <span className="layout-topbar-icon pi pi-question-circle"/>
+        <IconQuestionCircle className="layout-topbar-icon" style={{ fontSize: '2em' }} />
       </a>
     )
   }

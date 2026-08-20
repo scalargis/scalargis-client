@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, Button, Text } from '@mantine/core';
-import { DataGrid } from '@scalargis/ui';
+import { DataGrid, IconSearch } from '@scalargis/ui';
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import OlFeature from 'ol/Feature';
 import {getCenter as olGetCenter} from 'ol/extent';
@@ -99,7 +99,7 @@ export default function SearchLayerResults(props) {
               zoomLayerFeatures();
             }
           }}>
-          <i className="pi pi-search" aria-hidden="true" />
+          <IconSearch />
         </ActionIcon>
     );
   }

@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useState } from 'react';
 
 import { ActionIcon, Alert, Badge, Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { confirm } from '@scalargis/ui';
+import { confirm, IconPencil, IconTrash, IconInfoCircle } from '@scalargis/ui';
 
 import {
   isObjectArrayControl,
@@ -108,7 +108,7 @@ export const ArrayFileControlRenderer = (props) => {
                               setRowIndex(index);
                               setRowData(item);
                             }}>
-                            <i className="pi pi-pencil" aria-hidden="true" />
+                            <IconPencil />
                           </ActionIcon>
                           <ActionIcon variant="outline" color="danger" radius="xl" size="md"
                             title={translateMsg("common.deleteFile", "deleteFile", "Eliminar ficheiro", i18Props)}
@@ -129,7 +129,7 @@ export const ArrayFileControlRenderer = (props) => {
                               });
 
                           } }>
-                            <i className="pi pi-trash" aria-hidden="true" />
+                            <IconTrash />
                           </ActionIcon>
                         </td>
                     </tr>
@@ -141,7 +141,7 @@ export const ArrayFileControlRenderer = (props) => {
           </div> :
           <Alert color="informative" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-info-circle" aria-hidden="true" />
+              <IconInfoCircle />
               <span>{translateMsg("noFilesInfo", null, "Não existem ficheiros. Pode adicioná-las através do botão 'Adicionar ficheiro'.", i18Props)}</span>
             </Group>
           </Alert>
