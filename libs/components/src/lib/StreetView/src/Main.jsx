@@ -24,7 +24,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title="Ferramentas do Mapa"
       className={className}
-      icon="pi pi-sliders-h"
+      icon={<IconSliders />}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )

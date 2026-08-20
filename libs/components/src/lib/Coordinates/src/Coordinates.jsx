@@ -20,6 +20,7 @@ import OlPoint from 'ol/geom/Point'
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import * as OlProj from 'ol/proj';
 
+import { IconDownload, IconAlignJustify, IconGlobe, IconSearch, IconX, IconInfoCircle } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import { MAPCONTROL_NAME } from './utils';
 
@@ -84,18 +85,18 @@ export default function Coordinates({ core, config, actions, dispatch, record })
           aria-label={t("exportResults", "Exportar resultados")}
           title={t("exportResults", "Exportar resultados")}
         >
-          <i className="pi pi-download" aria-hidden="true" />
+          <IconDownload />
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item
-          leftSection={<i className="pi pi-align-justify" aria-hidden="true" />}
+          leftSection={<IconAlignJustify />}
           onClick={() => exportItem(data, 'csv')}
         >
           CSV
         </Menu.Item>
         <Menu.Item
-          leftSection={<i className="pi pi-globe" aria-hidden="true" />}
+          leftSection={<IconGlobe />}
           onClick={() => exportItem(data, 'geojson')}
         >
           GeoJSON
@@ -471,14 +472,14 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         <Group className="coordinates-item-tools" justify="flex-end" gap={0}>
           <MapToolButton
             radius={0}
-            icon="pi pi-search"
+            icon={<IconSearch />}
             title={t("zoomToElement", "Aproximar ao elemento")}
             onClick={e => zoomItem(data)}
           />
           {renderSaveBtn(data)}
           <MapToolButton
             radius={0}
-            icon="pi pi-times"
+            icon={<IconX />}
             title={t("removeElement","Remover elemento")}
             onClick={e => removeItem(data)}
           />
@@ -604,7 +605,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         <div className="mt-2 mb-3">
           <Alert color="informative" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
-              <i className="pi pi-info-circle" />
+              <IconInfoCircle />
               <span>{msg}</span>
             </Group>
           </Alert>
@@ -747,7 +748,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
         </div>)}
       <div className="card text-center">
         <Button
-            leftSection={<i className="pi pi-search" aria-hidden="true" />}
+            leftSection={<IconSearch />}
             onClick={e => { transformCoordinatesByApi(); }}
         >
           {t("locate","Localizar")}
@@ -763,7 +764,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
               variant="outline"
               size="xs"
               title={t("clearResults", "Limpar resultados")}
-              leftSection={<i className="pi pi-times" aria-hidden="true" />}
+              leftSection={<IconX />}
               onClick={e => removeAll()}
             >
               {t("clear", "Limpar")}
@@ -772,7 +773,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
               variant="outline"
               size="xs"
               title={t("exportResults", "Exportar resultados")}
-              leftSection={<i className="pi pi-download" aria-hidden="true" />}
+              leftSection={<IconDownload />}
               onClick={e => exportAll('csv')}
             >
               CSV
@@ -781,7 +782,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
               variant="outline"
               size="xs"
               title={t("exportResults", "Exportar resultados")}
-              leftSection={<i className="pi pi-download" aria-hidden="true" />}
+              leftSection={<IconDownload />}
               onClick={e => exportAll('geojson')}
             >
               GeoJSON

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
 import { Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, IconAngleUp, IconAngleDown } from '@scalargis/ui';
 import TimelineControl from './TimelineControl';
 import { WMSCapabilities } from 'ol/format';
 
@@ -165,7 +165,7 @@ export default function Main(props) {
           type="button"
           fullWidth
           color="warning"
-          rightSection={<i className={opened ? "pi pi-angle-up" : "pi pi-angle-down"} aria-hidden="true" />}
+          rightSection={opened ? <IconAngleUp /> : <IconAngleDown />}
           title="Fechar"
           aria-expanded={opened}
           onClick={toggle}>

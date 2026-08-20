@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation} from "react-i18next"
-import { CollapsiblePanel } from '@scalargis/ui'
+import { CollapsiblePanel, IconGlobe } from '@scalargis/ui'
 import { MainMenuButton } from '../../components'
 import GeoLocation from './GeoLocation'
 
@@ -17,7 +17,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={t("myLocation", "A minha localização")}
       className={className}
-      icon="pi pi-globe"
+      icon={<IconGlobe />}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )

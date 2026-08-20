@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation} from "react-i18next";
 import { Button, Group, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Dialog } from '@scalargis/ui';
+import { Dialog, IconMinus, IconCheck } from '@scalargis/ui';
 import { unByKey } from 'ol/Observable';
 import Overlay from 'ol/Overlay';
 import * as OlSphere from 'ol/sphere';
@@ -412,7 +412,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
   const render = () => {
     //const { control, helpModal } = this.state;
     const controlOptions = [
-      { key: 'length', label: t("measureDistance", "Medir Distância"), icon: "pi pi-minus" },
+      { key: 'length', label: t("measureDistance", "Medir Distância"), icon: <IconMinus /> },
       { key: 'area', label: t("measureArea", "Medir Área"), icon: "fas fa-draw-polygon" },
     ];
 
@@ -437,7 +437,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
                 style={{ flex: 1 }}
                 variant={selectedControl === option.key ? 'filled' : 'default'}
                 aria-pressed={selectedControl === option.key}
-                leftSection={<i className={option.icon} aria-hidden="true" />}
+                leftSection={React.isValidElement(option.icon) ? option.icon : <i className={option.icon} aria-hidden="true" />}
                 onClick={() => onControlSelect(selectedControl === option.key ? null : option.key)}
               >
                 {option.label}
@@ -494,7 +494,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
             <Group justify="flex-end">
               <Button
                 type="button"
-                leftSection={<i className="pi pi-check" aria-hidden="true" />}
+                leftSection={<IconCheck />}
                 onClick={closeHelp}
               >
                 OK

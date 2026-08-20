@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
 import { Button, Switch, Tooltip } from '@mantine/core'
+import { IconInfoCircle, IconArrowCircleDown } from '@scalargis/ui'
 import { Feature } from 'ol'
 import Point from 'ol/geom/Point'
 import OLGroupLayer from "ol/layer/Group"
@@ -107,11 +108,11 @@ export default function Main({ config }) {
           <tr>
             <td>
               <Tooltip label="O ponto onde clicou no mapa" withArrow>
-                <span className="export-map-features-label">Ponto <i className="pi pi-info-circle" aria-hidden="true" /></span>
+                <span className="export-map-features-label">Ponto <IconInfoCircle /></span>
               </Tooltip>
             </td>
             <td>
-              <Button type="button" size="xs" onClick={exportCoord} leftSection={<i className="pi pi-arrow-circle-down" aria-hidden="true" />}>Exportar</Button>
+              <Button type="button" size="xs" onClick={exportCoord} leftSection={<IconArrowCircleDown />}>Exportar</Button>
             </td>
           </tr>
           ) }
@@ -120,11 +121,11 @@ export default function Main({ config }) {
           <tr key={i}>
             <td>
               <Tooltip label="A geometria que selecionou no mapa" withArrow>
-                <span className="export-map-features-label">Geometria <i className="pi pi-info-circle" aria-hidden="true" /></span>
+                <span className="export-map-features-label">Geometria <IconInfoCircle /></span>
               </Tooltip>
             </td>
             <td>
-              <Button type="button" size="xs" onClick={() => exportSelected([feat])} leftSection={<i className="pi pi-arrow-circle-down" aria-hidden="true" />}>Exportar</Button>
+              <Button type="button" size="xs" onClick={() => exportSelected([feat])} leftSection={<IconArrowCircleDown />}>Exportar</Button>
             </td>
           </tr>
           )) }

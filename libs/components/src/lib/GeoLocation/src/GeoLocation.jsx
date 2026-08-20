@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation} from "react-i18next"
 import { transform } from 'ol/proj'
 import { Alert, Button, Checkbox, Group, Switch } from '@mantine/core'
-import { AttributeTable } from '@scalargis/ui'
+import { AttributeTable, IconAlertTriangle, IconInfoCircle, IconSearch } from '@scalargis/ui'
 
 const StatusMessage = ({ color, icon, text }) => (
   <Alert color={color} py="xs">
     <Group justify="center" gap="xs" wrap="nowrap">
-      <i className={icon} />
+      {React.isValidElement(icon) ? icon : <i className={icon} />}
       <span>{text}</span>
     </Group>
   </Alert>
@@ -127,7 +127,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
   if (geolocation && geolocation.error) return (
     <StatusMessage
       color="warning"
-      icon="pi pi-exclamation-triangle"
+      icon={<IconAlertTriangle />}
       text={getErrorMessage(geolocation.error, component_cfg?.messages)}
     />
   )
@@ -136,7 +136,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
     <div>
       <StatusMessage
         color="informative"
-        icon="pi pi-info-circle"
+        icon={<IconInfoCircle />}
         text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : t("myLocationSelectOption","Selecione a opção 'Ver Posição' para ativar a visualização da sua posição.")}
       />
 
@@ -164,7 +164,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
           <div className="col text-right">
             <Button
               size="xs"
-              leftSection={<i className="pi pi-search" aria-hidden="true" />}
+              leftSection={<IconSearch />}
               onClick={e => { zoomGeoLocation(geolocation); }}
               disabled={!geoLocationActive}
             >

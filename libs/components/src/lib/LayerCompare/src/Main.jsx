@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, IconPause, IconAngleDown, IconAngleUp } from '@scalargis/ui';
 import { getRenderPixel } from 'ol/render';
 
 import { i18n as i18nUtils, MainMenuButton } from '../../components';
@@ -22,7 +22,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={className}
-      icon="pi pi-pause"
+      icon={<IconPause />}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )
@@ -343,7 +343,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
                 type="button"
                 radius="xl"
                 color="warning"
-                rightSection={<i className="pi pi-angle-down" aria-hidden="true" />}
+                rightSection={<IconAngleDown />}
                 title="Abrir"
                 aria-expanded={opened}
                 onClick={e => open()}>
@@ -358,7 +358,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
                 type="button"
                 fullWidth
                 color="warning"
-                rightSection={<i className="pi pi-angle-up" aria-hidden="true" />}
+                rightSection={<IconAngleUp />}
                 title="Fechar"
                 aria-expanded={opened}
                 onClick={e => close()}>

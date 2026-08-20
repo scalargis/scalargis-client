@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation} from "react-i18next";
 import { Checkbox } from '@mantine/core';
+import { IconBullseye, IconInfoCircle, IconGlobe } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import ZoomToExtent from 'ol/control/ZoomToExtent';
 import DragBox from 'ol/interaction/DragBox';
@@ -180,7 +181,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
       return (!!coordinates_control && !!coordinates_control.show_button) ?
         <MapToolButton key={type}
           title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
-          icon="pi pi-bullseye"
+          icon={<IconBullseye />}
           active={exclusive_mapcontrol === 'Coordinates'}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}
         /> : null;
@@ -188,7 +189,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
       return (!!feature_info_control && !!feature_info_control.show_button) ?
         <MapToolButton key={type}
           title={feature_info_control.title || t("identifyElements", "Identificar elementos")}
-          icon="pi pi-info-circle"
+          icon={<IconInfoCircle />}
           active={exclusive_mapcontrol === 'FeatureInfo'}
           onClick={e => { e.currentTarget.blur(); toggleFeatureInfoControl() }}
         /> : null;
@@ -199,7 +200,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
           onMouseLeave={e => { setGeoLocationSettings(false); }}>
           <MapToolButton
             title={geo_location_control.title || t("myLocation", "A minha localização")}
-            icon="pi pi-globe"
+            icon={<IconGlobe />}
             active={geoLocationActive}
             onClick={e => { e.currentTarget.blur(); toggleGeoLocationControl() }}
           />

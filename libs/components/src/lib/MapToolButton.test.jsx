@@ -56,7 +56,7 @@ import MapToolButton from './MapToolButton';
 
 describe('MapToolButton — chrome mode (defaults, no new props)', () => {
   it('applies the map-chrome class, filled variant, xl radius and the size CSS var', () => {
-    render(<MapToolButton icon="pi pi-image" title="Mapas de base" onClick={() => {}} />);
+    render(<MapToolButton icon="stub-icon" title="Mapas de base" onClick={() => {}} />);
     const button = screen.getByRole('button', { name: 'Mapas de base' });
 
     expect(button.className).toContain('map-tool-btn');
@@ -85,18 +85,22 @@ describe('MapToolButton — chrome mode (defaults, no new props)', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the icon <i> by default and a custom child when given one', () => {
-    const { container, rerender } = render(<MapToolButton icon="pi pi-search" title="Zoom" onClick={() => {}} />);
-    expect(container.querySelector('i.pi.pi-search')).not.toBeNull();
+  it('renders a className-string icon as an <i>, a rendered icon element as-is, and a custom child when given one', () => {
+    const { container, rerender } = render(<MapToolButton icon="stub-icon" title="Zoom" onClick={() => {}} />);
+    expect(container.querySelector('i.stub-icon')).not.toBeNull();
 
-    rerender(<MapToolButton icon="pi pi-search" title="Zoom" onClick={() => {}}><span>Custom</span></MapToolButton>);
+    // The @scalargis/ui recipe icons are passed as rendered elements, not class strings.
+    rerender(<MapToolButton icon={<span data-testid="icon-node" />} title="Zoom" onClick={() => {}} />);
+    expect(screen.getByTestId('icon-node')).toBeTruthy();
+
+    rerender(<MapToolButton icon="stub-icon" title="Zoom" onClick={() => {}}><span>Custom</span></MapToolButton>);
     expect(screen.getByText('Custom')).toBeTruthy();
   });
 });
 
 describe('MapToolButton — plain mode (size/variant/color/radius opted in)', () => {
   it('drops the map-chrome class and the size CSS var once any of the four is passed', () => {
-    render(<MapToolButton icon="pi pi-trash" title="Apagar" size="md" variant="default" onClick={() => {}} />);
+    render(<MapToolButton icon="stub-icon" title="Apagar" size="md" variant="default" onClick={() => {}} />);
     const button = screen.getByRole('button', { name: 'Apagar' });
 
     expect(button.className).not.toContain('map-tool-btn');
@@ -109,7 +113,7 @@ describe('MapToolButton — plain mode (size/variant/color/radius opted in)', ()
   it('forwards size/variant/color/radius straight to the ActionIcon', () => {
     render(
       <MapToolButton
-        icon="pi pi-trash"
+        icon="stub-icon"
         title="Eliminar"
         size="md"
         variant="filled"
@@ -127,7 +131,7 @@ describe('MapToolButton — plain mode (size/variant/color/radius opted in)', ()
 
   it('still wires title/aria-label/aria-pressed in plain mode', () => {
     render(
-      <MapToolButton icon="pi pi-circle" title="Ferramenta" size="md" variant="default" active onClick={() => {}} />
+      <MapToolButton icon="stub-icon" title="Ferramenta" size="md" variant="default" active onClick={() => {}} />
     );
     const button = screen.getByRole('button', { name: 'Ferramenta' });
     expect(button.getAttribute('aria-pressed')).toBe('true');
@@ -140,8 +144,8 @@ describe('MapToolButton.Group', () => {
   it('wraps its children in an ActionIcon.Group', () => {
     render(
       <MapToolButton.Group>
-        <MapToolButton icon="pi pi-angle-left" title="Anterior" size="lg" variant="filled" onClick={() => {}} />
-        <MapToolButton icon="pi pi-angle-right" title="Seguinte" size="lg" variant="filled" onClick={() => {}} />
+        <MapToolButton icon="stub-icon" title="Anterior" size="lg" variant="filled" onClick={() => {}} />
+        <MapToolButton icon="stub-icon" title="Seguinte" size="lg" variant="filled" onClick={() => {}} />
       </MapToolButton.Group>
     );
 

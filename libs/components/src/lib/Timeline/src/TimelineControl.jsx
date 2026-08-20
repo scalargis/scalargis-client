@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 
 import { Alert, Group, Select, Slider } from '@mantine/core';
+import { IconInfoCircle, IconAngleDoubleLeft, IconAngleLeft, IconPause, IconPlay, IconAngleRight, IconAngleDoubleRight } from '@scalargis/ui';
 
 import { Legend, MapToolButton } from '../../components';
 
@@ -431,7 +432,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
       <div style={{width: "100%"}}>
         <Alert color="informative" py="xs" className="mt-2" style={{width: "100%" }}>
           <Group justify="center" gap="xs" wrap="nowrap">
-            <i className="pi pi-info-circle" />
+            <IconInfoCircle />
             <span>{`O tema "${theme?.title}" não está visível`}</span>
           </Group>
         </Alert>
@@ -468,13 +469,13 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
         <MapToolButton.Group>
           <MapToolButton
             variant="filled" size="lg"
-            icon="pi pi-angle-double-left"
+            icon={<IconAngleDoubleLeft />}
             title="Primeira data"
             onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}
           />
           <MapToolButton
             variant="filled" size="lg"
-            icon="pi pi-angle-left"
+            icon={<IconAngleLeft />}
             title="Data anterior"
             onClick={(e) => {
               if (currentPos) setCurrentPos(currentPos - 1);
@@ -484,20 +485,20 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
           { intervalId ?
             <MapToolButton
               variant="filled" size="lg"
-              icon="pi pi-pause"
+              icon={<IconPause />}
               title="Pausar"
               onClick={(e) => { stopIntervalHandler(); }}
             /> :
             <MapToolButton
               variant="filled" size="lg"
-              icon="pi pi-play"
+              icon={<IconPlay />}
               title="Reproduzir"
               onClick={(e) => { startIntervalHandler(); }} disabled={!hasTimeData}
             />
           }
           <MapToolButton
             variant="filled" size="lg"
-            icon="pi pi-angle-right"
+            icon={<IconAngleRight />}
             title="Data seguinte"
             onClick={(e) => {
               if (timeData?.length) {
@@ -512,7 +513,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
           />
           <MapToolButton
             variant="filled" size="lg"
-            icon="pi pi-angle-double-right"
+            icon={<IconAngleDoubleRight />}
             title="Última data"
             onClick={(e) => { if (timeData?.length) setCurrentPos(timeData.length - 1); }} disabled={!hasTimeData}
           />

@@ -45,7 +45,9 @@ export default function MainMenuButton({
       aria-pressed={isActive}
       onClick={onClick}
     >
-      {children ?? <i className={icon} aria-hidden="true" />}
+      {/* `icon` takes either a rendered icon element (the @scalargis/ui recipe
+          icons) or a className string (config-driven `btn_icon`). */}
+      {children ?? (React.isValidElement(icon) ? icon : <i className={icon} aria-hidden="true" />)}
     </ActionIcon>
   );
 }

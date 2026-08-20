@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useTranslation} from "react-i18next"
-import { CollapsiblePanel } from '@scalargis/ui'
+import { CollapsiblePanel, IconPalette } from '@scalargis/ui'
 import { MainMenuButton, MapToolButton } from '../../components'
 import DrawTools from './DrawTools'
 
@@ -23,7 +23,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
-      icon="pi pi-palette"
+      icon={<IconPalette />}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />
   )
@@ -71,7 +71,7 @@ export default function Main({ type, region, as, config, actions, record, utils 
   if (type === 'link' && region === record.links) {
     return <MapToolButton
       title={title}
-      icon="pi pi-palette"
+      icon={<IconPalette />}
       onClick={e => {
         dispatch(actions.viewer_set_selectedmenu(record.id));
         dispatch(actions.layout_show_menu(!isMobile));

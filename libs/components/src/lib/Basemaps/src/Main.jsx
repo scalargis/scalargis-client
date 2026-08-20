@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation} from "react-i18next";
-import { CollapsiblePanel } from '@scalargis/ui';
+import { CollapsiblePanel, IconImage } from '@scalargis/ui';
 import { MainMenuButton } from '../../components';
 import Basemaps from './Basemaps'
 
@@ -19,7 +19,7 @@ export function MainMenu({ className, config, actions, record }) {
           <MainMenuButton
             title={title}
             className={className}
-            icon="pi pi-image"
+            icon={<IconImage />}
             onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
           />
       )

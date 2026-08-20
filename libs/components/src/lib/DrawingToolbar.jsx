@@ -1,17 +1,18 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
 import { Group } from '@mantine/core';
+import { IconCircleFill, IconMinus, IconCopy, IconPencil, IconTrash, IconSearchPlus } from '@scalargis/ui';
 
 import MapToolButton from './MapToolButton';
 import './drawing-toolbar.css';
 
 const DRAW_TOOLS = [
-  { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: "pi pi-circle-fill" },
-  { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: "pi pi-minus" },
+  { value: "Point", title: "addPoint", "defaultTitle": "Adicionar ponto", icon: <IconCircleFill /> },
+  { value: "LineString", title: "addLine", "defaultTitle": "Adicionar linha", icon: <IconMinus /> },
   { value: "Polygon", title: "addPolygon", "defaultTitle": "Adicionar polígono", icon: "fas fa-draw-polygon" },
-  { value: "Copy", title: "copyFeature", "defaultTitle": "Copiar geometria", icon: "pi pi-copy" },
+  { value: "Copy", title: "copyFeature", "defaultTitle": "Copiar geometria", icon: <IconCopy /> },
   { value: "Select", title: "selectElement", "defaultTitle": "Selecionar elemento", icon: "fas fa-mouse-pointer" },
-  { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: "pi pi-pencil" }
+  { value: "Modify", title: "editElement", "defaultTitle": "Editar elemento", icon: <IconPencil /> }
 ];
 
 /**
@@ -45,14 +46,14 @@ export default function DrawingToolbar({ availableTools, activeTool, onSelectToo
           size="md"
           variant="filled"
           color="danger"
-          icon="pi pi-trash"
+          icon={<IconTrash />}
           title={deleteTitle}
           onClick={() => onDeleteSelected()}
         />
         <MapToolButton
           size="md"
           variant="default"
-          icon="pi pi-search-plus"
+          icon={<IconSearchPlus />}
           title={t("viewAllElements", "Ver todos os elementos")}
           onClick={() => onZoomAll()}
         />

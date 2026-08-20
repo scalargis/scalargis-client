@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import { Paper, TextInput, UnstyledButton } from '@mantine/core';
+import { IconX, IconSearch, IconSpinner } from '@scalargis/ui';
 import 'ol/ol.css';
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
@@ -320,12 +321,12 @@ export default function Main({ core, config, actions, utils, record }) {
             onFocus={(e) => setShowPlaces(true)}
             onChange={(e) => changeFilterFunc(e)} />
           { isLoading ?
-            <span className='layout-topbar-search-icon pi pi-spin pi-spinner' aria-hidden="true" />
-            : filter ? <UnstyledButton type="button" className='layout-topbar-search-icon pi pi-times'
+            <IconSpinner className='layout-topbar-search-icon' spin aria-hidden="true" />
+            : filter ? <UnstyledButton type="button" className='layout-topbar-search-icon'
               aria-label={t('clear', 'Limpar')}
               title={t('clear', 'Limpar')}
-              onClick={e=>clearFilter()} />
-            : <span className='layout-topbar-search-icon pi pi-search' aria-hidden="true" />
+              onClick={e=>clearFilter()}><IconX /></UnstyledButton>
+            : <IconSearch className='layout-topbar-search-icon' />
           }
       </span>
       {(showPlaces && places && places.length > 0 ?

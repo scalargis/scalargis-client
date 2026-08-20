@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { IconImage } from '@scalargis/ui'
 import { MapToolButton } from '../../components'
 import BasemapItem from './BasemapItem'
 import './style.css'
@@ -31,7 +32,7 @@ export default function Basemaps({ core, viewer, mainMap, config, actions, recor
     </div> :
     <div className="basemaps map-controls">
       <MapToolButton
-        icon="pi pi-image"
+        icon={<IconImage />}
         title={record.title || 'Mapas de Base'}
         active={opened}
         aria-expanded={opened}

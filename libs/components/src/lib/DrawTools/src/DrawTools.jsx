@@ -1,7 +1,7 @@
 import React from 'react';
 import i18next from "i18next";
 import { ActionIcon, Button, Group, Paper, Popover, Select, Stack, TextInput } from '@mantine/core';
-import { DataGrid, notify } from '@scalargis/ui';
+import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconPalette, IconFile, IconSave, IconSearch } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import { getAppRootPath } from '../../utils/common';
 import OlFormatWKT from "ol/format/WKT";
@@ -37,21 +37,21 @@ const selectTools = [
 ]
 
 const historyTools = [
-  { value: "undo", title: "undo", defaultTitle: "Desfazer", icon: "pi pi-replay" },
-  { value: "redo", title: "redo", defaultTitle: "Refazer", icon: "pi pi-refresh" },
-  { value: "clear", title: "clearAll", defaultTitle: "Limpar tudo", icon: "pi pi-trash" }
+  { value: "undo", title: "undo", defaultTitle: "Desfazer", icon: <IconReplay /> },
+  { value: "redo", title: "redo", defaultTitle: "Refazer", icon: <IconRefresh /> },
+  { value: "clear", title: "clearAll", defaultTitle: "Limpar tudo", icon: <IconTrash /> }
 ];
 
 const colorTools = [
-  { value: "fill", title: "fillColor", defaultTitle: "Côr de preenchimento", icon: "pi pi-palette" },
-  { value: "stroke", title: "outlineColor", defaultTitle: "Côr de rebordo", icon: "pi pi-palette" }
+  { value: "fill", title: "fillColor", defaultTitle: "Côr de preenchimento", icon: <IconPalette /> },
+  { value: "stroke", title: "outlineColor", defaultTitle: "Côr de rebordo", icon: <IconPalette /> }
 ];
 
 const defaultExportFormats = [
-  { value: "geojson", title: "GeoJSON", icon: "pi pi-file", tooltip: "Exportar para ficheiro GeoJSON" },
-  { value: "gml", title: "GML", icon: "pi pi-file", tooltip: "Exportar para ficheiro GML" },
-  { value: "shape", title: "ShapeFile", icon: "pi pi-file", tooltip: "Exportar para ficheiro ShapeFile" },
-  { value: "kml", title: "KML", icon: "pi pi-file", tooltip: "Exportar para ficheiro KML" }
+  { value: "geojson", title: "GeoJSON", icon: <IconFile />, tooltip: "Exportar para ficheiro GeoJSON" },
+  { value: "gml", title: "GML", icon: <IconFile />, tooltip: "Exportar para ficheiro GML" },
+  { value: "shape", title: "ShapeFile", icon: <IconFile />, tooltip: "Exportar para ficheiro ShapeFile" },
+  { value: "kml", title: "KML", icon: <IconFile />, tooltip: "Exportar para ficheiro KML" }
 ];
 
 const typeLabels = {
@@ -963,7 +963,7 @@ class DrawTools extends React.Component {
                         style={this.getButtonStyle(opt)}
                         onClick={() => onToggle()}
                       >
-                        <i className={opt.icon} aria-hidden="true" />
+                        {opt.icon}
                       </ActionIcon>
                     </Popover.Target>
                     <Popover.Dropdown p={0}>
@@ -1016,7 +1016,7 @@ class DrawTools extends React.Component {
               <Button
                 type="button"
                 size="sm"
-                leftSection={<i className="pi pi-save" aria-hidden="true" />}
+                leftSection={<IconSave />}
                 title="Aplicar alterações"
                 onClick={e => this.finishEditing()}
               >
@@ -1026,7 +1026,7 @@ class DrawTools extends React.Component {
                 size="input-sm"
                 variant="filled"
                 color="danger"
-                icon="pi pi-trash"
+                icon={<IconTrash />}
                 title="Apagar desenho"
                 onClick={e => this.removeFeature()}
               />
@@ -1110,7 +1110,7 @@ class DrawTools extends React.Component {
                 size="xs"
                 variant="outline"
                 className="mr-2 mb-2"
-                leftSection={<i className={opt.icon} aria-hidden="true" />}
+                leftSection={opt.icon}
                 title={opt.tooltip}
                 onClick={(e) => this.download(opt.value)}
               >
@@ -1150,7 +1150,7 @@ class DrawTools extends React.Component {
                       variant="subtle"
                       radius="xl"
                       size="md"
-                      icon="pi pi-search"
+                      icon={<IconSearch />}
                       title={i18next.t("locate", "Localizar")}
                       onClick={() => this.zoom(row)}
                     />
@@ -1159,7 +1159,7 @@ class DrawTools extends React.Component {
                       color="danger"
                       radius="xl"
                       size="md"
-                      icon="pi pi-trash"
+                      icon={<IconTrash />}
                       title={i18next.t("delete", "Eliminar")}
                       onClick={() => this.deleteItem(row)}
                     />

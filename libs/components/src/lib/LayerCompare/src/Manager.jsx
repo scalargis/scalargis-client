@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Tabs } from '@mantine/core';
+import { IconCog } from '@scalargis/ui';
 
 /* Define manager components in ManagerComponents folder and import here */
 
@@ -17,7 +18,7 @@ export default function Manager({ className, config, actions, record }) {
     <React.Fragment>
       <Tabs value={activeTab} onChange={setActiveTab}>
         <Tabs.List>
-          <Tabs.Tab value="settings" leftSection={<i className="pi pi-fw pi-cog" aria-hidden="true" />}>
+          <Tabs.Tab value="settings" leftSection={<IconCog fixedWidth />}>
             Configurações
           </Tabs.Tab>
         </Tabs.List>

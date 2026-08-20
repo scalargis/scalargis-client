@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useTranslation} from "react-i18next"
-import { CollapsiblePanel, useIsMobile } from '@scalargis/ui'
+import { CollapsiblePanel, useIsMobile, IconBullseye } from '@scalargis/ui'
 
 import { MainMenuButton } from '../../components'
 import { MAPCONTROL_NAME } from './utils'
@@ -28,7 +28,7 @@ export function MainMenu({ className, config, actions, record }) {
     <MainMenuButton
       title={title}
       className={`${className}${isInactive ? " menu-inactive" : ""}`}
-      icon="pi pi-bullseye"
+      icon={<IconBullseye />}
       onClick={e => {
         if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));
         if (exclusive_mapcontrol !== MAPCONTROL_NAME) {
