@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { TourProvider, useTour } from '@scalargis/ui'
+import { TourProvider } from '@scalargis/ui'
 import { useOnboardingSteps } from '../../onboarding'
 import Layout from './Layout'
 import { useLocation, useNavigate, useParams } from 'react-router'
@@ -25,39 +25,9 @@ import DialogWindows from './DialogWindows'
 import { mapStateToProps } from '../utils'
 import {PageView, initGA} from '../components/Tracking'
 
-/** Temp trigger: a visible button in the bottom-right corner. It starts the
- *  tour built from the base catalog (Phase 2). Replaced by the HelpButton Menu
- *  launcher in Phase 4. */
-function SmokeButton() {
-  const { start, active } = useTour();
-  if (active) return null; // hide while the tour runs
-  return (
-    <button
-      type="button"
-      onClick={() => start()}
-      style={{
-        position: 'fixed',
-        bottom: 20,
-        right: 20,
-        zIndex: 9999,
-        padding: '6px 16px',
-        background: 'var(--mantine-primary-color-filled)',
-        color: 'var(--mantine-color-white)',
-        border: 'none',
-        borderRadius: 'var(--mantine-radius-sm)',
-        cursor: 'pointer',
-        fontWeight: 600,
-        fontSize: '14px',
-      }}
-    >
-      Start Tour (smoke)
-    </button>
-  );
-}
-
 /**
  * Viewer layout container
- * @param {Object} props 
+ * @param {Object} props
  */
 function Viewer(props) {
 
@@ -158,12 +128,12 @@ function Viewer(props) {
   }
 
   const rootLayers = layers.filter(c => rlayers.includes(c.id)).reverse();
-  return (
-    <TourProvider viewerId={viewer.id || 'smoke-viewer'} steps={onboardingSteps}>
-      <SmokeButton />
-      {/* Phase 3 wraps each mounted component in <TourTarget> at the Core.jsx
-          render sites. Until then the steps show with a centered popover and
-          no spotlight (the T7 safety net). */}
+
+  // The tour targets bind at the Core.jsx render sites (Phase 3). The launcher
+  // is the HelpButton Menu (Phase 4). The provider only mounts for a real
+  // viewer id, so the localStorage key (sg:ob:viewer:<id>) always matches a
+  // real viewer.
+  const content = (
       <Layout
         history={history}
         core={core}
@@ -226,8 +196,15 @@ function Viewer(props) {
       <DialogWindows core={core} dialogWindows={viewer?.dialogWindows} />
 
     </Layout>
-    </TourProvider>
   );
+
+  return viewer?.id != null && viewer.id !== ''
+    ? (
+      <TourProvider viewerId={String(viewer.id)} steps={onboardingSteps}>
+        {content}
+      </TourProvider>
+    )
+    : content;
 }
 
 export default connect(state => {

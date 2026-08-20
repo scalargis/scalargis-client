@@ -72,6 +72,10 @@
       "title": "Base maps",
       "content": "Change the map background. Choose between street map, satellite or orthophotos."
     },
+    "launcher": {
+      "manual": "Full manual",
+      "tour": "Guided tour"
+    },
     "mapControls": {
       "title": "Navigation",
       "content": "Zoom the map in and out. Use the full extent button to return to the complete view."

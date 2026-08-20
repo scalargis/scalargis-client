@@ -1,0 +1,15 @@
+{
+  "_description": "Topbar icon that opens a maximizable Dialog. Fetches a localized HTML file and shows it inline. Custom close label.",
+  "id": "help_popup",
+  "type": "HelpButton",
+  "title": "Ajuda",
+  "target": "topbar_right",
+  "as": "popup",
+  "config_json": {
+    "header": { "default": "Manual do visualizador", "en": "Viewer manual" },
+    "closeLabel": { "default": "Fechar", "en": "Close" },
+    "url": "/static/viewer/{language}/help.html",
+    "default_url": "/static/viewer/pt/help.html"
+  },
+  "children": []
+}

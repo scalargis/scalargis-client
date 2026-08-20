@@ -15,7 +15,7 @@
 
 import type { OnboardingStep } from './types';
 import {
-  getLastStep,
+  isCompleted,
   markCompleted,
   resetState,
   setLastStep,
@@ -84,11 +84,6 @@ export function createController(
     for (const fn of listeners) fn(ctrl);
   }
 
-  function resolveStartIndex(): number {
-    if (options?.reset) return 0;
-    return validateLastStep(viewerId, steps.length);
-  }
-
   function persistCurrentStep(): void {
     if (currentIndex >= 0) setLastStep(viewerId, currentIndex);
   }
@@ -124,7 +119,14 @@ export function createController(
     async start() {
       if (steps.length === 0) return;
 
-      const startIdx = resolveStartIndex();
+      // P1 (Phase 4): a finished tour restarts from the top. start() must
+      // not reopen on the last step. resetState clears the completed flag and
+      // the saved lastStep so this run tracks and completes cleanly. A
+      // partly-done tour (not completed) still resumes from its last step.
+      const restart = !!options?.reset || isCompleted(viewerId);
+      if (restart) resetState(viewerId);
+      const startIdx = restart ? 0 : validateLastStep(viewerId, steps.length);
+
       const step = steps[startIdx];
       if (step) await doBefore(step);
 

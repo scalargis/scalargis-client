@@ -1,0 +1,13 @@
+{
+  "_description": "Topbar icon that opens a localized help page in a new tab. {language} fills from the locale; default_url covers a missing locale.",
+  "id": "help",
+  "type": "HelpButton",
+  "title": { "default": "Ajuda", "en": "Help", "fr": "Aide" },
+  "target": "topbar_right",
+  "as": "external",
+  "config_json": {
+    "url": "https://www.example.pt/manual/{language}/index.html",
+    "default_url": "https://www.example.pt/manual/pt/index.html"
+  },
+  "children": []
+}

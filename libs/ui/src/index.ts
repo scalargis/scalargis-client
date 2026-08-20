@@ -85,6 +85,7 @@ export {
   TourProvider,
   TourTarget,
   useTour,
+  useOptionalTour,
   OVERLAY_Z,
   POPOVER_Z,
   createController,

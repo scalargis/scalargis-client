@@ -1,0 +1,14 @@
+{
+  "_description": "Inline panel content. as:panel renders the help HTML inside a CollapsiblePanel, with no launching button. Pair it with a mainmenu button that opens this menu.",
+  "id": "help_panel",
+  "type": "HelpButton",
+  "title": "Ajuda",
+  "target": "mainmenu",
+  "as": "panel",
+  "config_json": {
+    "header": "Ajuda",
+    "url": "/static/viewer/{language}/help.html",
+    "default_url": "/static/viewer/pt/help.html"
+  },
+  "children": []
+}

@@ -75,6 +75,10 @@
     "mapControls": {
       "title": "Navegação",
       "content": "Aproxime e afaste o mapa. Use o botão de extensão total para voltar à vista completa."
+    },
+    "launcher": {
+      "manual": "Manual completo",
+      "tour": "Visita guiada"
     }
   }
 }

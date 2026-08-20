@@ -1,0 +1,13 @@
+{
+  "_description": "Sidebar button (main menu) that opens a Dialog on click.",
+  "id": "help_menu_popup",
+  "type": "HelpButton",
+  "title": "Ajuda",
+  "target": "mainmenu",
+  "as": "popup",
+  "config_json": {
+    "header": "Ajuda",
+    "url": "/static/viewer/pt/help.html"
+  },
+  "children": []
+}

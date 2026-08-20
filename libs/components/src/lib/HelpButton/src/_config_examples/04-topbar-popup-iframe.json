@@ -1,0 +1,14 @@
+{
+  "_description": "Topbar icon that opens a Dialog embedding the help page in an iframe, instead of inlining fetched HTML.",
+  "id": "help_iframe",
+  "type": "HelpButton",
+  "title": "Ajuda",
+  "target": "topbar_right",
+  "as": "popup",
+  "config_json": {
+    "header": "Ajuda (iframe)",
+    "url": "/static/viewer/pt/help.html",
+    "iframe": true
+  },
+  "children": []
+}

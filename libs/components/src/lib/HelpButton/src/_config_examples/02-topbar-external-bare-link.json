@@ -1,0 +1,13 @@
+{
+  "_description": "Topbar external link rendered as a bare link (no text label), via elementType.",
+  "id": "help_link",
+  "type": "HelpButton",
+  "title": "Ajuda",
+  "target": "topbar_right",
+  "as": "external",
+  "config_json": {
+    "elementType": "link",
+    "url": "https://www.example.pt/manual/pt/index.html"
+  },
+  "children": []
+}

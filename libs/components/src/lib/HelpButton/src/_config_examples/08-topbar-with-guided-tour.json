@@ -1,0 +1,17 @@
+{
+  "_description": "Full launcher setup. The topbar HelpButton record, plus _viewer_config_json showing where the tour flag sits. With onboarding.enabled true, the icon opens a Menu with the manual and the guided tour. Put the record in components[]; put the onboarding + help_url keys at the viewer config_json root (not inside the record).",
+  "id": "help",
+  "type": "HelpButton",
+  "title": "Ajuda",
+  "target": "topbar_right",
+  "as": "popup",
+  "config_json": {
+    "header": "Ajuda",
+    "url": "/static/viewer/pt/help.html"
+  },
+  "children": [],
+  "_viewer_config_json": {
+    "onboarding": { "enabled": true },
+    "help_url": "/static/viewer/pt/help.html"
+  }
+}

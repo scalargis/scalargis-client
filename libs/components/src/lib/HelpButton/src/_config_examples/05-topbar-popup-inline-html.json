@@ -1,0 +1,16 @@
+{
+  "_description": "Topbar icon that opens a Dialog with inline HTML. No url, so the html field is shown. i18n object gives per-locale copy.",
+  "id": "help_inline",
+  "type": "HelpButton",
+  "title": "Ajuda",
+  "target": "topbar_right",
+  "as": "popup",
+  "config_json": {
+    "header": "Ajuda",
+    "html": {
+      "default": "<h1>Ajuda</h1><p>Use as ferramentas da barra superior para explorar o mapa.</p>",
+      "en": "<h1>Help</h1><p>Use the topbar tools to explore the map.</p>"
+    }
+  },
+  "children": []
+}
