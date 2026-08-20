@@ -285,9 +285,11 @@ export function Dialog({
             <Modal.CloseButton aria-label={uiText('dialog.close', 'Close')} />
           </Group>
         </Modal.Header>
-        {/* minHeight 0 lets the body actually shrink and scroll in a flex
-            column; without it long content stretches the dialog offscreen. */}
-        <Modal.Body style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+        {/* minHeight 0 lets the body shrink and scroll in a flex column.
+            paddingTop restores room for an autofocused top field's focus ring:
+            Mantine zeroes the body's top padding when it has a sibling (always,
+            the Header), so the ring would clip against this overflow:auto edge. */}
+        <Modal.Body style={{ flex: 1, minHeight: 0, overflow: 'auto', paddingTop: '0.5rem' }}>
           {children}
         </Modal.Body>
         {footer && <Box className="ads-dialog__footer">{footer}</Box>}
