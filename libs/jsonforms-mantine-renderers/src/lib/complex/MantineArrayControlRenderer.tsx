@@ -18,6 +18,7 @@ import {
   withTranslateProps,
 } from '@jsonforms/react';
 import { ActionIcon, Alert, Button, Group, Stack, Table, Text } from '@mantine/core';
+import { IconTrash, IconPlus } from '@scalargis/ui';
 
 import {
   arrayTexts,
@@ -146,7 +147,7 @@ export const MantineArrayControlRenderer = (props: ArrayLayoutProps) => {
                         aria-label={`${texts.remove} ${index + 1}`}
                         onClick={() => remove(index)}
                       >
-                        <i className="pi pi-trash" aria-hidden="true" />
+                        <IconTrash />
                       </ActionIcon>
                     </Table.Td>
                   </Table.Tr>
@@ -163,7 +164,7 @@ export const MantineArrayControlRenderer = (props: ArrayLayoutProps) => {
           size="xs"
           variant="light"
           disabled={!enabled}
-          leftSection={<i className="pi pi-plus" aria-hidden="true" />}
+          leftSection={<IconPlus />}
           onClick={add}
         >
           {texts.add}

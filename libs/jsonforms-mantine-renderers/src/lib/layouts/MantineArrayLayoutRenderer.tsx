@@ -18,6 +18,7 @@ import {
   withTranslateProps,
 } from '@jsonforms/react';
 import { Accordion, ActionIcon, Alert, Button, Group, Stack, Text } from '@mantine/core';
+import { IconTrash, IconPlus } from '@scalargis/ui';
 
 import {
   arrayTexts,
@@ -132,7 +133,7 @@ export const MantineArrayLayoutRenderer = (props: ArrayLayoutProps) => {
                     aria-label={`${texts.remove} ${index + 1}`}
                     onClick={() => remove(index)}
                   >
-                    <i className="pi pi-trash" aria-hidden="true" />
+                    <IconTrash />
                   </ActionIcon>
                 </Group>
                 <Accordion.Panel>
@@ -157,7 +158,7 @@ export const MantineArrayLayoutRenderer = (props: ArrayLayoutProps) => {
           size="xs"
           variant="light"
           disabled={!enabled}
-          leftSection={<i className="pi pi-plus" aria-hidden="true" />}
+          leftSection={<IconPlus />}
           onClick={() => {
             add();
             // The item just appended is the one the user wants to fill in.

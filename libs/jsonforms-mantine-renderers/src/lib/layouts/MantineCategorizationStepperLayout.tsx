@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import merge from 'lodash/merge';
 import { Button, Group, Stepper } from '@mantine/core';
+import { IconAlertTriangle } from '@scalargis/ui';
 import {
   and,
   categorizationHasCategory,
@@ -178,7 +179,7 @@ export const MantineCategorizationStepperLayoutRenderer = (
           // Invalid steps keep the number/check off and go danger-coloured,
           // in every state — including the ones already walked past, which
           // is where Mantine would otherwise paint a completed tick.
-          const invalidIcon = <i className="pi pi-exclamation-triangle" aria-hidden="true" />;
+          const invalidIcon = <IconAlertTriangle />;
           return (
             <Stepper.Step
               key={idx}
