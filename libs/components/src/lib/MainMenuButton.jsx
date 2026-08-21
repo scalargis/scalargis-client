@@ -17,15 +17,18 @@ import { ActionIcon } from '@mantine/core';
  * every other class (menu-inactive, main-menu-btn-image, custom hooks)
  * passes through for the layout sass.
  */
-export default function MainMenuButton({
-  className = '',
-  title,
-  icon,
-  style,
-  active,
-  onClick,
-  children,
-}) {
+const MainMenuButton = React.forwardRef(function MainMenuButton(
+  {
+    className = '',
+    title,
+    icon,
+    style,
+    active,
+    onClick,
+    children,
+  },
+  ref,
+) {
   const isActive = active ?? !String(className).includes('p-button-outlined');
   const passthrough = String(className)
     .split(/\s+/)
@@ -34,6 +37,7 @@ export default function MainMenuButton({
 
   return (
     <ActionIcon
+      ref={ref}
       type="button"
       variant={isActive ? 'filled' : 'outline'}
       size={38}
@@ -50,4 +54,6 @@ export default function MainMenuButton({
       {children ?? (React.isValidElement(icon) ? icon : <i className={icon} aria-hidden="true" />)}
     </ActionIcon>
   );
-}
+});
+
+export default MainMenuButton;
