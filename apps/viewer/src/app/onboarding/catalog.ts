@@ -32,6 +32,13 @@ export interface OnboardingCatalogEntry {
   components: string[];
   /** Default viewer-config target slot. Phase 3 wraps the mount in this slot. */
   target: string;
+  /**
+   * For a mainmenu step, whether it spotlights the round button or the revealed
+   * panel content (improvement 01). A "button" step keeps the target clickable
+   * and advances on the real click; a "panel" step gets the reveal before/after
+   * hooks. Absent for non-mainmenu slots.
+   */
+  kind?: 'button' | 'panel';
   /** Sort order within the flow. */
   order: number;
   /** Flow membership. The viewer uses one flow: "viewer". */
@@ -69,11 +76,18 @@ export function primaryComponentOf(
 /** Map one catalog row to a runtime OnboardingStep (D3). */
 export function catalogToStep(entry: OnboardingCatalogEntry): OnboardingStep {
   const key = entry.i18n;
-  return {
+  const step: OnboardingStep = {
     id: entry.id,
     order: entry.order,
     flow: entry.flow,
     title: () => tr(`${key}.title`),
     content: () => tr(`${key}.content`),
   };
+  // A mainmenu button step stays clickable and advances on the real click, so
+  // clicking the tool opens its panel and moves the tour to the panel step
+  // (improvement 01, engine capability 07). The panel step advances on Next.
+  if (entry.kind === 'button') {
+    step.advanceOnTargetClick = true;
+  }
+  return step;
 }

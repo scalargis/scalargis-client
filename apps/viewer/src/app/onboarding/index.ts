@@ -24,7 +24,6 @@ export { registerOnboardingTranslations } from './i18n';
 export { useOnboardingSteps } from './useOnboardingSteps';
 
 export {
-  PANEL_STEPS,
   panelRevealByStepId,
   mainmenuButtonStep,
   mainmenuPanelStep,

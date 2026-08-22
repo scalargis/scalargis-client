@@ -2,35 +2,67 @@
   "onboarding": {
     "toc": {
       "title": "Themes",
-      "content": "Manage the map themes here. Turn each theme on or off, change the order, and adjust the transparency."
+      "content": "See the map themes here. Open it to manage the list."
+    },
+    "tocPanel": {
+      "title": "Manage themes",
+      "content": "Turn each theme on or off, change the order, and adjust the transparency."
     },
     "themesAdd": {
-      "title": "Add Themes",
+      "title": "Add themes",
+      "content": "Bring new themes into the map."
+    },
+    "themesAddPanel": {
+      "title": "Load a theme",
       "content": "Load themes from WMS, WMTS or WFS services, or from files on your computer."
     },
     "measure": {
       "title": "Measure",
-      "content": "Measure distances and areas on the map. Mark points and see the result in real time."
+      "content": "Measure distances and areas on the map."
+    },
+    "measurePanel": {
+      "title": "Measure on the map",
+      "content": "Mark points on the map and read the distance or area in real time."
     },
     "draw": {
       "title": "Draw",
-      "content": "Draw points, lines, polygons and text on the map. Export the drawing as GeoJSON."
+      "content": "Draw and annotate on the map."
+    },
+    "drawPanel": {
+      "title": "Draw on the map",
+      "content": "Draw points, lines, polygons and text. Export the drawing as GeoJSON."
     },
     "identify": {
       "title": "Identify",
-      "content": "Click a point on the map to see the information of the features visible at that spot."
+      "content": "Get the information behind a point on the map."
+    },
+    "identifyPanel": {
+      "title": "Identify features",
+      "content": "Click a point on the map to see the features visible at that spot."
     },
     "coordinates": {
       "title": "Coordinates",
+      "content": "Work with map coordinates."
+    },
+    "coordinatesPanel": {
+      "title": "Go to a coordinate",
       "content": "Enter coordinates to go to a point, or click the map to read the coordinates of a location."
     },
     "geolocation": {
       "title": "My location",
+      "content": "Find your own position on the map."
+    },
+    "geolocationPanel": {
+      "title": "Your position",
       "content": "After you allow it, the map goes to your current position. Useful in the field on a phone."
     },
     "print": {
       "title": "Print",
-      "content": "Generate a PDF layout of the map. Choose the scale and the sheet format."
+      "content": "Produce a PDF of the map."
+    },
+    "printPanel": {
+      "title": "Print a map",
+      "content": "Choose the scale and the sheet format, then generate the PDF layout."
     },
     "search": {
       "title": "Search",

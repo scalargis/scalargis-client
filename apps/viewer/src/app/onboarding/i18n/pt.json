@@ -2,35 +2,67 @@
   "onboarding": {
     "toc": {
       "title": "Temas",
-      "content": "Aqui gere os temas do mapa. Ative ou desative cada tema, mude a ordem e ajuste a transparência."
+      "content": "Veja aqui os temas do mapa. Abra para gerir a lista."
+    },
+    "tocPanel": {
+      "title": "Gerir temas",
+      "content": "Ative ou desative cada tema, mude a ordem e ajuste a transparência."
     },
     "themesAdd": {
-      "title": "Adicionar Temas",
+      "title": "Adicionar temas",
+      "content": "Traga novos temas para o mapa."
+    },
+    "themesAddPanel": {
+      "title": "Carregar um tema",
       "content": "Carregue temas de serviços WMS, WMTS ou WFS, ou de ficheiros do seu computador."
     },
     "measure": {
       "title": "Medição",
-      "content": "Meça distâncias e áreas no mapa. Marque pontos e veja o resultado em tempo real."
+      "content": "Meça distâncias e áreas no mapa."
+    },
+    "measurePanel": {
+      "title": "Medir no mapa",
+      "content": "Marque pontos no mapa e veja a distância ou a área em tempo real."
     },
     "draw": {
       "title": "Desenho",
-      "content": "Desenhe pontos, linhas, polígonos e texto no mapa. Exporte o desenho em GeoJSON."
+      "content": "Desenhe e anote sobre o mapa."
+    },
+    "drawPanel": {
+      "title": "Desenhar no mapa",
+      "content": "Desenhe pontos, linhas, polígonos e texto. Exporte o desenho em GeoJSON."
     },
     "identify": {
       "title": "Identificar",
-      "content": "Clique num ponto do mapa para ver a informação dos elementos visíveis nesse local."
+      "content": "Obtenha a informação por trás de um ponto do mapa."
+    },
+    "identifyPanel": {
+      "title": "Identificar elementos",
+      "content": "Clique num ponto do mapa para ver os elementos visíveis nesse local."
     },
     "coordinates": {
       "title": "Coordenadas",
+      "content": "Trabalhe com coordenadas do mapa."
+    },
+    "coordinatesPanel": {
+      "title": "Ir para uma coordenada",
       "content": "Introduza coordenadas para ir a um ponto, ou clique no mapa para ler as coordenadas de um local."
     },
     "geolocation": {
       "title": "A minha localização",
+      "content": "Encontre a sua posição no mapa."
+    },
+    "geolocationPanel": {
+      "title": "A sua posição",
       "content": "Depois de autorizar, o mapa vai para a sua posição atual. Útil em campo no telemóvel."
     },
     "print": {
       "title": "Imprimir",
-      "content": "Gere uma planta do mapa em PDF. Escolha a escala e o formato da folha."
+      "content": "Produza um PDF do mapa."
+    },
+    "printPanel": {
+      "title": "Imprimir um mapa",
+      "content": "Escolha a escala e o formato da folha e depois gere a planta em PDF."
     },
     "search": {
       "title": "Pesquisar",
