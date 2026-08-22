@@ -4,9 +4,21 @@
    Owns the lifecycle:
      1. Take explicit steps (sorted by order).
      2. Check persistence (resume where left off, unless reset).
-     3. Drive the tour: start / next / prev / skip / goTo / end.
+     3. Drive the tour: start / next / prev / pause / complete / goTo / end.
      4. Run step.before() / after() hooks. The before hook is awaited so the
         renderer can measure after the DOM settles (D12).
+
+   Dismiss semantics (improvement 04, INTENT D5): Escape and the close button
+   pause() the tour. pause() keeps `completed` false and keeps the saved
+   lastStep, so the next start() resumes. Only the final Complete on the last
+   step (next() past the end) marks the tour done through complete().
+
+   Auto-skip (improvement 02): the controller does not measure the DOM. The
+   renderer measures each landing and calls skipDeadStep() when the target is
+   not live (not mounted, or a mounted-but-empty rect). skipDeadStep() moves one
+   step in the last navigation direction, so a dead step never stays on screen.
+   The direction is stored in lastDir. Each move measures again through D12, so
+   a step whose before() reveals a panel is measured after the panel mounts.
 
    The controller owns lifecycle and persistence. The renderer (TourOverlay)
    reads the controller through useSyncExternalStore and draws the visual
@@ -48,8 +60,25 @@ export interface OnboardingController {
   next(): Promise<void>;
   /** Move to the previous step. Stays at 0 on underflow. */
   prev(): Promise<void>;
-  /** Skip the tour (dismiss). */
+  /**
+   * Pause the tour (dismiss via Escape or the close button). Keeps `completed`
+   * false and the saved lastStep, so the next start() resumes (improvement 04).
+   */
+  pause(): void;
+  /** Mark the tour done. The final Complete on the last step. */
+  complete(): void;
+  /**
+   * Deprecated alias of pause(), kept for the public useTour handle. Escape and
+   * the close button used to mark the tour completed; they now pause. New code
+   * calls pause() or complete().
+   */
   skip(): void;
+  /**
+   * Skip a dead step. The renderer calls this when it measures no live target
+   * on the current landing. Moves one step in lastDir (improvement 02). Returns
+   * to the caller nothing; it notifies, so the renderer re-measures.
+   */
+  skipDeadStep(): Promise<void>;
   /** Jump to a specific step by index. */
   goTo(index: number): Promise<void>;
   /** Tear down the tour without marking it completed. */
@@ -78,6 +107,10 @@ export function createController(
 
   let currentIndex = -1;
   let active = false;
+  // Direction of the last navigation. The renderer-driven auto-skip
+  // (skipDeadStep) moves this way, so a dead step lands the tour on the next
+  // live step in the same direction the user was going (improvement 02).
+  let lastDir: 1 | -1 = 1;
   const listeners = new Set<ControllerListener>();
 
   function notify(): void {
@@ -106,6 +139,26 @@ export function createController(
     }
   }
 
+  /**
+   * Land on a step: run its before hook, set the index, persist, notify. The
+   * caller runs the leaving step's after hook first. Shared by next / prev /
+   * skipDeadStep.
+   */
+  async function moveTo(index: number): Promise<void> {
+    const step = steps[index];
+    if (step) await doBefore(step);
+    currentIndex = index;
+    persistCurrentStep();
+    notify();
+  }
+
+  /** Mark the tour done and tear the overlay down. */
+  function completeInternal(): void {
+    markCompleted(viewerId);
+    active = false;
+    notify();
+  }
+
   const ctrl: OnboardingController = {
     viewerId,
     steps,
@@ -132,68 +185,101 @@ export function createController(
 
       active = true;
       currentIndex = startIdx;
+      // A resume onto a saved step backs up if that step is now dead; a fresh
+      // start at the top moves forward (improvement 02/04).
+      lastDir = startIdx > 0 ? -1 : 1;
       persistCurrentStep();
       notify();
     },
 
     async next() {
       if (!active) return;
+      lastDir = 1;
       const current = steps[currentIndex];
       if (current) doAfter(current);
 
       const nextIdx = currentIndex + 1;
       if (nextIdx >= steps.length) {
-        markCompleted(viewerId);
-        active = false;
-        notify();
+        completeInternal();
         return;
       }
 
-      const step = steps[nextIdx];
-      if (step) await doBefore(step);
-
-      currentIndex = nextIdx;
-      persistCurrentStep();
-      notify();
+      await moveTo(nextIdx);
     },
 
     async prev() {
       if (!active || currentIndex <= 0) return;
+      lastDir = -1;
       const current = steps[currentIndex];
       if (current) doAfter(current);
 
-      const prevIdx = currentIndex - 1;
-      const step = steps[prevIdx];
-      if (step) await doBefore(step);
-
-      currentIndex = prevIdx;
-      persistCurrentStep();
-      notify();
+      await moveTo(currentIndex - 1);
     },
 
-    skip() {
+    pause() {
       if (!active) return;
       const current = steps[currentIndex];
       if (current) doAfter(current);
-
-      markCompleted(viewerId);
+      // Keep completed false and keep the saved lastStep, so start() resumes.
+      persistCurrentStep();
       active = false;
       notify();
+    },
+
+    complete() {
+      if (!active) return;
+      const current = steps[currentIndex];
+      if (current) doAfter(current);
+      completeInternal();
+    },
+
+    skip() {
+      // Deprecated alias. Escape and the close button pause now (improvement 04).
+      ctrl.pause();
+    },
+
+    async skipDeadStep() {
+      if (!active) return;
+      const current = steps[currentIndex];
+      if (current) doAfter(current); // restore any reveal this dead step ran
+
+      if (lastDir > 0) {
+        const nextIdx = currentIndex + 1;
+        // Ran out of live steps forward: the previous live step was the last,
+        // so the tour completes.
+        if (nextIdx >= steps.length) {
+          completeInternal();
+          return;
+        }
+        await moveTo(nextIdx);
+        return;
+      }
+
+      const prevIdx = currentIndex - 1;
+      if (prevIdx < 0) {
+        // Nowhere to back up and this step is dead. Search forward instead, so
+        // a dead first step never stays on screen.
+        lastDir = 1;
+        const nextIdx = currentIndex + 1;
+        if (nextIdx >= steps.length) {
+          completeInternal();
+          return;
+        }
+        await moveTo(nextIdx);
+        return;
+      }
+      await moveTo(prevIdx);
     },
 
     async goTo(index: number) {
       if (!active || index < 0 || index >= steps.length) return;
       if (index === currentIndex) return;
 
+      lastDir = index > currentIndex ? 1 : -1;
       const current = steps[currentIndex];
       if (current) doAfter(current);
 
-      const step = steps[index];
-      if (step) await doBefore(step);
-
-      currentIndex = index;
-      persistCurrentStep();
-      notify();
+      await moveTo(index);
     },
 
     end() {

@@ -76,6 +76,12 @@
       "manual": "Full manual",
       "tour": "Guided tour"
     },
+    "controls": {
+      "previous": "Previous",
+      "next": "Next",
+      "complete": "Complete",
+      "close": "Close tour"
+    },
     "mapControls": {
       "title": "Navigation",
       "content": "Zoom the map in and out. Use the full extent button to return to the complete view."

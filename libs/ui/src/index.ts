@@ -94,6 +94,7 @@ export {
 export type {
   OnboardingStep,
   OnboardingState,
+  OnboardingLabels,
   PopoverPosition,
   TourHandle,
   OnboardingController,

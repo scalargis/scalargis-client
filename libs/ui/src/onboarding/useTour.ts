@@ -23,7 +23,9 @@ export interface TourHandle {
   next: OnboardingController['next'];
   /** Move to the previous step. */
   prev: OnboardingController['prev'];
-  /** Skip the tour (dismiss, mark completed). */
+  /** Pause the tour (dismiss, resume on the next start). */
+  pause: OnboardingController['pause'];
+  /** Deprecated alias of pause, kept for older callers. */
   skip: OnboardingController['skip'];
   /** Jump to a step by index. */
   goTo: OnboardingController['goTo'];
@@ -79,6 +81,12 @@ export function useOptionalTour(): TourHandle | null {
       controller ? controller.prev(...args) : Promise.resolve(),
     [controller],
   );
+  const pause = useCallback(
+    (...args: Parameters<OnboardingController['pause']>) => {
+      if (controller) controller.pause(...args);
+    },
+    [controller],
+  );
   const skip = useCallback(
     (...args: Parameters<OnboardingController['skip']>) => {
       if (controller) controller.skip(...args);
@@ -108,6 +116,7 @@ export function useOptionalTour(): TourHandle | null {
     start,
     next,
     prev,
+    pause,
     skip,
     goTo,
     end,

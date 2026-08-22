@@ -12,3 +12,12 @@ export const OVERLAY_Z = 9000;
 
 /** Above the overlay, so the card clears the dim layer. */
 export const POPOVER_Z = 9100;
+
+/**
+ * Minimum measured width and height, in CSS px, for a target rect to count as
+ * live (improvement 02). A rect below this is "mounted but empty" (a revealed
+ * panel with no content, like the Print panel with no layouts), so the auto-
+ * skip treats it like a missing target. measureTarget already nulls a 0×0 rect;
+ * this catches the near-empty case above zero.
+ */
+export const LIVE_RECT_MIN_SIZE = 4;

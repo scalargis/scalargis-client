@@ -39,7 +39,7 @@ import { Button, CloseButton, FocusTrap, Popover, Portal, Text } from '@mantine/
 import { TourContext } from './TourContext';
 import type { OnboardingStep, PopoverPosition } from './types';
 import type { OnboardingController } from './controller';
-import { OVERLAY_Z, POPOVER_Z } from './constants';
+import { OVERLAY_Z, POPOVER_Z, LIVE_RECT_MIN_SIZE } from './constants';
 
 /* --------------------------------------------------------------------------
    Defaults
@@ -70,6 +70,16 @@ function measureTarget(el: HTMLElement | undefined): Rect | null {
   const r = el.getBoundingClientRect();
   if (r.width === 0 && r.height === 0) return null; // hidden target
   return { left: r.left, top: r.top, width: r.width, height: r.height };
+}
+
+/**
+ * Whether a measured rect counts as a live target (improvement 02). A null rect
+ * (target not mounted or hidden) or a rect below the minimum size (a revealed
+ * but empty panel) is not live, so the controller auto-skips the step.
+ */
+function isLiveRect(rect: Rect | null): boolean {
+  if (!rect) return false;
+  return rect.width >= LIVE_RECT_MIN_SIZE && rect.height >= LIVE_RECT_MIN_SIZE;
 }
 
 /* --------------------------------------------------------------------------
@@ -211,11 +221,21 @@ export default function TourOverlay() {
     // preventPositionChangeWhenVisible={false} (see below).
     setReady(false);
     const raf = requestAnimationFrame(() => {
-      setRect(measureTarget(targetEl));
+      const measured = measureTarget(targetEl);
+      setRect(measured);
+      // Auto-skip a dead step (improvement 02). When the landed step has no
+      // live target, ask the controller to move on in the last direction. The
+      // move notifies, this effect re-runs for the new step, and the card
+      // stays hidden (ready false) until a live step lands. So a dead step
+      // never shows.
+      if (!isLiveRect(measured)) {
+        controller?.skipDeadStep();
+        return;
+      }
       setReady(true);
     });
     return () => cancelAnimationFrame(raf);
-  }, [active, currentStep, targetEl]);
+  }, [active, currentStep, targetEl, controller]);
 
   // Keep the rect fresh during the step.
   useEffect(() => {
@@ -239,6 +259,24 @@ export default function TourOverlay() {
       window.removeEventListener('resize', onMove);
     };
   }, [active, currentStep, targetEl]);
+
+  // Advance on the real target click (improvement 07, D14). Bind a one-shot
+  // click listener on the target. It lets the real click through (no
+  // preventDefault), then runs the same forward advance Next uses, so the
+  // click that opens a panel or runs a search fires and the tour moves on in
+  // the same gesture. The auto-skip in improvement 02 still applies, because
+  // next() sets the forward direction.
+  useEffect(() => {
+    if (!active || !currentStep?.advanceOnTargetClick || !targetEl) return;
+    let advanced = false;
+    function onClick() {
+      if (advanced) return;
+      advanced = true;
+      controller?.next();
+    }
+    targetEl.addEventListener('click', onClick);
+    return () => targetEl.removeEventListener('click', onClick);
+  }, [active, currentStep, targetEl, controller]);
 
   /* ---- step values ---- */
 
@@ -284,7 +322,7 @@ export default function TourOverlay() {
     ['ArrowDown', () => { if (activeRef.current) ctrlRef.current?.next(); }],
     ['ArrowLeft', () => { if (activeRef.current) ctrlRef.current?.prev(); }],
     ['ArrowUp', () => { if (activeRef.current) ctrlRef.current?.prev(); }],
-    ['Escape', () => { if (activeRef.current) ctrlRef.current?.skip(); }],
+    ['Escape', () => { if (activeRef.current) ctrlRef.current?.pause(); }],
   ]);
 
   /* ---- render ---- */
@@ -292,6 +330,19 @@ export default function TourOverlay() {
   // Guard AFTER every hook (Rules of Hooks). Past this line ctx is non-null.
   if (!ctx || !active) return null;
   const c = ctx.controller;
+
+  // Localised control labels (improvement 06). The consumer passes them from
+  // its i18n bundle; absent → the English defaults keep the engine working.
+  const labels = ctx.labels;
+  const prevLabel = labels?.previous ?? 'Previous';
+  const nextLabel = labels?.next ?? 'Next';
+  const completeLabel = labels?.complete ?? 'Complete';
+  const closeLabel = labels?.close ?? 'Close tour';
+
+  // Stable per-step ids so the screen reader links the dialog to its title and
+  // body (improvement 06).
+  const titleId = currentStep ? `sg-tour-title-${currentStep.id}` : undefined;
+  const descId = currentStep ? `sg-tour-desc-${currentStep.id}` : undefined;
 
   // Compute cutout coords from the target rect.
   const hasCutout = rect !== null;
@@ -389,7 +440,14 @@ export default function TourOverlay() {
 
           <Popover.Dropdown>
             <FocusTrap active={ready}>
-              <div>
+              {/* role=dialog + aria links so the screen reader announces the
+                  card and reads the title then the body (improvement 06). */}
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={title ? titleId : undefined}
+                aria-describedby={content ? descId : undefined}
+              >
                 {/* Header */}
                 <div
                   style={{
@@ -401,20 +459,20 @@ export default function TourOverlay() {
                   }}
                 >
                   {title && (
-                    <Text fw={700} size="lg">
+                    <Text id={titleId} fw={700} size="lg">
                       {title}
                     </Text>
                   )}
                   <CloseButton
-                    onClick={() => c.skip()}
-                    aria-label="Close tour"
+                    onClick={() => c.pause()}
+                    aria-label={closeLabel}
                     style={{ flexShrink: 0 }}
                   />
                 </div>
 
                 {/* Content */}
                 {content && (
-                  <Text size="sm" c="dimmed" style={{ marginBottom: 16 }}>
+                  <Text id={descId} size="sm" c="dimmed" style={{ marginBottom: 16 }}>
                     {content}
                   </Text>
                 )}
@@ -437,7 +495,7 @@ export default function TourOverlay() {
                         size="sm"
                         onClick={() => c.prev()}
                       >
-                        Previous
+                        {prevLabel}
                       </Button>
                     )}
                     <Button
@@ -446,7 +504,7 @@ export default function TourOverlay() {
                       size="sm"
                       onClick={() => c.next()}
                     >
-                      {isLast ? 'Complete' : 'Next'}
+                      {isLast ? completeLabel : nextLabel}
                     </Button>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useMemo, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { TourProvider } from '@scalargis/ui'
@@ -51,7 +51,17 @@ function Viewer(props) {
   }
 
   //Localization
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Localised labels for the tour step-card controls (improvement 06). The
+  // engine keeps English defaults; the viewer supplies the copy from its
+  // onboarding.* bundle. Recomputed on a language change.
+  const tourLabels = useMemo(() => ({
+    previous: t('onboarding.controls.previous'),
+    next: t('onboarding.controls.next'),
+    complete: t('onboarding.controls.complete'),
+    close: t('onboarding.controls.close'),
+  }), [t, i18n.language]);
 
   // Main map
   const mainMapEl = useRef(null);
@@ -200,7 +210,7 @@ function Viewer(props) {
 
   return viewer?.id != null && viewer.id !== ''
     ? (
-      <TourProvider viewerId={String(viewer.id)} steps={onboardingSteps}>
+      <TourProvider viewerId={String(viewer.id)} steps={onboardingSteps} labels={tourLabels}>
         {content}
       </TourProvider>
     )

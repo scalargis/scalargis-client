@@ -79,6 +79,12 @@
     "launcher": {
       "manual": "Manual completo",
       "tour": "Visita guiada"
+    },
+    "controls": {
+      "previous": "Anterior",
+      "next": "Seguinte",
+      "complete": "Concluir",
+      "close": "Fechar visita"
     }
   }
 }

@@ -13,7 +13,7 @@
    ========================================================================== */
 
 import React, { useEffect, useMemo, useRef, type ReactNode } from 'react';
-import type { OnboardingStep } from './types';
+import type { OnboardingStep, OnboardingLabels } from './types';
 import { createController } from './controller';
 import { TourContext, type TourContextValue } from './TourContext';
 import TourOverlay from './TourOverlay';
@@ -27,10 +27,15 @@ interface Props {
   viewerId: string;
   /** The step list for this tour. Sorted internally by the controller. */
   steps: OnboardingStep[];
+  /**
+   * Localised control labels for the step card (improvement 06). The consumer
+   * passes its i18n values. Absent → the engine uses the English defaults.
+   */
+  labels?: OnboardingLabels;
   children: ReactNode;
 }
 
-export default function TourProvider({ viewerId, steps, children }: Props) {
+export default function TourProvider({ viewerId, steps, labels, children }: Props) {
   const registry = useRef(new Map<string, HTMLElement>()).current;
 
   const controller = useMemo(
@@ -46,8 +51,8 @@ export default function TourProvider({ viewerId, steps, children }: Props) {
   }, [controller]);
 
   const ctx: TourContextValue = useMemo(
-    () => ({ controller, registry, steps }),
-    [controller, registry, steps],
+    () => ({ controller, registry, steps, labels }),
+    [controller, registry, steps, labels],
   );
 
   return (

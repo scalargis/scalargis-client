@@ -60,10 +60,35 @@ export interface OnboardingStep {
   focus?: 'ring' | 'pulse' | 'none';
   /** Block interaction with the live target while this step shows. */
   disableTargetInteraction?: boolean;
+  /**
+   * Advance the tour when the user clicks the real target (improvement 07,
+   * D14). The renderer binds a one-shot click listener on the measured target.
+   * It lets the real click through, then runs the same forward advance Next
+   * uses. Default off (a D13 seam). The step must keep the target interactive,
+   * so do not pair it with disableTargetInteraction.
+   */
+  advanceOnTargetClick?: boolean;
   /** Hook that runs before this step shows. Awaited. */
   before?: () => void | Promise<void>;
   /** Hook that runs after this step leaves. */
   after?: () => void;
+}
+
+/**
+ * Localised labels for the step-card controls (improvement 06). The engine
+ * stays content-free: the consumer passes these from its i18n bundle. When a
+ * label is absent the renderer falls back to the English literal, so a consumer
+ * without i18n still works.
+ */
+export interface OnboardingLabels {
+  /** The Previous button. Default "Previous". */
+  previous?: string;
+  /** The Next button (not the last step). Default "Next". */
+  next?: string;
+  /** The final button on the last step. Default "Complete". */
+  complete?: string;
+  /** The close-button aria-label. Default "Close tour". */
+  close?: string;
 }
 
 /** Persisted state for a viewer tour. */
