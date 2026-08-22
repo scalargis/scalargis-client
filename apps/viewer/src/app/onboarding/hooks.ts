@@ -47,8 +47,15 @@ function attachOnePanelReveal(
   menuId: string,
   ctx: RevealHooksContext,
 ): void {
+  // Keep any before/after the step already declares. A self step can ship its
+  // own reveal on top of the panel reveal — CatalogoSNIG opens its services
+  // menu in the add-map-services step (improvement 03). Compose instead of
+  // overwrite: the panel reveal runs first, then the step's own before; on the
+  // way out the step's own after runs, then the prior menu is restored.
+  const ownBefore = step.before;
+  const ownAfter = step.after;
   let prior: string | null = null;
-  step.before = () => {
+  step.before = async () => {
     prior = ctx.getSelectedMenu();
     // Open the sidebar drawer first when it is collapsed, so the panel
     // content inside #content is no longer display:none and measures to
@@ -57,8 +64,10 @@ function attachOnePanelReveal(
       ctx.showMenu();
     }
     ctx.dispatch(ctx.setSelectedMenu(menuId));
+    if (ownBefore) await ownBefore();
   };
   step.after = () => {
+    if (ownAfter) ownAfter();
     if (prior != null) {
       ctx.dispatch(ctx.setSelectedMenu(prior));
     }
