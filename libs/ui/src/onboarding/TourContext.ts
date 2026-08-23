@@ -7,15 +7,17 @@
 
 import { createContext } from 'react';
 import type { OnboardingController } from './controller';
-import type { OnboardingStep, OnboardingLabels } from './types';
+import type { OnboardingLabels } from './types';
 
 export interface TourContextValue {
   controller: OnboardingController;
   /** Map from step id to the DOM element registered by TourTarget. */
   registry: Map<string, HTMLElement>;
-  /** The sorted step list. */
-  steps: readonly OnboardingStep[];
-  /** Localised control labels (improvement 06). Absent → English defaults. */
+  /**
+   * Localised control labels (improvement 06). Absent → English defaults.
+   * The live step list is read from `controller.steps`, not from the context.
+   * The controller owns it so setSteps can swap it on a running tour (F4).
+   */
   labels?: OnboardingLabels;
 }
 

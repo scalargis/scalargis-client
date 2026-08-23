@@ -38,12 +38,25 @@ interface Props {
 export default function TourProvider({ viewerId, steps, labels, children }: Props) {
   const registry = useRef(new Map<string, HTMLElement>()).current;
 
+  // The controller is stable per viewer. A new steps array (a login, an
+  // is_owner flip, or a self component finishing its async import all build one)
+  // must NOT rebuild it: a rebuild resets active to false and drops a running
+  // tour. The live list is pushed through setSteps below instead (F4).
   const controller = useMemo(
     () => createController(viewerId, steps),
-    [viewerId, steps],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [viewerId],
   );
 
-  // Clean up on unmount
+  // Feed the live step list to the stable controller. The first run re-applies
+  // the same list the controller already built (idempotent). A later membership
+  // change swaps the list without tearing down the tour.
+  useEffect(() => {
+    controller.setSteps(steps);
+  }, [controller, steps]);
+
+  // Clean up on unmount, or when the controller itself changes (a viewerId
+  // change). A steps change no longer destroys it.
   useEffect(() => {
     return () => {
       controller.destroy();
@@ -51,8 +64,8 @@ export default function TourProvider({ viewerId, steps, labels, children }: Prop
   }, [controller]);
 
   const ctx: TourContextValue = useMemo(
-    () => ({ controller, registry, steps, labels }),
-    [controller, registry, steps, labels],
+    () => ({ controller, registry, labels }),
+    [controller, registry, labels],
   );
 
   return (

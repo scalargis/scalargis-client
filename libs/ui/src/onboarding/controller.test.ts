@@ -79,3 +79,96 @@ describe('onboarding controller — resume by step id (F3)', () => {
     expect(restart.currentIndex).toBe(0);
   });
 });
+
+describe('onboarding controller — live step swap (F4)', () => {
+  it('swaps the list in silence while idle', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20)]);
+    // Not started yet. A membership change replaces the list.
+    await ctrl.setSteps([step('a', 10), step('c', 30), step('d', 40)]);
+    expect(ctrl.active).toBe(false);
+    expect(ctrl.currentIndex).toBe(-1);
+    expect(ctrl.steps.map((s) => s.id)).toEqual(['a', 'c', 'd']);
+    // A later start uses the swapped list.
+    await ctrl.start();
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('a');
+  });
+
+  it('keeps the active step by id when a step is inserted before it', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20), step('c', 30)]);
+    await ctrl.start();
+    await ctrl.next(); // on 'b', index 1
+    expect(ctrl.currentIndex).toBe(1);
+
+    // A login inserts 'x' (order 15) before 'b'. 'b' shifts to index 2.
+    await ctrl.setSteps([step('a', 10), step('x', 15), step('b', 20), step('c', 30)]);
+    expect(ctrl.active).toBe(true);
+    expect(ctrl.currentIndex).toBe(2);
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('b');
+  });
+
+  it('keeps the active step and index when a step is added after it', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20), step('c', 30)]);
+    await ctrl.start();
+    await ctrl.next(); // on 'b', index 1
+    // A step 'z' (order 25) joins after 'b'. Index stays 1, the list grows.
+    await ctrl.setSteps([step('a', 10), step('b', 20), step('z', 25), step('c', 30)]);
+    expect(ctrl.active).toBe(true);
+    expect(ctrl.currentIndex).toBe(1);
+    expect(ctrl.steps).toHaveLength(4);
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('b');
+  });
+
+  it('resumes on the same id after a silent remap in a new session', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20), step('c', 30)]);
+    await ctrl.start();
+    await ctrl.next(); // on 'b'
+    await ctrl.setSteps([step('a', 10), step('x', 15), step('b', 20), step('c', 30)]);
+    ctrl.pause();
+
+    const resumed = createController(VIEWER, [step('a', 10), step('x', 15), step('b', 20)]);
+    await resumed.start();
+    expect(resumed.steps[resumed.currentIndex].id).toBe('b');
+  });
+
+  it('moves forward to the nearest survivor when the active step is dropped', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20), step('c', 30), step('d', 40)]);
+    await ctrl.start();
+    await ctrl.next();
+    await ctrl.next(); // on 'c', index 2, lastDir forward
+    await ctrl.setSteps([step('a', 10), step('b', 20), step('d', 40)]); // 'c' gone
+    expect(ctrl.active).toBe(true);
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('d');
+  });
+
+  it('moves back to the nearest survivor when the active step is dropped going back', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20), step('c', 30), step('d', 40)]);
+    await ctrl.start();
+    await ctrl.next();
+    await ctrl.next(); // on 'c'
+    await ctrl.prev(); // back to 'b', index 1, lastDir backward
+    await ctrl.setSteps([step('a', 10), step('c', 30), step('d', 40)]); // 'b' gone
+    expect(ctrl.active).toBe(true);
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('a');
+  });
+
+  it('flips forward when the dropped step was going back and nothing survives behind', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20), step('c', 30), step('d', 40)]);
+    await ctrl.start();
+    await ctrl.next();
+    await ctrl.next(); // on 'c'
+    await ctrl.prev(); // back to 'b', lastDir backward
+    // 'a' and 'b' both leave. Nothing survives behind 'b', so land forward on 'c'.
+    await ctrl.setSteps([step('c', 30), step('d', 40)]);
+    expect(ctrl.active).toBe(true);
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('c');
+  });
+
+  it('completes when the active step and every step after it are dropped', async () => {
+    const ctrl = createController(VIEWER, [step('a', 10), step('b', 20), step('c', 30), step('d', 40)]);
+    await ctrl.start();
+    await ctrl.next();
+    await ctrl.next(); // on 'c', lastDir forward
+    await ctrl.setSteps([step('a', 10), step('b', 20)]); // 'c' and 'd' gone
+    expect(ctrl.active).toBe(false);
+  });
+});

@@ -16,6 +16,9 @@ import { TourContext } from './TourContext';
 import type { OnboardingController } from './controller';
 import type { OnboardingStep } from './types';
 
+/** Stable empty list so a null controller never rebuilds the steps snapshot. */
+const EMPTY_STEPS: readonly OnboardingStep[] = [];
+
 export interface TourHandle {
   /** Start or restart the tour. */
   start: OnboardingController['start'];
@@ -65,6 +68,12 @@ export function useOptionalTour(): TourHandle | null {
     subscribe,
     () => controller?.currentIndex ?? -1,
   );
+  // Subscribe to the step list so a live swap (setSteps, F4) refreshes the
+  // current step and the exposed list even when currentIndex does not move.
+  const steps = useSyncExternalStore(
+    subscribe,
+    () => controller?.steps ?? EMPTY_STEPS,
+  );
 
   const start = useCallback(
     (...args: Parameters<OnboardingController['start']>) =>
@@ -108,8 +117,8 @@ export function useOptionalTour(): TourHandle | null {
   if (!controller) return null;
 
   const currentStep: OnboardingStep | null =
-    active && currentIndex >= 0 && currentIndex < controller.steps.length
-      ? controller.steps[currentIndex]
+    active && currentIndex >= 0 && currentIndex < steps.length
+      ? steps[currentIndex]
       : null;
 
   return {
@@ -123,7 +132,7 @@ export function useOptionalTour(): TourHandle | null {
     active,
     currentIndex,
     currentStep,
-    steps: controller.steps,
+    steps,
   };
 }
 

@@ -162,7 +162,21 @@ export default function TourOverlay() {
     () => controller?.currentIndex ?? -1,
   );
 
-  const steps = controller?.steps ?? EMPTY_STEPS;
+  // Subscribe to the step list too, not only active/currentIndex. setSteps (F4)
+  // can swap the list while the tour runs and leave currentIndex unchanged (a
+  // step added after the current one). The array reference changes on a swap and
+  // holds steady otherwise, so the counter and the last-step check stay fresh
+  // without an extra render.
+  const steps = useSyncExternalStore(
+    useCallback(
+      (onChange: () => void) => {
+        if (!controller) return () => undefined;
+        return controller.subscribe(() => onChange());
+      },
+      [controller],
+    ),
+    () => controller?.steps ?? EMPTY_STEPS,
+  );
   const currentStep: OnboardingStep | null =
     active && currentIndex >= 0 && currentIndex < steps.length
       ? steps[currentIndex]

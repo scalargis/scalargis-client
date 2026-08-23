@@ -87,6 +87,21 @@ export interface OnboardingController {
   /** Tear down the tour without marking it completed. */
   end(): void;
 
+  /**
+   * Replace the step list on a live controller (F4). The provider calls this
+   * when the membership memo yields a new array. A login, an is_owner flip, or
+   * a self component that finishes its async import each build a new array.
+   * When the tour is idle the list is swapped and a later start() resolves the
+   * saved id against it. When the tour is active the user stays on the same
+   * step by id: a surviving step keeps its place and only its index remaps in
+   * silence (the before and after hooks do not run again, the step is already
+   * on screen); a dropped step has its reveal restored and the tour moves to
+   * the nearest surviving neighbour in the last direction, and completes when
+   * no neighbour survives. So a membership change does not tear down a running
+   * tour.
+   */
+  setSteps(next: readonly OnboardingStep[]): Promise<void>;
+
   /** Subscribe to state changes. Returns unsubscribe function. */
   subscribe(fn: ControllerListener): () => void;
   /** Remove all listeners and clean up. */
@@ -102,7 +117,9 @@ export function createController(
   explicitSteps: readonly OnboardingStep[],
   options?: { reset?: boolean },
 ): OnboardingController {
-  const steps = [...explicitSteps].sort(byOrder);
+  // Mutable so setSteps can swap the list on a live controller (F4). Every read
+  // goes through the ctrl.steps getter, so a swap is seen by every consumer.
+  let steps = [...explicitSteps].sort(byOrder);
 
   if (options?.reset) {
     resetState(viewerId);
@@ -165,7 +182,9 @@ export function createController(
 
   const ctrl: OnboardingController = {
     viewerId,
-    steps,
+    get steps() {
+      return steps;
+    },
     get currentIndex() {
       return currentIndex;
     },
@@ -301,6 +320,61 @@ export function createController(
       }
       active = false;
       notify();
+    },
+
+    async setSteps(next: readonly OnboardingStep[]) {
+      const sorted = [...next].sort(byOrder);
+      const oldSteps = steps;
+      const oldIdx = currentIndex;
+      const oldStep = active ? oldSteps[oldIdx] : undefined;
+
+      steps = sorted;
+
+      // Idle: nothing is on screen. Swap the list and let a later start()
+      // resolve the saved id against it (F3). No hooks run.
+      if (!active || !oldStep) {
+        notify();
+        return;
+      }
+
+      // The step the user is on survived the change. Remap its index in
+      // silence: the step is already revealed and on screen, so the before and
+      // after hooks do not run again. Persist the id at its new index and
+      // notify so the card counter and controls refresh.
+      const survivedIdx = sorted.findIndex((s) => s.id === oldStep.id);
+      if (survivedIdx >= 0) {
+        currentIndex = survivedIdx;
+        persistCurrentStep();
+        notify();
+        return;
+      }
+
+      // The step the user was on left the list. Restore its reveal, then land
+      // on the nearest surviving neighbour in the last direction. This mirrors
+      // skipDeadStep: a backward search that finds nothing flips forward, and
+      // the tour completes when no neighbour survives. The walk uses the old
+      // list for position and the new list for membership and the landing
+      // index, so it holds even when several steps leave at once.
+      doAfter(oldStep);
+      const newIndexById = new Map(sorted.map((s, i) => [s.id, i] as const));
+      const survivorFrom = (dir: 1 | -1): number | null => {
+        for (let i = oldIdx + dir; i >= 0 && i < oldSteps.length; i += dir) {
+          const hit = newIndexById.get(oldSteps[i].id);
+          if (hit !== undefined) return hit;
+        }
+        return null;
+      };
+
+      let landIdx = survivorFrom(lastDir);
+      if (landIdx === null && lastDir < 0) {
+        lastDir = 1;
+        landIdx = survivorFrom(1);
+      }
+      if (landIdx === null) {
+        completeInternal();
+        return;
+      }
+      await moveTo(landIdx);
     },
 
     subscribe(fn: ControllerListener) {
