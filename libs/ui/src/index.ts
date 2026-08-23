@@ -90,6 +90,7 @@ export {
   POPOVER_Z,
   createController,
   TourContext,
+  resetTourState,
 } from './onboarding';
 export type {
   OnboardingStep,
