@@ -73,7 +73,7 @@ export default function FileForm(props) {
             {labels.close}
           </Button>
           <Button
-            leftSection={isSaving ? <IconCheck className="pi-spinner" /> : <IconCheck />}
+            leftSection={<IconCheck />}
             disabled={isSaving}
             data-autofocus
             onClick={onSave}>
