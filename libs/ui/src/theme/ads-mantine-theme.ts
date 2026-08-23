@@ -340,6 +340,35 @@ export const adsBaseTheme = createTheme({
         transitionProps: motionTransitionProps.dropdown,
       },
     },
+
+    /* Outlined, compact accordion. The default variant draws only dividers
+       between items; 'contained' wraps the whole accordion in a border and
+       keeps the dividers, which reads as a clear panel. Rows are tightened
+       and the label keeps Mantine's left alignment with the chevron on the
+       right. Set here so every consumer gets the same accordion and no call
+       site ships its own CSS. */
+    Accordion: {
+      defaultProps: {
+        variant: 'contained',
+      },
+      styles: {
+        control: {
+          paddingTop: rem(6),
+          paddingBottom: rem(6),
+        },
+        label: {
+          paddingTop: rem(6),
+          paddingBottom: rem(6),
+          fontWeight: 600,
+        },
+        content: {
+          paddingTop: rem(4),
+          paddingBottom: rem(10),
+          paddingLeft: rem(12),
+          paddingRight: rem(12),
+        },
+      },
+    },
   },
 
   /* ─── ESCAPE HATCH: raw ADS tokens for hand-written CSS ─────────── */
