@@ -40,7 +40,11 @@ export default function COG(props) {
     if (isUrlAppHostname(url) && viewer.integrated_authentication) {
       if (auth && auth.data && auth.data.auth_token) {
         const authkey = viewer?.integrated_authentication_key || 'authkey';
-        url = url + '&' + authkey + '=' + auth.data.auth_token;
+        if (url.indexOf('?') !== -1) {
+          url = url + '&' + authkey + '=' + auth.data.auth_token;
+        } else {
+          url = url + '?' + authkey + '=' + auth.data.auth_token;
+        }
       }
     }
 
