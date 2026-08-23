@@ -93,7 +93,13 @@ function attachOnePanelReveal(
   // way out the step's own after runs, then the prior menu is restored.
   const ownBefore = step.before;
   const ownAfter = step.after;
+  // The menu the user had selected before this step first revealed its panel.
+  // Captured once per tour session, never re-read (F8): a dismiss (pause) skips
+  // the after hook by design, so the panel stays open. If before re-read the
+  // selection on resume it would capture the tour's own open panel, and the next
+  // move would then restore to that panel, not to the user's original menu.
   let prior: string | null = null;
+  let priorCaptured = false;
   // Set only when this step opened the mobile drawer, so the after hook closes
   // just the drawer it opened and never a drawer the user had open (bugs/04).
   let openedMobileDrawer = false;
@@ -102,7 +108,10 @@ function attachOnePanelReveal(
   // left the sidebar expanded after the tour and showed the default TOC panel.
   let openedSidebar = false;
   step.before = async () => {
-    prior = ctx.getSelectedMenu();
+    if (!priorCaptured) {
+      prior = ctx.getSelectedMenu();
+      priorCaptured = true;
+    }
     if (ctx.isMobile()) {
       // Mobile: the panel lives in the slide-in drawer, gated on
       // mobileMenuActive, not the static sidebar (bugs/04). Open the drawer,

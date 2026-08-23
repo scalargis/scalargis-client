@@ -349,10 +349,14 @@ export const adsBaseTheme = createTheme({
   other: {
     adsFocus: '#F408FC',
     controlMinTouch: '44px',
+    // The tour band is two rungs: `tour` is the dim overlay, `tourPopover` the
+    // card above it. The onboarding engine mirrors both as OVERLAY_Z/POPOVER_Z
+    // (onboarding/constants.ts); ads-mantine-theme.test.ts locks the mirror to
+    // these rungs so a later edit to one fails against the other (F7).
     zLadder: {
       dropdown: 1000, backdrop: 2000, sticky: 3000, fixed: 4000,
       drawer: 5000, dialog: 6000, toast: 7000, tooltip: 8000,
-      tour: 9000,
+      tour: 9000, tourPopover: 9100,
     },
     // Easing via the central motion token, not a literal — single-sourced
     // with --transition-easing so hover/chevrons can't diverge (R5).

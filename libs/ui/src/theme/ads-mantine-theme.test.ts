@@ -14,6 +14,7 @@ import { DEFAULT_THEME, mergeThemeOverrides, type MantineTheme } from '@mantine/
 import { describe, expect, it } from 'vitest';
 
 import { adsBaseTheme, adsCssVariablesResolver } from './ads-mantine-theme';
+import { OVERLAY_Z, POPOVER_Z } from '../onboarding/constants';
 import {
   motionCssVariables,
   motionDurations,
@@ -326,9 +327,21 @@ describe('CSS ↔ theme token sync (R5)', () => {
   it('z-ladder rungs match theme.other.zLadder', () => {
     const zLadder = (adsBaseTheme.other as Record<string, Record<string, number>>)
       .zLadder;
+    // A camelCase rung (tourPopover) maps to a kebab CSS token (z-tour-popover).
+    const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
     for (const [rung, value] of Object.entries(zLadder)) {
-      expect(Number(cssTokens.get(`z-${rung}`))).toBe(value);
+      expect(Number(cssTokens.get(`z-${kebab(rung)}`))).toBe(value);
     }
+  });
+
+  // The onboarding engine keeps its own OVERLAY_Z/POPOVER_Z literals so it stays
+  // theme-free (D10). This locks that hand-mirror to the ladder rungs, so an
+  // edit to one rung that forgets the engine copy fails here (F7).
+  it('locks the onboarding engine z-constants to the tour rungs', () => {
+    const zLadder = (adsBaseTheme.other as Record<string, Record<string, number>>)
+      .zLadder;
+    expect(OVERLAY_Z).toBe(zLadder.tour);
+    expect(POPOVER_Z).toBe(zLadder.tourPopover);
   });
 
   it('single-sources the transition easing onto the motion token', () => {

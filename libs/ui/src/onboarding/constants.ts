@@ -1,16 +1,19 @@
 /* ==========================================================================
    Onboarding engine constants.
 
-   The single source of truth for tour z-index values. The runtime enforcement
-   lives in the theme zLadder (theme.other.zLadder.tour = 9000), added by
-   Phase 1 step 6. These constants are the engine's own copy for the barrel
-   export and for self-documenting the budget (D7).
+   The runtime enforcement of the tour z-budget lives in the theme zLadder
+   (theme.other.zLadder.tour = 9000, tourPopover = 9100), added by Phase 1
+   step 6. These two constants are the engine's own copy for the barrel export
+   and for self-documenting the budget (D7). The engine stays content-free and
+   theme-free by design (D10), so it keeps its own literals instead of importing
+   the theme. ads-mantine-theme.test.ts locks these against the ladder rungs, so
+   a later edit to either rung fails against the mirror (F7).
    ========================================================================== */
 
-/** Above the tooltip rung (8000) in the ADS zLadder. */
+/** The dim overlay. Mirrors theme.other.zLadder.tour (8000 = tooltip, below). */
 export const OVERLAY_Z = 9000;
 
-/** Above the overlay, so the card clears the dim layer. */
+/** The card, above its own dim overlay. Mirrors theme.other.zLadder.tourPopover. */
 export const POPOVER_Z = 9100;
 
 /**
