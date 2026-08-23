@@ -2,11 +2,11 @@
   "onboarding": {
     "toc": {
       "title": "Temas",
-      "content": "Veja aqui os temas do mapa. Abra para gerir a lista."
+      "content": "Veja aqui os temas do mapa. Abra o painel para os gerir."
     },
     "tocPanel": {
       "title": "Gerir temas",
-      "content": "Ative ou desative cada tema, mude a ordem e ajuste a transparência."
+      "content": "Ligue ou desligue cada tema, mude a ordem, ajuste a transparência e veja a legenda."
     },
     "themesAdd": {
       "title": "Adicionar temas",
@@ -14,7 +14,7 @@
     },
     "themesAddPanel": {
       "title": "Carregar um tema",
-      "content": "Carregue temas de serviços WMS, WMTS ou WFS, ou de ficheiros do seu computador."
+      "content": "Carregue temas de serviços WMS, WMTS ou WFS pelo URL, ou de ficheiros como Shapefile, KML, GeoJSON e DXF."
     },
     "measure": {
       "title": "Medição",
@@ -22,7 +22,7 @@
     },
     "measurePanel": {
       "title": "Medir no mapa",
-      "content": "Marque pontos no mapa e veja a distância ou a área em tempo real."
+      "content": "Escolha medir distância ou área e marque pontos no mapa. O resultado aparece em tempo real."
     },
     "draw": {
       "title": "Desenho",
@@ -30,7 +30,7 @@
     },
     "drawPanel": {
       "title": "Desenhar no mapa",
-      "content": "Desenhe pontos, linhas, polígonos e texto. Exporte o desenho em GeoJSON."
+      "content": "Desenhe símbolos, texto, pontos, linhas e polígonos. Exporte tudo num ficheiro GeoJSON georreferenciado."
     },
     "identify": {
       "title": "Identificar",
@@ -38,7 +38,7 @@
     },
     "identifyPanel": {
       "title": "Identificar elementos",
-      "content": "Clique num ponto do mapa para ver os elementos visíveis nesse local."
+      "content": "Clique num ponto do mapa para ver os dados dos elementos dos temas ativos nesse local."
     },
     "coordinates": {
       "title": "Coordenadas",
@@ -46,7 +46,7 @@
     },
     "coordinatesPanel": {
       "title": "Ir para uma coordenada",
-      "content": "Introduza coordenadas para ir a um ponto, ou clique no mapa para ler as coordenadas de um local."
+      "content": "Introduza coordenadas para ir a um ponto, ou clique no mapa para as ler. Exporte os pontos em CSV ou GeoJSON."
     },
     "geolocation": {
       "title": "A minha localização",
@@ -54,7 +54,7 @@
     },
     "geolocationPanel": {
       "title": "A sua posição",
-      "content": "Depois de autorizar, o mapa vai para a sua posição atual. Útil em campo no telemóvel."
+      "content": "Depois de autorizar, o mapa vai para a sua posição. Uma opção segue-o enquanto se move, útil no terreno."
     },
     "print": {
       "title": "Imprimir",
@@ -62,7 +62,7 @@
     },
     "printPanel": {
       "title": "Imprimir um mapa",
-      "content": "Escolha a escala e o formato da folha e depois gere a planta em PDF."
+      "content": "Escolha a escala, predefinida, livre ou igual à do mapa, e o formato da folha. O botão Imprimir gera a planta em PDF."
     },
     "search": {
       "title": "Pesquisar",
@@ -70,11 +70,11 @@
     },
     "share": {
       "title": "Partilhar mapa",
-      "content": "Crie um link para a vista atual do mapa. Envie o link para partilhar a localização."
+      "content": "Crie um link permanente para a vista atual. Pode juntar um título, uma descrição e os temas que carregou."
     },
     "save": {
       "title": "Guardar visualizador",
-      "content": "Guarde a vista e os temas atuais como um visualizador seu. Pode voltar a ele mais tarde."
+      "content": "Guarde a vista, os temas e as opções atuais como um visualizador seu. Volte a ele quando quiser."
     },
     "locale": {
       "title": "Idioma",
@@ -82,7 +82,7 @@
     },
     "login": {
       "title": "Entrar",
-      "content": "Entre na sua conta para aceder às funções reservadas."
+      "content": "Entre na sua conta para aceder às funções reservadas. Conforme a instalação, pode criar conta e repor a palavra-passe."
     },
     "help": {
       "title": "Ajuda",
@@ -90,15 +90,15 @@
     },
     "scale": {
       "title": "Escala do mapa",
-      "content": "Veja a escala atual. Escreva um valor como 1:25000 para ir direto a essa escala."
+      "content": "Veja a escala atual, gráfica e numérica. Escreva um valor como 1:25000 para ir direto a essa escala."
     },
     "crs": {
-      "title": "Coordenadas",
-      "content": "Veja as coordenadas do cursor. Troque o sistema de referência no seletor."
+      "title": "Coordenadas do cursor",
+      "content": "Veja as coordenadas na posição do cursor. Troque o sistema de referência no seletor."
     },
     "contact": {
       "title": "Contacto",
-      "content": "Envie uma mensagem ao serviço responsável. Pode anexar ficheiros."
+      "content": "Envie uma mensagem ao serviço responsável pelo visualizador. Pode anexar ficheiros."
     },
     "basemaps": {
       "title": "Mapas de base",

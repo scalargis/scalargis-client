@@ -2,11 +2,11 @@
   "onboarding": {
     "toc": {
       "title": "Themes",
-      "content": "See the map themes here. Open it to manage the list."
+      "content": "See the map themes here. Open the panel to manage them."
     },
     "tocPanel": {
       "title": "Manage themes",
-      "content": "Turn each theme on or off, change the order, and adjust the transparency."
+      "content": "Turn each theme on or off, change the order, adjust the transparency and see the legend."
     },
     "themesAdd": {
       "title": "Add themes",
@@ -14,7 +14,7 @@
     },
     "themesAddPanel": {
       "title": "Load a theme",
-      "content": "Load themes from WMS, WMTS or WFS services, or from files on your computer."
+      "content": "Load themes from WMS, WMTS or WFS services by URL, or from files like Shapefile, KML, GeoJSON and DXF."
     },
     "measure": {
       "title": "Measure",
@@ -22,7 +22,7 @@
     },
     "measurePanel": {
       "title": "Measure on the map",
-      "content": "Mark points on the map and read the distance or area in real time."
+      "content": "Choose distance or area and mark points on the map. The result appears in real time."
     },
     "draw": {
       "title": "Draw",
@@ -30,7 +30,7 @@
     },
     "drawPanel": {
       "title": "Draw on the map",
-      "content": "Draw points, lines, polygons and text. Export the drawing as GeoJSON."
+      "content": "Draw symbols, text, points, lines and polygons. Export it all as a georeferenced GeoJSON file."
     },
     "identify": {
       "title": "Identify",
@@ -38,7 +38,7 @@
     },
     "identifyPanel": {
       "title": "Identify features",
-      "content": "Click a point on the map to see the features visible at that spot."
+      "content": "Click a point on the map to see the feature data of the active themes at that spot."
     },
     "coordinates": {
       "title": "Coordinates",
@@ -46,7 +46,7 @@
     },
     "coordinatesPanel": {
       "title": "Go to a coordinate",
-      "content": "Enter coordinates to go to a point, or click the map to read the coordinates of a location."
+      "content": "Enter coordinates to go to a point, or click the map to read them. Export the points as CSV or GeoJSON."
     },
     "geolocation": {
       "title": "My location",
@@ -54,7 +54,7 @@
     },
     "geolocationPanel": {
       "title": "Your position",
-      "content": "After you allow it, the map goes to your current position. Useful in the field on a phone."
+      "content": "After you allow it, the map goes to your position. An option follows you as you move, useful in the field."
     },
     "print": {
       "title": "Print",
@@ -62,7 +62,7 @@
     },
     "printPanel": {
       "title": "Print a map",
-      "content": "Choose the scale and the sheet format, then generate the PDF layout."
+      "content": "Choose the scale, preset, free or the current map scale, and the sheet format. The Print button builds the PDF layout."
     },
     "search": {
       "title": "Search",
@@ -70,11 +70,11 @@
     },
     "share": {
       "title": "Share map",
-      "content": "Create a link to the current map view. Send the link to share the location."
+      "content": "Create a permanent link to the current view. You can add a title, a description and the themes you loaded."
     },
     "save": {
       "title": "Save viewer",
-      "content": "Save the current view and themes as your own viewer. You can return to it later."
+      "content": "Save the current view, themes and options as your own viewer. Return to it whenever you want."
     },
     "locale": {
       "title": "Language",
@@ -82,7 +82,7 @@
     },
     "login": {
       "title": "Login",
-      "content": "Log in to your account to reach the restricted features."
+      "content": "Log in to your account to reach the restricted features. Depending on the install, you can create an account and reset the password."
     },
     "help": {
       "title": "Help",
@@ -90,19 +90,23 @@
     },
     "scale": {
       "title": "Map scale",
-      "content": "See the current scale. Type a value like 1:25000 to jump straight to that scale."
+      "content": "See the current scale, graphic and numeric. Type a value like 1:25000 to jump straight to that scale."
     },
     "crs": {
-      "title": "Coordinates",
-      "content": "See the cursor coordinates. Change the reference system in the selector."
+      "title": "Cursor coordinates",
+      "content": "See the coordinates at the cursor position. Change the reference system in the selector."
     },
     "contact": {
       "title": "Contact",
-      "content": "Send a message to the responsible service. You can attach files."
+      "content": "Send a message to the service responsible for the viewer. You can attach files."
     },
     "basemaps": {
       "title": "Base maps",
       "content": "Change the map background. Choose between street map, satellite or orthophotos."
+    },
+    "mapControls": {
+      "title": "Navigation",
+      "content": "Zoom the map in and out. Use the full extent button to return to the complete view."
     },
     "launcher": {
       "manual": "Full manual",
@@ -113,10 +117,6 @@
       "next": "Next",
       "complete": "Complete",
       "close": "Close tour"
-    },
-    "mapControls": {
-      "title": "Navigation",
-      "content": "Zoom the map in and out. Use the full extent button to return to the complete view."
     }
   }
 }
