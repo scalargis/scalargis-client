@@ -63,6 +63,17 @@ export default defineConfig(() => {
     root: __dirname,
     cacheDir: '../../node_modules/.vite/apps/viewer',
     base: process.env.BASE,
+    // Asset URLs follow the runtime mount prefix. JS chunks, dynamic imports
+    // and workers resolve through window.__sgAsset, which reads the prefix the
+    // server injects into window.SCALARGIS_ROOT_PATH per request. CSS url() stays
+    // relative, so it inherits the prefix from the .css file's own URL. An empty
+    // prefix (root install) gives the same output as today.
+    experimental: {
+      renderBuiltUrl(filename: string, { hostType }: { hostType: 'js' | 'css' | 'html' }) {
+        if (hostType === 'js') return { runtime: `window.__sgAsset(${JSON.stringify(filename)})` };
+        return { relative: true };
+      },
+    },
     server: {
       port: 4200,
       host: 'localhost',
