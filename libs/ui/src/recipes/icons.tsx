@@ -144,3 +144,24 @@ export const IconAngleLeft = piIcon('pi pi-angle-left');
 export const IconAngleRight = piIcon('pi pi-angle-right');
 export const IconAngleDoubleLeft = piIcon('pi pi-angle-double-left');
 export const IconAngleDoubleRight = piIcon('pi pi-angle-double-right');
+export const IconArrowUp = piIcon('pi pi-arrow-up');
+
+// Charts / stats
+export const IconChartBar = piIcon('pi pi-chart-bar');
+export const IconChartLine = piIcon('pi pi-chart-line');
+
+// Map / place
+export const IconMap = piIcon('pi pi-map');
+export const IconMapMarker = piIcon('pi pi-map-marker');
+
+// Files / documents
+export const IconFilePdf = piIcon('pi pi-file-pdf');
+export const IconFileExcel = piIcon('pi pi-file-excel');
+export const IconBook = piIcon('pi pi-book');
+// A closed folder as a static group marker (see MapasPT IntelIGTConfig group
+// title); not aliased to IconFolderOpen since there is no expand state.
+export const IconFolder = piIcon('pi pi-folder');
+
+// Status / visibility
+export const IconShield = piIcon('pi pi-shield');
+export const IconEyeSlash = piIcon('pi pi-eye-slash');
