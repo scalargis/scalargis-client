@@ -204,6 +204,7 @@
   --z-dialog:    6000;
   --z-toast:     7000;
   --z-tooltip:   8000;
+  --z-tour:      9000;  /* guided tour overlay budget (D7) */
 
   /* ─── BREAKPOINTS (only xs/md/xl are ADS-sanctioned) ─ */
   --bp-xs: 360px;

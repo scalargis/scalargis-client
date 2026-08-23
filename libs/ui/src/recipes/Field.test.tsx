@@ -6,7 +6,7 @@
 import React from 'react';
 import { MantineProvider, TextInput } from '@mantine/core';
 import { useForm } from 'react-hook-form';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { adsBaseTheme } from '../theme/ads-mantine-theme';
@@ -64,16 +64,19 @@ describe('Field', () => {
     expect(error).toBeTruthy();
   });
 
-  it('wires typed input back into the form value on submit', () => {
+  it('wires typed input back into the form value on submit', async () => {
     const onSubmit = vi.fn();
     renderField(<Harness onSubmit={onSubmit} />);
 
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'a@b.com' }),
-      expect.anything()
+    // RHF's handleSubmit resolves on a later microtask, so await the call.
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'a@b.com' }),
+        expect.anything()
+      )
     );
   });
 
