@@ -44,6 +44,13 @@ export interface RevealHooksContext {
    */
   showMenu: () => unknown;
   /**
+   * Collapse the static sidebar again. Dispatches layout_toggle_menu(true),
+   * which toggles staticMenuInactive on a static layout. The after hook calls
+   * it only when this step opened a collapsed sidebar, so the tour restores the
+   * sidebar to the state the user had before it started.
+   */
+  hideMenu: () => unknown;
+  /**
    * Is the static sidebar currently collapsed? Reads
    * state.root.viewer.staticMenuInactive + layoutMode from the store.
    */
@@ -90,6 +97,10 @@ function attachOnePanelReveal(
   // Set only when this step opened the mobile drawer, so the after hook closes
   // just the drawer it opened and never a drawer the user had open (bugs/04).
   let openedMobileDrawer = false;
+  // Set only when this step opened the collapsed static sidebar, so the after
+  // hook collapses just the sidebar it opened. Without this the desktop reveal
+  // left the sidebar expanded after the tour and showed the default TOC panel.
+  let openedSidebar = false;
   step.before = async () => {
     prior = ctx.getSelectedMenu();
     if (ctx.isMobile()) {
@@ -109,6 +120,7 @@ function attachOnePanelReveal(
       // to a non-zero rect (layout.scss :233).
       if (ctx.isSidebarClosed()) {
         ctx.showMenu();
+        openedSidebar = true;
       }
       ctx.dispatch(ctx.setSelectedMenu(menuId));
     }
@@ -124,6 +136,15 @@ function attachOnePanelReveal(
     if (openedMobileDrawer) {
       ctx.closeMobileMenu();
       openedMobileDrawer = false;
+    }
+    // Collapse the static sidebar this step opened, so leaving the tour on a
+    // desktop panel step restores the sidebar the user had collapsed. Guard on
+    // the live state so a sidebar the user reopened by hand is not toggled shut.
+    if (openedSidebar) {
+      if (!ctx.isSidebarClosed()) {
+        ctx.hideMenu();
+      }
+      openedSidebar = false;
     }
   };
 }

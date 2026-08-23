@@ -106,6 +106,11 @@ export function useOnboardingSteps(
         showMenu: core?.actions?.layout_show_menu
           ? () => core.store!.dispatch!(core.actions!.layout_show_menu!(true))
           : () => undefined,
+        // Collapse the static sidebar again. layout_toggle_menu(true) toggles
+        // staticMenuInactive on a static layout. No-op in an embedded shell.
+        hideMenu: core?.actions?.layout_toggle_menu
+          ? () => core.store!.dispatch!(core.actions!.layout_toggle_menu!(true))
+          : () => undefined,
         isSidebarClosed: () => {
           const state = core.store!.getState!() as Record<string, unknown> | undefined;
           const root = state?.root as Record<string, unknown> | undefined;

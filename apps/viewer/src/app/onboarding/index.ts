@@ -20,7 +20,7 @@ export {
   enabledComponentTypes,
 } from './membership';
 
-export { registerOnboardingTranslations } from './i18n';
+export { registerOnboardingTranslations, useOnboardingLabels } from './i18n';
 export { useOnboardingSteps } from './useOnboardingSteps';
 
 export {

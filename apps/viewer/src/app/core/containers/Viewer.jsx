@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useMemo, useRef } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { TourProvider } from '@scalargis/ui'
-import { useOnboardingSteps } from '../../onboarding'
+import { useOnboardingSteps, useOnboardingLabels } from '../../onboarding'
 import Layout from './Layout'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import AppContext from '../../AppContext'
@@ -51,17 +51,12 @@ function Viewer(props) {
   }
 
   //Localization
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
 
   // Localised labels for the tour step-card controls (improvement 06). The
-  // engine keeps English defaults; the viewer supplies the copy from its
-  // onboarding.* bundle. Recomputed on a language change.
-  const tourLabels = useMemo(() => ({
-    previous: t('onboarding.controls.previous'),
-    next: t('onboarding.controls.next'),
-    complete: t('onboarding.controls.complete'),
-    close: t('onboarding.controls.close'),
-  }), [t, i18n.language]);
+  // onboarding module owns the copy and its bundle registration, so the labels
+  // resolve live and never freeze on the raw keys during a fast start.
+  const tourLabels = useOnboardingLabels();
 
   // Main map
   const mainMapEl = useRef(null);
