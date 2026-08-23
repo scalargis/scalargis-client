@@ -127,6 +127,39 @@
   animation-iteration-count: infinite !important;
 }
 
+/* ─── ONBOARDING TOUR — spotlight focus effect (improvements/05, D13 seam) ──
+   The optional ring/pulse the tour draws around its spotlight cutout. A step
+   opts in with focus:'ring' or focus:'pulse'; the default 'none' draws
+   nothing, so old steps stay unchanged (D13). The stroke colour follows the
+   active client theme through the Mantine primary token.
+   The pulse is a CSS animation, so the two reduced-motion kills above stop it
+   for free: under prefers-reduced-motion or data-sg-motion='reduced' the
+   animation-duration drops to 0.01ms and iteration-count to 1, so the pulse
+   settles on its first keyframe — a static ring. The pace comes from the
+   central motion token, so the renderer hardcodes no duration. */
+.sg-tour-focus {
+  fill: none;
+  stroke: var(--mantine-primary-color-filled, #1c7ed6);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.sg-tour-focus--pulse {
+  animation: sg-tour-pulse calc(var(--sg-motion-slow, 300ms) * 2)
+    var(--sg-motion-ease, ease) infinite alternate;
+}
+
+@keyframes sg-tour-pulse {
+  from {
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+  to {
+    stroke-opacity: 0.35;
+    stroke-width: 5;
+  }
+}
+
 /* ─── BASE DOCUMENT — DEFERRED (see ACTIVATION in the header note) ─────
    Kit rule: html/body on Noto Sans + ADS text/background colours so the
    whole app reads as one system. Restyles unmigrated screens AND moves

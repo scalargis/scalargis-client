@@ -283,6 +283,11 @@ export default function TourOverlay() {
   const spotlight = currentStep?.spotlight;
   const padding = spotlight?.padding ?? DEFAULT_SPOTLIGHT_PADDING;
   const radius = spotlight?.radius ?? DEFAULT_SPOTLIGHT_RADIUS;
+  // The spotlight focus effect (improvement 05, D13 seam). Default 'none'
+  // draws nothing, so opting in per step never changes an old step. The
+  // pulse is a CSS animation, so the reduced-motion kill in ads-globals.css
+  // freezes it to a static ring. The renderer hardcodes no motion duration.
+  const focus = currentStep?.focus ?? 'none';
   const popover = currentStep?.popover;
   const resolvedPos = resolvePopoverPosition(
     rect,
@@ -390,6 +395,24 @@ export default function TourOverlay() {
           fill={DIM_COLOR}
           mask={`url(#${maskId})`}
         />
+        {/* Focus effect around the cutout (improvement 05, D13 seam). The
+            pulse variant animates through the CSS class, so the reduced-motion
+            kill stops it; the ring variant is static. No motion here. */}
+        {hasCutout && focus !== 'none' && (
+          <rect
+            x={cx}
+            y={cy}
+            width={cw}
+            height={ch}
+            rx={radius}
+            ry={radius}
+            className={
+              focus === 'pulse'
+                ? 'sg-tour-focus sg-tour-focus--pulse'
+                : 'sg-tour-focus'
+            }
+          />
+        )}
         {/* Transparent catcher over the cutout when target interaction is blocked */}
         {hasCutout && currentStep?.disableTargetInteraction && (
           <rect
