@@ -9,8 +9,8 @@
         renderer can measure after the DOM settles (D12).
 
    Dismiss semantics (improvement 04, INTENT D5): Escape and the close button
-   pause() the tour. pause() keeps `completed` false and keeps the saved
-   lastStep, so the next start() resumes. It does not run the leaving step's
+   pause() the tour. pause() keeps `completed` false and keeps the saved step
+   id, so the next start() resumes. It does not run the leaving step's
    after hook, so a panel or menu the step revealed stays open and any work the
    user started under the tour is kept (freeze on dismiss). Only the final
    Complete on the last step (next() past the end) marks the tour done through
@@ -33,8 +33,8 @@ import {
   isCompleted,
   markCompleted,
   resetState,
-  setLastStep,
-  validateLastStep,
+  resolveLastStep,
+  setLastStepId,
 } from './persistence';
 
 function byOrder(a: OnboardingStep, b: OnboardingStep): number {
@@ -121,7 +121,8 @@ export function createController(
   }
 
   function persistCurrentStep(): void {
-    if (currentIndex >= 0) setLastStep(viewerId, currentIndex);
+    const step = steps[currentIndex];
+    if (step) setLastStepId(viewerId, step.id);
   }
 
   async function doBefore(step: OnboardingStep): Promise<void> {
@@ -177,11 +178,15 @@ export function createController(
 
       // P1 (Phase 4): a finished tour restarts from the top. start() must
       // not reopen on the last step. resetState clears the completed flag and
-      // the saved lastStep so this run tracks and completes cleanly. A
-      // partly-done tour (not completed) still resumes from its last step.
+      // the saved step so this run tracks and completes cleanly. A partly-done
+      // tour (not completed) still resumes from its last step.
       const restart = !!options?.reset || isCompleted(viewerId);
       if (restart) resetState(viewerId);
-      const startIdx = restart ? 0 : validateLastStep(viewerId, steps.length);
+      // Resume resolves the saved step id to its index in the current list. A
+      // membership change since the pause (login, is_owner, config) can drop
+      // that step; resolveLastStep returns 0 then, so the tour restarts from the
+      // first live step instead of resuming on a different step at the old index.
+      const startIdx = restart ? 0 : resolveLastStep(viewerId, steps);
 
       const step = steps[startIdx];
       if (step) await doBefore(step);
@@ -227,7 +232,7 @@ export function createController(
       // resumes on the same step and its before hook re-establishes the target.
       // Between-step moves (next/prev/goTo), complete() and end() still run the
       // after hook, so only a user dismiss keeps the view.
-      // Keep completed false and keep the saved lastStep, so start() resumes.
+      // Keep completed false and keep the saved step id, so start() resumes.
       persistCurrentStep();
       active = false;
       notify();

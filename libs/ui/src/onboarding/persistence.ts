@@ -1,7 +1,14 @@
 /* ==========================================================================
    localStorage persistence for onboarding tour progress.
 
-   Key:  sg:ob:viewer:<viewerId>  →  { completed: boolean, lastStep: number }
+   Key:  sg:ob:viewer:<viewerId>  →  { completed: boolean, lastStepId: string | null }
+
+   Progress persists by step id, not by list index. The step list is dynamic:
+   its membership changes with the auth token, the is_owner flag, and the viewer
+   config (useOnboardingSteps deps). A saved index can point at a different step
+   in the next session, so resume by index lands on the wrong step in silence.
+   The step id is stable, so resume resolves the id to the current index and
+   drops it when the id is gone. This is the same id the TourTarget registry uses.
    ========================================================================== */
 
 import type { OnboardingState } from './types';
@@ -20,10 +27,12 @@ export function getState(viewerId: string): OnboardingState | null {
     const parsed = JSON.parse(raw) as OnboardingState;
     if (
       typeof parsed.completed === 'boolean' &&
-      typeof parsed.lastStep === 'number'
+      (typeof parsed.lastStepId === 'string' || parsed.lastStepId === null)
     ) {
       return parsed;
     }
+    // A value from an older build stored lastStep as a number. It does not
+    // match the id shape, so drop it and start fresh.
     return null;
   } catch {
     return null;
@@ -52,21 +61,21 @@ export function markCompleted(viewerId: string): void {
   const existing = getState(viewerId);
   setState(viewerId, {
     completed: true,
-    lastStep: existing?.lastStep ?? 0,
+    lastStepId: existing?.lastStepId ?? null,
   });
 }
 
-/** Get the index of the last active step, or 0 when nothing is persisted. */
-export function getLastStep(viewerId: string): number {
-  return getState(viewerId)?.lastStep ?? 0;
+/** Get the id of the last active step, or null when nothing is persisted. */
+export function getLastStepId(viewerId: string): string | null {
+  return getState(viewerId)?.lastStepId ?? null;
 }
 
-/** Update the last-step index so the tour can resume. */
-export function setLastStep(viewerId: string, step: number): void {
+/** Update the last-step id so the tour can resume. */
+export function setLastStepId(viewerId: string, id: string): void {
   const existing = getState(viewerId);
   setState(viewerId, {
     completed: existing?.completed ?? false,
-    lastStep: step,
+    lastStepId: id,
   });
 }
 
@@ -80,17 +89,19 @@ export function resetState(viewerId: string): void {
 }
 
 /**
- * Validate a persisted lastStep against the current step list.
- * When the saved index is out of range (the config dropped that step's
- * component), reset to 0 so the tour starts at the first live step.
+ * Resolve the persisted step id to an index in the current step list. Returns
+ * the index of the saved step, or 0 when nothing is saved or the saved step is
+ * no longer a member. A membership change between sessions (login, is_owner, or
+ * a config change) drops steps from the list; when it drops the saved step, the
+ * tour restarts from the first live step instead of resuming on a stranger.
+ * Does not clear the saved state; the controller decides.
  */
-export function validateLastStep(
+export function resolveLastStep(
   viewerId: string,
-  stepCount: number,
+  steps: readonly { id: string }[],
 ): number {
-  const last = getLastStep(viewerId);
-  if (last > 0 && last < stepCount) return last;
-  // Out of range or never started — start fresh.
-  // Don't clear the saved state here; the controller decides.
-  return 0;
+  const id = getLastStepId(viewerId);
+  if (!id) return 0;
+  const idx = steps.findIndex((s) => s.id === id);
+  return idx > 0 ? idx : 0;
 }

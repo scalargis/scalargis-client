@@ -95,6 +95,12 @@ export interface OnboardingLabels {
 export interface OnboardingState {
   /** Whether the user completed or dismissed the tour. */
   completed: boolean;
-  /** Index of the last active step for resume. */
-  lastStep: number;
+  /**
+   * Id of the last active step, for resume. Null when the tour never ran.
+   * The tour persists the step id, not the list index. The step list is
+   * dynamic: its length changes with the auth token, the is_owner flag, and the
+   * viewer config. A saved index can point at a different step in the next
+   * session. The id is stable, so resume resolves it to the current index.
+   */
+  lastStepId: string | null;
 }
