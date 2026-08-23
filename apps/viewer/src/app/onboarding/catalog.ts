@@ -1,7 +1,7 @@
 /* ==========================================================================
    Base step catalog loader (Phase 2, D3).
 
-   Reads the compiled-in base catalog (onboarding-index.json, 19 objects) and
+   Reads the compiled-in base catalog (onboarding-index.json, 27 objects) and
    maps each row to a runtime OnboardingStep from the engine (@scalargis/ui).
    No runtime fetch. Self steps are not here; they ship from the component
    export and merge in Phase 5.
@@ -9,11 +9,11 @@
    The catalog lives in apps/viewer with the copy, not in the engine, so the
    engine stays content-free (INTENT "Base and self, in tour terms").
 
-   Client seed vs docs seed: this file holds only the fields the client reads
-   at runtime — id, components, target, order, flow, i18n, also_on, condition,
-   primary_component. The full docs seed in references/ keeps the traceability
-   fields (sources, doc, manual, owner) that point at the help-base markdown and
-   the manual anchors. The client is self-contained, so it ships none of those.
+   This JSON is the single source of truth for the base steps. It holds only the
+   fields the client reads at runtime — id, components, target, kind, order, flow,
+   i18n, also_on, condition, primary_component. The human traceability view
+   (component, help file, manual anchor) lives in the project docs, not here. The
+   client is self-contained, so it ships none of those authoring fields.
 
    title and content use the function form so the popover text follows the
    live locale (D4). The i18n key comes from each row (for example
@@ -53,7 +53,7 @@ export interface OnboardingCatalogEntry {
   primary_component?: string;
 }
 
-/** The base catalog: 19 rows, compiled in. */
+/** The base catalog: 27 rows, compiled in. */
 export const baseCatalog: OnboardingCatalogEntry[] =
   rawCatalog as unknown as OnboardingCatalogEntry[];
 
