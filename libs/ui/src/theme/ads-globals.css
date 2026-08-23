@@ -102,7 +102,8 @@
   .mantine-Loader-root,
   .mantine-Loader-root *,
   .mantine-Loader-root::before,
-  .mantine-Loader-root::after {
+  .mantine-Loader-root::after,
+  .sg-spinner {
     animation-duration: 0.8s !important;
     animation-iteration-count: infinite !important;
   }
@@ -122,9 +123,35 @@
 :root[data-sg-motion='reduced'] .mantine-Loader-root,
 :root[data-sg-motion='reduced'] .mantine-Loader-root *,
 :root[data-sg-motion='reduced'] .mantine-Loader-root::before,
-:root[data-sg-motion='reduced'] .mantine-Loader-root::after {
+:root[data-sg-motion='reduced'] .mantine-Loader-root::after,
+:root[data-sg-motion='reduced'] .sg-spinner {
   animation-duration: 0.8s !important;
   animation-iteration-count: infinite !important;
+}
+
+/* ─── JSONFORM LOADING SPINNER — dependency-free (Phase 5, S3) ────────────
+   The JsonForm seam shows a loading placeholder while it evaluates the
+   FigTree schema. It builds a raw HTML string for a JSONForms `Html`
+   element, so it cannot mount a Mantine <Loader/> — a React component does
+   not render into an innerHTML string. This class gives that HTML string a
+   spinner with no primereact/primeicons dependency (Phase 5 drops both).
+   The reduced-motion kills above freeze it, so it is re-stated in both
+   blocks for the same WCAG 2.3.3 reason as the Mantine Loader. */
+.sg-spinner {
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  vertical-align: middle;
+  border: 0.2em solid var(--color-border, currentColor);
+  border-top-color: var(--mantine-primary-color-filled, #1c7ed6);
+  border-radius: 50%;
+  animation: sg-spinner-rotate 0.8s linear infinite;
+}
+
+@keyframes sg-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─── ONBOARDING TOUR — spotlight focus effect (improvements/05, D13 seam) ──
