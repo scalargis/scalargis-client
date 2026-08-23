@@ -39,6 +39,7 @@ interface CoreLike {
   actions?: {
     viewer_set_selectedmenu?: (id: string) => unknown;
     layout_show_menu?: (isDesktop: boolean) => unknown;
+    layout_toggle_menu?: (isDesktop: boolean) => unknown;
   };
   /** Phase 5: self onboarding steps by component type. */
   getOnboardingSelfSteps?: () => Record<string, OnboardingStep[]>;
@@ -107,10 +108,29 @@ export function useOnboardingSteps(
           : () => undefined,
         isSidebarClosed: () => {
           const state = core.store!.getState!() as Record<string, unknown> | undefined;
-          const v = state?.root?.viewer as Record<string, unknown> | undefined;
-          return !!(v as Record<string, unknown> | undefined)?.staticMenuInactive
-            && (v as Record<string, unknown> | undefined)?.layoutMode === 'static';
+          const root = state?.root as Record<string, unknown> | undefined;
+          const v = root?.viewer as Record<string, unknown> | undefined;
+          return !!v?.staticMenuInactive && v?.layoutMode === 'static';
         },
+        // Mobile drawer path (bugs/04). ≤ 1024px is the layout mobile
+        // breakpoint (sass/_responsive.scss), the inverse of core isDesktop().
+        isMobile: () =>
+          typeof window !== 'undefined' && window.innerWidth <= 1024,
+        isMobileMenuClosed: () => {
+          const state = core.store!.getState!() as Record<string, unknown> | undefined;
+          const root = state?.root as Record<string, unknown> | undefined;
+          const v = root?.viewer as Record<string, unknown> | undefined;
+          return !(v?.mobileMenuActive as boolean | undefined);
+        },
+        // layout_show_menu(false) toggles the mobile drawer on when it is
+        // closed; layout_toggle_menu(false) toggles it off. Both no-op when
+        // the action is absent (embedded shell).
+        openMobileMenu: core?.actions?.layout_show_menu
+          ? () => core.store!.dispatch!(core.actions!.layout_show_menu!(false))
+          : () => undefined,
+        closeMobileMenu: core?.actions?.layout_toggle_menu
+          ? () => core.store!.dispatch!(core.actions!.layout_toggle_menu!(false))
+          : () => undefined,
       };
       attachRevealHooks(baseSteps, revealCtx);
       // Each self component's steps spotlight its own mainmenu panel. Reveal

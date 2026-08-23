@@ -14,6 +14,19 @@
 import type { OnboardingStep } from '@scalargis/ui';
 import { panelRevealByStepId } from './targets';
 
+/**
+ * The mainmenu drawer slides in over the `left` transition
+ * ($transitionDuration ≈ the normal motion token, sass/_sidebar.scss). Wait a
+ * touch longer than that so the panel has settled before the renderer measures
+ * it (bugs/04). Under reduced motion the slide is near-instant, so this is only
+ * a small idle.
+ */
+const DRAWER_REVEAL_MS = 320;
+
+/** Resolve after `ms` milliseconds. */
+const wait = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 /** The bits of the open viewer that the reveal hooks need at runtime. */
 export interface RevealHooksContext {
   /** config_json.components[] */
@@ -35,6 +48,25 @@ export interface RevealHooksContext {
    * state.root.viewer.staticMenuInactive + layoutMode from the store.
    */
   isSidebarClosed: () => boolean;
+  /**
+   * Small-screen check (viewport ≤ 1024px, the layout mobile breakpoint in
+   * sass/_responsive.scss, matching core utils isDesktop()). On a small screen
+   * the mainmenu is a slide-in drawer, not the static sidebar, so the reveal
+   * path differs (bugs/04).
+   */
+  isMobile: () => boolean;
+  /** Is the mobile drawer closed? Reads state.root.viewer.mobileMenuActive. */
+  isMobileMenuClosed: () => boolean;
+  /**
+   * Open the mobile mainmenu drawer. Dispatches layout_show_menu(false), which
+   * toggles the drawer on only when it is closed.
+   */
+  openMobileMenu: () => unknown;
+  /**
+   * Close the mobile mainmenu drawer. Dispatches layout_toggle_menu(false),
+   * which toggles the drawer off.
+   */
+  closeMobileMenu: () => unknown;
 }
 
 /**
@@ -55,21 +87,43 @@ function attachOnePanelReveal(
   const ownBefore = step.before;
   const ownAfter = step.after;
   let prior: string | null = null;
+  // Set only when this step opened the mobile drawer, so the after hook closes
+  // just the drawer it opened and never a drawer the user had open (bugs/04).
+  let openedMobileDrawer = false;
   step.before = async () => {
     prior = ctx.getSelectedMenu();
-    // Open the sidebar drawer first when it is collapsed, so the panel
-    // content inside #content is no longer display:none and measures to
-    // a non-zero rect (layout.scss :233).
-    if (ctx.isSidebarClosed()) {
-      ctx.showMenu();
+    if (ctx.isMobile()) {
+      // Mobile: the panel lives in the slide-in drawer, gated on
+      // mobileMenuActive, not the static sidebar (bugs/04). Open the drawer,
+      // select the menu, then wait for the slide so #content measures a
+      // non-zero rect on screen instead of falling back to the center card.
+      if (ctx.isMobileMenuClosed()) {
+        ctx.openMobileMenu();
+        openedMobileDrawer = true;
+      }
+      ctx.dispatch(ctx.setSelectedMenu(menuId));
+      if (openedMobileDrawer) await wait(DRAWER_REVEAL_MS);
+    } else {
+      // Desktop: open the static sidebar first when it is collapsed, so the
+      // panel content inside #content is no longer display:none and measures
+      // to a non-zero rect (layout.scss :233).
+      if (ctx.isSidebarClosed()) {
+        ctx.showMenu();
+      }
+      ctx.dispatch(ctx.setSelectedMenu(menuId));
     }
-    ctx.dispatch(ctx.setSelectedMenu(menuId));
     if (ownBefore) await ownBefore();
   };
   step.after = () => {
     if (ownAfter) ownAfter();
     if (prior != null) {
       ctx.dispatch(ctx.setSelectedMenu(prior));
+    }
+    // Close the drawer this step opened, so a following map or topbar step is
+    // not left behind the drawer overlay on mobile.
+    if (openedMobileDrawer) {
+      ctx.closeMobileMenu();
+      openedMobileDrawer = false;
     }
   };
 }
