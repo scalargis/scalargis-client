@@ -8,6 +8,11 @@ function step(id: string, order: number): OnboardingStep {
   return { id, order };
 }
 
+/* A step in a named flow, for the flow-scoped run tests. */
+function flowStep(id: string, order: number, flow: string): OnboardingStep {
+  return { id, order, flow };
+}
+
 const VIEWER = 'test-viewer';
 
 beforeEach(() => {
@@ -170,5 +175,83 @@ describe('onboarding controller — live step swap (F4)', () => {
     await ctrl.next(); // on 'c', lastDir forward
     await ctrl.setSteps([step('a', 10), step('b', 20)]); // 'c' and 'd' gone
     expect(ctrl.active).toBe(false);
+  });
+});
+
+describe('onboarding controller — flow-scoped run (P1)', () => {
+  // A list that mixes two flows. A scoped run walks only its own flow.
+  const mixed = [
+    flowStep('a1', 10, 'a'),
+    flowStep('b1', 20, 'b'),
+    flowStep('a2', 30, 'a'),
+    flowStep('b2', 40, 'b'),
+  ];
+
+  it('walks only the steps of the requested flow', async () => {
+    const ctrl = createController(VIEWER, mixed);
+    await ctrl.start({ flow: 'a' });
+    expect(ctrl.activeFlow).toBe('a');
+    expect(ctrl.steps.map((s) => s.id)).toEqual(['a1', 'a2']);
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('a1');
+    await ctrl.next();
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('a2');
+    await ctrl.next(); // past the flow-a end -> complete
+    expect(ctrl.active).toBe(false);
+  });
+
+  it('counts the scoped total, not the merged total', async () => {
+    const ctrl = createController(VIEWER, mixed);
+    await ctrl.start({ flow: 'a' });
+    // The overlay counter reads ctrl.steps.length. It must be the flow-a count.
+    expect(ctrl.steps).toHaveLength(2);
+  });
+
+  it('saves progress under a flow-keyed slot, apart from the unscoped slot', async () => {
+    const ctrl = createController(VIEWER, mixed);
+    await ctrl.start({ flow: 'a' });
+    await ctrl.next(); // on 'a2'
+    ctrl.pause();
+    expect(localStorage.getItem(`sg:ob:viewer:${VIEWER}:a`)).not.toBeNull();
+    expect(localStorage.getItem(`sg:ob:viewer:${VIEWER}`)).toBeNull();
+
+    // Resume with the same flow lands on the saved flow-a step.
+    const resumed = createController(VIEWER, mixed);
+    await resumed.start({ flow: 'a' });
+    expect(resumed.steps[resumed.currentIndex].id).toBe('a2');
+  });
+
+  it('keeps a scoped run and an unscoped run in separate slots', async () => {
+    // The unscoped run walks the whole list and saves under the plain key.
+    const scoped = createController(VIEWER, mixed);
+    await scoped.start({ flow: 'a' });
+    await scoped.next(); // flow-a run on 'a2'
+    scoped.pause();
+
+    const unscoped = createController(VIEWER, mixed);
+    await unscoped.start();
+    expect(unscoped.activeFlow).toBeNull();
+    expect(unscoped.steps).toHaveLength(4);
+    // The unscoped run starts fresh; the scoped run's saved step does not leak.
+    expect(unscoped.steps[unscoped.currentIndex].id).toBe('a1');
+    unscoped.pause();
+
+    // The flow-a slot still resumes on 'a2', untouched by the unscoped run.
+    const back = createController(VIEWER, mixed);
+    await back.start({ flow: 'a' });
+    expect(back.steps[back.currentIndex].id).toBe('a2');
+  });
+
+  it('keeps the flow scope across a live step swap', async () => {
+    const ctrl = createController(VIEWER, mixed);
+    await ctrl.start({ flow: 'a' }); // on 'a1'
+    // A membership change adds another flow-a step and another flow-b step.
+    await ctrl.setSteps([
+      ...mixed,
+      flowStep('a3', 50, 'a'),
+      flowStep('b3', 60, 'b'),
+    ]);
+    expect(ctrl.active).toBe(true);
+    expect(ctrl.steps.map((s) => s.id)).toEqual(['a1', 'a2', 'a3']);
+    expect(ctrl.steps[ctrl.currentIndex].id).toBe('a1');
   });
 });

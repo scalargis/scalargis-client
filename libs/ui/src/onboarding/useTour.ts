@@ -36,11 +36,17 @@ export interface TourHandle {
   end: OnboardingController['end'];
   /** Whether the tour overlay is active. */
   active: boolean;
+  /**
+   * The flow of the current or last run: a flow name for a scoped run, null for
+   * an unscoped run. It holds after the run ends, so a watcher reads it on the
+   * falling edge of `active`.
+   */
+  activeFlow: string | null;
   /** Current step index (0-based). -1 when not started. */
   currentIndex: number;
   /** The active step object, or null when idle. */
   currentStep: OnboardingStep | null;
-  /** The sorted step list. */
+  /** The steps of the current run (scoped while a scoped run is active). */
   steps: readonly OnboardingStep[];
 }
 
@@ -63,6 +69,10 @@ export function useOptionalTour(): TourHandle | null {
   const active = useSyncExternalStore(
     subscribe,
     () => controller?.active ?? false,
+  );
+  const activeFlow = useSyncExternalStore(
+    subscribe,
+    () => controller?.activeFlow ?? null,
   );
   const currentIndex = useSyncExternalStore(
     subscribe,
@@ -130,6 +140,7 @@ export function useOptionalTour(): TourHandle | null {
     goTo,
     end,
     active,
+    activeFlow,
     currentIndex,
     currentStep,
     steps,

@@ -50,15 +50,32 @@ export type ControllerListener = (ctrl: OnboardingController) => void;
 export interface OnboardingController {
   /** The viewer id this controller persists under. */
   readonly viewerId: string;
-  /** Resolved steps for this tour (sorted). */
+  /**
+   * The steps of the current run (sorted). A scoped run holds the flow subset
+   * while active; an idle controller holds the full list. So the overlay
+   * counter and isLast read the scoped total during a scoped run.
+   */
   readonly steps: readonly OnboardingStep[];
   /** Current step index (0-based). -1 when the tour is not started. */
   readonly currentIndex: number;
   /** Whether the tour overlay is active. */
   readonly active: boolean;
+  /**
+   * The flow of the current or last run. A scoped start sets it to the flow
+   * name; an unscoped start sets it null. It holds after the run ends, so a
+   * watcher can read the flow on the falling edge of `active`.
+   */
+  readonly activeFlow: string | null;
 
-  /** Start or restart the tour. Awaits the first step's before hook. */
-  start(): Promise<void>;
+  /**
+   * Start or restart the tour. Awaits the first step's before hook.
+   *
+   * With `options.flow`, the run walks only the steps of that flow
+   * (`(s.flow ?? 'viewer') === flow`) and persists under a flow-keyed slot.
+   * Without it the run walks the whole list and persists under the plain key.
+   * `options.reset` forces a restart from the first step.
+   */
+  start(options?: { flow?: string; reset?: boolean }): Promise<void>;
   /** Move to the next step. Completes the tour past the last step. */
   next(): Promise<void>;
   /** Move to the previous step. Stays at 0 on underflow. */
@@ -117,9 +134,28 @@ export function createController(
   explicitSteps: readonly OnboardingStep[],
   options?: { reset?: boolean },
 ): OnboardingController {
-  // Mutable so setSteps can swap the list on a live controller (F4). Every read
-  // goes through the ctrl.steps getter, so a swap is seen by every consumer.
-  let steps = [...explicitSteps].sort(byOrder);
+  // The full step list. Mutable so setSteps can swap it on a live controller
+  // (F4). The run list below is derived from it at each start.
+  let allSteps = [...explicitSteps].sort(byOrder);
+
+  // The steps of the current run. For an unscoped run it is allSteps; for a
+  // scoped run it is the flow subset. start() derives it, setSteps re-derives
+  // it, and the ctrl.steps getter returns it while a run is active, so every
+  // consumer (the overlay counter, isLast) reads the scoped total.
+  let runList: readonly OnboardingStep[] = allSteps;
+
+  // The flow of the current or last run. Set at start(): a flow name for a
+  // scoped run, null for an unscoped run. It holds after the run ends, so the
+  // reset watcher reads it on the falling edge of active.
+  let activeFlow: string | null = null;
+
+  // Derive the run list for a flow. An unscoped run (flow null) uses the whole
+  // list. A scoped run keeps the steps whose flow matches, with the default
+  // 'viewer' for a step that names none.
+  function deriveRunList(flow: string | null): readonly OnboardingStep[] {
+    if (flow == null) return allSteps;
+    return allSteps.filter((s) => (s.flow ?? 'viewer') === flow);
+  }
 
   if (options?.reset) {
     resetState(viewerId);
@@ -138,8 +174,8 @@ export function createController(
   }
 
   function persistCurrentStep(): void {
-    const step = steps[currentIndex];
-    if (step) setLastStepId(viewerId, step.id);
+    const step = runList[currentIndex];
+    if (step) setLastStepId(viewerId, step.id, activeFlow);
   }
 
   async function doBefore(step: OnboardingStep): Promise<void> {
@@ -166,7 +202,7 @@ export function createController(
    * skipDeadStep.
    */
   async function moveTo(index: number): Promise<void> {
-    const step = steps[index];
+    const step = runList[index];
     if (step) await doBefore(step);
     currentIndex = index;
     persistCurrentStep();
@@ -175,7 +211,7 @@ export function createController(
 
   /** Mark the tour done and tear the overlay down. */
   function completeInternal(): void {
-    markCompleted(viewerId);
+    markCompleted(viewerId, activeFlow);
     active = false;
     notify();
   }
@@ -183,7 +219,9 @@ export function createController(
   const ctrl: OnboardingController = {
     viewerId,
     get steps() {
-      return steps;
+      // A run holds the scoped list; an idle controller holds the full list, so
+      // a launcher that reads steps to test membership sees every step.
+      return active ? runList : allSteps;
     },
     get currentIndex() {
       return currentIndex;
@@ -191,23 +229,33 @@ export function createController(
     get active() {
       return active;
     },
+    get activeFlow() {
+      return activeFlow;
+    },
 
-    async start() {
-      if (steps.length === 0) return;
+    async start(startOptions?: { flow?: string; reset?: boolean }) {
+      // Derive the run list for this run's flow first, so every check below and
+      // every navigation reads the scoped list.
+      const flow = startOptions?.flow ?? null;
+      activeFlow = flow;
+      runList = deriveRunList(flow);
+      if (runList.length === 0) return;
 
       // P1 (Phase 4): a finished tour restarts from the top. start() must
       // not reopen on the last step. resetState clears the completed flag and
       // the saved step so this run tracks and completes cleanly. A partly-done
-      // tour (not completed) still resumes from its last step.
-      const restart = !!options?.reset || isCompleted(viewerId);
-      if (restart) resetState(viewerId);
+      // tour (not completed) still resumes from its last step. The persistence
+      // is flow-keyed, so a scoped run reads its own slot.
+      const restart =
+        !!options?.reset || !!startOptions?.reset || isCompleted(viewerId, flow);
+      if (restart) resetState(viewerId, flow);
       // Resume resolves the saved step id to its index in the current list. A
       // membership change since the pause (login, is_owner, config) can drop
       // that step; resolveLastStep returns 0 then, so the tour restarts from the
       // first live step instead of resuming on a different step at the old index.
-      const startIdx = restart ? 0 : resolveLastStep(viewerId, steps);
+      const startIdx = restart ? 0 : resolveLastStep(viewerId, runList, flow);
 
-      const step = steps[startIdx];
+      const step = runList[startIdx];
       if (step) await doBefore(step);
 
       active = true;
@@ -222,11 +270,11 @@ export function createController(
     async next() {
       if (!active) return;
       lastDir = 1;
-      const current = steps[currentIndex];
+      const current = runList[currentIndex];
       if (current) doAfter(current);
 
       const nextIdx = currentIndex + 1;
-      if (nextIdx >= steps.length) {
+      if (nextIdx >= runList.length) {
         completeInternal();
         return;
       }
@@ -237,7 +285,7 @@ export function createController(
     async prev() {
       if (!active || currentIndex <= 0) return;
       lastDir = -1;
-      const current = steps[currentIndex];
+      const current = runList[currentIndex];
       if (current) doAfter(current);
 
       await moveTo(currentIndex - 1);
@@ -259,7 +307,7 @@ export function createController(
 
     complete() {
       if (!active) return;
-      const current = steps[currentIndex];
+      const current = runList[currentIndex];
       if (current) doAfter(current);
       completeInternal();
     },
@@ -271,14 +319,14 @@ export function createController(
 
     async skipDeadStep() {
       if (!active) return;
-      const current = steps[currentIndex];
+      const current = runList[currentIndex];
       if (current) doAfter(current); // restore any reveal this dead step ran
 
       if (lastDir > 0) {
         const nextIdx = currentIndex + 1;
         // Ran out of live steps forward: the previous live step was the last,
         // so the tour completes.
-        if (nextIdx >= steps.length) {
+        if (nextIdx >= runList.length) {
           completeInternal();
           return;
         }
@@ -292,7 +340,7 @@ export function createController(
         // a dead first step never stays on screen.
         lastDir = 1;
         const nextIdx = currentIndex + 1;
-        if (nextIdx >= steps.length) {
+        if (nextIdx >= runList.length) {
           completeInternal();
           return;
         }
@@ -303,11 +351,11 @@ export function createController(
     },
 
     async goTo(index: number) {
-      if (!active || index < 0 || index >= steps.length) return;
+      if (!active || index < 0 || index >= runList.length) return;
       if (index === currentIndex) return;
 
       lastDir = index > currentIndex ? 1 : -1;
-      const current = steps[currentIndex];
+      const current = runList[currentIndex];
       if (current) doAfter(current);
 
       await moveTo(index);
@@ -315,7 +363,7 @@ export function createController(
 
     end() {
       if (active) {
-        const current = steps[currentIndex];
+        const current = runList[currentIndex];
         if (current) doAfter(current);
       }
       active = false;
@@ -324,11 +372,16 @@ export function createController(
 
     async setSteps(next: readonly OnboardingStep[]) {
       const sorted = [...next].sort(byOrder);
-      const oldSteps = steps;
+      // The user navigates within the run list, so the remap works against it,
+      // not the full list. Capture the old run list before the swap.
+      const oldRunList = runList;
       const oldIdx = currentIndex;
-      const oldStep = active ? oldSteps[oldIdx] : undefined;
+      const oldStep = active ? oldRunList[oldIdx] : undefined;
 
-      steps = sorted;
+      allSteps = sorted;
+      // Re-derive the run list by the same flow, so a membership change during a
+      // scoped run keeps the scope.
+      runList = deriveRunList(activeFlow);
 
       // Idle: nothing is on screen. Swap the list and let a later start()
       // resolve the saved id against it (F3). No hooks run.
@@ -341,7 +394,7 @@ export function createController(
       // silence: the step is already revealed and on screen, so the before and
       // after hooks do not run again. Persist the id at its new index and
       // notify so the card counter and controls refresh.
-      const survivedIdx = sorted.findIndex((s) => s.id === oldStep.id);
+      const survivedIdx = runList.findIndex((s) => s.id === oldStep.id);
       if (survivedIdx >= 0) {
         currentIndex = survivedIdx;
         persistCurrentStep();
@@ -353,13 +406,13 @@ export function createController(
       // on the nearest surviving neighbour in the last direction. This mirrors
       // skipDeadStep: a backward search that finds nothing flips forward, and
       // the tour completes when no neighbour survives. The walk uses the old
-      // list for position and the new list for membership and the landing
-      // index, so it holds even when several steps leave at once.
+      // run list for position and the new run list for membership and the
+      // landing index, so it holds even when several steps leave at once.
       doAfter(oldStep);
-      const newIndexById = new Map(sorted.map((s, i) => [s.id, i] as const));
+      const newIndexById = new Map(runList.map((s, i) => [s.id, i] as const));
       const survivorFrom = (dir: 1 | -1): number | null => {
-        for (let i = oldIdx + dir; i >= 0 && i < oldSteps.length; i += dir) {
-          const hit = newIndexById.get(oldSteps[i].id);
+        for (let i = oldIdx + dir; i >= 0 && i < oldRunList.length; i += dir) {
+          const hit = newIndexById.get(oldRunList[i].id);
           if (hit !== undefined) return hit;
         }
         return null;

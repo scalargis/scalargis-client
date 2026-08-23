@@ -117,7 +117,7 @@ export function MainMenu({ className, config, actions, record }) {
           tourLabel={tourLabel}
           manualDisabled={record.as === 'external' && !help_url}
           onManual={runManual}
-          onTour={() => tour.start()}
+          onTour={() => tour.start({ flow: 'viewer' })}
         />
         {dialog}
       </React.Fragment>
@@ -252,7 +252,7 @@ export default function Main({ type, as, config, actions, record }) {
           tourLabel={tourLabel}
           manualDisabled={openAs === 'external' && !help_url}
           onManual={runManual}
-          onTour={() => tour.start()}
+          onTour={() => tour.start({ flow: 'viewer' })}
         />
         { openAs !== 'external' && dialogEl }
       </React.Fragment>
