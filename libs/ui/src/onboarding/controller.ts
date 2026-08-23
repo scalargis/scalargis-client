@@ -10,8 +10,11 @@
 
    Dismiss semantics (improvement 04, INTENT D5): Escape and the close button
    pause() the tour. pause() keeps `completed` false and keeps the saved
-   lastStep, so the next start() resumes. Only the final Complete on the last
-   step (next() past the end) marks the tour done through complete().
+   lastStep, so the next start() resumes. It does not run the leaving step's
+   after hook, so a panel or menu the step revealed stays open and any work the
+   user started under the tour is kept (freeze on dismiss). Only the final
+   Complete on the last step (next() past the end) marks the tour done through
+   complete().
 
    Auto-skip (improvement 02): the controller does not measure the DOM. The
    renderer measures each landing and calls skipDeadStep() when the target is
@@ -218,8 +221,12 @@ export function createController(
 
     pause() {
       if (!active) return;
-      const current = steps[currentIndex];
-      if (current) doAfter(current);
+      // Dismiss freezes the viewer as-is. pause() does NOT run the leaving
+      // step's after hook, so a panel or menu the step revealed stays open and
+      // any work the user started under the tour is kept. The next start()
+      // resumes on the same step and its before hook re-establishes the target.
+      // Between-step moves (next/prev/goTo), complete() and end() still run the
+      // after hook, so only a user dismiss keeps the view.
       // Keep completed false and keep the saved lastStep, so start() resumes.
       persistCurrentStep();
       active = false;
