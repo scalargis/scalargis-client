@@ -11,9 +11,16 @@
 
    This JSON is the single source of truth for the base steps. It holds only the
    fields the client reads at runtime — id, components, target, kind, order, flow,
-   i18n, also_on, condition, primary_component. The human traceability view
-   (component, help file, manual anchor) lives in the project docs, not here. The
-   client is self-contained, so it ships none of those authoring fields.
+   i18n, condition, primary_component. The human traceability view (component, help
+   file, manual anchor) lives in the project docs, not here. The client is
+   self-contained, so it ships none of those authoring fields.
+
+   A base step targets one slot (the `target` field). Membership keeps a step when
+   its component type is present in any slot, but the TourTarget binds only in that
+   one slot. So a component mounted on a different slot than its step targets makes
+   the step have no target, and the dead-step skip drops it. This is by design. All
+   shipped viewers mount each tool on its step's slot, so no step goes dead in
+   practice.
 
    title and content use the function form so the popover text follows the
    live locale (D4). The i18n key comes from each row (for example
@@ -45,8 +52,6 @@ export interface OnboardingCatalogEntry {
   flow: string;
   /** i18n key prefix. ".title" and ".content" hang off it. */
   i18n: string;
-  /** Extra slots where the same component mounts (Phase 3 dedupe input). */
-  also_on?: string[];
   /** Named membership condition, bound to a predicate in conditions.ts. */
   condition?: string;
   /** For a multi-component step, the component that carries the TourTarget. */
