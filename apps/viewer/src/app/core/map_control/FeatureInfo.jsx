@@ -66,6 +66,7 @@ export default function FeatureInfo({ core, config, actions }) {
 
     const acc = [];
     const features = [];
+    let ogcFound = 0;
 
     // Display vector feature
     const displayFeature = (feature, l) => {
@@ -98,6 +99,7 @@ export default function FeatureInfo({ core, config, actions }) {
       if (!l) return;
       if (l == selectionLayer.current) return;
       if (l.get('selectable') == false) return;
+      if (l.get('type') === 'OGCFeatures') return;
       if (l instanceof OlVectorTileLayer) {
         const fvt = new OlFeature();
         const props = f.getProperties();
@@ -220,6 +222,29 @@ export default function FeatureInfo({ core, config, actions }) {
         .catch(err => console.log(err));
       }
     });
+
+    // Find features from OGC API Features layers strategy
+    const ogclrs = utils.findActiveOGCFeaturesLayer(mainMap.getLayers());
+    ogclrs.forEach(l => {
+      if (l.get('selectable') === false) return;
+      const source = l.getSource();
+      if (!source) return;
+
+      const res = mainMap.getView().getResolution();
+      const buffer = typeof l.get('identify_buffer') === 'number' ? l.get('identify_buffer') : res * 5;
+      const bbox = [
+        coordinate[0] - buffer, coordinate[1] - buffer,
+        coordinate[0] + buffer, coordinate[1] + buffer
+      ];
+
+      source.forEachFeatureIntersectingExtent(bbox, feat => {
+        const geom = feat.getGeometry();
+        if (geom && /Polygon/i.test(geom.getType()) && !geom.intersectsCoordinate(coordinate)) return;
+        acc.push(displayFeature(feat, l));
+        ogcFound++;
+      });
+    });
+    if (ogcFound) dispatch(actions.viewer_set_featureinfo(acc));
 
     // Find features from WMS layers strategy
     const viewResolution = (mainMap.getView().getResolution());
@@ -388,7 +413,7 @@ export default function FeatureInfo({ core, config, actions }) {
 
     // No layers found, disable GetFeatureInfo
     //if (features.length === 0 && lrs.length === 0) {
-      if (features.length === 0 && fvt_remote.length === 0) {
+      if (features.length === 0 && fvt_remote.length === 0 && ogcFound === 0) {
       const emptyResults = [{
         id: uuidV4(),
         type: 'text',
@@ -959,6 +984,20 @@ class FeatureInfoUtils  {
     return result;
   }
   
+  findActiveOGCFeaturesLayer(layers) {
+    const result = [];
+    layers.forEach(l => {
+      if (l.getVisible() && l.get('type') === 'OGCFeatures') {
+        result.push(l);
+      }
+      if ((l instanceof OlGroup) && l.getVisible()) {
+        const temp = this.findActiveOGCFeaturesLayer(l.getLayers());
+        temp.forEach(t => result.push(t));
+      }
+    });
+    return result;
+  }
+
   buildFeatureInfoWMSUrl(map, layer, viewResolution, coordinate, crs, format) {
     //TODO: Add option to set FEATURE_COUNT by config
     const params = { 'INFO_FORMAT': format, 'FEATURE_COUNT': 10 }
