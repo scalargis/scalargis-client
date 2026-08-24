@@ -16,6 +16,7 @@ import COGLayer from "./COGLayer";
 import OGCMapTileLayer from "./OGCMapTileLayer";
 import OGCVectorTileLayer from "./OGCVectorTileLayer";
 import OGCFeaturesLayer from "./OGCFeaturesLayer";
+import OGCMap from "./OGCMap";
 
 import GroupLayer from './GroupLayer';
 import { removeUrlParam, addUrlParam} from '../../utils';
@@ -157,6 +158,10 @@ const MorphLayer = ({ layers, config, group, checked, viewer }) => {
 
     case 'OGCFeatures':
       LayerComponent = OGCFeaturesLayer;
+      break;
+
+    case 'OGCMap':
+      LayerComponent = OGCMap;
       break;
 
     case 'GROUP':

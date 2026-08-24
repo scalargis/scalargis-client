@@ -71,6 +71,7 @@
 
   "useProxy": "Use server proxy",
   "ogcapiLoadAll": "Load whole collection (no bbox)",
-  "ogcapiUnsupportedCollections": "{{count}} map or record collections are not supported yet."
+  "ogcapiAsTiles": "Data collections as vector tiles (fast render)",
+  "ogcapiUnsupportedCollections": "{{count}} record collections are not supported yet."
 
 }

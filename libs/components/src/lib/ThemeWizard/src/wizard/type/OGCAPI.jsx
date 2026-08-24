@@ -50,7 +50,8 @@ export default function OGCAPI(props) {
       .then(json => {
         const options = {
           use_proxy: !!data.ogcUseProxy,
-          strategy: data.ogcLoadAll ? 'all' : 'bbox'
+          strategy: data.ogcLoadAll ? 'all' : 'bbox',
+          featureRender: data.ogcAsTiles ? 'tiles' : 'features'
         };
         const dataitems = Models.OWSModel.convertOGCAPI2Themes(json, base, options);
         const total = (json?.collections || []).length;
@@ -104,7 +105,7 @@ export default function OGCAPI(props) {
 
         { data.ogcSkipped > 0 &&
           <Alert color="informative" py="xs" mt="sm" icon={<IconInfoCircle />}>
-            {t("ogcapiUnsupportedCollections", "{{count}} coleções de mapa ou registo ainda não são suportadas.", { count: data.ogcSkipped })}
+            {t("ogcapiUnsupportedCollections", "{{count}} coleções de registo ainda não são suportadas.", { count: data.ogcSkipped })}
           </Alert>
         }
 
@@ -143,6 +144,18 @@ export default function OGCAPI(props) {
                     style={{ display: 'inline-block' }}
                     checked={!!data.ogcLoadAll}
                     onChange={e => editField('ogcLoadAll', !data.ogcLoadAll)}
+                  />
+                </div>
+              </div>
+
+              <div className="field grid">
+                <label className="col-12 md:col-8">{t("ogcapiAsTiles", "Coleções de dados como vector tiles (render rápido)")}</label>
+                <div className="col-12 md:col-4" style={{ textAlign: 'right' }}>
+                  <Switch
+                    size="md"
+                    style={{ display: 'inline-block' }}
+                    checked={!!data.ogcAsTiles}
+                    onChange={e => editField('ogcAsTiles', !data.ogcAsTiles)}
                   />
                 </div>
               </div>

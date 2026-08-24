@@ -71,6 +71,7 @@
 
   "useProxy": "Usar proxy del servidor",
   "ogcapiLoadAll": "Cargar toda la colección (sin bbox)",
-  "ogcapiUnsupportedCollections": "{{count}} colecciones de mapa o registro aún no son compatibles."
+  "ogcapiAsTiles": "Colecciones de datos como vector tiles (render rápido)",
+  "ogcapiUnsupportedCollections": "{{count}} colecciones de registro aún no son compatibles."
 
 }

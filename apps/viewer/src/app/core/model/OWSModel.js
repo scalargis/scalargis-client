@@ -916,37 +916,117 @@ const ogcapiItemsUrl = (collection, serviceUrl) => {
   return href.split('?')[0];
 }
 
+/** Build the rendered map endpoint URL for one map collection (query stripped). */
+const ogcapiMapUrl = (collection, serviceUrl) => {
+  const links = collection?.links || [];
+  const mapLink = links.find(l => {
+    const rel = (l.rel || '').toLowerCase();
+    return rel === 'map' || rel.endsWith('/map');
+  });
+  let href = mapLink?.href || null;
+
+  if (!href && collection?.id) {
+    href = serviceUrl.replace(/\/+$/, '') + '/collections/' + collection.id + '/map';
+  }
+  if (!href) return null;
+
+  if (!/^https?:\/\//i.test(href)) {
+    try { href = new URL(href, serviceUrl).toString(); } catch (e) { /* keep relative href */ }
+  }
+  return href.split('?')[0];
+}
+
+/** Build the vector tileset document URL for one feature collection. */
+const ogcapiVectorTilesUrl = (collection, serviceUrl, tileMatrixSet = 'WebMercatorQuad') => {
+  const links = collection?.links || [];
+  const tilesLink = links.find(l => (l.rel || '').toLowerCase().includes('tileset'));
+  let base = tilesLink?.href || null;
+
+  if (!base && collection?.id) {
+    base = serviceUrl.replace(/\/+$/, '') + '/collections/' + collection.id + '/tiles';
+  }
+  if (!base) return null;
+
+  if (!/^https?:\/\//i.test(base)) {
+    try { base = new URL(base, serviceUrl).toString(); } catch (e) { /* keep relative href */ }
+  }
+  base = base.split('?')[0].replace(/\/+$/, '');
+  return base + '/' + tileMatrixSet + '?f=json';
+}
+
 /**
  * Parse an OGC API /collections response to viewer themes.
+ *
+ * options.featureRender picks the layer type for feature collections:
+ * 'features' (default, query + identify) or 'tiles' (OGC vector tiles).
+ * Map collections always build as OGC API Maps rendered images.
  */
 export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) => {
   const result = [];
   const collections = collectionsJson?.collections || [];
+  const asTiles = options.featureRender === 'tiles';
 
   collections.forEach(coll => {
-    if (detectOGCAPICollectionType(coll) !== 'features') return;
+    const type = detectOGCAPICollectionType(coll);
 
-    const url = ogcapiItemsUrl(coll, serviceUrl);
-    if (!url) return;
+    let theme = null;
 
-    const theme = {
-      id: uuidv4(),
-      title: (coll.title || coll.id || '').toString().trim(),
-      description: (coll.description || '').toString().trim(),
-      active: false,
-      open: false,
-      opacity: 1,
-      type: 'OGCFeatures',
-      url,
-      limit: 1000,
-      max_pages: 10,
-      style_color: generateRGBA(),
-      style_stroke_color: generateRGBA(),
-      style_stroke_width: 1,
-      children: []
-    };
+    if (type === 'features' && asTiles) {
+      const url = ogcapiVectorTilesUrl(coll, serviceUrl);
+      if (!url) return;
+      theme = {
+        id: uuidv4(),
+        title: (coll.title || coll.id || '').toString().trim(),
+        description: (coll.description || '').toString().trim(),
+        active: false,
+        open: false,
+        opacity: 1,
+        type: 'OGCVectorTile',
+        url,
+        style_color: generateRGBA(),
+        style_stroke_color: generateRGBA(),
+        style_stroke_width: 1,
+        children: []
+      };
+    } else if (type === 'features') {
+      const url = ogcapiItemsUrl(coll, serviceUrl);
+      if (!url) return;
+      theme = {
+        id: uuidv4(),
+        title: (coll.title || coll.id || '').toString().trim(),
+        description: (coll.description || '').toString().trim(),
+        active: false,
+        open: false,
+        opacity: 1,
+        type: 'OGCFeatures',
+        url,
+        limit: 1000,
+        max_pages: 10,
+        style_color: generateRGBA(),
+        style_stroke_color: generateRGBA(),
+        style_stroke_width: 1,
+        children: []
+      };
+    } else if (type === 'map') {
+      const url = ogcapiMapUrl(coll, serviceUrl);
+      if (!url) return;
+      theme = {
+        id: uuidv4(),
+        title: (coll.title || coll.id || '').toString().trim(),
+        description: (coll.description || '').toString().trim(),
+        active: false,
+        open: false,
+        opacity: 1,
+        type: 'OGCMap',
+        url,
+        children: []
+      };
+    } else {
+      return;
+    }
+
     if (options.use_proxy) theme.use_proxy = true;
-    if (options.strategy === 'all') theme.strategy = 'all';
+    if (options.strategy === 'all' && theme.type === 'OGCFeatures') theme.strategy = 'all';
 
     result.push(theme);
   });

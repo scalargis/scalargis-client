@@ -14,6 +14,9 @@ import WFS from './WFS.json';
 import WMTS from './WMTS.json';
 import WMTSXYZ from './WMTSXYZ';
 import OGCFeatures from './OGCFeatures.json';
+import OGCMap from './OGCMap.json';
+import OGCVectorTile from './OGCVectorTile.json';
+import OGCMapTile from './OGCMapTile.json';
 
 
 export default {
@@ -32,5 +35,8 @@ export default {
     "WFS": WFS,
     "WMTS": WMTS,
     "WMTSXYZ": WMTSXYZ,
-    "OGCFeatures": OGCFeatures
+    "OGCFeatures": OGCFeatures,
+    "OGCMap": OGCMap,
+    "OGCVectorTile": OGCVectorTile,
+    "OGCMapTile": OGCMapTile
 }

@@ -71,6 +71,7 @@
 
   "useProxy": "Utiliser le proxy du serveur",
   "ogcapiLoadAll": "Charger toute la collection (sans bbox)",
-  "ogcapiUnsupportedCollections": "{{count}} collections de carte ou d'enregistrement ne sont pas encore prises en charge."
+  "ogcapiAsTiles": "Collections de données comme tuiles vectorielles (rendu rapide)",
+  "ogcapiUnsupportedCollections": "{{count}} collections d'enregistrement ne sont pas encore prises en charge."
 
 }
