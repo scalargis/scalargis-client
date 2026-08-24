@@ -2,6 +2,7 @@
   "wms": "WMS - Web Map service",
   "wmts": "WMTS - Web Map Tile Service",
   "wfs": "WFS - Web Feature Service",
+  "ogcapi": "OGC API",
   "arcgismap": "ArcGIS REST - Map Service",
   "shape": "Shapefile - ficheiro .zip contendo .shp",
   "kml": "KML - Keyhole Markup Language",
@@ -66,6 +67,10 @@
 
   "groupName": "Nombre del Grupo",
 
-  "wfsDataCRS": "CRS de los datos"
+  "wfsDataCRS": "CRS de los datos",
+
+  "useProxy": "Usar proxy del servidor",
+  "ogcapiLoadAll": "Cargar toda la colección (sin bbox)",
+  "ogcapiUnsupportedCollections": "{{count}} colecciones de mapa o registro aún no son compatibles."
 
 }

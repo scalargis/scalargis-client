@@ -879,6 +879,81 @@ export const convertGML2Themes = (gml, url, name, crs) => {
   return items;
 }
 
+/** Classify one OGC API collection from its itemType and links. */
+export const detectOGCAPICollectionType = (collection) => {
+  const itemType = (collection?.itemType || '').toString().toLowerCase();
+  const links = collection?.links || [];
+  const hasItems = links.some(l => l.rel === 'items');
+  const hasMap = links.some(l => {
+    const rel = (l.rel || '').toLowerCase();
+    return rel === 'map' || rel.endsWith('/map');
+  });
+  const hasTiles = links.some(l => (l.rel || '').toLowerCase().includes('tileset'));
+
+  if (itemType === 'record') return 'record';
+  if (itemType === 'feature') return 'features';
+  if (itemType === 'map' || hasMap) return 'map';
+  if (hasItems) return 'features';
+  if (hasTiles) return 'tiles';
+  return 'unknown';
+}
+
+/** Build the items endpoint base URL for one feature collection (query stripped). */
+const ogcapiItemsUrl = (collection, serviceUrl) => {
+  const links = collection?.links || [];
+  const geojson = links.find(l => l.rel === 'items' && (l.type || '').indexOf('geo+json') > -1);
+  const anyItems = links.find(l => l.rel === 'items');
+  let href = (geojson || anyItems)?.href || null;
+
+  if (!href && collection?.id) {
+    href = serviceUrl.replace(/\/+$/, '') + '/collections/' + collection.id + '/items';
+  }
+  if (!href) return null;
+
+  if (!/^https?:\/\//i.test(href)) {
+    try { href = new URL(href, serviceUrl).toString(); } catch (e) { /* keep relative href */ }
+  }
+  return href.split('?')[0];
+}
+
+/**
+ * Parse an OGC API /collections response to viewer themes.
+ */
+export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) => {
+  const result = [];
+  const collections = collectionsJson?.collections || [];
+
+  collections.forEach(coll => {
+    if (detectOGCAPICollectionType(coll) !== 'features') return;
+
+    const url = ogcapiItemsUrl(coll, serviceUrl);
+    if (!url) return;
+
+    const theme = {
+      id: uuidv4(),
+      title: (coll.title || coll.id || '').toString().trim(),
+      description: (coll.description || '').toString().trim(),
+      active: false,
+      open: false,
+      opacity: 1,
+      type: 'OGCFeatures',
+      url,
+      limit: 1000,
+      max_pages: 10,
+      style_color: generateRGBA(),
+      style_stroke_color: generateRGBA(),
+      style_stroke_width: 1,
+      children: []
+    };
+    if (options.use_proxy) theme.use_proxy = true;
+    if (options.strategy === 'all') theme.strategy = 'all';
+
+    result.push(theme);
+  });
+
+  return result;
+}
+
 /**
  * Download theme
  *
@@ -1138,5 +1213,7 @@ export default {
   convertGeoJSON2Themes,
   convertGML2Themes,
   convertCOG2Themes,
+  convertOGCAPI2Themes,
+  detectOGCAPICollectionType,
   createGroup
 }

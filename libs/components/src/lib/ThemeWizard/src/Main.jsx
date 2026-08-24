@@ -22,6 +22,7 @@ const source_types = [
   { value: 'wms', label: 'WMS - Web Map service' },
   { value: 'wmts', label: 'WMTS - Web Map Tile Service' },
   { value: 'wfs', label: 'WFS - web Feature Service' },
+  { value: 'ogcapi', label: 'OGC API' },
   { value: 'arcgismap', label: 'ArcGIS REST - Map Service' },
   { value: 'shape', label: 'Shapefile - ficheiro .zip contendo .shp' },
   { value: 'kml', label: 'KML - Keyhole Markup Language' },

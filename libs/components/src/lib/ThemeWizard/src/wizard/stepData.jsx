@@ -12,6 +12,7 @@ import GeoJSON from './type/GeoJSON';
 import KML from './type/KML';
 import GML from './type/GML';
 import DXF from './type/DXF';
+import OGCAPI from './type/OGCAPI';
 import Group from './type/Group';
 import WMSThemesSelector from './WMSThemesSelector';
 import WMTSThemesSelector from './WMTSThemesSelector';
@@ -89,6 +90,7 @@ export default function WizardStepData(props) {
     case 'gml': TypeComponent = GML; break;
     case 'dxf': TypeComponent = DXF; break;
     case 'cog': TypeComponent= COG; break;
+    case 'ogcapi': TypeComponent = OGCAPI; break;
     case 'group': TypeComponent = Group; break;
     default: TypeComponent = null;
   }
