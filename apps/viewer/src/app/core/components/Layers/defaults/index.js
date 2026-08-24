@@ -13,6 +13,7 @@ import WMS from './WMS.json';
 import WFS from './WFS.json';
 import WMTS from './WMTS.json';
 import WMTSXYZ from './WMTSXYZ';
+import OGCFeatures from './OGCFeatures.json';
 
 
 export default {
@@ -30,5 +31,6 @@ export default {
     "WMS": WMS,
     "WFS": WFS,
     "WMTS": WMTS,
-    "WMTSXYZ": WMTSXYZ
+    "WMTSXYZ": WMTSXYZ,
+    "OGCFeatures": OGCFeatures
 }

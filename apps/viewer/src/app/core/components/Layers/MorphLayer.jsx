@@ -15,6 +15,7 @@ import ArcGISMapLayer from "./ArcGISMapLayer";
 import COGLayer from "./COGLayer";
 import OGCMapTileLayer from "./OGCMapTileLayer";
 import OGCVectorTileLayer from "./OGCVectorTileLayer";
+import OGCFeaturesLayer from "./OGCFeaturesLayer";
 
 import GroupLayer from './GroupLayer';
 import { removeUrlParam, addUrlParam} from '../../utils';
@@ -152,7 +153,11 @@ const MorphLayer = ({ layers, config, group, checked, viewer }) => {
 
     case 'OGCVectorTile':
       LayerComponent = OGCVectorTileLayer;
-      break; 
+      break;
+
+    case 'OGCFeatures':
+      LayerComponent = OGCFeaturesLayer;
+      break;
 
     case 'GROUP':
       LayerComponent = GroupLayer;
