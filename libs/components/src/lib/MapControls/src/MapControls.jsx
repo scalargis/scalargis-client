@@ -202,6 +202,16 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
             <label> {t("myLocationUpdatePosition", "Atualizar posição")}</label>
           </div>
         </div> : null;
+    } else if (type === 'TOC') {
+      const toc_control = viewer.config_json.map_controls.find(c => c.type === 'TOC');
+      return (!!toc_control && !!toc_control.show_button) ?
+        <Button key={type}
+          title={toc_control.title || t("themes", "Temas")}
+          icon="pi pi-list"
+          rounded
+          className="p-button-raised"
+          onClick={e => { e.currentTarget.blur(); dispatch(viewer_set_selectedmenu(toc_control.menu || 'toc')); }}
+        /> : null;
     } else {
       return null;
     }
