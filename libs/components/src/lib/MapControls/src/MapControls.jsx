@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation} from "react-i18next";
 import { Checkbox } from '@mantine/core';
-import { IconBullseye, IconInfoCircle, IconGlobe } from '@scalargis/ui';
+import { IconBullseye, IconInfoCircle, IconGlobe, IconList } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import ZoomToExtent from 'ol/control/ZoomToExtent';
 import DragBox from 'ol/interaction/DragBox';
@@ -215,6 +215,14 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
             />
           </div>
         </div> : null;
+    } else if (type === 'TOC') {
+      const toc_control = viewer.config_json.map_controls.find(c => c.type === 'TOC');
+      return (!!toc_control && !!toc_control.show_button) ?
+        <MapToolButton key={type}
+          title={toc_control.title || t("themes", "Temas")}
+          icon={<IconList />}
+          onClick={e => { e.currentTarget.blur(); dispatch(viewer_set_selectedmenu(toc_control.menu || 'toc')); }}
+        /> : null;
     } else {
       return null;
     }

@@ -185,6 +185,7 @@ function Viewer(props) {
 
         { !!map_controls && map_controls.map(ctrl => {
           const OlControl = OlControls[ctrl.type];
+          if (!OlControl) return null;
           return (
             <OlControl
               core={core}
