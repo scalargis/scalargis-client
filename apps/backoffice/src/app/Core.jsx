@@ -77,9 +77,17 @@ Core.prototype.addComponent = function(core, component, done) {
   (async () => {
     let c = null;
     try {
-      c = await import(`./components/${component.type}/src/Main.jsx`);
+      c = await import(`./components/${component.type}/src/Manager.jsx`);
     } catch (e1) {
-      c = await import(`./components/${component.type}/src/Main.tsx`);
+      try {
+        c = await import(`./components/${component.type}/src/Manager.tsx`);
+      } catch (e2) {
+        try {
+          c = await import(`./components/${component.type}/src/Main.jsx`);
+        } catch (e3) {
+          c = await import(`./components/${component.type}/src/Main.tsx`);
+        }
+      }
     }
     return c;
   })().then(c => {  

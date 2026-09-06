@@ -38,13 +38,21 @@ const App = () => {
       const routes = (config?.customComponents || []).map(async (item) => {
         let mod = null;
         try {
-          mod = await import(`./components/${item}/src/Main.jsx`);
+          mod = await import(`./components/${item}/src/Manager.jsx`);
         } catch (e1) {
           try {
-            mod = await import(`./components/${item}/src/Main.tsx`);
+            mod = await import(`./components/${item}/src/Manager.tsx`);
           } catch (e2) {
-            console.error(e2);
-            return null;
+            try {
+              mod = await import(`./components/${item}/src/Main.jsx`);
+            } catch (e3) {
+              try {
+                mod = await import(`./components/${item}/src/Main.tsx`);
+              } catch (e4) {
+                console.error(e4);
+                return null;
+              }
+            }
           }
         }
         return _getRoutesInfo(mod);
