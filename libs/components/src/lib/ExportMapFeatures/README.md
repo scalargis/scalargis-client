@@ -82,5 +82,5 @@ Para exercitar o componente é preciso uma camada vetorial não-system. Serve o 
 
 ## Referências
 
-- Guia geral de componentes/extensões: `references/architecture/BUILDING_COMPONENTS_AND_EXTENSIONS.md`
+- Guia geral de componentes/extensões: `references/architecture/components-extensions/`
 - Diagnóstico completo do C-12 (as 3 causas empilhadas): `references/projects/client/migration2/mantine/qa/cluster-c-walkthrough.md` (secção `### C-12`)
