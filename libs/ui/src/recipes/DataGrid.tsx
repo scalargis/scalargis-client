@@ -28,6 +28,7 @@ import {
   getRecordId,
   reorderRecords,
   type DataTableColumn,
+  type DataTableColumnGroup,
   type DataTableProps,
 } from 'mantine-datatable';
 import {
@@ -49,18 +50,13 @@ export type DataGridColumn<T> = DataTableColumn<T> & {
   exportable?: boolean;
 };
 
-/**
- * `DataTableProps` is a union: a table is defined by `columns` XOR `groups`
- * (grouped header rows). DataGrid supports the `columns` branch only, because
- * carrying the union through makes every call site's props unassignable.
- *
- * ONE in-scope consumer does use grouped headers today: a decoupled
- * component's monitoring list (`headerColumnGroup`). When that screen
- * migrates, extend DataGrid with a `groups` variant — do not work around
- * the recipe at the call site. Recorded in qa/phase-1.md.
- */
-export type DataGridProps<T> = Omit<DataTableProps<T>, 'columns' | 'groups'> & {
+/** A grouped-header cell whose leaf columns carry the DataGrid CSV metadata. */
+export type DataGridGroup<T> = Omit<DataTableColumnGroup<T>, 'columns'> & {
   columns: DataGridColumn<T>[];
+};
+
+/** Props shared by both the `columns` and the `groups` branch. */
+type DataGridBaseProps<T> = Omit<DataTableProps<T>, 'columns' | 'groups'> & {
   /**
    * Enables row drag-reordering: a grip-handle column is prepended and the
    * callback receives the full `records` array in its new order (the caller
@@ -74,9 +70,25 @@ export type DataGridProps<T> = Omit<DataTableProps<T>, 'columns' | 'groups'> & {
    *
    * The handle is a real button, so keyboard reordering works out of the
    * box (focus the grip, Space lifts, arrows move, Space drops).
+   *
+   * Reordering pairs with the `columns` branch only. It is ignored under
+   * `groups`, where no in-scope screen reorders rows.
    */
   onRowReorder?: (records: T[]) => void;
 };
+
+/**
+ * `DataTableProps` is a union: a table is defined by `columns` XOR `groups`
+ * (grouped header rows). DataGrid mirrors that discriminant so each call site
+ * passes exactly one, and neither branch leaves the other's props assignable.
+ *
+ * The `groups` branch serves the grouped monitoring list. mantine-datatable
+ * renders `groups` natively, so this is a type and pass-through, not a new
+ * rendering path; the ADS header band and grid defaults apply to both.
+ */
+export type DataGridProps<T> =
+  | (DataGridBaseProps<T> & { columns: DataGridColumn<T>[]; groups?: never })
+  | (DataGridBaseProps<T> & { groups: DataGridGroup<T>[]; columns?: never });
 
 /**
  * ADS defaults. Colours are theme references (`neutral.2`), never hexes, so a
@@ -156,6 +168,7 @@ const REORDER_HANDLE_COLUMN: DataGridColumn<unknown> = {
 export function DataGrid<T>({
   classNames,
   columns,
+  groups,
   onRowReorder,
   ...props
 }: DataGridProps<T>) {
@@ -237,12 +250,16 @@ export function DataGrid<T>({
     []
   );
 
+  // Reorder applies to the flat-columns branch only. The grouped branch has no
+  // in-scope reorder consumer, so its columns pass through untouched.
+  const reordering = Boolean(onRowReorder) && Boolean(columns);
+
   const effectiveColumns = React.useMemo(
     () =>
-      onRowReorder
+      reordering && columns
         ? [REORDER_HANDLE_COLUMN as DataGridColumn<T>, ...columns]
         : columns,
-    [columns, onRowReorder]
+    [columns, reordering]
   );
 
   if (onRowReorder && (props.rowFactory || props.tableWrapper)) {
@@ -252,15 +269,15 @@ export function DataGrid<T>({
     );
   }
 
-  // The cast re-enters the union on its `columns` branch, which the type above
-  // deliberately flattened away. `columns` is always present, so the branch holds.
+  // The cast re-enters the union on whichever branch the call site chose.
+  // Exactly one of `columns`/`groups` is present, so the discriminant holds.
   const tableProps = {
     ...ADS_DEFAULTS,
     ...props,
-    ...(onRowReorder
+    ...(reordering
       ? { rowFactory: reorderRowFactory, tableWrapper: reorderTableWrapper }
       : {}),
-    columns: effectiveColumns,
+    ...(groups ? { groups } : { columns: effectiveColumns }),
     classNames: mergedClassNames,
   } as unknown as DataTableProps<T>;
 
