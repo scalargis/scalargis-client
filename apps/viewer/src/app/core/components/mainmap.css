@@ -78,6 +78,14 @@
     background-color: var(--mantine-color-primary-6);
 }
 
+/* Pressed state reads as a ring, not only a shade step, so it is visible over
+   a basemap (WCAG 1.4.1). Reuse the magenta focus-ring token; box-shadow is
+   already in the transition above, so the ring eases in. */
+.ol-control button:active {
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--ads-focus, #f408fc),
+        0 3px 6px rgba(0, 0, 0, 0.18);
+}
+
 .ol-touch .ol-control button {
     font-size: 1rem;
 }
@@ -99,6 +107,11 @@
     font-size: .9rem;
     width: 2.2em;
     height: 2.2em;
+    /* The 2.2em glyph computes to ~28px, below the ADS touch floor. Opt this
+       one control into the shared touch-target token; the kit keeps the floor
+       opt-in per control so it does not distort dense backoffice tables. */
+    min-width: var(--ads-control-min-touch, 44px);
+    min-height: var(--ads-control-min-touch, 44px);
     padding-top: .4rem;
     padding-bottom: .4rem;
 }

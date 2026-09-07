@@ -26,3 +26,18 @@
 .map-tool-btn:focus-visible {
   background-color: var(--mantine-color-primary-6); /* #034AD8 = --color-action-hover */
 }
+
+/* Pressed and toggled-on state read as a ring, not only a shade step. The
+   action ladder signals state by hue shade alone, which is hard to see over a
+   basemap and fails WCAG 1.4.1 (colour as the only cue). Reuse the magenta
+   focus-ring token, which today fires on :focus-visible only, so a mouse press
+   and a selected tool carry the same clear signal. */
+.map-tool-btn {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.map-tool-btn:active,
+.map-tool-btn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--ads-focus, #f408fc),
+    0 3px 6px rgb(0 0 0 / 18%);
+}

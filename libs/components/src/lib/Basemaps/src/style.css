@@ -30,7 +30,9 @@
 }
 
 .map-region-top-left .basemaps-control {
-    margin-left: 40px;
+    /* Clear the 55px control strip (layout.scss #mainmenu width) so the
+       top-left switcher does not sit under it. */
+    margin-left: 50px;
     top: -15px;
 }
 

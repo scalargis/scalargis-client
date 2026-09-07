@@ -235,6 +235,13 @@ body .p-dropdown {
   display: none !important;
 }
 
+// #content has a fixed height, but its direct panel children (everything but
+// #content-bottom) did not scroll, so a panel taller than its box clipped.
+// Give them the same overflow the #content-bottom sibling already has.
+.layout-sidebar-panel div#content > div:not(#content-bottom) {
+  overflow-y: auto;
+}
+
 .layout-sidebar #content-bottom {
   position: relative;
   flex: none;
