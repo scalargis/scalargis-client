@@ -165,3 +165,55 @@ export const IconFolder = piIcon('pi pi-folder');
 // Status / visibility
 export const IconShield = piIcon('pi pi-shield');
 export const IconEyeSlash = piIcon('pi pi-eye-slash');
+
+// ── Batch 4 additions ────────────────────────────────────────────────────
+// Glyphs the decoupled component ports need. Named for the use, not the
+// glyph, in the alert family (IconAlertCircle wraps pi-exclamation-circle,
+// keeping company with IconAlertTriangle and IconXCircle above).
+
+// Navigation arrows
+export const IconArrowDown = piIcon('pi pi-arrow-down');
+export const IconArrowRight = piIcon('pi pi-arrow-right');
+
+// Actions / status
+export const IconSync = piIcon('pi pi-sync');
+export const IconFilterSlash = piIcon('pi pi-filter-slash');
+export const IconLockOpen = piIcon('pi pi-lock-open');
+export const IconSignIn = piIcon('pi pi-sign-in');
+export const IconSignOut = piIcon('pi pi-sign-out');
+export const IconAlertCircle = piIcon('pi pi-exclamation-circle');
+export const IconVerified = piIcon('pi pi-verified');
+export const IconCheckSquare = piIcon('pi pi-check-square');
+
+// Commerce
+export const IconShoppingCart = piIcon('pi pi-shopping-cart');
+export const IconShoppingBag = piIcon('pi pi-shopping-bag');
+export const IconReceipt = piIcon('pi pi-receipt');
+export const IconCreditCard = piIcon('pi pi-credit-card');
+export const IconWallet = piIcon('pi pi-wallet');
+export const IconMoneyBill = piIcon('pi pi-money-bill');
+export const IconEuro = piIcon('pi pi-euro');
+
+// Files / documents
+export const IconFileEdit = piIcon('pi pi-file-edit');
+export const IconFileExport = piIcon('pi pi-file-export');
+export const IconFileOutline = piIcon('pi pi-file-o');
+
+// Objects / places
+export const IconBookmark = piIcon('pi pi-bookmark');
+export const IconCompass = piIcon('pi pi-compass');
+export const IconHistory = piIcon('pi pi-history');
+export const IconClock = piIcon('pi pi-clock');
+export const IconBuilding = piIcon('pi pi-building');
+export const IconUsers = piIcon('pi pi-users');
+export const IconWrench = piIcon('pi pi-wrench');
+export const IconMicrochip = piIcon('pi pi-microchip');
+export const IconQuestion = piIcon('pi pi-question');
+
+// Devices / infrastructure
+export const IconMobile = piIcon('pi pi-mobile');
+export const IconPhone = piIcon('pi pi-phone');
+export const IconDesktop = piIcon('pi pi-desktop');
+export const IconServer = piIcon('pi pi-server');
+export const IconDatabase = piIcon('pi pi-database');
+export const IconCode = piIcon('pi pi-code');
