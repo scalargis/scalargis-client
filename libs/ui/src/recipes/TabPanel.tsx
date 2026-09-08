@@ -45,6 +45,8 @@ export interface TabPanelProps {
   active: boolean;
   /** Mount strategy. Default 'eager'. */
   mount?: TabMount;
+  /** Stretch the active panel to fill a parent flex column (both wrappers become flex-column fill). Default false. */
+  fill?: boolean;
   className?: string;
   style?: CSSProperties;
   children: ReactNode;
@@ -64,7 +66,25 @@ const OFF_FLOW: CSSProperties = {
   pointerEvents: 'none',
 };
 
-export function TabPanel({ active, mount = 'eager', className, style, children }: TabPanelProps) {
+// Fill mode: the active panel stretches to the parent flex column and turns
+// into a flex column itself, so a height:100% body inside resolves. The
+// wrapper only claims flex space while active — an inactive fill wrapper would
+// otherwise split the column height between the hidden panels.
+const FILL_WRAPPER: CSSProperties = {
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: '1 1 auto',
+  minHeight: 0,
+};
+const FILL_ACTIVE: CSSProperties = {
+  flex: '1 1 auto',
+  minHeight: 0,
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+export function TabPanel({ active, mount = 'eager', fill = false, className, style, children }: TabPanelProps) {
   // 'lazy' latches: once revealed it stays mounted, so re-reveals are instant.
   const revealed = useRef(false);
   if (active) revealed.current = true;
@@ -80,9 +100,12 @@ export function TabPanel({ active, mount = 'eager', className, style, children }
 
   // Outer wrapper stays in flow and establishes the positioning context, so
   // the hidden inner body lays out at the true container width.
+  const wrapperStyle = fill && active ? FILL_WRAPPER : { position: 'relative' as const };
+  const activeStyle = fill ? { ...style, ...FILL_ACTIVE } : style;
+
   return (
-    <div style={{ position: 'relative' }}>
-      <div className={className} style={active ? style : { ...style, ...OFF_FLOW }}>
+    <div style={wrapperStyle}>
+      <div className={className} style={active ? activeStyle : { ...style, ...OFF_FLOW }}>
         {frozen.current}
       </div>
     </div>

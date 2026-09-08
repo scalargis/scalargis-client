@@ -83,6 +83,27 @@ describe('TabPanel', () => {
     expect(screen.queryByText('one')).toBeNull();
   });
 
+  it('fill stretches the active panel and its wrapper into flex columns', () => {
+    renderPanel({ active: true, fill: true, children: <span>Body</span> });
+
+    const inner = bodyWrapper();
+    expect(inner.style.flex).toBe('1 1 auto');
+    expect(inner.style.display).toBe('flex');
+    expect(inner.style.flexDirection).toBe('column');
+
+    const outer = inner.parentElement as HTMLElement;
+    expect(outer.style.flex).toBe('1 1 auto');
+    expect(outer.style.minHeight).toBe('0px');
+  });
+
+  it('fill wrapper claims no flex space while inactive', () => {
+    renderPanel({ active: false, fill: true, children: <span>Body</span> });
+
+    const outer = bodyWrapper().parentElement as HTMLElement;
+    expect(outer.style.flex).toBe('');
+    expect(outer.style.position).toBe('relative');
+  });
+
   it('unmount renders children only while active', () => {
     const { rerender } = renderPanel({ active: true, mount: 'unmount', children: <span>Body</span> });
     expect(screen.getByText('Body')).toBeTruthy();
