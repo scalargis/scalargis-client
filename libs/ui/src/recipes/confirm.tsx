@@ -56,6 +56,11 @@ export interface ConfirmOptions {
   reject?: () => void;
   /** Runs on every close, whichever button (or Esc) caused it. */
   onHide?: () => void;
+  /**
+   * Overrides the modal z-index. Defaults to the ADS dialog rung (6000);
+   * raise it (e.g. 6100) so a confirm clears an already-open Dialog.
+   */
+  zIndex?: number;
 }
 
 /**
@@ -75,8 +80,10 @@ export function confirm({
   accept,
   reject,
   onHide,
+  zIndex,
 }: ConfirmOptions): string {
   return modals.openConfirmModal({
+    ...(zIndex != null ? { zIndex } : {}),
     title: header,
     // The icon rides with the message rather than the header, so severity
     // survives when `header` is omitted and reads in DOM order for a
