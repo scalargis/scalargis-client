@@ -18,6 +18,79 @@
     --p-surface-700: var(--mantine-color-neutral-7);
     --p-surface-800: var(--mantine-color-neutral-8);
     --p-surface-900: var(--mantine-color-neutral-9);
+
+    // primeflex's colour utilities (.text-primary, .text-color,
+    // .border-yellow-300, .bg-red-50, .text-green-700, …) read the semantic
+    // --p-<family>-* ramps. Only --p-surface-* bridged before, so every other
+    // family stayed undefined and its utility dropped the declaration (no tint,
+    // inherited text colour). Map each ramp onto the ADS palette (ads-tokens.css
+    // --color-*, 50..900): red→danger, green→success, blue→informative, and both
+    // yellow and orange→warning (ADS has no orange scale). Same dead-family
+    // cleanup as the surface bridge above.
+    --p-primary-color: var(--color-primary-500);
+    --p-primary-contrast-color: var(--color-white);
+    --p-text-color: var(--color-text-primary);
+    --p-text-color-secondary: var(--color-text-secondary);
+    --p-primary-50: var(--color-primary-50);
+    --p-primary-100: var(--color-primary-100);
+    --p-primary-200: var(--color-primary-200);
+    --p-primary-300: var(--color-primary-300);
+    --p-primary-400: var(--color-primary-400);
+    --p-primary-500: var(--color-primary-500);
+    --p-primary-600: var(--color-primary-600);
+    --p-primary-700: var(--color-primary-700);
+    --p-primary-800: var(--color-primary-800);
+    --p-primary-900: var(--color-primary-900);
+    --p-red-50: var(--color-danger-50);
+    --p-red-100: var(--color-danger-100);
+    --p-red-200: var(--color-danger-200);
+    --p-red-300: var(--color-danger-300);
+    --p-red-400: var(--color-danger-400);
+    --p-red-500: var(--color-danger-500);
+    --p-red-600: var(--color-danger-600);
+    --p-red-700: var(--color-danger-700);
+    --p-red-800: var(--color-danger-800);
+    --p-red-900: var(--color-danger-900);
+    --p-green-50: var(--color-success-50);
+    --p-green-100: var(--color-success-100);
+    --p-green-200: var(--color-success-200);
+    --p-green-300: var(--color-success-300);
+    --p-green-400: var(--color-success-400);
+    --p-green-500: var(--color-success-500);
+    --p-green-600: var(--color-success-600);
+    --p-green-700: var(--color-success-700);
+    --p-green-800: var(--color-success-800);
+    --p-green-900: var(--color-success-900);
+    --p-blue-50: var(--color-informative-50);
+    --p-blue-100: var(--color-informative-100);
+    --p-blue-200: var(--color-informative-200);
+    --p-blue-300: var(--color-informative-300);
+    --p-blue-400: var(--color-informative-400);
+    --p-blue-500: var(--color-informative-500);
+    --p-blue-600: var(--color-informative-600);
+    --p-blue-700: var(--color-informative-700);
+    --p-blue-800: var(--color-informative-800);
+    --p-blue-900: var(--color-informative-900);
+    --p-yellow-50: var(--color-warning-50);
+    --p-yellow-100: var(--color-warning-100);
+    --p-yellow-200: var(--color-warning-200);
+    --p-yellow-300: var(--color-warning-300);
+    --p-yellow-400: var(--color-warning-400);
+    --p-yellow-500: var(--color-warning-500);
+    --p-yellow-600: var(--color-warning-600);
+    --p-yellow-700: var(--color-warning-700);
+    --p-yellow-800: var(--color-warning-800);
+    --p-yellow-900: var(--color-warning-900);
+    --p-orange-50: var(--color-warning-50);
+    --p-orange-100: var(--color-warning-100);
+    --p-orange-200: var(--color-warning-200);
+    --p-orange-300: var(--color-warning-300);
+    --p-orange-400: var(--color-warning-400);
+    --p-orange-500: var(--color-warning-600);
+    --p-orange-600: var(--color-warning-700);
+    --p-orange-700: var(--color-warning-800);
+    --p-orange-800: var(--color-warning-900);
+    --p-orange-900: var(--color-warning-900);
 }
 
 body {
