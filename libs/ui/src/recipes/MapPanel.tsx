@@ -37,6 +37,10 @@ export interface DockMapPanelProps extends MapPanelBase {
   variant?: 'dock';
   /** Drawer edge. Every current dock consumer sits on the right. */
   position?: DrawerRootProps['position'];
+  /** Inset from the viewport top, to clear the app topbar. Defaults to the 50px viewer topbar. */
+  offsetTop?: number | string;
+  /** Inset from the viewport bottom, to clear the app footer. Defaults to the 50px viewer footer. */
+  offsetBottom?: number | string;
 }
 
 export interface FloatMapPanelProps extends MapPanelBase {
@@ -84,7 +88,8 @@ export function MapPanel(props: MapPanelProps) {
     );
   }
 
-  const { position = 'right' } = props;
+  const { position = 'right', offsetTop = 50, offsetBottom = 50 } = props;
+  const toLength = (v: number | string) => (typeof v === 'number' ? `${v}px` : v);
   return (
     <>
       {pill}
@@ -97,6 +102,7 @@ export function MapPanel(props: MapPanelProps) {
         closeOnClickOutside={false}
         lockScroll={false}
         returnFocus
+        styles={{ inner: { top: toLength(offsetTop), bottom: toLength(offsetBottom) } }}
       >
         <Drawer.Content>
           <Drawer.Header bg={headerColor}>
