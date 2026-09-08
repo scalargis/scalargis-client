@@ -55,6 +55,8 @@ export interface FileUploadProps
   cancelLabel?: string;
   /** Empty-state content for the drop area. */
   placeholder?: React.ReactNode;
+  /** Show the drop area. Set false for the Prime shape: Choose opens the picker, no standing drop area. */
+  showDropArea?: boolean;
 }
 
 export function FileUpload({
@@ -66,6 +68,7 @@ export function FileUpload({
   uploadLabel = uiText('upload.upload', 'Upload'),
   cancelLabel = uiText('upload.cancel', 'Cancel'),
   placeholder = uiText('upload.placeholder', 'Drag and drop files here, or use Choose.'),
+  showDropArea = true,
   multiple = true,
   onReject: onRejectProp,
   ...dropzoneProps
@@ -203,6 +206,10 @@ export function FileUpload({
         multiple={multiple}
         disabled={uploading}
         {...dropzoneProps}
+        style={{
+          ...(typeof dropzoneProps.style === 'object' ? dropzoneProps.style : {}),
+          ...(showDropArea ? {} : { display: 'none' }),
+        }}
       >
         <Text ta="center" py="md" c="dimmed" size="sm">
           {placeholder}
