@@ -67,7 +67,7 @@ export function MapPanel(props: MapPanelProps) {
             {(styles) => (
               <Paper style={{ ...styles, width: size }} shadow="md" radius="md" withBorder>
                 <Group justify="space-between" wrap="nowrap" gap="xs" p="xs" bg={headerColor} style={roundedTop}>
-                  <Box fw={600} fz="sm">
+                  <Box fw={600} fz="sm" pl="xs">
                     {title}
                   </Box>
                   <Group gap={4} wrap="nowrap">
