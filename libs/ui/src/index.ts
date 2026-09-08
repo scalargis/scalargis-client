@@ -77,6 +77,16 @@ export type { FieldProps } from './recipes/Field';
 export { AttributeTable } from './recipes/AttributeTable';
 export type { AttributeTableProps, AttributeRow } from './recipes/AttributeTable';
 
+export { MapPanel } from './recipes/MapPanel';
+export type {
+  MapPanelProps,
+  DockMapPanelProps,
+  FloatMapPanelProps,
+} from './recipes/MapPanel';
+
+export { useMapResize } from './recipes/useMapResize';
+export type { MapResizeDeps, MapResizeActions } from './recipes/useMapResize';
+
 /* Icon seam — primeicons behind one indirection (see recipes/icons.tsx). */
 export * from './recipes/icons';
 

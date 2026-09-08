@@ -38,6 +38,7 @@ const en = {
   datagrid: { reorder: 'Reorder row' },
   dialog: { maximize: 'Maximize', restore: 'Restore', close: 'Close' },
   field: { required: 'This field is required' },
+  mappanel: { close: 'Close' },
 };
 
 const pt: typeof en = {
@@ -60,6 +61,7 @@ const pt: typeof en = {
   datagrid: { reorder: 'Reordenar linha' },
   dialog: { maximize: 'Maximizar', restore: 'Restaurar', close: 'Fechar' },
   field: { required: 'Campo de preenchimento obrigatório' },
+  mappanel: { close: 'Fechar' },
 };
 
 /** Idempotent; safe to call on every render. `pt-PT` resolves to the `pt`
