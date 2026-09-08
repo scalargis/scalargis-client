@@ -105,6 +105,13 @@ describe('MapPanel', () => {
     expect(screen.queryByText('Flutuante')).toBeNull();
   });
 
+  it('paints the header when headerColor is set', () => {
+    renderPanel(<MapPanel {...dockProps({ headerColor: 'warning.5' })} />);
+    const header = document.querySelector('.mantine-Drawer-header') as HTMLElement;
+    expect(header).toBeTruthy();
+    expect(header.getAttribute('style') || '').toContain('background');
+  });
+
   it('renders in the dark theme', () => {
     renderPanel(<MapPanel {...dockProps()} />, 'dark');
     expect(screen.getByText('Conteúdo')).toBeTruthy();

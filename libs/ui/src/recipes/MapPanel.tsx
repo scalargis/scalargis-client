@@ -28,6 +28,8 @@ interface MapPanelBase {
   collapsedControl?: React.ReactNode;
   /** Controls rendered before the close button (Help button, extra icons). */
   headerActions?: React.ReactNode;
+  /** Header background (a Mantine colour like `"warning.5"`). Omit for the plain header. */
+  headerColor?: string;
   children?: React.ReactNode;
 }
 
@@ -48,9 +50,12 @@ export interface FloatMapPanelProps extends MapPanelBase {
 export type MapPanelProps = DockMapPanelProps | FloatMapPanelProps;
 
 export function MapPanel(props: MapPanelProps) {
-  const { opened, onClose, title, size, collapsedControl, headerActions, children } = props;
+  const { opened, onClose, title, size, collapsedControl, headerActions, headerColor, children } = props;
   const pill = opened ? null : collapsedControl;
   const closeLabel = uiText('mappanel.close', 'Close');
+  const roundedTop = headerColor
+    ? { borderTopLeftRadius: 'var(--mantine-radius-md)', borderTopRightRadius: 'var(--mantine-radius-md)' }
+    : undefined;
 
   if (props.variant === 'float') {
     const { affixPosition = { top: 51, right: 16 }, transition = 'slide-left' } = props;
@@ -61,7 +66,7 @@ export function MapPanel(props: MapPanelProps) {
           <Transition mounted={opened} transition={transition}>
             {(styles) => (
               <Paper style={{ ...styles, width: size }} shadow="md" radius="md" withBorder>
-                <Group justify="space-between" wrap="nowrap" gap="xs" p="xs">
+                <Group justify="space-between" wrap="nowrap" gap="xs" p="xs" bg={headerColor} style={roundedTop}>
                   <Box fw={600} fz="sm">
                     {title}
                   </Box>
@@ -94,7 +99,7 @@ export function MapPanel(props: MapPanelProps) {
         returnFocus
       >
         <Drawer.Content>
-          <Drawer.Header>
+          <Drawer.Header bg={headerColor}>
             <Drawer.Title>{title}</Drawer.Title>
             <Group gap={4} wrap="nowrap">
               {headerActions}
