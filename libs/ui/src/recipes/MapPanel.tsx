@@ -62,10 +62,11 @@ export function MapPanel(props: MapPanelProps) {
     : undefined;
 
   if (props.variant === 'float') {
-    const { affixPosition = { top: 51, right: 16 }, transition = 'slide-left' } = props;
+    const { affixPosition = { top: 58, right: 16 }, transition = 'slide-left' } = props;
+    const affixTop = typeof affixPosition.top === 'number' ? affixPosition.top : 58;
     return (
       <>
-        {pill}
+        {pill && <Affix position={affixPosition}>{pill}</Affix>}
         <Affix position={affixPosition}>
           <Transition mounted={opened} transition={transition}>
             {(styles) => (
@@ -79,7 +80,12 @@ export function MapPanel(props: MapPanelProps) {
                     <CloseButton onClick={onClose} aria-label={closeLabel} />
                   </Group>
                 </Group>
-                <Box p="sm">{children}</Box>
+                <Box
+                  p="sm"
+                  style={{ maxHeight: `calc(100vh - ${affixTop + 66}px)`, overflowY: 'auto', overflowX: 'hidden' }}
+                >
+                  {children}
+                </Box>
               </Paper>
             )}
           </Transition>
