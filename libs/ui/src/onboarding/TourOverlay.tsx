@@ -18,7 +18,9 @@
 
    The popover card is hidden until the first rect measurement completes.
    Without this, the popover flashes at the center fallback position for one
-   frame while the rAF measurement is pending.
+   frame while the rAF measurement is pending. After that first measurement the
+   card stays mounted between steps; it repositions and swaps its text in place,
+   so a Next/Prev never fades the card out and back in.
 
    Rules of Hooks: every hook runs before the `if (!ctx) return null` guard.
    The controller and registry are read null-safe until that guard, the same
@@ -224,25 +226,28 @@ export default function TourOverlay() {
       wasActiveRef.current = false;
       return;
     }
-    // First activation: also null the stale rect from a previous session.
+    // First activation only: hide the card and null the stale rect from a
+    // previous session, so the card never flashes at the center fallback while
+    // the first measurement is pending (`rect` is null here). Between steps the
+    // card stays mounted. Toggling `ready` off on every step would close and
+    // reopen the Popover, and Mantine's fade would blink the card on each
+    // Next/Prev. So we keep it open, measure the new target one frame later, and
+    // let the card reposition and swap its text in place.
     if (!wasActiveRef.current) {
       wasActiveRef.current = true;
       setRect(null);
+      setReady(false);
     }
-    // Hide the card for one frame while the new rect is pending; `rect` still
-    // holds the old value here. One rAF later we measure the new target and
-    // show again. The card's side follows the new region through the Popover's
-    // preventPositionChangeWhenVisible={false} (see below).
-    setReady(false);
     const raf = requestAnimationFrame(() => {
       const measured = measureTarget(targetEl);
       setRect(measured);
       // Auto-skip a dead step (improvement 02). When the landed step has no
-      // live target, ask the controller to move on in the last direction. The
-      // move notifies, this effect re-runs for the new step, and the card
-      // stays hidden (ready false) until a live step lands. So a dead step
+      // live target, hide the card and ask the controller to move on in the
+      // last direction. The move notifies, this effect re-runs for the new
+      // step, and the card stays hidden until a live step lands. So a dead step
       // never shows.
       if (!isLiveRect(measured)) {
+        setReady(false);
         controller?.skipDeadStep();
         return;
       }
