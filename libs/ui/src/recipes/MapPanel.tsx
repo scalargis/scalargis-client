@@ -71,15 +71,19 @@ export function MapPanel(props: MapPanelProps) {
           <Transition mounted={opened} transition={transition}>
             {(styles) => (
               <Paper style={{ ...styles, width: size }} shadow="md" radius="md" withBorder>
-                <Group justify="space-between" wrap="nowrap" gap="xs" p="xs" bg={headerColor} style={roundedTop}>
-                  <Box fw={600} fz="sm" pl="xs">
+                <Box pos="relative" p="xs" bg={headerColor} style={roundedTop}>
+                  <Box fw={600} fz="sm" ta="center" px={48}>
                     {title}
                   </Box>
-                  <Group gap={4} wrap="nowrap">
+                  <Group
+                    gap={4}
+                    wrap="nowrap"
+                    style={{ position: 'absolute', top: 0, bottom: 0, right: 'var(--mantine-spacing-xs)', alignItems: 'center' }}
+                  >
                     {headerActions}
                     <CloseButton onClick={onClose} aria-label={closeLabel} />
                   </Group>
-                </Group>
+                </Box>
                 <Box
                   p="sm"
                   style={{ maxHeight: `calc(100vh - ${affixTop + 66}px)`, overflowY: 'auto', overflowX: 'hidden' }}
