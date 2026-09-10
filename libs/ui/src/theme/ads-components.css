@@ -46,15 +46,19 @@
    border in --tabs-color. Inside the tinted viewer panels that one thin
    line reads as "nothing selected" — and a panel that scrolls its tab list
    hides the line under the scrollbar. Restore the Prime affordance: the
-   active tab also takes the primary text colour and the medium weight, so
-   the selection stays legible without the border alone (the weight is the
-   non-colour cue, WCAG 1.4.1). Scoped to the default variant — pills and
-   outline paint their own active surface and must keep their own text.
+   active tab also takes the primary text colour, the medium weight and a
+   light grey fill with a rounded top, so the selection reads as a pill and
+   stays legible without the border alone (the weight is the non-colour cue,
+   WCAG 1.4.1). Scoped to the default variant — pills and outline paint their
+   own active surface and must keep their own text.
    -------------------------------------------------------------------- */
 .mantine-Tabs-tab[data-variant='default'][data-active],
 .mantine-Tabs-list[data-variant='default'] .mantine-Tabs-tab[data-active] {
   color: var(--mantine-color-primary-6);
   font-weight: 600;
+  background-color: var(--mantine-color-gray-0);
+  border-top-left-radius: var(--mantine-radius-xs);
+  border-top-right-radius: var(--mantine-radius-xs);
 }
 
 /* ─── Button ───────────────────────────────────────────────────────────
