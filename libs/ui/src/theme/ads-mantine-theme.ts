@@ -369,6 +369,20 @@ export const adsBaseTheme = createTheme({
         },
       },
     },
+
+    Alert: {
+      styles: {
+        root: {
+          paddingTop: rem(12),
+          paddingBottom: rem(12),
+          paddingLeft: rem(16),
+          paddingRight: rem(16),
+        },
+        icon: {
+          marginInlineEnd: rem(12),
+        },
+      },
+    },
   },
 
   /* ─── ESCAPE HATCH: raw ADS tokens for hand-written CSS ─────────── */
