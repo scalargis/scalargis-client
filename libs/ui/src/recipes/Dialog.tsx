@@ -31,6 +31,8 @@ export interface DialogProps extends Omit<ModalRootProps, 'title'> {
   height?: number | string;
   /** false = non-modal: no backdrop, page behind stays interactive. */
   withOverlay?: boolean;
+  /** Initial placement. 'top-left' anchors to the viewport corner (Prime's position='top-left'); default centred. */
+  position?: 'center' | 'top-left';
 }
 
 export function Dialog({
@@ -45,11 +47,15 @@ export function Dialog({
   zIndex,
   size: sizeProp,
   withOverlay = true,
+  position,
   ...rootProps
 }: DialogProps) {
   const theme = useMantineTheme();
   const isMobile = useIsMobile();
   const [maximized, setMaximized] = useState(false);
+
+  const topLeft = position === 'top-left';
+  const cornerBase = topLeft ? { justifyContent: 'flex-start', alignItems: 'flex-start' } : undefined;
 
   const resolvedSize = sizeProp ?? (isMobile ? '90%' : DIALOG_DESKTOP_SIZE);
 
@@ -147,7 +153,7 @@ export function Dialog({
     <Modal.Root
       opened={opened}
       onClose={onClose}
-      centered={centered}
+      centered={topLeft ? false : centered}
       zIndex={z}
       size={resolvedSize}
       fullScreen={maximized}
@@ -192,8 +198,8 @@ export function Dialog({
                   transition: 'none',
                 }
               : offset.x === 0 && offset.y === 0
-                ? undefined
-                : { transform: `translate(${offset.x}px, ${offset.y}px)`, transition: 'none' },
+                ? cornerBase
+                : { ...cornerBase, transform: `translate(${offset.x}px, ${offset.y}px)`, transition: 'none' },
         }}
       >
         <Modal.Header
