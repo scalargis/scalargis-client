@@ -112,6 +112,10 @@ const ADS_DEFAULTS = {
   paginationSize: 'sm',
   paginationWithEdges: true,
   paginationWithControls: true,
+  getPaginationItemProps: () => ({ 'data-ads-page-item': '' }),
+  getPaginationControlProps: (control: 'first' | 'last' | 'previous' | 'next') => ({
+    'data-ads-control': control,
+  }),
   // An empty table has no rows, so its body has no height, and the empty state
   // is centred into it absolutely — with nothing to centre in, the icon and its
   // text end up crushed against the header. This is the floor that gives them

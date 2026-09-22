@@ -222,33 +222,47 @@
   background-color: var(--mantine-color-body);
   border-top: 1px solid var(--mantine-color-neutral-2);
   font-size: var(--mantine-font-size-sm);
+  flex-wrap: nowrap;
 }
 
-/* The pagination footer is one flex row — count, page-size selector, pages —
-   which needs ~500px to stay legible. mantine-datatable can stack it, but off
-   `paginationWrapBreakpoint`, a VIEWPORT media query: on a desktop screen it
-   never fires, so the same grid that reads fine on a backoffice page collapses
-   into four ragged lines inside the viewer's ~300px side panel.
+.ads-datagrid__pagination .mantine-datatable-pagination-pages {
+  flex-wrap: nowrap;
+}
 
-   The grid's own width is what matters, so ask the container, not the screen.
-   Nothing is hidden — the row simply breaks in two: count + page size above,
-   pages centred below. */
+/* Borderless controls, light-blue tint on the current page (the Prime footer). */
+.ads-datagrid__pagination .mantine-datatable-pagination-pages-control {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.ads-datagrid__pagination .mantine-datatable-pagination-pages-control:hover {
+  background-color: var(--mantine-color-neutral-1);
+}
+
+.ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-active] {
+  background-color: var(--mantine-color-primary-0);
+  color: var(--mantine-color-primary-7);
+}
+
+.ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-active]:hover {
+  background-color: var(--mantine-color-primary-1);
+}
+
+/* The footer stays on one row at every width. In a narrow grid (the ~300px
+   viewer side panel) the row would overflow, so the pages collapse to
+   `previous / current / next`: the first/last edge buttons, the other page
+   numbers and the dots are hidden. A wide backoffice grid keeps the full set.
+   The width that matters is the grid's own, so the query asks the container. */
 .ads-datagrid {
   container-type: inline-size;
 }
 
 @container (max-width: 520px) {
-  .ads-datagrid__pagination {
-    flex-wrap: wrap;
-    row-gap: var(--mantine-spacing-xs);
-  }
-
-  /* Full-width second row. The pages themselves may wrap too rather than
-     overflow, which is what a 25-page set does at panel width. */
-  .ads-datagrid__pagination .mantine-datatable-pagination-pages {
-    flex: 0 0 100%;
-    justify-content: center;
-    flex-wrap: wrap;
+  .ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-ads-control='first'],
+  .ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-ads-control='last'],
+  .ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-ads-page-item]:not([data-active]),
+  .ads-datagrid__pagination .mantine-Pagination-dots {
+    display: none;
   }
 }
 
