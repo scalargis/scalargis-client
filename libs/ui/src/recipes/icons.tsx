@@ -108,6 +108,7 @@ export const IconEllipsisV = piIcon('pi pi-ellipsis-v');
 // People / auth
 export const IconUser = piIcon('pi pi-user');
 export const IconUserEdit = piIcon('pi pi-user-edit');
+export const IconUserMinus = piIcon('pi pi-user-minus');
 export const IconLock = piIcon('pi pi-lock');
 export const IconUnlock = piIcon('pi pi-unlock');
 export const IconKey = piIcon('pi pi-key');
