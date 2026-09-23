@@ -77,6 +77,9 @@ export type { FieldProps } from './recipes/Field';
 export { AttributeTable } from './recipes/AttributeTable';
 export type { AttributeTableProps, AttributeRow } from './recipes/AttributeTable';
 
+export { MapTip } from './recipes/MapTip';
+export type { MapTipProps } from './recipes/MapTip';
+
 export { MapPanel } from './recipes/MapPanel';
 export type {
   MapPanelProps,

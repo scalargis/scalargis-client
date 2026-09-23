@@ -421,3 +421,42 @@
   border-top: 1px solid var(--mantine-color-neutral-2);
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
 }
+
+/* ─── MapTip ─────────────────────────────────────────────────────────── */
+.ads-maptip {
+  position: absolute;
+  z-index: 1000;
+  width: fit-content;
+  max-width: 300px;
+  height: fit-content;
+  padding: 2px 4px;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25;
+  word-break: break-word;
+  pointer-events: none;
+  touch-action: none;
+  transform: translate(25px, -25px);
+}
+
+.ads-maptip--dark {
+  background-color: rgba(30, 30, 30, 0.7);
+  color: #f0f0f0;
+}
+
+.ads-maptip--bordered {
+  border: 1px solid #f0f0f0;
+}
+
+.ads-maptip--light {
+  background-color: rgba(242, 242, 242, 0.9);
+  color: #000000;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+@media screen and (max-width: 740px) {
+  .ads-maptip {
+    max-width: 360px;
+  }
+}
