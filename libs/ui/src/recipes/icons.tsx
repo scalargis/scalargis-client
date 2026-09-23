@@ -119,6 +119,7 @@ export const IconGlobe = piIcon('pi pi-globe');
 export const IconEnvelope = piIcon('pi pi-envelope');
 export const IconInbox = piIcon('pi pi-inbox');
 export const IconImage = piIcon('pi pi-image');
+export const IconCamera = piIcon('pi pi-camera');
 export const IconFolderOpen = piIcon('pi pi-folder-open');
 export const IconPalette = piIcon('pi pi-palette');
 export const IconCog = piIcon('pi pi-cog');
