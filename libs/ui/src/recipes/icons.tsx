@@ -150,6 +150,8 @@ export const IconArrowUp = piIcon('pi pi-arrow-up');
 // Charts / stats
 export const IconChartBar = piIcon('pi pi-chart-bar');
 export const IconChartLine = piIcon('pi pi-chart-line');
+export const IconPercentage = piIcon('pi pi-percentage');
+export const IconSitemap = piIcon('pi pi-sitemap');
 
 // Map / place
 export const IconMap = piIcon('pi pi-map');
@@ -175,9 +177,11 @@ export const IconEyeSlash = piIcon('pi pi-eye-slash');
 // Navigation arrows
 export const IconArrowDown = piIcon('pi pi-arrow-down');
 export const IconArrowRight = piIcon('pi pi-arrow-right');
+export const IconSortAlt = piIcon('pi pi-sort-alt');
 
 // Actions / status
 export const IconSync = piIcon('pi pi-sync');
+export const IconFilter = piIcon('pi pi-filter');
 export const IconFilterSlash = piIcon('pi pi-filter-slash');
 export const IconLockOpen = piIcon('pi pi-lock-open');
 export const IconSignIn = piIcon('pi pi-sign-in');
