@@ -279,6 +279,7 @@ export function DataGrid<T>({
   const tableProps = {
     ...ADS_DEFAULTS,
     minHeight: records?.length ? undefined : EMPTY_MIN_HEIGHT,
+    recordsPerPageLabel: uiText('datagrid.recordsPerPage', 'Records per page'),
     ...props,
     ...(reordering
       ? { rowFactory: reorderRowFactory, tableWrapper: reorderTableWrapper }

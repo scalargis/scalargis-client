@@ -20,6 +20,7 @@ describe('uiText', () => {
     expect(uiText('confirm.yes', 'Yes')).toBe('Sim');
     expect(uiText('notify.warn', 'Warning')).toBe('Aviso');
     expect(uiText('upload.choose', 'Choose')).toBe('Escolher');
+    expect(uiText('datagrid.recordsPerPage', 'Records per page')).toBe('Registos por página');
     expect(i18next.hasResourceBundle('pt', UI_NAMESPACE)).toBe(true);
   });
 

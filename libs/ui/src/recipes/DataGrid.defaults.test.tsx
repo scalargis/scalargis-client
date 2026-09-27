@@ -1,7 +1,7 @@
-/** DataGrid min height: the empty-state floor applies to an empty grid only. */
+/** DataGrid defaults: the empty-state floor on an empty grid only, and the page-size label. */
 import React from 'react';
 import { MantineProvider } from '@mantine/core';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { adsBaseTheme } from '../theme/ads-mantine-theme';
@@ -40,5 +40,20 @@ describe('DataGrid min height', () => {
 
   it('keeps a minHeight that the caller passes', () => {
     expect(rootOf({ records: [{ id: 1, name: 'Lagoa' }], minHeight: 300 }).style.minHeight).toBe('300px');
+  });
+});
+
+describe('DataGrid page-size label', () => {
+  it('labels the page-size picker with the recipe default', () => {
+    rootOf({
+      records: [{ id: 1, name: 'Lagoa' }],
+      totalRecords: 1,
+      page: 1,
+      onPageChange: () => undefined,
+      recordsPerPage: 10,
+      recordsPerPageOptions: [10, 20],
+      onRecordsPerPageChange: () => undefined,
+    });
+    expect(screen.getByText('Records per page').tagName).toBeTruthy();
   });
 });
