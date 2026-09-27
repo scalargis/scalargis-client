@@ -116,13 +116,14 @@ const ADS_DEFAULTS = {
   getPaginationControlProps: (control: 'first' | 'last' | 'previous' | 'next') => ({
     'data-ads-control': control,
   }),
-  // An empty table has no rows, so its body has no height, and the empty state
-  // is centred into it absolutely — with nothing to centre in, the icon and its
-  // text end up crushed against the header. This is the floor that gives them
-  // somewhere to be. It is the body that needs the room, not the state: adding
-  // spacing inside the state instead pushes it out of a body this short.
-  minHeight: 180,
 } as const satisfies Partial<DataTableProps<never>>;
+
+// An empty table has no rows, so its body has no height, and the empty state
+// is centred into it absolutely — with nothing to centre in, the icon and its
+// text end up crushed against the header. This is the floor that gives them
+// somewhere to be. It is the body that needs the room, not the state: adding
+// spacing inside the state instead pushes it out of a body this short.
+const EMPTY_MIN_HEIGHT = 180;
 
 const ADS_CLASS_NAMES = {
   // The root carries `container-type: inline-size`, so the pagination footer
@@ -277,6 +278,7 @@ export function DataGrid<T>({
   // Exactly one of `columns`/`groups` is present, so the discriminant holds.
   const tableProps = {
     ...ADS_DEFAULTS,
+    minHeight: records?.length ? undefined : EMPTY_MIN_HEIGHT,
     ...props,
     ...(reordering
       ? { rowFactory: reorderRowFactory, tableWrapper: reorderTableWrapper }
