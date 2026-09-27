@@ -70,7 +70,7 @@ export function MapPanel(props: MapPanelProps) {
         <Affix position={affixPosition}>
           <Transition mounted={opened} transition={transition}>
             {(styles) => (
-              <Paper style={{ ...styles, width: size }} shadow="md" radius="md" withBorder>
+              <Paper style={{ ...styles, width: size, maxWidth: 'calc(100vw - 32px)' }} shadow="md" radius="md" withBorder>
                 <Box pos="relative" p="xs" bg={headerColor} style={roundedTop}>
                   <Box fw={600} fz="sm" ta="center" px={48}>
                     {title}

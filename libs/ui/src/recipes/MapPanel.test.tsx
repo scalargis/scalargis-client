@@ -89,6 +89,17 @@ describe('MapPanel', () => {
     expect(screen.queryByText('Abrir')).toBeNull();
   });
 
+  it('float variant caps the card width at the viewport', () => {
+    renderPanel(
+      <MapPanel variant="float" opened onClose={vi.fn()} title="Cartão" size="30em">
+        <div>Flutuante</div>
+      </MapPanel>
+    );
+    const card = screen.getByText('Flutuante').closest('.mantine-Paper-root') as HTMLElement;
+    expect(card.style.width).toBe('30em');
+    expect(card.style.maxWidth).toBe('calc(100vw - 32px)');
+  });
+
   it('float variant shows the pill and no card when closed', () => {
     renderPanel(
       <MapPanel
