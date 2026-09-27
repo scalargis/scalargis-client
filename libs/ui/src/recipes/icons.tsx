@@ -99,6 +99,7 @@ export const IconSearch = piIcon('pi pi-search');
 export const IconSearchPlus = piIcon('pi pi-search-plus');
 export const IconEye = piIcon('pi pi-eye');
 export const IconList = piIcon('pi pi-list');
+export const IconListCheck = piIcon('pi pi-list-check');
 export const IconTable = piIcon('pi pi-table');
 export const IconObjectsColumn = piIcon('pi pi-objects-column');
 export const IconSliders = piIcon('pi pi-sliders-h');
@@ -107,6 +108,7 @@ export const IconEllipsisV = piIcon('pi pi-ellipsis-v');
 
 // People / auth
 export const IconUser = piIcon('pi pi-user');
+export const IconIdCard = piIcon('pi pi-id-card');
 export const IconUserEdit = piIcon('pi pi-user-edit');
 export const IconUserMinus = piIcon('pi pi-user-minus');
 export const IconLock = piIcon('pi pi-lock');
@@ -146,6 +148,8 @@ export const IconAngleLeft = piIcon('pi pi-angle-left');
 export const IconAngleRight = piIcon('pi pi-angle-right');
 export const IconAngleDoubleLeft = piIcon('pi pi-angle-double-left');
 export const IconAngleDoubleRight = piIcon('pi pi-angle-double-right');
+export const IconForward = piIcon('pi pi-forward');
+export const IconBackward = piIcon('pi pi-backward');
 export const IconArrowUp = piIcon('pi pi-arrow-up');
 
 // Charts / stats

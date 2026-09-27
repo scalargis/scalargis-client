@@ -31,8 +31,8 @@ export interface DialogProps extends Omit<ModalRootProps, 'title'> {
   height?: number | string;
   /** false = non-modal: no backdrop, page behind stays interactive. */
   withOverlay?: boolean;
-  /** Initial placement. 'top-left' anchors to the viewport corner (Prime's position='top-left'); default centred. */
-  position?: 'center' | 'top-left';
+  /** Initial placement. 'top-left' and 'top-right' anchor to that viewport corner (Prime's position prop); default centred. */
+  position?: 'center' | 'top-left' | 'top-right';
 }
 
 export function Dialog({
@@ -54,8 +54,10 @@ export function Dialog({
   const isMobile = useIsMobile();
   const [maximized, setMaximized] = useState(false);
 
-  const topLeft = position === 'top-left';
-  const cornerBase = topLeft ? { justifyContent: 'flex-start', alignItems: 'flex-start' } : undefined;
+  const corner = position === 'top-left' || position === 'top-right';
+  const cornerBase = corner
+    ? { justifyContent: position === 'top-right' ? 'flex-end' : 'flex-start', alignItems: 'flex-start' }
+    : undefined;
 
   const resolvedSize = sizeProp ?? (isMobile ? '90%' : DIALOG_DESKTOP_SIZE);
 
@@ -153,7 +155,7 @@ export function Dialog({
     <Modal.Root
       opened={opened}
       onClose={onClose}
-      centered={topLeft ? false : centered}
+      centered={corner ? false : centered}
       zIndex={z}
       size={resolvedSize}
       fullScreen={maximized}

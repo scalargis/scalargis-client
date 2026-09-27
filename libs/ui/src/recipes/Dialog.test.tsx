@@ -101,6 +101,32 @@ describe('Dialog', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it.each([
+    ['top-left', 'flex-start'],
+    ['top-right', 'flex-end'],
+  ] as const)('anchors the %s position to that viewport corner', (position, justify) => {
+    renderDialog(
+      <Dialog opened onClose={vi.fn()} title="Ajuda" position={position}>
+        Corpo
+      </Dialog>
+    );
+
+    const inner = document.querySelector('.mantine-Modal-inner') as HTMLElement;
+    expect(inner.style.justifyContent).toBe(justify);
+    expect(inner.style.alignItems).toBe('flex-start');
+  });
+
+  it('leaves the inner wrapper to Mantine centring by default', () => {
+    renderDialog(
+      <Dialog opened onClose={vi.fn()} title="Ajuda">
+        Corpo
+      </Dialog>
+    );
+
+    const inner = document.querySelector('.mantine-Modal-inner') as HTMLElement;
+    expect(inner.style.justifyContent).toBe('');
+  });
 });
 
 /* DIALOG_DEFAULTS is the ONE source for the ADS dialog rung — AdsProviders'
