@@ -49,6 +49,8 @@ export interface FloatMapPanelProps extends MapPanelBase {
   affixPosition?: AffixProps['position'];
   /** Slide direction. */
   transition?: MantineTransition;
+  /** Space kept free under the card, to clear the app footer. Defaults to the 50px viewer footer. */
+  offsetBottom?: number;
 }
 
 export type MapPanelProps = DockMapPanelProps | FloatMapPanelProps;
@@ -62,7 +64,7 @@ export function MapPanel(props: MapPanelProps) {
     : undefined;
 
   if (props.variant === 'float') {
-    const { affixPosition = { top: 58, right: 16 }, transition = 'slide-left' } = props;
+    const { affixPosition = { top: 58, right: 16 }, transition = 'slide-left', offsetBottom = 50 } = props;
     const affixTop = typeof affixPosition.top === 'number' ? affixPosition.top : 58;
     return (
       <>
@@ -86,7 +88,13 @@ export function MapPanel(props: MapPanelProps) {
                 </Box>
                 <Box
                   p="sm"
-                  style={{ maxHeight: `calc(100vh - ${affixTop + 66}px)`, overflowY: 'auto', overflowX: 'hidden' }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    maxHeight: `calc(100dvh - ${affixTop + 66 + offsetBottom}px)`,
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                  }}
                 >
                   {children}
                 </Box>

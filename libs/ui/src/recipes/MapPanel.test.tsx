@@ -100,6 +100,17 @@ describe('MapPanel', () => {
     expect(card.style.maxWidth).toBe('calc(100vw - 32px)');
   });
 
+  it('float variant keeps the card body above the footer', () => {
+    renderPanel(
+      <MapPanel variant="float" opened onClose={vi.fn()} title="Cartão" offsetBottom={35}>
+        <div>Flutuante</div>
+      </MapPanel>
+    );
+    const body = screen.getByText('Flutuante').parentElement as HTMLElement;
+    expect(body.style.maxHeight).toBe('calc(100dvh - 159px)');
+    expect(body.style.display).toBe('flex');
+  });
+
   it('float variant shows the pill and no card when closed', () => {
     renderPanel(
       <MapPanel
