@@ -118,3 +118,4 @@ export type {
 
 /* ─── Hooks ──────────────────────────────────────────────────────────── */
 export { useIsMobile } from './hooks/useIsMobile';
+export { useFooterHeight } from './hooks/useFooterHeight';

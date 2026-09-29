@@ -38,7 +38,7 @@ const en = {
   datagrid: { reorder: 'Reorder row', recordsPerPage: 'Records per page' },
   dialog: { maximize: 'Maximize', restore: 'Restore', close: 'Close' },
   field: { required: 'This field is required' },
-  mappanel: { close: 'Close' },
+  mappanel: { close: 'Close', expand: 'Expand', collapse: 'Collapse', resize: 'Resize panel' },
 };
 
 const pt: typeof en = {
@@ -61,7 +61,7 @@ const pt: typeof en = {
   datagrid: { reorder: 'Reordenar linha', recordsPerPage: 'Registos por página' },
   dialog: { maximize: 'Maximizar', restore: 'Restaurar', close: 'Fechar' },
   field: { required: 'Campo de preenchimento obrigatório' },
-  mappanel: { close: 'Fechar' },
+  mappanel: { close: 'Fechar', expand: 'Expandir', collapse: 'Recolher', resize: 'Redimensionar painel' },
 };
 
 /** Idempotent; safe to call on every render. `pt-PT` resolves to the `pt`

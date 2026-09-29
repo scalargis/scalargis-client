@@ -6,7 +6,7 @@
 import React from 'react';
 import { MantineProvider, type MantineColorScheme } from '@mantine/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { adsBaseTheme } from '../theme/ads-mantine-theme';
 import { MapPanel, type MapPanelProps } from './MapPanel';
@@ -137,5 +137,146 @@ describe('MapPanel', () => {
   it('renders in the dark theme', () => {
     renderPanel(<MapPanel {...dockProps()} />, 'dark');
     expect(screen.getByText('Conteúdo')).toBeTruthy();
+  });
+});
+
+function setMobile(matches: boolean) {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: matches && query.includes('max-width'),
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })) as unknown as typeof window.matchMedia;
+}
+
+function floatProps(over: Partial<MapPanelProps> = {}): MapPanelProps {
+  return {
+    variant: 'float',
+    opened: true,
+    onClose: vi.fn(),
+    title: 'Painel',
+    collapsedControl: <button type="button">Abrir</button>,
+    children: <div>Conteúdo</div>,
+    ...over,
+  } as MapPanelProps;
+}
+
+async function findSheet() {
+  return (await screen.findByRole('region', { name: 'Painel' })) as HTMLElement;
+}
+
+function pointer(el: Element, type: 'pointerDown' | 'pointerMove' | 'pointerUp', clientY: number) {
+  fireEvent[type](el, { clientY, pointerId: 1 });
+}
+
+describe('MapPanel on a phone', () => {
+  const realMatchMedia = window.matchMedia;
+  const realHeight = window.innerHeight;
+
+  beforeEach(() => {
+    setMobile(true);
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 1000 });
+  });
+
+  afterEach(() => {
+    window.matchMedia = realMatchMedia;
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: realHeight });
+  });
+
+  it('float renders a bottom sheet with the header slots', async () => {
+    const onClose = vi.fn();
+    renderPanel(<MapPanel {...floatProps({ onClose, headerActions: <button type="button">Ajuda</button> })} />);
+    const sheet = await findSheet();
+    expect(sheet.classList.contains('ads-mappanel-sheet')).toBe(true);
+    expect(sheet.getAttribute('data-stop')).toBe('0');
+    expect(screen.getByRole('button', { name: 'Ajuda' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('a tap on the grip steps through the three stops', async () => {
+    renderPanel(<MapPanel {...floatProps()} />);
+    const sheet = await findSheet();
+    const grip = screen.getByRole('button', { name: 'Resize panel' });
+    fireEvent.click(grip);
+    expect(sheet.getAttribute('data-stop')).toBe('1');
+    fireEvent.click(grip);
+    expect(sheet.getAttribute('data-stop')).toBe('2');
+    fireEvent.click(grip);
+    expect(sheet.getAttribute('data-stop')).toBe('0');
+  });
+
+  it('the arrow keys on the grip step one stop', async () => {
+    renderPanel(<MapPanel {...floatProps()} />);
+    const sheet = await findSheet();
+    const grip = screen.getByRole('button', { name: 'Resize panel' });
+    fireEvent.keyDown(grip, { key: 'ArrowUp' });
+    fireEvent.keyDown(grip, { key: 'ArrowUp' });
+    fireEvent.keyDown(grip, { key: 'ArrowUp' });
+    expect(sheet.getAttribute('data-stop')).toBe('2');
+    fireEvent.keyDown(grip, { key: 'ArrowDown' });
+    expect(sheet.getAttribute('data-stop')).toBe('1');
+  });
+
+  it('a drag follows the pointer and snaps to the nearest stop', async () => {
+    renderPanel(<MapPanel {...floatProps()} />);
+    const sheet = await findSheet();
+    const head = sheet.querySelector('.ads-mappanel-sheet-head') as HTMLElement;
+    let h = 300;
+    sheet.getBoundingClientRect = () => ({ height: h }) as DOMRect;
+    pointer(head, 'pointerDown', 700);
+    pointer(head, 'pointerMove', 450);
+    expect(sheet.style.height).toBe('550px');
+    h = 550;
+    pointer(head, 'pointerUp', 450);
+    expect(sheet.getAttribute('data-stop')).toBe('1');
+  });
+
+  it('a drag on a header button does not move the sheet', async () => {
+    renderPanel(<MapPanel {...floatProps()} />);
+    const sheet = await findSheet();
+    const close = screen.getByRole('button', { name: 'Close' });
+    pointer(close, 'pointerDown', 700);
+    pointer(close, 'pointerMove', 400);
+    expect(sheet.style.height).not.toMatch(/px$/);
+    expect(sheet.getAttribute('data-stop')).toBe('0');
+  });
+
+  it('the sheet sits on the modal layer, under portaled dropdowns', async () => {
+    renderPanel(<MapPanel {...floatProps({ offsetBottom: 35 })} />);
+    const sheet = await findSheet();
+    expect(sheet.style.zIndex).toBe('200');
+    expect(sheet.style.bottom).toBe('35px');
+  });
+
+  it('float puts the closed pill at the bottom centre above the attribution', async () => {
+    renderPanel(<MapPanel {...floatProps({ opened: false, offsetBottom: 40 })} />);
+    const pill = (await screen.findByText('Abrir')).closest('.ads-mappanel-pill--mobile') as HTMLElement;
+    expect(pill).toBeTruthy();
+    expect(pill.style.bottom).toBe('108px');
+  });
+
+  it('dock keeps the Drawer and moves its pill to the bottom', async () => {
+    const { rerender } = renderPanel(<MapPanel {...dockProps({ opened: false, offsetBottom: 40 })} />);
+    const pill = (await screen.findByText('Abrir')).closest('.ads-mappanel-pill--mobile');
+    expect(pill).toBeTruthy();
+    rerender(
+      <MantineProvider theme={adsBaseTheme}>
+        <MapPanel {...dockProps({ opened: true })} />
+      </MantineProvider>
+    );
+    expect(await screen.findByText('Conteúdo')).toBeTruthy();
+    expect(document.querySelector('.mantine-Drawer-content')).toBeTruthy();
+    expect(screen.queryByRole('region', { name: 'Painel' })).toBeNull();
+  });
+
+  it('mobile="off" keeps the float card', async () => {
+    renderPanel(<MapPanel {...floatProps({ mobile: 'off' })} />);
+    expect(await screen.findByText('Conteúdo')).toBeTruthy();
+    expect(document.querySelector('.ads-mappanel-sheet')).toBeNull();
   });
 });
