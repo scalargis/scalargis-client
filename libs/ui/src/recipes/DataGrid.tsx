@@ -21,7 +21,7 @@
    ===================================================================== */
 
 import React from 'react';
-import { Box, Group, Pagination, Paper, Stack, UnstyledButton } from '@mantine/core';
+import { Box, Group, Loader, LoadingOverlay, Pagination, Paper, Stack, UnstyledButton } from '@mantine/core';
 import {
   DataTable,
   DataTableDraggableRow,
@@ -179,7 +179,16 @@ const REORDER_HANDLE_COLUMN: DataGridColumn<unknown> = {
 
 type CardsProps<T> = Pick<
   DataTableProps<T>,
-  'records' | 'idAccessor' | 'noRecordsText' | 'onRowClick' | 'page' | 'onPageChange' | 'totalRecords' | 'recordsPerPage'
+  | 'records'
+  | 'idAccessor'
+  | 'noRecordsText'
+  | 'onRowClick'
+  | 'page'
+  | 'onPageChange'
+  | 'totalRecords'
+  | 'recordsPerPage'
+  | 'fetching'
+  | 'loadingText'
 > & { columns: DataGridColumn<T>[] };
 
 function cellValue<T>(column: DataGridColumn<T>, record: T, index: number): React.ReactNode {
@@ -201,6 +210,8 @@ function DataGridCards<T>({
   onPageChange,
   totalRecords,
   recordsPerPage,
+  fetching,
+  loadingText,
 }: CardsProps<T>) {
   const shown = columns.filter((c) => c.phone !== 'hidden' && !c.hidden);
   const role = (c: DataGridColumn<T>) => c.phone ?? 'body';
@@ -211,8 +222,18 @@ function DataGridCards<T>({
 
   return (
     <>
-      <Paper withBorder radius="sm" className="ads-datagrid-cards">
-        {records.length === 0 ? (
+      <Paper withBorder radius="sm" pos="relative" className="ads-datagrid-cards" aria-busy={fetching || undefined}>
+        <LoadingOverlay visible={Boolean(fetching) && records.length > 0} zIndex={2} overlayProps={{ blur: 1 }} />
+        {records.length === 0 && fetching ? (
+          <Stack align="center" gap="xs" p="md" role="status" aria-label={loadingText ?? uiText('datagrid.loading', 'Loading')}>
+            <Loader size="sm" />
+            {loadingText && (
+              <Box fz="sm" c="dimmed">
+                {loadingText}
+              </Box>
+            )}
+          </Stack>
+        ) : records.length === 0 ? (
           <Box p="md" fz="sm" c="dimmed" ta="center">
             {noRecordsText ?? uiText('datagrid.noRecords', 'No records')}
           </Box>
@@ -394,7 +415,7 @@ export function DataGrid<T>({
   } as unknown as DataTableProps<T>;
 
   if (isMobile && phoneLayout === 'cards' && columns) {
-    const { records: cardRecords, noRecordsText, onRowClick, page, onPageChange, totalRecords, recordsPerPage } =
+    const { records: cardRecords, noRecordsText, onRowClick, page, onPageChange, totalRecords, recordsPerPage, fetching, loadingText } =
       tableProps as DataTableProps<T> & { page?: number; onPageChange?: (p: number) => void; totalRecords?: number; recordsPerPage?: number };
     return (
       <DataGridCards
@@ -407,6 +428,8 @@ export function DataGrid<T>({
         onPageChange={onPageChange}
         totalRecords={totalRecords}
         recordsPerPage={recordsPerPage}
+        fetching={fetching}
+        loadingText={loadingText}
       />
     );
   }

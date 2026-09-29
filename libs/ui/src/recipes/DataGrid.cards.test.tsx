@@ -84,6 +84,31 @@ describe('DataGrid phoneLayout="cards"', () => {
     expect(onRowClick).toHaveBeenCalledWith(expect.objectContaining({ record: rows[1], index: 1 }));
   });
 
+  it('shows a loader in place of the empty text while fetching', () => {
+    setMobile(true);
+    renderGrid(
+      <DataGrid idAccessor="id" records={[]} columns={columns} phoneLayout="cards" noRecordsText="Sem registos" fetching />
+    );
+    expect(screen.queryByText('Sem registos')).toBeNull();
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy();
+  });
+
+  it('shows the loading text when the caller gives one', () => {
+    setMobile(true);
+    renderGrid(
+      <DataGrid idAccessor="id" records={[]} columns={columns} phoneLayout="cards" fetching loadingText="A carregar" />
+    );
+    expect(screen.getByRole('status', { name: 'A carregar' }).textContent).toContain('A carregar');
+  });
+
+  it('keeps the cards and marks the list busy while it fetches again', () => {
+    setMobile(true);
+    renderGrid(<DataGrid idAccessor="id" records={rows} columns={columns} phoneLayout="cards" fetching />);
+    expect(document.querySelectorAll('.ads-datagrid-card')).toHaveLength(2);
+    expect(document.querySelector('.ads-datagrid-cards')?.getAttribute('aria-busy')).toBe('true');
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
   it('pages the cards when the grid pages', () => {
     setMobile(true);
     const onPageChange = vi.fn();
