@@ -31,10 +31,13 @@
 /* The topbar sizes button icons to 1em (layout.scss:340 overriding the 2em in
    _topbar.scss); the anchor variants must match, or the "?" towers over every
    sibling icon and breaks the right-hand corner. The reset only knows `button`,
-   so restate 1em for both anchor forms. */
-.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-icon,
-.layout-topbar .layout-topbar-icons a.sg-help-button-link .layout-topbar-icon {
+   so restate 1em for the external anchor. */
+.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-icon {
   font-size: 1em;
+}
+
+.layout-topbar .layout-topbar-icons a.sg-help-button-link .layout-topbar-icon {
+  font-size: 1rem !important;
 }
 
 /* The sass hid this label with display:none, which also takes it out of the

@@ -63,7 +63,8 @@
   }
 }
 
-.layout-topbar .layout-topbar-icons .layout-topbar-search .layout-topbar-search-icon {
+.layout-topbar .layout-topbar-icons .layout-topbar-search-container .layout-topbar-search .layout-topbar-search-icon {
+  font-size: 18px !important;
   top: 2px;
   margin-left: 0;
 }

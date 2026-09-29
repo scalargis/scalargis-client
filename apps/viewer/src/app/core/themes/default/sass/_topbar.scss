@@ -19,7 +19,7 @@
     // row's own item now: a flex item has nowhere to escape to.
     .layout-topbar-icons {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         margin-left: auto;
         -moz-animation-duration: .5s;
         -webkit-animation-duration: .5s;

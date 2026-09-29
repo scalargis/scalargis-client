@@ -332,13 +332,12 @@ body .p-dropdown {
 // that it takes the 50px `.layout-main` deducts from its own height. In flow is
 // also why the strip's old float could reach `.layout-main` at all, so the row
 // is a flex line instead — the items cannot leave it, whatever the viewer puts
-// in the region. The padding moves to the cross axis: the top-only padding was
-// how a float got itself off the top edge.
+// in the region.
 .layout-topbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   position: unset;
-  padding: 0em 1.5em;
+  padding: 1.1em 1.5em 0em 1.5em;
   z-index: 1000;
 }
 
