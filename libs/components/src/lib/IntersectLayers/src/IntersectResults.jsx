@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Checkbox, Group, Menu } from '@mantine/core';
+import { Box, Button, Checkbox, Group, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { DataGrid, notify, IconUpload, IconChevronDown, IconChevronRight, IconTable, IconPlus, IconMinus } from '@scalargis/ui';
+import { ActionToolbar, DataGrid, ResponsiveButton, notify, IconUpload, IconChevronDown, IconChevronRight, IconTable, IconPlus, IconMinus } from '@scalargis/ui';
 import OlWKT from "ol/format/WKT";
 import OlFeature from 'ol/Feature';
 
@@ -496,15 +496,15 @@ export default function IntersectResults(props) {
     );
 
     const header = (
-        <div className="flex justify-content-between flex-wrap">
-            { showTablesButton && <div className="flex flex-wrap justify-content-end gap-2 my-1">
-                <Button type="button" size="xs" variant="subtle" leftSection={<IconTable />} onClick={showTable}>{t("tables", "Tabelas")}</Button>
-            </div> }
-            <div className="flex flex-wrap justify-content-end gap-2 my-1">
-                <Button type="button" size="xs" variant="subtle" leftSection={<IconPlus />} onClick={expandAll}>{t("expand", "Expandir")}</Button>
-                <Button type="button" size="xs" variant="subtle" leftSection={<IconMinus />} onClick={collapseAll}>{t("collapse", "Recolher")}</Button>
-            </div>
-        </div>
+        <Box my={4}>
+            <ActionToolbar
+                start={<>
+                    <ResponsiveButton size="xs" variant="subtle" icon={<IconPlus />} label={t("expand", "Expandir")} onClick={expandAll} />
+                    <ResponsiveButton size="xs" variant="subtle" icon={<IconMinus />} label={t("collapse", "Recolher")} onClick={collapseAll} />
+                </>}
+                actions={showTablesButton ? [{ key: 'tables', label: t("tables", "Tabelas"), icon: <IconTable />, onClick: showTable }] : []}
+            />
+        </Box>
     )
 
     return (

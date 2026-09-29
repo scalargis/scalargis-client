@@ -189,3 +189,69 @@ describe('Dialog responsive size default', () => {
     expect(modalSize()).toBe('50vw');
   });
 });
+
+describe('Dialog on a phone', () => {
+  afterEach(() => {
+    setMobile(false);
+  });
+
+  const grip = () => document.querySelector('[style*="nwse-resize"]');
+  const header = () => screen.getByText('Ajuda').closest('.mantine-Modal-header') as HTMLElement;
+
+  it('keeps the drag and the resize grip on a wide screen', () => {
+    setMobile(false);
+    renderDialog(<Dialog opened onClose={vi.fn()} title="Ajuda">Corpo</Dialog>);
+    expect(grip()).toBeTruthy();
+    expect(header().style.cursor).toBe('move');
+  });
+
+  it('auto drops the drag and the resize grip', () => {
+    setMobile(true);
+    renderDialog(<Dialog opened onClose={vi.fn()} title="Ajuda">Corpo</Dialog>);
+    expect(grip()).toBeNull();
+    expect(header().style.cursor).toBe('');
+  });
+
+  it('sheet renders a bottom sheet at the half stop with the pinned footer', () => {
+    setMobile(true);
+    const onClose = vi.fn();
+    renderDialog(
+      <Dialog opened onClose={onClose} title="Relatório" mobile="sheet" footer={<button type="button">Imprimir</button>}>
+        Corpo
+      </Dialog>
+    );
+    const sheet = screen.getByRole('region', { name: 'Relatório' });
+    expect(sheet.getAttribute('data-stop')).toBe('1');
+    expect(sheet.style.zIndex).toBe(String(DIALOG_DEFAULTS.zIndex));
+    expect(screen.getByText('Imprimir').closest('.ads-dialog__footer')).toBeTruthy();
+    expect(screen.getByText('Corpo').closest('.ads-dialog__footer')).toBeNull();
+    expect(document.querySelector('.mantine-Modal-content')).toBeNull();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('sheet renders nothing when closed', () => {
+    setMobile(true);
+    renderDialog(<Dialog opened={false} onClose={vi.fn()} title="Relatório" mobile="sheet">Corpo</Dialog>);
+    expect(screen.queryByRole('region')).toBeNull();
+  });
+
+  it('sheet keeps the window on a wide screen', () => {
+    setMobile(false);
+    renderDialog(<Dialog opened onClose={vi.fn()} title="Relatório" mobile="sheet">Corpo</Dialog>);
+    expect(document.querySelector('.ads-mappanel-sheet')).toBeNull();
+    expect(document.querySelector('.mantine-Modal-content')).toBeTruthy();
+  });
+
+  it('fullscreen fills the screen with no maximize control', () => {
+    setMobile(true);
+    renderDialog(
+      <Dialog opened onClose={vi.fn()} title="Ajuda" mobile="fullscreen" maximizable>
+        Corpo
+      </Dialog>
+    );
+    expect(document.querySelector('.mantine-Modal-content')?.hasAttribute('data-full-screen')).toBe(true);
+    expect(screen.queryByRole('button', { name: 'Maximize' })).toBeNull();
+    expect(grip()).toBeNull();
+  });
+});

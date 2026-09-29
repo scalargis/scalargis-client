@@ -528,8 +528,12 @@
   min-width: 0;
   text-align: center;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .ads-mappanel-sheet-body {
@@ -539,4 +543,9 @@
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+/* ─── DataGrid phone cards ─────────────────────────────────────────── */
+.ads-datagrid-card + .ads-datagrid-card {
+  border-top: 1px solid var(--mantine-color-neutral-2);
 }

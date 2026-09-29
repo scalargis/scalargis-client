@@ -2,9 +2,8 @@
  *  (Affix + Paper + Transition), sharing one controlled open state, a
  *  close button, a headerActions slot, and a collapse-to-pill toggle. */
 
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import {
-  ActionIcon,
   Affix,
   Box,
   CloseButton,
@@ -13,7 +12,6 @@ import {
   Paper,
   Portal,
   Transition,
-  UnstyledButton,
   type AffixProps,
   type DrawerRootProps,
   type MantineTransition,
@@ -21,8 +19,8 @@ import {
 
 import { useFooterHeight } from '../hooks/useFooterHeight';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { BottomSheet, SHEET_TOPBAR } from './BottomSheet';
 import { uiText } from './i18n';
-import { IconAngleDown, IconAngleUp } from './icons';
 
 interface MapPanelBase {
   opened: boolean;
@@ -63,10 +61,7 @@ export interface FloatMapPanelProps extends MapPanelBase {
 
 export type MapPanelProps = DockMapPanelProps | FloatMapPanelProps;
 
-const TOPBAR = 50;
-const SHEET_STOPS = [0.3, 0.55, 0.85];
-const SHEET_MIN = 80;
-const TAP_SLOP = 5;
+const TOPBAR = SHEET_TOPBAR;
 const PILL_LIFT = 68;
 const PANEL_Z = 200;
 
@@ -80,143 +75,6 @@ function MobilePill({ offsetBottom, children }: { offsetBottom: number; children
       >
         {children}
       </Box>
-    </Portal>
-  );
-}
-
-interface SheetProps {
-  title?: React.ReactNode;
-  headerColor?: string;
-  headerActions?: React.ReactNode;
-  onClose: () => void;
-  offsetBottom: number;
-  children?: React.ReactNode;
-}
-
-/** The phone form of the float card: a bottom sheet with a peek, a half, and a full stop. */
-function MapPanelSheet({ title, headerColor, headerActions, onClose, offsetBottom, children }: SheetProps) {
-  const [stop, setStop] = useState(0);
-  const [dragHeight, setDragHeight] = useState<number | null>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ startY: number; startH: number; moved: boolean } | null>(null);
-  const suppressClick = useRef(false);
-
-  const maxPx = () => window.innerHeight - TOPBAR - offsetBottom;
-  const stopPx = (i: number) => Math.min(SHEET_STOPS[i] * window.innerHeight, maxPx());
-  const last = SHEET_STOPS.length - 1;
-
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    if (target.closest('button, a, input') && !target.closest('[data-sheet-grip]')) return;
-    const startH = sheetRef.current?.getBoundingClientRect().height ?? stopPx(stop);
-    drag.current = { startY: e.clientY, startH, moved: false };
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-  };
-
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
-    if (!d) return;
-    const dy = d.startY - e.clientY;
-    if (!d.moved && Math.abs(dy) <= TAP_SLOP) return;
-    d.moved = true;
-    setDragHeight(Math.max(SHEET_MIN, Math.min(d.startH + dy, maxPx())));
-  };
-
-  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
-    drag.current = null;
-    e.currentTarget.releasePointerCapture?.(e.pointerId);
-    if (!d || !d.moved) return;
-    const h = sheetRef.current?.getBoundingClientRect().height ?? d.startH;
-    let nearest = 0;
-    SHEET_STOPS.forEach((_, i) => {
-      if (Math.abs(stopPx(i) - h) < Math.abs(stopPx(nearest) - h)) nearest = i;
-    });
-    suppressClick.current = true;
-    setDragHeight(null);
-    setStop(nearest);
-  };
-
-  const onGripClick = () => {
-    if (suppressClick.current) {
-      suppressClick.current = false;
-      return;
-    }
-    setStop((s) => (s + 1) % SHEET_STOPS.length);
-  };
-
-  const onGripKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setStop((s) => Math.min(s + 1, last));
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setStop((s) => Math.max(s - 1, 0));
-    }
-  };
-
-  const atTop = stop === last;
-  const stepLabel = atTop ? uiText('mappanel.collapse', 'Collapse') : uiText('mappanel.expand', 'Expand');
-  const height =
-    dragHeight != null
-      ? `${dragHeight}px`
-      : `min(${SHEET_STOPS[stop] * 100}dvh, calc(100dvh - ${TOPBAR + offsetBottom}px))`;
-
-  return (
-    <Portal>
-      <Paper
-        ref={sheetRef}
-        className="ads-mappanel-sheet"
-        shadow="md"
-        withBorder
-        role="region"
-        aria-label={typeof title === 'string' ? title : undefined}
-        data-stop={stop}
-        style={{
-          bottom: offsetBottom,
-          height,
-          maxWidth: 'none',
-          zIndex: PANEL_Z,
-          transition: dragHeight != null ? 'none' : 'height 200ms ease',
-        }}
-      >
-        <Box
-          bg={headerColor}
-          className="ads-mappanel-sheet-head"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-        >
-          <UnstyledButton
-            data-sheet-grip
-            className="ads-mappanel-sheet-grip"
-            aria-label={uiText('mappanel.resize', 'Resize panel')}
-            onClick={onGripClick}
-            onKeyDown={onGripKey}
-          />
-          <Group justify="space-between" wrap="nowrap" gap={4} px="xs" pb={4}>
-            <ActionIcon
-              variant="subtle"
-              color="dark"
-              aria-label={stepLabel}
-              onClick={() => setStop(atTop ? 0 : stop + 1)}
-            >
-              {atTop ? <IconAngleDown /> : <IconAngleUp />}
-            </ActionIcon>
-            <Box fw={600} fz="sm" className="ads-mappanel-sheet-title">
-              {title}
-            </Box>
-            <Group gap={4} wrap="nowrap">
-              {headerActions}
-              <CloseButton onClick={onClose} aria-label={uiText('mappanel.close', 'Close')} />
-            </Group>
-          </Group>
-        </Box>
-        <Box p="sm" className="ads-mappanel-sheet-body">
-          {children}
-        </Box>
-      </Paper>
     </Portal>
   );
 }
@@ -242,15 +100,16 @@ export function MapPanel(props: MapPanelProps) {
         <>
           {pill && <MobilePill offsetBottom={offsetBottom}>{pill}</MobilePill>}
           {opened && (
-            <MapPanelSheet
+            <BottomSheet
               title={title}
               headerColor={headerColor}
               headerActions={headerActions}
               onClose={onClose}
               offsetBottom={offsetBottom}
+              zIndex={PANEL_Z}
             >
               {children}
-            </MapPanelSheet>
+            </BottomSheet>
           )}
         </>
       );

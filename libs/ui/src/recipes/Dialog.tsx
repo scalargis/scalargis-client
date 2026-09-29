@@ -11,7 +11,9 @@ import {
   type ModalRootProps,
 } from '@mantine/core';
 
+import { useFooterHeight } from '../hooks/useFooterHeight';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { BottomSheet } from './BottomSheet';
 import { DIALOG_DEFAULTS } from './dialogDefaults';
 import { IconWindowMaximize, IconWindowMinimize } from './icons';
 import { uiText } from './i18n';
@@ -33,6 +35,8 @@ export interface DialogProps extends Omit<ModalRootProps, 'title'> {
   withOverlay?: boolean;
   /** Initial placement. 'top-left' and 'top-right' anchor to that viewport corner (Prime's position prop); default centred. */
   position?: 'center' | 'top-left' | 'top-right';
+  /** Phone form: `auto` keeps the window with no drag or resize, `sheet` is a bottom sheet over the map, `fullscreen` fills the screen. */
+  mobile?: 'auto' | 'sheet' | 'fullscreen';
 }
 
 export function Dialog({
@@ -48,11 +52,15 @@ export function Dialog({
   size: sizeProp,
   withOverlay = true,
   position,
+  mobile = 'auto',
   ...rootProps
 }: DialogProps) {
   const theme = useMantineTheme();
   const isMobile = useIsMobile();
+  const footerHeight = useFooterHeight();
   const [maximized, setMaximized] = useState(false);
+  const phoneFull = isMobile && mobile === 'fullscreen';
+  const fixed = maximized || isMobile;
 
   const corner = position === 'top-left' || position === 'top-right';
   const cornerBase = corner
@@ -90,14 +98,14 @@ export function Dialog({
   // Pointer capture keeps the drag/resize alive over a body iframe (StreetView).
   const onHeaderPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (maximized) return;
+      if (fixed) return;
       if ((e.target as HTMLElement).closest('button')) return;
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
       drag.current = box
         ? { startX: e.clientX, startY: e.clientY, baseX: box.x, baseY: box.y, anchored: true }
         : { startX: e.clientX, startY: e.clientY, baseX: offset.x, baseY: offset.y, anchored: false };
     },
-    [maximized, box, offset.x, offset.y]
+    [fixed, box, offset.x, offset.y]
   );
 
   const onHeaderPointerMove = useCallback((e: React.PointerEvent) => {
@@ -151,6 +159,22 @@ export function Dialog({
   // Modal.Root skips the theme's Modal defaultProps, so restate the ADS rung.
   const z = zIndex ?? theme.other?.zLadder?.dialog ?? DIALOG_DEFAULTS.zIndex;
 
+  if (isMobile && mobile === 'sheet') {
+    return opened ? (
+      <BottomSheet
+        title={title}
+        onClose={onClose}
+        offsetBottom={footerHeight}
+        footer={footer}
+        zIndex={z}
+        initialStop={1}
+        closeOnEscape={rootProps.closeOnEscape ?? true}
+      >
+        {children}
+      </BottomSheet>
+    ) : null;
+  }
+
   return (
     <Modal.Root
       opened={opened}
@@ -158,7 +182,7 @@ export function Dialog({
       centered={corner ? false : centered}
       zIndex={z}
       size={resolvedSize}
-      fullScreen={maximized}
+      fullScreen={maximized || phoneFull}
       transitionProps={DIALOG_DEFAULTS.transitionProps}
       {...rootProps}
     >
@@ -171,7 +195,7 @@ export function Dialog({
       <Modal.Content
         ref={contentRef}
         pos="relative"
-        h={maximized ? undefined : (box?.h ?? height)}
+        h={maximized || phoneFull ? undefined : (box?.h ?? height)}
         classNames={{ content: 'ads-dialog__content' }}
         styles={{
           // Width is flex-basis: the content is a flex item whose main size is
@@ -209,14 +233,14 @@ export function Dialog({
           onPointerMove={onHeaderPointerMove}
           onPointerUp={onHeaderPointerUp}
           style={
-            maximized
+            fixed
               ? undefined
               : { cursor: 'move', touchAction: 'none', userSelect: 'none' }
           }
         >
           <Modal.Title>{title}</Modal.Title>
           <Group gap={4} wrap="nowrap">
-            {maximizable && (
+            {maximizable && !phoneFull && (
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -240,7 +264,7 @@ export function Dialog({
           {children}
         </Modal.Body>
         {footer && <Box className="ads-dialog__footer">{footer}</Box>}
-        {!maximized && (
+        {!fixed && (
           <Box
             onPointerDown={onResizePointerDown}
             onPointerMove={onResizePointerMove}

@@ -21,7 +21,7 @@
    ===================================================================== */
 
 import React from 'react';
-import { UnstyledButton } from '@mantine/core';
+import { Box, Group, Pagination, Paper, Stack, UnstyledButton } from '@mantine/core';
 import {
   DataTable,
   DataTableDraggableRow,
@@ -39,6 +39,7 @@ import {
   type DropResult,
 } from '@hello-pangea/dnd';
 
+import { useIsMobile } from '../hooks/useIsMobile';
 import { exportCSV, type ExportCSVOptions, type ExportColumn } from './exportCSV';
 import { IconGripVertical } from './icons';
 import { uiText } from './i18n';
@@ -48,6 +49,10 @@ export type DataGridColumn<T> = DataTableColumn<T> & {
   exportRender?: (record: T) => unknown;
   /** Exclude this column from CSV export (action columns, checkboxes). */
   exportable?: boolean;
+  /** Place in a phone card: `title`, `meta` (dimmed line), `end` (right side), `body` (label and value, the default), or `hidden`. */
+  phone?: 'title' | 'meta' | 'end' | 'body' | 'hidden';
+  /** Cell for a phone card, when it differs from `render`. */
+  phoneRender?: (record: T, index: number) => React.ReactNode;
 };
 
 /** A grouped-header cell whose leaf columns carry the DataGrid CSV metadata. */
@@ -75,6 +80,8 @@ type DataGridBaseProps<T> = Omit<DataTableProps<T>, 'columns' | 'groups'> & {
    * `groups`, where no in-scope screen reorders rows.
    */
   onRowReorder?: (records: T[]) => void;
+  /** `cards` shows one card per record on a phone, laid out by each column's `phone` role. */
+  phoneLayout?: 'table' | 'cards';
 };
 
 /**
@@ -170,13 +177,111 @@ const REORDER_HANDLE_COLUMN: DataGridColumn<unknown> = {
   render: () => <RowDragHandle />,
 };
 
+type CardsProps<T> = Pick<
+  DataTableProps<T>,
+  'records' | 'idAccessor' | 'noRecordsText' | 'onRowClick' | 'page' | 'onPageChange' | 'totalRecords' | 'recordsPerPage'
+> & { columns: DataGridColumn<T>[] };
+
+function cellValue<T>(column: DataGridColumn<T>, record: T, index: number): React.ReactNode {
+  if (column.phoneRender) return column.phoneRender(record, index);
+  if (column.render) return column.render(record, index);
+  const path = String(column.accessor).split('.');
+  const value = path.reduce<unknown>((v, key) => (v == null ? v : (v as Record<string, unknown>)[key]), record);
+  return value == null ? '' : String(value);
+}
+
+/** The phone form of the grid: one card per record. */
+function DataGridCards<T>({
+  columns,
+  records = [],
+  idAccessor = 'id',
+  noRecordsText,
+  onRowClick,
+  page,
+  onPageChange,
+  totalRecords,
+  recordsPerPage,
+}: CardsProps<T>) {
+  const shown = columns.filter((c) => c.phone !== 'hidden' && !c.hidden);
+  const role = (c: DataGridColumn<T>) => c.phone ?? 'body';
+  const lead = shown.filter((c) => role(c) === 'title' || role(c) === 'meta');
+  const end = shown.filter((c) => role(c) === 'end');
+  const body = shown.filter((c) => role(c) === 'body');
+  const pages = page && onPageChange && totalRecords && recordsPerPage ? Math.ceil(totalRecords / recordsPerPage) : 0;
+
+  return (
+    <>
+      <Paper withBorder radius="sm" className="ads-datagrid-cards">
+        {records.length === 0 ? (
+          <Box p="md" fz="sm" c="dimmed" ta="center">
+            {noRecordsText ?? uiText('datagrid.noRecords', 'No records')}
+          </Box>
+        ) : (
+          records.map((record, index) => (
+            <Box
+              key={String(getRecordId(record, idAccessor))}
+              className="ads-datagrid-card"
+              px="sm"
+              py="xs"
+              style={onRowClick ? { cursor: 'pointer' } : undefined}
+              onClick={onRowClick ? (event) => onRowClick({ record, index, event }) : undefined}
+            >
+              <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
+                <Stack gap={2} miw={0} style={{ flex: 1 }}>
+                  {lead.map((c) =>
+                    role(c) === 'meta' ? (
+                      <Box key={String(c.accessor)} fz="xs" c="dimmed">
+                        {cellValue(c, record, index)}
+                      </Box>
+                    ) : (
+                      <Box key={String(c.accessor)} fz="sm" miw={0} style={{ overflowWrap: 'anywhere' }}>
+                        {cellValue(c, record, index)}
+                      </Box>
+                    )
+                  )}
+                </Stack>
+                {end.length > 0 && (
+                  <Stack gap={0} align="flex-end">
+                    {end.map((c) => (
+                      <Box key={String(c.accessor)}>{cellValue(c, record, index)}</Box>
+                    ))}
+                  </Stack>
+                )}
+              </Group>
+              {body.length > 0 && (
+                <Stack gap={2} mt={4}>
+                  {body.map((c) => (
+                    <Group key={String(c.accessor)} gap={4} wrap="wrap" fz="sm">
+                      {c.title && <Box c="dimmed">{c.title}:</Box>}
+                      <Box miw={0} style={{ overflowWrap: 'anywhere' }}>
+                        {cellValue(c, record, index)}
+                      </Box>
+                    </Group>
+                  ))}
+                </Stack>
+              )}
+            </Box>
+          ))
+        )}
+      </Paper>
+      {pages > 1 && (
+        <Group justify="center" mt="xs">
+          <Pagination size="sm" total={pages} value={page} onChange={onPageChange} />
+        </Group>
+      )}
+    </>
+  );
+}
+
 export function DataGrid<T>({
   classNames,
   columns,
   groups,
   onRowReorder,
+  phoneLayout = 'table',
   ...props
 }: DataGridProps<T>) {
+  const isMobile = useIsMobile();
   // Caller class names extend ours rather than replacing them, so opting into
   // a custom pagination style doesn't silently drop the header band.
   const mergedClassNames = React.useMemo(
@@ -287,6 +392,24 @@ export function DataGrid<T>({
     ...(groups ? { groups } : { columns: effectiveColumns }),
     classNames: mergedClassNames,
   } as unknown as DataTableProps<T>;
+
+  if (isMobile && phoneLayout === 'cards' && columns) {
+    const { records: cardRecords, noRecordsText, onRowClick, page, onPageChange, totalRecords, recordsPerPage } =
+      tableProps as DataTableProps<T> & { page?: number; onPageChange?: (p: number) => void; totalRecords?: number; recordsPerPage?: number };
+    return (
+      <DataGridCards
+        columns={columns}
+        records={cardRecords}
+        idAccessor={idAccessor}
+        noRecordsText={noRecordsText}
+        onRowClick={onRowClick}
+        page={page}
+        onPageChange={onPageChange}
+        totalRecords={totalRecords}
+        recordsPerPage={recordsPerPage}
+      />
+    );
+  }
 
   return <DataTable {...tableProps} />;
 }
