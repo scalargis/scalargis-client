@@ -337,7 +337,7 @@ body .p-dropdown {
   display: flex;
   align-items: flex-start;
   position: unset;
-  padding: 1.1em 1.5em 0em 1.5em;
+  padding: 1.1em 1.5em 0em 0;
   z-index: 1000;
 }
 
@@ -347,13 +347,16 @@ body .p-dropdown {
     left: 0px !important;
     width: 55px;
     height: 50px;
-    padding: 1.1em 1.5em;
+    padding: 1.1em 0;
     background: rgba(33, 150, 243, 0.92);
     z-index: 1000 !important;
 }
 
 .layout-topbar .layout-menu-button {
   font-size: 9px;
+  flex: 0 0 55px;
+  width: 55px;
+  text-align: center;
 }
 
 
