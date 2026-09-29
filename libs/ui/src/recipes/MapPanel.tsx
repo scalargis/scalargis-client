@@ -175,6 +175,7 @@ function MapPanelSheet({ title, headerColor, headerActions, onClose, offsetBotto
         style={{
           bottom: offsetBottom,
           height,
+          maxWidth: 'none',
           zIndex: PANEL_Z,
           transition: dragHeight != null ? 'none' : 'height 200ms ease',
         }}

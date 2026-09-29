@@ -250,6 +250,7 @@ describe('MapPanel on a phone', () => {
     renderPanel(<MapPanel {...floatProps({ offsetBottom: 35 })} />);
     const sheet = await findSheet();
     expect(sheet.style.zIndex).toBe('200');
+    expect(sheet.style.maxWidth).toBe('none');
     expect(sheet.style.bottom).toBe('35px');
   });
 
