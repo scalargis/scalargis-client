@@ -128,3 +128,4 @@ export type {
 /* ─── Hooks ──────────────────────────────────────────────────────────── */
 export { useIsMobile } from './hooks/useIsMobile';
 export { useFooterHeight } from './hooks/useFooterHeight';
+export { useTopbarOffset } from './hooks/useTopbarOffset';

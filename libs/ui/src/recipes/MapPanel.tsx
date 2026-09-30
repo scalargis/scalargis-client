@@ -19,6 +19,7 @@ import {
 
 import { useFooterHeight } from '../hooks/useFooterHeight';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { useTopbarOffset } from '../hooks/useTopbarOffset';
 import { BottomSheet, SHEET_TOPBAR } from './BottomSheet';
 import { uiText } from './i18n';
 
@@ -43,7 +44,7 @@ export interface DockMapPanelProps extends MapPanelBase {
   variant?: 'dock';
   /** Drawer edge. Every current dock consumer sits on the right. */
   position?: DrawerRootProps['position'];
-  /** Inset from the viewport top, to clear the app topbar. Defaults to the 50px viewer topbar. */
+  /** Inset from the viewport top, to clear the app topbar. Defaults to 50px, or 0 in the embedded layout. */
   offsetTop?: number | string;
   /** Inset from the viewport bottom, to clear the app footer. Defaults to the measured viewer footer. */
   offsetBottom?: number | string;
@@ -84,6 +85,7 @@ export function MapPanel(props: MapPanelProps) {
     props;
   const isMobile = useIsMobile() && mobile !== 'off';
   const footerHeight = useFooterHeight();
+  const topbarOffset = useTopbarOffset(TOPBAR);
   const pill = opened ? null : collapsedControl;
   const closeLabel = uiText('mappanel.close', 'Close');
   const roundedTop = headerColor
@@ -159,7 +161,7 @@ export function MapPanel(props: MapPanelProps) {
     );
   }
 
-  const { position = 'right', offsetTop = TOPBAR } = props;
+  const { position = 'right', offsetTop = topbarOffset } = props;
   const offsetBottom = props.offsetBottom ?? footerHeight;
   const toLength = (v: number | string) => (typeof v === 'number' ? `${v}px` : v);
   return (
