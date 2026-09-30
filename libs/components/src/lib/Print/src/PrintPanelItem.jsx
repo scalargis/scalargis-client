@@ -19,6 +19,7 @@ import { DrawingToolbar } from '../../components';
 import PrintFormFields from './PrintFormFields';
 import { MAPCONTROL_NAME, DEFAULT_DRAWING_TOOLS } from './utils';
 
+import { runJob } from '../../utils/jobs';
 import './style.css';
 
 // Scale-tab key (the config's defaultScaleSelector vocabulary) → scale mode.
@@ -351,8 +352,7 @@ export default function PrintPanelItem(props) {
       body: data
     }
 
-    return fetch(url, opts)
-      .then(res => res.json())
+    return runJob(url + '/job', core.API_URL + '/jobs', opts, { fallbackUrl: url })
       .then(res => {
         setIsPrinting(false);
         if (res.Success) {

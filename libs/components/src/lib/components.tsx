@@ -69,6 +69,7 @@ import {
 
 import * as i18n from './utils/i18n';
 import * as utils from './utils/common';
+import { runJob, JobError } from './utils/jobs';
 
 
 import  LocaleSelectorComponent from  './LocaleSelector/src/LocaleSelector';
@@ -144,6 +145,8 @@ export {
 
   i18n,
   utils,
+  runJob,
+  JobError,
 
   LocaleSelectorComponent
 };

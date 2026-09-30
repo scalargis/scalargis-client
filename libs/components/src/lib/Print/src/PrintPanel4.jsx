@@ -3,6 +3,7 @@ import { useTranslation} from "react-i18next";
 import { Alert, Button, Group, Loader } from '@mantine/core';
 import { notify, IconInfoCircle, IconXCircle, IconCheck, IconExternalLink, IconChevronLeft } from '@scalargis/ui';
 
+import { runJob } from '../../utils/jobs';
 import './style.css';
 
 
@@ -153,8 +154,7 @@ export default function PrintPanel4(props) {
         body: data
       }
 
-      return fetch(url, opts)
-        .then(res => res.json())
+      return runJob(url + '/job', API_URL + '/jobs', opts, { fallbackUrl: url })
         .then(res => {
           // Make a shallow copy of the item we want to mutate
           const item = {...print};
