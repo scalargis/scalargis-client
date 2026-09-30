@@ -1,5 +1,5 @@
 /**
- * The palette's AA gate, mechanized (kit 02 pairing checks / kit 06):
+ * The palette's AA gate, mechanized:
  * for every shipped preset, white↔primary[primaryShade] must clear 4.5:1
  * in both directions — this is the check that made the bright brands bump
  * to shade 7. Editing a tuple or a shade without re-running the numbers
@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { adsBaseTheme } from './ads-mantine-theme';
 import { clientThemePresets, resolveClientThemePreset } from './presets';
 
-// WCAG 2.x sRGB relative luminance — the same maths as the kit and the
+// WCAG 2.x sRGB relative luminance — the same maths as the
 // /demo-ext/theme live table.
 function srgbChannel(value: number): number {
   const c = value / 255;
@@ -31,7 +31,7 @@ function contrast(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-describe('clientThemePresets (kit 06 palette gates)', () => {
+describe('clientThemePresets', () => {
   it('ships the six sellable presets, default first', () => {
     expect(clientThemePresets.map((p) => p.name)).toEqual([
       'default',

@@ -1,19 +1,17 @@
 # @scalargis/ui
 
-The Mantine foundation lib for the PrimeReact→Mantine migration
-(`references/projects/client/migration2/mantine/`).
+The Mantine foundation lib for the PrimeReact→Mantine migration.
 
-What lives here — and the only things allowed to (plan §1c anti-goal:
+What lives here — and the only things allowed to (anti-goal:
 **no universal widget abstraction layer**):
 
-- **`adsBaseTheme`** — the ADS-anchored base theme (living copy; the spec is
-  the adherence kit at `references/projects/client/migration2/ads-adherence-restrictions/`).
+- **`adsBaseTheme`** — the ADS-anchored base theme (see `docs/aderencia-ads.md` at the repo root).
   Client themes may override `colors.primary`/`colors.secondary`, with
   written justification `primaryShade`, and — client-BRANDED themes only,
   the B2 font clause — the font family. Nothing else. **`createClientTheme()`**
   is the only sanctioned way to build one: it merges over the base and throws
   on any key outside that contract, so the ADS-immutable boundary is enforced
-  by construction, not by review (kit 06 §override contract, extending kit 05).
+  by construction, not by review.
   The shipped six-preset palette (`src/theme/presets.ts`, AA-gated by its
   test) is the data behind the viewer's theme folders — the how-to for theme
   authors is `apps/viewer/src/app/themes/README.md`.
@@ -47,8 +45,8 @@ What lives here — and the only things allowed to (plan §1c anti-goal:
   | `exportCSV`, `toCSV` | `DataTable.exportCSV()` |
 
   Recipes carry no **primereact** dependency (it is removed in Phase 5). They
-  do use **primeicons** (`pi pi-*`) — kept permanently by plan decision
-  (mantine/README.md §decisions; a standalone MIT icon font) — but only
+  do use **primeicons** (`pi pi-*`) — kept permanently
+  (a standalone MIT icon font) — but only
   through `src/recipes/icons.tsx`, the single mapping point, so a future
   icon-set swap is a one-file change. AdsProviders imports the primeicons
   stylesheet itself. Recipe default strings (button labels, toast titles) are
@@ -62,13 +60,13 @@ What lives here — and the only things allowed to (plan §1c anti-goal:
    the theme object must therefore go through Mantine's `rem()` — a literal
    `'1rem'` escapes the scale and silently renders 12.5% small. Hand-written CSS
    uses `calc(<n>rem * var(--mantine-scale))`.
-2. Coexistence-window note: two kit rules (html/body base document, global `<a>`
+2. Coexistence-window note: two ADS rules (html/body base document, global `<a>`
    underline) ship deferred inside `src/theme/ads-globals.css` — see the comment
    there before "fixing" it: activation is one atomic app-global commit at the
    end of Phase 3 (root to 16px + theme `scale` removal + those blocks),
    because the file and the theme are shared by both apps. Note that Mantine's
    own `styles.css` already restyles `body`; that bleed onto Prime screens is
-   sanctioned (qa/phase-1 D4).
+   sanctioned.
 
 `eslint.config.js` bans `primereact` imports in this lib — the recipes must
 survive the Phase 5 primereact removal untouched, so a violation fails

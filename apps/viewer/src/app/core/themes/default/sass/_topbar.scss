@@ -25,7 +25,7 @@
         -webkit-animation-duration: .5s;
         animation-duration: .5s;
 
-        // Trap 3 (qa/phase-3.md): this rule knew only `button`, so anchors in
+        // Trap 3: this rule knew only `button`, so anchors in
         // the strip (HelpButton's external-link mode) carried none of the item
         // chrome. Both are topbar items now.
         button, a {

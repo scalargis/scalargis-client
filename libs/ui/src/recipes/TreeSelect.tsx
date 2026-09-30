@@ -107,8 +107,7 @@ export function TreeSelect({
       /* The dropdown is portaled, so without a trap, Tab never reaches it.
          Trapping gets Arrow keys + Esc working from the tree; TreeView's
          Enter binding commits the focused node through the same
-         onSelectedStateChange path as a click (closed the qa/phase-1
-         keyboard-selection item, 2026-07-10). */
+         onSelectedStateChange path as a click. */
       trapFocus
       returnFocus
     >

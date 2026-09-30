@@ -1,7 +1,7 @@
-// CSS order rule (migration2/mantine plan, kit 05): global CSS first, then
+// CSS order rule: global CSS first, then
 // the Mantine block (@scalargis/ui: Mantine core → ads-tokens → ads-globals).
 // These lines own that order for the whole viewer — keep them at the top.
-// primeicons stays by plan decision (the recipe icons ARE primeicons);
+// primeicons stays (the recipe icons ARE primeicons);
 // primeflex utility classnames are still used and leave in Phase 5.
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';

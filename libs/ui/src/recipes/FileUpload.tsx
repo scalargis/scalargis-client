@@ -1,11 +1,11 @@
 /* =====================================================================
-   FileUpload — the Prime FileUpload twin (plan §1c, 17 call sites).
+   FileUpload — the Prime FileUpload twin.
 
    @mantine/dropzone is only the drop area. Prime's FileUpload is an
    action bar (Choose / Upload / Cancel) over a drop area, with a staged
    file list, per-file removal and an upload progress bar — and in
-   `auto` mode it skips the bar and uploads on drop. That whole shape is
-   the "one genuinely new build" the evaluation flagged, so it lives here.
+   `auto` mode it skips the bar and uploads on drop. Mantine has no such
+   widget, so it lives here.
 
    Keyboard: Choose opens the native picker via the dropzone's openRef, so
    the flow never depends on drag-and-drop (WCAG 2.1.1). Rejected files

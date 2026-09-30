@@ -1,7 +1,7 @@
 /* =====================================================================
    AdsProviders — the single Mantine mount point for both app shells
    (viewer app.jsx, backoffice app.jsx). Mounted once in Phase 1,
-   removed never (migration2/mantine/02-phase-1-foundations.md §1a).
+   removed never.
 
    This module also owns the Mantine side of the CSS import order:
      Prime globals → Mantine core styles → ads-tokens.css → ads-globals.css
@@ -17,8 +17,7 @@ import '@fontsource/noto-sans/500.css';
 import '@fontsource/noto-sans/600.css';
 import '@fontsource/noto-sans/700.css';
 
-/* primeicons — kept permanently by plan decision (mantine/README.md
-   §decisions); the recipes render pi classes via recipes/icons.tsx, so the
+/* primeicons — kept permanently; the recipes render pi classes via recipes/icons.tsx, so the
    lib loads the font itself instead of assuming the shell still does. The
    shells import it earlier anyway (Prime globals), so this dedupes. */
 import 'primeicons/primeicons.css';
@@ -68,8 +67,8 @@ export function AdsProviders({ children }: AdsProvidersProps) {
   const activeLanguage = i18n?.resolvedLanguage ?? i18n?.language;
   const locale = activeLanguage?.startsWith('pt') ? 'pt' : 'en';
 
-  // <html lang> follows the active i18next language (kit 04 §screen-reader:
-  // WCAG 3.1.1 — the document lang must flip with the content language so
+  // <html lang> follows the active i18next language
+  // (WCAG 3.1.1 — the document lang must flip with the content language so
   // screen readers switch pronunciation). The tag is already valid BCP-47
   // ('pt', 'pt-PT', 'en'); until i18next has one, the shell's static
   // index.html lang stands.
@@ -89,7 +88,7 @@ export function AdsProviders({ children }: AdsProvidersProps) {
 
   return (
     // ADS is a light-only system — a dark scheme would be its own spec,
-    // not a client override (kit 05 §what this mapping does NOT do).
+    // not a client override.
     <MantineProvider
       theme={activeClientTheme?.theme ?? adsBaseTheme}
       cssVariablesResolver={adsCssVariablesResolver}

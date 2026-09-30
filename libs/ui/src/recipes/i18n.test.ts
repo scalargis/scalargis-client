@@ -1,5 +1,5 @@
 /**
- * The "i18n-aware defaults" contract (plan §1c): recipe strings resolve in
+ * The "i18n-aware defaults" contract: recipe strings resolve in
  * the app language at call time, registered on the host i18next singleton —
  * the same instance the shells initialise (apps/<app>/src/app/core/i18n).
  */

@@ -150,7 +150,7 @@ export function TreeView({
 
   // Mantine's Tree binds Space and the Arrow keys but NOT Enter (9.4.1
   // TreeNode handleKeyDown), so a keyboard user can focus a row yet never
-  // activate it — the kit 04 (2.1.1) gap recorded in qa/phase-1.md, and what
+  // activate it (a WCAG 2.1.1 gap), and what
   // made TreeSelect unusable without a pointer. The ARIA tree pattern gives
   // Enter the node's default action; here that mirrors a row click exactly:
   // toggle the check in checkbox mode, otherwise disclose + select the same

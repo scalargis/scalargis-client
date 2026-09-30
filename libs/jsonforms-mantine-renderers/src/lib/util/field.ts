@@ -5,7 +5,7 @@ import type { CellProps, WithClassname } from '@jsonforms/core';
  * The field props MantineInputControl computes once and hands to every cell.
  * Mantine's Input-based components accept them natively (label association,
  * `aria-invalid` + `aria-describedby` wiring, error text next to the field —
- * the plan §1d a11y contract); non-Input widgets (Checkbox, Switch, Slider)
+ * the a11y contract); non-Input widgets (Checkbox, Switch, Slider)
  * adapt them inside their cell.
  */
 export interface MantineFieldProps {

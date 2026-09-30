@@ -158,5 +158,4 @@ wire the name into the target deploy per [03](03-applying-a-theme.md).
 - [ ] shipped themes only: preset added to `presets.ts` (the AA test now
       guards it) and a row in the README palette table
 
-Deep spec — the formal contract, AA gates, per-preset rationale:
-`references/projects/client/migration2/ads-adherence-restrictions/06-theme-support.md`.
+ADS adherence in this repo: `docs/aderencia-ads.md`.

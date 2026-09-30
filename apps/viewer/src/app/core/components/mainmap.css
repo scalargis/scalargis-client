@@ -108,7 +108,7 @@
     width: 2.2em;
     height: 2.2em;
     /* The 2.2em glyph computes to ~28px, below the ADS touch floor. Opt this
-       one control into the shared touch-target token; the kit keeps the floor
+       one control into the shared touch-target token; the floor stays
        opt-in per control so it does not distort dense backoffice tables. */
     min-width: var(--ads-control-min-touch, 44px);
     min-height: var(--ads-control-min-touch, 44px);

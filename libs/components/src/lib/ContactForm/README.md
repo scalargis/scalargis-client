@@ -120,5 +120,4 @@ Resultado na tira do rodapé:
 
 ## Referências
 
-- Guia geral de componentes/extensões: `references/architecture/components-extensions/`
 - Precedente do mesmo slot do rodapé: `libs/components/src/lib/CRSSelect/`

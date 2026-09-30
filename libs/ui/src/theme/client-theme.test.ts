@@ -8,7 +8,7 @@ const BRAND: readonly string[] = [
   '#FF6B6B', '#FA5252', '#F03E3E', '#E03131', '#C92A2A',
 ];
 
-describe('createClientTheme (kit 05 override contract)', () => {
+describe('createClientTheme', () => {
   it('merges a brand primary over the base theme', () => {
     const theme = createClientTheme({ primary: BRAND as never });
     expect(theme.colors?.primary).toEqual(BRAND);

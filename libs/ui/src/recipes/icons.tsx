@@ -1,11 +1,9 @@
 /* =====================================================================
    Recipe icons — primeicons behind one indirection point.
 
-   The migration keeps primeicons (mantine/README.md §decisions: "primeicons
-   stay"; 00-baseline-and-scope.md §prime-ecosystem: Mantine renders them
-   via <i className>). The recipes therefore use the same `pi pi-*` classes
-   as every other screen — but only through this module, so the "optional
-   icon swap" the plan defers to a future project is a one-file change.
+   The migration keeps primeicons (Mantine renders them via <i className>). The recipes therefore use the same `pi pi-*` classes
+   as every other screen — but only through this module, so an icon swap
+   is a one-file change.
 
    primeicons is a standalone MIT icon FONT with no primereact runtime
    dependency; it survives the Phase 5 primereact removal by decision.

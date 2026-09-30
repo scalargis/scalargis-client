@@ -1,8 +1,8 @@
-// CSS order rule (migration2/mantine plan, kit 05): the Prime keeps first,
+// CSS order rule: the Prime keeps first,
 // then the Mantine block (@scalargis/ui: Mantine core → ads-tokens → ads-globals).
 // These lines own that order for the whole backoffice — keep them at the top.
 // saga-blue and primereact.min left with the last Prime widget (Phase 2 wave 3);
-// primeicons and primeflex stay for good (plan §what does NOT migrate).
+// primeicons and primeflex stay for good.
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 

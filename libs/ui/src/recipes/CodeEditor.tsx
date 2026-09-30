@@ -1,9 +1,7 @@
 /* =====================================================================
    CodeEditor — the single CodeMirror 6 code editor for the Mantine stack.
 
-   The migration policy (references/projects/client/migration2/mantine/
-   codemirror-policy.md) makes CodeMirror 6 the one code editor from
-   Phase 2 onward. Every backoffice form was repeating the same explicit
+   CodeMirror 6 is the one code editor from Phase 2 onward. Every backoffice form was repeating the same explicit
    extension list, the same `basicSetup={false}` wiring and the same
    `ref.current.view` dance for undo/redo/search — four copies drifting
    apart. This recipe owns all of it in one place.

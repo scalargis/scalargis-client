@@ -23,7 +23,7 @@ export type { ClientThemePreset } from './theme/presets';
 export { useApplyClientTheme } from './theme/client-theme-registry';
 export type { ClientThemeEntry } from './theme/client-theme-registry';
 
-/* ─── Recipes (plan §1c) ─────────────────────────────────────────────── */
+/* ─── Recipes ─────────────────────────────────────────────── */
 export { DataGrid, exportGridCSV } from './recipes/DataGrid';
 export type { DataGridColumn, DataGridProps } from './recipes/DataGrid';
 

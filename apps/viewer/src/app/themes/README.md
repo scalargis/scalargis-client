@@ -61,6 +61,4 @@ do something.
 4. **[04-creating-a-theme.md](04-creating-a-theme.md)** — building a new
    theme step by step, with the contrast pitfalls spelled out.
 
-The deep ADS-adherence spec (AA gates, per-preset rationale, the formal
-contract) lives with the platform docs:
-`references/projects/client/migration2/ads-adherence-restrictions/06-theme-support.md`.
+ADS adherence in this repo: `docs/aderencia-ads.md`.

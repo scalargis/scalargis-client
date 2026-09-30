@@ -1,7 +1,7 @@
 /* =====================================================================
    SkipLink — the "skip to content" link every app shell must lead with
-   (kit 04 §keyboard operability: "cheap, high-value, expected on
-   public-sector portals"; ADS ships SkipNavigation, this is the
+   (keyboard operability: cheap, high-value, expected on
+   public-sector portals; ADS ships SkipNavigation, this is the
    Mantine-side equivalent).
 
    Render it as the FIRST element of a shell, before the topbar, and mark

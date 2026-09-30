@@ -1,5 +1,5 @@
 /**
- * SkipLink contract (kit 04 shell item): a link that is first in the DOM,
+ * SkipLink contract: a link that is first in the DOM,
  * points at the shell's content landmark, and on activation moves focus
  * onto that landmark without leaving it in the tab order.
  */

@@ -1,6 +1,6 @@
 /* =====================================================================
    confirm — replaces PrimeReact's ConfirmDialog (34 sites) and
-   ConfirmPopup (4 sites). Plan §1c.
+   ConfirmPopup (4 sites).
 
    Two presentations, because Prime has two and they are not
    interchangeable:
@@ -13,7 +13,7 @@
                         same anchoring without the ref plumbing, and
                         focus-return comes for free.
 
-   Accessibility bar (kit 04): both trap focus, close on Esc, and return
+   Accessibility bar: both trap focus, close on Esc, and return
    focus to the trigger. Neither signals severity by colour alone — a
    destructive action carries an icon and an explicit verb, not just red.
    ===================================================================== */

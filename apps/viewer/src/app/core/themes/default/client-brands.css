@@ -11,15 +11,14 @@
    topbar/footer are brand surfaces and this is how the bright-brand
    deploys have always looked. Interactive and text surfaces take their
    colour from the Mantine theme at primaryShade instead. Per-hue
-   white-on-500 ratios are recorded in the adherence kit's
-   06-theme-support.md.
+   white-on-500 ratios are checked in libs/ui/src/theme/presets.test.ts.
    ===================================================================== */
 
 /* The brand hex opens the bar and hands off to near-black, mirroring the
    default's own blue→black chrome. The dark right end is load-bearing, not
    decoration: the footer's coordinate readout and the topbar's locale picker
    are 14/16px white text pinned to that end. Flattening the bar to the brand
-   500 dropped them from 18.36:1 to 2.06 on the bright hues — the kit's chrome
+   500 dropped them from 18.36:1 to 2.06 on the bright hues — the chrome
    deviation does not cover that (it covers chrome; this is reading text).
 
    BOTH stops are opaque, deliberately, and that is a divergence from the ADS

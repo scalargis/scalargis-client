@@ -2,21 +2,18 @@
    ADS global rules (LIVING COPY) — the accessibility restrictions
    Mantine's theme object cannot express.
 
-   Spec: references/projects/client/migration2/ads-adherence-restrictions/
-   theme/ads-globals.css. Load AFTER Mantine core styles and after
-   ads-tokens.css:
+   Load AFTER Mantine core styles and after ads-tokens.css:
      Prime globals → @mantine/core styles → ads-tokens.css → ads-globals.css
    (matches the Phase 1 CSS import-order rule.)
 
-   COEXISTENCE-WINDOW NOTE (Phase 1, 2026-07-09): the kit file also carries
+   COEXISTENCE-WINDOW NOTE (Phase 1, 2026-07-09): this file also carries
    a base-document block (html/body font + colours) and a global <a>
    underline fallback. Both restyle UNMIGRATED Prime screens, and the
    Phase 1 gate sanctions exactly one global change — the magenta focus
    ring. They are therefore DEFERRED below (commented out). Do not
    delete them.
 
-   ACTIVATION (corrected 2026-07-10, audit pass — the original note said
-   "backoffice → Phase 2, viewer → Phase 3", which cannot work): this
+   ACTIVATION: this
    file is loaded by AdsProviders in BOTH apps, so nothing here can
    activate "for backoffice only" — uncommenting reaches the viewer too.
    The base-document block is also interlocked with the theme:
@@ -188,7 +185,7 @@
 }
 
 /* ─── BASE DOCUMENT — DEFERRED (see ACTIVATION in the header note) ─────
-   Kit rule: html/body on Noto Sans + ADS text/background colours so the
+   ADS rule: html/body on Noto Sans + ADS text/background colours so the
    whole app reads as one system. Restyles unmigrated screens AND moves
    the root font-size, so it activates only in the atomic end-of-Phase-3
    commit described above (with the theme `scale` removal) — never alone.
@@ -211,7 +208,7 @@ html, body {
 }
 
 /* ─── LINK UNDERLINE FALLBACK (WCAG 1.4.1) — DEFERRED ──────────────────
-   Kit rule: plain <a> outside Mantine must be underlined so links are
+   ADS rule: plain <a> outside Mantine must be underlined so links are
    never colour-only. Global, so it restyles unmigrated screens — it
    rides the same atomic end-of-Phase-3 activation as the base-document
    block (this file is shared by both apps; see the header note).

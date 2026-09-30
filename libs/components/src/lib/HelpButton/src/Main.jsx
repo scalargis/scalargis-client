@@ -296,7 +296,7 @@ export default function Main({ type, as, config, actions, record }) {
     }
 
     // One real anchor instead of the old button-wrapping-an-anchor pair —
-    // same chrome classes, no nested interactive controls (kit 04).
+    // same chrome classes, no nested interactive controls.
     return (
       <a
         href={help_url}

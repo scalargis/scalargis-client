@@ -20,7 +20,7 @@
      any shell <Transition> read these exports.
    - CSS: adsCssVariablesResolver emits them as --sg-motion-* custom
      properties on :root. The app shells' sass ($transitionDuration) and
-     the ADS kit token --transition-duration (ads-tokens.css) alias onto
+     the ADS token --transition-duration (ads-tokens.css) alias onto
      those, so hand-written CSS transitions follow the same clock.
 
    INVARIANT — durations stay > 0 even when motion is "off". The Combobox

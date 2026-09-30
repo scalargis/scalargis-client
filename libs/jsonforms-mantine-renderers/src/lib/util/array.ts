@@ -15,7 +15,7 @@ import { confirm } from '@scalargis/ui';
    Both are NET-NEW here, not ports: the Prime lib shipped an array
    control that was a `TODO:` stub AND left it commented out of its
    registry, so an object array has always fallen through to "No
-   applicable renderer found" (qa/phase-3.md D16/D17).
+   applicable renderer found".
 
    Labels come from props.translations, whose JSONForms defaults are all
    undefined — the fallbacks below are what actually shows unless the

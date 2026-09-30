@@ -1,7 +1,6 @@
 /* =====================================================================
    ADS token layer — CSS custom properties
-   Source: @ama-pt/agora-design-system v3.5.3
-   Copied from references/projects/ads/agora-tokens.css (good as-is),
+   Source: @ama-pt/agora-design-system v3.5.3,
    with the @font-face blocks omitted — see the FONTS note below.
 
    Purpose: the raw ADS tokens for hand-written CSS that Mantine's theme
@@ -12,11 +11,7 @@
    ===================================================================== */
 
 /* ─── FONTS ────────────────────────────────────────────────────────────
-   Noto Sans is the sole ADS family. Load the @font-face set from the
-   canonical copy that ships the .ttf files:
-     references/projects/ads/agora-design-system/fonts/*.ttf
-     references/projects/ads/agora-tokens.css   (the @font-face blocks)
-   In the client, load Noto Sans however the shells already load fonts
+   Noto Sans is the sole ADS family. In the client, load Noto Sans however the shells already load fonts
    (self-host the .ttf, or Google Fonts). Do NOT substitute another family.
    -------------------------------------------------------------------- */
 
@@ -186,9 +181,9 @@
   --shadow-inner:         0px 4px 4px 0px rgba(0, 0, 0, 0.32) inset;
 
   /* ─── TRANSITIONS ─────────────────────────────────────
-     Per the kit spec (03 §9): both duration AND easing alias onto the
+     Both duration AND easing alias onto the
      central motion tokens (theme/motion.ts → --sg-motion-* via the
-     resolver) so every kit-token consumer follows the one motion control.
+     resolver) so every ADS-token consumer follows the one motion control.
      Easing was ease-in-out here while hover feedback ran `ease` (the
      motion token) — aliasing kills that divergence (R5). Same 200ms. */
   --transition-duration: var(--sg-motion-normal, 200ms);
@@ -221,7 +216,7 @@
   /* ─── TYPE SCALE ──────────────────────────────────────────────────
      rem × --mantine-scale, the same shape Mantine's rem() emits: rem
      resolves against the document root, which the shells pin to 14px
-     during the coexistence window (kit 03 §the root font-size trap) —
+     during the coexistence window —
      raw rem here would render the whole scale 12.5% small. The fallback
      1 keeps the values correct with no Mantine on the page and once the
      root moves to 16px (scale drops to 1 in the same commit). */

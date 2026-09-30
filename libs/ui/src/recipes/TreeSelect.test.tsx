@@ -1,7 +1,6 @@
 /**
  * TreeSelect behavioural contract: commit paths (click and Enter must be
- * equivalent — the Enter path closed the qa/phase-1 keyboard-selection
- * item), the leaves-only guard, and clearing.
+ * equivalent), the leaves-only guard, and clearing.
  *
  * jsdom note: Mantine's Popover Transition never progresses past its
  * pre-enter `display:none` here (no layout engine), so role queries use

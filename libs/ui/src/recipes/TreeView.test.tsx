@@ -1,7 +1,7 @@
 /**
  * TreeView keyboard contract. Mantine's Tree ships Space + Arrow bindings
  * but no Enter — the recipe adds it (ARIA tree pattern: Enter = the row's
- * default action). This is the kit 04 (2.1.1) gap recorded in qa/phase-1.md.
+ * default action, WCAG 2.1.1).
  */
 import React from 'react';
 import { MantineProvider } from '@mantine/core';

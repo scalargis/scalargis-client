@@ -1,5 +1,5 @@
 /* =====================================================================
-   DataGrid — the DataTable+Column replacement (plan §1c; 45 files).
+   DataGrid — the DataTable+Column replacement.
 
    A thin wrapper over mantine-datatable, NOT a new grid abstraction (the
    §1c anti-goal). Everything mantine-datatable does — controlled paging

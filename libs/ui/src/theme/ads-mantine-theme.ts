@@ -5,10 +5,7 @@
 
    This is the "construction-norms" adherence layer (ADS Art. 2.5.6):
    ADS supplies colour / type / spacing tokens and the WCAG 2.1 AA bar;
-   Mantine supplies the components. The spec this file implements lives
-   in references/projects/client/migration2/ads-adherence-restrictions/
-   (02 colours, 03 sizing, 04 accessibility, 05 mantine mapping) — keep
-   the two in sync; the kit is the spec, this copy is what ships.
+   Mantine supplies the components.
 
    Pairs with ads-tokens.css (raw --* custom properties) and
    ads-globals.css (magenta focus ring + reduced-motion — the parts
@@ -16,7 +13,7 @@
 
    IMMUTABLE: neutral / informative / success / warning / danger.
    BRANDABLE (client themes only): primary + secondary — see the
-   override contract in the kit's 05-mantine-mapping.md.
+   override contract in client-theme.ts.
    ===================================================================== */
 
 import {
@@ -97,9 +94,9 @@ export const adsBaseTheme = createTheme({
   /* ─── COLOUR ────────────────────────────────────────────────────── */
   // Mantine derives --mantine-color-text from `black` and --mantine-color-body
   // from `white`. Left unset they default to #000/#fff; ADS body text is
-  // neutral-900 (12.4:1 on white, kit 02 §text on white), never pure black.
+  // neutral-900 (12.4:1 on white), never pure black.
   // `black` is also what autoContrast puts on light fills — so this is the
-  // colour that lands on warning-500 (8.1:1, the pairing the kit verified).
+  // colour that lands on warning-500 (8.1:1).
   black: '#2B363C', // neutral-900
   white: '#FFFFFF',
   colors: {
@@ -118,7 +115,7 @@ export const adsBaseTheme = createTheme({
   // ADS "main" is shade 500 → tuple index 5 (Mantine default is 6).
   primaryShade: 5,
   // Auto-pick black/white label on filled controls by luminance — this is
-  // what keeps white OFF the light warning-500 fill (kit 02 §warning).
+  // what keeps white OFF the light warning-500 fill.
   autoContrast: true,
   luminanceThreshold: 0.3,
 
@@ -197,7 +194,7 @@ export const adsBaseTheme = createTheme({
 
   /* ─── COMPONENT DEFAULTS (thin, pattern-level only) ─────────────── */
   components: {
-    /* ~42px control-height baseline (kit 03 §6). This must cover EVERY
+    /* ~42px control-height baseline. This must cover EVERY
        control that renders an Input shell, not just the common few —
        any component left out silently falls back to Mantine's `sm` and
        renders visibly shorter than the field next to it. */
@@ -246,7 +243,7 @@ export const adsBaseTheme = createTheme({
       defaultProps: { transitionDuration: motionDurations.normal },
     },
 
-    /* ─── ADS z-index ladder (kit 03 §8) ───────────────────────────
+    /* ─── ADS z-index ladder ───────────────────────────
        Mantine's own defaults (popover 300, modal 200) sit far below the
        ladder and would render under app chrome — and, during the
        coexistence window, under Prime's own overlays (~1100). */
@@ -426,8 +423,8 @@ export const adsCssVariablesResolver: CSSVariablesResolver = () => ({
   // themes, which is what keeps motion consistent across the six presets.
   variables: { ...motionCssVariables },
   light: {
-    // Mantine default: gray-6 (#8893AA) = 3.1:1 on white. The kit rates that
-    // "AA large/UI only — never body text" (02 §verified pairings), yet it is
+    // Mantine default: gray-6 (#8893AA) = 3.1:1 on white. That is
+    // "AA large/UI only — never body text", yet it is
     // what every <Text c="dimmed"> renders. neutral-7 (#64718B) = 4.9:1.
     '--mantine-color-dimmed': 'var(--mantine-color-neutral-7)',
     // ADS --color-border-strong (neutral-300). Decorative framing: it is the

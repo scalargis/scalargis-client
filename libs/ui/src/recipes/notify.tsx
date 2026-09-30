@@ -1,16 +1,16 @@
 /* =====================================================================
-   notify — the Toast replacement (plan §1c; 76 PrimeReact call sites).
+   notify — the Toast replacement.
 
    Prime's Toast is ref-based: every screen declares <Toast ref={t} /> and
    calls t.current.show({severity, summary, detail}). That pattern dies
    here — <Notifications /> is mounted once in AdsProviders, so `notify`
    is importable from anywhere with no ref, no mount, no prop drilling.
 
-   Accessibility bar (kit 04): Mantine's Notifications root is the live
+   Accessibility bar: Mantine's Notifications root is the live
    region, so a toast announces without stealing focus. Severity is never
    signalled by colour alone (WCAG 1.4.1) — each level carries an icon and
    a title. `warn` fills with the light ADS amber, so its content is dark
-   by contract (kit 02 §the warning trap).
+   by contract.
    ===================================================================== */
 
 import React from 'react';
@@ -27,7 +27,7 @@ import { uiText } from './i18n';
 
 export type NotifySeverity = 'success' | 'info' | 'warn' | 'error';
 
-/** Severity → ADS foundation palette. These palettes are immutable (kit 02).
+/** Severity → ADS foundation palette. These palettes are immutable.
  *  Titles resolve through uiText at call time so they follow the language. */
 const SEVERITY: Record<
   NotifySeverity,

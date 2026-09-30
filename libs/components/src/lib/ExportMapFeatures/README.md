@@ -82,5 +82,4 @@ Para exercitar o componente é preciso uma camada vetorial não-system. Serve o 
 
 ## Referências
 
-- Guia geral de componentes/extensões: `references/architecture/components-extensions/`
-- Diagnóstico completo do C-12 (as 3 causas empilhadas): `references/projects/client/migration2/mantine/qa/cluster-c-walkthrough.md` (secção `### C-12`)
+- Diagnóstico completo do C-12 (as 3 causas empilhadas): a mensagem do commit do C-12 no branch `mantine-migration`

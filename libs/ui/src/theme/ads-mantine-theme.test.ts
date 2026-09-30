@@ -3,8 +3,7 @@
 
    Each test below corresponds to a defect observed on /demo-ext/mantine
    (2026-07-09) whose cause was a missing line in this theme. They assert
-   the restriction, not the implementation — see the adherence kit at
-   references/projects/client/migration2/ads-adherence-restrictions/.
+   the restriction, not the implementation.
    ===================================================================== */
 
 import { readFileSync } from 'node:fs';
@@ -87,7 +86,7 @@ describe('root font-size compensation', () => {
   });
 });
 
-describe('colour restrictions (kit 02)', () => {
+describe('colour restrictions', () => {
   it('uses ADS neutral-900 for body text, not pure black', () => {
     // Mantine derives --mantine-color-text from `black`. Left unset it is
     // #000, which is what made every string read as bold.
@@ -110,7 +109,7 @@ describe('colour restrictions (kit 02)', () => {
   });
 });
 
-describe('control defaults (kit 03 §6)', () => {
+describe('control defaults', () => {
   /**
    * The bug: only six components carried size 'md', so DatePickerInput and
    * TagsInput fell back to Mantine's 'sm' and rendered visibly shorter than
@@ -146,7 +145,7 @@ describe('control defaults (kit 03 §6)', () => {
   });
 });
 
-describe('overlay ladder (kit 03 §8)', () => {
+describe('overlay ladder', () => {
   it.each([
     ['Drawer', 5000],
     ['Modal', 6000],
@@ -270,7 +269,7 @@ describe('central motion control', () => {
    ads-tokens.css and ads-mantine-theme.ts each hold the ADS palette, shadows
    and z-ladder; the only thing keeping them equal is a "keep in sync" comment.
    This block enforces it — a future edit to one that forgets the other fails
-   here, hex-for-hex. It also pins the easing single-source (R5): the kit
+   here, hex-for-hex. It also pins the easing single-source (R5): the ADS
    --transition-easing must alias the central motion token, not restate a
    literal, so hover feedback and chevrons can never diverge again. */
 
@@ -345,7 +344,7 @@ describe('CSS ↔ theme token sync (R5)', () => {
   });
 
   it('single-sources the transition easing onto the motion token', () => {
-    // The kit token aliases the central motion ease — not a literal.
+    // The ADS token aliases the central motion ease — not a literal.
     expect(cssTokens.get('transition-easing')).toContain('--sg-motion-ease');
     // And that motion ease is what the resolver emits, so both resolve equal.
     expect(motionCssVariables['--sg-motion-ease']).toBe(motionEasing);

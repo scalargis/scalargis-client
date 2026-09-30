@@ -1,6 +1,5 @@
 /* =====================================================================
-   Recipe default strings — the "i18n-aware defaults" the plan's §1c
-   contract requires (02-phase-1-foundations.md, notify row).
+   Recipe default strings — i18n-aware defaults.
 
    The en/pt dictionaries below register on the HOST i18next instance
    (the one both app shells initialise) as the `scalargis_ui` namespace —

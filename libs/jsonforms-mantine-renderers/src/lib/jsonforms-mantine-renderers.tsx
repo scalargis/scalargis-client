@@ -1,6 +1,6 @@
 /* =====================================================================
    jsonforms-mantine-renderers — the Mantine twin of
-   libs/jsonforms-primereact-renderers (migration2 plan §1d).
+   libs/jsonforms-primereact-renderers.
 
    Same testers and ranks; Mantine widgets themed by the ADS base theme
    (@scalargis/ui). Behavioural contracts carried over from the Prime lib:
@@ -11,11 +11,11 @@
    - the same i18n default keys (enum.placeholder, stepper.next, …).
 
    Documented improvements over the Prime lib (see the twin page
-   /demo-ext/jsonforms-mantine and qa/phase-1.md):
+   /demo-ext/jsonforms-mantine):
    - `options.multi` renders a real Textarea;
    - label/error/aria wiring is native to every Mantine input;
    - layout/label/divider renderers honour `visible`;
-   - arrays actually render (qa/phase-3.md D16/D17): the Prime lib's array
+   - arrays actually render: the Prime lib's array
      control was a `TODO:` stub left out of its registry, and its array
      layout a registered stub, so object arrays showed "No applicable
      renderer found" or the raw TODO text. Here they are a table control

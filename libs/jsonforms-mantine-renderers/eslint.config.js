@@ -16,7 +16,7 @@ module.exports = [
             {
               group: ['primereact', 'primereact/*'],
               message:
-                'jsonforms-mantine-renderers must not depend on primereact (migration2 plan §1d; it is removed in Phase 5).',
+                'jsonforms-mantine-renderers must not depend on primereact.',
             },
           ],
         },

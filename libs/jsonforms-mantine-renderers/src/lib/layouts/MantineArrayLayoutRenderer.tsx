@@ -32,7 +32,7 @@ import {
  * objects/arrays, or a `options.detail` uischema of their own. One accordion
  * panel per item, holding the item's detail form.
  *
- * Implemented in the Mantine lib (qa/phase-3.md D17); the Prime twin left a
+ * Implemented in the Mantine lib; the Prime twin left a
  * registered `TODO: PrimereactArrayLayoutRenderer` stub showing through to
  * the user, and this file was its faithful copy until now.
  */

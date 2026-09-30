@@ -3,9 +3,7 @@
    module — Phase 4) or a palette preset (theme/presets.ts — B2)
    derives its theme from the ADS base.
 
-   The kit's override contract (ads-adherence-restrictions/
-   06-theme-support.md, extending 05-mantine-mapping.md §override
-   contract) allows a client theme to set colors.primary,
+   The override contract allows a client theme to set colors.primary,
    colors.secondary, — with written justification — primaryShade, and,
    for client-BRANDED themes only, the font family. NOTHING else:
    foundation palettes, sizing, spacing, radius, breakpoints and the
@@ -23,7 +21,7 @@
    route must not set it. Loading the font files (@fontsource import)
    is the theme's own job; the override just names the family.
 
-   After every re-brand, re-run the kit 02 AA pairing checks against the
+   After every re-brand, re-run the AA pairing checks against the
    new hues (white-on-primary-500 and primary-500-on-white at minimum) —
    a light/bright brand colour fails 4.5:1 with white and forces a
    primaryShade bump (the shipped bright presets sit at 7).
@@ -44,7 +42,7 @@ export interface ClientThemeOverride {
   /** Brand secondary — a full 10-shade tuple. */
   secondary?: MantineColorsTuple;
   /**
-   * Only with written justification (kit 06): bump to the first shade that
+   * Only with written justification: bump to the first shade that
    * clears 4.5:1 with white when the brand's 500 fails the AA check, so
    * filled controls, links and text accents darken while the bright 500
    * stays available for brand chrome (the shipped bright presets use 7).
@@ -74,7 +72,7 @@ function assertTuple(name: string, tuple: MantineColorsTuple): void {
     throw new Error(
       `createClientTheme: colors.${name} must be a full 10-shade tuple ` +
         `(ADS 50→900); got ${Array.isArray(tuple) ? tuple.length : typeof tuple}. ` +
-        'Partial palettes break shade-indexed pairings (kit 02 §indexing).'
+        'Partial palettes break shade-indexed pairings.'
     );
   }
 }
@@ -96,8 +94,7 @@ export function createClientTheme(override: ClientThemeOverride): MantineThemeOv
     throw new Error(
       `createClientTheme: [${rejected.join(', ')}] is outside the override ` +
         'contract — only primary, secondary, primaryShade and the font ' +
-        'family may change (kit 06 §override contract; everything else ' +
-        'is ADS-immutable).'
+        'family may change (everything else is ADS-immutable).'
     );
   }
 

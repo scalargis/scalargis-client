@@ -7,9 +7,7 @@
    override contract stays enforced by construction. This file is the
    palette DATA, locked by the AA gate in presets.test.ts; what the viewer
    loads by name are the theme module folders that front these presets
-   (apps/viewer/src/app/themes/<name>). The spec — AA gates,
-   chrome-vs-interactive split, rationale per hue — is the kit's
-   06-theme-support.md; the in-repo how-to is the viewer's themes
+   (apps/viewer/src/app/themes/<name>). The in-repo how-to is the viewer's themes
    README (apps/viewer/src/app/themes/README.md).
 
    Every tuple keeps the TRUE brand hex at index 5 (ADS 500 = "main"),

@@ -1,5 +1,5 @@
 /**
- * AdsProviders document-language contract (kit 04 §screen-reader / WCAG
+ * AdsProviders document-language contract (WCAG
  * 3.1.1): <html lang> is stamped with the active i18next language on mount
  * and follows every live language switch.
  *

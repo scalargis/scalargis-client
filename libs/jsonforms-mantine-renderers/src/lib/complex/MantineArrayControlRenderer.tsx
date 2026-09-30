@@ -34,7 +34,7 @@ import './array-table.css';
  * Object and primitive arrays as an editable table — one row per item, one
  * column per item property, Add below and a Delete per row.
  *
- * New in the Mantine lib (qa/phase-3.md D16): the Prime twin's array control
+ * New in the Mantine lib: the Prime twin's array control
  * was a `TODO:` stub that was never even registered, so these arrays used to
  * render "No applicable renderer found".
  *
