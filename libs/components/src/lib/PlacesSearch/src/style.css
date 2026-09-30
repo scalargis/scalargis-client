@@ -78,7 +78,7 @@
   position: absolute;
   right: 0;
   margin-top: 5px;
-  z-index: 10;
+  z-index: 250;
 }
 
 .layout-topbar .layout-topbar-icons .places-search-list {
@@ -162,6 +162,12 @@
 
 .layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search:hover .layout-topbar-search-icon {
   color: rgba(0, 0, 0, 0.87);
+}
+
+.map-region-top-right .layout-topbar-search-container .layout-topbar-search .layout-topbar-search-icon {
+  position: absolute;
+  right: 5px;
+  top: 20px;
 }
 
 .layout-topbar .layout-topbar-icons .p-menu .layout-topbar-search-results {
