@@ -286,15 +286,6 @@ export default function PrintPanel4(props) {
         }) }
       </div>
 
-      { mergedFile ?
-        <div className="card text-center">
-          <a href={mergedFile.url} target="_blank" style={ { textDecoration: "none", color: "var(--mantine-color-primary-filled)"} } rel="noreferrer">
-            <IconExternalLink className="pl-2" /> {t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
-          </a>
-        </div> :
-        null
-      }
-
       { !isProcessing && !mergedFile && getFinalPrintsTotal() > 1 ?
         <Group justify="center" mt="md">
           <Button
@@ -307,7 +298,7 @@ export default function PrintPanel4(props) {
         null
       }
 
-      <Group justify="flex-start" mt="md">
+      <Group justify="space-between" mt="md">
         <Button
             size="xs"
             leftSection={<IconChevronLeft />}
@@ -315,6 +306,20 @@ export default function PrintPanel4(props) {
         >
           {t("back", "Voltar")}
         </Button>
+        { mergedFile ?
+          <Button
+            component="a"
+            href={mergedFile.url}
+            target="_blank"
+            rel="noreferrer"
+            variant="light"
+            size="xs"
+            leftSection={<IconExternalLink />}
+            title={t("openAllPrintsPDF", "Abrir PDF com todas as plantas")}
+          >
+            {t("openPdf", "Abrir PDF")}
+          </Button> : null
+        }
       </Group>
 
     </div>

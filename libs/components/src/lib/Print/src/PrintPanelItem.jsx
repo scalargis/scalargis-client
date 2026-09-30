@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation} from "react-i18next";
 import { useFormContext } from 'react-hook-form';
-import { Alert, Button, Checkbox, Group, Loader, NumberInput, Select, Tabs } from '@mantine/core';
+import { Alert, Anchor, Button, Checkbox, Group, NumberInput, Select, Tabs } from '@mantine/core';
 import { confirm, notify, IconXCircle, IconInfoCircle, IconExternalLink, IconChevronLeft, IconPrint } from '@scalargis/ui';
 import OlInteractionDraw from 'ol/interaction/Draw';
 import OlInteractionModify from 'ol/interaction/Modify';
@@ -24,6 +24,7 @@ import './style.css';
 
 // Scale-tab key (the config's defaultScaleSelector vocabulary) → scale mode.
 const TAB_MODE = { predefined: 'restricted', freescale: 'free', map: 'map' };
+const RESULT_TOAST_MS = 15000;
 
 export default function PrintPanelItem(props) {
 
@@ -69,6 +70,12 @@ export default function PrintPanelItem(props) {
   const [geometryError, setGeometryError] = useState(false);
 
   const [printFile, setPrintFile] = useState(null);
+  const rootRef = useRef(null);
+
+  function panelVisible() {
+    const el = rootRef.current;
+    return !!(el && el.isConnected && el.getClientRects().length);
+  }
 
   const drawingOptionsTools = useMemo(() => {
     const _tools = control?.config_json?.drawingOptions?.tools || DEFAULT_DRAWING_TOOLS;
@@ -357,6 +364,14 @@ export default function PrintPanelItem(props) {
         setIsPrinting(false);
         if (res.Success) {
           setPrintFile({ filename: res.Data.filename, url: res.Data.url });
+          if (!panelVisible()) {
+            notify.success(printItem.title || t("print", "Imprimir"),
+              <Anchor href={res.Data.url} target="_blank" rel="noreferrer">
+                <Group gap={4} wrap="nowrap" component="span">
+                  <IconExternalLink />{t("openPdf", "Abrir PDF")}
+                </Group>
+              </Anchor>, { autoClose: RESULT_TOAST_MS });
+          }
         } else {
           throw (res.Message || 'Ocorreu um erro ao gerar a planta');
         }
@@ -668,7 +683,7 @@ export default function PrintPanelItem(props) {
 
 
   return (
-    <div className="print-panel-item">
+    <div className="print-panel-item" ref={rootRef}>
       <h3>{props.printItem.title}</h3>
 
       {(printItem.allow_drawing !== false) && <div className="p-fluid">
@@ -751,24 +766,6 @@ export default function PrintPanelItem(props) {
         handleFieldChange={handleFieldChange}
       />
 
-      {isPrinting ?
-        <Alert color="informative" py="xs" mt="lg">
-          <Group justify="center" gap="xs" wrap="nowrap">
-            <Loader size="xs" />
-            <span>{t("generatingPrint", "A gerar a planta...")}</span>
-          </Group>
-        </Alert> : null
-      }
-      {!isPrinting && printFile ?
-        <Alert color="informative" py="xs" mt="lg">
-          <Group justify="center" gap="xs" wrap="nowrap">
-            <a href={printFile.url} target="_blank" rel="noreferrer">
-              <IconExternalLink className="pl-2 mr-1" />{t("openPrintPdf", "Abrir PDF da planta")}
-            </a>
-          </Group>
-        </Alert> : null
-      }
-
       <Group justify="space-between" mt="md">
         <div>
           {!standalone &&
@@ -780,14 +777,29 @@ export default function PrintPanelItem(props) {
               {t("back", "Voltar")}
             </Button>}
         </div>
-        <Button
-          size="xs"
-          leftSection={<IconPrint />}
-          onClick={e => { doPrint(); }}
-          disabled={isPrinting}
-        >
-          {t("print", "Imprimir")}
-        </Button>
+        <Group gap="xs" wrap="nowrap">
+          {!isPrinting && printFile ?
+            <Button
+              component="a"
+              href={printFile.url}
+              target="_blank"
+              rel="noreferrer"
+              variant="light"
+              size="xs"
+              leftSection={<IconExternalLink />}
+            >
+              {t("openPdf", "Abrir PDF")}
+            </Button> : null
+          }
+          <Button
+            size="xs"
+            leftSection={<IconPrint />}
+            onClick={e => { doPrint(); }}
+            loading={isPrinting}
+          >
+            {t("print", "Imprimir")}
+          </Button>
+        </Group>
       </Group>
       {config.showPreview ? <div className="mt-2">
         <Checkbox
