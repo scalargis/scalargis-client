@@ -7,6 +7,7 @@ import {
   Paths,
   rankWith,
   type ArrayLayoutProps,
+  type ArrayTranslations,
   type ControlElement,
   type RankedTester,
 } from '@jsonforms/core';
@@ -35,7 +36,9 @@ import {
  * registered `TODO: PrimereactArrayLayoutRenderer` stub showing through to
  * the user, and this file was its faithful copy until now.
  */
-export const MantineArrayLayoutRenderer = (props: ArrayLayoutProps) => {
+export const MantineArrayLayoutRenderer = (
+  props: ArrayLayoutProps & { translations: ArrayTranslations }
+) => {
   const {
     data,
     path,

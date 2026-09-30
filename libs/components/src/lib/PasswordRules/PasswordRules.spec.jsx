@@ -33,8 +33,8 @@ beforeAll(() => {
   // reads it on mount.
   window.matchMedia = window.matchMedia || ((query) => ({
     matches: false, media: query, onchange: null,
-    addEventListener: () => {}, removeEventListener: () => {},
-    addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false
+    addEventListener: vi.fn(), removeEventListener: vi.fn(),
+    addListener: vi.fn(), removeListener: vi.fn(), dispatchEvent: () => false
   }));
 
   // Empty resources: translateValue falls back to the module's pt defaults, and

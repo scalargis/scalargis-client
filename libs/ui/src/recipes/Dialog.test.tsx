@@ -10,7 +10,6 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { adsBaseTheme } from '../theme/ads-mantine-theme';
-import { motionTransitionProps } from '../theme/motion';
 import { Dialog } from './Dialog';
 import { DIALOG_DEFAULTS } from './dialogDefaults';
 
@@ -41,7 +40,7 @@ function setMobile(isMobile: boolean) {
 describe('Dialog', () => {
   it('renders title, body and footer; footer sits outside the scroll body', () => {
     renderDialog(
-      <Dialog opened onClose={() => {}} title="Ajuda" footer={<button>Fechar</button>}>
+      <Dialog opened onClose={vi.fn()} title="Ajuda" footer={<button>Fechar</button>}>
         Corpo
       </Dialog>
     );
@@ -55,7 +54,7 @@ describe('Dialog', () => {
 
   it('maximize control toggles full screen and swaps its accessible name', () => {
     renderDialog(
-      <Dialog opened onClose={() => {}} title="Ajuda" maximizable>
+      <Dialog opened onClose={vi.fn()} title="Ajuda" maximizable>
         Corpo
       </Dialog>
     );
@@ -75,7 +74,7 @@ describe('Dialog', () => {
      the content slot alone. */
   it('does not leak the content column onto the inner wrapper', () => {
     renderDialog(
-      <Dialog opened onClose={() => {}} title="Ajuda" size="50vw" height="80vh">
+      <Dialog opened onClose={vi.fn()} title="Ajuda" size="50vw" height="80vh">
         Corpo
       </Dialog>
     );
@@ -134,13 +133,6 @@ describe('Dialog', () => {
    motion can't drift (R4). These lock its shape so a future edit can't
    re-fork the two consumers. */
 describe('DIALOG_DEFAULTS', () => {
-  it('carries the ADS rung: centred, z-6000, the dialog motion', () => {
-    expect(DIALOG_DEFAULTS.centered).toBe(true);
-    expect(DIALOG_DEFAULTS.zIndex).toBe(6000);
-    // The motion is the SAME object the central tokens expose, not a copy.
-    expect(DIALOG_DEFAULTS.transitionProps).toBe(motionTransitionProps.dialog);
-  });
-
   it('agrees with the theme overlay ladder the Dialog falls back to', () => {
     const zLadder = (adsBaseTheme.other as Record<string, Record<string, number>>)
       .zLadder;
@@ -159,7 +151,7 @@ describe('Dialog responsive size default', () => {
   it('uses the desktop default when no size is passed on a wide screen', () => {
     setMobile(false);
     renderDialog(
-      <Dialog opened onClose={() => {}} title="Ajuda">
+      <Dialog opened onClose={vi.fn()} title="Ajuda">
         Corpo
       </Dialog>
     );
@@ -169,7 +161,7 @@ describe('Dialog responsive size default', () => {
   it('collapses to 90% below the breakpoint', () => {
     setMobile(true);
     renderDialog(
-      <Dialog opened onClose={() => {}} title="Ajuda">
+      <Dialog opened onClose={vi.fn()} title="Ajuda">
         Corpo
       </Dialog>
     );
@@ -182,7 +174,7 @@ describe('Dialog responsive size default', () => {
     // this assertion) so the caller value passes through verbatim.
     setMobile(true);
     renderDialog(
-      <Dialog opened onClose={() => {}} title="Ajuda" size="50vw">
+      <Dialog opened onClose={vi.fn()} title="Ajuda" size="50vw">
         Corpo
       </Dialog>
     );

@@ -3,6 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { vi } from 'vitest';
 
+import Main from './Main';
+
 // O barrel `../../components` puxa a lib inteira; aqui só interessa o trigger.
 vi.mock('../../components', () => ({ MainMenuButton: () => null }));
 vi.mock('./ContactForm', () => ({ default: () => <div data-testid="contact-form" /> }));
@@ -11,8 +13,6 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key, fallback) => fallback || key, i18n: {} })
 }));
 
-import Main from './Main';
-
 // O jsdom não traz `matchMedia` e o MantineProvider chama-o ao montar.
 // Fica local ao spec para não mexer na config partilhada da lib.
 beforeAll(() => {
@@ -20,10 +20,10 @@ beforeAll(() => {
     matches: false,
     media: query,
     onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
     dispatchEvent: () => false
   }));
 });
@@ -36,7 +36,7 @@ const props = (region, config_json = {}) => ({
   record: { id: 'contactform', title: '', config_json },
   config: {
     viewer: { id: 1 },
-    dispatch: () => {},
+    dispatch: vi.fn(),
     Models: { Utils: { getWindowSize: () => [1200, 800] } }
   }
 });

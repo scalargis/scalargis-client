@@ -49,6 +49,13 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
     return (componentConfig?.mode || defaultMode).toLowerCase();
   });
 
+  const currentLabel = useMemo(() => {
+    const match = localesList.find(
+      item => String(item.value).toLowerCase() === locale.toLowerCase()
+    );
+    return match?.label ?? locale.toUpperCase();
+  }, [localesList, locale]);
+
   const handleChange = (value) => {
     if (!value) return;
     i18n.changeLanguage(value); // Save to localStorage
@@ -99,13 +106,6 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
   // which stood out in a 50px strip of 1em icons. The widget is really a choice
   // menu, so it IS one: a text trigger ("PT ▾") that, being a real <button>,
   // inherits the topbar chrome (_topbar.scss `button` rule) like every sibling.
-  const currentLabel = useMemo(() => {
-    const match = localesList.find(
-      item => String(item.value).toLowerCase() === locale.toLowerCase()
-    );
-    return match?.label ?? locale.toUpperCase();
-  }, [localesList, locale]);
-
   const menu = (
     <Menu shadow="md" position="bottom-end" withinPortal>
       <Menu.Target>

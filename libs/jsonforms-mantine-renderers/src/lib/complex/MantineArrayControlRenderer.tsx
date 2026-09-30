@@ -8,6 +8,7 @@ import {
   Paths,
   rankWith,
   type ArrayLayoutProps,
+  type ArrayTranslations,
   type ControlElement,
   type RankedTester,
 } from '@jsonforms/core';
@@ -44,7 +45,9 @@ import './array-table.css';
  * reader, so it is kept and hidden visually (see array-table.css); the column
  * header carries it for everyone else.
  */
-export const MantineArrayControlRenderer = (props: ArrayLayoutProps) => {
+export const MantineArrayControlRenderer = (
+  props: ArrayLayoutProps & { translations: ArrayTranslations }
+) => {
   const {
     data,
     path,
