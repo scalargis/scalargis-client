@@ -7,8 +7,7 @@
    override contract stays enforced by construction. This file is the
    palette DATA, locked by the AA gate in presets.test.ts; what the viewer
    loads by name are the theme module folders that front these presets
-   (apps/viewer/src/app/themes/<name>). The in-repo how-to is the viewer's themes
-   README (apps/viewer/src/app/themes/README.md).
+   (apps/viewer/src/app/themes/<name>).
 
    Every tuple keeps the TRUE brand hex at index 5 (ADS 500 = "main"),
    because the brand chrome (viewer topbar/footer/splash, the map-control

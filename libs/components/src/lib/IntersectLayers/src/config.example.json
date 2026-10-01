@@ -1,5 +1,5 @@
 {
-  "_comment": "Sample do IntersectLayers: a entrada para viewer.config_json.components[]. Duas peças a mais sao obrigatorias: (1) uma row em scalargis.site_settings com code = config_id (ver server.config.example.json), (2) a funcao intersects_layers na DB, instalada pelo plugin spatial_toolbox. Chaves explicadas no README.md ao lado; montagem ponta-a-ponta no guia de configuração do IntersectLayers (documentação do ScalarGIS)",
+  "_comment": "Sample do IntersectLayers: a entrada para viewer.config_json.components[]. Duas peças a mais sao obrigatorias: (1) uma row em scalargis.site_settings com code = config_id (ver server.config.example.json), (2) a funcao intersects_layers na DB, instalada pelo plugin spatial_toolbox. Montagem ponta-a-ponta no guia de configuração do IntersectLayers (documentação do ScalarGIS)",
   "_note_as_popup": "O IntersectLayers NAO suporta as:'popup' nem dialogOptions - Main.jsx so distingue as==='panel'. O unico dialogo e o das tabelas (showTables), e as dimensoes dele sao fixas em codigo.",
 
   "id": "IntersectLayers",
@@ -29,7 +29,7 @@
       }
     },
 
-    "_comment_drawTools": "Copy = copiar a geometria de uma camada do mapa (e o util). Select so apanha a camada do Print - ver o gotcha 2 do README.",
+    "_comment_drawTools": "Copy = copiar a geometria de uma camada do mapa (e o util). Select so apanha a camada do Print.",
     "drawTools": ["Point", "LineString", "Polygon", "Copy", "Modify"],
     "bufferOption": true,
 
@@ -47,7 +47,7 @@
     "_comment_showTables": "Destranca o botao 'Tabelas' (dialogo 75vw x 75vh, maximizavel, com uma tab por camada). O filtro de grupos do dialogo depende do array groups do site_settings.",
     "showTables": true,
 
-    "_comment_export": "Com mais de 3 formatos a barra vira dropdown. O pdf exige um print template no backend - sem isso, tirar da lista.",
+    "_comment_export": "Com mais de 3 formatos a barra vira dropdown. Sem print template no backend, o pdf sai como tabela simples.",
     "showExport": true,
     "exportFormats": ["xls", "csv"],
     "export_crs": 3763,

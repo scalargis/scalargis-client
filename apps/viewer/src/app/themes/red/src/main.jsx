@@ -2,7 +2,7 @@
    deploy configures is the folder name, the Mantine override comes from
    the @scalargis/ui preset of the same name (where the tuple lives under
    the AA gate), and the default shell chrome is reused as-is — the brand
-   paint hangs off the data-sg-theme attribute instead (see ../../README.md).
+   paint hangs off the data-sg-theme attribute instead.
    #C62828 passes AA both ways, so this is a colour-only re-brand: shade 5,
    ADS type. */
 import { resolveClientThemePreset } from '@scalargis/ui';

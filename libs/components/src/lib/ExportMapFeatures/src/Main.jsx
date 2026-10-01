@@ -66,7 +66,7 @@ export default function Main({ config }) {
       layers: [olLayer]
     });
     select.on('select', e => {
-      // read the full selection, not this event's delta (see README)
+      // read the full selection, not this event's delta
       setSelected({
         items: select.getFeatures().getArray().slice(),
         coord: e.mapBrowserEvent.coordinate,

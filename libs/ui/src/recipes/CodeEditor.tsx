@@ -66,8 +66,6 @@ export type CodeEditorLanguage = 'json' | 'css';
  *     editor's OWN scroller directly (never an ancestor) — the page scroll is
  *     left untouched — using nearest-style behaviour (only move when the match
  *     is outside the visible band).
- *
- * See delete_after_use/codemirror-search-scroll-bug.md.
  */
 const noScrollEffect = StateEffect.define<null>();
 const SCROLL_MARGIN = 40;

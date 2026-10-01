@@ -33,7 +33,7 @@
    resolves to, so the right end matches ADS while staying opaque and locked.
 
    A theme MAY override this in its own scoped style.css — including going
-   flat (see 04-creating-a-theme). If it does, and its brand 500 is light,
+   flat. If it does, and its brand 500 is light,
    it owns the readout's legibility. */
 :root[data-sg-theme] .layout-topbar,
 :root[data-sg-theme] .layout-footer {

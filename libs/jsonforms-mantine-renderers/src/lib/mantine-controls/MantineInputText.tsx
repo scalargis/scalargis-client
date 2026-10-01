@@ -28,8 +28,7 @@ export const MantineInputText = memo(function MantineInputText(
   };
 
   // `multi` renders a real textarea — a documented gap in the Prime cell,
-  // which rendered every string single-line (json-forms-baseline-test.md
-  // flags it: "Textarea (if `multi` option works)").
+  // which rendered every string single-line.
   if (appliedUiSchemaOptions.multi) {
     return <Textarea {...common} onChange={onChange} autosize minRows={3} />;
   }

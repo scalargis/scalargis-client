@@ -65,7 +65,7 @@ export default function ThemeSelector(props) {
     }
 
     // Every named theme is a module in themes/ (the shipped palette folders
-    // and the client submodules alike — see themes/README.md). A module of
+    // and the client submodules alike). A module of
     // the post-B2 contract exports `mantineTheme` (built with
     // createClientTheme); Prime-era modules don't and explicitly fall back
     // to the base Mantine theme — their CSS still applies via the component.
