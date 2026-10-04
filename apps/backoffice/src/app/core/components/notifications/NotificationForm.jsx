@@ -92,16 +92,16 @@ function NotificationForm(props) {
             <Grid.Col span={{ base: 12, md: 9 }}>
               <Grid gap="sm">
                 <Grid.Col span={{ base: 12, md: 2 }}>
-                    <TextInput id="id" label="Id" value={data.id} disabled />
+                    <TextInput id="id" label="Id" value={data.id ?? ''} disabled />
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 5 }}>
-                    <TextInput id="name" label="Nome" value={data.name} disabled />
+                    <TextInput id="name" label="Nome" value={data.name ?? ''} disabled />
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 5 }}>
-                    <TextInput id="email" label="Email" value={data.email} disabled />
+                    <TextInput id="email" label="Email" value={data.email ?? ''} disabled />
                 </Grid.Col>
                 <Grid.Col span={12}>
-                    <Textarea id="message" label="Mensagem" rows={5} value={data.message} readOnly
+                    <Textarea id="message" label="Mensagem" rows={5} value={data.message ?? ''} readOnly
                       autosize minRows={5} maxRows={10} style={{opacity: '0.6'}} />
                 </Grid.Col>
                 <Grid.Col span={12}>
@@ -130,7 +130,7 @@ function NotificationForm(props) {
             <Grid.Col span={{ base: 12, md: 3 }}>
               <Grid gap="sm">
                 <Grid.Col span={12}>
-                    <TextInput id="viewer" label="Visualizador" value={data.viewer} disabled />
+                    <TextInput id="viewer" label="Visualizador" value={data.viewer ?? ''} disabled />
                 </Grid.Col>
                 <Grid.Col span={12}>
                     <TextInput id="date" label="Data" value={data.date || ''} disabled />
@@ -140,7 +140,7 @@ function NotificationForm(props) {
             <Grid.Col span={{ base: 12, md: 9 }}>
               <Grid gap="sm">
                 <Grid.Col span={12}>
-                  <Textarea id="notes" label="Observações" rows={5} autosize minRows={5} value={data.notes}
+                  <Textarea id="notes" label="Observações" rows={5} autosize minRows={5} value={data.notes ?? ''}
                   onChange={(e) => setData({...data, notes: e.target.value})
                   } />
                 </Grid.Col>
