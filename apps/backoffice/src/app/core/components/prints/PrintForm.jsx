@@ -24,6 +24,7 @@ import PrintLayoutsEditor from "./PrintLayoutsEditor";
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import PageSection from '../common/PageSection';
 
 const buildScaleList = (list1, list2) => {
   const list = [...new Set([...(list1 || []) ,...(list2 || [])])].sort((a, b)=>{return a-b});
@@ -219,7 +220,7 @@ function PrintForm(props) {
       <form onSubmit={handleSubmit(onSubmit)}>
 
         <TabPanel active={activeTab === 'base'} mount="eager">
-        <div className="card">
+        <PageSection>
 
             <div className="formgrid grid">
 
@@ -490,11 +491,11 @@ function PrintForm(props) {
 
             </div>
 
-          </div>
+          </PageSection>
         </TabPanel>
 
         <TabPanel active={activeTab === 'config'} mount="eager">
-        <div className="card">
+        <PageSection>
 
             <div className="field col-12">
               <Input.Label>Configuração</Input.Label>
@@ -516,11 +517,11 @@ function PrintForm(props) {
                 />
             </div>
 
-          </div>
+          </PageSection>
         </TabPanel>
 
         <TabPanel active={activeTab === 'form'} mount="eager">
-        <div className="card">
+        <PageSection>
 
             <FormFieldsEditor data={formFields}
               onChange={(data) => {
@@ -528,7 +529,7 @@ function PrintForm(props) {
               }}
             />
 
-          </div>
+          </PageSection>
         </TabPanel>
 
         {/* unmount, not lazy: a datatable hidden off-flow at height:0 keeps a
@@ -536,7 +537,7 @@ function PrintForm(props) {
             fresh mount into the laid-out container paints complete. The grid
             is fully controlled (layouts state lives here), so remounts are free. */}
         <TabPanel active={activeTab === 'layouts'} mount="unmount">
-        <div className="card">
+        <PageSection>
 
               <PrintLayoutsEditor data={layouts}
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
@@ -544,7 +545,7 @@ function PrintForm(props) {
                   setLayouts(data);
                 }}
               />
-          </div>
+          </PageSection>
         </TabPanel>
 
         <Group justify="flex-end" className="mt-4 mb-4">

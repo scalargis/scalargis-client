@@ -6,6 +6,7 @@ import { DataGrid, confirm, notify, IconPencil, IconTrash, IconPlus, IconX } fro
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
+import PageSection from '../common/PageSection';
 
 
 const initialSearchParams = {
@@ -229,39 +230,36 @@ function RoleList(props) {
   );
 
   return (
-    <React.Fragment>
-      <div className="col-12"><h3>Utilizadores - Perfis</h3></div>
-
-      <div className="grid viewer-list">
-          <div className="card col-12">
-            <Group justify="space-between" wrap="wrap" className="mb-4">
-              <Group gap="xs">
-                <Button color="success" leftSection={<IconPlus />} onClick={newRecord}>Novo</Button>
-                <Button color="danger" leftSection={<IconTrash />} onClick={deleteSelectedRecords}
-                  disabled={!selectedRecords.length}>Eliminar</Button>
-              </Group>
-              <Button variant="outline" color="secondary" leftSection={<IconX />} onClick={onFilterClear}>Limpar</Button>
-            </Group>
-
-            <DataGrid
-              idAccessor="id"
-              records={records}
-              totalRecords={totalRecords}
-              fetching={fetching}
-              page={searchParams.page}
-              onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
-              recordsPerPage={searchParams.pageSize}
-              sortStatus={searchParams.sortStatus}
-              onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
-              selectedRecords={selectedRecords}
-              onSelectedRecordsChange={setSelectedRecords}
-              isRecordSelectable={(record) => !record.read_only}
-              columns={columns}
-              noRecordsText="Não foram encontrados registos."
-            />
-        </div>
-      </div>
-    </React.Fragment>
+    <PageSection
+      title="Utilizadores - Perfis"
+      toolbar={
+        <Group justify="space-between" wrap="wrap">
+          <Group gap="xs">
+            <Button color="success" leftSection={<IconPlus />} onClick={newRecord}>Novo</Button>
+            <Button color="danger" leftSection={<IconTrash />} onClick={deleteSelectedRecords}
+              disabled={!selectedRecords.length}>Eliminar</Button>
+          </Group>
+          <Button variant="outline" color="secondary" leftSection={<IconX />} onClick={onFilterClear}>Limpar</Button>
+        </Group>
+      }
+    >
+      <DataGrid
+        idAccessor="id"
+        records={records}
+        totalRecords={totalRecords}
+        fetching={fetching}
+        page={searchParams.page}
+        onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
+        recordsPerPage={searchParams.pageSize}
+        sortStatus={searchParams.sortStatus}
+        onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
+        selectedRecords={selectedRecords}
+        onSelectedRecordsChange={setSelectedRecords}
+        isRecordSelectable={(record) => !record.read_only}
+        columns={columns}
+        noRecordsText="Não foram encontrados registos."
+      />
+    </PageSection>
   );
 
 }

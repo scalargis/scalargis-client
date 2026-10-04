@@ -27,6 +27,7 @@ import dataProvider from '../../../service/DataProvider';
 import { isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
+import PageSection from '../common/PageSection';
 
 // Inactive tabs stay mounted (so editor state and history survive a tab
 // switch) but are hidden off-flow. We deliberately do NOT use display:none:
@@ -365,7 +366,7 @@ function ViewerForm(props) {
 
       <form onSubmit={handleSubmit(onSubmit)} style={{ position: 'relative' }}>
 
-        <div className="card" style={activeTab === 'base' ? undefined : HIDDEN}>
+        <PageSection style={activeTab === 'base' ? undefined : HIDDEN}>
 
             <div className="formgrid grid">
 
@@ -475,7 +476,7 @@ function ViewerForm(props) {
 
               <div className="field col-12 md:col-6">
                 <Input.Label>Perfis</Input.Label>
-                <div className="card p-2">
+                <Paper p="xs">
                   { (availableRoles && availableRoles.length > 0) &&
                   <>
                   <div className="field col-12 pl-0">
@@ -524,14 +525,14 @@ function ViewerForm(props) {
                       </div>
                     </div>
                   }
-                </div>
+                </Paper>
               </div>
 
             </div>
 
-          </div>
+          </PageSection>
 
-        <div className="card" style={activeTab === 'ui' ? undefined : HIDDEN}>
+        <PageSection style={activeTab === 'ui' ? undefined : HIDDEN}>
             <div className="formgrid grid">
 
               <div className="field col-12 md:col-4">
@@ -595,9 +596,9 @@ function ViewerForm(props) {
               </div>
 
             </div>
-          </div>
+          </PageSection>
 
-        <div className="card" style={activeTab === 'config' ? undefined : HIDDEN}>
+        <PageSection style={activeTab === 'config' ? undefined : HIDDEN}>
             <Group justify="flex-end" gap="xs" wrap="nowrap" className="mb-1">
               <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
                 onClick={e => {
@@ -629,9 +630,9 @@ function ViewerForm(props) {
               height="calc(100vh - 300px)"
               aria-label="Config JSON"
             />
-          </div>
+          </PageSection>
 
-        <div className="card" style={activeTab === 'prints' ? undefined : HIDDEN}>
+        <PageSection style={activeTab === 'prints' ? undefined : HIDDEN}>
 
             <PrintGroupChildsEditor
               data={printChilds}
@@ -642,7 +643,7 @@ function ViewerForm(props) {
               }}
             />
 
-          </div>
+          </PageSection>
 
         <Group justify="flex-end" className="mt-4 mb-4">
           <Button

@@ -464,7 +464,7 @@ function UserForm(props) {
 
         <div className="field col-12 md:col-6">
           <Input.Label>Perfis</Input.Label>
-          <div className="card p-2">
+          <Paper p="xs">
             { (availableRoles && availableRoles.length > 0) &&
             <>
             <div className="field col-12 pl-0">
@@ -513,12 +513,12 @@ function UserForm(props) {
                 </div>
               </div>
             }
-          </div>
+          </Paper>
         </div>
 
         <div className="field col-12 md:col-6">
           <Input.Label>Grupos</Input.Label>
-          <div className="card p-2">
+          <Paper p="xs">
             { (availableGroups && availableGroups.length > 0) &&
             <>
             <div className="field col-12 pl-0">
@@ -567,7 +567,7 @@ function UserForm(props) {
                 </div>
               </div>
             }
-          </div>
+          </Paper>
         </div>
 
       </div>

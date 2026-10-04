@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { connect } from 'react-redux';
+import { Grid, Stack } from '@mantine/core';
 import AppContext from "../../AppContext";
 
 import ViewerVisitsChart from '../components/stats/ViewerVisitsChart';
@@ -29,19 +30,20 @@ function Dashboard(props) {
     }
 
     return (
-        <div className="grid dashboard">
-            
+        <Stack gap="md" className="dashboard">
             { adminOrManager && <BasicStats core={core} /> }
 
-            <div className={(contacts && contacts.length > 0)  ? "col-12 md:col-9" : "col-12"}>
-                <ViewerVisitsChart core={core} stats={stats} />
-            </div>
+            <Grid gutter="md">
+                <Grid.Col span={{ base: 12, sm: (contacts && contacts.length > 0) ? 9 : 12 }}>
+                    <ViewerVisitsChart core={core} stats={stats} />
+                </Grid.Col>
 
-            { (contacts && contacts.length > 0) ?
-            <div className="col-12 md:col-3 contacts">
-                <ContactList core={core} contacts={contacts} />
-            </div> : null }
-        </div>
+                { (contacts && contacts.length > 0) ?
+                <Grid.Col span={{ base: 12, sm: 3 }} className="contacts">
+                    <ContactList core={core} contacts={contacts} />
+                </Grid.Col> : null }
+            </Grid>
+        </Stack>
     );
 }
 

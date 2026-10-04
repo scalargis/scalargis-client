@@ -7,6 +7,7 @@ import { DataGrid, confirm, notify, Dialog, IconEye, IconPencil, IconTrash, Icon
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
+import PageSection from '../common/PageSection';
 
 
 const initialSearchParams = {
@@ -263,58 +264,55 @@ function ParameterList(props) {
   );
 
   return (
-    <React.Fragment>
-      <div className="col-12"><h3>Parâmetros</h3></div>
-
-      <div className="grid viewer-list">
-          <div className="card col-12">
-            <Group justify="space-between" wrap="wrap" className="mb-4">
-              <Group gap="xs">
-                <Button color="success" leftSection={<IconPlus />} onClick={newRecord}>Novo</Button>
-                <Button color="danger" leftSection={<IconTrash />} onClick={deleteSelectedRecords}
-                  disabled={!selectedRecords.length}>Eliminar</Button>
-              </Group>
-              <Button variant="outline" color="secondary" leftSection={<IconX />} onClick={onFilterClear}>Limpar</Button>
-            </Group>
-
-            <DataGrid
-              idAccessor="id"
-              records={records}
-              totalRecords={totalRecords}
-              fetching={fetching}
-              page={searchParams.page}
-              onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
-              recordsPerPage={searchParams.pageSize}
-              sortStatus={searchParams.sortStatus}
-              onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
-              selectedRecords={selectedRecords}
-              onSelectedRecordsChange={setSelectedRecords}
-              isRecordSelectable={(record) => !record.read_only}
-              columns={columns}
-              noRecordsText="Não foram encontrados registos."
-            />
-            <Dialog title="Valor" opened={displayFieldValue} size="50vw"
-              onClose={closeFieldValue}>
-              {(() => {
-                const raw = fieldValue ?? '';
-                // Pretty-print JSON values (SITE_CONFIG etc.); fall back to the
-                // HTML render for non-JSON (rich-text) settings.
-                try {
-                  const parsed = JSON.parse(raw);
-                  if (parsed && typeof parsed === 'object') {
-                    return (
-                      <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '60vh', overflow: 'auto', margin: 0 }}>
-                        {JSON.stringify(parsed, null, 2)}
-                      </pre>
-                    );
-                  }
-                } catch { /* not JSON */ }
-                return <div dangerouslySetInnerHTML={{ __html: raw }} />;
-              })()}
-            </Dialog>
-        </div>
-      </div>
-    </React.Fragment>
+    <PageSection
+      title="Parâmetros"
+      toolbar={
+        <Group justify="space-between" wrap="wrap">
+          <Group gap="xs">
+            <Button color="success" leftSection={<IconPlus />} onClick={newRecord}>Novo</Button>
+            <Button color="danger" leftSection={<IconTrash />} onClick={deleteSelectedRecords}
+              disabled={!selectedRecords.length}>Eliminar</Button>
+          </Group>
+          <Button variant="outline" color="secondary" leftSection={<IconX />} onClick={onFilterClear}>Limpar</Button>
+        </Group>
+      }
+    >
+      <DataGrid
+        idAccessor="id"
+        records={records}
+        totalRecords={totalRecords}
+        fetching={fetching}
+        page={searchParams.page}
+        onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
+        recordsPerPage={searchParams.pageSize}
+        sortStatus={searchParams.sortStatus}
+        onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
+        selectedRecords={selectedRecords}
+        onSelectedRecordsChange={setSelectedRecords}
+        isRecordSelectable={(record) => !record.read_only}
+        columns={columns}
+        noRecordsText="Não foram encontrados registos."
+      />
+      <Dialog title="Valor" opened={displayFieldValue} size="50vw"
+        onClose={closeFieldValue}>
+        {(() => {
+          const raw = fieldValue ?? '';
+          // Pretty-print JSON values (SITE_CONFIG etc.); fall back to the
+          // HTML render for non-JSON (rich-text) settings.
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              return (
+                <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '60vh', overflow: 'auto', margin: 0 }}>
+                  {JSON.stringify(parsed, null, 2)}
+                </pre>
+              );
+            }
+          } catch { /* not JSON */ }
+          return <div dangerouslySetInnerHTML={{ __html: raw }} />;
+        })()}
+      </Dialog>
+    </PageSection>
   );
 
 }

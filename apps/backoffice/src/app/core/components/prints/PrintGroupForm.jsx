@@ -23,6 +23,7 @@ import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import PageSection from '../common/PageSection';
 
 
 const buildScaleList = (list1, list2) => {
@@ -226,7 +227,7 @@ function PrintGroupForm(props) {
 
         {activeTab === 'base' ?
 
-          <div className="card">
+          <PageSection>
 
             <div className="formgrid grid">
 
@@ -458,25 +459,25 @@ function PrintGroupForm(props) {
 
             </div>
 
-          </div>
+          </PageSection>
 
         : null}
 
         {activeTab === 'form' ?
 
-          <div className="card">
+          <PageSection>
 
             <FormFieldsEditor data={formFields} onChange={(data) => {
               setFormFields(data);
             }} />
 
-          </div>
+          </PageSection>
 
         : null}
 
         {activeTab === 'layouts' ?
 
-          <div className="card">
+          <PageSection>
 
             <div className="formgrid grid">
               <PrintLayoutsEditor data={layouts}
@@ -487,13 +488,13 @@ function PrintGroupForm(props) {
               />
             </div>
 
-          </div>
+          </PageSection>
 
         : null}
 
         {activeTab === 'childs' ?
 
-          <div className="card">
+          <PageSection>
 
             <PrintGroupChildsEditor
               data={groupChilds}
@@ -504,7 +505,7 @@ function PrintGroupForm(props) {
               }}
             />
 
-          </div>
+          </PageSection>
 
         : null}
 

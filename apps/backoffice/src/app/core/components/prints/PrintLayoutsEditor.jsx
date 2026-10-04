@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { ActionIcon, Button, Group, Input, Select } from '@mantine/core';
 import { CodeEditor, DataGrid, ConfirmPopover, Dialog, useIsMobile, IconX, IconCheck, IconPencil, IconTrash, IconPlus } from '@scalargis/ui';
 import { useForm, Controller } from 'react-hook-form';
+import PageSection from '../common/PageSection';
 
 const LayoutEditor = props => {
 
@@ -171,9 +172,9 @@ const PrintLayoutsEditor = props => {
           onSave={onLayoutFormSave} />
       }
 
-      <div className="grid">
-        <div className="card col-12">
-          <Group justify="flex-end" gap="xs" className="mb-4">
+      <PageSection
+        toolbar={
+          <Group justify="flex-end" gap="xs">
             <Button type="button" color="success" leftSection={<IconPlus />}
               onClick={() => setEditing(null)}>Novo</Button>
             <ConfirmPopover
@@ -187,18 +188,18 @@ const PrintLayoutsEditor = props => {
                 disabled={!selectedRecords.length}>Eliminar</Button>
             </ConfirmPopover>
           </Group>
-
-          <DataGrid
-            idAccessor={layoutKey}
-            records={data}
-            onRowReorder={props.onChange}
-            selectedRecords={selectedRecords}
-            onSelectedRecordsChange={setSelectedRecords}
-            columns={columns}
-            noRecordsText="Não foram encontrados registos."
-          />
-        </div>
-      </div>
+        }
+      >
+        <DataGrid
+          idAccessor={layoutKey}
+          records={data}
+          onRowReorder={props.onChange}
+          selectedRecords={selectedRecords}
+          onSelectedRecordsChange={setSelectedRecords}
+          columns={columns}
+          noRecordsText="Não foram encontrados registos."
+        />
+      </PageSection>
     </div>
   )
 

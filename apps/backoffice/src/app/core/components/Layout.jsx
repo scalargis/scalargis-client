@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Routes, Route } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { CSSTransition } from 'react-transition-group';
 import { SkipLink } from '@scalargis/ui';
 
@@ -172,6 +172,7 @@ function Layout(props) {
                 <Route path="/settings/coordinate_systems/create" element={<CoordinateSystemEdit />}  />
                 <Route path="/settings/coordinate_systems/edit/:id" element={<CoordinateSystemEdit />} />
                 <Route path="/settings/coordinate_systems/list" element={<CoordinateSystemList />} />
+                <Route path="*" element={<Navigate to="/not-found" replace />} />
             </Routes>
         </main>
 

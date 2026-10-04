@@ -244,7 +244,7 @@ function GroupForm(props) {
 
             <div className="field col-12 md:col-6">
               <Input.Label>Perfis</Input.Label>
-              <div className="card pt-4">
+              <Paper p="md" pt="lg">
                 { (availableRoles && availableRoles.length > 0) &&
                 <>
                 <div className="field col-12">
@@ -291,12 +291,12 @@ function GroupForm(props) {
                     </div>
                   </div>
                 }
-              </div>
+              </Paper>
             </div>
 
             <div className="field col-12 md:col-6">
               <Input.Label>Utilizadores</Input.Label>
-              <div className="card pt-4">
+              <Paper p="md" pt="lg">
                 { (availableUsers && availableUsers.length > 0) &&
                 <>
                 <div className="field col-12">
@@ -341,7 +341,7 @@ function GroupForm(props) {
                     </div>
                   </div>
                 }
-              </div>
+              </Paper>
             </div>
 
           </div>

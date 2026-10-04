@@ -18,6 +18,7 @@ import dayjs from 'dayjs';
 
 import dataProvider from '../../../service/DataProvider';
 import { fetchJson } from  '../../../service/fetch'
+import PageSection from '../common/PageSection';
 
 
 defaults.animation = false
@@ -285,7 +286,7 @@ export default function ViewerVisitsChart(props) {
 
 
     return (
-        <div className="card">
+        <PageSection>
             <div className="grid">
                 <div className="col-12 md:col-6">
                     <Select
@@ -370,6 +371,6 @@ export default function ViewerVisitsChart(props) {
 
                 <Line data={data} options={options} />
             </div>
-        </div>
+        </PageSection>
     )
 }

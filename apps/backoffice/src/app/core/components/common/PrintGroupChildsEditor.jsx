@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Component } from "react";
-import { ActionIcon, Alert, Button, Group, MultiSelect } from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, MultiSelect, Paper } from '@mantine/core';
 import { CollapsiblePanel, ConfirmPopover, IconInfoCircle, IconX } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { getItemStyle, getFieldListStyle } from "./utils";
@@ -38,7 +38,7 @@ function RecordSelector(props) {
     .map(p => ({ value: String(p.id), label: p.title || '', code: p.code }));
 
   return (
-    <div className="card p-2">
+    <Paper p="xs">
         <div className="field col-12 pl-0">
           <MultiSelect
             data={options}
@@ -65,7 +65,7 @@ function RecordSelector(props) {
           </div>
           <div className="col"></div>
         </div>
-      </div>
+      </Paper>
   );
 }
 
@@ -231,7 +231,7 @@ class PrintGroupChildsEditor extends Component {
               </div>
               <div className="grid">
                 <div className="col-12">
-                  <div className="card p-2">
+                  <Paper p="xs">
                     <ListChilds
                       data={this.state.data.prints}
                       type="PRINTS"
@@ -239,7 +239,7 @@ class PrintGroupChildsEditor extends Component {
                         this.onPrintsChange(data);
                       }}
                     />
-                  </div>
+                  </Paper>
                 </div>
               </div>
             </div>
@@ -262,7 +262,7 @@ class PrintGroupChildsEditor extends Component {
               </div>
               <div className="grid">
                 <div className="col-12">
-                  <div className="card p-2">
+                  <Paper p="xs">
                     <ListChilds
                       data={this.state.data.groups}
                       type="GROUPS"
@@ -270,7 +270,7 @@ class PrintGroupChildsEditor extends Component {
                         this.onGroupsChange(data);
                       }}
                     />
-                  </div>
+                  </Paper>
                 </div>
               </div>
             </div>

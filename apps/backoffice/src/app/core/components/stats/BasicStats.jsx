@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { defaults } from 'chart.js';
+import { Paper, SimpleGrid } from '@mantine/core';
 
 defaults.animation = false;
 
@@ -26,35 +27,27 @@ export default function BasicStats(props) {
 
 
     return (
-        <React.Fragment>
-            <div className="col-12 md:col-6 lg:col-3">
-                <div className="card summary">
-                    <span className="title">Utilizadores</span>
-                    <span className="detail">Utilizadores registados</span>
-                    <span className="count blue">{basicstats?.nb_users}</span>
-                </div>
-            </div>
-            <div className="col-12 md:col-6 lg:col-3">
-                <div className="card summary">
-                    <span className="title">Grupos</span>
-                    <span className="detail">Grupos de utilizadores</span>
-                    <span className="count blue">{basicstats?.nb_groups}</span>
-                </div>
-            </div>
-            <div className="col-12 md:col-6 lg:col-3">
-                <div className="card summary">
-                    <span className="title">Visualizadores</span>
-                    <span className="detail">Incluindo mapas partilhados</span>
-                    <span className="count orange">{basicstats?.nb_viewers}</span>
-                </div>
-            </div>
-            <div className="col-12 md:col-6 lg:col-3">
-                <div className="card summary">
-                    <span className="title">Operações</span>
-                    <span className="detail">Visitas, plantas, etc...</span>
-                    <span className="count red">{basicstats?.nb_ops}</span>
-                </div>
-            </div>
-        </React.Fragment>
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
+            <Paper p="md" className="summary">
+                <span className="title">Utilizadores</span>
+                <span className="detail">Utilizadores registados</span>
+                <span className="count blue">{basicstats?.nb_users}</span>
+            </Paper>
+            <Paper p="md" className="summary">
+                <span className="title">Grupos</span>
+                <span className="detail">Grupos de utilizadores</span>
+                <span className="count blue">{basicstats?.nb_groups}</span>
+            </Paper>
+            <Paper p="md" className="summary">
+                <span className="title">Visualizadores</span>
+                <span className="detail">Incluindo mapas partilhados</span>
+                <span className="count orange">{basicstats?.nb_viewers}</span>
+            </Paper>
+            <Paper p="md" className="summary">
+                <span className="title">Operações</span>
+                <span className="detail">Visitas, plantas, etc...</span>
+                <span className="count red">{basicstats?.nb_ops}</span>
+            </Paper>
+        </SimpleGrid>
     )
 }

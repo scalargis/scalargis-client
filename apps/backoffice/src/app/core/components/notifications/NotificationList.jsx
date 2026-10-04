@@ -9,6 +9,7 @@ import { CollapsiblePanel, DataGrid, exportGridCSV, notify, IconPencil, IconUplo
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
+import PageSection from '../common/PageSection';
 
 
 const initialSearchParams = {
@@ -201,119 +202,116 @@ function NotificationList(props) {
   );
 
   return (
-    <React.Fragment>
-      <div className="col-12"><h3>Notificações</h3></div>
+    <PageSection
+      title="Notificações"
+      toolbar={
+        <CollapsiblePanel header="Filtro" defaultOpened>
+          <form onSubmit={handleSubmit(onFilterSubmit)}>
 
-      <div className="grid notification-list">
-          <div className="card col-12">
-            <CollapsiblePanel header="Filtro" defaultOpened>
-              <form onSubmit={handleSubmit(onFilterSubmit)}>
+            <div className="formgrid grid">
+              <div className="field col-12 md:col-2">
+                  <TextInput id="id" label="Id" {...register('id')} />
+              </div>
+              <div className="field col-12 md:col-10">
+                  <Controller
+                      control={control}
+                      name="viewer"
+                      render={({ field }) => (
+                        <MultiSelect
+                          label="Visualizador"
+                          data={viewersOptions.map(v => ({ value: String(v.id), label: v.name }))}
+                          value={(field.value || []).map(String)}
+                          onChange={(values) => field.onChange(values.length ? values.map(Number) : null)}
+                          searchable clearable />
+                      )}
+                    />
+              </div>
+              <div className="field col-12 md:col-4">
+                  <Controller
+                      control={control}
+                      name="start_date"
+                      render={({ field }) => (
+                        <DatePickerInput
+                          label="Data envio (início)"
+                          value={toPickerDate(field.value)}
+                          onChange={(value) => field.onChange(fromPickerDate(value))}
+                          valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
+                          clearable />
+                      )}
+                    />
+              </div>
+              <div className="field col-12 md:col-4">
+                  <Controller
+                      control={control}
+                      name="end_date"
+                      render={({ field }) => (
+                        <DatePickerInput
+                          label="Data envio (fim)"
+                          value={toPickerDate(field.value)}
+                          onChange={(value) => field.onChange(fromPickerDate(value))}
+                          valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
+                          clearable />
+                      )}
+                    />
+              </div>
+              <div className="field col-12 md:col-4">
+                  <TextInput id="author" label="Autor" {...register('author')} />
+              </div>
+              <div className="field col-12 md:col-4">
+                  <TextInput id="message" label="Mensagem" {...register('message')} />
+              </div>
+              <div className="field col-12 md:col-4">
+                  <Controller
+                      control={control}
+                      name="status"
+                      render={({ field }) => (
+                        <MultiSelect
+                          label="Estado"
+                          data={status.map(s => ({ value: String(s.value), label: s.name }))}
+                          value={(field.value || []).map(String)}
+                          onChange={(values) => field.onChange(values.length ? values.map(Number) : null)}
+                          clearable />
+                      )}
+                    />
+              </div>
+            </div>
 
-                <div className="formgrid grid">
-                  <div className="field col-12 md:col-2">
-                      <TextInput id="id" label="Id" {...register('id')} />
-                  </div>
-                  <div className="field col-12 md:col-10">
-                      <Controller
-                          control={control}
-                          name="viewer"
-                          render={({ field }) => (
-                            <MultiSelect
-                              label="Visualizador"
-                              data={viewersOptions.map(v => ({ value: String(v.id), label: v.name }))}
-                              value={(field.value || []).map(String)}
-                              onChange={(values) => field.onChange(values.length ? values.map(Number) : null)}
-                              searchable clearable />
-                          )}
-                        />
-                  </div>
-                  <div className="field col-12 md:col-4">
-                      <Controller
-                          control={control}
-                          name="start_date"
-                          render={({ field }) => (
-                            <DatePickerInput
-                              label="Data envio (início)"
-                              value={toPickerDate(field.value)}
-                              onChange={(value) => field.onChange(fromPickerDate(value))}
-                              valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
-                              clearable />
-                          )}
-                        />
-                  </div>
-                  <div className="field col-12 md:col-4">
-                      <Controller
-                          control={control}
-                          name="end_date"
-                          render={({ field }) => (
-                            <DatePickerInput
-                              label="Data envio (fim)"
-                              value={toPickerDate(field.value)}
-                              onChange={(value) => field.onChange(fromPickerDate(value))}
-                              valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
-                              clearable />
-                          )}
-                        />
-                  </div>
-                  <div className="field col-12 md:col-4">
-                      <TextInput id="author" label="Autor" {...register('author')} />
-                  </div>
-                  <div className="field col-12 md:col-4">
-                      <TextInput id="message" label="Mensagem" {...register('message')} />
-                  </div>
-                  <div className="field col-12 md:col-4">
-                      <Controller
-                          control={control}
-                          name="status"
-                          render={({ field }) => (
-                            <MultiSelect
-                              label="Estado"
-                              data={status.map(s => ({ value: String(s.value), label: s.name }))}
-                              value={(field.value || []).map(String)}
-                              onChange={(values) => field.onChange(values.length ? values.map(Number) : null)}
-                              clearable />
-                          )}
-                        />
-                  </div>
-                </div>
+            <div className="fluid grid justify-content-end">
+              <div className="field col-12 md:col-1">
+                <Button type="submit" fullWidth>Pesquisar</Button>
+              </div>
+              <div className="field col-12 md:col-1">
+                <Button type="button" variant="default" fullWidth onClick={onFilterClear}>Limpar</Button>
+              </div>
+            </div>
 
-                <div className="fluid grid justify-content-end">
-                  <div className="field col-12 md:col-1">
-                    <Button type="submit" fullWidth>Pesquisar</Button>
-                  </div>
-                  <div className="field col-12 md:col-1">
-                    <Button type="button" variant="default" fullWidth onClick={onFilterClear}>Limpar</Button>
-                  </div>
-                </div>
+            </form>
+        </CollapsiblePanel>
+      }
+    >
+      <Group justify="space-between" wrap="wrap">
+        <span><b>Total:</b> {totalRecords}</span>
+        <Button variant="outline" color="secondary" leftSection={<IconUpload />}
+          onClick={() => exportGridCSV(records, columns, { filename: 'notificacoes.csv' })}
+          disabled={!totalRecords}>Exportar</Button>
+      </Group>
 
-                </form>
-            </CollapsiblePanel>
-
-            <Group justify="space-between" wrap="wrap" className="mt-2 mb-4">
-              <span><b>Total:</b> {totalRecords}</span>
-              <Button variant="outline" color="secondary" leftSection={<IconUpload />}
-                onClick={() => exportGridCSV(records, columns, { filename: 'notificacoes.csv' })}
-                disabled={!totalRecords}>Exportar</Button>
-            </Group>
-
-            <DataGrid
-              idAccessor="id"
-              records={records}
-              totalRecords={totalRecords}
-              fetching={fetching}
-              page={searchParams.page}
-              onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
-              recordsPerPage={searchParams.pageSize}
-              sortStatus={searchParams.sortStatus}
-              onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
-              selectedRecords={selectedRecords}
-              onSelectedRecordsChange={setSelectedRecords}
-              columns={columns}
-              noRecordsText="Não foram encontradas notificações."
-            />
-        </div>
-      </div>
-    </React.Fragment>
+      <DataGrid
+        idAccessor="id"
+        records={records}
+        totalRecords={totalRecords}
+        fetching={fetching}
+        page={searchParams.page}
+        onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
+        recordsPerPage={searchParams.pageSize}
+        sortStatus={searchParams.sortStatus}
+        onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
+        selectedRecords={selectedRecords}
+        onSelectedRecordsChange={setSelectedRecords}
+        columns={columns}
+        noRecordsText="Não foram encontradas notificações."
+      />
+    </PageSection>
   );
 
 }
