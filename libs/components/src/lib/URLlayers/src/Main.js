@@ -9,7 +9,7 @@ const addLayer = (data, dispatch, actions, viewer) => {
 
     let theme = {...data};
 
-    const themeId = data?.themeId || uuid();
+    const themeId = data?.themeid || uuid();
 
     const layerType = theme?.type || '';
 
