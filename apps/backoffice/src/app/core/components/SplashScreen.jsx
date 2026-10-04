@@ -1,5 +1,6 @@
 import React, { useContext }  from 'react';
 import AppContext from '../../AppContext';
+import { Flex } from '@mantine/core';
 
 function SplashScreen({ history }) {
 
@@ -10,7 +11,7 @@ function SplashScreen({ history }) {
   // Render page
   const logo = CLIENT_URL + 'assets/images/logo-splash.png'
   return (
-    <div className="flex align-items-center justify-content-center" style={{ height: '100%' }}>
+    <Flex align="center" justify="center" style={{ height: '100%' }}>
       <div style={{ backgroundColor: 'white', padding: '6rem' }}>
 
         <div className="login-logo">
@@ -20,7 +21,7 @@ function SplashScreen({ history }) {
         <p>Bem-vindo!</p>
         <p>Para continuar, por favor aceite a nossa política de privacidade.</p>
       </div>
-  </div>
+  </Flex>
   )
 }
 

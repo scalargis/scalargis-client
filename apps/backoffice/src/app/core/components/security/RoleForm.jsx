@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { Button, Group, TextInput } from '@mantine/core';
+import { Button, Grid, Group, TextInput } from '@mantine/core';
 import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -92,26 +92,26 @@ function RoleForm(props) {
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
-          <div className="formgrid grid">
-            <div className="field col-12 md:col-2">
+          <Grid gap="sm">
+            <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="id" label="Id" value={data.id || ''} disabled />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-10">
+            <Grid.Col span={{ base: 12, md: 10 }}>
               <TextInput id="name" label="Designação" autoFocus
                error={fieldError(errors, 'name')}
                {...register('name', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12">
+            <Grid.Col span={12}>
               <TextInput id="description" label="Descrição"
                error={fieldError(errors, 'description')}
                {...register('description')} />
-            </div>
+            </Grid.Col>
 
-          </div>
+          </Grid>
 
-        <Group justify="flex-end" className="mt-4 mb-4">
+        <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
             variant="default"

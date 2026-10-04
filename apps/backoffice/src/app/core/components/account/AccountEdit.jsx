@@ -5,6 +5,7 @@ import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 
 import AccountForm from './AccountForm';
+import { Box } from '@mantine/core';
 
 function AccountEdit(props) {
 
@@ -38,7 +39,7 @@ function AccountEdit(props) {
 
   return (
     <React.Fragment>
-      <div className="col-12"><h3>Conta</h3></div>
+      <Box p="xs"><h3>Conta</h3></Box>
       { record ?      
           <AccountForm data={record} />
         :

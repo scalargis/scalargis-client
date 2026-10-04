@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Group, PasswordInput } from '@mantine/core';
+import { Box, Button, Group, PasswordInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notify, Dialog, IconUserEdit, IconX, IconSave } from '@scalargis/ui';
 import { PasswordRules, usePasswordPolicy, validatePasswordAgainstPolicy } from '@scalargis/components';
@@ -86,7 +86,7 @@ export default function PasswordChange(props) {
             }}>Alterar password</Button>
             <Dialog title="Alterar password" opened={showPasswordDialog}
                 onClose={close}>
-                <div className="mt-2">
+                <Box mt="xs">
 
                     <form onSubmit={(e) => {
                         e.preventDefault();
@@ -94,7 +94,7 @@ export default function PasswordChange(props) {
                         handleSubmit(onSubmit)();
                     }}
                     autoComplete="off">
-                        <div className="field">
+                        <Box mb="sm">
                             <Controller name="newPassword" control={control}
                                 rules={{
                                     required: "Campo obrigatório",
@@ -116,9 +116,9 @@ export default function PasswordChange(props) {
                                 )}
                             />
                             <PasswordRules policy={passwordPolicy} password={watchFields[0]} />
-                        </div>
+                        </Box>
 
-                        <div className="field">
+                        <Box mb="sm">
                             <Controller name="confirmPassword" control={control}
                                 rules={{
                                     required: "Campo obrigatório",
@@ -138,9 +138,9 @@ export default function PasswordChange(props) {
                                     autoComplete="off" />
                                 )}
                             />
-                        </div>
+                        </Box>
 
-                        <Group justify="flex-end" className="mt-4">
+                        <Group justify="flex-end" mt="md">
                             <Button type="button" variant="subtle" leftSection={<IconX />}
                                 onClick={() => close()}
                                 disabled={isSaving}>Cancelar</Button>
@@ -150,7 +150,7 @@ export default function PasswordChange(props) {
                         </Group>
 
                     </form>
-                </div>
+                </Box>
             </Dialog>
         </React.Fragment>
     )

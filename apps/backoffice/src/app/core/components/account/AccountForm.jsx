@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-import { ActionIcon, Button, Group, Input, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Grid, Group, Input, TextInput } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { notify, IconCheck, IconX, IconPowerOff, IconSave, IconPencil } from '@scalargis/ui';
@@ -87,43 +87,43 @@ function AccountForm(props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
 
-      <div className="formgrid grid">
-        <div className="field col-12 md:col-3">
+      <Grid gap="sm">
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <TextInput id="first_name" label="Primeiro Nome" autoFocus disabled={!isEditMode}
             {...register('first_name')} />
-        </div>
-        <div className="field col-12 md:col-3">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <TextInput id="last_name" label="Último Nome" disabled={!isEditMode}
             {...register('last_name')} />
-        </div>
-        <div className="field col-12 md:col-6">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <TextInput id="name" label="Nome" disabled={!isEditMode}
             error={fieldError(errors, 'name')}
             {...register('name', { required: 'Campo obrigatório.' })} />
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12 md:col-3">
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <TextInput id="username" label="Username" disabled={!isEditMode}
             error={fieldError(errors, 'username')}
             {...register('username', { required: 'Campo obrigatório.' })} />
-        </div>
-        <div className="field col-12 md:col-4">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 4 }}>
           <TextInput id="email" label="Email" disabled={!isEditMode}
             error={fieldError(errors, 'email')}
             {...register('email', {
               required: 'Campo obrigatório.',
               pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Formato de email inválido.' }
             })} />
-        </div>
+        </Grid.Col>
 
         { !isEditMode &&
-        <div className="field col-12 md:col-3">
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <Input.Label>Password</Input.Label>
           <PasswordChange core={core} />
-        </div>
+        </Grid.Col>
         }
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <Group gap="xs" align="flex-end" wrap="nowrap">
             <Button type="button" leftSection={<IconCheck />} disabled={!isEditMode}
               onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
@@ -134,8 +134,8 @@ function AccountForm(props) {
               <IconX />
             </ActionIcon>
           </Group>
-        </div>
-        <div className="field col-12 md:col-3">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <Group gap="xs" align="flex-end" wrap="nowrap">
             <Controller
               control={control}
@@ -157,11 +157,11 @@ function AccountForm(props) {
               <IconX />
             </ActionIcon>
           </Group>
-        </div>
+        </Grid.Col>
 
-      </div>
+      </Grid>
 
-      <Group justify="space-between" className="mt-4 mb-4">
+      <Group justify="space-between" mt="md" mb="md">
         <div>
           { !isEditMode &&
           <Button

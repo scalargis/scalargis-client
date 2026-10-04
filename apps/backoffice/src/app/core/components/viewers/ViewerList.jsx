@@ -241,7 +241,7 @@ function ViewerList(props) {
           title: 'Keywords',
           render: (record) => (
             <React.Fragment>
-              { record.keywords && record.keywords.map( (item) => <Badge variant="light" color="secondary" key={item} className="mr-2 mb-2">{item}</Badge> ) }
+              { record.keywords && record.keywords.map( (item) => <Badge variant="light" color="secondary" key={item} mr="xs" mb="xs">{item}</Badge> ) }
             </React.Fragment>
           )
         },

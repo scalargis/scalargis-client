@@ -1,10 +1,9 @@
 // CSS order rule: the Prime keeps first,
 // then the Mantine block (@scalargis/ui: Mantine core → ads-tokens → ads-globals).
 // These lines own that order for the whole backoffice — keep them at the top.
-// saga-blue and primereact.min left with the last Prime widget (Phase 2 wave 3);
-// primeicons and primeflex stay for good.
+// saga-blue and primereact.min left with the last Prime widget (Phase 2 wave 3),
+// and primeflex left with the backoffice page shell. primeicons stays for good.
 import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css';
 
 import { AdsProviders } from '@scalargis/ui';
 

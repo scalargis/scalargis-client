@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
-import { Alert, Badge, Button, Group, Input, Textarea, TextInput } from '@mantine/core';
+import { Alert, Badge, Box, Button, Grid, Group, Input, TextInput, Textarea } from '@mantine/core';
 import { notify, IconArrowLeft } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -88,76 +88,76 @@ function NotificationForm(props) {
       <form>
         { data.id ?
         <React.Fragment>
-          <div className="grid">
-            <div className="col-12 md:col-9">
-              <div className="formgrid grid">
-                <div className="field col-12 md:col-2">
+          <Grid gap="sm">
+            <Grid.Col span={{ base: 12, md: 9 }}>
+              <Grid gap="sm">
+                <Grid.Col span={{ base: 12, md: 2 }}>
                     <TextInput id="id" label="Id" value={data.id} disabled />
-                </div>
-                <div className="field col-12 md:col-5">
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 5 }}>
                     <TextInput id="name" label="Nome" value={data.name} disabled />
-                </div>
-                <div className="field col-12 md:col-5">
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 5 }}>
                     <TextInput id="email" label="Email" value={data.email} disabled />
-                </div>
-                <div className="field col-12">
+                </Grid.Col>
+                <Grid.Col span={12}>
                     <Textarea id="message" label="Mensagem" rows={5} value={data.message} readOnly
                       autosize minRows={5} maxRows={10} style={{opacity: '0.6'}} />
-                </div>
-                <div className="field col-12">
+                </Grid.Col>
+                <Grid.Col span={12}>
                   <Input.Label>Ficheiros</Input.Label>
                   { (data?.files || []).length ?
                     (data.files || []).map((file, index) => (
-                      <div className="grid" key={file.url || index}>
-                        <div className="col md:col-9">
-                          <div className="m-2">
+                      <Grid gap="sm" key={file.url || index}>
+                        <Grid.Col span={{ base: "auto", md: 9 }}>
+                          <Box m="xs">
                             <a href={file.url} target="_blank" rel="noreferrer" download={file.filename}>{file.filename}</a>
-                          </div>
-                        </div>
-                        <div className="col md:col-3">
-                          <div className="m-2 text-center">
+                          </Box>
+                        </Grid.Col>
+                        <Grid.Col span={{ base: "auto", md: 3 }}>
+                          <Box m="xs" ta="center">
                             {file.size != null && <Badge variant="light" color="secondary">{(file.size / 1024).toFixed(2) + " KB"}</Badge>}
-                          </div>
-                        </div>
-                      </div>
+                          </Box>
+                        </Grid.Col>
+                      </Grid>
                     ))
                     :
-                    <div className="m-2">Não tem ficheiros</div>
+                    <Box m="xs">Não tem ficheiros</Box>
                   }
-                </div>
-              </div>
-            </div>
-            <div className="col-12 md:col-3">
-              <div className="formgrid grid">
-                <div className="field col-12">
+                </Grid.Col>
+              </Grid>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 3 }}>
+              <Grid gap="sm">
+                <Grid.Col span={12}>
                     <TextInput id="viewer" label="Visualizador" value={data.viewer} disabled />
-                </div>
-                <div className="field col-12">
+                </Grid.Col>
+                <Grid.Col span={12}>
                     <TextInput id="date" label="Data" value={data.date || ''} disabled />
-                </div>
-              </div>
-            </div>
-            <div className="col-12 md:col-9">
-              <div className="formgrid grid">
-                <div className="field col-12">
+                </Grid.Col>
+              </Grid>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 9 }}>
+              <Grid gap="sm">
+                <Grid.Col span={12}>
                   <Textarea id="notes" label="Observações" rows={5} autosize minRows={5} value={data.notes}
                   onChange={(e) => setData({...data, notes: e.target.value})
                   } />
-                </div>
-              </div>
-            </div>
-            <div className="col-12 md:col-3">
-              <div className="formgrid grid">
-                  <div className="field col-12">
+                </Grid.Col>
+              </Grid>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 3 }}>
+              <Grid gap="sm">
+                  <Grid.Col span={12}>
                       <TextInput id="read_date" label="Data Leitura" value={data.checked_date || ''} disabled />
-                  </div>
-                  <div className="field col-12">
+                  </Grid.Col>
+                  <Grid.Col span={12}>
                       <TextInput id="close_date" label="Data Encerramento" value={data.closed_date || ''} disabled />
-                  </div>
-                </div>
-            </div>
-          </div>
-          <Group justify="flex-end" className="mt-2 mb-4">
+                  </Grid.Col>
+                </Grid>
+            </Grid.Col>
+          </Grid>
+          <Group justify="flex-end" mt="md" mb="md">
             <Button
               type="button"
               variant="default"
@@ -184,8 +184,8 @@ function NotificationForm(props) {
         </React.Fragment>
         :
         <React.Fragment>
-          <Alert color="danger" className="col md:col-12">Não foi possível obter os dados da notificação.</Alert>
-          <Group justify="flex-end" className="mt-2 mb-4">
+          <Alert color="danger" py="xs">Não foi possível obter os dados da notificação.</Alert>
+          <Group justify="flex-end" mt="xs" mb="md">
             <Button
                 type="button"
                 variant="default"

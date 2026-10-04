@@ -4,15 +4,17 @@ import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
+  Box,
   Button,
   Checkbox,
+  Grid,
   Group,
   MultiSelect,
   NumberInput,
   Popover,
   Switch,
   Tabs,
-  TextInput
+  TextInput,
 } from '@mantine/core';
 import { CollapsiblePanel, notify, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog } from '@scalargis/ui';
 
@@ -229,26 +231,26 @@ function PrintGroupForm(props) {
 
           <PageSection>
 
-            <div className="formgrid grid">
+            <Grid gap="sm">
 
-              <div className="field col-12 md:col-1">
+              <Grid.Col span={{ base: 12, md: 1 }}>
                 <TextInput id="id" label="Id" value={data.id || ''} readOnly />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-2">
+              <Grid.Col span={{ base: 12, md: 2 }}>
                 <TextInput id="code" label="Código" autoFocus
                   error={fieldError(errors, 'code')}
                   {...register('code', { required: 'Campo obrigatório.' })} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-7">
+              <Grid.Col span={{ base: 12, md: 7 }}>
                 <TextInput id="title" label="Título"
                   error={fieldError(errors, 'title')}
                   {...register('title', { required: 'Campo obrigatório.' })} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-2 text-center">
-                <label className="block">&nbsp;</label>
+              <Grid.Col ta="center" span={{ base: 12, md: 2 }}>
+                <Box component="label" display="block">&nbsp;</Box>
                 <Controller
                   control={control}
                   name="is_active"
@@ -262,16 +264,16 @@ function PrintGroupForm(props) {
                     />
                   )}
                 />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12">
+              <Grid.Col span={12}>
                 <TextInput id="description" label="Descrição" {...register('description')} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <CollapsiblePanel header="Opções de Escalas" toggleable={false}>
-                  <div className="grid">
-                    <div className="col field mt-2">
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="free_scale" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="free_scale" label="Escala livre"
@@ -279,8 +281,8 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                    <div className="col field mt-2">
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="map_scale" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="map_scale" label="Escala do mapa"
@@ -288,10 +290,10 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
-                  <div className="grid">
-                    <div className={`col field ${restrictScales ? "mt-2 mb-0" : "mt-2 mb-4"}`}>
+                    </Grid.Col>
+                  </Grid>
+                  <Grid gap="sm">
+                    <Grid.Col span="auto" mt="xs" mb={restrictScales ? 0 : "md"}>
                       <Controller name="restrict_scales" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="restrict_scales" label="Escalas restritas"
@@ -299,9 +301,9 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
+                    </Grid.Col>
                     {restrictScales && (
-                    <div className="col field mt-2" style={{"overflow": "auto"}}>
+                    <Grid.Col mt="xs" span="auto" style={{"overflow": "auto"}}>
                       <Group gap="xs" align="flex-end" wrap="nowrap">
                         <Controller name="restrict_scales_list" control={control}
                           render={({ field }) => (
@@ -342,14 +344,14 @@ function PrintGroupForm(props) {
                           </Popover.Dropdown>
                         </Popover>
                       </Group>
-                    </div>
+                    </Grid.Col>
                     )}
-                  </div>
+                  </Grid>
                 </CollapsiblePanel>
 
-                <CollapsiblePanel header="Marcação de local e geometrias" toggleable={false} className="mt-2">
-                  <div className="grid">
-                    <div className="col field mt-2">
+                <CollapsiblePanel header="Marcação de local e geometrias" toggleable={false} mt="xs">
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="allow_drawing" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="allow_drawing" label="Permitir desenhar"
@@ -357,8 +359,8 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                    <div className="col field mt-2">
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="location_marking" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="location_marking" label="Obrigatório marcar local"
@@ -366,10 +368,10 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
-                  <div className="grid">
-                    <div className="col field mt-2">
+                    </Grid.Col>
+                  </Grid>
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="draw_location" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="draw_location" label="Desenhar local"
@@ -377,8 +379,8 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                    <div className="col field mt-2">
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="multi_geom" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="multi_geom" label="Múltiplas geometrias"
@@ -386,13 +388,13 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
+                    </Grid.Col>
+                  </Grid>
                 </CollapsiblePanel>
 
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <CollapsiblePanel header="Filtro Geográfico" toggleable={false}>
                   <GeometryFilterEditor
                     data={
@@ -422,9 +424,9 @@ function PrintGroupForm(props) {
                   />
                 </CollapsiblePanel>
 
-                <CollapsiblePanel header="Opções de Grupo" toggleable={false} className="mt-2">
-                  <div className="grid">
-                    <div className="col field mt-2">
+                <CollapsiblePanel header="Opções de Grupo" toggleable={false} mt="xs">
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="select_prints" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="select_prints" label="Permitir selecionar plantas"
@@ -432,8 +434,8 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                    <div className="col field mt-2">
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="group_prints" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="group_prints" label="Agrupar plantas"
@@ -441,10 +443,10 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
-                  <div className="grid">
-                    <div className="col field mt-2">
+                    </Grid.Col>
+                  </Grid>
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span="auto">
                       <Controller name="show_all_prints" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="show_all_prints" label="Mostar filhos vazios"
@@ -452,12 +454,12 @@ function PrintGroupForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
+                    </Grid.Col>
+                  </Grid>
                 </CollapsiblePanel>
-              </div>
+              </Grid.Col>
 
-            </div>
+            </Grid>
 
           </PageSection>
 
@@ -479,14 +481,14 @@ function PrintGroupForm(props) {
 
           <PageSection>
 
-            <div className="formgrid grid">
+            <Grid gap="sm">
               <PrintLayoutsEditor data={layouts}
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
                 onChange={(data) => {
                   setLayouts(data);
                 }}
               />
-            </div>
+            </Grid>
 
           </PageSection>
 
@@ -510,7 +512,7 @@ function PrintGroupForm(props) {
         : null}
 
 
-        <Group justify="flex-end" className="mt-4 mb-4">
+        <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
             variant="default"

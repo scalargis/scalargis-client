@@ -5,8 +5,11 @@ import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
   Alert,
+  Box,
   Button,
   Checkbox,
+  Flex,
+  Grid,
   Group,
   Input,
   MultiSelect,
@@ -15,7 +18,7 @@ import {
   PasswordInput,
   Stack,
   Switch,
-  TextInput
+  TextInput,
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
@@ -333,33 +336,33 @@ function UserForm(props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
 
-      <div className="formgrid grid">
-        <div className="field col-12 md:col-3">
+      <Grid gap="sm">
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <TextInput id="first_name" label="Primeiro Nome" autoFocus {...register('first_name')} />
-        </div>
-        <div className="field col-12 md:col-3">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <TextInput id="last_name" label="Último Nome" {...register('last_name')} />
-        </div>
-        <div className="field col-12 md:col-6">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <TextInput id="name" label="Nome"
             error={fieldError(errors, 'name')}
             {...register('name', { required: 'Campo obrigatório.' })} />
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12 md:col-3">
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <TextInput id="username" label="Username"
             error={fieldError(errors, 'username')}
             {...register('username', { required: 'Campo obrigatório.' })} />
-        </div>
-        <div className="field col-12 md:col-4">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 4 }}>
           <TextInput id="email" label="Email"
             error={fieldError(errors, 'email')}
             {...register('email', {
               required: 'Campo obrigatório.',
               pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Formato de email inválido.' }
             })} />
-        </div>
-        <div className={`field col-12 ${isCreate ? 'md:col-5' : 'md:col-4'}`}>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: isCreate ? 5 : 4 }}>
           <Controller
             control={control}
             name="password"
@@ -388,8 +391,8 @@ function UserForm(props) {
             )}
           />
           { !isCreate &&
-            <small className="block mt-1" style={{ opacity: 0.7 }}>Deixe em branco para manter a password atual.</small> }
-          <div className="flex align-items-end justify-content-end flex-wrap mt-2" style={{ gap: '0.5rem' }}>
+            <Box component="small" display="block" mt={4} style={{ opacity: 0.7 }}>Deixe em branco para manter a password atual.</Box> }
+          <Flex align="flex-end" justify="flex-end" wrap="wrap" gap="xs" mt="xs">
             <NumberInput
               label="Tamanho"
               value={passwordLength}
@@ -403,14 +406,14 @@ function UserForm(props) {
                 setValue('password', pwd, { shouldValidate: true, shouldDirty: true });
                 setRevealPassword(true);
               }}>Gerar</Button>
-          </div>
+          </Flex>
           { (isCreate || !!password) &&
             <PasswordRules policy={passwordPolicy} password={password} /> }
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12">
-          <div className="grid">
-            <div className="col-3 mt-2 mb-2">
+        <Grid.Col span={12}>
+          <Grid gap="sm">
+            <Grid.Col mt="xs" mb="xs" span={3}>
               <Controller
                 control={control}
                 name="active"
@@ -423,11 +426,11 @@ function UserForm(props) {
                   />
                 )}
               />
-            </div>
-          </div>
-        </div>
+            </Grid.Col>
+          </Grid>
+        </Grid.Col>
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <Group gap="xs" align="flex-end" wrap="nowrap">
             <Button type="button" leftSection={<IconCheck />}
               onClick={() => { setValue('auth_token', String(uuidV4())); }}>Gerar</Button>
@@ -438,8 +441,8 @@ function UserForm(props) {
               <IconX />
             </ActionIcon>
           </Group>
-        </div>
-        <div className="field col-12 md:col-3">
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <Group gap="xs" align="flex-end" wrap="nowrap">
             <Controller
               control={control}
@@ -460,119 +463,119 @@ function UserForm(props) {
               <IconX />
             </ActionIcon>
           </Group>
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <Input.Label>Perfis</Input.Label>
           <Paper p="xs">
             { (availableRoles && availableRoles.length > 0) &&
             <>
-            <div className="field col-12 pl-0">
+            <Box p="xs" pl={0} mb="sm">
               <MultiSelect
                 data={availableRoles.map(r => ({ value: String(r.id), label: r.name }))}
                 value={selectedRoles || []}
                 onChange={(value) => setSelectedRoles(value.length ? value : null)}
                 placeholder="Selecionar"
                 searchable clearable />
-            </div>
-            <div className="grid">
-              <div className="col"></div>
-              <div className="col">
+            </Box>
+            <Grid gap="sm">
+              <Grid.Col span="auto"></Grid.Col>
+              <Grid.Col span="auto">
                   <Button type="button"
                     disabled={(!selectedRoles || selectedRoles.length === 0)}
                   onClick={addRoles}>Adicionar</Button>
-              </div>
-              <div className="col"></div>
-            </div>
+              </Grid.Col>
+              <Grid.Col span="auto"></Grid.Col>
+            </Grid>
             </>
             }
             { (roles && roles.length > 0) ?
               <>
-              <div className="field col-12 pl-0 pt-2">
+              <Box pl={0} pt="xs" p="xs" mb="sm">
                 <SelectionList options={roles} value={removedRoles}
                   onChange={setRemovedRoles} ariaLabel="Perfis atribuídos" />
-              </div>
-              <div className="grid">
-                <div className="col"></div>
-                <div className="col">
+              </Box>
+              <Grid gap="sm">
+                <Grid.Col span="auto"></Grid.Col>
+                <Grid.Col span="auto">
                   <Button type="button"
                   disabled={(!removedRoles || removedRoles.length === 0)}
                   onClick={removeRoles}>Remover</Button>
-                </div>
-                <div className="col"></div>
-              </div>
+                </Grid.Col>
+                <Grid.Col span="auto"></Grid.Col>
+              </Grid>
               </> :
-              <div className="grid justify-content-center">
-                <div className="col-12 mt-4 mb-2">
+              <Grid justify="center" gap="sm">
+                <Grid.Col mt="md" mb="xs" span={12}>
                   <Alert color="warning" py="xs">
                     <Group justify="center" gap="xs" wrap="nowrap">
                       <IconAlertTriangle />
                       <span>Adicione um ou mais Perfis</span>
                     </Group>
                   </Alert>
-                </div>
-              </div>
+                </Grid.Col>
+              </Grid>
             }
           </Paper>
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <Input.Label>Grupos</Input.Label>
           <Paper p="xs">
             { (availableGroups && availableGroups.length > 0) &&
             <>
-            <div className="field col-12 pl-0">
+            <Box p="xs" pl={0} mb="sm">
               <MultiSelect
                 data={availableGroups.map(g => ({ value: String(g.id), label: g.name }))}
                 value={selectedGroups || []}
                 onChange={(value) => setSelectedGroups(value.length ? value : null)}
                 placeholder="Selecionar"
                 searchable clearable />
-            </div>
-            <div className="grid">
-              <div className="col"></div>
-              <div className="col">
+            </Box>
+            <Grid gap="sm">
+              <Grid.Col span="auto"></Grid.Col>
+              <Grid.Col span="auto">
                   <Button type="button"
                     disabled={(!selectedGroups || selectedGroups.length === 0)}
                   onClick={addGroups}>Adicionar</Button>
-              </div>
-              <div className="col"></div>
-            </div>
+              </Grid.Col>
+              <Grid.Col span="auto"></Grid.Col>
+            </Grid>
             </>
             }
             { (groups && groups.length > 0) ?
               <>
-              <div className="field col-12 pl-0 pt-2">
+              <Box pl={0} pt="xs" p="xs" mb="sm">
                 <SelectionList options={groups} value={removedGroups}
                   onChange={setRemovedGroups} ariaLabel="Grupos atribuídos" />
-              </div>
-              <div className="grid">
-                <div className="col"></div>
-                <div className="col">
+              </Box>
+              <Grid gap="sm">
+                <Grid.Col span="auto"></Grid.Col>
+                <Grid.Col span="auto">
                   <Button type="button"
                   disabled={(!removedGroups || removedGroups.length === 0)}
                   onClick={removeGroups}>Remover</Button>
-                </div>
-                <div className="col"></div>
-              </div>
+                </Grid.Col>
+                <Grid.Col span="auto"></Grid.Col>
+              </Grid>
               </> :
-              <div className="grid justify-content-center">
-                <div className="col-12 mt-4 mb-2">
+              <Grid justify="center" gap="sm">
+                <Grid.Col mt="md" mb="xs" span={12}>
                   <Alert color="warning" py="xs">
                     <Group justify="center" gap="xs" wrap="nowrap">
                       <IconAlertTriangle />
                       <span>Adicione um ou mais Grupos</span>
                     </Group>
                   </Alert>
-                </div>
-              </div>
+                </Grid.Col>
+              </Grid>
             }
           </Paper>
-        </div>
+        </Grid.Col>
 
-      </div>
+      </Grid>
 
-      <Group justify="flex-end" className="mt-4 mb-4">
+      <Group justify="flex-end" mt="md" mb="md">
         <Button
           type="button"
           variant="default"

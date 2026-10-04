@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router';
 import LoginWidget from './LoginWidget';
 import AppContext from '../../AppContext';
+import { Flex } from '@mantine/core';
 
 function PageLogin(props) {
   // Routing
@@ -23,7 +24,7 @@ function PageLogin(props) {
   // Render page
   const logo = CLIENT_URL + 'assets/images/logo.png';
   return (
-    <div id="login-page" className="flex align-items-center justify-content-center" style={{ height: '100%' }}>
+    <Flex id="login-page" align="center" justify="center" style={{ height: '100%' }}>
       <div style={{ backgroundColor: 'white', padding: '3rem' }}>
         
         <div className="login-logo">
@@ -36,7 +37,7 @@ function PageLogin(props) {
         />
 
       </div>
-  </div>
+  </Flex>
   )
 }
 

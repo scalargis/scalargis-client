@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { ActionIcon, Button, Group, Input, Select } from '@mantine/core';
+import { ActionIcon, Button, Grid, Group, Input, Select } from '@mantine/core';
 import { CodeEditor, DataGrid, ConfirmPopover, Dialog, useIsMobile, IconX, IconCheck, IconPencil, IconTrash, IconPlus } from '@scalargis/ui';
 import { useForm, Controller } from 'react-hook-form';
 import PageSection from '../common/PageSection';
@@ -30,8 +30,8 @@ const LayoutEditor = props => {
   return (
     <Dialog title="Edição de Layout" opened size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
       <form>
-        <div className="grid formgrid">
-          <div className="field col-12 md:col-6">
+        <Grid gap="sm">
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <Controller name="format" control={control} rules={{ required: 'Campo obrigatório.' }}
               render={({ field }) => (
                 <Select
@@ -43,8 +43,8 @@ const LayoutEditor = props => {
                   error={fieldError(errors, 'format')} />
               )}
             />
-          </div>
-          <div className="field col-12 md:col-6">
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <Controller name="orientation" control={control} rules={{ required: 'Campo obrigatório.' }}
               render={({ field }) => (
                 <Select
@@ -56,8 +56,8 @@ const LayoutEditor = props => {
                   error={fieldError(errors, 'orientation')} />
               )}
             />
-          </div>
-          <div className="field col-12">
+          </Grid.Col>
+          <Grid.Col span={12}>
             <Input.Label>Configuração</Input.Label>
 
               <Controller
@@ -74,11 +74,11 @@ const LayoutEditor = props => {
                   />
                 }}
               />
-          </div>
+          </Grid.Col>
 
-        </div>
+        </Grid>
 
-        <Group justify="flex-end" gap="xs" className="mt-4">
+        <Group justify="flex-end" gap="xs" mt="md">
           <Button type="button" variant="subtle" leftSection={<IconX />}
             onClick={() => props.onHide()}>Fechar</Button>
           <Button type="button" leftSection={<IconCheck />}

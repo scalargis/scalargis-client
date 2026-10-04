@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Alert, Button, Group, NumberInput, Select, Tabs, Textarea } from '@mantine/core';
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Group,
+  NumberInput,
+  Select,
+  Tabs,
+  Textarea,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Dialog, useIsMobile, IconInfoCircle, IconAlertTriangle, IconTrash, IconPencil, IconX, IconCheck } from '@scalargis/ui';
 import { useForm, Controller } from 'react-hook-form';
@@ -222,7 +232,7 @@ const GeometryFilterEditor = props => {
 
     <React.Fragment>
 
-      <div className="field col-12 mb-1">
+      <Box mb={4} p="xs">
         { data.geometryWKT ?
           <Alert color="informative" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
@@ -238,9 +248,9 @@ const GeometryFilterEditor = props => {
             </Group>
           </Alert>
         }
-      </div>
+      </Box>
 
-      <Group justify="flex-end" gap="xs" className="m-2">
+      <Group justify="flex-end" gap="xs" m="xs">
         { data.geometryWKT &&
         <Button type="button" variant="outline" color="danger" leftSection={<IconTrash />}
           onClick={(e)=> {e.preventDefault(); onRemove();}}>Remover</Button>
@@ -252,15 +262,15 @@ const GeometryFilterEditor = props => {
       { showForm &&
       <Dialog title="Edição de Filtro Espacial" opened={showForm} size={isMobile ? '95%' : '45vw'} onClose={onHide}>
         <form>
-          <div className="grid formgrid">
-            <div className="field col-12">
+          <Grid gap="sm">
+            <Grid.Col span={12}>
               <Tabs defaultValue="wkt" keepMounted={false}>
                 <Tabs.List>
                   <Tabs.Tab value="wkt">WKT</Tabs.Tab>
                   <Tabs.Tab value="map">Mapa</Tabs.Tab>
                 </Tabs.List>
                 <Tabs.Panel value="wkt" pt="sm">
-                  <div className="field col">
+                  <Box p="xs" mb="sm">
                     <Controller name="geometrySRID" control={control} rules={{required: 'Campo obrigatório.' }}
                       render={({ field }) => (
                         <Select
@@ -274,12 +284,12 @@ const GeometryFilterEditor = props => {
                         />
                       )}
                     />
-                  </div>
-                  <div className="field col-12">
+                  </Box>
+                  <Box p="xs" mb="sm">
                     <Textarea id="geometryWKT" label="Geometria (WKT)" rows={5}
                       error={fieldError(errors, 'geometryWKT')}
                       {...register("geometryWKT", { required: 'Campo obrigatório.' })} />
-                  </div>
+                  </Box>
                 </Tabs.Panel>
                 <Tabs.Panel value="map" pt="sm">
                   <div>
@@ -287,8 +297,8 @@ const GeometryFilterEditor = props => {
                   </div>
                 </Tabs.Panel>
               </Tabs>
-            </div>
-            <div className="field col-12">
+            </Grid.Col>
+            <Grid.Col span={12}>
               <Controller name="tolerance" control={control}
                 render={({ field }) => (
                   <NumberInput id="tolerance" label="Tolerância (m)" hideControls
@@ -296,10 +306,10 @@ const GeometryFilterEditor = props => {
                     onChange={(value) => field.onChange(value === '' ? null : value)} />
                 )}
               />
-            </div>
-          </div>
+            </Grid.Col>
+          </Grid>
 
-          <Group justify="flex-end" gap="xs" className="mt-4">
+          <Group justify="flex-end" gap="xs" mt="md">
             <Button type="button" variant="subtle" leftSection={<IconX />}
               onClick={onHide}>Fechar</Button>
             <Button type="button" leftSection={<IconCheck />}

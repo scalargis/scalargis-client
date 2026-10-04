@@ -33,7 +33,7 @@ function Dashboard(props) {
         <Stack gap="md" className="dashboard">
             { adminOrManager && <BasicStats core={core} /> }
 
-            <Grid gutter="md">
+            <Grid gap="md">
                 <Grid.Col span={{ base: 12, sm: (contacts && contacts.length > 0) ? 9 : 12 }}>
                     <ViewerVisitsChart core={core} stats={stats} />
                 </Grid.Col>

@@ -1,5 +1,15 @@
 import React, { useState, useEffect, Component } from "react";
-import { ActionIcon, Button, Checkbox, Group, TextInput, Tooltip, Alert } from '@mantine/core';
+import {
+  ActionIcon,
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  Grid,
+  Group,
+  TextInput,
+  Tooltip,
+} from '@mantine/core';
 import { CollapsiblePanel, ConfirmPopover, Dialog, useIsMobile, IconInfoCircle, IconX, IconCheck, IconTrash, IconPencil, IconList, IconPlusCircle } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useForm, Controller } from 'react-hook-form';
@@ -22,7 +32,7 @@ const fieldError = (errors, name) => {
 };
 
 const InfoMessage = ({ text }) => (
-  <Alert color="informative" py="xs" className="w-full">
+  <Alert color="informative" py="xs" w="100%">
     <Group justify="center" gap="xs" wrap="nowrap">
       <IconInfoCircle />
       <span>{text}</span>
@@ -50,8 +60,8 @@ const FieldFormEditor = props => {
   return (
     <Dialog title="Edição de Campo" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
       <form>
-        <div className="grid formgrid">
-          <div className="field col-12">
+        <Grid gap="sm">
+          <Grid.Col span={12}>
             <Group gap="xs" align="flex-end" wrap="nowrap">
               <TextInput id="key" label="Chave" style={{ flex: 1 }}
                 error={fieldError(errors, 'key')}
@@ -65,17 +75,17 @@ const FieldFormEditor = props => {
                 </ActionIcon>
               </Tooltip>
             </Group>
-          </div>
-          <div className="field col-12">
-            <TextInput id="title" label="Título" className="w-full"
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <TextInput id="title" label="Título" w="100%"
               error={fieldError(errors, 'title')}
               {...register("title", { required: 'Campo obrigatório.' })} />
-          </div>
-          <div className="field col-12">
-            <TextInput id="header" label="Cabeçalho" className="w-full" {...register("header")} />
-          </div>
-          <div className="grid formgrid col-12">
-            <div className="field col-6">
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <TextInput id="header" label="Cabeçalho" w="100%" {...register("header")} />
+          </Grid.Col>
+          <Grid.Col span={12}><Grid gap="sm">
+            <Grid.Col span={6}>
               <Controller name="required" control={control}
                 render={({ field }) => (
                   <Checkbox size="md" id="required" label="Preenchimento obrigatório"
@@ -83,8 +93,8 @@ const FieldFormEditor = props => {
                     onChange={(e) => field.onChange(e.currentTarget.checked)} />
                 )}
               />
-            </div>
-            <div className="field col-6">
+            </Grid.Col>
+            <Grid.Col span={6}>
               <Controller name="showLabel" control={control}
                 render={({ field }) => (
                   <Checkbox size="md" id="showLabel" label="Mostrar título"
@@ -92,12 +102,12 @@ const FieldFormEditor = props => {
                     onChange={(e) => field.onChange(e.currentTarget.checked)} />
                 )}
               />
-            </div>
-          </div>
+            </Grid.Col>
+          </Grid></Grid.Col>
 
-          <div className="field col-12"><hr /></div>
+          <Grid.Col span={12}><hr /></Grid.Col>
 
-          <div className="field col-6">
+          <Grid.Col span={6}>
             <Controller name="active" control={control}
               render={({ field }) => (
                 <Checkbox size="md" id="active" label="Activo"
@@ -105,10 +115,10 @@ const FieldFormEditor = props => {
                   onChange={(e) => field.onChange(e.currentTarget.checked)} />
               )}
             />
-          </div>
-        </div>
+          </Grid.Col>
+        </Grid>
 
-        <Group justify="flex-end" gap="xs" className="mt-4">
+        <Group justify="flex-end" gap="xs" mt="md">
           <Button type="button" variant="subtle" leftSection={<IconX />}
             onClick={() => props.onHide()}>Fechar</Button>
           <Button type="button" leftSection={<IconCheck />}
@@ -139,8 +149,8 @@ const GroupFormEditor = props => {
   return (
   <Dialog title="Edição de Grupo" opened={props.show} size={isMobile ? '90%' : '45vw'} onClose={() => { props.onHide(); }}>
     <form>
-      <div className="grid formgrid">
-        <div className="field col-12">
+      <Grid gap="sm">
+        <Grid.Col span={12}>
           <Group gap="xs" align="flex-end" wrap="nowrap">
             <TextInput id="key" label="Chave" style={{ flex: 1 }}
               error={fieldError(errors, 'key')}
@@ -154,16 +164,16 @@ const GroupFormEditor = props => {
               </ActionIcon>
             </Tooltip>
           </Group>
-        </div>
-        <div className="field col-12">
-          <TextInput id="title" label="Título" className="w-full"
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <TextInput id="title" label="Título" w="100%"
             error={fieldError(errors, 'title')}
             {...register("title", { required: 'Campo obrigatório.' })} />
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12"><hr /></div>
+        <Grid.Col span={12}><hr /></Grid.Col>
 
-        <div className="field col-12">
+        <Grid.Col span={12}>
           <Controller name="active" control={control}
             render={({ field }) => (
               <Checkbox size="md" id="active" label="Activo"
@@ -171,10 +181,10 @@ const GroupFormEditor = props => {
                 onChange={(e) => field.onChange(e.currentTarget.checked)} />
             )}
           />
-        </div>
-      </div>
+        </Grid.Col>
+      </Grid>
 
-      <Group justify="flex-end" gap="xs" className="mt-4">
+      <Group justify="flex-end" gap="xs" mt="md">
         <Button type="button" variant="subtle" leftSection={<IconX />}
           onClick={() => props.onHide()}>Fechar</Button>
         <Button type="button" leftSection={<IconCheck />}
@@ -226,9 +236,9 @@ const GroupFields = props => {
           style={getFieldListStyle(snapshot.isDraggingOver)}
         >
           {Object.keys(group.data.fields || {}).length === 0 &&
-            <div className="col-12">
+            <Box p="xs">
                 <InfoMessage text="Clique em '+' para adicionar um campo" />
-            </div>
+            </Box>
           }
 
           {Object.entries(group.data.fields).map((g,i) => {
@@ -242,14 +252,13 @@ const GroupFields = props => {
                   style={{ "border": "solid 1px lightgray", marginTop: 3 }}
                 >
                   {(provided, snapshot) => (
-                    <div
+                    <Box
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      style={getItemStyle(
+                      style={{ boxShadow: 'var(--mantine-shadow-xs)', ...getItemStyle(
                         snapshot.isDragging,
                         provided.draggableProps.style
-                      )}
-                      className="shadow-1"
+                      ) }}
                     >
                       <div style={{marginBottom: 5 }}>
                         <div style={{ float: "left", paddingTop: 6 }}>
@@ -289,41 +298,41 @@ const GroupFields = props => {
                           <FieldFormEditor data={fieldEdition} show={showFieldForm} onHide={onFieldFormHide} onSave={onFieldFormSave} />
                         }
 
-                        <div className="pt-2">
-                          <div className="grid field mb-0">
-                            <div className="col-12 md:col-10">
-                              <div className="grid">
-                                <label className="col-12 md:col-2"><strong>Título: </strong></label>
-                                <div className="col-12 md:col-10">
+                        <Box pt="xs">
+                          <Grid mb={0} gap="sm">
+                            <Grid.Col span={{ base: 12, md: 10 }}>
+                              <Grid gap="sm">
+                                <Grid.Col span={{ base: 12, md: 2 }}><label><strong>Título: </strong></label></Grid.Col>
+                                <Grid.Col span={{ base: 12, md: 10 }}>
                                     <span>{field.title}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col-12 md:col-2 mt-2">
+                                </Grid.Col>
+                              </Grid>
+                            </Grid.Col>
+                            <Grid.Col mt="xs" span={{ base: 12, md: 2 }}>
                               <Checkbox label="Ativo" checked={!!field.active} disabled readOnly />
-                            </div>
-                          </div>
-                          <div className="grid field">
-                            <div className="col-12">
-                              <div className="grid">
-                                <label className="col-12 md:col-2"><strong>Cabeçalho: </strong></label>
-                                <div className="col-12 md:col-10">
+                            </Grid.Col>
+                          </Grid>
+                          <Grid gap="sm" mb="sm">
+                            <Grid.Col span={12}>
+                              <Grid gap="sm">
+                                <Grid.Col span={{ base: 12, md: 2 }}><label><strong>Cabeçalho: </strong></label></Grid.Col>
+                                <Grid.Col span={{ base: 12, md: 10 }}>
                                     <span>{field.header}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="grid field">
-                            <div className="col-12 md:col-7">
+                                </Grid.Col>
+                              </Grid>
+                            </Grid.Col>
+                          </Grid>
+                          <Grid gap="sm" mb="sm">
+                            <Grid.Col span={{ base: 12, md: 7 }}>
                               <Checkbox label="Preenchimento obrigatório" checked={!!field.required} disabled readOnly />
-                            </div>
-                            <div className="col-12 md:col-5">
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, md: 5 }}>
                               <Checkbox label="Mostrar título" checked={!!field.showLabel} disabled readOnly />
-                            </div>
-                          </div>
-                        </div>
+                            </Grid.Col>
+                          </Grid>
+                        </Box>
 
-                    </div>
+                    </Box>
                   )}
                 </Draggable>
               );
@@ -379,9 +388,9 @@ const Fields = props => {
             style={getFieldListStyle(snapshot.isDraggingOver)}
           >
             {Object.keys(fields || {}).length === 0 &&
-              <div className="col-12">
+              <Box p="xs">
                   <InfoMessage text="Clique em 'Novo Campo' para adicionar um campo" />
-              </div>
+              </Box>
             }
 
             {Object.entries(fields).map((f,i) => {
@@ -394,14 +403,13 @@ const Fields = props => {
                 style={{ "border": "solid 1px lightgray", marginTop: 3 }}
               >
                 {(provided, snapshot) => (
-                  <div
+                  <Box
                     ref={provided.innerRef}
                     {...provided.draggableProps}
-                    style={getItemStyle(
+                    style={{ boxShadow: 'var(--mantine-shadow-xs)', ...getItemStyle(
                       snapshot.isDragging,
                       provided.draggableProps.style
-                    )}
-                    className="shadow-1"
+                    ) }}
                   >
                   <div style={{marginBottom: 5 }}>
                     <div style={{ float: "left", paddingTop: 6 }}>
@@ -441,41 +449,41 @@ const Fields = props => {
                       <FieldFormEditor data={fieldEdition} show={showFieldForm} onHide={onFieldFormHide} onSave={onFieldFormSave} />
                     }
 
-                    <div className="pt-2">
-                      <div className="grid field mb-0">
-                        <div className="col-12 md:col-10">
-                          <div className="grid">
-                            <label className="col-12 md:col-2"><strong>Título: </strong></label>
-                            <div className="col-12 md:col-10">
+                    <Box pt="xs">
+                      <Grid mb={0} gap="sm">
+                        <Grid.Col span={{ base: 12, md: 10 }}>
+                          <Grid gap="sm">
+                            <Grid.Col span={{ base: 12, md: 2 }}><label><strong>Título: </strong></label></Grid.Col>
+                            <Grid.Col span={{ base: 12, md: 10 }}>
                                 <span>{field.data.title}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-12 md:col-2 mt-2">
+                            </Grid.Col>
+                          </Grid>
+                        </Grid.Col>
+                        <Grid.Col mt="xs" span={{ base: 12, md: 2 }}>
                           <Checkbox label="Ativo" checked={!!field.data.active} disabled readOnly />
-                        </div>
-                      </div>
-                      <div className="grid field">
-                        <div className="col-12">
-                          <div className="grid">
-                            <label className="col-12 md:col-2"><strong>Cabeçalho: </strong></label>
-                            <div className="col-12 md:col-10">
+                        </Grid.Col>
+                      </Grid>
+                      <Grid gap="sm" mb="sm">
+                        <Grid.Col span={12}>
+                          <Grid gap="sm">
+                            <Grid.Col span={{ base: 12, md: 2 }}><label><strong>Cabeçalho: </strong></label></Grid.Col>
+                            <Grid.Col span={{ base: 12, md: 10 }}>
                                 <span>{field.data.header}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="grid field">
-                        <div className="col-12 md:col-6">
+                            </Grid.Col>
+                          </Grid>
+                        </Grid.Col>
+                      </Grid>
+                      <Grid gap="sm" mb="sm">
+                        <Grid.Col span={{ base: 12, md: 6 }}>
                           <Checkbox label="Preenchimento obrigatório" checked={!!field.data.required} disabled readOnly />
-                        </div>
-                        <div className="col-12 md:col-6">
+                        </Grid.Col>
+                        <Grid.Col span={{ base: 12, md: 6 }}>
                           <Checkbox label="Mostrar título" checked={!!field.data.showLabel} disabled readOnly />
-                        </div>
-                      </div>
-                    </div>
+                        </Grid.Col>
+                      </Grid>
+                    </Box>
 
-                  </div>
+                  </Box>
                 )}
               </Draggable>
             ))}
@@ -641,22 +649,22 @@ class FormFieldsEditor extends Component {
   render() {
     return (
 
-      <div className="grid formgrid">
+      <Grid gap="sm">
 
         { this.state.showFieldForm &&
           <FieldFormEditor data={this.fieldEdition} show={this.state.showFieldForm} onHide={this.onFieldFormHide} onSave={this.onFieldFormSave} />
         }
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <CollapsiblePanel header="Campos" toggleable={false}>
 
-            <div className="col-12">
+            <Box p="xs">
 
               <div>
-                <div className="grid">
-                  <div className="col-12 md:col-8">
-                  </div>
-                  <div className="col-12 md:col-4 mt-2 mb-2 text-center">
+                <Grid gap="sm">
+                  <Grid.Col span={{ base: 12, md: 8 }}>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" mb="xs" ta="center" span={{ base: 12, md: 4 }}>
                     <Button
                       type="button"
                       variant="outline"
@@ -669,31 +677,31 @@ class FormFieldsEditor extends Component {
                         });
                       }}
                     >Novo Campo</Button>
-                  </div>
-                </div>
+                  </Grid.Col>
+                </Grid>
               </div>
 
               <Fields fields={this.state.data.fields || {}} onDragEnd={this.onDragEnd} onChange={this.onFieldsChange} />
 
-            </div>
+            </Box>
 
           </CollapsiblePanel>
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <CollapsiblePanel header="Grupos" toggleable={false}>
 
-          <div className="col-12">
+          <Box p="xs">
 
             <div>
               { this.state.showGroupForm &&
                 <GroupFormEditor data={this.groupEdition} show={this.state.showGroupForm} onHide={this.onGroupFormHide} onSave={this.onGroupFormSave} />
               }
 
-              <div className="grid">
-                <div className="col-12 md:col-8">
-                </div>
-                <div className="col-12 md:col-4 mt-2 mb-2 text-center" >
+              <Grid gap="sm">
+                <Grid.Col span={{ base: 12, md: 8 }}>
+                </Grid.Col>
+                <Grid.Col mt="xs" mb="xs" ta="center" span={{ base: 12, md: 4 }} >
                   <Button
                     type="button"
                     variant="outline"
@@ -706,8 +714,8 @@ class FormFieldsEditor extends Component {
                       });
                     }}
                   >Novo Grupo</Button>
-                </div>
-              </div>
+                </Grid.Col>
+              </Grid>
             </div>
 
             <DragDropContext
@@ -720,9 +728,9 @@ class FormFieldsEditor extends Component {
                     style={getGroupListStyle(snapshot.isDraggingOver)}
                   >
                     {Object.keys(this.state.data.groups || {}).length === 0 &&
-                      <div className="col-12">
+                      <Box p="xs">
                           <InfoMessage text="Clique em 'Novo Grupo' para adicionar um grupo" />
-                      </div>
+                      </Box>
                     }
 
                     {Object.entries(this.state.data.groups).map((g,i) => {
@@ -734,14 +742,13 @@ class FormFieldsEditor extends Component {
                         index={index}
                       >
                         {(provided, snapshot) => (
-                          <div
+                          <Box
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            style={getItemStyle(
+                            style={{ boxShadow: 'var(--mantine-shadow-xs)', ...getItemStyle(
                               snapshot.isDragging,
                               provided.draggableProps.style
-                            )}
-                            className="shadow-1"
+                            ) }}
                           >
                             <div>
                               <div style={{ float: "left", paddingTop: "6px" }}>
@@ -751,7 +758,7 @@ class FormFieldsEditor extends Component {
                                 </div>
                               </div>
                               <div style={{ textAlign: "right"}}>
-                                <ActionIcon type="button" variant="subtle" color="warning" className="mr-2"
+                                <ActionIcon type="button" variant="subtle" color="warning" mr="xs"
                                   aria-label="Adicionar campo" title="Adicionar campo"
                                   onClick={ (e) => {
                                     e.preventDefault();
@@ -793,30 +800,30 @@ class FormFieldsEditor extends Component {
                               </div>
                             </div>
 
-                            <div><hr className="mt-1 pb-3" /></div>
+                            <div><Box component="hr" mt={4} pb="sm" /></div>
 
                             <div>
-                              <div className="grid">
-                                <div className="col-12 md:col-10">
-                                  <div className="grid">
-                                    <label className="col-12 md:col-2"><strong>Título: </strong></label>
-                                    <div className="col-12 md:col-10">
+                              <Grid gap="sm">
+                                <Grid.Col span={{ base: 12, md: 10 }}>
+                                  <Grid gap="sm">
+                                    <Grid.Col span={{ base: 12, md: 2 }}><label><strong>Título: </strong></label></Grid.Col>
+                                    <Grid.Col span={{ base: 12, md: 10 }}>
                                         <span>{group.data.title}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-12 md:col-2 mt-2">
+                                    </Grid.Col>
+                                  </Grid>
+                                </Grid.Col>
+                                <Grid.Col mt="xs" span={{ base: 12, md: 2 }}>
                                   <Checkbox label="Ativo" checked disabled readOnly />
-                                </div>
-                              </div>
-                              <div className="grid">
-                                <label className="col-12"><strong>Campos:</strong></label>
-                                <div className="col-12">
+                                </Grid.Col>
+                              </Grid>
+                              <Grid gap="sm">
+                                <Grid.Col span={12}><label><strong>Campos:</strong></label></Grid.Col>
+                                <Grid.Col span={12}>
                                   <GroupFields groupNum={group.id} group={group} onChange={this.onGroupFieldsChange} />
-                                </div>
-                              </div>
+                                </Grid.Col>
+                              </Grid>
                             </div>
-                          </div>
+                          </Box>
                         )}
                       </Draggable>
                     ))}
@@ -826,13 +833,13 @@ class FormFieldsEditor extends Component {
               </Droppable>
             </DragDropContext>
 
-            </div>
+            </Box>
 
 
           </CollapsiblePanel>
-        </div>
+        </Grid.Col>
 
-      </div>
+      </Grid>
 
     );
   }

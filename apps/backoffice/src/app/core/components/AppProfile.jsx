@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
-import { Collapse, UnstyledButton } from '@mantine/core';
+import { Box, Collapse, UnstyledButton } from '@mantine/core';
 import { IconCog, IconUser, IconInbox, IconPowerOff } from '@scalargis/ui';
 
 export const AppProfile = (props) => {
@@ -17,9 +17,9 @@ export const AppProfile = (props) => {
 
     return (
         <div className="layout-profile">
-            <div className="mb-2">
+            <Box mb="xs">
                 <i className="fas fa-user-circle" style={{fontSize: "3rem"}} aria-hidden="true"></i>
-            </div>
+            </Box>
             <UnstyledButton className="layout-profile-link" onClick={() => setExpanded(prevState => !prevState)} aria-expanded={expanded}>
                 <span className="username">{name || username || ''}</span>
                 <IconCog fixedWidth />

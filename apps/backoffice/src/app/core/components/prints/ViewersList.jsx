@@ -212,7 +212,7 @@ function ViewersList(props) {
       </ActionIcon>
 
       <Dialog title={props.header || ''} opened={visible} size="75vw" onClose={onHide}>
-        <Group justify="space-between" wrap="wrap" className="mb-2">
+        <Group justify="space-between" wrap="wrap" mb="xs">
           <span>Lista Visualizadores</span>
           <span>Total de registos: {totalRecords}</span>
         </Group>

@@ -2,7 +2,19 @@ import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { Alert, Button, Checkbox, Group, Input, MultiSelect, Paper, Stack, TextInput } from '@mantine/core';
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  Grid,
+  Group,
+  Input,
+  MultiSelect,
+  Paper,
+  Stack,
+  TextInput,
+} from '@mantine/core';
 import { notify, IconAlertTriangle, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -225,128 +237,128 @@ function GroupForm(props) {
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
-          <div className="formgrid grid">
-            <div className="field col-12 md:col-2">
+          <Grid gap="sm">
+            <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="id" label="Id" value={data.id || ''} disabled />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-10">
+            <Grid.Col span={{ base: 12, md: 10 }}>
               <TextInput id="name" label="Designação" autoFocus
                error={fieldError(errors, 'name')}
                {...register('name', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12">
+            <Grid.Col span={12}>
               <TextInput id="description" label="Descrição"
                error={fieldError(errors, 'description')}
                {...register('description')} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-6">
+            <Grid.Col span={{ base: 12, md: 6 }}>
               <Input.Label>Perfis</Input.Label>
               <Paper p="md" pt="lg">
                 { (availableRoles && availableRoles.length > 0) &&
                 <>
-                <div className="field col-12">
+                <Box p="xs" mb="sm">
                   <MultiSelect
                     data={availableRoles.map(r => ({ value: String(r.id), label: r.name }))}
                     value={selectedRoles || []}
                     onChange={(value) => setSelectedRoles(value.length ? value : null)}
                     placeholder="Selecionar"
                     searchable clearable />
-                </div>
-                <div className="grid">
-                  <div className="col text-center">
+                </Box>
+                <Grid gap="sm">
+                  <Grid.Col ta="center" span="auto">
                       <Button type="button"
                         disabled={(!selectedRoles || selectedRoles.length === 0)}
                       onClick={addRoles}>Adicionar</Button>
-                  </div>
-                </div>
+                  </Grid.Col>
+                </Grid>
                 </>
                 }
                 { (roles && roles.length > 0) ?
                   <>
-                  <div className="field col-12 pt-2">
+                  <Box pt="xs" p="xs" mb="sm">
                     <SelectionList options={roles} value={removedRoles}
                       onChange={setRemovedRoles} ariaLabel="Perfis atribuídos" />
-                  </div>
-                  <div className="grid">
-                    <div className="col"></div>
-                    <div className="col text-center">
+                  </Box>
+                  <Grid gap="sm">
+                    <Grid.Col span="auto"></Grid.Col>
+                    <Grid.Col ta="center" span="auto">
                       <Button type="button"
                       disabled={(!removedRoles || removedRoles.length === 0)}
                       onClick={removeRoles}>Remover</Button>
-                    </div>
-                    <div className="col"></div>
-                  </div>
+                    </Grid.Col>
+                    <Grid.Col span="auto"></Grid.Col>
+                  </Grid>
                   </> :
-                  <div className="grid justify-center">
-                    <div className="col-12 mt-4 mb-2">
+                  <Grid gap="sm">
+                    <Grid.Col mt="md" mb="xs" span={12}>
                       <Alert color="warning" py="xs">
                         <Group justify="center" gap="xs" wrap="nowrap">
                           <IconAlertTriangle />
                           <span>Adicione um ou mais Perfis</span>
                         </Group>
                       </Alert>
-                    </div>
-                  </div>
+                    </Grid.Col>
+                  </Grid>
                 }
               </Paper>
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-6">
+            <Grid.Col span={{ base: 12, md: 6 }}>
               <Input.Label>Utilizadores</Input.Label>
               <Paper p="md" pt="lg">
                 { (availableUsers && availableUsers.length > 0) &&
                 <>
-                <div className="field col-12">
+                <Box p="xs" mb="sm">
                   <MultiSelect
                     data={availableUsers.map(u => ({ value: String(u.id), label: u.name }))}
                     value={selectedUsers || []}
                     onChange={(value) => setSelectedUsers(value.length ? value : null)}
                     placeholder="Selecionar"
                     searchable clearable />
-                </div>
-                <div className="grid">
-                  <div className="col text-center">
+                </Box>
+                <Grid gap="sm">
+                  <Grid.Col ta="center" span="auto">
                       <Button type="button"
                         disabled={(!selectedUsers || selectedUsers.length === 0)}
                       onClick={addUsers}>Adicionar</Button>
-                  </div>
-                </div>
+                  </Grid.Col>
+                </Grid>
                 </>
                 }
                 { (users && users.length > 0) ?
                   <>
-                  <div className="field col-12 pt-2">
+                  <Box pt="xs" p="xs" mb="sm">
                     <SelectionList options={users} value={removedUsers}
                       onChange={setRemovedUsers} ariaLabel="Utilizadores atribuídos" />
-                  </div>
-                  <div className="grid">
-                    <div className="col text-center">
+                  </Box>
+                  <Grid gap="sm">
+                    <Grid.Col ta="center" span="auto">
                       <Button type="button"
                       disabled={(!removedUsers || removedUsers.length === 0)}
                       onClick={removeUsers}>Remover</Button>
-                    </div>
-                  </div>
+                    </Grid.Col>
+                  </Grid>
                   </> :
-                  <div className="grid justify-center">
-                    <div className="col-12 mt-4 mb-2">
+                  <Grid gap="sm">
+                    <Grid.Col mt="md" mb="xs" span={12}>
                       <Alert color="warning" py="xs">
                         <Group justify="center" gap="xs" wrap="nowrap">
                           <IconAlertTriangle />
                           <span>Adicione um ou mais Utilizadores</span>
                         </Group>
                       </Alert>
-                    </div>
-                  </div>
+                    </Grid.Col>
+                  </Grid>
                 }
               </Paper>
-            </div>
+            </Grid.Col>
 
-          </div>
+          </Grid>
 
-        <Group justify="flex-end" className="mt-4 mb-4">
+        <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
             variant="default"

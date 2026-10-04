@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { Button, Group, Textarea, TextInput } from '@mantine/core';
+import { Button, Grid, Group, TextInput, Textarea } from '@mantine/core';
 import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -96,38 +96,38 @@ function ParameterForm(props) {
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
-          <div className="formgrid grid">
-            <div className="field col-12 md:col-2">
+          <Grid gap="sm">
+            <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="id" label="Id" value={data.id || ''} disabled />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-3">
+            <Grid.Col span={{ base: 12, md: 3 }}>
               <TextInput id="code" label="Código" autoFocus
                error={fieldError(errors, 'code')}
                {...register('code', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-7">
+            <Grid.Col span={{ base: 12, md: 7 }}>
               <TextInput id="name" label="Designação"
                error={fieldError(errors, 'name')}
                {...register('name', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12">
+            <Grid.Col span={12}>
               <TextInput id="notes" label="Descrição"
                error={fieldError(errors, 'notes')}
                {...register('notes')} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12">
+            <Grid.Col span={12}>
               <Textarea id="setting_value" label="Valor" rows={25}
                error={fieldError(errors, 'setting_value')}
                {...register('setting_value', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-          </div>
+          </Grid>
 
-        <Group justify="flex-end" className="mt-4 mb-4">
+        <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
             variant="default"

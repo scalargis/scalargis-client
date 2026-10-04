@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Grid,
   Group,
   Input,
   LoadingOverlay,
@@ -18,7 +19,7 @@ import {
   Switch,
   Tabs,
   TagsInput,
-  TextInput
+  TextInput,
 } from '@mantine/core';
 import { CodeEditor, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint } from '@scalargis/ui';
 
@@ -368,14 +369,14 @@ function ViewerForm(props) {
 
         <PageSection style={activeTab === 'base' ? undefined : HIDDEN}>
 
-            <div className="formgrid grid">
+            <Grid gap="sm">
 
-              <div className="field col-12 md:col-2">
+              <Grid.Col span={{ base: 12, md: 2 }}>
                 <TextInput id="id" label="Id" value={data.id || ''} readOnly />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-4 text-center">
-                <label className="block">&nbsp;</label>
+              <Grid.Col ta="center" span={{ base: 12, md: 4 }}>
+                <Box component="label" display="block">&nbsp;</Box>
                 <Controller
                   control={control}
                   name="is_active"
@@ -389,10 +390,10 @@ function ViewerForm(props) {
                     />
                   )}
                 />
-              </div>
+              </Grid.Col>
 
               { adminOrManager &&
-              <div className="field col-12 md:col-4">
+              <Grid.Col span={{ base: 12, md: 4 }}>
                 <Group gap="xs" align="flex-end" wrap="nowrap">
                   <TextInput
                     label="Dono"
@@ -449,105 +450,105 @@ function ViewerForm(props) {
                     </ActionIcon>
                   }
                 </Group>
-              </div>
+              </Grid.Col>
               }
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <TextInput id="name" label="Designação"
                   error={fieldError(errors, 'name')}
                   {...register('name', { required: 'Campo obrigatório.' })} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <TextInput id="title" label="Título"
                   error={fieldError(errors, 'title')}
                   {...register('title', { required: 'Campo obrigatório.' })} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <TextInput id="slug" label="Slug" {...register('slug')} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <Controller name="keywords" control={control} render={({ field }) => (
                   <TagsInput id="keywords" label="Tags" value={field.value || []} onChange={field.onChange} />
                 )} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <Input.Label>Perfis</Input.Label>
                 <Paper p="xs">
                   { (availableRoles && availableRoles.length > 0) &&
                   <>
-                  <div className="field col-12 pl-0">
+                  <Box p="xs" pl={0} mb="sm">
                     <MultiSelect
                       data={availableRoles.map(r => ({ value: String(r.id), label: r.name }))}
                       value={selectedRoles || []}
                       onChange={(value) => setSelectedRoles(value.length ? value : null)}
                       placeholder="Selecionar"
                       searchable clearable />
-                  </div>
-                  <div className="grid">
-                    <div className="col"></div>
-                    <div className="col">
+                  </Box>
+                  <Grid gap="sm">
+                    <Grid.Col span="auto"></Grid.Col>
+                    <Grid.Col span="auto">
                         <Button type="button"
                           disabled={(!selectedRoles || selectedRoles.length === 0)}
                         onClick={addRoles}>Adicionar</Button>
-                    </div>
-                    <div className="col"></div>
-                  </div>
+                    </Grid.Col>
+                    <Grid.Col span="auto"></Grid.Col>
+                  </Grid>
                   </>
                   }
                   { (roles && roles.length > 0) ?
                     <>
-                    <div className="field col-12 pl-0 pt-2">
+                    <Box pl={0} pt="xs" p="xs" mb="sm">
                       <SelectionList options={roles} value={removedRoles}
                         onChange={setRemovedRoles} ariaLabel="Perfis atribuídos" />
-                    </div>
-                    <div className="grid">
-                      <div className="col"></div>
-                      <div className="col">
+                    </Box>
+                    <Grid gap="sm">
+                      <Grid.Col span="auto"></Grid.Col>
+                      <Grid.Col span="auto">
                         <Button type="button"
                         disabled={(!removedRoles || removedRoles.length === 0)}
                         onClick={removeRoles}>Remover</Button>
-                      </div>
-                      <div className="col"></div>
-                    </div>
+                      </Grid.Col>
+                      <Grid.Col span="auto"></Grid.Col>
+                    </Grid>
                     </> :
-                    <div className="grid justify-content-center">
-                      <div className="col-12 mt-4 mb-2">
+                    <Grid justify="center" gap="sm">
+                      <Grid.Col mt="md" mb="xs" span={12}>
                         <Alert color="warning" py="xs">
                           <Group justify="center" gap="xs" wrap="nowrap">
                             <IconAlertTriangle />
                             <span>Adicione um ou mais Perfis</span>
                           </Group>
                         </Alert>
-                      </div>
-                    </div>
+                      </Grid.Col>
+                    </Grid>
                   }
                 </Paper>
-              </div>
+              </Grid.Col>
 
-            </div>
+            </Grid>
 
           </PageSection>
 
         <PageSection style={activeTab === 'ui' ? undefined : HIDDEN}>
-            <div className="formgrid grid">
+            <Grid gap="sm">
 
-              <div className="field col-12 md:col-4">
+              <Grid.Col span={{ base: 12, md: 4 }}>
                 <TextInput id="img_icon" label="Icon" {...register('img_icon')} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-4">
+              <Grid.Col span={{ base: 12, md: 4 }}>
                 <TextInput id="img_logo" label="Logo" {...register('img_logo')} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-4">
+              <Grid.Col span={{ base: 12, md: 4 }}>
                 <TextInput id="img_logo_alt" label="Logo Alternativo" {...register('img_logo_alt')} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12">
+              <Grid.Col span={12}>
                 <Input.Label>App Manifest</Input.Label>
                   <CodeEditor
                     language="json"
@@ -557,10 +558,10 @@ function ViewerForm(props) {
                     maxHeight="360px"
                     aria-label="App Manifest"
                   />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12">
-                <Group justify="flex-end" gap="xs" wrap="nowrap" className="mb-1">
+              <Grid.Col span={12}>
+                <Group justify="flex-end" gap="xs" wrap="nowrap" mb={4}>
                   <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
                     onClick={e => {
                       e.preventDefault();
@@ -593,13 +594,13 @@ function ViewerForm(props) {
                   maxHeight="360px"
                   aria-label="Style (Código)"
                 />
-              </div>
+              </Grid.Col>
 
-            </div>
+            </Grid>
           </PageSection>
 
         <PageSection style={activeTab === 'config' ? undefined : HIDDEN}>
-            <Group justify="flex-end" gap="xs" wrap="nowrap" className="mb-1">
+            <Group justify="flex-end" gap="xs" wrap="nowrap" mb={4}>
               <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
                 onClick={e => {
                   e.preventDefault();
@@ -645,7 +646,7 @@ function ViewerForm(props) {
 
           </PageSection>
 
-        <Group justify="flex-end" className="mt-4 mb-4">
+        <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
             variant="default"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Component } from "react";
-import { ActionIcon, Alert, Button, Group, MultiSelect, Paper } from '@mantine/core';
+import { ActionIcon, Alert, Box, Button, Grid, Group, MultiSelect, Paper } from '@mantine/core';
 import { CollapsiblePanel, ConfirmPopover, IconInfoCircle, IconX } from '@scalargis/ui';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { getItemStyle, getFieldListStyle } from "./utils";
@@ -39,7 +39,7 @@ function RecordSelector(props) {
 
   return (
     <Paper p="xs">
-        <div className="field col-12 pl-0">
+        <Box p="xs" pl={0} mb="sm">
           <MultiSelect
             data={options}
             value={selectedRecords || []}
@@ -55,16 +55,16 @@ function RecordSelector(props) {
             }}
             nothingFoundMessage="Não foram encontrados registos"
             searchable clearable />
-        </div>
-        <div className="grid">
-          <div className="col"></div>
-          <div className="col">
+        </Box>
+        <Grid gap="sm">
+          <Grid.Col span="auto"></Grid.Col>
+          <Grid.Col span="auto">
               <Button type="button"
                 disabled={(!selectedRecords || selectedRecords.length === 0)}
               onClick={addRecords}>Adicionar</Button>
-          </div>
-          <div className="col"></div>
-        </div>
+          </Grid.Col>
+          <Grid.Col span="auto"></Grid.Col>
+        </Grid>
       </Paper>
   );
 }
@@ -116,14 +116,13 @@ const ListChilds = props => {
                   style={{ "border": "solid 1px lightgray", marginTop: 3 }}
                 >
                   {(provided, snapshot) => (
-                    <div
+                    <Box
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      style={getItemStyle(
+                      style={{ boxShadow: 'var(--mantine-shadow-xs)', ...getItemStyle(
                         snapshot.isDragging,
                         provided.draggableProps.style
-                      )}
-                      className="shadow-1"
+                      ) }}
                     >
                     <div style={{marginBottom: 5 }}>
                       <div style={{ float: "left", paddingTop: 6 }}>
@@ -150,20 +149,20 @@ const ListChilds = props => {
                         </div>
                       </div>
 
-                      <div className="pt-2">
-                        <div className="field grid mb-0">
-                          <div className="col-12">
-                            <div className="grid">
-                              <label className="col-12 md:col-2"><strong>Título: </strong></label>
-                              <div className="col-12 md:col-10">
+                      <Box pt="xs">
+                        <Grid mb={0} gap="sm">
+                          <Grid.Col span={12}>
+                            <Grid gap="sm">
+                              <Grid.Col span={{ base: 12, md: 2 }}><label><strong>Título: </strong></label></Grid.Col>
+                              <Grid.Col span={{ base: 12, md: 10 }}>
                                   <span>{item.title}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                              </Grid.Col>
+                            </Grid>
+                          </Grid.Col>
+                        </Grid>
+                      </Box>
 
-                    </div>
+                    </Box>
                   )}
                 </Draggable>
               ))}
@@ -213,13 +212,13 @@ class PrintGroupChildsEditor extends Component {
   render() {
     return (
 
-      <div className="formgrid grid">
+      <Grid gap="sm">
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <CollapsiblePanel header="Plantas" toggleable={false}>
-            <div className="col-12">
-              <div className="grid mb-4">
-                <div className="col-12">
+            <Box p="xs">
+              <Grid mb="md" gap="sm">
+                <Grid.Col span={12}>
                   <RecordSelector
                     data={this.state.data.prints}
                     list={this.state.printsList}
@@ -227,10 +226,10 @@ class PrintGroupChildsEditor extends Component {
                       this.onPrintsChange(data);
                     }}
                   />
-                </div>
-              </div>
-              <div className="grid">
-                <div className="col-12">
+                </Grid.Col>
+              </Grid>
+              <Grid gap="sm">
+                <Grid.Col span={12}>
                   <Paper p="xs">
                     <ListChilds
                       data={this.state.data.prints}
@@ -240,17 +239,17 @@ class PrintGroupChildsEditor extends Component {
                       }}
                     />
                   </Paper>
-                </div>
-              </div>
-            </div>
+                </Grid.Col>
+              </Grid>
+            </Box>
           </CollapsiblePanel>
-        </div>
+        </Grid.Col>
 
-        <div className="field col-12 md:col-6">
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <CollapsiblePanel header="Grupos" toggleable={false}>
-            <div className="col-12">
-              <div className="grid mb-4">
-                <div className="col-12">
+            <Box p="xs">
+              <Grid mb="md" gap="sm">
+                <Grid.Col span={12}>
                   <RecordSelector
                     data={this.state.data.groups}
                     list={this.state.groupsList}
@@ -258,10 +257,10 @@ class PrintGroupChildsEditor extends Component {
                       this.onGroupsChange(data);
                     }}
                   />
-                </div>
-              </div>
-              <div className="grid">
-                <div className="col-12">
+                </Grid.Col>
+              </Grid>
+              <Grid gap="sm">
+                <Grid.Col span={12}>
                   <Paper p="xs">
                     <ListChilds
                       data={this.state.data.groups}
@@ -271,13 +270,13 @@ class PrintGroupChildsEditor extends Component {
                       }}
                     />
                   </Paper>
-                </div>
-              </div>
-            </div>
+                </Grid.Col>
+              </Grid>
+            </Box>
           </CollapsiblePanel>
-        </div>
+        </Grid.Col>
 
-      </div>
+      </Grid>
 
     );
   }

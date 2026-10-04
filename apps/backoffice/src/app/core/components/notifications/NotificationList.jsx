@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
-import { ActionIcon, Badge, Button, Group, MultiSelect, TextInput } from '@mantine/core';
+import { ActionIcon, Badge, Button, Grid, Group, MultiSelect, TextInput } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { CollapsiblePanel, DataGrid, exportGridCSV, notify, IconPencil, IconUpload } from '@scalargis/ui';
@@ -208,11 +208,11 @@ function NotificationList(props) {
         <CollapsiblePanel header="Filtro" defaultOpened>
           <form onSubmit={handleSubmit(onFilterSubmit)}>
 
-            <div className="formgrid grid">
-              <div className="field col-12 md:col-2">
+            <Grid gap="sm">
+              <Grid.Col span={{ base: 12, md: 2 }}>
                   <TextInput id="id" label="Id" {...register('id')} />
-              </div>
-              <div className="field col-12 md:col-10">
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 10 }}>
                   <Controller
                       control={control}
                       name="viewer"
@@ -225,8 +225,8 @@ function NotificationList(props) {
                           searchable clearable />
                       )}
                     />
-              </div>
-              <div className="field col-12 md:col-4">
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 4 }}>
                   <Controller
                       control={control}
                       name="start_date"
@@ -239,8 +239,8 @@ function NotificationList(props) {
                           clearable />
                       )}
                     />
-              </div>
-              <div className="field col-12 md:col-4">
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 4 }}>
                   <Controller
                       control={control}
                       name="end_date"
@@ -253,14 +253,14 @@ function NotificationList(props) {
                           clearable />
                       )}
                     />
-              </div>
-              <div className="field col-12 md:col-4">
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 4 }}>
                   <TextInput id="author" label="Autor" {...register('author')} />
-              </div>
-              <div className="field col-12 md:col-4">
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 4 }}>
                   <TextInput id="message" label="Mensagem" {...register('message')} />
-              </div>
-              <div className="field col-12 md:col-4">
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 4 }}>
                   <Controller
                       control={control}
                       name="status"
@@ -273,17 +273,17 @@ function NotificationList(props) {
                           clearable />
                       )}
                     />
-              </div>
-            </div>
+              </Grid.Col>
+            </Grid>
 
-            <div className="fluid grid justify-content-end">
-              <div className="field col-12 md:col-1">
+            <Grid justify="flex-end" gap="sm">
+              <Grid.Col span={{ base: 12, md: 1 }}>
                 <Button type="submit" fullWidth>Pesquisar</Button>
-              </div>
-              <div className="field col-12 md:col-1">
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 1 }}>
                 <Button type="button" variant="default" fullWidth onClick={onFilterClear}>Limpar</Button>
-              </div>
-            </div>
+              </Grid.Col>
+            </Grid>
 
             </form>
         </CollapsiblePanel>

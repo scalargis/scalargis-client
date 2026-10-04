@@ -232,7 +232,7 @@ function PrintList(props) {
           cellsStyle: () => ({ wordBreak: 'break-all' }),
           render: (record) => (
             <React.Fragment>
-              { record.groups && record.groups.map( (item) => <Badge variant="light" color="secondary" key={item.id} className="mr-2 mb-2">{item.code}</Badge> ) }
+              { record.groups && record.groups.map( (item) => <Badge variant="light" color="secondary" key={item.id} mr="xs" mb="xs">{item.code}</Badge> ) }
             </React.Fragment>
           ),
           filter: (

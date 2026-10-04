@@ -4,8 +4,10 @@ import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
+  Box,
   Button,
   Checkbox,
+  Grid,
   Group,
   Input,
   MultiSelect,
@@ -14,7 +16,7 @@ import {
   Select,
   Switch,
   Tabs,
-  TextInput
+  TextInput,
 } from '@mantine/core';
 import { CodeEditor, CollapsiblePanel, notify, TabPanel, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog } from '@scalargis/ui';
 
@@ -222,26 +224,26 @@ function PrintForm(props) {
         <TabPanel active={activeTab === 'base'} mount="eager">
         <PageSection>
 
-            <div className="formgrid grid">
+            <Grid gap="sm">
 
-              <div className="field col-12 md:col-1">
+              <Grid.Col span={{ base: 12, md: 1 }}>
                 <TextInput id="id" label="Id" value={data.id || ''} readOnly />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-2">
+              <Grid.Col span={{ base: 12, md: 2 }}>
                 <TextInput id="code" label="Código" autoFocus
                   error={fieldError(errors, 'code')}
                   {...register('code', { required: 'Campo obrigatório.' })} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-7">
+              <Grid.Col span={{ base: 12, md: 7 }}>
                 <TextInput id="name" label="Designação"
                   error={fieldError(errors, 'name')}
                   {...register('name', { required: 'Campo obrigatório.' })} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-2 text-center">
-                <label className="w-full block">&nbsp;</label>
+              <Grid.Col ta="center" span={{ base: 12, md: 2 }}>
+                <Box component="label" w="100%" display="block">&nbsp;</Box>
                 <Controller
                   control={control}
                   name="is_active"
@@ -255,21 +257,21 @@ function PrintForm(props) {
                     />
                   )}
                 />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12">
+              <Grid.Col span={12}>
                 <TextInput id="title" label="Título"
                   error={fieldError(errors, 'title')}
                   {...register('title', { required: 'Campo obrigatório.' })} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12">
+              <Grid.Col span={12}>
                 <TextInput id="description" label="Descrição" {...register('description')} />
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
-                <div className="grid">
-                  <div className="field col-12 md:col-4">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Grid gap="sm">
+                  <Grid.Col span={{ base: 12, md: 4 }}>
                     <Controller name="scale" control={control}
                       render={({ field }) => (
                         <NumberInput id="scale" label="Escala" hideControls
@@ -279,8 +281,8 @@ function PrintForm(props) {
                           onChange={(value) => field.onChange(value === '' ? null : value)} />
                       )}
                     />
-                  </div>
-                  <div className="field col-12 md:col-4">
+                  </Grid.Col>
+                  <Grid.Col span={{ base: 12, md: 4 }}>
                     <Controller name="format" control={control}
                       render={({ field }) => (
                         <Select id="format" label="Formato"
@@ -290,8 +292,8 @@ function PrintForm(props) {
                           clearable />
                       )}
                     />
-                  </div>
-                  <div className="field col-12 md:col-4">
+                  </Grid.Col>
+                  <Grid.Col span={{ base: 12, md: 4 }}>
                     <Controller name="orientation" control={control}
                       render={({ field }) => (
                         <Select id="orientation" label="Orientação"
@@ -301,8 +303,8 @@ function PrintForm(props) {
                           clearable />
                       )}
                     />
-                  </div>
-                  <div className="field col-12">
+                  </Grid.Col>
+                  <Grid.Col span={12}>
                     <Controller name="srid" control={control} rules={{ required: 'Campo obrigatório.' }}
                       render={({ field }) => (
                         <Select id="srid" label="Sistema de Coordenadas"
@@ -312,11 +314,11 @@ function PrintForm(props) {
                           error={fieldError(errors, 'srid')} />
                       )}
                     />
-                  </div>
-                </div>
-              </div>
+                  </Grid.Col>
+                </Grid>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <CollapsiblePanel header="Filtro Geográfico" toggleable={false}>
                   <GeometryFilterEditor
                     data={
@@ -345,12 +347,12 @@ function PrintForm(props) {
                     }}
                   />
                 </CollapsiblePanel>
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <CollapsiblePanel header="Opções de Escalas" toggleable={false}>
-                  <div className="grid">
-                    <div className="field col-12 md:col-6 mt-2">
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="free_scale" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="free_scale" label="Escala livre"
@@ -358,8 +360,8 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                    <div className="field col-12 md:col-6 mt-2">
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="map_scale" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="map_scale" label="Escala do mapa"
@@ -367,10 +369,10 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
-                  <div className="grid">
-                    <div className="field col-12 md:col-6 mt-2">
+                    </Grid.Col>
+                  </Grid>
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="restrict_scales" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="restrict_scales" label="Escalas restritas"
@@ -378,9 +380,9 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
+                    </Grid.Col>
                     {restrictScales && (
-                    <div className="field col-12 md:col-6 mt-2">
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Group gap="xs" align="flex-end" wrap="nowrap">
                         <Controller name="restrict_scales_list" control={control}
                           render={({ field }) => (
@@ -422,16 +424,16 @@ function PrintForm(props) {
                           </Popover.Dropdown>
                         </Popover>
                       </Group>
-                    </div>
+                    </Grid.Col>
                     )}
-                  </div>
+                  </Grid>
                 </CollapsiblePanel>
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
+              <Grid.Col span={{ base: 12, md: 6 }}>
                 <CollapsiblePanel header="Opções de impressão" toggleable={false}>
-                  <div className="grid">
-                    <div className="field col-12 md:col-6 mt-2">
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="free_printing" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="free_printing" label="Emissão livre"
@@ -439,15 +441,15 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
+                    </Grid.Col>
+                  </Grid>
                 </CollapsiblePanel>
-              </div>
+              </Grid.Col>
 
-              <div className="field col-12 md:col-6">
-                <CollapsiblePanel header="Marcação de local e geometrias" toggleable={false} className="mt-2">
-                  <div className="grid">
-                    <div className="field col-12 md:col-6 mt-2">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <CollapsiblePanel header="Marcação de local e geometrias" toggleable={false} mt="xs">
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="allow_drawing" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="allow_drawing" label="Permitir desenhar"
@@ -455,8 +457,8 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                    <div className="field col-12 md:col-6 mt-2">
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="location_marking" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="location_marking" label="Obrigatório marcar local"
@@ -464,10 +466,10 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
-                  <div className="grid">
-                    <div className="field col-12 md:col-6 mt-2">
+                    </Grid.Col>
+                  </Grid>
+                  <Grid gap="sm">
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="draw_location" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="draw_location" label="Desenhar local"
@@ -475,8 +477,8 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                    <div className="field col-12 md:col-6 mt-2">
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span={{ base: 12, md: 6 }}>
                       <Controller name="multi_geom" control={control}
                         render={({ field }) => (
                           <Checkbox size="md" id="multi_geom" label="Múltiplas geometrias"
@@ -484,12 +486,12 @@ function PrintForm(props) {
                             onChange={(e) => field.onChange(e.currentTarget.checked)} />
                         )}
                       />
-                    </div>
-                  </div>
+                    </Grid.Col>
+                  </Grid>
                 </CollapsiblePanel>
-              </div>
+              </Grid.Col>
 
-            </div>
+            </Grid>
 
           </PageSection>
         </TabPanel>
@@ -497,7 +499,7 @@ function PrintForm(props) {
         <TabPanel active={activeTab === 'config'} mount="eager">
         <PageSection>
 
-            <div className="field col-12">
+            <Box p="xs" mb="sm">
               <Input.Label>Configuração</Input.Label>
 
                 <Controller
@@ -515,7 +517,7 @@ function PrintForm(props) {
                     />
                   }}
                 />
-            </div>
+            </Box>
 
           </PageSection>
         </TabPanel>
@@ -548,7 +550,7 @@ function PrintForm(props) {
           </PageSection>
         </TabPanel>
 
-        <Group justify="flex-end" className="mt-4 mb-4">
+        <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
             variant="default"

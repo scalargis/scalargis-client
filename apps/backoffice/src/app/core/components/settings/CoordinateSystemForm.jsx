@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Group, Select, TextInput } from '@mantine/core';
+import { Button, Grid, Group, Select, TextInput } from '@mantine/core';
 import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -111,77 +111,77 @@ function CoordinateSystemForm(props) {
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
-          <div className="formgrid grid">
-            <div className="field col-12 md:col-2">
+          <Grid gap="sm">
+            <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="id" label="Id" value={data.id || ''} disabled />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-2">
+            <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="code" label="Código" autoFocus
                error={fieldError(errors, 'code')}
                {...register('code', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-2">
+            <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="srid" label="SRID"
                error={fieldError(errors, 'srid')}
                {...register('srid', { required: true, pattern: { value: /^[0-9]+$/, message: 'Formato inválido'} })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-6">
+            <Grid.Col span={{ base: 12, md: 6 }}>
               <TextInput id="name" label="Designação"
                error={fieldError(errors, 'name')}
                {...register('name', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-6">
+            <Grid.Col span={{ base: 12, md: 6 }}>
               <TextInput id="label" label="Label"
                error={fieldError(errors, 'label')}
                {...register('label')} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-6">
+            <Grid.Col span={{ base: 12, md: 6 }}>
               <TextInput id="description" label="Descrição"
                error={fieldError(errors, 'description')}
                {...register('description', { required: 'Campo obrigatório.' })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12">
+            <Grid.Col span={12}>
               <TextInput id="defs" label="Definição"
                {...register('defs')} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-3">
+            <Grid.Col span={{ base: 12, md: 3 }}>
               <TextInput id="minx" label="Min X"
                error={fieldError(errors, 'minx')}
                {...register('minx', { required: 'Campo obrigatório.',
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'},
                 min: -180, max: 180 } )} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-3">
+            <Grid.Col span={{ base: 12, md: 3 }}>
               <TextInput id="miny" label="Min Y"
                error={fieldError(errors, 'miny')}
                {...register('miny', { required: 'Campo obrigatório.',
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'},
                 min: -90, max: 90 } )} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-3">
+            <Grid.Col span={{ base: 12, md: 3 }}>
               <TextInput id="maxx" label="Max X"
                error={fieldError(errors, 'maxx')}
                {...register('maxx', { required: 'Campo obrigatório.',
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-3">
+            <Grid.Col span={{ base: 12, md: 3 }}>
               <TextInput id="maxy" label="Max Y"
                error={fieldError(errors, 'maxy')}
                {...register('maxy', { required: 'Campo obrigatório.',
                 pattern: { value: /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/, message: 'Formato inválido'} })} />
-            </div>
+            </Grid.Col>
 
-            <div className="field col-12 md:col-3">
+            <Grid.Col span={{ base: 12, md: 3 }}>
               <Controller name="precision" control={control} render={({ field }) => (
                 <Select
                   id="precision"
@@ -191,11 +191,11 @@ function CoordinateSystemForm(props) {
                   onChange={(value) => field.onChange(value != null ? Number(value) : null)}
                   clearable />
               )} />
-            </div>
+            </Grid.Col>
 
-          </div>
+          </Grid>
 
-        <Group justify="flex-end" className="mt-4 mb-4">
+        <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
             variant="default"

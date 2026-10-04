@@ -11,7 +11,7 @@ import {
 } from 'chart.js';
 import { defaults } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { Button, Loader, Select } from '@mantine/core';
+import { Box, Button, Grid, Loader, Select } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { IconDownload } from '@scalargis/ui';
 import dayjs from 'dayjs';
@@ -287,8 +287,8 @@ export default function ViewerVisitsChart(props) {
 
     return (
         <PageSection>
-            <div className="grid">
-                <div className="col-12 md:col-6">
+            <Grid gap="sm">
+                <Grid.Col span={{ base: 12, md: 6 }}>
                     <Select
                         data={types}
                         value={op_type}
@@ -296,7 +296,7 @@ export default function ViewerVisitsChart(props) {
                         allowDeselect={false} />
 
                     { !props?.stats?.viewers?.length &&
-                        <div className="col-12 pl-0 pr-0">
+                        <Box py="xs">
                             <Select
                                 placeholder="Escolha um Visualizador"
                                 data={(viewers_list || []).map(v => ({ value: String(v.value), label: v.name }))}
@@ -309,10 +309,10 @@ export default function ViewerVisitsChart(props) {
                                 }}
                                 onSearchChange={onViewerSearchChange}
                                 searchable clearable />
-                        </div>
+                        </Box>
                     }
-                </div>
-                <div className="col-12 md:col-6">
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 6 }}>
                     { props?.stats?.viewers?.length > 0 &&
                         <Select
                             placeholder="Escolha um Visualizador"
@@ -328,8 +328,8 @@ export default function ViewerVisitsChart(props) {
                                 set_selected_viewer(new_val)
                             }} />
                     }
-                </div>
-                <div className="col-12 md:col-6">
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 6 }}>
                     <Select
                         data={timeranges}
                         value={timerange}
@@ -337,40 +337,40 @@ export default function ViewerVisitsChart(props) {
                         allowDeselect={false} />
 
                     { timerange === 'custom' &&
-                    <div className="grid mt-1">
-                        <div className="col">
+                    <Grid mt={4} gap="sm">
+                        <Grid.Col span="auto">
                             <DatePickerInput
                                 valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
                                 value={toPickerDate(customRange?.length ? customRange[0] : null)}
                                 onChange={(value) => changeCustomRange(0, fromPickerDate(value))} />
-                        </div>
-                        <div className="align-content-center text-center">e</div>
-                        <div className="col">
+                        </Grid.Col>
+                        <Box ta="center" style={{ alignContent: 'center' }}>e</Box>
+                        <Grid.Col span="auto">
                             <DatePickerInput
                                 valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
                                 value={toPickerDate(customRange?.length ? customRange[1] : null)}
                                 onChange={(value) => changeCustomRange(1, fromPickerDate(value))} />
-                        </div>
-                    </div>
+                        </Grid.Col>
+                    </Grid>
                     }
-                </div>
+                </Grid.Col>
                 { loading_data_chart &&
-                <div className="col-12 md:col-6 text-right">
+                <Grid.Col ta="right" span={{ base: 12, md: 6 }}>
                     <Loader size="sm" />
-                </div>
+                </Grid.Col>
                 }
 
-                <div className="col-12 text-right">
+                <Grid.Col ta="right" span={12}>
                     <Button
                         variant="outline"
                         leftSection={<IconDownload />}
                         onClick={exportCSV}
                         disabled={!data_values?.length}>Exportar CSV</Button>
-                </div>
+                </Grid.Col>
 
 
                 <Line data={data} options={options} />
-            </div>
+            </Grid>
         </PageSection>
     )
 }

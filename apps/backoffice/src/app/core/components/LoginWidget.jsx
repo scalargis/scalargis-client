@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import { Alert, Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core';
+import { Alert, Anchor, Box, Button, Flex, Group, PasswordInput, TextInput } from '@mantine/core';
 import { IconCheck, IconXCircle } from '@scalargis/ui';
 
 import AppContext from '../../AppContext';
@@ -40,8 +40,8 @@ function LoginWidget({ auth, history, redirect }) {
   return (
     <form onSubmit={submit}>
 
-      <div className="flex flex-column">
-        <div className="field">
+      <Flex direction="column">
+        <Box mb="sm">
           <TextInput
             id="username"
             label="Nome de Utilizador / E-mail"
@@ -50,9 +50,9 @@ function LoginWidget({ auth, history, redirect }) {
             value={username}
             onChange={e => setUsername(e.target.value)}
           />
-        </div>
+        </Box>
 
-        <div className="field">
+        <Box mb="sm">
           <PasswordInput
             id="password"
             label="Palavra-passe"
@@ -61,8 +61,8 @@ function LoginWidget({ auth, history, redirect }) {
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
-        </div>
-      </div>
+        </Box>
+      </Flex>
 
       <div className="dialog-footer">
         <Button
@@ -72,25 +72,25 @@ function LoginWidget({ auth, history, redirect }) {
       </div>
 
       { auth.http_error && !auth.response &&
-        <div className="pt-4">
+        <Box pt="md">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
               <IconXCircle />
               <span>Serviço Indisponível</span>
             </Group>
           </Alert>
-        </div>
+        </Box>
       }
 
       { !!auth.response?.message &&
-        <div className="pt-4">
+        <Box pt="md">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
               <IconXCircle />
               <span>Nome de Utilizador ou Palavra-passe inválido</span>
             </Group>
           </Alert>
-        </div>
+        </Box>
       }
 
     </form>
