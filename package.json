@@ -24,6 +24,7 @@
     "classnames": "^2.5.1",
     "convert": "^7.0.0",
     "d3": "^7.9.0",
+    "d3-sankey": "^0.12.3",
     "dayjs": "^1.11.20",
     "fig-tree-evaluator": "^2.21.3",
     "file-saver": "^2.0.5",
