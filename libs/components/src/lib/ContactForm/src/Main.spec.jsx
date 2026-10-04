@@ -9,6 +9,19 @@ import Main from './Main';
 vi.mock('../../components', () => ({ MainMenuButton: () => null }));
 vi.mock('./ContactForm', () => ({ default: () => <div data-testid="contact-form" /> }));
 vi.mock('./ContactInfo', () => ({ default: () => null }));
+const dialogSizes = [];
+let phone = false;
+vi.mock('@scalargis/ui', async (importOriginal) => {
+  const ui = await importOriginal();
+  return {
+    ...ui,
+    useIsMobile: () => phone,
+    Dialog: (p) => {
+      dialogSizes.push(p.size);
+      return <ui.Dialog {...p} />;
+    }
+  };
+});
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key, fallback) => fallback || key, i18n: {} })
 }));
@@ -84,6 +97,17 @@ describe('ContactForm Main', () => {
     expect(screen.queryByTestId('contact-form')).toBeNull();
     fireEvent.click(container.querySelector('.contactform-footer-button'));
     expect(await screen.findByTestId('contact-form')).toBeTruthy();
+  });
+
+  it('passes only the desktop size to the Dialog on a phone', async () => {
+    phone = true;
+    dialogSizes.length = 0;
+    const { container } = renderMain('footer_left');
+    fireEvent.click(container.querySelector('.contactform-footer-button'));
+    await screen.findByTestId('contact-form');
+    phone = false;
+    expect(dialogSizes.length).toBeGreaterThan(0);
+    expect(dialogSizes.every(size => size === '45vw')).toBe(true);
   });
 
 });

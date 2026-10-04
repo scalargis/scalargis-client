@@ -168,17 +168,24 @@ describe('Dialog responsive size default', () => {
     expect(modalSize()).toBe('90%');
   });
 
-  it('lets a caller-passed size win on both breakpoints', () => {
-    // On mobile the default would be 90%; a caller size overrides it. Use a
-    // vw value (Mantine's rem() would rewrite a px string to rem — a wash for
-    // this assertion) so the caller value passes through verbatim.
-    setMobile(true);
+  it('uses a caller-passed size on a wide screen', () => {
+    setMobile(false);
     renderDialog(
       <Dialog opened onClose={vi.fn()} title="Ajuda" size="50vw">
         Corpo
       </Dialog>
     );
     expect(modalSize()).toBe('50vw');
+  });
+
+  it('keeps 90% below the breakpoint when a caller passes a size', () => {
+    setMobile(true);
+    renderDialog(
+      <Dialog opened onClose={vi.fn()} title="Ajuda" size="50vw">
+        Corpo
+      </Dialog>
+    );
+    expect(modalSize()).toBe('90%');
   });
 });
 

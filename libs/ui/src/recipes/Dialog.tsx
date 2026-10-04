@@ -67,7 +67,7 @@ export function Dialog({
     ? { justifyContent: position === 'top-right' ? 'flex-end' : 'flex-start', alignItems: 'flex-start' }
     : undefined;
 
-  const resolvedSize = sizeProp ?? (isMobile ? '90%' : DIALOG_DESKTOP_SIZE);
+  const resolvedSize = isMobile ? '90%' : sizeProp ?? DIALOG_DESKTOP_SIZE;
 
   // Centred-model drag: a translate on the Modal's `inner` centring wrapper.
   const [offset, setOffset] = useState({ x: 0, y: 0 });

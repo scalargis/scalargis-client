@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation} from "react-i18next";
 import { Button, Group, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel, Dialog, useIsMobile, IconQuestionCircle, IconEnvelope } from '@scalargis/ui';
+import { CollapsiblePanel, Dialog, IconQuestionCircle, IconEnvelope } from '@scalargis/ui';
 
 import { MainMenuButton } from '../../components';
 
@@ -31,8 +31,6 @@ export function MainMenu({ className, core, config, actions, record }) {
   const component_cfg = record.config_json || {};
   const title = record.title || '';
   const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
-
-  const isMobile = useIsMobile();
 
   function renderContent() {
     return (
@@ -70,7 +68,7 @@ export function MainMenu({ className, core, config, actions, record }) {
         <Dialog
           title={header}
           opened={showPopup}
-          size={isMobile ? '90%' : '45vw'}
+          size="45vw"
           onClose={close}
           footer={<Button onClick={close}>{closeLabel}</Button>}>
 
@@ -103,8 +101,6 @@ export default function Main({ region, as, core, config, actions, record }) {
   const component_cfg = record.config_json || {};
   const title = record.title || '';
   const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
-
-  const isMobile = useIsMobile();
 
   const closeLabel = component_cfg.closeLabel || t("close", "Fechar");
 
@@ -171,7 +167,7 @@ export default function Main({ region, as, core, config, actions, record }) {
       <Dialog
         title={header}
         opened={showForm}
-        size={isMobile ? '90%' : '45vw'}
+        size="45vw"
         onClose={close}
         footer={<Button onClick={close}>{closeLabel}</Button>}>
 
