@@ -91,7 +91,7 @@ export function login_post(post, history, redirect) {
           dispatch(login(res));
           const cookies = new Cookies();
           cookies.set(cookieAuthName, res, { path: '/' });
-          if (redirect && history?.navigate) history.navigate(redirect); 
+          if (redirect) window.location.assign(getBackofficeBaseUrl() + redirect.replace(/^\//, ''));
           else window.location.reload();
         } else {
           dispatch(login_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
@@ -270,16 +270,16 @@ export function backoffice_load(core, history) {
       })
 
     }).catch(error => {
-      const base_url = getBackofficeBaseUrl();
+      const target = encodeURIComponent(`${history.location?.pathname || '/'}${history.location?.search || ''}`);
 
       // Redirect to login or error pages
       if (error.message === 'Not found') {
         //TODO: Bad API endpoint, redirect to page with more info to user
-        const redirect = `/login?redirect=${base_url}`;
+        const redirect = `/login?redirect=${target}`;
         history.navigate(redirect);
       } else if (error.message === 'Unauthorized') {
         if (!logged) {
-          const redirect = `/login?redirect=${base_url}`;
+          const redirect = `/login?redirect=${target}`;
           history.navigate(redirect);
         } else dispatch(backoffice_not_authorized(history));
       } else {

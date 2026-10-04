@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router';
 import LoginWidget from './LoginWidget';
 import AppContext from '../../AppContext';
+import { getBackofficeBaseUrl } from '../utils';
 import { Flex } from '@mantine/core';
 
 function PageLogin(props) {
@@ -16,6 +17,9 @@ function PageLogin(props) {
 
   const { search } = location;
   const foundRedirect = /redirect=(.*)/i.exec(search);
+  const baseUrl = getBackofficeBaseUrl();
+  let redirect = foundRedirect ? decodeURIComponent(foundRedirect[1]) : null;
+  if (redirect && (redirect + '/').startsWith(baseUrl)) redirect = '/' + redirect.slice(baseUrl.length);
 
   const { core } = useContext(AppContext);
 
@@ -33,7 +37,7 @@ function PageLogin(props) {
         
         <LoginWidget
           history={history}
-          redirect={foundRedirect ? foundRedirect[1] : null }
+          redirect={redirect}
         />
 
       </div>
