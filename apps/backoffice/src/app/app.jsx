@@ -17,6 +17,7 @@ import RGPD from './core/components/RGPD';
 import Routes from './core/containers/Routes';
 import LoadingScreen from './core/components/LoadingScreen'
 import { getBackofficeBaseUrl } from './core/utils';
+import { loadComponentModule } from './componentModules';
 
 import './core/components/index.css';
 
@@ -51,26 +52,13 @@ const App = () => {
       }
       
       const routes = (config?.customComponents || []).map(async (item) => {
-        let mod = null;
         try {
-          mod = await import(`./components/${item}/src/Manager.jsx`);
-        } catch (e1) {
-          try {
-            mod = await import(`./components/${item}/src/Manager.tsx`);
-          } catch (e2) {
-            try {
-              mod = await import(`./components/${item}/src/Main.jsx`);
-            } catch (e3) {
-              try {
-                mod = await import(`./components/${item}/src/Main.tsx`);
-              } catch (e4) {
-                console.error(e4);
-                return null;
-              }
-            }
-          }
+          const mod = await loadComponentModule(item);
+          return mod ? _getRoutesInfo(mod) : null;
+        } catch (e) {
+          console.error(e);
+          return null;
         }
-        return _getRoutesInfo(mod);
       });
 
       return Promise.all(routes).then((result) => {

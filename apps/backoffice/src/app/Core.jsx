@@ -4,6 +4,7 @@ import { thunk } from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
 import * as actions from './core/actions'
 import * as utils from './core/utils'
+import { loadComponentModule } from './componentModules'
 
 
 import { initTranslations } from './core/i18n';
@@ -74,23 +75,12 @@ Core.prototype.setConfig = function(config) {
 
 // Add components
 Core.prototype.addComponent = function(core, component, done) {
-  (async () => {
-    let c = null;
-    try {
-      c = await import(`./components/${component.type}/src/Manager.jsx`);
-    } catch (e1) {
-      try {
-        c = await import(`./components/${component.type}/src/Manager.tsx`);
-      } catch (e2) {
-        try {
-          c = await import(`./components/${component.type}/src/Main.jsx`);
-        } catch (e3) {
-          c = await import(`./components/${component.type}/src/Main.tsx`);
-        }
-      }
+  loadComponentModule(component.type).then(c => {
+    if (!c) {
+      done();
+      return;
     }
-    return c;
-  })().then(c => {  
+
     // Basic Decorator Pattern: decorates core with additional functionality
     if (c.decorators && typeof c.decorators === 'object') {
       core.actions = extend(core.actions, omit(c.decorators, this.__secureProps ));
