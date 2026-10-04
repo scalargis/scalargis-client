@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Group, Menu, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { CollapsiblePanel, Dialog, useIsMobile, useOptionalTour, IconQuestionCircle } from '@scalargis/ui';
+import { CollapsiblePanel, Dialog, useIsMobile, useOptionalTour, IconQuestionCircle, stepInFlow } from '@scalargis/ui';
 
 import { i18n as i18nUtils, MainMenuButton } from '../../components';
 
@@ -14,12 +14,14 @@ import './style.css';
  *
  * Strict opt-in: the viewer turns the tour on with
  * `config_json.onboarding.enabled = true`. The item also needs a live
- * <TourProvider> above (tour is not null) and at least one membership step.
- * A viewer with the flag off, or with no matching steps, shows only the manual.
+ * <TourProvider> above (tour is not null) and at least one step in the
+ * `viewer` flow (`stepInFlow`). A step of a scoped flow only, such as a
+ * component panel tour, does not count. A viewer with the flag off, or with no
+ * `viewer` steps, shows only the manual.
  */
 function isTourEnabled(viewer, tour) {
-  if (!tour) return false; // no provider above (embedded shell)
-  if (!tour.steps || tour.steps.length === 0) return false; // nothing to walk
+  if (!tour) return false;
+  if (!tour.steps || !tour.steps.some(s => stepInFlow(s, 'viewer'))) return false;
   return viewer?.config_json?.onboarding?.enabled === true;
 }
 
@@ -242,7 +244,16 @@ export default function Main({ type, as, config, actions, record }) {
     return (
       <React.Fragment>
         <HelpMenu
-          trigger={
+          trigger={openAs === 'external' ?
+            <UnstyledButton
+              title={title}
+              className={component_cfg?.elementType === 'link' ? "sg-help-button-link" : "sg-help-button-external"}
+              style={{ color: 'var(--mantine-color-white)' }}
+            >
+              { component_cfg?.elementType !== 'link' &&
+                <span className="layout-topbar-item-text">{title}</span> }
+              <IconQuestionCircle className="layout-topbar-icon" />
+            </UnstyledButton> :
             <UnstyledButton title={title}>
               <span className="layout-topbar-item-text"></span>
               <IconQuestionCircle className="layout-topbar-icon" />

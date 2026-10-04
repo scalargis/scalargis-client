@@ -15,7 +15,8 @@
  * interactive) left the anchor matching no rule at all: the label showed, glued to
  * the icon and to the border. Same chrome, restated for the anchor.
  */
-.layout-topbar .layout-topbar-icons a.sg-help-button-external {
+.layout-topbar .layout-topbar-icons a.sg-help-button-external,
+.layout-topbar .layout-topbar-icons button.sg-help-button-external {
   position: relative;
   margin-left: 20px;
   display: inline-block;
@@ -24,7 +25,8 @@
   transition: color 0.2s;
 }
 
-.layout-topbar .layout-topbar-icons a.sg-help-button-external:hover {
+.layout-topbar .layout-topbar-icons a.sg-help-button-external:hover,
+.layout-topbar .layout-topbar-icons button.sg-help-button-external:hover {
   color: #c3e8fb;
 }
 
@@ -32,18 +34,21 @@
    _topbar.scss); the anchor variants must match, or the "?" towers over every
    sibling icon and breaks the right-hand corner. The reset only knows `button`,
    so restate 1em for the external anchor. */
-.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-icon {
+.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-icon,
+.layout-topbar .layout-topbar-icons button.sg-help-button-external .layout-topbar-icon {
   font-size: 1em;
 }
 
-.layout-topbar .layout-topbar-icons a.sg-help-button-link .layout-topbar-icon {
+.layout-topbar .layout-topbar-icons a.sg-help-button-link .layout-topbar-icon,
+.layout-topbar .layout-topbar-icons button.sg-help-button-link .layout-topbar-icon {
   font-size: 1rem !important;
 }
 
 /* The sass hid this label with display:none, which also takes it out of the
    accessibility tree and leaves the link named only by its title attribute.
    Clipping hides it on screen and keeps the name. */
-.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-item-text {
+.layout-topbar .layout-topbar-icons a.sg-help-button-external .layout-topbar-item-text,
+.layout-topbar .layout-topbar-icons button.sg-help-button-external .layout-topbar-item-text {
   position: absolute;
   width: 1px;
   height: 1px;
