@@ -48,7 +48,7 @@ export interface OnboardingCatalogEntry {
   kind?: 'button' | 'panel';
   /** Sort order within the flow. */
   order: number;
-  /** Flow membership. The viewer uses one flow: "viewer". */
+  /** Flow membership. A base step names one flow; the engine rule is stepInFlow. */
   flow: string;
   /** i18n key prefix. ".title" and ".content" hang off it. */
   i18n: string;

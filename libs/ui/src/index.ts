@@ -113,6 +113,8 @@ export {
   createController,
   TourContext,
   resetTourState,
+  setTourLastStep,
+  stepInFlow,
 } from './onboarding';
 export type {
   OnboardingStep,

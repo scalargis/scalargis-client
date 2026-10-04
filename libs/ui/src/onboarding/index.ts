@@ -17,9 +17,12 @@ export type {
   OnboardingLabels,
   PopoverPosition,
 } from './types';
-export { createController } from './controller';
+export { createController, stepInFlow } from './controller';
 export type { OnboardingController, ControllerListener } from './controller';
 // Clear the persisted progress for a viewer, keyed by flow. A launcher that
 // resets a scoped run on exit calls this, so it never reconstructs the storage
 // key by hand.
-export { resetState as resetTourState } from './persistence';
+export {
+  resetState as resetTourState,
+  setLastStepId as setTourLastStep,
+} from './persistence';

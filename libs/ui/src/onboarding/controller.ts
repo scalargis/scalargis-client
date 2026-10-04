@@ -37,6 +37,12 @@ import {
   setLastStepId,
 } from './persistence';
 
+/** Whether a step belongs to a flow. No flow means 'viewer'; an array must contain the flow. */
+export function stepInFlow(step: OnboardingStep, flow: string): boolean {
+  const own = step.flow ?? 'viewer';
+  return Array.isArray(own) ? own.includes(flow) : own === flow;
+}
+
 function byOrder(a: OnboardingStep, b: OnboardingStep): number {
   return (a.order ?? 100) - (b.order ?? 100);
 }
@@ -71,7 +77,8 @@ export interface OnboardingController {
    * Start or restart the tour. Awaits the first step's before hook.
    *
    * With `options.flow`, the run walks only the steps of that flow
-   * (`(s.flow ?? 'viewer') === flow`) and persists under a flow-keyed slot.
+   * (`stepInFlow(s, flow)`, so a step with a flow array joins each run it
+   * names) and persists under a flow-keyed slot.
    * Without it the run walks the whole list and persists under the plain key.
    * `options.reset` forces a restart from the first step.
    */
@@ -150,11 +157,10 @@ export function createController(
   let activeFlow: string | null = null;
 
   // Derive the run list for a flow. An unscoped run (flow null) uses the whole
-  // list. A scoped run keeps the steps whose flow matches, with the default
-  // 'viewer' for a step that names none.
+  // list. A scoped run keeps the steps in that flow (stepInFlow).
   function deriveRunList(flow: string | null): readonly OnboardingStep[] {
     if (flow == null) return allSteps;
-    return allSteps.filter((s) => (s.flow ?? 'viewer') === flow);
+    return allSteps.filter((s) => stepInFlow(s, flow));
   }
 
   if (options?.reset) {

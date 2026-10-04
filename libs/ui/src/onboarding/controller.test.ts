@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { createController } from './controller';
+import { createController, stepInFlow } from './controller';
 import type { OnboardingStep } from './types';
 
 /* Steps carry only id and order here; the controller does not read text. */
@@ -9,7 +9,11 @@ function step(id: string, order: number): OnboardingStep {
 }
 
 /* A step in a named flow, for the flow-scoped run tests. */
-function flowStep(id: string, order: number, flow: string): OnboardingStep {
+function flowStep(
+  id: string,
+  order: number,
+  flow: string | string[],
+): OnboardingStep {
   return { id, order, flow };
 }
 
@@ -253,5 +257,48 @@ describe('onboarding controller — flow-scoped run (P1)', () => {
     expect(ctrl.active).toBe(true);
     expect(ctrl.steps.map((s) => s.id)).toEqual(['a1', 'a2', 'a3']);
     expect(ctrl.steps[ctrl.currentIndex].id).toBe('a1');
+  });
+});
+
+describe('onboarding controller — multi-flow step', () => {
+  const shared = [
+    flowStep('a1', 10, 'a'),
+    flowStep('ab', 20, ['a', 'b']),
+    flowStep('b1', 30, 'b'),
+  ];
+
+  it('matches a flow by string, by array, and by the viewer default', () => {
+    expect(stepInFlow(step('x', 1), 'viewer')).toBe(true);
+    expect(stepInFlow(step('x', 1), 'a')).toBe(false);
+    expect(stepInFlow(flowStep('x', 1, 'a'), 'a')).toBe(true);
+    expect(stepInFlow(flowStep('x', 1, 'a'), 'viewer')).toBe(false);
+    expect(stepInFlow(flowStep('x', 1, ['a', 'b']), 'b')).toBe(true);
+    expect(stepInFlow(flowStep('x', 1, ['a', 'b']), 'viewer')).toBe(false);
+  });
+
+  it('shows a step with two flows in a run of each flow', async () => {
+    const runA = createController(VIEWER, shared);
+    await runA.start({ flow: 'a' });
+    expect(runA.steps.map((s) => s.id)).toEqual(['a1', 'ab']);
+    runA.end();
+
+    const runB = createController(VIEWER, shared);
+    await runB.start({ flow: 'b' });
+    expect(runB.steps.map((s) => s.id)).toEqual(['ab', 'b1']);
+  });
+
+  it('saves the step id of a shared step in the slot of the run flow', async () => {
+    const ctrl = createController(VIEWER, shared);
+    await ctrl.start({ flow: 'b' }); // on 'ab'
+    ctrl.pause();
+    const saved = localStorage.getItem(`sg:ob:viewer:${VIEWER}:b`);
+    expect(saved && JSON.parse(saved).lastStepId).toBe('ab');
+    expect(localStorage.getItem(`sg:ob:viewer:${VIEWER}:a`)).toBeNull();
+  });
+
+  it('keeps the viewer default for a step with no flow', async () => {
+    const ctrl = createController(VIEWER, [step('v', 10), ...shared]);
+    await ctrl.start({ flow: 'viewer' });
+    expect(ctrl.steps.map((s) => s.id)).toEqual(['v']);
   });
 });

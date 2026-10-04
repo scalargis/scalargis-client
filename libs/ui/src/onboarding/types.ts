@@ -34,8 +34,8 @@ export interface OnboardingStep {
   id: string;
   /** Sort order within the flow (lower = earlier). Default 100. */
   order?: number;
-  /** Flow membership. The viewer uses one flow: "viewer". */
-  flow?: string;
+  /** Flow membership. A step with an array belongs to each flow in it. */
+  flow?: string | string[];
   /** Step title shown in the popover card. */
   title?: ReactNode | (() => ReactNode);
   /** Step body shown in the popover card. */
