@@ -28,6 +28,19 @@ class HttpError extends Error {
 
 //export default HttpError;
 
+const inflight = new Map();
+
+/** GETs a url once for all callers that ask while it is in flight. Resolves to { status, json }. */
+export const fetchShared = (url, options = {}) => {
+    const key = url + '|' + (options.headers?.['X-API-KEY'] || '');
+    if (inflight.has(key)) return inflight.get(key);
+    const request = fetch(url, options)
+        .then(res => res.json().catch(() => null).then(json => ({ status: res.status, json })))
+        .finally(() => inflight.delete(key));
+    inflight.set(key, request);
+    return request;
+};
+
 export const createHeadersFromOptions = (options) => {
 
     const requestHeaders = (options.headers ||

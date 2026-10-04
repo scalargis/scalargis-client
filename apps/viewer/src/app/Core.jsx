@@ -7,6 +7,8 @@ import * as actions from './core/actions';
 import * as utils from './core/utils';
 import * as services from './core/service';
 import * as pubsub from './core/pubsub';
+import { importComponentModule } from './componentModules';
+import ErrorBoundary from './core/components/ErrorBoundary';
 
 import { initTranslations } from './core/i18n';
 import { TourTarget } from '@scalargis/ui';
@@ -97,6 +99,7 @@ export function createReducerManager(initialReducers) {
 
       // Remove it from the reducer mapping
       delete reducers[key]
+      delete reducers_list[key]
 
       // Add the key to the list of keys to clean up
       keysToRemove.push(key)
@@ -184,9 +187,14 @@ function Core(config, reducers) {
   this.__onboardingSteps = {};
 
   /**
+   * Hold the reducer keys the viewer components added
+   */
+  this.__reducerKeys = new Set();
+
+  /**
    * Secure app props
    */
-  this.__secureProps = ['config', 'actions', 'store', 'Renderer', '__components', '__widgets', '__mainmenu', '__onboardingSteps'];
+  this.__secureProps = ['config', 'actions', 'store', 'Renderer', '__components', '__widgets', '__mainmenu', '__onboardingSteps', '__reducerKeys'];
 }
 
 // Set core site config
@@ -204,132 +212,73 @@ Core.prototype.setConfig = function(config) {
   this.config = config;
 }
 
-// Add components
-Core.prototype.addComponent = function(core, component, done) {
+/** Adds the actions, reducers, translations and registries of one component module to core. */
+function registerComponentModule(core, type, c) {
 
-  const components = { ...local_components, ...core_components};
-  
-  if (components[component.type]) {
+  // Add component actions
+  if (c.actions && typeof c.actions === 'object') {
+    core.actions = {
+      ...core.actions,
+      ...c.actions
+    };
+  }
 
-    //Add local and core components
-    const c = components[component.type];
+  // Add component reducers
+  if (c.reducers && typeof c.reducers === 'object') {
+    Object.entries(c.reducers).forEach(function([key, reducer]) {
+      core.store.reducerManager.add(key, reducer);
+      core.__reducerKeys.add(key);
+    });
+  }
 
-    // Add component actions
-    if (c.actions && typeof c.actions === 'object') {
-      try {
-        core.actions = {
-          ...core.actions,
-          ...c.actions
-        };
-      } catch (e) {
-        console.log(e);
-      }
-    }
+  // Load component translations
+  if (c.translations && typeof c.translations === 'object') {
+    c.translations.load && c.translations.load();
+  }
 
-    // Add component reducers
-    if (c.reducers && typeof c.reducers === 'object') {
-      Object.entries(c.reducers).forEach(function([key, reducer]) {
-        core.store.reducerManager.add(key, reducer);
-     });
-    }
+  // Registry Pattern: register react component in components registry
+  if (!!c.default && !core.__components[type]) {
+    core.__components[type] = c.default;
+  }
 
-    // Load component translations
-    if (c.translations && typeof c.translations === 'object') {
-      c.translations.load && c.translations.load();
-    }
+  // Main menu registry
+  if (!!c.MainMenu && !core.__mainmenu[type]) {
+    core.__mainmenu[type] = c.MainMenu;
+  }
 
-    // Registry Pattern: register react component in components registry
-    if (!!c.default && !this.__components[component.type]) {   
-      const ReactComponent = c.default;
-      this.__components[component.type] = ReactComponent;
-    }
+  // Widgets registry
+  if (!!c.widgets && !core.__widgets[type]) {
+    core.__widgets[type] = c?.widgets;
+  }
 
-    // Main menu registry
-    if (!!c.MainMenu && !this.__mainmenu[component.type]) {
-      const MainMenu = c.MainMenu;
-      this.__mainmenu[component.type] = MainMenu;
-    }
-
-    // Widgets registry
-    if (!!c.widgets && !this.__widgets[component.type]) {
-      this.__widgets[component.type] = c?.widgets;
-    }
-
-    // Self onboarding steps registry (Phase 5)
-    if (Array.isArray(c.onboardingSteps) && !this.__onboardingSteps[component.type]) {
-      this.__onboardingSteps[component.type] = c.onboardingSteps;
-    }
-
-    done();
-
-  } else {
-    // Add plugin components
-    (async () => {
-      let c = null;
-      try {
-        c = await import(`./components/${component.type}/src/Main.jsx`);
-      } catch (e1) {
-        c = await import(`./components/${component.type}/src/Main.tsx`);
-      }
-      return c;
-    })().then(c => {
-      // Add component actions
-      if (c.actions && typeof c.actions === 'object') {
-        try {
-          core.actions = {
-            ...core.actions,
-            ...c.actions
-          };
-        } catch (e) {
-          console.log(e);
-        }
-      }
-
-      // Add component reducers
-      if (c.reducers && typeof c.reducers === 'object') {
-          Object.entries(c.reducers).forEach(function([key, reducer]) {
-            core.store.reducerManager.add(key, reducer);
-        });
-      }
-
-      // Load component translations
-      if (c.translations && typeof c.translations === 'object') {
-        c.translations.load && c.translations.load();
-      }
-
-      // Registry Pattern: register react component in components registry 
-      if (!!c.default && !this.__components[component.type]) {
-        const ReactComponent = c.default;
-        this.__components[component.type] = ReactComponent;
-      }
-
-      // Main menu registry
-      if (!!c.MainMenu && !this.__mainmenu[component.type]) {
-        const MainMenu = c.MainMenu;
-        this.__mainmenu[component.type] = MainMenu;
-      }
-
-      // Widgets registry
-      if (!!c.widgets && !this.__widgets[component.type]) {
-        this.__widgets[component.type] = c?.widgets;
-      }
-
-      // Self onboarding steps registry (Phase 5)
-      if (Array.isArray(c.onboardingSteps) && !this.__onboardingSteps[component.type]) {
-        this.__onboardingSteps[component.type] = c.onboardingSteps;
-      }
-
-      done();
-    }).catch(err => {
-      console.log('Error loading module:', err);
-      done();
-    })
+  // Self onboarding steps registry (Phase 5)
+  if (Array.isArray(c.onboardingSteps) && !core.__onboardingSteps[type]) {
+    core.__onboardingSteps[type] = c.onboardingSteps;
   }
 }
 
+/** Loads one viewer component. The promise always resolves, after it calls done. */
+Core.prototype.addComponent = function(core, component, done) {
+
+  const components = { ...local_components, ...core_components};
+
+  const load = components[component.type]
+    ? Promise.resolve(components[component.type])
+    : importComponentModule(component.type);
+
+  return load
+    .then(c => registerComponentModule(core, component.type, c))
+    .catch(err => console.error(`Error loading component "${component.type}":`, err))
+    .finally(() => done && done());
+}
+
+/** Clears the components of the current viewer, with their reducers and actions. */
 Core.prototype.unloadComponents = function() {
   this.__components = {}
   this.__onboardingSteps = {}
+  this.__reducerKeys.forEach(key => this.store.reducerManager.remove(key));
+  this.__reducerKeys = new Set();
+  this.actions = actions;
 }
 
 /**
@@ -387,15 +336,17 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
 
           const stepId = mainmenuButtonStep(c.type);
           const buttonEl = (
-            <PluginComponent
-              className={className}
-              active={active}
-              record={c}
-              config={{ className, active, ...props, ...c.config_json }}
-              core={this}
-              actions={this.actions}
-              utils={utils}
-            />
+            <ErrorBoundary name={c.type}>
+              <PluginComponent
+                className={className}
+                active={active}
+                record={c}
+                config={{ className, active, ...props, ...c.config_json }}
+                core={this}
+                actions={this.actions}
+                utils={utils}
+              />
+            </ErrorBoundary>
           );
 
           return (
@@ -430,14 +381,16 @@ Core.prototype.renderComponentById = function({ id, as = '', props, }) {
   // Validate dynamic import is loaded
   if (!PluginComponent) return null;
   return (
-    <PluginComponent
-      record={c}
-      config={{ ...props, ...c.config_json }}
-      core={this}
-      actions={this.actions}
-      as={as}
-      utils={utils}
-    />
+    <ErrorBoundary name={c.type}>
+      <PluginComponent
+        record={c}
+        config={{ ...props, ...c.config_json }}
+        core={this}
+        actions={this.actions}
+        as={as}
+        utils={utils}
+      />
+    </ErrorBoundary>
   )
 }
 
@@ -472,15 +425,17 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
 
     const cell = (
       <div key={c.id} className={`${className} ${classNameType} ${classNameId}`} style={style ? style(c) : null }>
-        <PluginComponent
-          record={c}
-          config={{ ...props, ...c.config_json }}
-          core={this}
-          actions={this.actions}
-          region={region}
-          as={c.as || as}
-          utils={utils}
-        />
+        <ErrorBoundary name={c.type}>
+          <PluginComponent
+            record={c}
+            config={{ ...props, ...c.config_json }}
+            core={this}
+            actions={this.actions}
+            region={region}
+            as={c.as || as}
+            utils={utils}
+          />
+        </ErrorBoundary>
         { separator }
       </div>
     );
@@ -525,16 +480,18 @@ Core.prototype.renderComponentsMenu = function({ region, as = '', mobileMenu = [
 
     const cell = (
       <div key={c.id} className={className} style={style ? style(c) : null }>
-        <PluginComponent
-          type="menu"
-          record={c}
-          config={{ ...props, ...c.config_json }}
-          core={this}
-          actions={this.actions}
-          region={region}
-          as={c.as || as}
-          utils={utils}
-        />
+        <ErrorBoundary name={c.type}>
+          <PluginComponent
+            type="menu"
+            record={c}
+            config={{ ...props, ...c.config_json }}
+            core={this}
+            actions={this.actions}
+            region={region}
+            as={c.as || as}
+            utils={utils}
+          />
+        </ErrorBoundary>
         { separator }
       </div>
     );
@@ -568,16 +525,18 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
 
     const cell = (
       <div key={c.id} className={className} style={style ? style(c) : null }>
-        <PluginComponent
-          type="link"
-          region={region}
-          record={c}
-          config={{ ...props, ...c.config_json }}
-          core={this}
-          actions={this.actions}
-          as={as}
-          utils={utils}
-        />
+        <ErrorBoundary name={c.type}>
+          <PluginComponent
+            type="link"
+            region={region}
+            record={c}
+            config={{ ...props, ...c.config_json }}
+            core={this}
+            actions={this.actions}
+            as={as}
+            utils={utils}
+          />
+        </ErrorBoundary>
         { separator }
       </div>
     );

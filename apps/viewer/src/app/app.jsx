@@ -17,6 +17,7 @@ import RGPD from './core/components/RGPD';
 import Routes from './core/containers/Routes';
 import LoadingScreen from './core/components/LoadingScreen';
 import { getAppBaseUrl } from './core/utils';
+import { importComponentModule } from './componentModules';
 
 
 const App = () => {
@@ -39,24 +40,14 @@ const App = () => {
         return [];
       }
       
-      const _mods = (config?.customComponents || []).map(async (item) => {
-        let mod = null;
-        try {
-          mod = await import(`./components/${item}/src/Main.jsx`);
-        } catch (e1) {
-          try {
-            mod = await import(`./components/${item}/src/Main.tsx`);
-          } catch (e2) {
-            console.error(e2);
+      const _mods = (config?.customComponents || []).map(item =>
+        importComponentModule(item)
+          .then(mod => ({ type: item, module: mod }))
+          .catch(error => {
+            console.error(error);
             return null;
-          }
-        }
-
-        return {
-          type: item,
-          module: mod
-        };
-      });
+          })
+      );
 
       return Promise.all(_mods).then((result) => {
         return result.flat();

@@ -68,6 +68,15 @@ export default function FeatureInfo({ core, config, actions }) {
     const features = [];
     let ogcFound = 0;
 
+    let frame = null;
+    const publish = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        dispatch(actions.viewer_set_featureinfo(acc));
+      });
+    };
+
     // Display vector feature
     const displayFeature = (feature, l) => {
       if ((typeof feature === 'object')) {
@@ -129,8 +138,8 @@ export default function FeatureInfo({ core, config, actions }) {
     if (features.length) {
       features.forEach(fl => {
         acc.push(displayFeature(fl.feature, fl.layer));
-        dispatch(actions.viewer_set_featureinfo(acc));
       });
+      publish();
     }
 
     //Get info for VectorTile features
@@ -182,7 +191,7 @@ export default function FeatureInfo({ core, config, actions }) {
           features.forEach(feat => {
             acc.push(displayFeature(feat, item.layer));
           });
-          dispatch(actions.viewer_set_featureinfo(acc)); 
+          publish(); 
 
         })
         .catch(err => console.log(err));
@@ -217,7 +226,7 @@ export default function FeatureInfo({ core, config, actions }) {
           features.forEach(feat => {
             acc.push(displayFeature(feat, item.layer));
           });
-          dispatch(actions.viewer_set_featureinfo(acc));          
+          publish();          
         })
         .catch(err => console.log(err));
       }
@@ -244,7 +253,7 @@ export default function FeatureInfo({ core, config, actions }) {
         ogcFound++;
       });
     });
-    if (ogcFound) dispatch(actions.viewer_set_featureinfo(acc));
+    if (ogcFound) publish();
 
     // Find features from WMS layers strategy
     const viewResolution = (mainMap.getView().getResolution());
@@ -291,7 +300,7 @@ export default function FeatureInfo({ core, config, actions }) {
             features.forEach(feat => {
               acc.push(displayFeature(feat, l));
             });
-            dispatch(actions.viewer_set_featureinfo(acc)); 
+            publish(); 
 
           })
           .catch(err => console.log(err));
@@ -324,7 +333,7 @@ export default function FeatureInfo({ core, config, actions }) {
             features.forEach(feat => {
               acc.push(displayFeature(feat, l));
             });
-            dispatch(actions.viewer_set_featureinfo(acc));          
+            publish();          
           })
           .catch(err => console.log(err));
         }
@@ -345,7 +354,7 @@ export default function FeatureInfo({ core, config, actions }) {
           } else {
            acc.push({id: uuidV4(), type: 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
           }
-          dispatch(actions.viewer_set_featureinfo(acc));
+          publish();
         });
       }
     });
@@ -386,7 +395,7 @@ export default function FeatureInfo({ core, config, actions }) {
           features.forEach(feat => {
             acc.push(displayFeature(feat, l));
           });
-          dispatch(actions.viewer_set_featureinfo(acc));          
+          publish();          
         })
         .catch(err => console.log(err));
       // Get features using any other strategy
@@ -406,7 +415,7 @@ export default function FeatureInfo({ core, config, actions }) {
           } else {
            acc.push({id: uuidV4(), type: 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
           }
-          dispatch(actions.viewer_set_featureinfo(acc));
+          publish();
         });
       }
     });    

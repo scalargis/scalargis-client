@@ -2,8 +2,9 @@ import { useContext, useEffect, useRef } from "react";
 import OLTileLayer from "ol/layer/Tile";
 import AppContext from "../../../AppContext";
 import { getResolutionForScale } from '../../model/MapModel';
+import { createTileSource } from "./tileSource";
 
-const TileLayer = ({ config, source, group, checked }) => {
+const TileLayer = ({ config, group, checked }) => {
 
   const { mainMap } = useContext(AppContext);
   const layer = useRef();
@@ -11,7 +12,8 @@ const TileLayer = ({ config, source, group, checked }) => {
   useEffect(() => {
     if (!mainMap) return;
 
-    if (config.attributions) {
+    const source = createTileSource(config);
+    if (source && config.attributions) {
       source.setAttributions(config.attributions);
     }
 

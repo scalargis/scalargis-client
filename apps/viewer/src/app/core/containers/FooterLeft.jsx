@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import AppContext from '../../AppContext'
 import FooterLeftComponent from '../components/FooterLeft'
-import { mapStateToProps } from '../utils'
 
 function FooterLeft(props) {
 
@@ -20,11 +19,4 @@ function FooterLeft(props) {
   )
 }
 
-export default connect(state => {
-  const gstate = mapStateToProps(state);
-  return ({
-    viewer: gstate.viewer,
-    components: gstate.components,
-    auth: gstate.auth
-  });
-})(FooterLeft);
+export default connect(state => ({ viewer: state.root.viewer }))(FooterLeft);

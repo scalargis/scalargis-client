@@ -13,6 +13,19 @@ const proxyUrl = hostDev + baseUrl;
 
 const sourcemap = process.env.SOURCEMAP === 'true' ? true : false;
 
+const vendorChunks: [string, RegExp][] = [
+  ['vendor-ol', /\/node_modules\/(ol|ol-mapbox-style|rbush|quickselect|earcut|pbf)\//],
+  ['vendor-react', /\/node_modules\/(react|react-dom|scheduler|react-router|react-redux|redux|redux-thunk|use-sync-external-store)\//],
+  ['vendor-mantine', /\/node_modules\/@mantine\//],
+  ['vendor-jsts', /\/node_modules\/jsts\//],
+];
+
+/** Puts the big libraries in their own chunks, so an app change keeps them cached. */
+function manualChunks(id: string) {
+  const hit = vendorChunks.find(([, re]) => re.test(id));
+  return hit ? hit[0] : undefined;
+}
+
 // Load user proxy config
 function loadUserProxyConfig() {
   const userConfigPath = path.resolve(__dirname, 'user.proxy.config.json');
@@ -109,16 +122,18 @@ export default defineConfig(() => {
       host: 'localhost',
     },
     plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
-    // Uncomment this if you are using workers.
-    // worker: {
-    //  plugins: [ nxViteTsPaths() ],
-    // },
+    worker: {
+      format: 'es',
+    },
     build: {
       outDir: '../../dist/apps/viewer',
       emptyOutDir: true,
       reportCompressedSize: true,
       commonjsOptions: {
         transformMixedEsModules: true,
+      },
+      rollupOptions: {
+        output: { manualChunks },
       },
       sourcemap: sourcemap
     },

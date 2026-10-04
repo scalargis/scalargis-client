@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import AppContext from '../../AppContext'
 import MainMenuComponent from '../components/MainMenu'
-import { mapStateToProps } from '../utils'
 
 function MainMenu(props) {
 
@@ -36,11 +35,8 @@ function MainMenu(props) {
   )
 }
 
-export default connect(state => {
-  const gstate = mapStateToProps(state);
-  return ({
-    viewer: gstate.viewer,
-    components: gstate.components,
-    auth: gstate.auth
-  });
-})(MainMenu);
+export default connect(state => ({
+  viewer: state.root.viewer,
+  components: state.root.components,
+  auth: state.root.auth
+}))(MainMenu);

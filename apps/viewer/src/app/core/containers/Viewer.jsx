@@ -22,7 +22,6 @@ import MapControlsBottomCenter from './MapControlsBottomCenter'
 import MapControlsBottomRight from './MapControlsBottomRight'
 import OlControls from '../map_control'
 import DialogWindows from './DialogWindows'
-import { mapStateToProps } from '../utils'
 import {PageView, initGA} from '../components/Tracking'
 
 /**
@@ -64,7 +63,7 @@ function Viewer(props) {
   // Enable redux actions
   const dispatch = useDispatch();
   const { core, mainMap } = useContext(AppContext);
-  const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu, viewer_update_mapcontrol } = core.actions;
+  const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu, viewer_update_mapcontrols } = core.actions;
 
   const gaTrackingId = import.meta.env.VITE_APP_GA_TRACKING_ID;
   
@@ -110,13 +109,10 @@ function Viewer(props) {
 
   useEffect(() => {
     if (!viewer.config_json) return;
-    viewer.config_json.map_controls.filter(c => c.exclusive).forEach(control => {
-      if (control.id === exclusive_mapcontrol) {
-        dispatch(viewer_update_mapcontrol({ ...control, active: true }));
-      } else {
-        dispatch(viewer_update_mapcontrol({ ...control, active: false }));
-      }
-    });
+    const changed = viewer.config_json.map_controls
+      .filter(c => c.exclusive && !!c.active !== (c.id === exclusive_mapcontrol))
+      .map(c => ({ ...c, active: c.id === exclusive_mapcontrol }));
+    if (changed.length) dispatch(viewer_update_mapcontrols(changed));
   }, [exclusive_mapcontrol]);
 
   // Base onboarding tour for the open viewer: membership from
@@ -213,7 +209,8 @@ function Viewer(props) {
     : content;
 }
 
-export default connect(state => {
-  const gstate = mapStateToProps(state);
-  return ({ viewer: gstate.viewer, auth: gstate.auth, notifications: gstate.notifications });
-})(Viewer);
+export default connect(state => ({
+  viewer: state.root.viewer,
+  auth: state.root.auth,
+  notifications: state.root.notifications
+}))(Viewer);

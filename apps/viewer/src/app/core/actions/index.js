@@ -4,7 +4,7 @@ import { i18n as i18nUtils } from "@scalargis/components";
 import { loadTranslations } from "../i18n";
 import { isUrlAppOrigin, getAppApiUrl, isUrlAppHostname, getAppMapProxyUrl, getCookieAuthName } from "../utils";
 import { isThemeOnScale as isThemeOnScaleMapModel, transformExtent } from "../model/MapModel";
-import { fetchJson } from "../service/fetch";
+import { fetchJson, fetchShared } from "../service/fetch";
 
 
 export const SITE_LOAD                  = 'SITE_LOAD'
@@ -60,6 +60,7 @@ export const VIEWER_ADD_THEMES          = 'VIEWER_ADD_THEMES'
 export const VIEWER_REMOVE_THEMES       = 'VIEWER_REMOVE_THEMES'
 export const VIEWER_SET_CONFIGJSON      = 'VIEWER_SET_CONFIGJSON'
 export const VIEWER_UPDATE_MAPCONTROL   = 'VIEWER_UPDATE_MAPCONTROL'
+export const VIEWER_UPDATE_MAPCONTROLS  = 'VIEWER_UPDATE_MAPCONTROLS'
 export const VIEWER_SET_EXCUSIVE_MAPCONTROL = 'VIEWER_SET_EXCUSIVE_MAPCONTROL'
 
 export const LAYOUT_WRAPPER_CLICK       = 'LAYOUT_WRAPPER_CLICK'
@@ -92,13 +93,11 @@ export function site_load(core, callback) {
     const url = API_URL + '/app/site/config';
 
     try {
-      await fetch(url, {
+      await fetchShared(url, {
           signal: AbortSignal.timeout(10000)
         })
-        .then(resp => { 
-            return resp.json();
-        })
-        .then(data => {
+        .then(({ json: data }) => {
+          if (!data) throw new Error('Site config is not JSON');
           core.setSiteConfig(data);
           callback && callback(data);
         })
@@ -677,13 +676,13 @@ export function viewer_load(core, id, history) {
     if (logged?.token) options.headers['X-API-KEY'] = logged.token;
     
     // Make request
-    fetch(url, options).then(res => {
+    fetchShared(url, options).then(res => {
 
       // Validate response
       if (res.status === 401) throw new Error('Unauthorized');
       else if (res.status !== 200) throw new Error('Not found');
-      return res.json();
-      
+      return structuredClone(res.json);
+
     }).then(config => {
       
       // Validate config
@@ -719,23 +718,16 @@ export function viewer_load(core, id, history) {
       });
 
       // Load components
-      let count = 0;
       const { components } = config.config_json;
-      components.forEach(component => {
-        core.addComponent(core, component, () => {
-          count++;
-          if (count === components.length) {
+      Promise.allSettled(components.map(component => core.addComponent(core, component))).then(() => {
 
-            // Index by id
-            const pitems = {};
-            components.forEach(c => pitems[c.id] = c);
+        // Index by id
+        const pitems = {};
+        components.forEach(c => pitems[c.id] = c);
 
-            // Finally, load into redux store
-            dispatch(viewer_load_components(pitems));
-            // Give time to create viewer and load componentes and layers 
-            setTimeout(() => dispatch(viewer_load_done()), 500);
-          }
-        })
+        // Finally, load into redux store
+        dispatch(viewer_load_components(pitems));
+        window.requestAnimationFrame(() => dispatch(viewer_load_done()));
       });
     }).catch(error => {
       // Redirect to login or error pages
@@ -887,6 +879,15 @@ export function viewer_update_mapcontrol(control) {
   const action = {
     type: VIEWER_UPDATE_MAPCONTROL,
     control
+  }
+  return action;
+}
+
+/** Replaces several map controls by id in one store update. */
+export function viewer_update_mapcontrols(controls) {
+  const action = {
+    type: VIEWER_UPDATE_MAPCONTROLS,
+    controls
   }
   return action;
 }

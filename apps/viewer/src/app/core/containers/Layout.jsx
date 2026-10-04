@@ -2,11 +2,11 @@ import React, { useRef, useEffect, useState } from 'react'
 import { connect } from 'react-redux';
 import ThemeSelector from '../components/ThemeSelector'
 import LayoutComponent from '../components/Layout'
-import { mapStateToProps, isDesktop } from '../utils'
+import { isDesktop } from '../utils'
 
 function Layout(props) {
 
-  const { core, history, config, viewer, mainOlMap, layout_toggle_menu, layout_wrapper_click } = props;
+  const { core, history, config, viewer, layout_toggle_menu, layout_wrapper_click } = props;
 
   const { utils } = core;
 
@@ -116,10 +116,7 @@ function Layout(props) {
   useEffect(() => {
       if (viewer.mobileMenuActive) addClass(document.body, 'body-overflow-hidden');
       else removeClass(document.body, 'body-overflow-hidden');
-      setTimeout(() => {
-        if (mainOlMap) mainOlMap.updateSize(); // TODO: improve first map render check
-      }, 210);
-  }, [viewer]);
+  }, [viewer.mobileMenuActive]);
 
   return (
     <ThemeSelector theme={activeTheme}>
@@ -134,7 +131,8 @@ function Layout(props) {
   )
 }
 
-export default connect(state => {
-  const gstate = mapStateToProps(state);
-  return ({ config: gstate.config, viewer: gstate.viewer, auth: gstate.auth })
-})(Layout);
+export default connect(state => ({
+  config: state.root.config,
+  viewer: state.root.viewer,
+  auth: state.root.auth
+}))(Layout);

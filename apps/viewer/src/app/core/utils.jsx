@@ -37,12 +37,6 @@ const _getAppDefaultLocale = () => {
   }
 }
 
-export const mapStateToProps = state => {
-  if (!state) return;
-  const props = Object.entries(state).map(([k,v])=>v);
-  return Object.assign(...props);
-};
-
 export function rememberUrl(cookies, type, url) {
   const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'scalargis_';
   const cookieName = prefix + type;

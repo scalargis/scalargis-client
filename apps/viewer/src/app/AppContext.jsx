@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map, View } from 'ol';
+import { Map } from 'ol';
 import OlCollection from 'ol/Collection';
 import Core from './Core';
 import rootReducer from './core/reducers';
@@ -35,11 +35,7 @@ export const core = new Core({
 
 const options = {
   controls: new OlCollection(),
-  interactions: new OlCollection(),
-  view: new View({
-    center: [-878528, 4465088],
-    zoom: 12
-  })
+  interactions: new OlCollection()
 };
 export const mainMap = new Map(options);
 

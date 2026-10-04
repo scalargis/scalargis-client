@@ -1,19 +1,26 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
+import { useTranslation } from 'react-i18next'
 import Viewer from './Viewer'
 import ViewerEmbedded from './ViewerEmbedded'
 import { Routes as ReactRoutes, Route, Navigate, useLocation } from 'react-router'
-import HomePage from '../components/HomePage'
-import Page404 from '../components/Page404'
-import Page401 from '../components/Page401'
-import PageLogin from './PageLogin'
-import PageRegistrationConfirmation from './PageRegistrationConfirmation'
-import PagePassword from './PagePassword'
+import LoadingScreen from '../components/LoadingScreen'
+import ErrorBoundary from '../components/ErrorBoundary'
+
+const Page404 = lazy(() => import('../components/Page404'))
+const Page401 = lazy(() => import('../components/Page401'))
+const PageLogin = lazy(() => import('./PageLogin'))
+const PageRegistrationConfirmation = lazy(() => import('./PageRegistrationConfirmation'))
+const PagePassword = lazy(() => import('./PagePassword'))
 
 const Routes = ({core, pages}) => {
 
     const location = useLocation();
+    const { t } = useTranslation();
+
+    const pageError = <div role="alert" style={{ padding: '2rem' }}>{t('pageRenderError', 'Não foi possível mostrar esta página.')}</div>;
 
     return (
+        <Suspense fallback={<LoadingScreen />}>
         <ReactRoutes>
             <Route path="/login" element={<PageLogin core={core} />} />
             <Route path="/registration" element={<PageRegistrationConfirmation core={core} />} />
@@ -34,7 +41,11 @@ const Routes = ({core, pages}) => {
             {pages.map((p, i) => {
                 const CustomPage = p.children;
                 return (
-                    <Route key={i} path={p.path} element={<CustomPage core={core} />} />
+                    <Route key={i} path={p.path} element={
+                        <ErrorBoundary name={p.path} fallback={pageError}>
+                            <CustomPage core={core} />
+                        </ErrorBoundary>
+                    } />
                 )
             })}
 
@@ -46,6 +57,7 @@ const Routes = ({core, pages}) => {
             />
 
         </ReactRoutes>
+        </Suspense>
     )
 }
 

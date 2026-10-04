@@ -6,6 +6,8 @@ export const loadTranslations = (ns, resources, deep=true, overwrite=true) => {
   });
 }
 
+const inflightTranslations = new Map();
+
 export const loadBackendTranslations = (url, deep=true, overwrite=true, callback=undefined) => { 
   const options = {
     headers: {
@@ -14,8 +16,13 @@ export const loadBackendTranslations = (url, deep=true, overwrite=true, callback
     method: 'GET'
   }    
 
-  fetch(url, options)
-    .then(res => res.json())
+  if (!inflightTranslations.has(url)) {
+    inflightTranslations.set(url, fetch(url, options)
+      .then(res => res.json())
+      .finally(() => inflightTranslations.delete(url)));
+  }
+
+  inflightTranslations.get(url)
     .then(res => {
       Object.keys(res).forEach(ns => {
         Object.entries(res[ns]).forEach(([lang, translations]) => {

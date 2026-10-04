@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import AppContext from '../../AppContext'
 import MapControlsLeftComponent from '../components/MapControlsLeft'
-import { mapStateToProps } from '../utils'
 
 function MapControlsLeft(props) {
 
@@ -22,11 +21,4 @@ function MapControlsLeft(props) {
   )
 }
 
-export default connect(state => {
-  const gstate = mapStateToProps(state);
-  return ({
-    viewer: gstate.viewer,
-    components: gstate.components,
-    auth: gstate.auth
-  });
-})(MapControlsLeft);
+export default connect(state => ({ viewer: state.root.viewer }))(MapControlsLeft);

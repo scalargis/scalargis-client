@@ -8,6 +8,7 @@ import OlStyleFill from "ol/style/Fill";
 import OlStyleCircle from "ol/style/Circle";
 import AppContext from "../../../AppContext";
 import { isUrlAppOrigin } from '../../utils';
+import { readGeoJSONInWorker } from './geojsonWorkerClient';
 
 const GeoJSONLayer = ({ config, group, checked }) => {
 
@@ -64,9 +65,10 @@ const GeoJSONLayer = ({ config, group, checked }) => {
         };
         // TODO: check loading
         //checkLoading('start');
-        fetch(url).then(res => res.text()).then(res => {
-          let features = [];
-          features = format.readFeatures(res);
+        const read = config.parse_in_worker
+          ? readGeoJSONInWorker(url, formatOptions.dataProjection, formatOptions.featureProjection)
+          : fetch(url).then(res => res.text()).then(res => format.readFeatures(res));
+        read.then(features => {
           features.forEach(f => f.ollayer = layer.current);
           layer.current.getSource().addFeatures(features);
           //checkLoading('end');

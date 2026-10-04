@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { View } from 'ol'
 import 'ol/ol.css'
 import './mainmap.css'
@@ -6,13 +6,46 @@ import { connect } from 'react-redux'
 import  { addProjections, transformExtent } from '../model/MapModel'
 
 
+/** Returns the View options for the zoom and extent limits of a viewer, or null if it has none. */
+function getViewConstraints(config_json, auth) {
+  const { constrained_extent, min_zoom, max_zoom, max_resolution, min_resolution,
+    min_zoom_authenticated, max_zoom_authenticated, max_resolution_authenticated, min_resolution_authenticated,
+  } = config_json;
+  if (!constrained_extent && !min_zoom && !max_zoom && !max_resolution && !min_resolution &&
+    !min_zoom_authenticated && !max_zoom_authenticated && !max_resolution_authenticated && !min_resolution_authenticated) return null;
+
+  const viewOptions = {};
+  if (constrained_extent) viewOptions['extent'] = constrained_extent;
+  if (min_zoom) viewOptions['minZoom'] = min_zoom;
+  if (max_zoom) viewOptions['maxZoom'] = max_zoom;
+  if (max_resolution) viewOptions['maxResolution'] = max_resolution;
+  if (min_resolution) viewOptions['minResolution'] = min_resolution;
+
+  if (auth && auth.data && auth.data.authenticated) {
+    if (min_zoom_authenticated) viewOptions['minZoom'] = min_zoom_authenticated;
+    if (max_zoom_authenticated) viewOptions['maxZoom'] = max_zoom_authenticated;
+    if (max_resolution_authenticated) viewOptions['maxResolution'] = max_resolution_authenticated;
+    if (min_resolution_authenticated) viewOptions['minResolution'] = min_resolution_authenticated;
+  }
+  return viewOptions;
+}
+
 function MainMap(props) {
   const { olMap, config, viewer, mainMapEl, core, dispatch, auth } = props;
+
+  const appliedConstraints = useRef(null);
+  const lastMapMove = useRef({});
 
   useEffect(() => {
     if (!config) return;
     if (olMap && mainMapEl.current) olMap.setTarget(mainMapEl.current);
     const { center, extent } = config.config_json;
+
+    const constraints = getViewConstraints(config.config_json, auth);
+    const previous = appliedConstraints.current;
+    appliedConstraints.current = JSON.stringify(constraints);
+    if (constraints || (previous && previous !== 'null')) olMap.setView(new View(constraints || {}));
+
     const resolution = olMap.getView().getResolutionForExtent(extent);
     olMap.getView().setCenter(center);
     olMap.getView().setResolution(resolution);
@@ -21,6 +54,7 @@ function MainMap(props) {
     function onMoveEnd() {
       const center = olMap.getView().getCenter();
       const extent = olMap.getView().calculateExtent();
+      lastMapMove.current = { center, extent };
       dispatch(core.actions.map_set_extent(center, extent));
     }
     olMap.on('moveend', onMoveEnd);
@@ -42,6 +76,7 @@ function MainMap(props) {
   const { center, extent } = viewer.config_json;
   useEffect(() => {
     if (!olMap) return;
+    if (center === lastMapMove.current.center && extent === lastMapMove.current.extent) return;
 
     // Apply programatic center and extent
     if (extent) {
@@ -57,38 +92,24 @@ function MainMap(props) {
   } = viewer.config_json;
   useEffect(() => {
     if (!olMap) return;
-    if (!constrained_extent && !min_zoom && !max_zoom && !max_resolution && !min_resolution &&
-      !min_zoom_authenticated && !max_zoom_authenticated && !max_resolution_authenticated && !min_resolution_authenticated) return;
-
-    const viewOptions = {
-      center: olMap.getView().getCenter(),
-      zoom: olMap.getView().getZoom()
-    }
-
-    if (constrained_extent) viewOptions['extent'] = constrained_extent;
-    if (min_zoom) viewOptions['minZoom'] = min_zoom;
-    if (max_zoom) viewOptions['maxZoom'] = max_zoom;
-    if (max_resolution) viewOptions['maxResolution'] = max_resolution;
-    if (min_resolution) viewOptions['minResolution'] = min_resolution;
-
-    if (auth && auth.data && auth.data.authenticated) {
-      if (min_zoom_authenticated) viewOptions['minZoom'] = min_zoom_authenticated;
-      if (max_zoom_authenticated) viewOptions['maxZoom'] = max_zoom_authenticated;
-      if (max_resolution_authenticated) viewOptions['maxResolution'] = max_resolution_authenticated;
-      if (min_resolution_authenticated) viewOptions['minResolution'] = min_resolution_authenticated;      
-    }
+    const constraints = getViewConstraints(viewer.config_json, auth);
+    const key = JSON.stringify(constraints);
+    if (!constraints || key === appliedConstraints.current) return;
+    appliedConstraints.current = key;
 
     // Recreate view with constrained extent and min and max zoom
-    olMap.setView(new View(viewOptions));    
+    olMap.setView(new View({
+      ...constraints,
+      center: olMap.getView().getCenter(),
+      zoom: olMap.getView().getZoom()
+    }));
   }, [constrained_extent, min_zoom, max_zoom, max_resolution, min_resolution, min_zoom_authenticated, max_zoom_authenticated, max_resolution_authenticated, min_resolution_authenticated]);
 
 
-  // OpenLayers reads the container size once and caches it, and the only
-  // updateSize() call in the app hangs off a redux `viewer` change (see
-  // containers/Layout.jsx). Anything else that resizes the map box - a scrollbar
-  // appearing, the topbar reflowing, a themed chrome change - left the canvas at
-  // its old width, painting the container's background beside the map. Watch the
-  // box itself instead. The frame coalesces bursts and keeps the observer from
+  // OpenLayers reads the container size once and caches it. Anything that
+  // resizes the map box - a scrollbar appearing, the topbar reflowing, a menu
+  // toggle, a themed chrome change - left the canvas at its old width, painting
+  // the container's background beside the map. Watch the box itself instead. The frame coalesces bursts and keeps the observer from
   // re-entering; updateSize only touches the canvas, never the observed box, so
   // this cannot feed itself.
   useEffect(() => {

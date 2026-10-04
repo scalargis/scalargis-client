@@ -39,6 +39,7 @@ import {
   VIEWER_SET_FEATUREINFO,
   VIEWER_SET_GEOLOCATION,
   VIEWER_UPDATE_MAPCONTROL,
+  VIEWER_UPDATE_MAPCONTROLS,
   VIEWER_SAVE_HTTP_LOADING,
   VIEWER_SAVE_HTTP_ERROR,
   VIEWER_SAVE_RESPONSE,
@@ -607,10 +608,12 @@ const root = (
       }());
 
     // Update map control
-    case VIEWER_UPDATE_MAPCONTROL: {
-      const { map_controls } = state.viewer.config_json;
-      const mindex = map_controls.findIndex(i => i.id === action.control.id);
-      map_controls.splice(mindex, 1, action.control);
+    case VIEWER_UPDATE_MAPCONTROL:
+    case VIEWER_UPDATE_MAPCONTROLS: {
+      const updates = action.controls || [action.control];
+      const byId = {};
+      updates.forEach(c => byId[c.id] = c);
+      const map_controls = state.viewer.config_json.map_controls.map(c => byId[c.id] || c);
       return {
         ...state,
         viewer: {

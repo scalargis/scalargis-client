@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import AppContext from '../../AppContext'
 import MapControlsTopRightComponent from '../components/MapControlsTopRight'
-import { mapStateToProps } from '../utils'
 
 function MapControlsTopRight(props) {
 
@@ -20,11 +19,4 @@ function MapControlsTopRight(props) {
   )
 }
 
-export default connect(state => {
-  const gstate = mapStateToProps(state);
-  return ({
-    viewer: gstate.viewer,
-    components: gstate.components,
-    auth: gstate.auth
-  });
-})(MapControlsTopRight);
+export default connect(state => ({ viewer: state.root.viewer }))(MapControlsTopRight);
