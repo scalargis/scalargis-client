@@ -21,6 +21,7 @@ import { selectBaseTourSteps, enabledComponentTypes } from './membership';
 import type { ConditionContext } from './conditions';
 import { attachRevealHooks, attachPanelRevealForType } from './hooks';
 import type { RevealHooksContext } from './hooks';
+import { applyTourSections, tourSections } from './sections';
 
 function byOrder(a: OnboardingStep, b: OnboardingStep): number {
   return (a.order ?? 100) - (b.order ?? 100);
@@ -29,7 +30,7 @@ function byOrder(a: OnboardingStep, b: OnboardingStep): number {
 interface ViewerLike {
   id?: string | number | null;
   is_owner?: boolean | null;
-  config_json?: { components?: unknown } | null;
+  config_json?: { components?: unknown; onboarding?: unknown } | null;
 }
 
 type AuthLike = ConditionContext['auth'];
@@ -68,6 +69,8 @@ export function useOnboardingSteps(
   // the memo rebuilds with the now-present self steps.
   const selfMap = core?.getOnboardingSelfSteps?.() ?? {};
   const selfKey = Object.keys(selfMap).sort().join('|');
+  const sections = tourSections(viewer?.config_json);
+  const sectionsKey = sections ? sections.join('|') : '';
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => {
@@ -146,7 +149,9 @@ export function useOnboardingSteps(
     }
 
     // Merge base + self and sort by order (the controller sorts too, but the
-    // launcher reads this list, so keep it ordered).
-    return [...baseSteps, ...selfSteps].sort(byOrder);
-  }, [viewerId, typesKey, token, isOwner, selfKey, core]);
+    // launcher reads this list, so keep it ordered). A sections list picks the
+    // parts and their order.
+    const merged = sections ? applyTourSections(baseSteps, selfByType, sections) : [...baseSteps, ...selfSteps];
+    return merged.sort(byOrder);
+  }, [viewerId, typesKey, token, isOwner, selfKey, sectionsKey, core]);
 }

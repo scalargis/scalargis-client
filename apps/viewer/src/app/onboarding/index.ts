@@ -22,6 +22,7 @@ export {
 
 export { registerOnboardingTranslations, useOnboardingLabels } from './i18n';
 export { useOnboardingSteps } from './useOnboardingSteps';
+export { applyTourSections, tourSections, CORE_SECTION } from './sections';
 
 export {
   panelRevealByStepId,
