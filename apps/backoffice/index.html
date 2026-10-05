@@ -6,11 +6,7 @@
 
     <base href="/" />
 
-    <!--
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#000000">
     <meta name="author" content="%VITE_APP_ENTITY_NAME%">
@@ -22,6 +18,7 @@
       window.SCALARGIS_ROOT_PATH_BASE_URL="__SCALARGIS_ROOT_PATH_BASE_URL__";
       window.SCALARGIS_DEFAULT_LOCALE="__SCALARGIS_DEFAULT_LOCALE__";
       window.__sgAsset=function(f){return (window.SCALARGIS_ROOT_PATH||"")+"/static/backoffice/"+f;};
+      if (window.SCALARGIS_ROOT_PATH.indexOf("__") !== 0) document.querySelector("base").href = window.SCALARGIS_ROOT_PATH + "/";
     </script>
 
     <style>
