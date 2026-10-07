@@ -14,6 +14,7 @@
 import React, { useId } from 'react';
 import {
   Box,
+  Flex,
   Collapse,
   Group,
   Paper,
@@ -58,11 +59,14 @@ export function CollapsiblePanel({
     if (!isControlled) handlers.toggle();
     onChange?.(!opened);
   };
-
+  
   const title = (
-    <Box fw={600} fz="sm" c="neutral.9">
-      {header}
-    </Box>
+    <Flex gap="md" w="100%">
+      <Box fw={600} fz="sm" c="neutral.9"
+         dangerouslySetInnerHTML={{__html: header}}
+      >
+      </Box>
+    </Flex>
   );
 
   return (

@@ -3,8 +3,9 @@ import { withTranslation, useTranslation} from "react-i18next";
 import { Alert, Badge, Button, Group, TextInput } from '@mantine/core';
 import { CollapsiblePanel, notify, IconList, IconCheck, IconFolderOpen, IconSave, IconX, IconInfoCircle } from '@scalargis/ui';
 
+import { i18n } from '@scalargis/components';
+
 import { MainMenuButton } from '../../components';
-import { translateValue } from '../../utils/i18n';
 import { foldDiacritics } from '../../utils/common';
 import Tree from './TOC/Tree';
 import { traverseTree, findAllParents, findAllChildren } from './TOC/Model';
@@ -24,9 +25,7 @@ export const actions = {
  */
 export function MainMenu({ className, config, actions, record }) {
 
-  const { t } = useTranslation();
-
-  const title = record.title || t("themes", "Temas");
+  const title = record.title ? i18n.translateValue(record.title, t("themes", "Temas")) : i18n.translateValue("themes", "Temas");
 
   return (
     <MainMenuButton
@@ -229,7 +228,7 @@ class Main extends React.Component {
       if (!filter) {
         n.filtered = false
       } else {
-        const hay = foldDiacritics(translateValue(n.title)) + ' ' + foldDiacritics(translateValue(n.description));
+        const hay = foldDiacritics(i18n.translateValue(n.title)) + ' ' + foldDiacritics(i18n.translateValue(n.description));
         n.filtered = hay.includes(needle) ? false : true;
       }
       filterDone.push(n.id);
@@ -298,17 +297,17 @@ class Main extends React.Component {
       .then(res => {
         if (res.success) {
           notify.success(
-            this.props.t("saveSession", "Gravar sessão"),
-            this.props.t("saveSessionSuccessMsg", "A sessão foi gravada com sucesso.")
+            i18n.translateValue("saveSession", "Gravar sessão"),
+            i18n.translateValue("saveSessionSuccessMsg", "A sessão foi gravada com sucesso.")
           );
           this.props.config.dispatch(this.props.actions.viewer_session_saved(res.session));
         } else {
-          throw new Error(this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão."));
+          throw new Error(i18n.translateValue("saveSessionErrorMsg", "Não foi possível gravar a sessão."));
         }
       }).catch(error => {
         notify.error(
-          this.props.t("unexpectedError", "Ocorreu um erro inesperado"),
-          this.props.t("saveSessionErrorMsg", "Não foi possível gravar a sessão.")
+          i18n.translateValue("unexpectedError", "Ocorreu um erro inesperado"),
+          i18n.translateValue("saveSessionErrorMsg", "Não foi possível gravar a sessão.")
         );
         this.props.config.dispatch(this.props.actions.viewer_save_http_error());
       });
@@ -374,7 +373,7 @@ class Main extends React.Component {
 
         <div id="layer-switcher" className={"plugin-main" + (dragging ? " dragging" : "")}>
 
-          { !!withHeading && <h3>{this.props.t("themes","Temas")}</h3> }
+          { !!withHeading && <h3>{i18n.translateValue("themes","Temas")}</h3> }
 
           { (!!logged?.token && !!config.viewer.allow_user_session) &&
             <Group justify="space-between" wrap="nowrap" className="toc-session-toolbar mb-2">
@@ -382,8 +381,8 @@ class Main extends React.Component {
                 {config.viewer.is_session &&
                   <Badge variant="light" color="informative" radius="xl"
                     leftSection={<IconCheck />}
-                    title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
-                    {this.props.t("session", "Sessão")}
+                    title={i18n.translateValue("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
+                    {i18n.translateValue("session", "Sessão")}
                   </Badge>}
               </div>
               <Group gap={4} wrap="nowrap">
@@ -392,14 +391,14 @@ class Main extends React.Component {
                     leftSection={<IconFolderOpen />}
                     onClick={e => this.loadSession()}
                     disabled={(config.viewer.save_loading)}
-                    title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
-                    {this.props.t("loadSession","Abrir sessão")}
+                    title={i18n.translateValue("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
+                    {i18n.translateValue("loadSession","Abrir sessão")}
                   </Button>}
                 <Button variant="subtle" size="compact-sm" type="button"
                   leftSection={<IconSave />}
                   loading={config.viewer.save_loading}
                   onClick={e => this.saveSession()}>
-                  {this.props.t("saveSession", "Gravar sessão")}
+                  {i18n.translateValue("saveSession", "Gravar sessão")}
                 </Button>
               </Group>
             </Group>
@@ -411,7 +410,7 @@ class Main extends React.Component {
               <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch" mb="xs">
                 <TextInput
                   size="sm"
-                  placeholder={`${this.props.t('filter', "Filtro")}...`}
+                  placeholder={`${i18n.translateValue('filter', "Filtro")}...`}
                   value={filter}
                   onChange={this.changeFilter.bind(this)}
                   style={{ flex: 1 }}
@@ -421,7 +420,7 @@ class Main extends React.Component {
                   leftSection={<IconX />}
                   onClick={this.clearFilter.bind(this)}
                 >
-                  {this.props.t('clear', "Limpar")}
+                  {i18n.translateValue('clear', "Limpar")}
                 </Button>
               </Group>
             ) : null }
@@ -430,7 +429,7 @@ class Main extends React.Component {
             <Alert color="informative" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
                 <IconInfoCircle />
-                <span>{this.props.t("noTocThemesMsg", "Não existem temas. Clique no menu + para adicionar.")}</span>
+                <span>{i18n.translateValue("noTocThemesMsg", "Não existem temas. Clique no menu + para adicionar.")}</span>
               </Group>
             </Alert>
           ) }
@@ -459,10 +458,14 @@ class Main extends React.Component {
   }
 
   render() {
-    const { as } = this.props;
+    const { as, record } = this.props;
+    const component_cfg = record.config_json || {};
+
+    const title = record.title ? i18n.translateValue(record.title, i18n.translateValue("themes", "Temas")) : i18n.translateValue("themes", "Temas");
+    const header = component_cfg.header ? i18n.translateValue(component_cfg.header, component_cfg.header) : title;
 
     if (as === 'panel') return (
-      <CollapsiblePanel header={this.props.t("themes","Temas")} toggleable={false}>
+      <CollapsiblePanel header={header} toggleable={false}>
         { this.renderContent() }
       </CollapsiblePanel>
     )
@@ -477,4 +480,4 @@ class Main extends React.Component {
 
 }
 
-export default withTranslation()(Main);
+export default Main;
