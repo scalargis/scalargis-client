@@ -70,6 +70,7 @@ import {
 import * as i18n from './utils/i18n';
 import * as utils from './utils/common';
 import { runJob, JobError } from './utils/jobs';
+import { useComponentTour, componentTourListed } from './utils/componentTour';
 
 
 import  LocaleSelectorComponent from  './LocaleSelector/src/LocaleSelector';
@@ -147,6 +148,8 @@ export {
   utils,
   runJob,
   JobError,
+  useComponentTour,
+  componentTourListed,
 
   LocaleSelectorComponent
 };
