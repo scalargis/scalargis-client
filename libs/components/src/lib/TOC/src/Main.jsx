@@ -3,7 +3,7 @@ import { withTranslation, useTranslation} from "react-i18next";
 import { Alert, Badge, Button, Group, TextInput } from '@mantine/core';
 import { CollapsiblePanel, notify, IconList, IconCheck, IconFolderOpen, IconSave, IconX, IconInfoCircle } from '@scalargis/ui';
 
-import { i18n } from '@scalargis/components';
+import * as i18n from '../../utils/i18n';
 
 import { MainMenuButton } from '../../components';
 import { foldDiacritics } from '../../utils/common';

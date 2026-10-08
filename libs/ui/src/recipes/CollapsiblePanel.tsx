@@ -59,13 +59,14 @@ export function CollapsiblePanel({
     if (!isControlled) handlers.toggle();
     onChange?.(!opened);
   };
-  
+
   const title = (
     <Flex gap="md" w="100%">
-      <Box fw={600} fz="sm" c="neutral.9"
-         dangerouslySetInnerHTML={{__html: header}}
-      >
-      </Box>
+      {typeof header === 'string' ? (
+        <Box fw={600} fz="sm" c="neutral.9" dangerouslySetInnerHTML={{ __html: header }} />
+      ) : (
+        <Box fw={600} fz="sm" c="neutral.9">{header}</Box>
+      )}
     </Flex>
   );
 
