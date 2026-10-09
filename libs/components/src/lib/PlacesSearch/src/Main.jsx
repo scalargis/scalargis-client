@@ -6,6 +6,7 @@ import 'ol/ol.css';
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
 import Feature from 'ol/Feature';
+import { getCenter } from 'ol/extent';
 import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import parse from 'html-react-parser';
 
@@ -133,7 +134,7 @@ export default function Main({ core, config, actions, utils, record }) {
       const geom_ext = geom.getExtent();
       const extent = [geom_ext[0] - buffer, geom_ext[1] - buffer, geom_ext[2] + buffer, geom_ext[3] + buffer];
 
-      dispatch(actions.map_set_extent([extent[2] - extent[0], extent[3] - extent[1]], extent));
+      dispatch(actions.map_set_extent(getCenter(extent), extent));
 
       //setFilter(item.name || filter);
       setSelectedPlace(item);

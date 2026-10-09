@@ -75,6 +75,25 @@ describe('PlacesSearch', () => {
     expect(fetch.mock.calls[1][0]).toBe('https://geonames.test/search?_filter=Martim%20Longo');
   });
 
+  it('moves the map to the centre of the place extent', async () => {
+    const dispatch = vi.fn();
+    const geom = { transform: vi.fn(), getExtent: () => [1000, 2000, 3000, 6000] };
+    const layer = { getSource: () => ({ clear: vi.fn(), addFeatures: vi.fn() }) };
+    const mainMap = { getView: () => ({ getProjection: () => 'EPSG:3857' }) };
+    render(<Main {...props}
+      config={{ ...props.config, mainMap, dispatch, buffer: 500,
+        Models: { MapModel: { getGeometryFromWKT: () => geom } } }}
+      record={{ config_json: { ...props.record.config_json, drawGeometry: false } }}
+      actions={{ map_set_extent: (center, extent) => ({ center, extent }) }}
+      utils={{ findOlLayer: () => layer }} />);
+    type('Martim Longo');
+    await act(async () => pending['Martim Longo']([{ name: 'Martim Longo', admin_level3: 'Alcoutim', geom_wkt: 'POINT(0 0)' }]));
+
+    fireEvent.click(screen.getByText('Martim Longo (Alcoutim)'));
+
+    expect(dispatch).toHaveBeenCalledWith({ center: [2000, 4000], extent: [500, 1500, 3500, 6500] });
+  });
+
   it('ignores an answer that arrives after the field is cleared', async () => {
     render(<Main {...props} />);
     type('Martim');
