@@ -92,6 +92,21 @@ describe('PlacesSearch', () => {
     fireEvent.click(screen.getByText('Martim Longo (Alcoutim)'));
 
     expect(dispatch).toHaveBeenCalledWith({ center: [2000, 4000], extent: [500, 1500, 3500, 6500] });
+    expect(screen.queryByText('Martim Longo (Alcoutim)')).toBeNull();
+  });
+
+  it('lists a place once when two sources give it', async () => {
+    render(<Main {...props} />);
+    type('Martim');
+
+    await act(async () => pending['Martim']([
+      { name: 'Martim Longo', source: 'DGT', type: 'populatedPlace', admin_code: '080203', admin_level3: 'Alcoutim' },
+      { name: 'Martim Longo', source: 'INE', type: 'populatedPlace', admin_code: '080203', admin_level3: 'Alcoutim' },
+      { name: 'Martim', source: 'INE', type: 'populatedPlace', admin_code: '170701', admin_level3: 'Murça' },
+    ]));
+
+    expect(screen.getAllByText('Martim Longo (Alcoutim)')).toHaveLength(1);
+    expect(screen.getByText('Martim (Murça)')).toBeTruthy();
   });
 
   it('ignores an answer that arrives after the field is cleared', async () => {

@@ -35,6 +35,19 @@ const featureStyle = new Style({
   })
 });
 
+/** Keeps the first row of each place that two sources give with the same name, type, and admin code. */
+export function uniquePlaces(rows) {
+  const seen = new Set();
+  return (rows || []).filter((row) => {
+    const name = row.name ?? row.designacao;
+    if (name == null) return true;
+    const key = [name, row.type, row.admin_code ?? row.dicofre].join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export default function Main({ core, config, actions, utils, record }) {
   const { viewer, mainMap, dispatch, Models } = config;
   const { MapModel } = Models;
@@ -52,6 +65,7 @@ export default function Main({ core, config, actions, utils, record }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const ref = useRef();
+  const picked = useRef(false);
 
   const featuresLayer = useRef();
 
@@ -101,11 +115,8 @@ export default function Main({ core, config, actions, utils, record }) {
     }).then(result => {
         if (pendingSearch.current !== search) return;
         pendingSearch.current = null;
-        if (activeSources?.length) {
-          setPlaces(result.filter((item)=>{ return activeSources.includes(item.source); }));
-        } else {
-          setPlaces(result);
-        }
+        const rows = activeSources?.length ? result.filter((item) => activeSources.includes(item.source)) : result;
+        setPlaces(uniquePlaces(rows));
         setIsLoading(false);
     }).catch(error => {
         //console.log('error', error);
@@ -137,7 +148,9 @@ export default function Main({ core, config, actions, utils, record }) {
       dispatch(actions.map_set_extent(getCenter(extent), extent));
 
       //setFilter(item.name || filter);
+      picked.current = true;
       setSelectedPlace(item);
+      setShowPlaces(false);
     }
   }
 
@@ -274,6 +287,10 @@ export default function Main({ core, config, actions, utils, record }) {
   }, [mainMap]);
 
   useEffect(() => {
+    if (picked.current) {
+      picked.current = false;
+      return;
+    }
     if (selectedPlace && component_cfg.unselectOnHide === true) {
       setSelectedPlace(null);
     }
