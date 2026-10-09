@@ -1,7 +1,7 @@
 import React from 'react';
-import { ActionIcon } from '@mantine/core';
+import { ActionIcon, rem } from '@mantine/core';
 
-/** Round main menu button: filled when selected, light when its panel waits for a map tool, outline otherwise. */
+/** Round main menu button: filled when selected, light with a primary border when its panel waits for a map tool, outline otherwise. */
 const MainMenuButton = React.forwardRef(function MainMenuButton(
   {
     className = '',
@@ -23,6 +23,7 @@ const MainMenuButton = React.forwardRef(function MainMenuButton(
 
   let variant = 'outline';
   if (isActive) variant = inactive ? 'light' : 'filled';
+  const lightBorder = variant === 'light' ? { '--ai-bd': `${rem(1)} solid var(--mantine-primary-color-filled)` } : null;
 
   return (
     <ActionIcon
@@ -32,7 +33,7 @@ const MainMenuButton = React.forwardRef(function MainMenuButton(
       size={38}
       radius="xl"
       className={passthrough || undefined}
-      style={style}
+      style={lightBorder ? [lightBorder, style] : style}
       title={title}
       aria-label={title}
       aria-pressed={isActive}

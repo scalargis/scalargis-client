@@ -3,12 +3,17 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@mantine/core', () => {
-  const ActionIcon = React.forwardRef(({ children, variant, ...rest }, ref) => (
-    <button ref={ref} data-variant={variant} {...rest}>
+  const ActionIcon = React.forwardRef(({ children, variant, style, ...rest }, ref) => (
+    <button
+      ref={ref}
+      data-variant={variant}
+      data-border={[style].flat().find((s) => s?.['--ai-bd'])?.['--ai-bd'] ?? ''}
+      {...rest}
+    >
       {children}
     </button>
   ));
-  return { ActionIcon };
+  return { ActionIcon, rem: (px) => `${px / 16}rem` };
 });
 
 // eslint-disable-next-line import/first
@@ -33,6 +38,16 @@ describe('MainMenuButton', () => {
 
   it('is light when selected and inactive', () => {
     expect(variantOf({ className: SELECTED, inactive: true })).toBe('light');
+  });
+
+  it('gives the light variant a primary border', () => {
+    render(<MainMenuButton title="Tool" className={SELECTED} inactive />);
+    expect(screen.getByTitle('Tool').getAttribute('data-border')).toContain('var(--mantine-primary-color-filled)');
+  });
+
+  it('keeps the default border on the filled variant', () => {
+    render(<MainMenuButton title="Tool" className={SELECTED} />);
+    expect(screen.getByTitle('Tool').getAttribute('data-border')).toBe('');
   });
 
   it('stays outline when inactive but unselected', () => {
