@@ -54,17 +54,26 @@ export default function Main({ core, config, actions, utils, record }) {
 
   const featuresLayer = useRef();
 
+  const pendingSearch = useRef(null);
+
   const component_cfg = record.config_json || {};
 
   useOutsideClick(ref, () => {
     setShowPlaces(false);
   });
 
+  function cancelSearch() {
+    pendingSearch.current?.abort();
+    pendingSearch.current = null;
+  }
+
   function changeFilterFunc(e) {
     setSelectedPlace(null);
     setFilter(e.target.value);
+    cancelSearch();
     if (e.target.value.length < 3) {
         setPlaces([]);
+        setIsLoading(false);
         return;
     }
 
@@ -82,11 +91,15 @@ export default function Main({ core, config, actions, utils, record }) {
     if (config.min_similarity) {
       url = url.replace('{min_similarity}', config.min_similarity);
     }
-    url = url.replace('{filter}', e.target.value);
-    fetch(url).then(res => {
+    url = url.replace('{filter}', encodeURIComponent(e.target.value));
+    const search = new AbortController();
+    pendingSearch.current = search;
+    fetch(url, { signal: search.signal }).then(res => {
         // TODO: Validate response
         return res.json();
     }).then(result => {
+        if (pendingSearch.current !== search) return;
+        pendingSearch.current = null;
         if (activeSources?.length) {
           setPlaces(result.filter((item)=>{ return activeSources.includes(item.source); }));
         } else {
@@ -95,6 +108,8 @@ export default function Main({ core, config, actions, utils, record }) {
         setIsLoading(false);
     }).catch(error => {
         //console.log('error', error);
+        if (pendingSearch.current !== search) return;
+        pendingSearch.current = null;
         setIsLoading(false);
     })
   }
@@ -126,6 +141,8 @@ export default function Main({ core, config, actions, utils, record }) {
   }
 
   function clearFilter() {
+    cancelSearch();
+    setIsLoading(false);
     setFilter("");
     setPlaces([]);
     setSelectedPlace(null);
