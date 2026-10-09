@@ -25,7 +25,8 @@ export function MainMenu({ className, config, actions, record }) {
   return (
     <MainMenuButton
       title={title}
-      className={`${className}${isInactive ? " menu-inactive" : ""}`}
+      className={className}
+      inactive={isInactive}
       icon="fas fa-ruler"
       onClick={e => {
         if (selected_menu !== record.id) {

@@ -27,7 +27,8 @@ export function MainMenu({ className, config, actions, record }) {
   return (
     <MainMenuButton
       title={title}
-      className={`${className}${isInactive ? " menu-inactive" : ""}`}
+      className={className}
+      inactive={isInactive}
       icon={<IconBullseye />}
       onClick={e => {
         if (selected_menu !== record.id) config.dispatch(actions.viewer_set_selectedmenu(record.id));

@@ -1,22 +1,7 @@
 import React from 'react';
 import { ActionIcon } from '@mantine/core';
 
-/**
- * Round main-menu button — the viewer plugin-contract control every
- * component's MainMenu export renders (Core.jsx renderMainMenu mounts them
- * in the 55px sidebar strip).
- *
- * Active state: until the shell pass hands a semantic prop, the only state
- * signal is the className contract — the shell appends `p-button-outlined`
- * to unselected items and nothing else. `active` (when given) wins over the
- * derived value, so the shell can migrate to `active={...}` without touching
- * the components again.
- *
- * The `p-button-*` tokens are stripped before the class list reaches the
- * DOM (they'd fight Mantine's styling while Prime CSS is still loaded);
- * every other class (menu-inactive, main-menu-btn-image, custom hooks)
- * passes through for the layout sass.
- */
+/** Round main menu button: filled when selected, light when its panel waits for a map tool, outline otherwise. */
 const MainMenuButton = React.forwardRef(function MainMenuButton(
   {
     className = '',
@@ -24,6 +9,7 @@ const MainMenuButton = React.forwardRef(function MainMenuButton(
     icon,
     style,
     active,
+    inactive = false,
     onClick,
     children,
   },
@@ -35,11 +21,14 @@ const MainMenuButton = React.forwardRef(function MainMenuButton(
     .filter((c) => c && !c.startsWith('p-button'))
     .join(' ');
 
+  let variant = 'outline';
+  if (isActive) variant = inactive ? 'light' : 'filled';
+
   return (
     <ActionIcon
       ref={ref}
       type="button"
-      variant={isActive ? 'filled' : 'outline'}
+      variant={variant}
       size={38}
       radius="xl"
       className={passthrough || undefined}
@@ -49,8 +38,6 @@ const MainMenuButton = React.forwardRef(function MainMenuButton(
       aria-pressed={isActive}
       onClick={onClick}
     >
-      {/* `icon` takes either a rendered icon element (the @scalargis/ui recipe
-          icons) or a className string (config-driven `btn_icon`). */}
       {children ?? (React.isValidElement(icon) ? icon : <i className={icon} aria-hidden="true" />)}
     </ActionIcon>
   );

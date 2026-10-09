@@ -22,7 +22,8 @@ export function MainMenu({ className, config, actions, record }) {
   return (
     <MainMenuButton
       title={title}
-      className={`${className}${isInactive ? " menu-inactive" : ""}`}
+      className={className}
+      inactive={isInactive}
       icon={<IconPalette />}
       onClick={e => config.dispatch(actions.viewer_set_selectedmenu(record.id))}
     />

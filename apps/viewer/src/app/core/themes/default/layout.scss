@@ -159,18 +159,12 @@ body .p-dropdown {
   margin: 0.5em 0.5em !important;
 }
 
-/* ----- TODO -----*/
 .layout-sidebar #mainmenu .main-menu-btn-image {
   background-size: contain !important;
   background-repeat: no-repeat !important;
   background-position-x: center !important;
   background-position-y: center !important;
 }
-
-.layout-sidebar #mainmenu button.menu-inactive {
-  background-color: #63abe3;
-}
-/* ----- END TODO -----*/
 
 .layout-wrapper.layout-static.layout-static-sidebar-inactive .layout-sidebar #mainmenu,
 .layout-wrapper.layout-static.layout-mobile-sidebar-active .layout-sidebar #mainmenu {
