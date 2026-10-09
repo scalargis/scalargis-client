@@ -14,6 +14,7 @@ import OlCircle from 'ol/style/Circle';
 import OlFill from 'ol/style/Fill';
 import OlStroke from 'ol/style/Stroke';
 import convert from 'convert';
+import { defaultLengthText } from './utils';
 import './style.css';
 
 
@@ -276,11 +277,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
         output = format.expression.replace('{value}', output);
       }
     } else {
-      if (length > 10000) {
-        output = (Math.round(length / 1000 * 1000) / 1000) + ' km';
-      } else {
-          output = (Math.round(length * 1000) / 1000) + ' m';
-      }
+      output = defaultLengthText(length);
     }
 
     return output;
