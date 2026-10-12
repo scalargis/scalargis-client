@@ -456,9 +456,7 @@ const root = (
 
     // Update theme
     case LAYERS_UPDATE_THEME: {
-      const { layers } = state.viewer.config_json;
-      const index = layers.findIndex(i => i.id === action.theme.id);
-      layers.splice(index, 1, action.theme);
+      const layers = state.viewer.config_json.layers.map(l => l.id === action.theme.id ? action.theme : l);
       return {
         ...state,
         viewer: {

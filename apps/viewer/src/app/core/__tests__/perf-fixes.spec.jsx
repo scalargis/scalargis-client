@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 
 import reducers from '../reducers';
-import { viewer_update_mapcontrol, viewer_update_mapcontrols } from '../actions';
+import { layers_update_theme, viewer_update_mapcontrol, viewer_update_mapcontrols } from '../actions';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 const rootReducer = reducers.root;
@@ -48,6 +48,27 @@ describe('map control updates', () => {
     const state = stateWithControls();
     const next = rootReducer(state, viewer_update_mapcontrol({ id: 'Nope', active: true }));
     expect(next.viewer.config_json.map_controls.map(c => c.id)).toEqual(['FeatureInfo', 'Measure', 'Coordinates']);
+  });
+});
+
+describe('theme updates', () => {
+  it('gives a new layers array so a group layer renders its changed child', () => {
+    const state = rootReducer({
+      viewer: {
+        config_json: {
+          layers: [
+            { id: 'group', type: 'GROUP', children: ['child'] },
+            { id: 'child', type: 'WMS', opacity: 1 },
+          ]
+        }
+      }
+    }, { type: '@@INIT' });
+    const before = state.viewer.config_json.layers;
+    const next = rootReducer(state, layers_update_theme({ id: 'child', type: 'WMS', opacity: 0.5 }));
+    expect(next.viewer.config_json.layers).not.toBe(before);
+    expect(before[1].opacity).toBe(1);
+    expect(next.viewer.config_json.layers[1].opacity).toBe(0.5);
+    expect(next.viewer.config_json.layers[0]).toBe(before[0]);
   });
 });
 
