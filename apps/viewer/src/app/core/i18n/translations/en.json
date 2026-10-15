@@ -296,6 +296,10 @@
   "userRegistrationFillEmail": "Enter the email used to create the user so that a new confirmation can be sent",
   "userRegistrationConfirmationSentToEmail": "User creation confirmation sent to email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "There is no user with the email indicated.",
+  "resendEmail": "Resend email",
+  "resendEmailIn": "Resend email ({{seconds}} s)",
+  "resendEmailHint": "No email? Check your spam folder or ask for a new email.",
+  "resendEmailSent": "The activation email was sent again.",
 
   "changePasswordConfirmationSuccess": "Password was changed successfully",
 

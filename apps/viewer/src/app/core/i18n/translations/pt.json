@@ -296,6 +296,10 @@
   "userRegistrationFillEmail": "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo",
   "userRegistrationConfirmationSentToEmail": "A confirmação de registo de utilizador foi enviada para o email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "Não existe nenhum registo de utilizador com o email indicado.",
+  "resendEmail": "Reenviar email",
+  "resendEmailIn": "Reenviar email ({{seconds}} s)",
+  "resendEmailHint": "Não recebeu o email? Verifique a pasta de SPAM ou peça um novo email.",
+  "resendEmailSent": "O email de ativação foi enviado novamente.",
 
   "changePasswordConfirmationSuccess": "A Palavra-passe foi alterada com sucesso",
 

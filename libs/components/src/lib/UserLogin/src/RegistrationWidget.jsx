@@ -7,6 +7,8 @@ import { IconCheckCircle, IconXCircle, IconEnvelope, IconUser, IconCheck } from 
 import { i18n as i18nUtils } from '../../components';
 import PasswordRules, { usePasswordPolicy, validatePasswordAgainstPolicy } from '../../PasswordRules';
 
+import ResendConfirmationButton from './ResendConfirmationButton';
+
 import { getFormValidationErrorMessage } from './utils';
 
 
@@ -31,6 +33,7 @@ function RegistrationWidget(props) {
     apiUrl,
     termsOfServiceUrl,
     onRegistration,
+    onResendConfirmation,
     onClearError,
     onShowLogin,
   } = props;
@@ -96,6 +99,8 @@ function RegistrationWidget(props) {
             <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
           </div>
           <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
+
+          { onResendConfirmation && <ResendConfirmationButton onResend={() => onResendConfirmation(auth.response.email)} /> }
 
           { onShowLogin && <Group justify="flex-end" mt="md" mb="md">
             <Anchor component="button" type="button" className="font-medium" onClick={onShowLogin}>
@@ -216,6 +221,7 @@ function RegistrationWidget(props) {
           <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
         </div>
         <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
+        { onResendConfirmation && <ResendConfirmationButton onResend={() => onResendConfirmation(auth.response.email)} /> }
         <div className='text-center py-2'>
           <Anchor component="button" type="button"
             onClick={ (e) => { e.preventDefault(); onShowLogin() }}>

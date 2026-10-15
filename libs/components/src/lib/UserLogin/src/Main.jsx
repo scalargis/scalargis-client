@@ -195,6 +195,8 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
                 const registrationApiUrl = siteConfig?.authentication?.endpoints?.registration;
                 dispatch(login_user_registration(core, { ...payload, redirect }, registrationApiUrl, redirect));
               }}
+              onResendConfirmation={siteConfig?.authentication?.endpoints?.registration ? undefined :
+                (email) => actions.resend_confirmation(email, redirect)}
               onShowLogin={() => setMode(1)}
             />
       </Dialog>

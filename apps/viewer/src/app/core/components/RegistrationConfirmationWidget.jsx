@@ -12,11 +12,13 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
   const [emailConfirmation, setEmailConfirmation] = useState('');
   const [goRedirect, setGoRedirect] = useState(false);
   const [validating, setValidating] = useState(!!token);
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState(null);
 
   // Enable redux actions
   const dispatch = useDispatch();
 
-  const { registration_confirmation, registration_send_confirmation, login, logout } = core.actions;
+  const { registration_confirmation, resend_confirmation, login, logout } = core.actions;
 
   useEffect(() => {
     if (auth?.data?.token) return;
@@ -48,7 +50,18 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
   }
 
   const sendEmailConfirmation = () => {
-    dispatch(registration_send_confirmation({ email: emailConfirmation }, history, redirect));
+    setSending(true);
+    setSendResult(null);
+    resend_confirmation(emailConfirmation, redirect)
+      .then(res => setSendResult({
+        error: false,
+        message: i18nUtils.translateValue("userRegistrationConfirmationSentToEmail", "A confirmação de registo de utilizador foi enviada para o email {{email}}.", undefined, undefined, undefined, { email: res?.email || emailConfirmation })
+      }))
+      .catch(() => setSendResult({
+        error: true,
+        message: i18nUtils.translateValue("unavailableService", "Serviço Indisponível")
+      }))
+      .finally(() => setSending(false));
   }
 
   if (validating) {
@@ -100,7 +113,18 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
             </Anchor>
         </Group>
 
-        { auth.http_error && auth.response && !!auth.response.message &&
+        { sendResult &&
+          <div className="w-full my-4">
+            <Alert color={sendResult.error ? "danger" : "informative"} py="xs">
+              <Group justify="center" gap="xs" wrap="nowrap">
+                {sendResult.error ? <IconXCircle /> : <IconInfoCircle />}
+                <span>{sendResult.message}</span>
+              </Group>
+            </Alert>
+          </div>
+        }
+
+        { !sendResult && auth.http_error && auth.response && !!auth.response.message &&
           <div className="w-full my-4">
             <Alert color="danger" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
@@ -111,7 +135,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
           </div>
         }
 
-        { auth.http_error && !auth.response &&
+        { !sendResult && auth.http_error && !auth.response &&
           <div className="w-full my-4">
             <Alert color="danger" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
@@ -122,7 +146,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
           </div>
         }
 
-        { !auth.http_error && auth.response && !!auth.response.message &&
+        { !sendResult && !auth.http_error && auth.response && !!auth.response.message &&
           <div className="w-full my-4">
             <Alert color="informative" py="xs">
               <Group justify="center" gap="xs" wrap="nowrap">
@@ -138,7 +162,8 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
             type="button"
             fullWidth
             leftSection={<IconCheck />}
-            loading={auth.loading}
+            loading={sending}
+            disabled={!emailConfirmation}
             onClick={sendEmailConfirmation}
           >{i18nUtils.translateValue("send", "Enviar")}</Button>
         </div>

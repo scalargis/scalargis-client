@@ -39,6 +39,7 @@ import * as UserLogin from './UserLogin/src/Main'
 import LoginWidget from './UserLogin/src/LoginWidget'
 import RegistrationWidget from './UserLogin/src/RegistrationWidget'
 import ResetPasswordWidget from './UserLogin/src/ResetPasswordWidget'
+import ResendConfirmationButton from './UserLogin/src/ResendConfirmationButton'
 import * as URLparams from './URLparams/src/Main'
 import * as IntersectLayers from './IntersectLayers/src/Main'
 import IntersectResults from './IntersectLayers/src/IntersectResults'
@@ -114,6 +115,7 @@ export {
   LoginWidget,
   RegistrationWidget,
   ResetPasswordWidget,
+  ResendConfirmationButton,
   URLparams,
   Timeline,
   DocumentBrowser,

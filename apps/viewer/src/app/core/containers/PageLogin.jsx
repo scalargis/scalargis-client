@@ -176,6 +176,8 @@ function PageLogin(props) {
                                     const apiUrl = siteConfig?.authentication?.endpoints?.registration;
                                     dispatch(login_user_registration(core, payload, apiUrl, redirect));
                                 }}
+                                onResendConfirmation={siteConfig?.authentication?.endpoints?.registration ? undefined :
+                                    (email) => actions.resend_confirmation(email, redirect)}
                                 onShowLogin={() => setMode(1)}
                             />
                         </React.Fragment>

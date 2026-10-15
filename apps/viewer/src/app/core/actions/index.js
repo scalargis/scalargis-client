@@ -494,35 +494,19 @@ export function registration_confirmation(post, history, redirect) {
 }
 
 
-export function registration_send_confirmation(post, history, redirect) {
-  return function (dispatch, getState) {
-    dispatch(login_http_loading());
-
-    const locale = i18nUtils.getResolvedLanguage();
-    const options = {
-      method: 'POST',
-      body: JSON.stringify({...post, redirect, locale})
-    }
-
-    const url = API_URL + '/security/registration/send_confirmation';
-    fetch(url, options)
-      .then(res => res.json())
-      .then(res => {
-        if (!res.error) {
-          if (res?.email) {
-            const msg = i18nUtils.translateValue("userRegistrationConfirmationSentToEmail","A confirmação de registo de utilizador foi enviada para o email {{email}}.", undefined, undefined, undefined, {email: res.email})
-            dispatch(login_response({...res, message: msg}));
-          } else {
-            dispatch(login_response({...res, message: i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res)}));
-          }
-        } else {
-          const msg = i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res);
-          dispatch(login_http_error({status: res.status, message: msg}));
-        }
-      }).catch(error => {
-        dispatch(login_http_error());
-      });
+/** Posts the email to registration/send_confirmation and resolves with the answer, with no redux state. */
+export function resend_confirmation(email, redirect) {
+  const locale = i18nUtils.getResolvedLanguage();
+  const options = {
+    method: 'POST',
+    body: JSON.stringify({ email, redirect, locale })
   }
+
+  const url = API_URL + '/security/registration/send_confirmation';
+  return fetch(url, options).then(res => {
+    if (!res.ok) throw new Error(res.status);
+    return res.json();
+  });
 }
 
 export function registration_response(res) {
