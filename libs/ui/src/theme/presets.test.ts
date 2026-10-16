@@ -1,17 +1,8 @@
-/**
- * The palette's AA gate, mechanized:
- * for every shipped preset, white↔primary[primaryShade] must clear 4.5:1
- * in both directions — this is the check that made the bright brands bump
- * to shade 7. Editing a tuple or a shade without re-running the numbers
- * fails here, not in an audit.
- */
 import { describe, expect, it } from 'vitest';
 
 import { adsBaseTheme } from './ads-mantine-theme';
 import { clientThemePresets, resolveClientThemePreset } from './presets';
 
-// WCAG 2.x sRGB relative luminance — the same maths as the
-// /demo-ext/theme live table.
 function srgbChannel(value: number): number {
   const c = value / 255;
   return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
@@ -49,8 +40,6 @@ describe('clientThemePresets', () => {
       expect(primary, preset.name).toHaveLength(10);
       expect(primary?.[5], preset.name).toBe(preset.brand);
     }
-    // The two bright brand hues, verbatim — these exact values are the
-    // point of the two presets, never regenerate them.
     expect(resolveClientThemePreset('lime')?.brand).toBe('#9EC222');
     expect(resolveClientThemePreset('cyan')?.brand).toBe('#37B2DF');
   });

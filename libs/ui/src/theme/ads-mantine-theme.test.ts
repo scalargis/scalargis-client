@@ -1,10 +1,3 @@
-/* =====================================================================
-   Regression locks for the ADS base theme.
-
-   Each test below corresponds to a defect observed on /demo-ext/mantine
-   (2026-07-09) whose cause was a missing line in this theme. They assert
-   the restriction, not the implementation.
-   ===================================================================== */
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -21,13 +14,10 @@ import {
   motionTransitionProps,
 } from './motion';
 
-/** The theme as MantineProvider will actually see it. */
 const theme = mergeThemeOverrides(DEFAULT_THEME, adsBaseTheme) as MantineTheme;
 
-/** The px a `rem()` token resolves to, given the shells' 14px root. */
 const ROOT_FONT_SIZE = 14;
 function resolvePx(token: string): number {
-  // rem() emits `calc(<n>rem * var(--mantine-scale))`.
   const match = /calc\(([\d.]+)rem \* var\(--mantine-scale\)\)/.exec(token);
   if (!match) throw new Error(`"${token}" is not a scaled rem token`);
   return Number(match[1]) * ROOT_FONT_SIZE * theme.scale;
@@ -39,7 +29,6 @@ describe('root font-size compensation', () => {
   });
 
   it('keeps spacing on the ADS 8px grid despite html{font-size:14px}', () => {
-    // The bug: literal '0.5rem' escaped the scale and rendered 7px.
     expect(resolvePx(theme.spacing.xs)).toBeCloseTo(8);
     expect(resolvePx(theme.spacing.sm)).toBeCloseTo(16);
     expect(resolvePx(theme.spacing.md)).toBeCloseTo(24);
@@ -48,7 +37,7 @@ describe('root font-size compensation', () => {
   });
 
   it('renders the ADS type scale at its stated pixel sizes', () => {
-    expect(resolvePx(theme.fontSizes.xs)).toBeCloseTo(11); // GIS chrome only
+    expect(resolvePx(theme.fontSizes.xs)).toBeCloseTo(11);
     expect(resolvePx(theme.fontSizes.sm)).toBeCloseTo(14);
     expect(resolvePx(theme.fontSizes.md)).toBeCloseTo(16);
     expect(resolvePx(theme.fontSizes.lg)).toBeCloseTo(20);
@@ -56,8 +45,6 @@ describe('root font-size compensation', () => {
   });
 
   it('runs every heading size through the scale', () => {
-    // resolvePx throws on a literal rem string, so a future '2.5rem' that
-    // silently escapes --mantine-scale fails here, not in production.
     const expected = [
       ['h1', 40],
       ['h2', 32],
@@ -88,8 +75,6 @@ describe('root font-size compensation', () => {
 
 describe('colour restrictions', () => {
   it('uses ADS neutral-900 for body text, not pure black', () => {
-    // Mantine derives --mantine-color-text from `black`. Left unset it is
-    // #000, which is what made every string read as bold.
     expect(theme.black).toBe('#2B363C');
     expect(theme.black).toBe(theme.colors.neutral[9]);
   });
@@ -110,11 +95,6 @@ describe('colour restrictions', () => {
 });
 
 describe('control defaults', () => {
-  /**
-   * The bug: only six components carried size 'md', so DatePickerInput and
-   * TagsInput fell back to Mantine's 'sm' and rendered visibly shorter than
-   * the field beside them. Every Input-shelled control must share a baseline.
-   */
   const CONTROLS = [
     'TextInput',
     'Textarea',
@@ -138,8 +118,6 @@ describe('control defaults', () => {
     expect(theme.components[name]?.defaultProps).toMatchObject({ size: 'md' });
   });
 
-  // Standalone <Input.Label> had no wrapper to size it and fell back to sm,
-  // reading 2px short of the md field labels beside it.
   it('renders standalone Input.Label at the md field-label size', () => {
     expect(theme.components.InputLabel?.defaultProps).toMatchObject({ size: 'md' });
   });
@@ -154,10 +132,6 @@ describe('overlay ladder', () => {
     expect(theme.components[name]?.defaultProps).toMatchObject({ zIndex });
   });
 
-  // Transient dropdown overlays ride above the dialog rung (not the 1000
-  // --z-dropdown token): Mantine portals them to body, so a Select inside a
-  // Modal (6000) must clear it or it paints behind and reads as empty. Still
-  // below toast (7000)/tooltip (8000).
   it.each([
     ['Popover', 6100],
     ['Menu', 6100],
@@ -171,20 +145,12 @@ describe('overlay ladder', () => {
     expect(theme.components.Modal?.defaultProps).toMatchObject({ centered: true });
   });
 
-  // Popover's centred `bottom` default makes the panel's x depend on its own
-  // width, which Combobox measures as 0 while the dropdown is display:none —
-  // so it paints half a field to the right before snapping into place.
   it('anchors combobox dropdowns to the target start edge', () => {
     expect(theme.components.Combobox?.defaultProps).toMatchObject({
       position: 'bottom-start',
     });
   });
 
-  // Under the default 'absolute' strategy the portaled dropdown is positioned
-  // in document coordinates, so for one frame it EXTENDS the document: the
-  // viewport grows scrollbars and the map shudders before floating-ui lands it.
-  // Fixed positioning cannot grow the document; flip/shift then choose the side
-  // by the space available, which is what the footer CRS select needs.
   it('positions combobox dropdowns against the viewport, flipping on demand', () => {
     expect(theme.components.Combobox?.defaultProps).toMatchObject({
       floatingStrategy: 'fixed',
@@ -192,17 +158,12 @@ describe('overlay ladder', () => {
     });
   });
 
-  // Popover and Menu default to 'absolute'; on that strategy a topbar Menu (F2)
-  // positions in document coordinates and extends the document for one frame.
   it.each(['Popover', 'Menu'])('positions %s against the viewport', (name) => {
     expect(theme.components[name]?.defaultProps).toMatchObject({
       floatingStrategy: 'fixed',
     });
   });
 
-  // Combobox is the one overlay Mantine ships with duration 0, which lets the
-  // panel paint at 0×0 before floating-ui measures it (the "flips side after
-  // painting" flicker). A non-zero fade keeps it display:none until positioned.
   it('gives combobox dropdowns a non-zero fade so they never paint unmeasured', () => {
     expect(theme.components.Combobox?.defaultProps).toMatchObject({
       transitionProps: { transition: 'fade', duration: 120 },
@@ -210,12 +171,8 @@ describe('overlay ladder', () => {
   });
 });
 
-/* ─── Motion (theme/motion.ts — THE central control) ─────────────────── */
 
 describe('central motion control', () => {
-  // Reduced motion is a CSS-side kill (ads-globals.css); the JS numbers must
-  // never be zeroed — the Combobox gate above positions dropdowns inside its
-  // non-zero transition window. A 0 here would resurrect that mispaint.
   it('keeps every JS duration above zero', () => {
     for (const duration of Object.values(motionDurations)) {
       expect(duration).toBeGreaterThan(0);
@@ -225,8 +182,6 @@ describe('central motion control', () => {
     }
   });
 
-  // Every overlay's transition is stated in the theme OFF the tokens, so no
-  // component ships a duration of its own — the whole point of the control.
   it('drives every overlay transition from the motion tokens', () => {
     expect(theme.components.Modal?.defaultProps?.transitionProps).toEqual(
       motionTransitionProps.dialog
@@ -255,9 +210,6 @@ describe('central motion control', () => {
     );
   });
 
-  // The CSS half: hand-written transitions (shell sass, ads-components.css)
-  // read var(--sg-motion-*), emitted by the resolver on :root for every
-  // client theme alike.
   it('emits the tokens as --sg-motion-* CSS variables', () => {
     const resolved = adsCssVariablesResolver(theme);
     expect(resolved.variables).toMatchObject(motionCssVariables);
@@ -265,17 +217,7 @@ describe('central motion control', () => {
   });
 });
 
-/* ─── CSS ↔ theme-object token sync (B-15 / R5) ──────────────────────────
-   ads-tokens.css and ads-mantine-theme.ts each hold the ADS palette, shadows
-   and z-ladder; the only thing keeping them equal is a "keep in sync" comment.
-   This block enforces it — a future edit to one that forgets the other fails
-   here, hex-for-hex. It also pins the easing single-source (R5): the ADS
-   --transition-easing must alias the central motion token, not restate a
-   literal, so hover feedback and chevrons can never diverge again. */
 
-/** ads-tokens.css :root custom properties, as a name → value map.
-   Read from disk (vitest stubs CSS imports to empty; the app ships this same
-   file, so parsing it is what keeps the two token sources honest). */
 const cssTokens: Map<string, string> = (() => {
   const css = readFileSync(join(import.meta.dirname, 'ads-tokens.css'), 'utf8');
   const map = new Map<string, string>();
@@ -287,8 +229,7 @@ const cssTokens: Map<string, string> = (() => {
 
 const norm = (v: string) => v.trim().toUpperCase();
 
-describe('CSS ↔ theme token sync (R5)', () => {
-  // ADS 50→900 maps onto Mantine tuple index 0→9.
+describe('CSS ↔ theme token sync', () => {
   const STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
   const SCALES = [
     'primary',
@@ -326,16 +267,12 @@ describe('CSS ↔ theme token sync (R5)', () => {
   it('z-ladder rungs match theme.other.zLadder', () => {
     const zLadder = (adsBaseTheme.other as Record<string, Record<string, number>>)
       .zLadder;
-    // A camelCase rung (tourPopover) maps to a kebab CSS token (z-tour-popover).
     const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
     for (const [rung, value] of Object.entries(zLadder)) {
       expect(Number(cssTokens.get(`z-${kebab(rung)}`))).toBe(value);
     }
   });
 
-  // The onboarding engine keeps its own OVERLAY_Z/POPOVER_Z literals so it stays
-  // theme-free (D10). This locks that hand-mirror to the ladder rungs, so an
-  // edit to one rung that forgets the engine copy fails here (F7).
   it('locks the onboarding engine z-constants to the tour rungs', () => {
     const zLadder = (adsBaseTheme.other as Record<string, Record<string, number>>)
       .zLadder;
@@ -344,9 +281,7 @@ describe('CSS ↔ theme token sync (R5)', () => {
   });
 
   it('single-sources the transition easing onto the motion token', () => {
-    // The ADS token aliases the central motion ease — not a literal.
     expect(cssTokens.get('transition-easing')).toContain('--sg-motion-ease');
-    // And that motion ease is what the resolver emits, so both resolve equal.
     expect(motionCssVariables['--sg-motion-ease']).toBe(motionEasing);
   });
 });

@@ -12,7 +12,6 @@ describe('createClientTheme', () => {
   it('merges a brand primary over the base theme', () => {
     const theme = createClientTheme({ primary: BRAND as never });
     expect(theme.colors?.primary).toEqual(BRAND);
-    // The base object must not be mutated by the merge.
     expect(adsBaseTheme.colors?.primary?.[5]).toBe('#1A65FA');
   });
 
@@ -46,7 +45,6 @@ describe('createClientTheme', () => {
     });
     expect(theme.fontFamily).toBe('Saira, sans-serif');
     expect(theme.headings?.fontFamily).toBe('Saira, sans-serif');
-    // The font clause moves the FAMILY only — type sizing stays ADS.
     expect(theme.headings?.sizes?.h1).toEqual(adsBaseTheme.headings?.sizes?.h1);
     expect(theme.fontSizes).toEqual(adsBaseTheme.fontSizes);
   });
