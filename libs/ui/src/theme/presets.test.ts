@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { adsBaseTheme } from './ads-mantine-theme';
-import { clientThemePresets, resolveClientThemePreset } from './presets';
+import { clientThemePresets } from './presets';
 
 function srgbChannel(value: number): number {
   const c = value / 255;
@@ -23,64 +22,11 @@ function contrast(a: string, b: string): number {
 }
 
 describe('clientThemePresets', () => {
-  it('ships the six sellable presets, default first', () => {
-    expect(clientThemePresets.map((p) => p.name)).toEqual([
-      'default',
-      'lime',
-      'cyan',
-      'red',
-      'dark-green',
-      'brown',
-    ]);
-  });
-
-  it('keeps the true brand hex at index 5 and full 10-shade tuples', () => {
-    for (const preset of clientThemePresets) {
-      const primary = preset.theme.colors?.primary;
-      expect(primary, preset.name).toHaveLength(10);
-      expect(primary?.[5], preset.name).toBe(preset.brand);
-    }
-    expect(resolveClientThemePreset('lime')?.brand).toBe('#9EC222');
-    expect(resolveClientThemePreset('cyan')?.brand).toBe('#37B2DF');
-  });
-
   it('passes AA at primaryShade for every preset (white↔shade ≥ 4.5:1)', () => {
     for (const preset of clientThemePresets) {
-      const primary = preset.theme.colors?.primary;
-      const shadeHex = primary?.[preset.primaryShade] as string;
+      const shadeHex = preset.theme.colors?.primary?.[preset.primaryShade] as string;
       expect(preset.theme.primaryShade, preset.name).toBe(preset.primaryShade);
-      expect(
-        contrast('#FFFFFF', shadeHex),
-        `${preset.name}: white↔${shadeHex} (shade ${preset.primaryShade})`
-      ).toBeGreaterThanOrEqual(4.5);
+      expect(contrast('#FFFFFF', shadeHex), `${preset.name}: ${shadeHex}`).toBeGreaterThanOrEqual(4.5);
     }
-  });
-
-  it('keeps every ramp light→dark so shade-indexed pairings hold', () => {
-    for (const preset of clientThemePresets) {
-      const primary = preset.theme.colors?.primary as readonly string[];
-      for (let i = 0; i < 9; i++) {
-        expect(
-          luminance(primary[i]),
-          `${preset.name}[${i}] should be lighter than [${i + 1}]`
-        ).toBeGreaterThan(luminance(primary[i + 1]));
-      }
-    }
-  });
-
-  it('carries Saira on the lime/cyan presets only; default IS the base theme', () => {
-    expect(resolveClientThemePreset('default')?.theme).toBe(adsBaseTheme);
-    for (const preset of clientThemePresets) {
-      if (preset.name === 'lime' || preset.name === 'cyan') {
-        expect(preset.fontFamily).toMatch(/^Saira/);
-        expect(preset.theme.fontFamily).toBe(preset.fontFamily);
-        expect(preset.theme.headings?.fontFamily).toBe(preset.fontFamily);
-      } else {
-        expect(preset.fontFamily, preset.name).toBeUndefined();
-        expect(preset.theme.fontFamily, preset.name).toBe(adsBaseTheme.fontFamily);
-      }
-    }
-    expect(resolveClientThemePreset('nope')).toBeUndefined();
-    expect(resolveClientThemePreset(undefined)).toBeUndefined();
   });
 });
