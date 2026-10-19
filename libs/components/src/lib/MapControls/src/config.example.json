@@ -1,0 +1,36 @@
+{
+  "id": "mapcontrols",
+  "type": "MapControls",
+  "target": "map_controls_left",
+  "config_json": {
+    "content": 1,
+    "crs": 3763,
+    "length": {
+      "format": {
+        "locale": "en-US",
+        "options": { "useGrouping": true, "minimumFractionDigits": 0, "maximumFractionDigits": 1 },
+        "source_unit": "m",
+        "output_unit": "m",
+        "expression": "{value} m"
+      }
+    },
+    "area": {
+      "format": {
+        "locale": "en-US",
+        "options": { "useGrouping": true, "minimumFractionDigits": 0, "maximumFractionDigits": 2 },
+        "source_unit": "m2",
+        "output_unit": "hectare",
+        "expression": "{value} ha"
+      }
+    }
+  },
+  "children": ["streetview"],
+  "_note_map_controls": "MapControls reads the viewer-level config_json.map_controls array, not this component config_json. Each entry with show_button true renders one in-map button, in array order. Zoom, FullScreen and ZoomToExtent are OpenLayers controls appended after these buttons.",
+  "_map_controls": [
+    { "id": "TOC", "type": "TOC", "show_button": true, "title": "Temas", "menu": "toc" },
+    { "id": "GeoLocation", "type": "GeoLocation", "show_button": true, "active": false, "zoom_init": true, "zoom": true },
+    { "id": "Coordinates", "type": "Coordinates", "show_button": true, "exclusive": true, "active": false },
+    { "id": "FeatureInfo", "type": "FeatureInfo", "show_button": true, "exclusive": true, "active": false },
+    { "id": "Attribution", "type": "Attribution", "collapsible": true, "collapsed": false }
+  ]
+}
