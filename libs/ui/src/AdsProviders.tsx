@@ -39,6 +39,8 @@ import { DatesProvider } from '@mantine/dates';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import 'dayjs/locale/pt';
+import 'dayjs/locale/es';
+import 'dayjs/locale/fr';
 
 import { adsBaseTheme, adsCssVariablesResolver } from './theme/ads-mantine-theme';
 import { applyMotionPreference, motionDurations } from './theme/motion';
@@ -48,6 +50,8 @@ import {
 } from './theme/client-theme-registry';
 import { DIALOG_DEFAULTS } from './recipes/dialogDefaults';
 import { registerUiTranslations } from './recipes/i18n';
+
+const DATES_LOCALES = ['pt', 'es', 'fr'];
 
 export interface AdsProvidersProps {
   children: React.ReactNode;
@@ -65,7 +69,7 @@ export function AdsProviders({ children }: AdsProvidersProps) {
   // so fall back to the requested language rather than defaulting wrong.
   const { i18n } = useTranslation();
   const activeLanguage = i18n?.resolvedLanguage ?? i18n?.language;
-  const locale = activeLanguage?.startsWith('pt') ? 'pt' : 'en';
+  const locale = DATES_LOCALES.find((l) => activeLanguage?.startsWith(l)) ?? 'en';
 
   // <html lang> follows the active i18next language
   // (WCAG 3.1.1 — the document lang must flip with the content language so
