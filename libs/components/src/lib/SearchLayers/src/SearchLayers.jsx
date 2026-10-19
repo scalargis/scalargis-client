@@ -6,7 +6,7 @@ import { getDescribeFeatureType } from './service';
 import SearchLayerForm from './SearchLayerForm';
 
 export default function SearchLayers(props) {
-  const { core, config, layer, layers, setLayers, actions, pubsub, dispatch, mainMap, Models, record } = props;
+  const { core, config, layer, layers, setLayersList, actions, pubsub, dispatch, mainMap, Models, record } = props;
   const { viewer, auth } = config;
   const component_cfg = record.config_json ? { show_icon: true, ...record.config_json } : { show_icon: true};
   const { show_icon } = component_cfg;
@@ -112,18 +112,7 @@ export default function SearchLayers(props) {
         {
           layer.current.getSource().clear();
           setActive(null);
-
-          if (component_cfg?.use_layers_datatables === true) {
-            setLayers((viewer?.config_json?.layers || []).filter(l => l.datatable).map(l => {
-              return {
-                title: l.title,
-                description: l.description,
-                ...l.datatable
-              }
-            }));
-          } else {
-            setLayers(component_cfg.layers || []);
-          }
+          setLayersList();
         }
       )}
       errorSchema={errorSchema}
