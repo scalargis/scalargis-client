@@ -66,7 +66,14 @@ export default function Main(props) {
 
   const buildLayersList = () => {
     if (component_cfg?.use_layers_datatables === true) {
-      return (viewer?.config_json?.layers || []).filter(l => l.datatable).map(l => {
+      return (viewer?.config_json?.layers || []).filter(l => {
+        if (!l.datatable) return false;
+        if ((component_cfg?.include_layers || []).length > 0 && !component_cfg.include_layers.includes(l.id)) return false;
+        if ((component_cfg?.include_datatables || []).length > 0 && !component_cfg.include_datatables.includes(l.datatable?.id)) return false;
+        if ((component_cfg?.exclude_layers || []).includes(l.id)) return false;
+        if ((component_cfg?.exclude_datatables || []).includes(l.datatable?.id)) return false;
+        return true;
+      }).map(l => {
         return {
           id: l.id,
           title: l.title,
@@ -102,6 +109,7 @@ export default function Main(props) {
       const new_layers = component_store_state[record.id].layers.map(l=>{
         return {
           id: l.id,
+          is_standalone: true,
           title: l.title,
           description: l.description,
           ...l.datatable

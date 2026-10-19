@@ -79,7 +79,7 @@ export default function SearchLayers(props) {
   }, [active, schemaConfig?.id]);
 
   useEffect(() => {
-    if (layers.length === 1 && !component_cfg.show_main) {
+    if (layers.length === 1 && (!component_cfg.show_main || layers[0].is_standalone)) {
       setActive(layers[0]);
     }
   }, [layers, component_cfg.show_main]);
