@@ -128,6 +128,15 @@
   background: var(--mantine-color-primary-1);
 }
 
+.layout-topbar .layout-topbar-icons .places-search-attribution {
+  padding: 0 1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: normal;
+  text-align: left;
+  white-space: normal;
+  color: #6c757d;
+}
+
 .layout-topbar .layout-topbar-icons .layout-topbar-search-results .place-list-item {
   text-align: left;
 }

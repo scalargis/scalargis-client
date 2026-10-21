@@ -61,6 +61,7 @@ export default function Main({ core, config, actions, utils, record }) {
   const [showPlaces, setShowPlaces]= useState(false);
   const [places, setPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [attributions, setAttributions] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -95,6 +96,11 @@ export default function Main({ core, config, actions, utils, record }) {
     setIsLoading(true);
     setShowPlaces(true);
 
+    if (config.providers?.length) {
+      searchProviders(e.target.value);
+      return;
+    }
+
     // Fetch filter
     let url = core.API_URL + '/geographical_names/search?_min_similarity=0.5&_maxrows=10&_filter={filter}';
     if (config.url) {
@@ -124,6 +130,50 @@ export default function Main({ core, config, actions, utils, record }) {
         pendingSearch.current = null;
         setIsLoading(false);
     })
+  }
+
+  /** Sends the filter to every configured provider in parallel and lists the rows of the providers that answer. */
+  function searchProviders(value) {
+    const providers = config.providers;
+    const search = new AbortController();
+    pendingSearch.current = search;
+    const requests = providers.map((provider) => {
+      let url = provider.url;
+      if (config.max_rows) {
+        url = url.replace('{max_rows}', config.max_rows);
+      }
+      if (config.min_similarity) {
+        url = url.replace('{min_similarity}', config.min_similarity);
+      }
+      url = url.replace('{filter}', encodeURIComponent(value));
+      return fetch(url, { signal: search.signal }).then(res => {
+        if (!res.ok) throw new Error(res.statusText);
+        return res.json();
+      });
+    });
+    Promise.allSettled(requests).then(answers => {
+      if (pendingSearch.current !== search) return;
+      pendingSearch.current = null;
+      const origin = new Map();
+      const rows = [];
+      answers.forEach((answer, i) => {
+        if (answer.status !== 'fulfilled' || !Array.isArray(answer.value)) return;
+        answer.value.forEach((row) => {
+          if (activeSources?.length && !activeSources.includes(row.source)) return;
+          origin.set(row, providers[i]);
+          rows.push(row);
+        });
+      });
+      const list = uniquePlaces(rows);
+      const texts = [];
+      list.forEach((row) => {
+        const text = origin.get(row)?.attribution;
+        if (text && !texts.includes(text)) texts.push(text);
+      });
+      setPlaces(list);
+      setAttributions(texts);
+      setIsLoading(false);
+    });
   }
 
   function selectPlace(item) {
@@ -159,6 +209,7 @@ export default function Main({ core, config, actions, utils, record }) {
     setIsLoading(false);
     setFilter("");
     setPlaces([]);
+    setAttributions([]);
     setSelectedPlace(null);
   }
 
@@ -379,6 +430,11 @@ export default function Main({ core, config, actions, utils, record }) {
                 </li>
               ))}
             </ul>
+            {attributions.length > 0 ?
+              <div className="places-search-attribution">
+                {attributions.map(text => t(text, text, {"ns": "custom"})).join(' · ')}
+              </div> : null
+            }
           </Paper>
         </div> : null
       )}
