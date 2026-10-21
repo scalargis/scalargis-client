@@ -104,6 +104,11 @@
     animation-duration: 0.8s !important;
     animation-iteration-count: infinite !important;
   }
+
+  .pi-spin {
+    animation-duration: 2s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 /* The project-switch twin of the media block above (path 2 in the note).
@@ -123,6 +128,11 @@
 :root[data-sg-motion='reduced'] .mantine-Loader-root::after,
 :root[data-sg-motion='reduced'] .sg-spinner {
   animation-duration: 0.8s !important;
+  animation-iteration-count: infinite !important;
+}
+
+:root[data-sg-motion='reduced'] .pi-spin {
+  animation-duration: 2s !important;
   animation-iteration-count: infinite !important;
 }
 

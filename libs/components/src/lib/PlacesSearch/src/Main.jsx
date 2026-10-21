@@ -48,6 +48,26 @@ export function uniquePlaces(rows) {
   });
 }
 
+/** Lowers the case, drops the accents, and splits the text into words. */
+function words(text) {
+  return (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+/** Orders the rows by the count of query words that start a word of the row label, and keeps the given order on a tie. */
+export function rankByWords(rows, query) {
+  const terms = words(query).filter((word) => word.length > 2 || /^\d+$/.test(word));
+  if (!terms.length) return rows;
+  const score = (row) => {
+    const label = words([row.name ?? row.designacao, row.admin_level1, row.admin_level2, row.admin_level3,
+      row.admin_level4, row.concelho].join(' '));
+    return terms.filter((term) => label.some((word) => word.startsWith(term))).length;
+  };
+  return rows
+    .map((row, i) => ({ row, i, score: score(row) }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .map((item) => item.row);
+}
+
 export default function Main({ core, config, actions, utils, record }) {
   const { viewer, mainMap, dispatch, Models } = config;
   const { MapModel } = Models;
@@ -71,6 +91,7 @@ export default function Main({ core, config, actions, utils, record }) {
   const featuresLayer = useRef();
 
   const pendingSearch = useRef(null);
+  const searchTimer = useRef(null);
 
   const component_cfg = record.config_json || {};
 
@@ -79,6 +100,8 @@ export default function Main({ core, config, actions, utils, record }) {
   });
 
   function cancelSearch() {
+    clearTimeout(searchTimer.current);
+    searchTimer.current = null;
     pendingSearch.current?.abort();
     pendingSearch.current = null;
   }
@@ -96,8 +119,17 @@ export default function Main({ core, config, actions, utils, record }) {
     setIsLoading(true);
     setShowPlaces(true);
 
+    const value = e.target.value;
+    searchTimer.current = setTimeout(() => {
+      searchTimer.current = null;
+      runSearch(value);
+    }, config.delay ?? 300);
+  }
+
+  /** Sends the filter to the configured url, or to every provider when the config has providers. */
+  function runSearch(value) {
     if (config.providers?.length) {
-      searchProviders(e.target.value);
+      searchProviders(value);
       return;
     }
 
@@ -112,7 +144,7 @@ export default function Main({ core, config, actions, utils, record }) {
     if (config.min_similarity) {
       url = url.replace('{min_similarity}', config.min_similarity);
     }
-    url = url.replace('{filter}', encodeURIComponent(e.target.value));
+    url = url.replace('{filter}', encodeURIComponent(value));
     const search = new AbortController();
     pendingSearch.current = search;
     fetch(url, { signal: search.signal }).then(res => {
@@ -164,7 +196,7 @@ export default function Main({ core, config, actions, utils, record }) {
           rows.push(row);
         });
       });
-      const list = uniquePlaces(rows);
+      const list = uniquePlaces(rankByWords(rows, value));
       const texts = [];
       list.forEach((row) => {
         const text = origin.get(row)?.attribution;
@@ -307,6 +339,8 @@ export default function Main({ core, config, actions, utils, record }) {
     }
     setActiveSources([...sources_ids]);
   }, []);
+
+  useEffect(() => () => clearTimeout(searchTimer.current), []);
 
   useEffect(() => {
     if (!mainMap) return;
