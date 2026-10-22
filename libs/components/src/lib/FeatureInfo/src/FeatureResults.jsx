@@ -144,6 +144,7 @@ export default function FeatureResults({ core, config, features, layers, actions
         val = <Button
             type="button"
             size="xs"
+            variant={action.variant}
             leftSection={action.icon ? <i className={action.icon} aria-hidden="true" /> : undefined}
             className={action.classname || action.className}
             title={i18n.translateValue(action.tooltip)}
@@ -360,6 +361,7 @@ function getFeatureRows(feat, layer) {
 
                 action.data = new_data;
               }
+              if (field.action.label) action.label = formatTemplateValue(feat_properties, field.action.label);
 
               rows.push({ 
                 key, 

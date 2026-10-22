@@ -21,6 +21,20 @@
           "name": "teste_intervencao_id",
           "title": "Intervenção",
           "value": "{intervencao_id}"
+        },
+        {
+          "name": "intervencao_link",
+          "title": "Intervenção",
+          "type": "action",
+          "action": {
+            "type": "FeatureInfo/DoAction",
+            "label": "{intervencao_id}",
+            "variant": "subtle",
+            "data": {
+              "intervencao_id": "{intervencao_id}"
+            }
+          },
+          "value": "{intervencao_id}"
         },        
         {
           "name": "teste_html1",
