@@ -189,6 +189,17 @@ export function login_http_loading() {
   return action;
 }
 
+/** Returns the URL when it stays on the page origin, else null. */
+function sameOriginUrl(url) {
+  if (!url) return null;
+  try {
+    const target = new URL(url, window.location.origin);
+    return target.origin === window.location.origin ? target.href : null;
+  } catch {
+    return null;
+  }
+}
+
 export function login_post(core, payload, apiUrl=null, history=null, redirect=null, urlRedirect=null) {
   return function (dispatch, getState) {
 
@@ -214,8 +225,9 @@ export function login_post(core, payload, apiUrl=null, history=null, redirect=nu
           expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
           cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
           dispatch(auth_login(res));
-          if (urlRedirect) {
-            window.location.assign(urlRedirect);
+          const safeUrlRedirect = sameOriginUrl(urlRedirect);
+          if (safeUrlRedirect) {
+            window.location.assign(safeUrlRedirect);
           } else if (redirect && history?.navigate) {
             history.navigate(redirect);
           } else {
@@ -240,8 +252,9 @@ export function login(auth, history, redirect, urlRedirect) {
       expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
       cookies.set(cookieAuthName, auth, { path: cookiePath, expires: expireDate });
       dispatch(auth_login(auth));
-      if (urlRedirect) {
-        window.location.assign(urlRedirect);
+      const safeUrlRedirect = sameOriginUrl(urlRedirect);
+      if (safeUrlRedirect) {
+        window.location.assign(safeUrlRedirect);
       } else if (redirect && history?.navigate) {
         history.navigate(redirect);
       } else {
