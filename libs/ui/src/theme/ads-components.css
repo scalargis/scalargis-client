@@ -476,14 +476,34 @@
 
 .ads-mappanel-pill--mobile {
   position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: calc(100vw - 112px);
+  left: 56px;
+  right: 56px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ads-mappanel-pill--mobile > * {
+  pointer-events: auto;
 }
 
 .ads-mappanel-pill--mobile * {
   position: static;
   max-width: 100%;
+}
+
+.ads-mappanel-pill--mobile :has(.mantine-Button-root) {
+  position: static !important;
+  transform: none !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.ads-mappanel-pill--mobile :has(> .mantine-Button-root:only-child) {
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
 }
 
 .ads-mappanel-sheet {
