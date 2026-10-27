@@ -11,6 +11,8 @@ import * as HelpButton from './HelpButton/src/Main'
 import * as HtmlContent from './HtmlContent'
 import * as LayerAttributesTable from './LayerAttributesTable/src/Main'
 import * as LayerCompare from './LayerCompare/src/Main'
+import SliderLayersMapControl from './LayerCompare/src/SliderLayersMapControl'
+import useLayerSwipe from './LayerCompare/src/useLayerSwipe'
 import * as LayerDownload from './LayerDownload/src/Main'
 import * as LayerEdit from './LayerEdit/src/Main'
 import * as LayerMetadata from './LayerMetadata/src/Main'
@@ -91,6 +93,8 @@ export {
   HtmlContent,
   LayerAttributesTable,
   LayerCompare,
+  SliderLayersMapControl,
+  useLayerSwipe,
   LayerDownload,
   LayerEdit,
   LayerMetadata,

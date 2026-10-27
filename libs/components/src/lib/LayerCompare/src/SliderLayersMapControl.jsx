@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Select } from '@mantine/core';
 
 import { i18n as i18nUtils } from '../../components';
@@ -9,7 +9,8 @@ export default function SliderLayersMapControl({
     layers,
     selectedLayer, setSelectedLayer,
     selectedSliderLayer, setSelectedSliderLayer,
-    sliderValue }) {
+    sliderValue,
+    leftPlaceholder, rightPlaceholder }) {
 
 
     function selectLayer(layer) {
@@ -42,7 +43,7 @@ export default function SliderLayersMapControl({
                             disabled: l.id === selectedSliderLayer?.id
                         }))}
                         onChange={(value) => selectLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
-                        placeholder={`<- ${i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda")}`}
+                        placeholder={leftPlaceholder ?? `<- ${i18nUtils.translateValue("selectLeftTheme", "Selecionar tema da esquerda")}`}
                     />
                 </div>
                 <div className='col'
@@ -58,7 +59,7 @@ export default function SliderLayersMapControl({
                             disabled: l.id === selectedLayer?.id
                         }))}
                         onChange={(value) => selectSliderLayer(value != null ? layers.find(l => String(l.id) === value) : null)}
-                        placeholder={`${i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita")} ->`}
+                        placeholder={rightPlaceholder ?? `${i18nUtils.translateValue("selectRightTheme", "Selecionar tema da direita")} ->`}
                     />
                 </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Slider } from '@mantine/core';
 
@@ -10,24 +10,13 @@ export default function LayerCompare({
     layers, actions, config,
     selectedLayer, setSelectedLayer,
     selectedSliderLayer, setSelectedSliderLayer,
-    layersRefs, sliderValue,
+    sliderValue, setSliderValue,
     compareToolOptions, compareTool, setCompareTool,
     opacitySliderValue, setOpacitySliderValue
 
 }) {
 
-    const { mainMap } = config;
-
     const [sliderIsActive, toggleSliderIsActive] = useState(true)
-    const [slider, set_slider] = useState(50);
-    sliderValue.current = slider
-
-
-    function setSlider(value) {
-        set_slider(value)
-        sliderValue.current = value
-        mainMap.render()
-    }
 
     const [map, setMap] = useState(null);
     useEffect(() => {
@@ -40,14 +29,14 @@ export default function LayerCompare({
                 step={0.1}
                 className='map-slider'
                 label={null}
-                value={slider}
-                onChange={(value) => setSlider(value)}
+                value={sliderValue}
+                onChange={(value) => setSliderValue(value)}
             />
         </div>
 
     const slider_map_controls =
         <SliderLayersMapControl
-            sliderValue={slider}
+            sliderValue={sliderValue}
             layers={layers}
             selectedLayer={selectedLayer}
             setSelectedLayer={setSelectedLayer}
@@ -66,7 +55,6 @@ export default function LayerCompare({
 
 
             {sliderIsActive ?
-                // <div className='card'> // FOR ptceu ui
                     <SliderPanel
                         active={active}
                         layers={layers}
@@ -80,7 +68,6 @@ export default function LayerCompare({
                         opacitySliderValue={opacitySliderValue}
                         setOpacitySliderValue={setOpacitySliderValue}
                     />
-                // </div>
                 : null}
 
         </div>

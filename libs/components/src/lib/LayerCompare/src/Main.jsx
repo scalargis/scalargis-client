@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { CollapsiblePanel, IconPause, IconAngleDown, IconAngleUp } from '@scalargis/ui';
-import { getRenderPixel } from 'ol/render';
 
 import { i18n as i18nUtils, MainMenuButton } from '../../components';
 
 import LayerCompare from './LayerCompare';
+import useLayerSwipe from './useLayerSwipe';
 
 import './style.css';
 import './control.css';
@@ -63,21 +63,8 @@ export default function Main({ as, config, actions, core, record, utils }) {
   const [toolUIposition, setToolUIposition] = useState()
 
 
-  // map layers ref
-  const leftMapSide = useRef()
-  const leftMapSideEvent_pre = useRef()
-  const leftMapSideEvent_post = useRef()
-
-  const rightMapSide = useRef()
-  const rightMapSideEvent_pre = useRef()
-  const rightMapSideEvent_post = useRef()
-
-  const activeRef = useRef(active)
-
-
   //compare tool
-  const sliderValue = useRef()
-  const layoutOptionRef = useRef('vertical') // horizontal: works but need devs on ui & css (slider, etc..)
+  const [sliderValue, setSliderValue] = useState(50)
 
   const compareToolOptions = [
     { name: i18nUtils.translateValue("splitMap", "Dividir mapa"), value: 1, icon: 'pi  pi-pause' },
@@ -121,203 +108,31 @@ export default function Main({ as, config, actions, core, record, utils }) {
   }, [])
 
 
-  // load events funcs (mapslider)
+  // checked layers
   useEffect(() => {
-
-    leftMapSideEvent_pre.current = (event) => {
-      if (!activeRef.current) return
-      const ctx = event.context
-      const mapSize = mainMap.getSize()
-      const width = mapSize[0] * (sliderValue.current / 100)
-      const height = mapSize[1] * ((100 - sliderValue.current) / 100)
-
-      let tl, tr, bl, br
-      if (layoutOptionRef.current === 'vertical') {
-        tl = getRenderPixel(event, [0, 0])
-        tr = getRenderPixel(event, [width - 1, 0])
-        bl = getRenderPixel(event, [0, mapSize[1]])
-        br = getRenderPixel(event, [width - 1, mapSize[1]])
-      } else { // horizontal
-        tl = getRenderPixel(event, [0, 0])
-        tr = getRenderPixel(event, [mapSize[0], 0])
-        bl = getRenderPixel(event, [0, height])
-        br = getRenderPixel(event, [mapSize[0], height])
-      }
-
-      clipContext(ctx, tl, tr, bl, br)
-    }
-
-    rightMapSideEvent_pre.current = (event) => {
-      if (!activeRef.current) return
-      const ctx = event.context
-      const mapSize = mainMap.getSize()
-      const width = mapSize[0] * (sliderValue.current / 100)
-      const height = mapSize[1] * ((100 - sliderValue.current) / 100)
-
-      let tl, tr, bl, br
-      if (layoutOptionRef.current === 'vertical') {
-        tl = getRenderPixel(event, [width + 1, 0])
-        tr = getRenderPixel(event, [mapSize[0], 0])
-        bl = getRenderPixel(event, [width + 1, mapSize[1]])
-        br = getRenderPixel(event, mapSize)
-      } else { // horizontal
-        tl = getRenderPixel(event, [0, height])
-        tr = getRenderPixel(event, [mapSize[0], height])
-        bl = getRenderPixel(event, [0, mapSize[1]])
-        br = getRenderPixel(event, mapSize)
-      }
-
-      clipContext(ctx, tl, tr, bl, br)
-    }
-
-    leftMapSideEvent_post.current = (event) => {
-      if (!activeRef.current) return
-      const ctx = event.context;
-      ctx.restore();
-    }
-
-    rightMapSideEvent_post.current = (event) => {
-      if (!activeRef.current) return
-      const ctx = event.context;
-      ctx.restore();
-    }
-  }, [])
-
-
-  // main layer selection
-  useEffect(() => {
-
-    if (leftMapSide.current) {
-      leftMapSide.current.setOpacity(1)
-    }
-
-    if (leftMapSideEvent_pre.current && leftMapSide.current) {
-      leftMapSide.current.un('postrender', leftMapSideEvent_post.current)
-      leftMapSide.current.un('prerender', leftMapSideEvent_pre.current)
-    }
-
-
-    if (mainMap && layers) { // set layer visible for all subcomponents
-      const layersIds = layers.map(e => e.code)
-      const checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
-      if (selectedLayer) {
-        checked.push(selectedLayer.code)
-        leftMapSide.current = utils.findOlLayer(mainMap, selectedLayer.code)
-
-        if (selectedSliderLayer) {
-          if (selectedSliderLayer.code === selectedLayer.code) {
-            setSelectedSliderLayer(null) // need to clean when not compare, if same layer
-          }
-        }
-
-      } else {
-        leftMapSide.current = null
-      }
-
-
-      if (selectedSliderLayer) { //mapslider active
-        checked.push(selectedSliderLayer.code);
-      }
-
-      dispatch(actions.layers_set_checked(checked));
-    } else {
-      return // wait for model....
-    }
-
-
-    if (selectedLayer && compareTool == 1 && leftMapSide.current) { //mapslider active
-      // ------  LEFT / TOP
-      leftMapSide.current.on('prerender', leftMapSideEvent_pre.current)
-      leftMapSide.current.on('postrender', leftMapSideEvent_post.current)
-    }
-
-    if (selectedLayer && compareTool == 2 && leftMapSide.current) { //opacity
-      leftMapSide.current.setOpacity(opacitySliderValue / 100)  // NO DISPATCH
-    }
-
-  }, [selectedLayer, compareTool])
-
-
-  // right layer selection
-  useEffect(() => {
-
-    if (rightMapSide.current) {
-      rightMapSide.current.setOpacity(1)
-    }
-
-    if (rightMapSideEvent_pre.current && rightMapSide.current) {
-      rightMapSide.current.un('postrender', rightMapSideEvent_post.current)
-      rightMapSide.current.un('prerender', rightMapSideEvent_pre.current)
-    }
-
-    if (mainMap && layers) {
-      const layersIds = layers.map(e => e.code)
-      const checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
-      if (selectedSliderLayer) {
-        checked.push(selectedSliderLayer.code)
-        rightMapSide.current = utils.findOlLayer(mainMap, selectedSliderLayer.code)
-      } else {
-        rightMapSide.current = null
-      }
-
-
-      if (selectedLayer) {
-        checked.push(selectedLayer.code);
-      }
-      dispatch(actions.layers_set_checked(checked));
-    } else {
-      return
-    }
-
-    if (selectedSliderLayer && compareTool == 1 && rightMapSide.current) { //mapslider
-      // ------  RIGHT / BOTTOM
-      rightMapSide.current.on('prerender', rightMapSideEvent_pre.current)
-      rightMapSide.current.on('postrender', rightMapSideEvent_post.current)
-    }
-
-    if (selectedSliderLayer && compareTool == 2 && rightMapSide.current) { //opacity
-      rightMapSide.current.setOpacity(1 - opacitySliderValue / 100)
-    }
-
-  }, [selectedSliderLayer, compareTool])
-
-
-  // opacity change
-  useEffect(() => {
-    if (leftMapSide.current) {
-      leftMapSide.current.setOpacity(opacitySliderValue / 100)  // TODO DISPATCH :
-    }
-    if (rightMapSide.current) {
-      rightMapSide.current.setOpacity(1 - opacitySliderValue / 100)  // TODO DISPATCH
-    }
-
-
-  }, [opacitySliderValue])
-
+    if (!mainMap || !layers) return
+    const layersIds = layers.map(e => e.code)
+    const checked = config.viewer.config_json.checked.filter(c => { return !layersIds.includes(c); });
+    if (selectedLayer) checked.push(selectedLayer.code)
+    if (selectedSliderLayer) checked.push(selectedSliderLayer.code)
+    dispatch(actions.layers_set_checked(checked));
+  }, [selectedLayer, selectedSliderLayer])
 
   useEffect(() => {
-    activeRef.current = active
-    if (leftMapSide.current) {
-      leftMapSide.current.setOpacity(active && compareTool == 2 ? opacitySliderValue / 100 : 1)
+    if (selectedLayer && selectedSliderLayer && selectedSliderLayer.code === selectedLayer.code) {
+      setSelectedSliderLayer(null)
     }
-    if (rightMapSide.current) {
-      rightMapSide.current.setOpacity(active && compareTool == 2 ? (1 - opacitySliderValue / 100) : 1)
-    }
-    if (mainMap) mainMap.render()
-  }, [active])
+  }, [selectedLayer])
 
-
-
-  function clipContext(ctx, tl, tr, bl, br) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(tl[0], tl[1]);
-    ctx.lineTo(bl[0], bl[1]);
-    ctx.lineTo(br[0], br[1]);
-    ctx.lineTo(tr[0], tr[1]);
-    ctx.closePath();
-    ctx.clip()
-  }
+  useLayerSwipe({
+    map: mainMap,
+    leftLayer: mainMap && selectedLayer ? utils.findOlLayer(mainMap, selectedLayer.code) : null,
+    rightLayer: mainMap && selectedSliderLayer ? utils.findOlLayer(mainMap, selectedSliderLayer.code) : null,
+    mode: compareTool === 2 ? 'opacity' : 'swipe',
+    swipe: sliderValue,
+    opacity: opacitySliderValue,
+    active
+  })
 
   // function changeLayoutOption(e) {
   //   setLayoutOption(e.value)
@@ -376,6 +191,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
                 selectedSliderLayer={selectedSliderLayer}
                 setSelectedSliderLayer={setSelectedSliderLayer}
                 sliderValue={sliderValue}
+                setSliderValue={setSliderValue}
                 compareToolOptions={compareToolOptions}
                 compareTool={compareTool}
                 setCompareTool={setCompareTool}
@@ -399,6 +215,7 @@ export default function Main({ as, config, actions, core, record, utils }) {
           selectedSliderLayer={selectedSliderLayer}
           setSelectedSliderLayer={setSelectedSliderLayer}
           sliderValue={sliderValue}
+          setSliderValue={setSliderValue}
           compareToolOptions={compareToolOptions}
           compareTool={compareTool}
           setCompareTool={setCompareTool}
