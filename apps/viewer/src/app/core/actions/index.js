@@ -2,7 +2,7 @@ import Cookies from 'universal-cookie';
 
 import { i18n as i18nUtils } from "@scalargis/components";
 import { loadTranslations } from "../i18n";
-import { isUrlAppOrigin, getAppApiUrl, isUrlAppHostname, getAppMapProxyUrl, getCookieAuthName } from "../utils";
+import { isUrlAppOrigin, getAppApiUrl, isUrlAppHostname, getAppMapProxyUrl, getCookieAuthName, removeUrlParam } from "../utils";
 import { isThemeOnScale as isThemeOnScaleMapModel, transformExtent } from "../model/MapModel";
 import { fetchJson, fetchShared } from "../service/fetch";
 
@@ -1045,8 +1045,9 @@ export function getThemeLegendUrl(viewer, config, auth) {
   } else {
 
     if (isUrlAppHostname(url) && viewer.integrated_authentication) {
+      const authkey = viewer?.integrated_authentication_key || 'authkey';
+      url = removeUrlParam(url, authkey);
       if (auth && auth.data && auth.data.auth_token) {
-        const authkey = viewer?.integrated_authentication_key || 'authkey';
         url += '&' + authkey + '=' + auth?.data.auth_token;
       }
     }
