@@ -89,7 +89,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
     return (
       <React.Fragment>
         { type != 'menu' ?
-          <div style={{ marginLeft: '15px' }} className={className ? `locale-selector ${className}` : 'locale-selector'}>
+          <div style={{ marginLeft: '15px' }} className={className ? `locale-selector locale-selector-inline ${className}` : 'locale-selector locale-selector-inline'}>
             {buttons}
           </div> :
           <span className="sg-menuitem">

@@ -10,6 +10,16 @@
 
 /* Inline mode (language buttons). */
 
+.locale-selector.locale-selector-inline {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+}
+
+.layout-topbar-icons .locale-selector .locale-btn {
+  margin-left: 0;
+}
+
 .locale-selector .locale-btn {
   color: white;
   font-size: inherit;
