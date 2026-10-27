@@ -55,6 +55,7 @@ export default function WMTS(props) {
       if (auth && auth.data && auth.data.auth_token) {
         const authkey = viewer?.integrated_authentication_key || 'authkey';
         turl = turl + '&' + authkey + '=' + auth.data.auth_token;
+        options.authToken = { param: authkey, token: auth.data.auth_token };
       }
     }
 

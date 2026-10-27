@@ -22,6 +22,12 @@ const getCRSCode = (val) => {
   return retVal;
 }
 
+/** Removes the integrated authentication token that the capabilities request carried. */
+const removeAuthToken = (url, authToken) => {
+  if (!url || !authToken?.token) return url;
+  return url.replace(new RegExp(`([?&])${authToken.param}=${authToken.token}(&|$)`, 'i'), (match, start, end) => end ? start : '');
+}
+
 // Get loaded coordinate systems from server
 export const projOptions = (coordsyss) => {
   const options = coordsyss.map(i => ({
@@ -188,7 +194,7 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
 
       // Some services publish wrong URL from GetCapabilities
       if (_url.indexOf('localhost') > -1) _url = url; // Wrong on some services
-      url = _url;
+      url = removeAuthToken(_url, options?.authToken);
 
       // Update CRS
       if (l.SRS) crs = getCRSCode(l.SRS[0]) ? parseInt(getCRSCode(l.SRS[0]), 10) : crs; //parseInt(/EPSG:(\d+)/g.exec(l.SRS[0])[1], 10);
@@ -255,7 +261,7 @@ export const convertWFS2Themes = (wfs, originUrl, options) => {
 
       // Some services publish wrong URL from GetCapabilities
       if (_url.indexOf('localhost') > -1) _url = url; // Wrong on some services
-      url = _url;    
+      url = removeAuthToken(_url, options?.authToken);    
 
       // Get CRS from DefaultCRS
       if (l[wfsns+'DefaultCRS']) {
@@ -431,7 +437,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
           layer.Style.map(style => {
             wms_styles.push(style.Name);
             if (!legend_url && typeof style.LegendURL === 'object' && style.LegendURL.length) {
-              legend_url = style.LegendURL[0].OnlineResource;
+              legend_url = removeAuthToken(style.LegendURL[0].OnlineResource, options.authToken);
             }
             return style;
           });
@@ -459,6 +465,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
 
       // Some services publish wrong URL from GetCapabilities
       if (finalUrl.indexOf('localhost') > -1) finalUrl = originUrl; // Wrong on some services
+      finalUrl = removeAuthToken(finalUrl, options.authToken);
 
 
       // Parse WGS84 bounding box
@@ -598,6 +605,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
   }
   // Some services publish wrong URL from GetCapabilities
   if (finalUrl.indexOf('localhost') > -1) finalUrl = originUrl; // Wrong on some services
+  finalUrl = removeAuthToken(finalUrl, options.authToken);
 
 
   //// Get formats for GetFeatureInfo request
@@ -647,7 +655,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
         l.Style.map(style => {
           wmts_styles.push(style.Identifier);
           if (!legend_url && typeof style.LegendURL === 'object' && style.LegendURL.length) {
-            legend_url = style.LegendURL[0].href;
+            legend_url = removeAuthToken(style.LegendURL[0].href, options.authToken);
           }
           return style;
         });
