@@ -57,6 +57,8 @@ export interface FileUploadProps
   placeholder?: React.ReactNode;
   /** Show the drop area. Set false for the Prime shape: Choose opens the picker, no standing drop area. */
   showDropArea?: boolean;
+  /** `basic` shows only the Choose button, with no toolbar box, drop area, or file list. */
+  mode?: 'advanced' | 'basic';
 }
 
 export function FileUpload({
@@ -69,6 +71,7 @@ export function FileUpload({
   cancelLabel = uiText('upload.cancel', 'Cancel'),
   placeholder = uiText('upload.placeholder', 'Drag and drop files here, or use Choose.'),
   showDropArea = true,
+  mode = 'advanced',
   multiple = true,
   onReject: onRejectProp,
   ...dropzoneProps
@@ -78,6 +81,7 @@ export function FileUpload({
   const openPicker = useRef<() => void>(null);
 
   const uploading = progress !== null;
+  const basic = mode === 'basic';
 
   const runUpload = async (toUpload: File[]) => {
     if (!onUpload || toUpload.length === 0) return;
@@ -154,7 +158,7 @@ export function FileUpload({
           px="xs" + a tight icon gap (ads-btn-tight) + a tight between-button
           gap, fits them on one line with room to spare. They still wrap
           gracefully on a genuinely tiny screen. */}
-      <Group className="ads-fileupload__toolbar" gap="6px" justify="center">
+      <Group className={basic ? undefined : 'ads-fileupload__toolbar'} gap="6px" justify={basic ? 'flex-start' : 'center'}>
         <Button
           size="xs"
           px="xs"
@@ -166,7 +170,7 @@ export function FileUpload({
           {chooseLabel}
         </Button>
 
-        {!auto && (
+        {!auto && !basic && (
           <>
             {onUpload && (
               <Button
@@ -208,7 +212,7 @@ export function FileUpload({
         {...dropzoneProps}
         style={{
           ...(typeof dropzoneProps.style === 'object' ? dropzoneProps.style : {}),
-          ...(showDropArea ? {} : { display: 'none' }),
+          ...(showDropArea && !basic ? {} : { display: 'none' }),
         }}
       >
         <Text ta="center" py="md" c="dimmed" size="sm">
@@ -224,7 +228,7 @@ export function FileUpload({
         />
       )}
 
-      {files.length > 0 && (
+      {!basic && files.length > 0 && (
         <Stack gap="xs" mt="xs">
           {files.map((file, index) => (
             <Group key={`${file.name}-${file.lastModified}`} gap="xs" wrap="nowrap">
