@@ -68,6 +68,9 @@ export type { SkipLinkProps } from './recipes/SkipLink';
 export { Dialog } from './recipes/Dialog';
 export type { DialogProps } from './recipes/Dialog';
 
+export { CheckboxSelect } from './recipes/CheckboxSelect';
+export type { CheckboxSelectProps, CheckboxSelectOption } from './recipes/CheckboxSelect';
+
 export { Lightbox } from './recipes/Lightbox';
 export type { LightboxProps } from './recipes/Lightbox';
 

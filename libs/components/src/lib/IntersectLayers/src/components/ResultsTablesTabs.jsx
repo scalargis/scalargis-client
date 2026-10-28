@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Group, MultiSelect, Tabs } from '@mantine/core';
-import { TabPanel } from '@scalargis/ui';
+import { Group, Tabs } from '@mantine/core';
+import { CheckboxSelect, TabPanel } from '@scalargis/ui';
 
 import { i18n } from '../../../components';
 
@@ -49,25 +49,19 @@ export default function ResultsTablesTabs(props) {
 
     const _layers = layers.filter((layer) => selectedGroups?.length ? selectedGroups.includes(layer.group) : true);
 
-    // Tabs are keyed by the layer's index in the ORIGINAL array, so the
-    // active tab survives the groups filter narrowing the visible set.
     const tabKeys = _layers.map((layer) => String(layers.findIndex(elem => elem === layer)));
     const currentTab = activeTab != null && tabKeys.includes(activeTab) ? activeTab : (tabKeys[0] ?? null);
 
     return (
         <>
 
-            <Group className='sg-intersect-toolbar mb-2' align="center" wrap="nowrap">
-                <label className='pr-2'>{t('groups', 'Grupos')}:</label>
-                <MultiSelect
+            <Group className='sg-intersect-toolbar' mb="xs" align="center" wrap="nowrap">
+                <CheckboxSelect
+                    label={t('groups', 'Grupos')}
+                    ofText={t('of', 'de')}
                     value={selectedGroups}
-                    onChange={(value) => setSelectedGroups(value)}
+                    onChange={setSelectedGroups}
                     data={groupsOptions.map(g => ({ value: g.code, label: g.name }))}
-                    // The placeholder shares the input row with the pills, so it
-                    // only earns its line while nothing is picked.
-                    placeholder={selectedGroups?.length ? undefined : t('selectGroups', 'Selecionar grupos')}
-                    flex="1"
-                    maw={360}
                 />
             </Group>
 
@@ -84,7 +78,6 @@ export default function ResultsTablesTabs(props) {
                 </Tabs.List>
 
                 { _layers.map((layer) => {
-                    // Get the index of the layer in the original layers array
                     const layerIndex = layers.findIndex(elem => elem === layer) || 0;
 
                     const records = layer?.results || [];
@@ -109,9 +102,7 @@ export default function ResultsTablesTabs(props) {
                     return (
                         <TabPanel key={layerIndex} active={currentTab === String(layerIndex)} mount="unmount">
 
-                            <div className='text-lg text-gray-600 mt-1 mb-3'>{`${t('group', 'Grupo')}: ${groupTitle}`}</div>
-
-                            <ResultsTable records={records} fields={fields} filters={tableFilters}
+                            <ResultsTable title={`${t('group', 'Grupo')}: ${groupTitle}`} records={records} fields={fields} filters={tableFilters}
                                 showResultMeasure={props?.showResultMeasure}
                                 showResultPercentage={props?.showResultPercentage}
                                 onFiltersChange={onTableFiltersChange}

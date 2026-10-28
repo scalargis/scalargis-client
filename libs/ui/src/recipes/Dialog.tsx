@@ -21,8 +21,9 @@ import { uiText } from './i18n';
 const MIN_DIALOG_W = 240;
 const MIN_DIALOG_H = 160;
 const DIALOG_DESKTOP_SIZE = '35vw';
+const DIALOG_FIT_STYLE = { minWidth: 'min(20rem, 100%)', maxWidth: 'min(48rem, 100%)' };
 
-export interface DialogProps extends Omit<ModalRootProps, 'title'> {
+export interface DialogProps extends Omit<ModalRootProps, 'title' | 'size'> {
   /** Header title (Prime's `header`). */
   title?: React.ReactNode;
   /** Action bar pinned below the scrollable body (Prime's `footer`). */
@@ -35,6 +36,8 @@ export interface DialogProps extends Omit<ModalRootProps, 'title'> {
   withOverlay?: boolean;
   /** Initial placement. 'top-left' and 'top-right' anchor to that viewport corner (Prime's position prop); default centred. */
   position?: 'center' | 'top-left' | 'top-right';
+  /** Desktop width. `fit` sizes the window to its content, between 20rem and 48rem and never wider than the viewport. Any other value is a Mantine size. Default 35vw. */
+  size?: ModalRootProps['size'] | 'fit';
   /** Phone form: `auto` keeps the window with no drag or resize, `sheet` is a bottom sheet over the map, `fullscreen` fills the screen. */
   mobile?: 'auto' | 'sheet' | 'fullscreen';
 }
@@ -67,7 +70,8 @@ export function Dialog({
     ? { justifyContent: position === 'top-right' ? 'flex-end' : 'flex-start', alignItems: 'flex-start' }
     : undefined;
 
-  const resolvedSize = isMobile ? '90%' : sizeProp ?? DIALOG_DESKTOP_SIZE;
+  const fit = sizeProp === 'fit';
+  const resolvedSize = isMobile ? '90%' : fit ? 'auto' : sizeProp ?? DIALOG_DESKTOP_SIZE;
 
   // Centred-model drag: a translate on the Modal's `inner` centring wrapper.
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -202,8 +206,10 @@ export function Dialog({
           // `flex: 0 0 var(--modal-size)`, so a plain width is ignored.
           content:
             box && !maximized
-              ? { flex: `0 0 ${box.w}px`, maxWidth: 'none', maxHeight: 'none' }
-              : undefined,
+              ? { flex: `0 0 ${box.w}px`, minWidth: 0, maxWidth: 'none', maxHeight: 'none' }
+              : fit && !isMobile && !maximized
+                ? DIALOG_FIT_STYLE
+                : undefined,
           // Centred: translate by the drag offset. Anchored (`box`): drop the
           // centring AND the inner padding, so `box.x/y` is the absolute
           // top-left (padding left in would double-count the translate). The

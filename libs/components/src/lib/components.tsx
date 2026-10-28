@@ -45,6 +45,7 @@ import ResendConfirmationButton from './UserLogin/src/ResendConfirmationButton'
 import * as URLparams from './URLparams/src/Main'
 import * as IntersectLayers from './IntersectLayers/src/Main'
 import IntersectResults from './IntersectLayers/src/IntersectResults'
+import ResultsTablesTabs from './IntersectLayers/src/components/ResultsTablesTabs'
 import * as URLlayers from './URLlayers/src/Main'
 
 import DrawingToolbar from './DrawingToolbar'
@@ -126,6 +127,7 @@ export {
   DocumentList,
   IntersectLayers,
   IntersectResults,
+  ResultsTablesTabs,
   URLlayers,
 
   Legend,

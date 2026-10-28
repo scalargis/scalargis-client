@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Group, NumberInput, TextInput } from '@mantine/core';
-import { DataGrid, exportGridCSV, IconUpload } from '@scalargis/ui';
+import { Button, Group, NumberInput, Text, TextInput } from '@mantine/core';
+import { DataGrid, exportGridCSV, IconDownload } from '@scalargis/ui';
 
 import { i18n } from '../../../components';
 import { foldDiacritics } from '../../../utils/common';
@@ -30,8 +30,6 @@ export default function ResultsTable(props) {
         onFiltersChange({ ...(filters || {}), [field]: { value } });
     };
 
-    // The Prime filter semantics restated client-side: text fields filter by
-    // contains, the numeric measure columns by greater-than.
     let data = records;
     (fields || []).forEach((item) => {
         const value = filterValue(item.field);
@@ -110,19 +108,17 @@ export default function ResultsTable(props) {
         columns.push({ accessor: 'percent', title: '%', sortable: true, render: rowData => numericValueTemplate(rowData.percent), exportRender: rowData => numericValueTemplate(rowData.percent), ...numericFilter('percent', '%') });
     }
 
-    // The "Tabelas" dialog has no export of its own (unlike the inline results,
-    // which export the full server-side dataset via IntersectResults' format
-    // toolbar) — this exports exactly what's on screen: current sort + filters.
     const exportFilename = props?.exportFilename || 'resultados.csv';
 
     return (
         <>
-            <Group justify="flex-end" mb="xs">
+            <Group justify={props?.title ? 'space-between' : 'flex-end'} align="center" wrap="nowrap" mb="xs">
+                {props?.title ? <Text size="lg" c="dimmed">{props.title}</Text> : null}
                 <Button
                     type="button"
                     size="xs"
                     variant="outline"
-                    leftSection={<IconUpload />}
+                    leftSection={<IconDownload />}
                     onClick={() => exportGridCSV(data, columns, { filename: exportFilename })}
                     disabled={!data.length}
                 >

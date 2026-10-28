@@ -56,10 +56,10 @@ export default function IntersectResults(props) {
                 }
             }
             const results = l.results || [];
-            results.forEach((r, index) => {
+            results.forEach((r) => {
                 groups[group].results.push(
                     {
-                        key: String(index),
+                        key: String(groups[group].results.length),
                         fields: l.fields,
                         ...r
                     }

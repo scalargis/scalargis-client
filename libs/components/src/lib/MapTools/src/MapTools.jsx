@@ -487,7 +487,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
           title={selectedControl === 'length' ? t("measureDistance", "Medir Distância") : t("measureArea", "Medir Área")}
           opened={helpModal}
           onClose={closeHelp}
-          size="auto"
+          size="fit"
           footer={
             <Group justify="flex-end">
               <Button
