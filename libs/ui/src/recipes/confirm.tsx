@@ -43,6 +43,8 @@ export interface ConfirmOptions {
   /** Modal title. Omitted → an untitled dialog, as Prime allows. */
   header?: React.ReactNode;
   severity?: ConfirmSeverity;
+  /** Replaces the severity icon next to the message. */
+  icon?: React.ReactNode;
   acceptLabel?: string;
   rejectLabel?: string;
   /** Runs when the user accepts. */
@@ -71,6 +73,7 @@ export function confirm({
   message,
   header,
   severity = 'primary',
+  icon,
   // Default params re-evaluate per call, so these follow the app language.
   // Yes/No, not OK/Cancel: Prime's confirmDialog falls back to
   // localeOption('accept'/'reject') — en Yes/No, pt Sim/Não — and call
@@ -91,8 +94,8 @@ export function confirm({
     // the meaning (WCAG 1.4.1), not the colour or the glyph.
     children: (
       <Group gap="sm" wrap="nowrap" align="flex-start">
-        <Box c={ACCEPT_COLOR[severity]} fz="lg" mt={2} aria-hidden>
-          {severityIcon(severity)}
+        <Box c={icon ? undefined : ACCEPT_COLOR[severity]} fz="lg" mt={2} aria-hidden>
+          {icon ?? severityIcon(severity)}
         </Box>
         <Text size="sm">{message}</Text>
       </Group>
