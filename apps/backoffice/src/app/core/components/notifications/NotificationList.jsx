@@ -34,10 +34,7 @@ const status = [
   }
 ];
 
-// The @mantine/dates pickers exchange 'YYYY-MM-DD' strings; the filter model
-// keeps Dates so the filter payload stays the pre-migration shape.
 const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
-const fromPickerDate = (value) => (value ? dayjs(value).toDate() : null);
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
 function NotificationList(props) {
@@ -91,7 +88,7 @@ function NotificationList(props) {
     const _filter = {};
     Object.entries(searchParams.filters || {}).forEach(([key, value]) => {
       if (key && value) {
-        _filter[key] = value;
+        _filter[key] = ['start_date', 'end_date'].includes(key) ? toPickerDate(value) : value;
       }
     });
 
@@ -235,7 +232,7 @@ function NotificationList(props) {
                         <DatePickerInput
                           label="Data envio (início)"
                           value={toPickerDate(field.value)}
-                          onChange={(value) => field.onChange(fromPickerDate(value))}
+                          onChange={(value) => field.onChange(value)}
                           valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
                           clearable />
                       )}
@@ -249,7 +246,7 @@ function NotificationList(props) {
                         <DatePickerInput
                           label="Data envio (fim)"
                           value={toPickerDate(field.value)}
-                          onChange={(value) => field.onChange(fromPickerDate(value))}
+                          onChange={(value) => field.onChange(value)}
                           valueFormat="DD/MM/YYYY" placeholder="dd/mm/aaaa"
                           clearable />
                       )}

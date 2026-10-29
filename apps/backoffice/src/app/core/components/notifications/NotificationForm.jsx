@@ -37,24 +37,21 @@ function NotificationForm(props) {
 
   const onCheck = () => {
     const values = {
-      checked: true,
-      checked_date: new Date().toISOString().slice(0, 10)
+      checked: true
     }
     updateNotification(values);
   }
 
   const onClose = () => {
     const values = {
-      closed: true,
-      closed_date: new Date().toISOString().slice(0, 10)
+      closed: true
     }
     updateNotification(values);
   }
 
   const onReopen = () => {
     const values = {
-      closed: false,
-      closed_date: null
+      closed: false
     }
     updateNotification(values);
   }
