@@ -16,6 +16,7 @@ import { Dropdown } from 'primereact/dropdown'
 import { ProgressSpinner } from 'primereact/progressspinner'
 import { AutoComplete } from 'primereact/autocomplete'
 import { Calendar } from 'primereact/calendar'
+import dayjs from 'dayjs'
 
 import dataProvider from '../../../service/DataProvider';
 import { fetchJson } from  '../../../service/fetch'
@@ -203,7 +204,7 @@ export default function ViewerVisitsChart(props) {
         let  new_dates_values = [];        
         if (customRange?.length > 1) {
             dates_str.forEach((d, i) => {
-                const date = new Date(d);
+                const date = dayjs(d).toDate();
                 if (customRange[0]<= date && customRange[1] >= date) {
                     new_dates_str.push(dates_str[i]);
                     new_dates_values.push(dates_values[i]);
@@ -228,7 +229,7 @@ export default function ViewerVisitsChart(props) {
         }
 
         if (value === 'custom') {
-            setCustomRange([new Date(dates_str[0]), new Date(dates_str[dates_str.length - 1])])
+            setCustomRange([dayjs(dates_str[0]).toDate(), dayjs(dates_str[dates_str.length - 1]).toDate()])
             return;
         }
 

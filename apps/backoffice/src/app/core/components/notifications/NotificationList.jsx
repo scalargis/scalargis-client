@@ -12,6 +12,7 @@ import { Button } from 'primereact/button';
 import { Chip } from 'primereact/chip';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
+import dayjs from 'dayjs';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
@@ -42,6 +43,8 @@ const status = [
     name: 'Encerrado'
   }
 ];
+
+const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
 function NotificationList(props) {
 
@@ -112,6 +115,8 @@ function NotificationList(props) {
       return e.data.label;
     } else if (e.field === 'author') {
       return (e.data.name + (e.data.email ? ` (${e.data.email})` : ''));
+    } else if (e.field === 'date') {
+      return formatDay(e.data);
     } else {
       return e.data;
     }
@@ -202,6 +207,8 @@ function NotificationList(props) {
     );
   }  
 
+  const dateTemplate = (rowData) => formatDay(rowData.date);
+
   const viewerTemplate = (rowData) => {
     return rowData.viewer ? <Chip label={rowData.viewer} /> : null;
   }
@@ -225,9 +232,9 @@ function NotificationList(props) {
     if (status.value === 0) {
       return <span className="badge badge-danger" title={`${status.label || 'Por abrir'}`}><i className="fas fa-envelope"></i></span>
     } else if (status.value === 1) {
-      return <span className="badge badge-warning" title={`${status.label || 'Lida'} (${status.date})`}><i className="fas fa-envelope-open"></i></span>
+      return <span className="badge badge-warning" title={`${status.label || 'Lida'} (${formatDay(status.date)})`}><i className="fas fa-envelope-open"></i></span>
     } else if (status.value === 2) {
-      return <span className="badge badge-success" title={`${status.label || 'Encerrada'} (${status.date})`}><i className="fas fa-check"></i></span>
+      return <span className="badge badge-success" title={`${status.label || 'Encerrada'} (${formatDay(status.date)})`}><i className="fas fa-check"></i></span>
     }
 
     return null;    
@@ -369,7 +376,7 @@ function NotificationList(props) {
                 emptyMessage="Não foram encontradas notificações." >
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
                 <Column field="id" header="Id" sortable headerStyle={{ width: '6rem' }} />
-                <Column field="date" header="Data" sortable headerStyle={{ width: '8rem' }} />
+                <Column field="date" header="Data" sortable body={dateTemplate} headerStyle={{ width: '8rem' }} />
                 <Column field="viewer" header="Visualizador" sortable sortField='viewer' body={viewerTemplate} headerStyle={{ width: '9rem' }} style={{ textAlign: 'center'}} />
                 <Column field="author" header="Autor" sortable sortField='name' body={authorTemplate} style={{"wordBreak": "break-all"}} />
                 <Column field="message" header="Mensagem" body={messageTemplate} />

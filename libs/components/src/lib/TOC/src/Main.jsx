@@ -45,6 +45,9 @@ export function MainMenu({ className, config, actions, record }) {
   )
 }
 
+/** Local date and time of an ISO stamp from the server. */
+const formatStamp = (value) => (value ? new Date(value).toLocaleString() : '');
+
 class Main extends React.Component {
 
   constructor(props) {
@@ -392,7 +395,7 @@ class Main extends React.Component {
             <Toolbar className="mb-2"
               start={(config.viewer.is_session && 
                 <Button label={this.props.t("session", "Sessão")} size="small" rounded severity="info"
-                  icon="pi pi-check" title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}  />)} 
+                  icon="pi pi-check" title={this.props.t("sessionSaveInfo", `Gravada em ${formatStamp(config.viewer.session.date)}`, {info: formatStamp(config.viewer.session.date)} )}  />)} 
               end={ 
               <React.Fragment>
                 {(config.viewer.session && !config.viewer.is_session) && <Button label={this.props.t("loadSession","Abrir sessão")} 
@@ -400,7 +403,7 @@ class Main extends React.Component {
                   text size="small"
                   onClick={e => this.loadSession()}
                   disabled={(config.viewer.save_loading)}
-                  title={this.props.t("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )} />}
+                  title={this.props.t("sessionSaveInfo", `Gravada em ${formatStamp(config.viewer.session.date)}`, {info: formatStamp(config.viewer.session.date)} )} />}
                 <Button label={this.props.t("saveSession", "Gravar sessão")}
                   icon={config.viewer.save_loading ? "pi pi-spin pi-spinner": "pi pi-save"}
                   text size="small"

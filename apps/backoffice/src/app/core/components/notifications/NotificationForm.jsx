@@ -8,9 +8,12 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { DataView } from 'primereact/dataview';
+import dayjs from 'dayjs';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+
+const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
 function NotificationForm(props) {
 
@@ -215,7 +218,7 @@ function NotificationForm(props) {
                 </div>
                 <div className="field col-12">
                     <label htmlFor="date">Data</label>
-                    <InputText id="date" type="text" value={data.date || ''}  disabled />
+                    <InputText id="date" type="text" value={formatDay(data.date)}  disabled />
                 </div>                                                
               </div>
             </div>
@@ -233,11 +236,11 @@ function NotificationForm(props) {
               <div className="p-fluid formgrid grid">
                   <div className="field col-12">
                       <label htmlFor="read_date">Data Leitura</label>
-                      <InputText id="read_date" type="text" value={data.checked_date || ''} disabled />
+                      <InputText id="read_date" type="text" value={formatDay(data.checked_date)} disabled />
                   </div>
                   <div className="field col-12">
                       <label htmlFor="close_date">Data Encerramento</label>
-                      <InputText id="close_date" type="text" value={data.closed_date || ''} disabled />
+                      <InputText id="close_date" type="text" value={formatDay(data.closed_date)} disabled />
                   </div>                               
                 </div>              
             </div>
