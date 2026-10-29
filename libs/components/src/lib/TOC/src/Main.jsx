@@ -37,6 +37,9 @@ export function MainMenu({ className, config, actions, record }) {
   )
 }
 
+/** Local date and time of an ISO stamp from the server. */
+const formatStamp = (value) => (value ? new Date(value).toLocaleString() : '');
+
 class Main extends React.Component {
 
   constructor(props) {
@@ -381,7 +384,7 @@ class Main extends React.Component {
                 {config.viewer.is_session &&
                   <Badge variant="light" color="informative" radius="xl"
                     leftSection={<IconCheck />}
-                    title={i18n.translateValue("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
+                    title={i18n.translateValue("sessionSaveInfo", `Gravada em ${formatStamp(config.viewer.session.date)}`, {info: formatStamp(config.viewer.session.date)} )}>
                     {i18n.translateValue("session", "Sessão")}
                   </Badge>}
               </div>
@@ -391,7 +394,7 @@ class Main extends React.Component {
                     leftSection={<IconFolderOpen />}
                     onClick={e => this.loadSession()}
                     disabled={(config.viewer.save_loading)}
-                    title={i18n.translateValue("sessionSaveInfo", `Gravada em ${config.viewer.session.date}`, {info: config.viewer.session.date} )}>
+                    title={i18n.translateValue("sessionSaveInfo", `Gravada em ${formatStamp(config.viewer.session.date)}`, {info: formatStamp(config.viewer.session.date)} )}>
                     {i18n.translateValue("loadSession","Abrir sessão")}
                   </Button>}
                 <Button variant="subtle" size="compact-sm" type="button"

@@ -2,10 +2,13 @@ import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { Alert, Badge, Box, Button, Grid, Group, Input, TextInput, Textarea } from '@mantine/core';
+import dayjs from 'dayjs';
 import { notify, IconArrowLeft } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+
+const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
 function NotificationForm(props) {
 
@@ -133,7 +136,7 @@ function NotificationForm(props) {
                     <TextInput id="viewer" label="Visualizador" value={data.viewer ?? ''} disabled />
                 </Grid.Col>
                 <Grid.Col span={12}>
-                    <TextInput id="date" label="Data" value={data.date || ''} disabled />
+                    <TextInput id="date" label="Data" value={formatDay(data.date)} disabled />
                 </Grid.Col>
               </Grid>
             </Grid.Col>
@@ -149,10 +152,10 @@ function NotificationForm(props) {
             <Grid.Col span={{ base: 12, md: 3 }}>
               <Grid gap="sm">
                   <Grid.Col span={12}>
-                      <TextInput id="read_date" label="Data Leitura" value={data.checked_date || ''} disabled />
+                      <TextInput id="read_date" label="Data Leitura" value={formatDay(data.checked_date)} disabled />
                   </Grid.Col>
                   <Grid.Col span={12}>
-                      <TextInput id="close_date" label="Data Encerramento" value={data.closed_date || ''} disabled />
+                      <TextInput id="close_date" label="Data Encerramento" value={formatDay(data.closed_date)} disabled />
                   </Grid.Col>
                 </Grid>
             </Grid.Col>

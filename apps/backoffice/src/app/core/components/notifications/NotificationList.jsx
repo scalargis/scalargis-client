@@ -38,6 +38,7 @@ const status = [
 // keeps Dates so the filter payload stays the pre-migration shape.
 const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
 const fromPickerDate = (value) => (value ? dayjs(value).toDate() : null);
+const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
 function NotificationList(props) {
 
@@ -135,7 +136,7 @@ function NotificationList(props) {
   const columns = useMemo(
     () => [
       { accessor: 'id', title: 'Id', sortable: true, width: 90 },
-      { accessor: 'date', title: 'Data', sortable: true, width: 130 },
+      { accessor: 'date', title: 'Data', sortable: true, width: 130, render: (record) => formatDay(record.date), exportRender: (record) => formatDay(record.date) },
       {
         accessor: 'viewer',
         title: 'Visualizador',
@@ -177,9 +178,9 @@ function NotificationList(props) {
           if (status.value === 0) {
             return <span className="badge badge-danger" title={`${status.label || 'Por abrir'}`}><i className="fas fa-envelope"></i></span>
           } else if (status.value === 1) {
-            return <span className="badge badge-warning" title={`${status.label || 'Lida'} (${status.date})`}><i className="fas fa-envelope-open"></i></span>
+            return <span className="badge badge-warning" title={`${status.label || 'Lida'} (${formatDay(status.date)})`}><i className="fas fa-envelope-open"></i></span>
           } else if (status.value === 2) {
-            return <span className="badge badge-success" title={`${status.label || 'Encerrada'} (${status.date})`}><i className="fas fa-check"></i></span>
+            return <span className="badge badge-success" title={`${status.label || 'Encerrada'} (${formatDay(status.date)})`}><i className="fas fa-check"></i></span>
           }
 
           return null;
