@@ -44,6 +44,7 @@ const status = [
   }
 ];
 
+const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
 function NotificationList(props) {
@@ -128,11 +129,11 @@ function NotificationList(props) {
     const _filter = {};
     if (filters) {
       Object.entries(filters).forEach(([key, item]) => {
-        _filter[key] = item.value;
+        _filter[key] = ['start_date', 'end_date'].includes(key) ? toPickerDate(item.value) : item.value;
       });
     } else if (searchParams.filters) {
       Object.entries(searchParams.filters).forEach(([key, item]) => {
-        if (key && item) _filter[key] = item;
+        if (key && item) _filter[key] = ['start_date', 'end_date'].includes(key) ? toPickerDate(item) : item;
       });
     }
 
