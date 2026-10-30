@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import i18next from "i18next";
-import { ActionIcon, Button, Group, NumberInput, Paper, Popover, Select, Stack, Switch, TextInput } from '@mantine/core';
-import { DataGrid, confirm, notify, IconReplay, IconRefresh, IconTrash, IconPalette, IconFile, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
+import { ActionIcon, Badge, Button, ColorSwatch, Divider, Group, NumberInput, Paper, Popover, Select, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
+import { DataGrid, confirm, notify, IconReplay, IconRefresh, IconTrash, IconDownload, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import { createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
 import { getAppRootPath } from '../../utils/common';
@@ -59,15 +59,15 @@ const historyTools = [
 ];
 
 const colorTools = [
-  { value: "fill", title: "fillColor", defaultTitle: "Côr de preenchimento", icon: <IconPalette /> },
-  { value: "stroke", title: "outlineColor", defaultTitle: "Côr de rebordo", icon: <IconPalette /> }
+  { value: "fill", title: "fillColor", defaultTitle: "Côr de preenchimento" },
+  { value: "stroke", title: "outlineColor", defaultTitle: "Côr de rebordo" }
 ];
 
 const defaultExportFormats = [
-  { value: "geojson", title: "GeoJSON", icon: <IconFile />, tooltip: "Exportar para ficheiro GeoJSON" },
-  { value: "gml", title: "GML", icon: <IconFile />, tooltip: "Exportar para ficheiro GML" },
-  { value: "shape", title: "ShapeFile", icon: <IconFile />, tooltip: "Exportar para ficheiro ShapeFile" },
-  { value: "kml", title: "KML", icon: <IconFile />, tooltip: "Exportar para ficheiro KML" }
+  { value: "geojson", title: "GeoJSON", icon: <IconDownload />, tooltip: "Exportar para ficheiro GeoJSON" },
+  { value: "gml", title: "GML", icon: <IconDownload />, tooltip: "Exportar para ficheiro GML" },
+  { value: "shape", title: "ShapeFile", icon: <IconDownload />, tooltip: "Exportar para ficheiro ShapeFile" },
+  { value: "kml", title: "KML", icon: <IconDownload />, tooltip: "Exportar para ficheiro KML" }
 ];
 
 const typeLabels = {
@@ -737,15 +737,6 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     });
   };
 
-  const getButtonStyle = (opt) => {
-    const { fill: f, stroke: s } = panel;
-    const fillStr = `rgba(${f.r}, ${f.g}, ${f.b}, ${f.a})`;
-    const strokeStr = `rgba(${s.r}, ${s.g}, ${s.b}, ${s.a})`;
-    if (opt.value === 'fill') return { backgroundColor: fillStr, color: 'gray' };
-    if (opt.value === 'stroke') return { backgroundColor: strokeStr, color: 'gray' };
-    return undefined;
-  };
-
   const zoom = (item) => {
     const features = parseOlFeatures(JSON.stringify(item), viewCrs());
     if (features.length) {
@@ -779,7 +770,6 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     <NumberInput
       key={name}
       size="xs"
-      w={84}
       label={label}
       aria-label={label}
       value={panel[name]}
@@ -789,158 +779,148 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     />
   );
 
+  const toolButton = (opt) => (
+    <MapToolButton
+      key={opt.value}
+      size="lg"
+      variant={opt.value === selectedTool ? 'filled' : 'default'}
+      active={opt.value === selectedTool}
+      title={i18next.t(opt.title, opt.defaultTitle)}
+      onClick={(e) => startDraw(e, opt.value)}
+    >
+      {opt.icon()}
+    </MapToolButton>
+  );
+
+  const section = (label, children) => (
+    <Stack gap={4} className="draw-section">
+      <Text className="draw-section-label">{label}</Text>
+      <Group gap={4} wrap="nowrap">{children}</Group>
+    </Stack>
+  );
+
+  const colorButton = (opt) => {
+    const isFill = opt.value === 'fill';
+    const opened = isFill ? panel.displayFillPicker : panel.displayStrokePicker;
+    const pickerColor = isFill ? fill : stroke;
+    const swatch = `rgba(${pickerColor.r}, ${pickerColor.g}, ${pickerColor.b}, ${pickerColor.a})`;
+    const onToggle = () => patch(isFill
+      ? { displayFillPicker: !panel.displayFillPicker, displayStrokePicker: false }
+      : { displayStrokePicker: !panel.displayStrokePicker, displayFillPicker: false });
+    const onClose = () => patch(isFill ? { displayFillPicker: false } : { displayStrokePicker: false });
+    const onColorChange = (color) => styleChange(isFill ? { fill: color.rgb } : { stroke: color.rgb });
+    return (
+      <Popover
+        key={opt.value}
+        opened={opened}
+        onChange={(isOpened) => { if (!isOpened) onClose(); }}
+        position="bottom-start"
+        withinPortal
+        shadow="md"
+        trapFocus={false}
+      >
+        <Popover.Target>
+          <ActionIcon
+            size="lg"
+            variant="default"
+            title={i18next.t(opt.title, opt.defaultTitle)}
+            aria-label={i18next.t(opt.title, opt.defaultTitle)}
+            onClick={() => onToggle()}
+          >
+            {isFill
+              ? <ColorSwatch size={18} radius={4} color={swatch} />
+              : <span className="draw-stroke-swatch" style={{ borderColor: swatch }} />}
+          </ActionIcon>
+        </Popover.Target>
+        <Popover.Dropdown p={0}>
+          <CompactPicker color={pickerColor} onChange={onColorChange} />
+        </Popover.Dropdown>
+      </Popover>
+    );
+  };
+
+  const historyButton = (opt) => (
+    <MapToolButton
+      key={opt.value}
+      size="lg"
+      variant={opt.value !== "clear" ? "default" : "light"}
+      color={opt.value !== "clear" ? undefined : "danger"}
+      icon={opt.icon}
+      title={i18next.t(opt.title, opt.defaultTitle)}
+      onClick={(e) => {
+        switch (opt.value) {
+          case 'undo': clickUndo(e); break;
+          case 'redo': clickRedo(e); break;
+          case 'clear': clickClear(e); break;
+          default: ;
+        }
+      }}
+    />
+  );
+
   return (
     <div id="drawtools">
 
-      <Paper shadow="md" p="sm" className="toolbar">
-        <Stack gap="xs">
+      <Paper withBorder radius="md" p="sm" className="toolbar">
+        <Stack gap="sm">
 
-          <Group gap="sm" wrap="wrap">
-            <Group gap={4} wrap="nowrap">
-              {drawElementsOptions.map(opt =>
-                <MapToolButton
-                  key={opt.value}
-                  size="lg"
-                  variant={opt.value === selectedTool ? 'filled' : 'default'}
-                  active={opt.value === selectedTool}
-                  title={i18next.t(opt.title, opt.defaultTitle)}
-                  onClick={(e) => startDraw(e, opt.value)}
-                >
-                  {opt.icon()}
-                </MapToolButton>
-              )}
-            </Group>
+          {section(i18next.t("drawingSectionDraw", "Desenhar"), drawElementsOptions.map(toolButton))}
 
-            <Group gap={4} wrap="nowrap">
-              {shapeTools.map(opt =>
-                <MapToolButton
-                  key={opt.value}
-                  size="lg"
-                  variant={opt.value === selectedTool ? 'filled' : 'default'}
-                  active={opt.value === selectedTool}
-                  title={i18next.t(opt.title, opt.defaultTitle)}
-                  onClick={(e) => startDraw(e, opt.value)}
-                >
-                  {opt.icon()}
-                </MapToolButton>
-              )}
-            </Group>
-
-            <Group gap={4} wrap="nowrap">
-              {selectTools.map(opt =>
-                <MapToolButton
-                  key={opt.value}
-                  size="lg"
-                  variant={opt.value === selectedTool ? 'filled' : 'default'}
-                  active={opt.value === selectedTool}
-                  title={i18next.t(opt.title, opt.defaultTitle)}
-                  onClick={(e) => startDraw(e, opt.value)}
-                >
-                  {opt.icon()}
-                </MapToolButton>
-              )}
-            </Group>
+          <Group gap={12} wrap="wrap" align="flex-start">
+            {section(i18next.t("drawingSectionShapes", "Formas"), shapeTools.map(toolButton))}
+            {section(i18next.t("drawingSectionEdit", "Editar"), selectTools.map(toolButton))}
           </Group>
 
-          <Group gap={4} wrap="wrap">
-            {colorTools.map(opt => {
-              const isFill = opt.value === 'fill';
-              const opened = isFill ? panel.displayFillPicker : panel.displayStrokePicker;
-              const pickerColor = isFill ? fill : stroke;
-              const onToggle = () => patch(isFill
-                ? { displayFillPicker: !panel.displayFillPicker, displayStrokePicker: false }
-                : { displayStrokePicker: !panel.displayStrokePicker, displayFillPicker: false });
-              const onClose = () => patch(isFill ? { displayFillPicker: false } : { displayStrokePicker: false });
-              const onColorChange = (color) => styleChange(isFill ? { fill: color.rgb } : { stroke: color.rgb });
-              return (
-                <Popover
-                  key={opt.value}
-                  opened={opened}
-                  onChange={(isOpened) => { if (!isOpened) onClose(); }}
-                  position="bottom-start"
-                  withinPortal
-                  shadow="md"
-                  trapFocus={false}
-                >
-                  <Popover.Target>
-                    <ActionIcon
-                      size="lg"
-                      variant="default"
-                      title={i18next.t(opt.title, opt.defaultTitle)}
-                      aria-label={i18next.t(opt.title, opt.defaultTitle)}
-                      style={getButtonStyle(opt)}
-                      onClick={() => onToggle()}
-                    >
-                      {opt.icon}
-                    </ActionIcon>
-                  </Popover.Target>
-                  <Popover.Dropdown p={0}>
-                    <CompactPicker color={pickerColor} onChange={onColorChange} />
-                  </Popover.Dropdown>
-                </Popover>
-              );
-            })}
-
-            <Select
-              size="sm"
-              w={72}
-              title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
-              aria-label={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
-              value={size}
-              data={sizeOptions}
-              onChange={value => styleChange({ size: value })}
-              allowDeselect={false}
-            />
+          <Group gap={12} wrap="wrap" align="flex-start">
+            {section(i18next.t("drawingSectionStyle", "Estilo"), (
+              <>
+                {colorTools.map(colorButton)}
+                <Select
+                  size="sm"
+                  w={56}
+                  title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
+                  aria-label={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
+                  value={size}
+                  data={sizeOptions}
+                  onChange={value => styleChange({ size: value })}
+                  allowDeselect={false}
+                  comboboxProps={{ withinPortal: true }}
+                />
+              </>
+            ))}
+            {section(i18next.t("drawingSectionHistory", "Histórico"), historyTools.map(historyButton))}
           </Group>
 
-          <Group gap={4} wrap="nowrap">
-            {historyTools.map(opt =>
-              <MapToolButton
-                key={opt.value}
-                size="lg"
-                variant={opt.value !== "clear" ? "default" : "filled"}
-                color={opt.value !== "clear" ? undefined : "danger"}
-                icon={opt.icon}
-                title={i18next.t(opt.title, opt.defaultTitle)}
-                onClick={(e) => {
-                  switch (opt.value) {
-                    case 'undo': clickUndo(e); break;
-                    case 'redo': clickRedo(e); break;
-                    case 'clear': clickClear(e); break;
-                    default: ;
-                  }
-                }}
-              />
-            )}
-          </Group>
+          <Divider />
+
+          <Switch
+            size="xs"
+            checked={panel.snap}
+            onChange={toggleSnap}
+            label={i18next.t("drawingSnap", "Atrair para desenhos e camadas")}
+          />
 
         </Stack>
       </Paper>
 
       <HelpBox tool={selectedTool || 'none'} />
 
-      <Switch
-        size="xs"
-        mt="xs"
-        checked={panel.snap}
-        onChange={toggleSnap}
-        label={i18next.t("drawingSnap", "Atrair para desenhos e camadas")}
-      />
-
       {PLACEMENT_TOOLS.includes(selectedTool) ? (
-        <Group gap="xs" mt="xs" align="flex-end" className="draw-shape-inputs">
-          {selectedTool === 'square' ? numberField('shapeSide', i18next.t("drawingSide", "Lado (m)"), { min: 0.01, decimalScale: 2 }) : null}
-          {selectedTool === 'rectangle' ? numberField('shapeWidth', i18next.t("drawingWidth", "Largura (m)"), { min: 0.01, decimalScale: 2 }) : null}
-          {selectedTool === 'rectangle' ? numberField('shapeHeight', i18next.t("drawingHeight", "Altura (m)"), { min: 0.01, decimalScale: 2 }) : null}
-          {selectedTool === 'grid' ? numberField('gridRows', i18next.t("drawingRows", "Linhas"), { min: 1, decimalScale: 0 }) : null}
-          {selectedTool === 'grid' ? numberField('gridCols', i18next.t("drawingCols", "Colunas"), { min: 1, decimalScale: 0 }) : null}
-          {selectedTool === 'grid' ? numberField('gridCell', i18next.t("drawingCellSize", "Célula (m)"), { min: 0.01, decimalScale: 2 }) : null}
-          {numberField('shapeRotation', i18next.t("drawingRotation", "Rotação (°)"), { decimalScale: 2 })}
-        </Group>
+        <Paper withBorder radius="md" p="sm" mt="sm" className="draw-shape-inputs">
+          <SimpleGrid cols={3} spacing="xs" verticalSpacing="xs">
+            {selectedTool === 'square' ? numberField('shapeSide', i18next.t("drawingSide", "Lado (m)"), { min: 0.01, decimalScale: 2 }) : null}
+            {selectedTool === 'rectangle' ? numberField('shapeWidth', i18next.t("drawingWidth", "Largura (m)"), { min: 0.01, decimalScale: 2 }) : null}
+            {selectedTool === 'rectangle' ? numberField('shapeHeight', i18next.t("drawingHeight", "Altura (m)"), { min: 0.01, decimalScale: 2 }) : null}
+            {selectedTool === 'grid' ? numberField('gridRows', i18next.t("drawingRows", "Linhas"), { min: 1, decimalScale: 0 }) : null}
+            {selectedTool === 'grid' ? numberField('gridCols', i18next.t("drawingCols", "Colunas"), { min: 1, decimalScale: 0 }) : null}
+            {selectedTool === 'grid' ? numberField('gridCell', i18next.t("drawingCellSize", "Célula (m)"), { min: 0.01, decimalScale: 2 }) : null}
+            {numberField('shapeRotation', i18next.t("drawingRotation", "Rotação (°)"), { decimalScale: 2 })}
+          </SimpleGrid>
+        </Paper>
       ) : null}
 
       {selectedTool === 'transform' && transformCount > 0 ? (
-        <Group gap="xs" mt="xs">
+        <Group gap="xs" mt="sm">
           <Button
             type="button"
             size="sm"
@@ -952,7 +932,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
           </Button>
           <MapToolButton
             size="input-sm"
-            variant="filled"
+            variant="light"
             color="danger"
             icon={<IconTrash />}
             title={i18next.t("drawingDeleteSelection", "Apagar seleção")}
@@ -962,8 +942,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       ) : null}
 
       {editing ? (
-        <React.Fragment>
-          <h5>{` ${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</h5>
+        <Paper withBorder radius="md" p="sm" mt="sm">
+          <Text size="xs" fw={600} mb="xs">{`${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</Text>
           <Group gap="xs">
             <Button
               type="button"
@@ -986,21 +966,21 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             </Button>
             <MapToolButton
               size="input-sm"
-              variant="filled"
+              variant="light"
               color="danger"
               icon={<IconTrash />}
               title="Apagar desenho"
               onClick={() => removeFeature()}
             />
           </Group>
-        </React.Fragment>
+        </Paper>
       ) : null}
 
       {draw_symbol ? (
-        <div>
-          <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
+        <Paper withBorder radius="md" p="sm" mt="sm">
+          <Text size="xs" fw={600} mb="xs">{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</Text>
           <Select
-            size="sm"
+            size="xs"
             title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
             aria-label={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
             value={symbol_type}
@@ -1008,15 +988,15 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             onChange={value => styleChange({ symbol_type: value })}
             allowDeselect={false}
           />
-        </div>
+        </Paper>
       ) : null}
 
       {draw_text ? (
-        <div>
-          <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
+        <Paper withBorder radius="md" p="sm" mt="sm">
+          <Text size="xs" fw={600} mb="xs">{i18next.t("textOptions", "Opções de Texto")}</Text>
           <Group gap="xs" grow>
             <Select
-              size="sm"
+              size="xs"
               title={i18next.t("textStyle", "Estilo do Texto")}
               aria-label={i18next.t("textStyle", "Estilo do Texto")}
               value={text_style}
@@ -1026,7 +1006,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             />
 
             <Select
-              size="sm"
+              size="xs"
               title={i18next.t("textSize", "Tamanho do Texto")}
               aria-label={i18next.t("textSize", "Tamanho do Texto")}
               value={text_size}
@@ -1036,7 +1016,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             />
 
             <Select
-              size="sm"
+              size="xs"
               title={i18next.t("fontType", "Tipo de Letra")}
               aria-label={i18next.t("fontType", "Tipo de Letra")}
               value={text_font}
@@ -1046,8 +1026,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             />
           </Group>
           <TextInput
-            size="sm"
-            mt="md"
+            size="xs"
+            mt="xs"
             value={text_value}
             onChange={e => styleChange({ text_value: e.target.value })}
             title={i18next.t("textLabel", "Texto para a etiqueta")}
@@ -1055,35 +1035,39 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
             onClick={e => e.target.select()}
           />
-        </div>
+        </Paper>
       ) : null}
 
-      <hr />
+      {drawings.length > 0 ? (
+        <Stack gap={4} mt="md" className="draw-section">
+          <Text className="draw-section-label">{i18next.t("drawingSectionExport", "Exportar")}</Text>
+          <Group gap={6}>
+            {exportFormats.map(opt =>
+              <Button
+                key={opt.value}
+                type="button"
+                size="compact-sm"
+                variant="light"
+                leftSection={opt.icon}
+                title={opt.tooltip}
+                onClick={() => download(opt.value)}
+              >
+                {opt.title}
+              </Button>
+            )}
+          </Group>
+        </Stack>
+      ) : null}
 
-      <div>
-        {drawings.length > 0 &&
-          exportFormats.map(opt =>
-            <Button
-              key={opt.value}
-              type="button"
-              size="xs"
-              variant="outline"
-              className="mr-2 mb-2"
-              leftSection={opt.icon}
-              title={opt.tooltip}
-              onClick={() => download(opt.value)}
-            >
-              {opt.title}
-            </Button>
-          )
-        }
-      </div>
+      <Divider my="md" />
 
-      <hr />
+      <Group gap="xs" mb="xs">
+        <Text size="sm" fw={600}>{i18next.t("drawings", "Desenhos")}</Text>
+        {drawings.length > 0 ? <Badge size="sm" variant="light" radius="sm">{drawings.length}</Badge> : null}
+      </Group>
 
-      <h5>{i18next.t("drawings", "Desenhos")}</h5>
       {drawings.length === 0 ? (
-        <p>{i18next.t("noDrawings", "Não existem desenhos")}</p>
+        <Text size="sm" c="dimmed">{i18next.t("noDrawings", "Não existem desenhos")}</Text>
       ) : (
         <DataGrid
           idAccessor="id"

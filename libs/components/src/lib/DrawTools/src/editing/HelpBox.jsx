@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import i18next from 'i18next';
-import { Paper, Switch, Text } from '@mantine/core';
+import { Group, Paper, Switch, Text } from '@mantine/core';
+import { IconQuestionCircle } from '@scalargis/ui';
 
 const STORAGE_KEY = 'scalargis.drawtools.help';
 
@@ -48,16 +49,19 @@ export default function HelpBox({ tool }) {
     writeEnabled(value);
   };
 
+  const label = i18next.t('drawingHelpShow', 'Mostrar ajuda');
+
   return (
-    <Paper withBorder p="xs" className="draw-help">
-      <Switch
-        size="xs"
-        checked={enabled}
-        onChange={toggle}
-        label={i18next.t('drawingHelpShow', 'Mostrar ajuda')}
-      />
-      {enabled ? <Text size="xs" mt={6}>{i18next.t(key, fallback)}</Text> : null}
-      {enabled && showSnap ? <Text size="xs" mt={4}>{i18next.t('drawingHelpSnap', 'Ative Atrair para o cursor aderir aos vértices e às arestas dos desenhos e das camadas vetoriais visíveis.')}</Text> : null}
+    <Paper radius="md" p="xs" mt="sm" className="draw-help" data-enabled={enabled || undefined}>
+      <Group justify="space-between" wrap="nowrap" gap="xs">
+        <Group gap={6} wrap="nowrap">
+          <IconQuestionCircle className="draw-help-icon" />
+          <Text size="xs" fw={600}>{i18next.t('drawingHelpTitle', 'Ajuda')}</Text>
+        </Group>
+        <Switch size="xs" checked={enabled} onChange={toggle} aria-label={label} title={label} />
+      </Group>
+      {enabled ? <Text size="xs" mt={6} lh={1.45}>{i18next.t(key, fallback)}</Text> : null}
+      {enabled && showSnap ? <Text size="xs" mt={4} lh={1.45} c="dimmed">{i18next.t('drawingHelpSnap', 'Ative Atrair para o cursor aderir aos vértices e às arestas dos desenhos e das camadas vetoriais visíveis.')}</Text> : null}
     </Paper>
   );
 }
