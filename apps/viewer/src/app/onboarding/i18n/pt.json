@@ -30,7 +30,7 @@
     },
     "drawPanel": {
       "title": "Desenhar no mapa",
-      "content": "Desenhe símbolos, texto, pontos, linhas e polígonos. Exporte tudo num ficheiro GeoJSON georreferenciado."
+      "content": "Desenhe símbolos, texto, pontos, linhas e polígonos. Crie quadrados e grelhas com medidas em metros. Mova, rode, escale e duplique. Exporte tudo num ficheiro GeoJSON georreferenciado."
     },
     "identify": {
       "title": "Identificar",

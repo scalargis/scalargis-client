@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import i18next from "i18next";
-import { ActionIcon, Button, Group, Paper, Popover, Select, Stack, TextInput } from '@mantine/core';
-import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconPalette, IconFile, IconSave, IconSearch } from '@scalargis/ui';
+import { ActionIcon, Button, Group, NumberInput, Paper, Popover, Select, Stack, Switch, TextInput } from '@mantine/core';
+import { DataGrid, confirm, notify, IconReplay, IconRefresh, IconTrash, IconPalette, IconFile, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
+import { createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
 import { getAppRootPath } from '../../utils/common';
-import OlFormatWKT from "ol/format/WKT";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import OlInteractionDragPan from "ol/interaction/DragPan";
 import OlInteractionDoubleClickZoom from "ol/interaction/DoubleClickZoom";
@@ -16,6 +16,7 @@ import { shiftKeyOnly, singleClick } from "ol/events/condition";
 import OlCollection from "ol/Collection";
 import { SketchPicker as CompactPicker } from 'react-color';
 import FileSaver from 'file-saver';
+import useDrawHistory from './useDrawHistory';
 import './index.css';
 import addSymbolIcon from './add-symbol.svg';
 import addTextIcon from './add-text.svg';
@@ -23,6 +24,10 @@ import addPointIcon from './add-point.svg';
 import addLineIcon from './add-line.svg';
 import addPolygonIcon from './add-polygon.svg';
 import selectFeatureIcon from './select-feature.svg';
+import transformIcon from './transform.svg';
+import squareIcon from './square.svg';
+import rectangleIcon from './rectangle.svg';
+import gridIcon from './grid.svg';
 
 const drawElementsOptions = [
   { value: "symbol", title: "drawingAddSymbol", defaultTitle: "Adicionar símbolo", icon: () => <img src={addSymbolIcon} alt="" className="draw-tool-icon" /> },
@@ -33,8 +38,19 @@ const drawElementsOptions = [
 ];
 
 const selectTools = [
-  { value: "select", title: "select", defaultTitle: "Selecionar", icon: () => <img src={selectFeatureIcon} alt="" className="draw-tool-icon" /> }
+  { value: "select", title: "select", defaultTitle: "Selecionar", icon: () => <img src={selectFeatureIcon} alt="" className="draw-tool-icon" /> },
+  { value: "transform", title: "drawingTransform", defaultTitle: "Mover, rodar e escalar", icon: () => <img src={transformIcon} alt="" className="draw-tool-icon" /> }
 ]
+
+const shapeTools = [
+  { value: "square", title: "drawingSquare", defaultTitle: "Quadrado com lado definido", icon: () => <img src={squareIcon} alt="" className="draw-tool-icon" /> },
+  { value: "rectangle", title: "drawingRectangle", defaultTitle: "Retângulo com medidas definidas", icon: () => <img src={rectangleIcon} alt="" className="draw-tool-icon" /> },
+  { value: "grid", title: "drawingGrid", defaultTitle: "Grelha de células", icon: () => <img src={gridIcon} alt="" className="draw-tool-icon" /> }
+];
+
+const PLACEMENT_TOOLS = shapeTools.map(t => t.value);
+
+const GRID_CONFIRM_LIMIT = 500;
 
 const historyTools = [
   { value: "undo", title: "undo", defaultTitle: "Desfazer", icon: <IconReplay /> },
@@ -62,732 +78,639 @@ const typeLabels = {
   "Polygon": "polygon"
 };
 
-class DrawTools extends React.Component {
+const sizeOptions = ['1', '2', '3', '4', '5', '10', '15', '20'].map(v => ({ key: v, label: v, value: v }));
 
-  constructor(props) {
-    super(props);
+const symbolOptions = [
+  { key: '1', label: 'circle', labelDefault: "círculo", value: 'circle' },
+  { key: '2', label: 'square', labelDefault: "quadrado", value: 'square' },
+  { key: '3', label: 'triangle', labelDefault: "triângulo", value: 'triangle' },
+  { key: '4', label: 'estrela', labelDefault: "estrela", value: 'star' },
+  { key: '5', label: 'cross', labelDefault: "cruz", value: 'cross' },
+  { key: '10', label: 'x', labelDefault: "x", value: 'x' }
+];
 
-    const drawings = Object.assign([], props.viewer.config_json.drawings);
+const textStyleOptions = [
+  { key: '1', label: 'normal', value: 'normal' },
+  { key: '2', label: 'italico', value: 'italic' },
+  { key: '3', label: 'negrito', value: 'bold' },
+];
 
-    const component_cfg = props.record.config_json;
+const textSizeOptions = ['8px', '11px', '15px', '20px', '25px'].map((v, i) => ({ key: String(i + 1), label: v, value: v }));
 
-    if (component_cfg && component_cfg.exclude_export_formats && component_cfg.exclude_export_formats.length) {
-      this.exportFormats = defaultExportFormats.filter(t => !component_cfg.exclude_export_formats.includes(t.value));
-    } else if (props.viewer && props.viewer.config_json && props.viewer.config_json.exclude_export_formats) {
-      this.exportFormats = defaultExportFormats.filter(t => !props.viewer.config_json.exclude_export_formats.includes(t.value));
-    } else {
-      this.exportFormats = [...defaultExportFormats];
+const textFontOptions = [
+  { key: '1', label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+  { key: '2', label: 'Georgia', value: 'Georgia, serif' },
+];
+
+const SELECTED_STROKE = { r: 255, g: 0, b: 0, a: 1 };
+
+const STYLE_FIELDS = ['fill', 'stroke', 'size', 'symbol_type', 'text_style', 'text_size', 'text_font', 'text_value'];
+
+const DOUBLE_CLICK_GUARD_MS = 350;
+
+const DRAW_FLAGS = { draw_geom: false, draw_symbol: false, draw_text: false };
+
+/** Drawing tools panel. */
+function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
+  const [panel, setPanel] = useState(() => ({
+    enabled: true,
+    fill: { r: '255', g: '255', b: '255', a: '1' },
+    stroke: { r: '0', g: '0', b: '0', a: '1' },
+    size: '2',
+    symbol_type: 'x',
+    text_style: 'normal',
+    text_size: '20px',
+    text_font: 'Arial, Helvetica, sans-serif',
+    text_value: i18next.t('drawingSampleText', 'Exemplo de texto'),
+    ...DRAW_FLAGS,
+    displayFillPicker: false,
+    displayStrokePicker: false,
+    editing: null,
+    transformCount: 0,
+    shapeSide: 5,
+    shapeWidth: 10,
+    shapeHeight: 5,
+    shapeRotation: 0,
+    gridRows: 3,
+    gridCols: 3,
+    gridCell: 5,
+    snap: false,
+    selectedTool: null,
+    page: 1,
+    pageSize: 10
+  }));
+  const panelRef = useRef(panel);
+  const propsRef = useRef({});
+  propsRef.current = { viewer, actions, dispatch, mainMap, utils, record };
+
+  const patch = useCallback((changes) => {
+    panelRef.current = { ...panelRef.current, ...changes };
+    setPanel(panelRef.current);
+  }, []);
+
+  const history = useDrawHistory({
+    initial: viewer.config_json.drawings || [],
+    dispatch,
+    actions
+  });
+
+  const drawRef = useRef(null);
+  const modifyRef = useRef(null);
+  const transformRef = useRef(null);
+  const snapRef = useRef(null);
+  const highlightedRef = useRef([]);
+  const oldSelectRef = useRef([]);
+  const zoomTimerRef = useRef(null);
+  const placementRef = useRef(null);
+  const handlersRef = useRef({});
+
+  const exportFormats = useMemo(() => {
+    const componentCfg = record.config_json;
+    const viewerCfg = viewer && viewer.config_json;
+    if (componentCfg && componentCfg.exclude_export_formats && componentCfg.exclude_export_formats.length) {
+      return defaultExportFormats.filter(t => !componentCfg.exclude_export_formats.includes(t.value));
     }
-
-    this.state = {
-      enabled: true,
-      hist: [drawings],
-      history_now: 0,
-      click: false,
-      draw_geom: false,
-      draw_symbol: false,
-      draw_text: false,
-      fill: { r: '255', g: '255', b: '255', a: '1' },
-      stroke: { r: '0', g: '0', b: '0', a: '1' },
-      size: '2',
-      symbol_type: 'x',
-      text_style: 'normal',
-      text_size: '20px',
-      text_font: 'Arial, Helvetica, sans-serif',
-      text_value: i18next.t('drawingSampleText', 'Exemplo de texto'),
-      displayFillPicker: false,
-      displayStrokePicker: false,
-      editing: null,
-      selectedTool: null,
-      page: 1,
-      pageSize: 10
+    if (viewerCfg && viewerCfg.exclude_export_formats) {
+      return defaultExportFormats.filter(t => !viewerCfg.exclude_export_formats.includes(t.value));
     }
+    return [...defaultExportFormats];
+  }, [record, viewer && viewer.config_json && viewer.config_json.exclude_export_formats]);
 
-    this.sizeOptions = [
-      { key: '1', label: '1', value: '1' },
-      { key: '2', label: '2', value: '2' },
-      { key: '3', label: '3', value: '3' },
-      { key: '4', label: '4', value: '4' },
-      { key: '5', label: '5', value: '5' },
-      { key: '10', label: '10', value: '10' },
-      { key: '15', label: '15', value: '15' },
-      { key: '20', label: '20', value: '20' },
-    ];
-
-    this.symbolOptions = [
-      { key: '1', label: 'circle', labelDefault: "círculo", value: 'circle' },
-      { key: '2', label: 'square', labelDefault: "quadrado", value: 'square' },
-      { key: '3', label: 'triangle', labelDefault: "triângulo", value: 'triangle' },
-      { key: '4', label: 'estrela', labelDefault: "estrela", value: 'star' },
-      { key: '5', label: 'cross', labelDefault: "cruz", value: 'cross' },
-      { key: '10', label: 'x', labelDefault: "x", value: 'x' }
-    ];
-
-    this.textStyleOptions = [
-      { key: '1', label: 'normal', value: 'normal' },
-      { key: '2', label: 'italico', value: 'italic' },
-      { key: '3', label: 'negrito', value: 'bold' },
-    ];
-
-    this.textSizeOptions = [
-      { key: '1', label: '8px', value: '8px' },
-      { key: '2', label: '11px', value: '11px' },
-      { key: '3', label: '15px', value: '15px' },
-      { key: '4', label: '20px', value: '20px' },
-      { key: '5', label: '25px', value: '25px' },
-    ];
-
-    this.textFontOptions = [
-      { key: '1', label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
-      { key: '2', label: 'Georgia', value: 'Georgia, serif' },
-    ];
-
-    const olmap = this.props.mainMap;
-    this.drawingsLayer = props.utils.findOlLayer(olmap, 'userlayer');
-    this.vectorSource = this?.drawingsLayer ? this.drawingsLayer.getSource() : null;
-    this.features = this?.vectorSource ? this.vectorSource.getFeaturesCollection() : [];
-
-    this.modify = null;
-
-    this.select = new OlInteractionSelect({
+  const select = useMemo(() => {
+    const interaction = new OlInteractionSelect({
       condition: singleClick,
       hitTolerance: 5,
       wrapX: false,
-      filter: (feature, layer) => {
-
-        // TODO: improve validate drawings layer
-        /*
-        olmap.getLayers().forEach(l => {
-          console.log('layer', l.get('id'));
-        });
-        */
-        if (layer.get('id') !== 'userlayer') return false;
-        return true;
-      }
+      filter: (feature, layer) => !!layer && layer.get('id') === 'userlayer'
     });
-    const oldSelect = new OlCollection();
-    this.select.on('select', (e) => {
-      const selected = e.selected;
-      const deselected = e.deselected;
-      if (selected) {
-        selected.forEach((feature) => {
-          if (feature.get('state')) {
-            oldSelect.push(feature);
-            const style = this.createStyle(feature, { r: 255, g: 0, b: 0, a: 1 });
-            feature.setStyle(style);
-          }
-        });
-      }
-      if (deselected) {
-        deselected.forEach((feature) => {
-          if (feature.get('state')) {
-            const props = feature.getProperties();
-            const style = this.createStyle(feature, props.state.stroke);
-            feature.setStyle(style);
-          }
-        });
-      }
-      if (!selected && !deselected) {
-        oldSelect.forEach((feature) => {
-          if (feature.get('state')) {
-            const props = feature.getProperties();
-            const style = this.createStyle(feature, props.state.stroke);
-            feature.setStyle(style);
-          }
-        });
-      }
-      //this.drawingsLayer.getSource().refresh();
-      if (!selected || selected.length === 0) {
-        if (this.modify) {
-          this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-          olmap.removeInteraction(this.modify);
-          this.modify = null;
-        }
-        return this.setState({
-          ...this.state,
-          draw_geom: false,
-          draw_symbol: false,
-          draw_text: false,
-          editing: null
-        });
-      } else {
-        this.editFeature(selected[0]);
-      }
-    });
+    interaction.on('select', (e) => handlersRef.current.onSelect(e));
+    return interaction;
+  }, []);
 
-    this.draw = null;
-    this.format = new OlFormatWKT();
-  }
+  const onModifyEnd = useCallback((e) => handlersRef.current.modifyEnd(e), []);
 
-  changeSize = (value) => {
-    this.setState({ ...this.state, size: value }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
+  const getMap = () => propsRef.current.mainMap;
 
-  changeFill = (color) => {
-    this.setState({ ...this.state, fill: color.rgb }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
-
-  changeStroke = (color) => {
-    this.setState({ ...this.state, stroke: color.rgb }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
-
-  changeSymbol = (value) => {
-    this.setState({ ...this.state, symbol_type: value }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
-
-  changeTextStyle = (value) => {
-    this.setState({ ...this.state, text_style: value }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
-
-  changeTextSize = (value) => {
-    this.setState({ ...this.state, text_size: value }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
-
-  changeTextFont = (value) => {
-    this.setState({ ...this.state, text_font: value }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
-
-  changeTextValue = (e) => {
-    this.setState({ ...this.state, text_value: e.target.value }, () => {
-      const selected = this.select.getFeatures();
-      if (selected.getLength()) this.updateStyle(selected.item(0));
-    });
-  }
-
-  toggleFillPicker = () => {
-    this.setState({ ...this.state, displayFillPicker: !this.state.displayFillPicker, displayStrokePicker: false })
+  const getSource = () => {
+    const { mainMap: map, utils: u } = propsRef.current;
+    const layer = u.findOlLayer(map, 'userlayer');
+    return layer ? layer.getSource() : null;
   };
 
-  closeFillPicker = () => {
-    this.setState({ ...this.state, displayFillPicker: false })
-  };
-
-  toggleStrokePicker = () => {
-    this.setState({ ...this.state, displayStrokePicker: !this.state.displayStrokePicker, displayFillPicker: false })
-  };
-
-  closeStrokePicker = () => {
-    this.setState({ ...this.state, displayStrokePicker: false })
-  };
-
-  createStyle(feature, stroke) {
-    const props = feature.getProperties();
-    const utils = this.props.utils;
-    const { symbol_type, size, fill, text_style, text_size, text_font, text_value } = props.state;
-    let style = utils.createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke);
-    if (props.type === 'Symbol') {
-      style = utils.createDrawingSymbol(symbol_type, size, fill, stroke);
-    }
-    if (props.type === 'Text') {
-      style = utils.createDrawingText(feature, size, fill, stroke, text_style, text_size, text_font, text_value);
-    }
-    return style;
-  }
-
-  updateStyle(feature) {
-    const { viewer, actions, dispatch, utils } = this.props;
-    const map = this.props.mainMap;
-    const crs = map.getView().getProjection().getCode();
-    const style = utils.createStyle(feature, this.state, { r: 255, g: 0, b: 0, a: 1 });
-    feature.setStyle(style);
-    const geojson = utils.serializeDrawing(feature, this.state, crs);
-    const drawings = viewer.config_json.drawings.map(d => {
-      if (d.id === geojson.id) return geojson;
-      return d;
-    });
-    dispatch(actions.viewer_set_drawings(drawings));
-  }
-
-  onMOdifyEnd(e) {
-    e.features.forEach(feat => {
-      this.updateStyle(feat);
-    });
-  }
-
-  editFeature(feature) {
-    const state = feature.get('state');
-    const olmap = this.props.mainMap;
-    this.setState({
-      ...this.state,
-      editing: feature.getProperties(),
-      ...state
-    }, () => {
-      const features = new OlCollection();
-      features.push(feature);
-      this.modify = new OlInteractionModify({
-        features,
-        deleteCondition: function (event) {
-          return shiftKeyOnly(event) && singleClick(event);
-        }
-      });
-      this.modify.on('modifyend', this.onMOdifyEnd.bind(this));
-      olmap.addInteraction(this.modify);
-      this.modify.setActive(true);
-    });
-  }
-
-  componentDidMount() {
-    const olmap = this.props.mainMap;
-    this.drawingsLayer = this.props.utils.findOlLayer(olmap, 'userlayer');
-    this.vectorSource = this?.drawingsLayer ? this.drawingsLayer.getSource() : null;
-    this.features = this?.vectorSource ? this.vectorSource.getFeaturesCollection(): null;
-    this.props.mainMap.addInteraction(this.select);
-    this.select.setActive(false);
-  }
-
-  componentDidUpdate(prevProps) {
-    const { viewer } = this.props;
-    if (this.state.enabled && (viewer.config_json.selected_menu !== 'drawtools' || viewer.exclusive_mapcontrol !== 'DrawTools')) {
-      this.disableTools()
-    }
-    if (!this.state.enabled && (viewer.config_json.selected_menu === 'drawtools' && viewer.exclusive_mapcontrol === 'DrawTools')) {
-      this.enableTools()
-    };
-
-    if (this.state.selectedTool && viewer.config_json.selected_menu != 'drawtools') {
-      this.select.setActive(false);
-      this.setState({
-        ...this.state,
-        selectedTool: null
-      });
-    }
-  }
-
-  addInteraction(type, cb) {
-    const { hist, history_now } = this.state;
-    const { viewer, actions, dispatch, utils } = this.props;
-    const map = this.props.mainMap;
-    const crs = map.getView().getProjection().getCode();
-    this.draw = new OlInteractionDraw({
-      features: new OlCollection(),
-      type: type
-    });
-    this.findInteraction(OlInteractionDragPan).setActive(false);
-    this.findInteraction(OlInteractionDoubleClickZoom).setActive(false);
-    this.findInteraction(OlInteractionPinchZoom).setActive(false);
-
-    dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
-
-    map.addInteraction(this.draw);
-    this.draw.on('drawend', (e) => {
-
-      // Add drawing
-      const geojson = utils.serializeDrawing(e.feature, this.state, crs);
-      const drawings_update = [...viewer.config_json.drawings, geojson];
-      dispatch(actions.viewer_set_drawings(drawings_update));
-
-      setTimeout(() => {
-        const history_item = [];
-        drawings_update.forEach(function (item) {
-          history_item.push(Object.assign({}, item));
-        });
-        hist.push(history_item);
-        this.setState({
-          ...this.state,
-          hist,
-          history_now: history_now + 1,
-          selectedTool: null,
-          draw_geom: false,
-          draw_symbol: false,
-          draw_text: false
-        });
-
-        // Terminate
-        map.removeInteraction(this.draw);
-        this.findInteraction(OlInteractionDragPan).setActive(true);
-        this.findInteraction(OlInteractionDoubleClickZoom).setActive(true);
-        this.findInteraction(OlInteractionPinchZoom).setActive(true);
-        //this.select.setActive(true);
-
-        dispatch(actions.viewer_set_exclusive_mapcontrol(null));
-      }, 350);
-    });
-  }
-
-  findInteraction(classname) {
+  const findInteraction = (classname) => {
     let result = false;
-    const { mainMap } = this.props;
-    mainMap.getInteractions().forEach(function (item) {
+    getMap().getInteractions().forEach((item) => {
       if (item instanceof classname) result = item;
     });
     return result;
-  }
+  };
 
-  // toggle geometry interaction
-  toggleInteraction(type) {
-    const { mainMap } = this.props;
-    if (this.draw) mainMap.removeInteraction(this.draw);
-    this.addInteraction(type);
-    this.findInteraction(OlInteractionDragPan).setActive(false);
-  }
+  const setNavigation = (active) => {
+    clearTimeout(zoomTimerRef.current);
+    [OlInteractionDragPan, OlInteractionDoubleClickZoom, OlInteractionPinchZoom].forEach(cls => {
+      const interaction = findInteraction(cls);
+      if (interaction) interaction.setActive(active);
+    });
+  };
 
-  startDraw(e, type) {
-    e.preventDefault();
-    e.target.blur();
+  const restoreNavigation = () => {
+    setNavigation(true);
+    const zoomInteraction = findInteraction(OlInteractionDoubleClickZoom);
+    if (zoomInteraction) {
+      zoomInteraction.setActive(false);
+      zoomTimerRef.current = setTimeout(() => zoomInteraction.setActive(true), DOUBLE_CLICK_GUARD_MS);
+    }
+  };
 
-    // Disable interaction
-    if (type === this.state.selectedTool) {
-      // Terminate
-      const { mainMap, actions, dispatch } = this.props;
+  const currentDrawings = () => propsRef.current.viewer.config_json.drawings;
 
-      if (type === 'select') {
-        this.select.setActive(false);
-      } else {
-        mainMap.removeInteraction(this.draw);
-        this.findInteraction(OlInteractionDragPan).setActive(true);
-        this.findInteraction(OlInteractionDoubleClickZoom).setActive(true);
-        this.findInteraction(OlInteractionPinchZoom).setActive(true);
-      }
+  const viewCrs = () => getMap().getView().getProjection().getCode();
 
-      return this.setState({
-        ...this.state,
-        selectedTool: null,
-        draw_geom: false,
-        draw_symbol: false,
-        draw_text: false
-      }, () => {
-        dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+  const createFeatureStyle = (feature, stroke) => {
+    const u = propsRef.current.utils;
+    const props = feature.getProperties();
+    const { symbol_type, size, fill, text_style, text_size, text_font, text_value } = props.state;
+    let style = u.createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke);
+    if (props.type === 'Symbol') {
+      style = u.createDrawingSymbol(symbol_type, size, fill, stroke);
+    }
+    if (props.type === 'Text') {
+      style = u.createDrawingText(feature, size, fill, stroke, text_style, text_size, text_font, text_value);
+    }
+    return style;
+  };
+
+  const restyle = (feature, stroke) => {
+    if (feature.get('state')) feature.setStyle(createFeatureStyle(feature, stroke));
+  };
+
+  const syncSnap = () => {
+    if (!snapRef.current) {
+      snapRef.current = createSnap({ map: getMap(), getDrawingsSource: getSource });
+    }
+    snapRef.current.setEnabled(panelRef.current.snap);
+    snapRef.current.refresh({ draw: drawRef.current });
+  };
+
+  const toggleSnap = (event) => {
+    patch({ snap: event.currentTarget.checked });
+    syncSnap();
+  };
+
+  const removeModify = () => {
+    if (modifyRef.current) {
+      modifyRef.current.un('modifyend', onModifyEnd);
+      getMap().removeInteraction(modifyRef.current);
+      modifyRef.current = null;
+    }
+  };
+
+  const clearSelection = () => {
+    removeModify();
+    select.getFeatures().clear();
+    if (transformRef.current) transformRef.current.clear();
+  };
+
+  const ensureTransform = () => {
+    if (!transformRef.current) {
+      transformRef.current = createTransform({
+        map: getMap(),
+        source: { hasFeature: (feature) => !!getSource() && getSource().hasFeature(feature) },
+        onStart: () => history.seal(),
+        onSelect: (features) => handlersRef.current.transformSelect(features),
+        onChange: (features) => handlersRef.current.transformChange(features)
       });
     }
+    return transformRef.current;
+  };
 
-    if (type === 'select') {
-      // Enable interaction
-      this.setState({
-        ...this.state,
-        selectedTool: type,
-        draw_geom: false,
-        draw_symbol: false,
-        draw_text: false
-      }, () => {
-        this.select.setActive(true);
+  const stopTransform = () => {
+    if (transformRef.current) {
+      transformRef.current.setActive(false);
+      highlightTransform([]);
+    }
+    if (panelRef.current.transformCount) patch({ transformCount: 0 });
+  };
 
-        const { mainMap, actions, dispatch } = this.props;
-        if (this.draw) mainMap.removeInteraction(this.draw);
+  const serializeFeatures = (features) => {
+    const { utils: u } = propsRef.current;
+    const crs = viewCrs();
+    return features.map(feature => u.serializeDrawing(feature, { ...feature.get('state') }, crs));
+  };
 
-        dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
-        //this.addInteraction(type);
-        //this.findInteraction(OlInteractionDragPan).setActive(false);
+  const highlightTransform = (features) => {
+    highlightedRef.current.forEach(feature => {
+      if (!features.includes(feature)) restyle(feature, feature.get('state') && feature.get('state').stroke);
+    });
+    features.forEach(feature => restyle(feature, SELECTED_STROKE));
+    highlightedRef.current = features.slice();
+  };
+
+  handlersRef.current.transformSelect = (features) => {
+    highlightTransform(features);
+    patch({ transformCount: features.length });
+  };
+
+  const deleteTransformSelection = () => {
+    if (!transformRef.current) return;
+    const ids = transformRef.current.getSelection().map(feature => feature.get('id'));
+    if (!ids.length) return;
+    clearSelection();
+    history.seal();
+    history.commit(currentDrawings().filter(d => !ids.includes(d.id)));
+  };
+
+  handlersRef.current.transformChange = (features) => {
+    const byId = {};
+    serializeFeatures(features).forEach(geojson => { byId[geojson.id] = geojson; });
+    history.commit(currentDrawings().map(d => byId[d.id] || d));
+  };
+
+  const duplicateSelected = () => {
+    const { utils: u } = propsRef.current;
+    const source = getSource();
+    const inTransform = panelRef.current.selectedTool === 'transform' && transformRef.current;
+    const features = inTransform ? transformRef.current.getSelection() : select.getFeatures().getArray().slice();
+    if (!source || !features.length) return;
+    history.seal();
+    duplicateFeatures({
+      map: getMap(),
+      source,
+      features,
+      onChange: (clones) => {
+        const geojsons = serializeFeatures(clones);
+        clones.forEach(clone => clone.setStyle(u.createStyle(clone, clone.get('state'))));
+        history.commit([...currentDrawings(), ...geojsons]);
+        if (inTransform) {
+          transformRef.current.selectFeatures(clones);
+        } else {
+          select.getFeatures().clear();
+          select.getFeatures().push(clones[0]);
+          handlersRef.current.onSelect({ selected: [clones[0]], deselected: features });
+        }
       }
-      );
-    } else {
-      // Enable interaction
-      this.setState({ ...this.state, selectedTool: type }, () => {
-        this.select.setActive(false);
-        switch (type) {
-          case 'symbol': this.clickDrawSymbol(); break;
-          case 'text': this.clickDrawText(); break;
-          case 'point': this.clickDrawPoint(); break;
-          case 'line': this.clickDrawLine(); break;
-          case 'polygon': this.clickDrawPolygon(); break;
-          default: this.clickDrawPoint();
+    });
+  };
+
+  const updateStyle = (feature) => {
+    const { utils: u } = propsRef.current;
+    const current = panelRef.current;
+    const state = { ...feature.get('state') };
+    STYLE_FIELDS.forEach(k => { state[k] = current[k]; });
+    feature.setStyle(u.createStyle(feature, state, SELECTED_STROKE));
+    const geojson = u.serializeDrawing(feature, state, viewCrs());
+    const drawings = currentDrawings().map(d => (d.id === geojson.id ? geojson : d));
+    history.commit(drawings, `style:${geojson.id}`);
+  };
+
+  const styleChange = (changes) => {
+    patch(changes);
+    const selected = select.getFeatures();
+    if (selected.getLength()) updateStyle(selected.item(0));
+  };
+
+  const editFeature = (feature) => {
+    removeModify();
+    patch({
+      editing: { id: feature.get('id'), type: feature.get('type') },
+      ...feature.get('state')
+    });
+    const features = new OlCollection();
+    features.push(feature);
+    const modify = new OlInteractionModify({
+      features,
+      deleteCondition: (event) => shiftKeyOnly(event) && singleClick(event)
+    });
+    modify.on('modifyend', onModifyEnd);
+    getMap().addInteraction(modify);
+    modify.setActive(true);
+    modifyRef.current = modify;
+    syncSnap();
+  };
+
+  handlersRef.current.modifyEnd = (e) => {
+    const { utils: u } = propsRef.current;
+    const crs = viewCrs();
+    const byId = {};
+    e.features.forEach(feature => {
+      const state = { ...feature.get('state') };
+      feature.setStyle(u.createStyle(feature, state, SELECTED_STROKE));
+      const geojson = u.serializeDrawing(feature, state, crs);
+      byId[geojson.id] = geojson;
+    });
+    history.commit(currentDrawings().map(d => byId[d.id] || d));
+  };
+
+  handlersRef.current.onSelect = (e) => {
+    const { selected, deselected } = e;
+    history.seal();
+    if (selected) {
+      selected.forEach(feature => {
+        if (feature.get('state')) {
+          if (!oldSelectRef.current.includes(feature)) oldSelectRef.current.push(feature);
+          restyle(feature, SELECTED_STROKE);
         }
       });
     }
-  }
+    if (deselected) {
+      deselected.forEach(feature => {
+        if (feature.get('state')) restyle(feature, feature.get('state').stroke);
+      });
+    }
+    if (!selected && !deselected) {
+      oldSelectRef.current.forEach(feature => {
+        if (feature.get('state')) restyle(feature, feature.get('state').stroke);
+      });
+      oldSelectRef.current = [];
+    }
+    if (!selected || selected.length === 0) {
+      removeModify();
+      patch({ ...DRAW_FLAGS, editing: null });
+    } else {
+      editFeature(selected[0]);
+    }
+  };
 
-  // Enable draw point
-  clickDrawPoint() {
-    this.toggleInteraction('Point');
-    this.setState({
-      ...this.state,
-      draw_geom: true,
-      draw_symbol: false,
-      draw_text: false,
-      editing: null
+  const stopPlacement = () => {
+    if (placementRef.current) {
+      getMap().un('singleclick', placementRef.current);
+      placementRef.current = null;
+    }
+  };
+
+  const commitPlaced = (features) => {
+    const { utils: u } = propsRef.current;
+    const state = { ...panelRef.current, ...DRAW_FLAGS, draw_geom: true };
+    const crs = viewCrs();
+    const geojsons = features.map(feature => u.serializeDrawing(feature, state, crs));
+    history.seal();
+    history.commit([...currentDrawings(), ...geojsons]);
+  };
+
+  const placeShape = (event) => {
+    const current = panelRef.current;
+    const centre = event.coordinate.slice();
+    const rotation = Number(current.shapeRotation) || 0;
+    const positive = (value) => Number.isFinite(Number(value)) && Number(value) > 0;
+    const map = getMap();
+    let build;
+    let count = 1;
+    let valid;
+    if (current.selectedTool === 'square') {
+      valid = positive(current.shapeSide);
+      build = () => createSizedShape({ map, centre, width: Number(current.shapeSide), height: Number(current.shapeSide), rotation });
+    } else if (current.selectedTool === 'rectangle') {
+      valid = positive(current.shapeWidth) && positive(current.shapeHeight);
+      build = () => createSizedShape({ map, centre, width: Number(current.shapeWidth), height: Number(current.shapeHeight), rotation });
+    } else {
+      const rows = Math.floor(Number(current.gridRows));
+      const cols = Math.floor(Number(current.gridCols));
+      valid = rows >= 1 && cols >= 1 && positive(current.gridCell);
+      count = rows * cols;
+      build = () => createGrid({ map, centre, rows, cols, cellSize: Number(current.gridCell), rotation });
+    }
+    if (!valid) {
+      notify.error(i18next.t("error", "Erro"), i18next.t("drawingShapeInvalid", "Indique valores maiores que zero."));
+      return;
+    }
+    if (count > GRID_CONFIRM_LIMIT) {
+      confirm({
+        severity: 'warning',
+        message: i18next.t("drawingGridConfirm", "A grelha tem {count} células. A impressão demora cerca de 1 s por cada 100 células. Continuar?").replace('{count}', count),
+        accept: () => commitPlaced(build())
+      });
+      return;
+    }
+    commitPlaced(build());
+  };
+
+  const startPlacement = () => {
+    stopPlacement();
+    placementRef.current = (event) => placeShape(event);
+    getMap().on('singleclick', placementRef.current);
+  };
+
+  const stopDraw = () => {
+    stopPlacement();
+    if (drawRef.current) {
+      getMap().removeInteraction(drawRef.current);
+      drawRef.current = null;
+      syncSnap();
+    }
+  };
+
+  const addInteraction = (type) => {
+    const { actions: act, dispatch: dsp, utils: u } = propsRef.current;
+    stopDraw();
+    const draw = new OlInteractionDraw({ features: new OlCollection(), type });
+    drawRef.current = draw;
+    setNavigation(false);
+    dsp(act.viewer_set_exclusive_mapcontrol('DrawTools'));
+    getMap().addInteraction(draw);
+    syncSnap();
+    draw.on('drawend', (e) => {
+      const geojson = u.serializeDrawing(e.feature, panelRef.current, viewCrs());
+      history.commit([...currentDrawings(), geojson]);
+      patch({ selectedTool: null, ...DRAW_FLAGS });
+      stopDraw();
+      restoreNavigation();
+      dsp(act.viewer_set_exclusive_mapcontrol(null));
     });
-  }
+  };
 
-  // Enable draw line
-  clickDrawLine() {
-    this.toggleInteraction('LineString');
-    this.setState({
-      ...this.state,
-      draw_geom: true,
-      draw_symbol: false,
-      draw_text: false,
-      editing: null
-    });
-  }
-
-  // Enable draw polygon
-  clickDrawPolygon() {
-    this.toggleInteraction('Polygon');
-    this.setState({
-      ...this.state,
-      draw_geom: true,
-      draw_symbol: false,
-      draw_text: false,
-      editing: null
-    });
-  }
-
-  // Enable draw text
-  clickDrawText() {
-    const { mainMap } = this.props;
-    this.setState({
-      ...this.state,
-      draw_geom: false,
-      draw_symbol: false,
-      draw_text: true,
-      editing: null
-    }, () => {
-      mainMap.removeInteraction(this.draw);
-      this.addInteraction('Point');
-    });
-  }
-
-  // Enable draw symbol
-  clickDrawSymbol() {
-    const { mainMap } = this.props;
-    this.setState({
-      ...this.state,
-      draw_geom: false,
-      draw_symbol: true,
-      draw_text: false,
-      editing: null
-    }, () => {
-      mainMap.removeInteraction(this.draw);
-      this.addInteraction('Point');
-    });
-  }
-
-  // Draw undo
-  clickUndo(e) {
+  const startDraw = (e, type) => {
     e.preventDefault();
-    const { actions, dispatch, mainMap } = this.props;
-    if (this.modify) {
-      this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-      mainMap.removeInteraction(this.modify);
-      this.modify = null;
-    }
-    this.select.getFeatures().clear();
-    this.setState({
-      ...this.state,
-      editing: null
-    }, () => {
-      const drawings = [];
-      const { hist } = this.state;
-      let { history_now } = this.state;
-      if (history_now > 0) {
-        history_now--;
-        hist[history_now].forEach(item => {
-          drawings.push(item);
-        });
-        this.setState({
-          ...this.state,
-          hist,
-          history_now: history_now
-        }, () => {
-          dispatch(actions.viewer_set_drawings(drawings));
-        });
-      }
-    });
-  }
+    e.target.blur();
 
-  // Draw redo
-  clickRedo(e) {
+    if (type === panelRef.current.selectedTool) {
+      if (type === 'transform') {
+        stopTransform();
+      } else if (type === 'select') {
+        select.setActive(false);
+      } else {
+        stopDraw();
+        setNavigation(true);
+      }
+      patch({ selectedTool: null, ...DRAW_FLAGS });
+      dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+      return;
+    }
+
+    history.seal();
+
+    if (type === 'transform') {
+      if (panelRef.current.editing) finishEditing();
+      stopDraw();
+      setNavigation(true);
+      select.setActive(false);
+      patch({ selectedTool: type, ...DRAW_FLAGS, editing: null });
+      ensureTransform().setActive(true);
+      syncSnap();
+      dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+      return;
+    }
+
+    stopTransform();
+
+    if (PLACEMENT_TOOLS.includes(type)) {
+      stopDraw();
+      setNavigation(true);
+      select.setActive(false);
+      patch({ selectedTool: type, ...DRAW_FLAGS, editing: null });
+      startPlacement();
+      dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+      return;
+    }
+
+    if (type === 'select') {
+      patch({ selectedTool: type, ...DRAW_FLAGS });
+      select.setActive(true);
+      stopDraw();
+      dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+      return;
+    }
+
+    patch({ selectedTool: type });
+    select.setActive(false);
+    switch (type) {
+      case 'symbol':
+        patch({ ...DRAW_FLAGS, draw_symbol: true, editing: null });
+        addInteraction('Point');
+        break;
+      case 'text':
+        patch({ ...DRAW_FLAGS, draw_text: true, editing: null });
+        addInteraction('Point');
+        break;
+      case 'line':
+        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
+        addInteraction('LineString');
+        break;
+      case 'polygon':
+        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
+        addInteraction('Polygon');
+        break;
+      default:
+        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
+        addInteraction('Point');
+    }
+  };
+
+  const clickUndo = (e) => {
     e.preventDefault();
-    const { actions, dispatch, mainMap } = this.props;
-    if (this.modify) {
-      this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-      mainMap.removeInteraction(this.modify);
-      this.modify = null;
-    }
-    this.select.getFeatures().clear();
-    this.setState({
-      ...this.state,
-      editing: null
-    }, () => {
-      const drawings = [];
-      const { hist } = this.state;
-      let { history_now } = this.state;
-      if (history_now + 1 < hist.length) {
-        history_now++;
-        hist[history_now].forEach(item => {
-          drawings.push(item);
-        });
-        this.setState({
-          ...this.state,
-          hist,
-          history_now: history_now
-        }, () => {
-          dispatch(actions.viewer_set_drawings(drawings));
-        });
-      }
-    });
-  }
+    clearSelection();
+    patch({ editing: null });
+    history.undo();
+  };
 
-  // Draw delete current
-  clickDelete(e) {
+  const clickRedo = (e) => {
     e.preventDefault();
-    const { actions, dispatch, mainMap } = this.props;
-    if (this.modify) {
-      this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-      mainMap.removeInteraction(this.modify);
-      this.modify = null;
+    clearSelection();
+    patch({ editing: null });
+    history.redo();
+  };
+
+  const clickClear = (e) => {
+    e.preventDefault();
+    clearSelection();
+    history.clear();
+    patch({ editing: null });
+  };
+
+  const removeFeature = () => {
+    const { editing } = panelRef.current;
+    if (editing) {
+      clearSelection();
+      history.commit(currentDrawings().filter(d => d.id !== editing.id));
     }
-    this.select.getFeatures().clear();
-    dispatch(actions.viewer_set_drawings([]));
-    this.setState({
-      ...this.state,
-      hist: [[]],
-      history_now: 0,
-      editing: null
-    });
-  }
+    patch({ ...DRAW_FLAGS, editing: null });
+  };
 
-  // Get editing feature
-  getEditingFeature(id) {
-    let found = null;
-    this.features.forEach(feat => {
-      if (feat.get('id') === id) found = feat;
-    });
-    return found;
-  }
+  const deleteItem = (item) => {
+    clearSelection();
+    patch({ ...DRAW_FLAGS, editing: null });
+    history.commit(currentDrawings().filter(d => d.id !== item.id));
+  };
 
-  // Remove feature
-  removeFeature() {
-    const { viewer, actions, dispatch, mainMap } = this.props;
-    let drawings = viewer.config_json.drawings;
-    const { editing } = this.state;
-    const feature = this.getEditingFeature(editing.id);
-    if (feature) {
-      if (this.modify) {
-        this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-        mainMap.removeInteraction(this.modify);
-        this.modify = null;
+  const finishEditing = () => {
+    select.getFeatures().clear();
+    select.dispatchEvent('select');
+  };
+
+  const disableTools = () => {
+    const current = panelRef.current;
+    if (current.selectedTool) {
+      stopDraw();
+      setNavigation(true);
+    }
+    if (current.editing) finishEditing();
+    stopTransform();
+    removeModify();
+    patch({ enabled: false, selectedTool: null, ...DRAW_FLAGS, editing: null });
+  };
+
+  const selectedMenu = viewer.config_json.selected_menu;
+  const exclusive = viewer.exclusive_mapcontrol;
+
+  useEffect(() => {
+    const active = selectedMenu === 'drawtools' && exclusive === 'DrawTools';
+    if (panelRef.current.enabled && !active) {
+      disableTools();
+    } else if (!panelRef.current.enabled && active) {
+      patch({ enabled: true });
+    }
+    if (panelRef.current.selectedTool && selectedMenu !== 'drawtools') {
+      select.setActive(false);
+      stopTransform();
+      patch({ selectedTool: null });
+    }
+  }, [selectedMenu, exclusive, panel.enabled, panel.selectedTool]);
+
+  useEffect(() => {
+    const map = mainMap;
+    map.addInteraction(select);
+    select.setActive(false);
+    return () => {
+      map.removeInteraction(select);
+      if (transformRef.current) {
+        transformRef.current.dispose();
+        transformRef.current = null;
       }
-      this.select.getFeatures().clear();
-      drawings = drawings.filter(d => d.id !== feature.getId());
-      dispatch(actions.viewer_set_drawings(drawings));
-    }
-    this.setState({
-      ...this.state,
-      draw_geom: false,
-      draw_symbol: false,
-      draw_text: false,
-      editing: null
-    });
-  }
+      removeModify();
+      stopDraw();
+      if (snapRef.current) {
+        snapRef.current.dispose();
+        snapRef.current = null;
+      }
+      setNavigation(true);
+    };
+  }, [mainMap]);
 
-  // Finish editing
-  finishEditing() {
-    this.select.getFeatures().clear();
-    this.select.dispatchEvent('select');
-  }
+  const download = (format) => {
+    const { viewer: v, record: rec, mainMap: map } = propsRef.current;
+    const componentCfg = rec ? rec.config_json : null;
+    const source = getSource();
+    const features = source ? source.getFeatures() : [];
 
-  // Disable draw tools
-  disableTools() {
-    const map = this.props.mainMap;
-    if (this.state.selectedTool) {
-      if (this.draw) map.removeInteraction(this.draw);
-      this.findInteraction(OlInteractionDragPan).setActive(true);
-      this.findInteraction(OlInteractionDoubleClickZoom).setActive(true);
-      this.findInteraction(OlInteractionPinchZoom).setActive(true);
-      this.setState({ ...this.state, selectedTool: null });
+    let crs = 4326;
+    if (componentCfg && componentCfg.export_crs) {
+      crs = componentCfg.export_crs;
+    } else if (v.config_json && v.config_json.export_crs) {
+      crs = v.config_json.export_crs;
+    } else if (v.config_json && v.config_json.display_crs) {
+      crs = v.config_json.display_crs;
     }
-    if (this.state.editing) this.finishEditing();
-    if (this.modify) {
-      this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-      map.removeInteraction(this.modify);
-      this.modify = null;
-    }
-    //this.select.setActive(false);
-    this.setState({
-      ...this.state,
-      enabled: false,
-      draw_geom: false,
-      draw_symbol: false,
-      draw_text: false,
-      editing: null
-    });
-  }
-
-  // Enable draw tools
-  enableTools() {
-    if (!this.state.enabled) {
-      this.setState({ ...this.state, enabled: true });
-      //RS
-      //this.select.setActive(true);
-    }
-  }
-
-  componentWillUnmount() {
-    const { mainMap } = this.props;
-    mainMap.removeInteraction(this.select);
-    if (this.modify) {
-      this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-      mainMap.removeInteraction(this.modify);
-      this.modify = null;
-    }
-    mainMap.removeInteraction(this.draw);
-    let interaction = this.findInteraction(OlInteractionDragPan);
-    interaction && interaction.setActive(true);
-    interaction = this.findInteraction(OlInteractionDoubleClickZoom);
-    interaction && interaction.setActive(true);
-    interaction = this.findInteraction(OlInteractionPinchZoom)
-    interaction && interaction.setActive(true);
-  }
-
-  download(format) {
-    const { viewer, record } = this.props;
-    const component_cfg = record ? record.config_json : null;
 
     const serializer = new OlFormatGeoJSON();
-
-    let crs = null;
-    if (component_cfg && component_cfg.export_crs) {
-      crs = component_cfg.export_crs;
-    } else if (viewer.config_json && viewer.config_json.export_crs) {
-      crs = viewer.config_json.export_crs;
-    } else if (viewer.config_json && viewer.config_json.display_crs) {
-      crs = viewer.config_json.display_crs;
-    } else {
-      crs = 4326;
-    }
-
-    // Export defaults to EPSG:4326
-    const serializeOptions = {
+    const json = serializer.writeFeaturesObject(features, {
       dataProjection: 'EPSG:' + crs,
-      featureProjection: this.props.mainMap.getView().getProjection().getCode(),
+      featureProjection: map.getView().getProjection().getCode(),
       decimals: 6
-    }
-    const json = serializer.writeFeaturesObject(this.features.getArray(), serializeOptions);
-
-    // Hack: OL does not serialize with CRS attribute
-    //json.crs = { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::4326" } }
-    const crsinfo = {
+    });
+    json.crs = {
       "type": "name",
-      "properties": {
-        "name": "urn:ogc:def:crs:EPSG::" + crs
-      }
+      "properties": { "name": "urn:ogc:def:crs:EPSG::" + crs }
     };
-    json.crs = crsinfo;
 
-    // GeoJSON is written in the browser; GML/ShapeFile/KML have no browser
-    // writer, so they go through the spatial_toolbox export endpoint (fiona)
-    // which returns the converted file (ShapeFile as a zip).
     if (format === 'geojson') {
       const file = new Blob([JSON.stringify(json)], { type: 'application/json' });
       FileSaver.saveAs(file, 'export.geojson');
@@ -812,383 +735,415 @@ class DrawTools extends React.Component {
         i18next.t("exportError", "Não foi possível exportar os elementos.")
       );
     });
-  }
+  };
 
-  getButtonStyle(opt) {
-    const { fill, stroke } = this.state;
-    const fillStr = `rgba(${fill.r}, ${fill.g}, ${fill.b}, ${fill.a})`;
-    const strokeStr = `rgba(${stroke.r}, ${stroke.g}, ${stroke.b}, ${stroke.a})`;
-    switch (opt.value) {
-      case 'fill':
-        return {
-          backgroundColor: fillStr,
-          color: 'gray'
-        }
-      case 'stroke':
-        return {
-          backgroundColor: strokeStr,
-          color: 'gray'
-        }
-      default: ;
-    }
-  }
+  const getButtonStyle = (opt) => {
+    const { fill: f, stroke: s } = panel;
+    const fillStr = `rgba(${f.r}, ${f.g}, ${f.b}, ${f.a})`;
+    const strokeStr = `rgba(${s.r}, ${s.g}, ${s.b}, ${s.a})`;
+    if (opt.value === 'fill') return { backgroundColor: fillStr, color: 'gray' };
+    if (opt.value === 'stroke') return { backgroundColor: strokeStr, color: 'gray' };
+    return undefined;
+  };
 
-  // TODO: get better BBOX for points
-  zoom(item) {
-    const { mainMap } = this.props;
-    const features = parseOlFeatures(JSON.stringify(item), mainMap.getView().getProjection().getCode());
+  const zoom = (item) => {
+    const features = parseOlFeatures(JSON.stringify(item), viewCrs());
     if (features.length) {
-      mainMap.getView().fit(features[0].getGeometry());
+      getMap().getView().fit(features[0].getGeometry());
     }
-  }
+  };
 
-  deleteItem(item) {
-    const { viewer, mainMap, dispatch, actions } = this.props;
-    if (this.modify) {
-      this.modify.un('modifyend', this.onMOdifyEnd.bind(this));
-      mainMap.removeInteraction(this.modify);
-      this.modify = null;
-    }
-    this.select.getFeatures().clear();
-    this.setState({
-      ...this.state,
-      draw_geom: false,
-      draw_symbol: false,
-      draw_text: false,
-      editing: null
-    }, () => {
-      const drawings = viewer.config_json.drawings.filter(d => d.id !== item.id);
-      dispatch(actions.viewer_set_drawings(drawings));
-    });
-  }
+  const {
+    draw_text,
+    draw_symbol,
+    size,
+    fill,
+    stroke,
+    symbol_type,
+    text_style,
+    text_size,
+    text_font,
+    text_value,
+    editing,
+    transformCount,
+    selectedTool,
+    pageSize
+  } = panel;
 
+  const drawings = viewer.config_json.drawings;
+  const totalPages = Math.max(1, Math.ceil(drawings.length / pageSize));
+  const page = Math.min(panel.page, totalPages);
+  const pageRecords = drawings.slice((page - 1) * pageSize, page * pageSize);
 
-  render() {
-    const {
-      draw_text,
-      draw_symbol,
-      size,
-      fill,
-      stroke,
-      symbol_type,
-      text_style,
-      text_size,
-      text_font,
-      text_value,
-      editing,
-      selectedTool,
-      pageSize
-    } = this.state;
-    const { viewer } = this.props;
+  const numberField = (name, label, props) => (
+    <NumberInput
+      key={name}
+      size="xs"
+      w={84}
+      label={label}
+      aria-label={label}
+      value={panel[name]}
+      onChange={(value) => patch({ [name]: value })}
+      hideControls
+      {...props}
+    />
+  );
 
-    const drawings = viewer.config_json.drawings;
+  return (
+    <div id="drawtools">
 
-    // Client-side paging: the page is clamped on derive, so deleting the
-    // last row of the last page never strands the grid on an empty page.
-    const totalPages = Math.max(1, Math.ceil(drawings.length / pageSize));
-    const page = Math.min(this.state.page, totalPages);
-    const pageRecords = drawings.slice((page - 1) * pageSize, page * pageSize);
+      <Paper shadow="md" p="sm" className="toolbar">
+        <Stack gap="xs">
 
-
-
-
-    return (
-      <div id="drawtools">
-
-        <Paper shadow="md" p="sm" className="toolbar">
-          <Stack gap="xs">
-
-            <Group gap="sm" wrap="wrap">
-              <Group gap={4} wrap="nowrap">
-                {drawElementsOptions.map(opt =>
-                  <MapToolButton
-                    key={opt.value}
-                    size="lg"
-                    variant={opt.value === selectedTool ? 'filled' : 'default'}
-                    active={opt.value === selectedTool}
-                    title={i18next.t(opt.title, opt.defaultTitle)}
-                    onClick={(e) => this.startDraw(e, opt.value)}
-                  >
-                    {opt.icon()}
-                  </MapToolButton>
-                )}
-              </Group>
-
-              <Group gap={4} wrap="nowrap">
-                {selectTools.map(opt =>
-                  <MapToolButton
-                    key={opt.value}
-                    size="lg"
-                    variant={opt.value === selectedTool ? 'filled' : 'default'}
-                    active={opt.value === selectedTool}
-                    title={i18next.t(opt.title, opt.defaultTitle)}
-                    onClick={(e) => this.startDraw(e, opt.value)}
-                  >
-                    {opt.icon()}
-                  </MapToolButton>
-                )}
-              </Group>
-            </Group>
-
-            <Group gap={4} wrap="wrap">
-              {colorTools.map(opt => {
-                // Anchor the react-color picker under its button (Mantine
-                // Popover) instead of the old free-floating absolute div that
-                // covered the toolbar (C-03).
-                const isFill = opt.value === 'fill';
-                const opened = isFill ? this.state.displayFillPicker : this.state.displayStrokePicker;
-                const pickerColor = isFill ? fill : stroke;
-                const onToggle = isFill ? this.toggleFillPicker : this.toggleStrokePicker;
-                const onClose = isFill ? this.closeFillPicker : this.closeStrokePicker;
-                const onColorChange = isFill ? this.changeFill : this.changeStroke;
-                return (
-                  <Popover
-                    key={opt.value}
-                    opened={opened}
-                    // Controlled Popover (Mantine v9): a click outside / Escape
-                    // signals intent through onChange(false), not onClose — so the
-                    // picker only ever dismissed by re-clicking its button (C-03).
-                    onChange={(isOpened) => { if (!isOpened) onClose(); }}
-                    position="bottom-start"
-                    withinPortal
-                    shadow="md"
-                    trapFocus={false}
-                  >
-                    <Popover.Target>
-                      <ActionIcon
-                        size="lg"
-                        variant="default"
-                        title={i18next.t(opt.title, opt.defaultTitle)}
-                        aria-label={i18next.t(opt.title, opt.defaultTitle)}
-                        style={this.getButtonStyle(opt)}
-                        onClick={() => onToggle()}
-                      >
-                        {opt.icon}
-                      </ActionIcon>
-                    </Popover.Target>
-                    <Popover.Dropdown p={0}>
-                      <CompactPicker color={pickerColor} onChange={onColorChange.bind(this)} />
-                    </Popover.Dropdown>
-                  </Popover>
-                );
-              })}
-
-              <Select
-                size="sm"
-                w={72}
-                title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
-                aria-label={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
-                value={size}
-                data={this.sizeOptions}
-                onChange={value => this.changeSize(value)}
-                allowDeselect={false}
-              />
-            </Group>
-
+          <Group gap="sm" wrap="wrap">
             <Group gap={4} wrap="nowrap">
-              {historyTools.map(opt =>
+              {drawElementsOptions.map(opt =>
                 <MapToolButton
                   key={opt.value}
                   size="lg"
-                  variant={opt.value !== "clear" ? "default" : "filled"}
-                  color={opt.value !== "clear" ? undefined : "danger"}
-                  icon={opt.icon}
+                  variant={opt.value === selectedTool ? 'filled' : 'default'}
+                  active={opt.value === selectedTool}
                   title={i18next.t(opt.title, opt.defaultTitle)}
-                  onClick={(e) => {
-                    switch (opt.value) {
-                      case 'undo': this.clickUndo(e); break;
-                      case 'redo': this.clickRedo(e); break;
-                      case 'clear': this.clickDelete(e); break;
-                      default: ;
-                    }
-                  }}
-                />
+                  onClick={(e) => startDraw(e, opt.value)}
+                >
+                  {opt.icon()}
+                </MapToolButton>
               )}
             </Group>
 
-          </Stack>
-        </Paper>
-
-        {editing ? (
-          <React.Fragment>
-            <h5>{` ${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</h5>
-            <Group gap="xs">
-              <Button
-                type="button"
-                size="sm"
-                leftSection={<IconSave />}
-                title="Aplicar alterações"
-                onClick={e => this.finishEditing()}
-              >
-                Aplicar
-              </Button>
-              <MapToolButton
-                size="input-sm"
-                variant="filled"
-                color="danger"
-                icon={<IconTrash />}
-                title="Apagar desenho"
-                onClick={e => this.removeFeature()}
-              />
+            <Group gap={4} wrap="nowrap">
+              {shapeTools.map(opt =>
+                <MapToolButton
+                  key={opt.value}
+                  size="lg"
+                  variant={opt.value === selectedTool ? 'filled' : 'default'}
+                  active={opt.value === selectedTool}
+                  title={i18next.t(opt.title, opt.defaultTitle)}
+                  onClick={(e) => startDraw(e, opt.value)}
+                >
+                  {opt.icon()}
+                </MapToolButton>
+              )}
             </Group>
-          </React.Fragment>
-        ) : null}
 
-        {draw_symbol ? (
-          <div>
-            <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
+            <Group gap={4} wrap="nowrap">
+              {selectTools.map(opt =>
+                <MapToolButton
+                  key={opt.value}
+                  size="lg"
+                  variant={opt.value === selectedTool ? 'filled' : 'default'}
+                  active={opt.value === selectedTool}
+                  title={i18next.t(opt.title, opt.defaultTitle)}
+                  onClick={(e) => startDraw(e, opt.value)}
+                >
+                  {opt.icon()}
+                </MapToolButton>
+              )}
+            </Group>
+          </Group>
+
+          <Group gap={4} wrap="wrap">
+            {colorTools.map(opt => {
+              const isFill = opt.value === 'fill';
+              const opened = isFill ? panel.displayFillPicker : panel.displayStrokePicker;
+              const pickerColor = isFill ? fill : stroke;
+              const onToggle = () => patch(isFill
+                ? { displayFillPicker: !panel.displayFillPicker, displayStrokePicker: false }
+                : { displayStrokePicker: !panel.displayStrokePicker, displayFillPicker: false });
+              const onClose = () => patch(isFill ? { displayFillPicker: false } : { displayStrokePicker: false });
+              const onColorChange = (color) => styleChange(isFill ? { fill: color.rgb } : { stroke: color.rgb });
+              return (
+                <Popover
+                  key={opt.value}
+                  opened={opened}
+                  onChange={(isOpened) => { if (!isOpened) onClose(); }}
+                  position="bottom-start"
+                  withinPortal
+                  shadow="md"
+                  trapFocus={false}
+                >
+                  <Popover.Target>
+                    <ActionIcon
+                      size="lg"
+                      variant="default"
+                      title={i18next.t(opt.title, opt.defaultTitle)}
+                      aria-label={i18next.t(opt.title, opt.defaultTitle)}
+                      style={getButtonStyle(opt)}
+                      onClick={() => onToggle()}
+                    >
+                      {opt.icon}
+                    </ActionIcon>
+                  </Popover.Target>
+                  <Popover.Dropdown p={0}>
+                    <CompactPicker color={pickerColor} onChange={onColorChange} />
+                  </Popover.Dropdown>
+                </Popover>
+              );
+            })}
+
             <Select
               size="sm"
-              title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
-              aria-label={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
-              value={symbol_type}
-              data={this.symbolOptions.map(o => { return { ...o, "label": i18next.t(o.label, o.labelDefault) } })}
-              onChange={this.changeSymbol.bind(this)}
+              w={72}
+              title={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
+              aria-label={i18next.t("drawingLineSymbolSize", "Tamanho da linha/símbolo")}
+              value={size}
+              data={sizeOptions}
+              onChange={value => styleChange({ size: value })}
               allowDeselect={false}
             />
-          </div>
-        ) : null}
+          </Group>
 
-        {draw_text ? (
-          <div>
-            <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
-            {/* Three side-by-side pickers in a ~288px panel land on ~88px each,
-                which the ADS md baseline spends on padding and the chevron
-                alone ("normal" came out "norm"). sm is the sidebar size. */}
-            <Group gap="xs" grow>
-              <Select
-                size="sm"
-                title={i18next.t("textStyle", "Estilo do Texto")}
-                aria-label={i18next.t("textStyle", "Estilo do Texto")}
-                value={text_style}
-                data={this.textStyleOptions}
-                onChange={this.changeTextStyle.bind(this)}
-                allowDeselect={false}
-              />
-
-              <Select
-                size="sm"
-                title={i18next.t("textSize", "Tamanho do Texto")}
-                aria-label={i18next.t("textSize", "Tamanho do Texto")}
-                value={text_size}
-                data={this.textSizeOptions}
-                onChange={this.changeTextSize.bind(this)}
-                allowDeselect={false}
-              />
-
-              <Select
-                size="sm"
-                title={i18next.t("fontType", "Tipo de Letra")}
-                aria-label={i18next.t("fontType", "Tipo de Letra")}
-                value={text_font}
-                data={this.textFontOptions}
-                onChange={this.changeTextFont.bind(this)}
-                allowDeselect={false}
-              />
-            </Group>
-            <TextInput
-              size="sm"
-              mt="md"
-              value={text_value}
-              onChange={this.changeTextValue.bind(this)}
-              title={i18next.t("textLabel", "Texto para a etiqueta")}
-              aria-label={i18next.t("textLabel", "Texto para a etiqueta")}
-              placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
-              onClick={e => e.target.select()}
-            />
-          </div>
-        ) : null}
-
-        <hr />
-
-        <div>
-          {drawings.length > 0 &&
-            this.exportFormats.map(opt =>
-              <Button
+          <Group gap={4} wrap="nowrap">
+            {historyTools.map(opt =>
+              <MapToolButton
                 key={opt.value}
-                type="button"
-                size="xs"
-                variant="outline"
-                className="mr-2 mb-2"
-                leftSection={opt.icon}
-                title={opt.tooltip}
-                onClick={(e) => this.download(opt.value)}
-              >
-                {opt.title}
-              </Button>
-            )
-          }
-        </div>
+                size="lg"
+                variant={opt.value !== "clear" ? "default" : "filled"}
+                color={opt.value !== "clear" ? undefined : "danger"}
+                icon={opt.icon}
+                title={i18next.t(opt.title, opt.defaultTitle)}
+                onClick={(e) => {
+                  switch (opt.value) {
+                    case 'undo': clickUndo(e); break;
+                    case 'redo': clickRedo(e); break;
+                    case 'clear': clickClear(e); break;
+                    default: ;
+                  }
+                }}
+              />
+            )}
+          </Group>
 
-        <hr />
+        </Stack>
+      </Paper>
 
-        <h5>{i18next.t("drawings", "Desenhos")}</h5>
-        {drawings.length === 0 ? (
-          <p>{i18next.t("noDrawings", "Não existem desenhos")}</p>
-        ) : (
-          <DataGrid
-            idAccessor="id"
-            records={pageRecords}
-            columns={[
-              {
-                accessor: 'properties.id',
-                title: 'ID',
-                render: (row, index) => (page - 1) * pageSize + index + 1,
-              },
-              {
-                accessor: 'properties.type',
-                title: i18next.t("type", "Tipo"),
-                render: row => i18next.t(typeLabels[row.properties.type], row.properties.type),
-              },
-              {
-                accessor: 'actions',
-                title: '',
-                textAlign: 'right',
-                render: row => (
-                  <Group gap={4} justify="flex-end" wrap="nowrap">
-                    <MapToolButton
-                      variant="subtle"
-                      radius="xl"
-                      size="md"
-                      icon={<IconSearch />}
-                      title={i18next.t("locate", "Localizar")}
-                      onClick={() => this.zoom(row)}
-                    />
-                    <MapToolButton
-                      variant="subtle"
-                      color="danger"
-                      radius="xl"
-                      size="md"
-                      icon={<IconTrash />}
-                      title={i18next.t("delete", "Eliminar")}
-                      onClick={() => this.deleteItem(row)}
-                    />
-                  </Group>
-                ),
-              },
-            ]}
-            totalRecords={drawings.length}
-            page={page}
-            onPageChange={(p) => this.setState({ page: p })}
-            recordsPerPage={pageSize}
-            recordsPerPageOptions={[5, 10, 25]}
-            onRecordsPerPageChange={(size) => this.setState({ pageSize: size, page: 1 })}
-            recordsPerPageLabel="Registos"
-            paginationText={({ from, to, totalRecords: total }) =>
-              i18next.t("drawingElementsPageInfo", "Mostrando {first} a {last} de {totalRecords} items")
-                .replace('{first}', from).replace('{last}', to).replace('{totalRecords}', total)}
+      <HelpBox tool={selectedTool || 'none'} />
+
+      <Switch
+        size="xs"
+        mt="xs"
+        checked={panel.snap}
+        onChange={toggleSnap}
+        label={i18next.t("drawingSnap", "Atrair para desenhos e camadas")}
+      />
+
+      {PLACEMENT_TOOLS.includes(selectedTool) ? (
+        <Group gap="xs" mt="xs" align="flex-end" className="draw-shape-inputs">
+          {selectedTool === 'square' ? numberField('shapeSide', i18next.t("drawingSide", "Lado (m)"), { min: 0.01, decimalScale: 2 }) : null}
+          {selectedTool === 'rectangle' ? numberField('shapeWidth', i18next.t("drawingWidth", "Largura (m)"), { min: 0.01, decimalScale: 2 }) : null}
+          {selectedTool === 'rectangle' ? numberField('shapeHeight', i18next.t("drawingHeight", "Altura (m)"), { min: 0.01, decimalScale: 2 }) : null}
+          {selectedTool === 'grid' ? numberField('gridRows', i18next.t("drawingRows", "Linhas"), { min: 1, decimalScale: 0 }) : null}
+          {selectedTool === 'grid' ? numberField('gridCols', i18next.t("drawingCols", "Colunas"), { min: 1, decimalScale: 0 }) : null}
+          {selectedTool === 'grid' ? numberField('gridCell', i18next.t("drawingCellSize", "Célula (m)"), { min: 0.01, decimalScale: 2 }) : null}
+          {numberField('shapeRotation', i18next.t("drawingRotation", "Rotação (°)"), { decimalScale: 2 })}
+        </Group>
+      ) : null}
+
+      {selectedTool === 'transform' && transformCount > 0 ? (
+        <Group gap="xs" mt="xs">
+          <Button
+            type="button"
+            size="sm"
+            leftSection={<IconCopy />}
+            title={i18next.t("drawingDuplicate", "Duplicar")}
+            onClick={() => duplicateSelected()}
+          >
+            {i18next.t("drawingDuplicate", "Duplicar")}
+          </Button>
+          <MapToolButton
+            size="input-sm"
+            variant="filled"
+            color="danger"
+            icon={<IconTrash />}
+            title={i18next.t("drawingDeleteSelection", "Apagar seleção")}
+            onClick={() => deleteTransformSelection()}
           />
-        )}
+        </Group>
+      ) : null}
 
+      {editing ? (
+        <React.Fragment>
+          <h5>{` ${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</h5>
+          <Group gap="xs">
+            <Button
+              type="button"
+              size="sm"
+              leftSection={<IconSave />}
+              title="Aplicar alterações"
+              onClick={() => finishEditing()}
+            >
+              Aplicar
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="default"
+              leftSection={<IconCopy />}
+              title={i18next.t("drawingDuplicate", "Duplicar")}
+              onClick={() => duplicateSelected()}
+            >
+              {i18next.t("drawingDuplicate", "Duplicar")}
+            </Button>
+            <MapToolButton
+              size="input-sm"
+              variant="filled"
+              color="danger"
+              icon={<IconTrash />}
+              title="Apagar desenho"
+              onClick={() => removeFeature()}
+            />
+          </Group>
+        </React.Fragment>
+      ) : null}
+
+      {draw_symbol ? (
+        <div>
+          <h5>{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</h5>
+          <Select
+            size="sm"
+            title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
+            aria-label={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
+            value={symbol_type}
+            data={symbolOptions.map(o => { return { ...o, "label": i18next.t(o.label, o.labelDefault) } })}
+            onChange={value => styleChange({ symbol_type: value })}
+            allowDeselect={false}
+          />
+        </div>
+      ) : null}
+
+      {draw_text ? (
+        <div>
+          <h5>{i18next.t("textOptions", "Opções de Texto")}</h5>
+          <Group gap="xs" grow>
+            <Select
+              size="sm"
+              title={i18next.t("textStyle", "Estilo do Texto")}
+              aria-label={i18next.t("textStyle", "Estilo do Texto")}
+              value={text_style}
+              data={textStyleOptions}
+              onChange={value => styleChange({ text_style: value })}
+              allowDeselect={false}
+            />
+
+            <Select
+              size="sm"
+              title={i18next.t("textSize", "Tamanho do Texto")}
+              aria-label={i18next.t("textSize", "Tamanho do Texto")}
+              value={text_size}
+              data={textSizeOptions}
+              onChange={value => styleChange({ text_size: value })}
+              allowDeselect={false}
+            />
+
+            <Select
+              size="sm"
+              title={i18next.t("fontType", "Tipo de Letra")}
+              aria-label={i18next.t("fontType", "Tipo de Letra")}
+              value={text_font}
+              data={textFontOptions}
+              onChange={value => styleChange({ text_font: value })}
+              allowDeselect={false}
+            />
+          </Group>
+          <TextInput
+            size="sm"
+            mt="md"
+            value={text_value}
+            onChange={e => styleChange({ text_value: e.target.value })}
+            title={i18next.t("textLabel", "Texto para a etiqueta")}
+            aria-label={i18next.t("textLabel", "Texto para a etiqueta")}
+            placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
+            onClick={e => e.target.select()}
+          />
+        </div>
+      ) : null}
+
+      <hr />
+
+      <div>
+        {drawings.length > 0 &&
+          exportFormats.map(opt =>
+            <Button
+              key={opt.value}
+              type="button"
+              size="xs"
+              variant="outline"
+              className="mr-2 mb-2"
+              leftSection={opt.icon}
+              title={opt.tooltip}
+              onClick={() => download(opt.value)}
+            >
+              {opt.title}
+            </Button>
+          )
+        }
       </div>
-    );
-  }
 
+      <hr />
+
+      <h5>{i18next.t("drawings", "Desenhos")}</h5>
+      {drawings.length === 0 ? (
+        <p>{i18next.t("noDrawings", "Não existem desenhos")}</p>
+      ) : (
+        <DataGrid
+          idAccessor="id"
+          records={pageRecords}
+          columns={[
+            {
+              accessor: 'properties.id',
+              title: 'ID',
+              render: (row, index) => (page - 1) * pageSize + index + 1,
+            },
+            {
+              accessor: 'properties.type',
+              title: i18next.t("type", "Tipo"),
+              render: row => i18next.t(typeLabels[row.properties.type], row.properties.type),
+            },
+            {
+              accessor: 'actions',
+              title: '',
+              textAlign: 'right',
+              render: row => (
+                <Group gap={4} justify="flex-end" wrap="nowrap">
+                  <MapToolButton
+                    variant="subtle"
+                    radius="xl"
+                    size="md"
+                    icon={<IconSearch />}
+                    title={i18next.t("locate", "Localizar")}
+                    onClick={() => zoom(row)}
+                  />
+                  <MapToolButton
+                    variant="subtle"
+                    color="danger"
+                    radius="xl"
+                    size="md"
+                    icon={<IconTrash />}
+                    title={i18next.t("delete", "Eliminar")}
+                    onClick={() => deleteItem(row)}
+                  />
+                </Group>
+              ),
+            },
+          ]}
+          totalRecords={drawings.length}
+          page={page}
+          onPageChange={(p) => patch({ page: p })}
+          recordsPerPage={pageSize}
+          recordsPerPageOptions={[5, 10, 25]}
+          onRecordsPerPageChange={(s) => patch({ pageSize: s, page: 1 })}
+          recordsPerPageLabel="Registos"
+          paginationText={({ from, to, totalRecords: total }) =>
+            i18next.t("drawingElementsPageInfo", "Mostrando {first} a {last} de {totalRecords} items")
+              .replace('{first}', from).replace('{last}', to).replace('{totalRecords}', total)}
+        />
+      )}
+
+    </div>
+  );
 }
 
 function parseOlFeatures(data, projection) {
-
-  // Parse OL feature
   const parser = new OlFormatGeoJSON();
   const parseOptions = {
     dataProjection: projection,

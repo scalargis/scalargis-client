@@ -30,7 +30,7 @@
     },
     "drawPanel": {
       "title": "Draw on the map",
-      "content": "Draw symbols, text, points, lines and polygons. Export it all as a georeferenced GeoJSON file."
+      "content": "Draw symbols, text, points, lines and polygons. Create squares and grids with sizes in metres. Move, rotate, scale and duplicate. Export it all as a georeferenced GeoJSON file."
     },
     "identify": {
       "title": "Identify",

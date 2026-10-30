@@ -4,6 +4,7 @@ import * as ContactForm from './ContactForm/src/Main'
 import * as Coordinates from './Coordinates/src/Main'
 import * as CRSSelect from './CRSSelect/src/Main'
 import * as DrawTools from './DrawTools/src/Main'
+import * as drawEditing from './DrawTools/src/editing'
 import * as ExportMapFeatures from './ExportMapFeatures/src/Main'
 import * as FeatureInfo from './FeatureInfo/src/Main'
 import * as GeoLocation from './GeoLocation/src/Main'
@@ -87,6 +88,7 @@ export {
   CRSSelect,
   Coordinates,
   DrawTools,
+  drawEditing,
   ExportMapFeatures,
   FeatureInfo,
   GeoLocation,
