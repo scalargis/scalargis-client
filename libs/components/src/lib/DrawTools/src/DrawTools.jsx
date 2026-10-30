@@ -943,7 +943,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
       {editing ? (
         <Paper withBorder radius="md" p="sm" mt="sm">
-          <Text size="xs" fw={600} mb="xs">{`${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</Text>
+          <Text size="sm" fw={600} mb="xs">{`${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</Text>
           <Group gap="xs">
             <Button
               type="button"
@@ -978,7 +978,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
       {draw_symbol ? (
         <Paper withBorder radius="md" p="sm" mt="sm">
-          <Text size="xs" fw={600} mb="xs">{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</Text>
+          <Text size="sm" fw={600} mb="xs">{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</Text>
           <Select
             size="xs"
             title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
@@ -993,30 +993,43 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
       {draw_text ? (
         <Paper withBorder radius="md" p="sm" mt="sm">
-          <Text size="xs" fw={600} mb="xs">{i18next.t("textOptions", "Opções de Texto")}</Text>
-          <Group gap="xs" grow>
-            <Select
-              size="xs"
-              title={i18next.t("textStyle", "Estilo do Texto")}
-              aria-label={i18next.t("textStyle", "Estilo do Texto")}
-              value={text_style}
-              data={textStyleOptions}
-              onChange={value => styleChange({ text_style: value })}
-              allowDeselect={false}
+          <Text size="sm" fw={600} mb="xs">{i18next.t("textOptions", "Opções de Texto")}</Text>
+          <Stack gap="xs">
+            <TextInput
+              size="sm"
+              label={i18next.t("textLabel", "Texto para a etiqueta")}
+              value={text_value}
+              onChange={e => styleChange({ text_value: e.target.value })}
+              title={i18next.t("textLabel", "Texto para a etiqueta")}
+              aria-label={i18next.t("textLabel", "Texto para a etiqueta")}
+              placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
+              onClick={e => e.target.select()}
             />
-
+            <SimpleGrid cols={2} spacing="xs">
+              <Select
+                size="sm"
+                label={i18next.t("textStyle", "Estilo do Texto")}
+                title={i18next.t("textStyle", "Estilo do Texto")}
+                aria-label={i18next.t("textStyle", "Estilo do Texto")}
+                value={text_style}
+                data={textStyleOptions}
+                onChange={value => styleChange({ text_style: value })}
+                allowDeselect={false}
+              />
+              <Select
+                size="sm"
+                label={i18next.t("textSize", "Tamanho do Texto")}
+                title={i18next.t("textSize", "Tamanho do Texto")}
+                aria-label={i18next.t("textSize", "Tamanho do Texto")}
+                value={text_size}
+                data={textSizeOptions}
+                onChange={value => styleChange({ text_size: value })}
+                allowDeselect={false}
+              />
+            </SimpleGrid>
             <Select
-              size="xs"
-              title={i18next.t("textSize", "Tamanho do Texto")}
-              aria-label={i18next.t("textSize", "Tamanho do Texto")}
-              value={text_size}
-              data={textSizeOptions}
-              onChange={value => styleChange({ text_size: value })}
-              allowDeselect={false}
-            />
-
-            <Select
-              size="xs"
+              size="sm"
+              label={i18next.t("fontType", "Tipo de Letra")}
               title={i18next.t("fontType", "Tipo de Letra")}
               aria-label={i18next.t("fontType", "Tipo de Letra")}
               value={text_font}
@@ -1024,17 +1037,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
               onChange={value => styleChange({ text_font: value })}
               allowDeselect={false}
             />
-          </Group>
-          <TextInput
-            size="xs"
-            mt="xs"
-            value={text_value}
-            onChange={e => styleChange({ text_value: e.target.value })}
-            title={i18next.t("textLabel", "Texto para a etiqueta")}
-            aria-label={i18next.t("textLabel", "Texto para a etiqueta")}
-            placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
-            onClick={e => e.target.select()}
-          />
+          </Stack>
         </Paper>
       ) : null}
 
