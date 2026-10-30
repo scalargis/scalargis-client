@@ -1,12 +1,14 @@
 import OlInteractionTransform from 'ol-ext/interaction/Transform';
+import { shiftKeyOnly } from 'ol/events/condition';
 
 const END_EVENTS = ['rotateend', 'scaleend', 'translateend'];
 
-/** Creates an inactive Transform interaction on the map. Each finished rotate, scale or move calls `onChange(features)`. */
+/** Creates an inactive Transform interaction on the map. Shift and click adds a feature. Each finished rotate, scale or move calls `onChange(features)`. */
 export function createTransform({ map, source, onChange, onSelect, onStart }) {
   const interaction = new OlInteractionTransform({
     filter: (feature) => source.hasFeature(feature),
     hitTolerance: 5,
+    addCondition: shiftKeyOnly,
     translateFeature: true,
     stretch: false,
     keepAspectRatio: () => true
@@ -16,7 +18,7 @@ export function createTransform({ map, source, onChange, onSelect, onStart }) {
 
   let current = [];
 
-  const isMoveOnly = (features) => features.some(f => f.getGeometry().getType() === 'Point');
+  const isMoveOnly = (features) => features.length === 1 && features[0].getGeometry().getType() === 'Point';
 
   interaction.on('select', (e) => {
     const features = e.features.getArray().slice();
@@ -46,8 +48,7 @@ export function createTransform({ map, source, onChange, onSelect, onStart }) {
       interaction.setActive(active);
     },
     selectFeatures(features) {
-      interaction.select(null);
-      features.forEach(f => interaction.select(f, true));
+      interaction.setSelection(features);
     },
     clear() {
       interaction.select(null);

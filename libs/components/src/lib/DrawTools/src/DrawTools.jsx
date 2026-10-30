@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import i18next from "i18next";
 import { ActionIcon, Badge, Button, ColorSwatch, Divider, Group, NumberInput, Paper, Popover, Select, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
-import { DataGrid, confirm, notify, IconReplay, IconRefresh, IconTrash, IconDownload, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
+import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconDownload, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import { createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
 import { getAppRootPath } from '../../utils/common';
@@ -50,7 +50,7 @@ const shapeTools = [
 
 const PLACEMENT_TOOLS = shapeTools.map(t => t.value);
 
-const GRID_CONFIRM_LIMIT = 500;
+const GRID_CELL_LIMIT = 1000;
 
 const historyTools = [
   { value: "undo", title: "undo", defaultTitle: "Desfazer", icon: <IconReplay /> },
@@ -163,6 +163,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const zoomTimerRef = useRef(null);
   const placementRef = useRef(null);
   const handlersRef = useRef({});
+
+  const showShapes = !(record.config_json && record.config_json.show_shapes === false);
 
   const exportFormats = useMemo(() => {
     const componentCfg = record.config_json;
@@ -345,34 +347,40 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
           transformRef.current.selectFeatures(clones);
         } else {
           select.getFeatures().clear();
-          select.getFeatures().push(clones[0]);
-          handlersRef.current.onSelect({ selected: [clones[0]], deselected: features });
+          select.getFeatures().extend(clones);
+          handlersRef.current.onSelect({ selected: clones, deselected: features });
         }
       }
     });
   };
 
-  const updateStyle = (feature) => {
+  const selectedDrawings = () => select.getFeatures().getArray().filter(feature => feature.get('state'));
+
+  const updateStyle = (features, changes) => {
     const { utils: u } = propsRef.current;
-    const current = panelRef.current;
-    const state = { ...feature.get('state') };
-    STYLE_FIELDS.forEach(k => { state[k] = current[k]; });
-    feature.setStyle(u.createStyle(feature, state, SELECTED_STROKE));
-    const geojson = u.serializeDrawing(feature, state, viewCrs());
-    const drawings = currentDrawings().map(d => (d.id === geojson.id ? geojson : d));
-    history.commit(drawings, `style:${geojson.id}`);
+    const crs = viewCrs();
+    const fields = Object.keys(changes).filter(k => STYLE_FIELDS.includes(k));
+    const byId = {};
+    features.forEach(feature => {
+      const state = { ...feature.get('state') };
+      fields.forEach(k => { state[k] = changes[k]; });
+      feature.setStyle(u.createStyle(feature, state, SELECTED_STROKE));
+      const geojson = u.serializeDrawing(feature, state, crs);
+      byId[geojson.id] = geojson;
+    });
+    history.commit(currentDrawings().map(d => byId[d.id] || d), `style:${Object.keys(byId).join(',')}`);
   };
 
   const styleChange = (changes) => {
     patch(changes);
-    const selected = select.getFeatures();
-    if (selected.getLength()) updateStyle(selected.item(0));
+    const features = selectedDrawings();
+    if (features.length) updateStyle(features, changes);
   };
 
   const editFeature = (feature) => {
     removeModify();
     patch({
-      editing: { id: feature.get('id'), type: feature.get('type') },
+      editing: { ids: [feature.get('id')], type: feature.get('type') },
       ...feature.get('state')
     });
     const features = new OlCollection();
@@ -423,11 +431,20 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       });
       oldSelectRef.current = [];
     }
-    if (!selected || selected.length === 0) {
+    const features = selectedDrawings();
+    if (features.length === 0) {
       removeModify();
       patch({ ...DRAW_FLAGS, editing: null });
+    } else if (features.length === 1) {
+      editFeature(features[0]);
     } else {
-      editFeature(selected[0]);
+      removeModify();
+      patch({
+        ...DRAW_FLAGS,
+        draw_symbol: features.every(feature => feature.get('type') === 'Symbol'),
+        draw_text: features.every(feature => feature.get('type') === 'Text'),
+        editing: { ids: features.map(feature => feature.get('id')) }
+      });
     }
   };
 
@@ -473,12 +490,12 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       notify.error(i18next.t("error", "Erro"), i18next.t("drawingShapeInvalid", "Indique valores maiores que zero."));
       return;
     }
-    if (count > GRID_CONFIRM_LIMIT) {
-      confirm({
-        severity: 'warning',
-        message: i18next.t("drawingGridConfirm", "A grelha tem {count} células. A impressão demora cerca de 1 s por cada 100 células. Continuar?").replace('{count}', count),
-        accept: () => commitPlaced(build())
-      });
+    if (count > GRID_CELL_LIMIT) {
+      notify.error(
+        i18next.t("error", "Erro"),
+        i18next.t("drawingGridLimit", "A grelha tem {count} células. O limite é {limit} células.")
+          .replace('{count}', count).replace('{limit}', GRID_CELL_LIMIT)
+      );
       return;
     }
     commitPlaced(build());
@@ -539,17 +556,20 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     history.seal();
 
     if (type === 'transform') {
+      const kept = selectedDrawings();
       if (panelRef.current.editing) finishEditing();
       stopDraw();
       setNavigation(true);
       select.setActive(false);
       patch({ selectedTool: type, ...DRAW_FLAGS, editing: null });
       ensureTransform().setActive(true);
+      if (kept.length) transformRef.current.selectFeatures(kept);
       syncSnap();
       dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
       return;
     }
 
+    const keptFromTransform = type === 'select' && transformRef.current ? transformRef.current.getSelection() : [];
     stopTransform();
 
     if (PLACEMENT_TOOLS.includes(type)) {
@@ -565,6 +585,10 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     if (type === 'select') {
       patch({ selectedTool: type, ...DRAW_FLAGS });
       select.setActive(true);
+      if (keptFromTransform.length) {
+        select.getFeatures().extend(keptFromTransform);
+        handlersRef.current.onSelect({ selected: keptFromTransform, deselected: [] });
+      }
       stopDraw();
       dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
       return;
@@ -620,7 +644,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     const { editing } = panelRef.current;
     if (editing) {
       clearSelection();
-      history.commit(currentDrawings().filter(d => d.id !== editing.id));
+      history.commit(currentDrawings().filter(d => !editing.ids.includes(d.id)));
     }
     patch({ ...DRAW_FLAGS, editing: null });
   };
@@ -867,7 +891,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
           {section(i18next.t("drawingSectionDraw", "Desenhar"), drawElementsOptions.map(toolButton))}
 
           <Group gap={12} wrap="wrap" align="flex-start">
-            {section(i18next.t("drawingSectionShapes", "Formas"), shapeTools.map(toolButton))}
+            {showShapes ? section(i18next.t("drawingSectionShapes", "Formas"), shapeTools.map(toolButton)) : null}
             {section(i18next.t("drawingSectionEdit", "Editar"), selectTools.map(toolButton))}
           </Group>
 
@@ -943,7 +967,11 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
       {editing ? (
         <Paper withBorder radius="md" p="sm" mt="sm">
-          <Text size="sm" fw={600} mb="xs">{`${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}</Text>
+          <Text size="sm" fw={600} mb="xs">
+            {editing.ids.length > 1
+              ? i18next.t("drawingSelectedCount", "{count} desenhos selecionados").replace('{count}', editing.ids.length)
+              : `${i18next.t("drawingEditing", "A editar")} ${i18next.t(typeLabels[editing.type], editing.type).toLocaleLowerCase()}`}
+          </Text>
           <Group gap="xs">
             <Button
               type="button"
@@ -969,7 +997,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
               variant="light"
               color="danger"
               icon={<IconTrash />}
-              title="Apagar desenho"
+              title={editing.ids.length > 1 ? i18next.t("drawingDeleteSelection", "Apagar seleção") : "Apagar desenho"}
               onClick={() => removeFeature()}
             />
           </Group>

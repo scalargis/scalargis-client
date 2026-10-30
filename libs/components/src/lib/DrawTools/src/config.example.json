@@ -5,7 +5,8 @@
   "order": 4,
   "config_json": { 
     "exclude_export_formats": ["gml", "kml", "shape"],
-    "export_crs": 3763
+    "export_crs": 3763,
+    "show_shapes": true
   },
   "children": []
 }
