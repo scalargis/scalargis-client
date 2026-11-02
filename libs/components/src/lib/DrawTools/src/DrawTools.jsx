@@ -522,12 +522,11 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       transformRef.current.selectFeatures(next);
       return;
     }
-    select.getFeatures().clear();
-    select.getFeatures().extend(next);
-    handlersRef.current.onSelect({
-      selected: next.filter(feature => !previous.includes(feature)),
-      deselected: previous.filter(feature => !next.includes(feature))
-    });
+    const selected = next.filter(feature => !previous.includes(feature));
+    const deselected = previous.filter(feature => !next.includes(feature));
+    deselected.forEach(feature => select.getFeatures().remove(feature));
+    select.getFeatures().extend(selected);
+    handlersRef.current.onSelect({ selected, deselected });
   };
 
   const stopPlacement = () => {
@@ -1271,11 +1270,13 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             {
               accessor: 'properties.id',
               title: 'ID',
+              noWrap: true,
               render: (row, index) => pageStart + index + 1,
             },
             {
               accessor: 'properties.type',
               title: i18next.t("type", "Tipo"),
+              noWrap: true,
               render: row => i18next.t(typeLabels[row.properties.type], row.properties.type),
             },
             {
