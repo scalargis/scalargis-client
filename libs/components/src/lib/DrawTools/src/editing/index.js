@@ -5,3 +5,4 @@ export { createSizedShape, rectangleRing } from './sizedShape';
 export { createGrid } from './grid';
 export { default as HelpBox } from './HelpBox';
 export { createSnap } from './snap';
+export { createBoxSelect } from './boxSelect';

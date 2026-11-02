@@ -37,3 +37,12 @@
   color: var(--mantine-primary-color-filled);
   font-size: 14px;
 }
+
+.drawtools-dragbox {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  border: 1.5px dashed var(--mantine-color-blue-6, #1c7ed6);
+  background: rgba(28, 126, 214, 0.12);
+  pointer-events: none;
+}

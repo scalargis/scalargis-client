@@ -3,7 +3,7 @@ import i18next from "i18next";
 import { ActionIcon, Badge, Button, ColorSwatch, Divider, Group, NumberInput, Paper, Popover, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
 import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconDownload, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
-import { createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
+import { createBoxSelect, createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
 import { getAppRootPath } from '../../utils/common';
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import OlInteractionDragPan from "ol/interaction/DragPan";
@@ -208,6 +208,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const modifyRef = useRef(null);
   const transformRef = useRef(null);
   const snapRef = useRef(null);
+  const boxRef = useRef(null);
   const highlightedRef = useRef([]);
   const oldSelectRef = useRef([]);
   const zoomTimerRef = useRef(null);
@@ -512,6 +513,23 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     }
   };
 
+  handlersRef.current.box = (features, add) => {
+    const inTransform = panelRef.current.selectedTool === 'transform' && transformRef.current;
+    const previous = inTransform ? transformRef.current.getSelection() : select.getFeatures().getArray().slice();
+    const next = add ? [...previous, ...features.filter(feature => !previous.includes(feature))] : features;
+    if (next.length === previous.length && next.every(feature => previous.includes(feature))) return;
+    if (inTransform) {
+      transformRef.current.selectFeatures(next);
+      return;
+    }
+    select.getFeatures().clear();
+    select.getFeatures().extend(next);
+    handlersRef.current.onSelect({
+      selected: next.filter(feature => !previous.includes(feature)),
+      deselected: previous.filter(feature => !next.includes(feature))
+    });
+  };
+
   const stopPlacement = () => {
     if (placementRef.current) {
       getMap().un('singleclick', placementRef.current);
@@ -779,6 +797,23 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       setNavigation(true);
     };
   }, [mainMap]);
+
+  useEffect(() => {
+    const box = createBoxSelect({
+      map: mainMap,
+      getSource,
+      onBox: (features, add) => handlersRef.current.box(features, add)
+    });
+    boxRef.current = box;
+    return () => {
+      box.dispose();
+      boxRef.current = null;
+    };
+  }, [mainMap]);
+
+  useEffect(() => {
+    if (boxRef.current) boxRef.current.setActive(panel.selectedTool === 'select' || panel.selectedTool === 'transform');
+  }, [panel.selectedTool]);
 
   const download = (format) => {
     const { viewer: v, record: rec, mainMap: map } = propsRef.current;
