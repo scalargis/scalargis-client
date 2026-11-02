@@ -14,6 +14,9 @@ import OlInteractionModify from "ol/interaction/Modify";
 import OlInteractionSelect from "ol/interaction/Select";
 import { shiftKeyOnly, singleClick } from "ol/events/condition";
 import OlCollection from "ol/Collection";
+import OlStyle from "ol/style/Style";
+import OlStyleStroke from "ol/style/Stroke";
+import OlStyleCircle from "ol/style/Circle";
 import { SketchPicker as CompactPicker } from 'react-color';
 import FileSaver from 'file-saver';
 import useDrawHistory from './useDrawHistory';
@@ -122,6 +125,69 @@ const LineStylePreview = ({ option }) => {
 
 const SELECTED_STROKE = { r: 255, g: 0, b: 0, a: 1 };
 
+const HIGHLIGHT_COLOR = 'rgba(255, 153, 0, 0.9)';
+
+const HIGHLIGHT_FLASH_MS = 2000;
+
+/** The fixed number of a drawing, or null when it has none. */
+const drawingNum = (drawing) => {
+  const num = drawing && drawing.properties ? drawing.properties.num : undefined;
+  return Number.isInteger(num) && num > 0 ? num : null;
+};
+
+/** The highest drawing number, 0 when no drawing has one. */
+const maxNum = (drawings) => drawings.reduce((max, d) => Math.max(max, drawingNum(d) || 0), 0);
+
+/** The drawings with a number, in array order after the highest one, for each drawing that has none. */
+const numberMissing = (drawings) => {
+  let next = maxNum(drawings);
+  let changed = false;
+  const result = drawings.map(d => {
+    if (drawingNum(d)) return d;
+    changed = true;
+    next += 1;
+    return { ...d, properties: { ...d.properties, num: next } };
+  });
+  return changed ? result : drawings;
+};
+
+/** The styles of a feature style at a resolution, as an array. */
+const baseStyles = (style, feature, resolution) => {
+  const value = typeof style === 'function' ? style(feature, resolution) : style;
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+};
+
+/** A style function that adds the highlight to the given feature style. */
+const highlightStyle = (original) => (feature, resolution) => {
+  const base = baseStyles(original, feature, resolution);
+  const state = feature.get('state') || {};
+  const geometry = feature.getGeometry();
+  const geometryType = geometry ? geometry.getType() : null;
+  if (feature.get('type') === 'Text') {
+    return base.map(style => {
+      const text = style.getText && style.getText();
+      if (!text) return style;
+      const boxed = text.clone();
+      boxed.setBackgroundStroke(new OlStyleStroke({ color: HIGHLIGHT_COLOR, width: 3 }));
+      boxed.setPadding([3, 3, 3, 3]);
+      return new OlStyle({ text: boxed });
+    });
+  }
+  if (geometryType === 'Point' || geometryType === 'MultiPoint') {
+    return [...base, new OlStyle({
+      image: new OlStyleCircle({
+        radius: (Number(state.size) || 5) + 8,
+        stroke: new OlStyleStroke({ color: HIGHLIGHT_COLOR, width: 4 })
+      })
+    })];
+  }
+  return [
+    new OlStyle({ stroke: new OlStyleStroke({ color: HIGHLIGHT_COLOR, width: (Number(state.size) || 2) + 10 }) }),
+    ...base
+  ];
+};
+
 const STYLE_FIELDS = ['fill', 'stroke', 'size', 'symbol_type', 'text_style', 'text_size', 'text_font', 'text_value', 'line_style'];
 
 const TOOL_KINDS = {
@@ -198,8 +264,14 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     setPanel(panelRef.current);
   }, []);
 
+  const [numbering] = useState(() => {
+    const loaded = viewer.config_json.drawings || [];
+    const drawings = numberMissing(loaded);
+    return { drawings, changed: drawings !== loaded };
+  });
+
   const history = useDrawHistory({
-    initial: viewer.config_json.drawings || [],
+    initial: numbering.drawings,
     dispatch,
     actions
   });
@@ -214,6 +286,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const zoomTimerRef = useRef(null);
   const placementRef = useRef(null);
   const handlersRef = useRef({});
+  const mapHighlightRef = useRef({ hover: null, flash: null, timer: null, applied: null });
 
   const componentConfig = record.config_json || {};
   const showShapes = componentConfig.show_shapes !== false;
@@ -356,10 +429,25 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     if (panelRef.current.transformCount) patch({ transformCount: 0 });
   };
 
+  const withNums = (features, geojsons) => {
+    const drawings = currentDrawings();
+    const known = new Map(drawings.map(d => [d.id, drawingNum(d)]));
+    let next = maxNum(drawings);
+    return geojsons.map((geojson, i) => {
+      let num = known.get(geojson.id);
+      if (!num) {
+        next += 1;
+        num = next;
+      }
+      if (features[i]) features[i].set('num', num, true);
+      return { ...geojson, properties: { ...geojson.properties, num } };
+    });
+  };
+
   const serializeFeatures = (features) => {
     const { utils: u } = propsRef.current;
     const crs = viewCrs();
-    return features.map(feature => u.serializeDrawing(feature, { ...feature.get('state') }, crs));
+    return withNums(features, features.map(feature => u.serializeDrawing(feature, { ...feature.get('state') }, crs)));
   };
 
   const highlightTransform = (features) => {
@@ -427,7 +515,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       const state = { ...feature.get('state') };
       fields.forEach(k => { state[k] = changes[k]; });
       feature.setStyle(u.createStyle(feature, state, SELECTED_STROKE));
-      const geojson = u.serializeDrawing(feature, state, crs);
+      const [geojson] = withNums([feature], [u.serializeDrawing(feature, state, crs)]);
       byId[geojson.id] = geojson;
     });
     history.commit(currentDrawings().map(d => byId[d.id] || d), `style:${Object.keys(byId).join(',')}`);
@@ -468,7 +556,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     e.features.forEach(feature => {
       const state = { ...feature.get('state') };
       feature.setStyle(u.createStyle(feature, state, SELECTED_STROKE));
-      const geojson = u.serializeDrawing(feature, state, crs);
+      const [geojson] = withNums([feature], [u.serializeDrawing(feature, state, crs)]);
       byId[geojson.id] = geojson;
     });
     history.commit(currentDrawings().map(d => byId[d.id] || d));
@@ -540,7 +628,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     const { utils: u } = propsRef.current;
     const state = { ...panelRef.current, ...DRAW_FLAGS, draw_geom: true };
     const crs = viewCrs();
-    const geojsons = features.map(feature => u.serializeDrawing(feature, state, crs));
+    const geojsons = withNums(features, features.map(feature => u.serializeDrawing(feature, state, crs)));
     history.seal();
     history.commit([...currentDrawings(), ...geojsons]);
   };
@@ -607,7 +695,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     getMap().addInteraction(draw);
     syncSnap();
     draw.on('drawend', (e) => {
-      const geojson = u.serializeDrawing(e.feature, panelRef.current, viewCrs());
+      const [geojson] = withNums([e.feature], [u.serializeDrawing(e.feature, panelRef.current, viewCrs())]);
       history.commit([...currentDrawings(), geojson]);
       patch({ selectedTool: null, ...DRAW_FLAGS });
       stopDraw();
@@ -837,6 +925,26 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     if (boxRef.current) boxRef.current.setActive(panel.selectedTool === 'select' || panel.selectedTool === 'transform');
   }, [panel.selectedTool]);
 
+  useEffect(() => {
+    if (!numbering.changed) return;
+    dispatch(actions.viewer_set_drawings(numbering.drawings));
+    const source = getSource();
+    if (source) {
+      numbering.drawings.forEach(d => {
+        const feature = source.getFeatureById(d.id);
+        if (feature) feature.set('num', d.properties.num, true);
+      });
+    }
+  }, []);
+
+  useEffect(() => () => {
+    const h = mapHighlightRef.current;
+    clearTimeout(h.timer);
+    h.hover = null;
+    h.flash = null;
+    applyMapHighlight();
+  }, []);
+
   const download = (format) => {
     const { viewer: v, record: rec, mainMap: map } = propsRef.current;
     const componentCfg = rec ? rec.config_json : null;
@@ -891,11 +999,46 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     });
   };
 
+  const applyMapHighlight = () => {
+    const h = mapHighlightRef.current;
+    const id = h.hover || h.flash;
+    const source = getSource();
+    const feature = id && source ? source.getFeatureById(id) : null;
+    if (h.applied && h.applied.feature === feature && feature.getStyle() === h.applied.style) return;
+    if (h.applied && h.applied.feature.getStyle() === h.applied.style) {
+      h.applied.feature.setStyle(h.applied.original);
+    }
+    h.applied = null;
+    if (!feature || !feature.get('state')) return;
+    const original = feature.getStyle();
+    const style = highlightStyle(original);
+    feature.setStyle(style);
+    h.applied = { feature, original, style };
+  };
+
+  const hoverRow = (id) => {
+    mapHighlightRef.current.hover = id;
+    applyMapHighlight();
+  };
+
+  const flashRow = (id) => {
+    const h = mapHighlightRef.current;
+    clearTimeout(h.timer);
+    h.flash = id;
+    applyMapHighlight();
+    h.timer = setTimeout(() => {
+      h.flash = null;
+      h.timer = null;
+      applyMapHighlight();
+    }, HIGHLIGHT_FLASH_MS);
+  };
+
   const zoom = (item) => {
     const features = parseOlFeatures(JSON.stringify(item), viewCrs());
     if (features.length) {
       getMap().getView().fit(features[0].getGeometry());
     }
+    flashRow(item.id);
   };
 
   const {
@@ -1268,10 +1411,10 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
           records={pageRecords}
           columns={[
             {
-              accessor: 'properties.id',
+              accessor: 'properties.num',
               title: 'ID',
               noWrap: true,
-              render: (row, index) => pageStart + index + 1,
+              render: row => drawingNum(row) || '',
             },
             {
               accessor: 'properties.type',
@@ -1337,6 +1480,10 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             },
           ]}
           onRowReorder={(items) => reorderPage(items, pageStart)}
+          customRowAttributes={(row) => ({
+            onMouseEnter: () => hoverRow(row.id),
+            onMouseLeave: () => hoverRow(null)
+          })}
           totalRecords={drawings.length}
           page={page}
           onPageChange={(p) => patch({ page: p })}

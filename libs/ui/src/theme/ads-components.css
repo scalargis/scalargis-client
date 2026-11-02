@@ -248,16 +248,47 @@
   background-color: var(--mantine-color-primary-1);
 }
 
-/* The footer stays on one row at every width. In a narrow grid (the ~300px
-   viewer side panel) the row would overflow, so the pages collapse to
-   `previous / current / next`: the first/last edge buttons, the other page
-   numbers and the dots are hidden. A wide backoffice grid keeps the full set.
-   The width that matters is the grid's own, so the query asks the container. */
+/* In a narrow grid (the ~300px viewer side panel) the footer is a two-row
+   grid. Row 1 holds the "Mostrando ..." text on one line. Row 2 holds the
+   records-per-page selector on the left and the pager on the right. The pager
+   collapses to `previous / current / next`: the first/last edge buttons, the
+   other page numbers and the dots are hidden. A wide backoffice grid keeps the
+   one-row footer with the full pager. The width that matters is the grid's
+   own, so the query asks the container. The grid layout ignores the inline
+   flex-direction that mantine-datatable sets below its wrap breakpoint. */
 .ads-datagrid {
   container-type: inline-size;
 }
 
 @container (max-width: 520px) {
+  .ads-datagrid__pagination {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    row-gap: var(--mantine-spacing-xs);
+  }
+
+  .ads-datagrid__pagination .mantine-datatable-pagination-text {
+    grid-column: 1 / -1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--mantine-font-size-xs);
+  }
+
+  .ads-datagrid__pagination > .mantine-Group-root {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .ads-datagrid__pagination .mantine-datatable-pagination-pages {
+    grid-column: 2;
+    justify-self: end;
+    flex-wrap: nowrap;
+  }
+
   .ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-ads-control='first'],
   .ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-ads-control='last'],
   .ads-datagrid__pagination .mantine-datatable-pagination-pages-control[data-ads-page-item]:not([data-active]),
