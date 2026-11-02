@@ -4,6 +4,7 @@ import AppContext from "../../../AppContext";
 import VectorSource from "ol/source/Vector";
 import OlCollection from "ol/Collection";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
+import { getUid } from "ol/util";
 import * as utils from '../../utils';
 
 const STATE_KEYS = ['draw_geom', 'draw_symbol', 'draw_text', 'fill', 'stroke', 'size', 'symbol_type', 'text_style', 'text_size', 'text_font', 'text_value', 'line_style'];
@@ -24,10 +25,19 @@ const featureMatchesDrawing = (feature, drawing, crs, writer) => {
   return normalizeState(feature.get('state')) === normalizeState(drawing.properties && drawing.properties.state);
 };
 
+/** Sorts features by drawing index, first = bottom. A feature with no index draws under the drawings. */
+const drawingOrder = (orderRef) => (a, b) => {
+  const order = orderRef.current;
+  const ia = order.has(a.getId()) ? order.get(a.getId()) : -1;
+  const ib = order.has(b.getId()) ? order.get(b.getId()) : -1;
+  return ia - ib || parseInt(getUid(a), 10) - parseInt(getUid(b), 10);
+};
+
 const VectorLayer = ({ config, source, style, group, checked, viewer }) => {
 
   const { mainMap } = useContext(AppContext);
   const layer = useRef()
+  const orderRef = useRef(new Map());
 
   useEffect(() => {
     if (!mainMap) return;
@@ -35,7 +45,8 @@ const VectorLayer = ({ config, source, style, group, checked, viewer }) => {
     // TODO: load source and style
     layer.current = new OLVectorLayer({
       ...config,
-      source: new VectorSource({ features: new OlCollection(), attributions: config.attributions || [] })
+      source: new VectorSource({ features: new OlCollection(), attributions: config.attributions || [] }),
+      ...(config.id === 'userlayer' ? { renderOrder: drawingOrder(orderRef) } : {})
       //style
     });
 
@@ -66,6 +77,12 @@ const VectorLayer = ({ config, source, style, group, checked, viewer }) => {
         if (exists) ollayer.getSource().removeFeature(exists);
         ollayer.getSource().addFeature(utils.deserializeDrawing(d, crs));
       });
+      const previous = orderRef.current;
+      const reordered = previous.size !== drawings.length || drawings.some((d, i) => previous.get(d.id) !== i);
+      if (reordered) {
+        orderRef.current = new Map(drawings.map((d, i) => [d.id, i]));
+        ollayer.changed();
+      }
     }
     return () => {
       //if (ollayer) ollayer.getSource().clear();

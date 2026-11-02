@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import i18next from "i18next";
-import { ActionIcon, Badge, Button, ColorSwatch, Divider, Group, NumberInput, Paper, Popover, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
-import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconDownload, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
+import { ActionIcon, Badge, Button, ColorSwatch, Divider, Group, Menu, NumberInput, Paper, Popover, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
+import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconDownload, IconSave, IconSearch, IconCopy, IconEllipsisV, IconArrowUp, IconArrowDown } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import { createBoxSelect, createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
 import { getAppRootPath } from '../../utils/common';
@@ -743,6 +743,29 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     history.commit(currentDrawings().filter(d => d.id !== item.id));
   };
 
+  const commitOrder = (next) => {
+    history.seal();
+    history.commit(next);
+  };
+
+  const bringToFront = (item) => {
+    const list = currentDrawings();
+    if (list[list.length - 1].id === item.id) return;
+    commitOrder([...list.filter(d => d.id !== item.id), item]);
+  };
+
+  const sendToBack = (item) => {
+    const list = currentDrawings();
+    if (list[0].id === item.id) return;
+    commitOrder([item, ...list.filter(d => d.id !== item.id)]);
+  };
+
+  const reorderPage = (pageItems, start) => {
+    const fromTop = currentDrawings().slice().reverse();
+    fromTop.splice(start, pageItems.length, ...pageItems);
+    commitOrder(fromTop.reverse());
+  };
+
   const finishEditing = () => {
     select.getFeatures().clear();
     select.dispatchEvent('select');
@@ -819,7 +842,9 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     const { viewer: v, record: rec, mainMap: map } = propsRef.current;
     const componentCfg = rec ? rec.config_json : null;
     const source = getSource();
-    const features = source ? source.getFeatures() : [];
+    const order = new Map(currentDrawings().map((d, i) => [d.id, i]));
+    const rank = (feature) => order.has(feature.getId()) ? order.get(feature.getId()) : -1;
+    const features = source ? source.getFeatures().sort((a, b) => rank(a) - rank(b)) : [];
 
     let crs = 4326;
     if (componentCfg && componentCfg.export_crs) {
@@ -905,7 +930,10 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const drawings = viewer.config_json.drawings;
   const totalPages = Math.max(1, Math.ceil(drawings.length / pageSize));
   const page = Math.min(panel.page, totalPages);
-  const pageRecords = drawings.slice((page - 1) * pageSize, page * pageSize);
+  const pageStart = (page - 1) * pageSize;
+  const pageRecords = drawings.slice().reverse().slice(pageStart, pageStart + pageSize);
+  const topId = drawings.length ? drawings[drawings.length - 1].id : null;
+  const bottomId = drawings.length ? drawings[0].id : null;
 
   const numberField = (name, label, props) => (
     <NumberInput
@@ -1243,7 +1271,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
             {
               accessor: 'properties.id',
               title: 'ID',
-              render: (row, index) => (page - 1) * pageSize + index + 1,
+              render: (row, index) => pageStart + index + 1,
             },
             {
               accessor: 'properties.type',
@@ -1273,10 +1301,41 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
                     title={i18next.t("delete", "Eliminar")}
                     onClick={() => deleteItem(row)}
                   />
+                  <Menu position="bottom-end" withinPortal shadow="md">
+                    <Menu.Target>
+                      <ActionIcon
+                        type="button"
+                        variant="subtle"
+                        radius="xl"
+                        size="md"
+                        title={i18next.t("drawingOrder", "Ordem de desenho")}
+                        aria-label={i18next.t("drawingOrder", "Ordem de desenho")}
+                      >
+                        <IconEllipsisV />
+                      </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown>
+                      <Menu.Item
+                        leftSection={<IconArrowUp />}
+                        disabled={row.id === topId}
+                        onClick={() => bringToFront(row)}
+                      >
+                        {i18next.t("drawingBringToFront", "Trazer para a frente")}
+                      </Menu.Item>
+                      <Menu.Item
+                        leftSection={<IconArrowDown />}
+                        disabled={row.id === bottomId}
+                        onClick={() => sendToBack(row)}
+                      >
+                        {i18next.t("drawingSendToBack", "Enviar para trás")}
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
                 </Group>
               ),
             },
           ]}
+          onRowReorder={(items) => reorderPage(items, pageStart)}
           totalRecords={drawings.length}
           page={page}
           onPageChange={(p) => patch({ page: p })}
