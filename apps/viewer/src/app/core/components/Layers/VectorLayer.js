@@ -6,7 +6,7 @@ import OlCollection from "ol/Collection";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import * as utils from '../../utils';
 
-const STATE_KEYS = ['draw_geom', 'draw_symbol', 'draw_text', 'fill', 'stroke', 'size', 'symbol_type', 'text_style', 'text_size', 'text_font', 'text_value'];
+const STATE_KEYS = ['draw_geom', 'draw_symbol', 'draw_text', 'fill', 'stroke', 'size', 'symbol_type', 'text_style', 'text_size', 'text_font', 'text_value', 'line_style'];
 
 const normalizeState = (state) => JSON.stringify(STATE_KEYS.map(k => {
   const v = state ? state[k] : undefined;

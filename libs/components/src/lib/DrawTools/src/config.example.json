@@ -1,12 +1,16 @@
 {
   "id": "drawtools",
-  "type": "DrawTools", 
-  "target": "mainmenu", 
+  "type": "DrawTools",
+  "target": "mainmenu",
   "order": 4,
-  "config_json": { 
+  "config_json": {
     "exclude_export_formats": ["gml", "kml", "shape"],
     "export_crs": 3763,
-    "show_shapes": true
+    "tools": ["point", "line", "polygon", "symbol", "text", "square", "rectangle", "grid", "select", "transform"],
+    "show_shapes": true,
+    "show_snap": true,
+    "show_help": true,
+    "show_export": true
   },
   "children": []
 }

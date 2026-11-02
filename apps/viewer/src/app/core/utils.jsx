@@ -290,7 +290,8 @@ export const serializeDrawing = (feature, state, crs) => {
     text_style: state.text_style,
     text_size: state.text_size,
     text_font: state.text_font,
-    text_value: state.text_value
+    text_value: state.text_value,
+    line_style: state.line_style
   });
   const serializer = new OlFormatGeoJSON();
 
@@ -309,9 +310,9 @@ export const serializeDrawing = (feature, state, crs) => {
 }
 
 export const createStyle = (feature, drawing, altStroke) => {
-  const { symbol_type, size, fill, text_style, text_size, text_font, text_value } = drawing;
+  const { symbol_type, size, fill, text_style, text_size, text_font, text_value, line_style } = drawing;
   const stroke = altStroke ? altStroke : drawing.stroke;
-  let style = createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke);
+  let style = createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke, line_style);
   if (feature.get('type') === 'Symbol') {
       style = createDrawingSymbol(symbol_type, size, fill, stroke);
   }
@@ -322,7 +323,7 @@ export const createStyle = (feature, drawing, altStroke) => {
 }
 
 export const deserializeDrawing = (drawing, crs) => {
-  const { draw_geom, draw_symbol, draw_text, symbol_type, size, fill, stroke, text_style, text_size, text_font, text_value } = drawing.properties.state;
+  const { draw_geom, draw_symbol, draw_text, symbol_type, size, fill, stroke, text_style, text_size, text_font, text_value, line_style } = drawing.properties.state;
   const serializer = new OlFormatGeoJSON();
 
   // Export defaults to EPSG:3857
@@ -345,12 +346,24 @@ export const deserializeDrawing = (drawing, crs) => {
     text_style,
     text_size,
     text_font,
-    text_value
+    text_value,
+    line_style
   });
   return feature;
 }
-  
-export const createDrawingStyle = (type, size, fill, stroke) => {
+
+/** OL lineDash and lineCap for a line style, scaled to the width. With no style, the fallback dash. */
+export const drawingLineDash = (lineStyle, width, fallback) => {
+  const w = Math.max(1, Number(width) || 1);
+  switch (lineStyle) {
+    case 'solid': return { lineDash: undefined, lineCap: 'round' };
+    case 'dashed': return { lineDash: [4 * w, 3 * w], lineCap: 'butt' };
+    case 'dotted': return { lineDash: [0, 2.5 * w], lineCap: 'round' };
+    default: return { lineDash: fallback, lineCap: 'round' };
+  }
+}
+
+export const createDrawingStyle = (type, size, fill, stroke, lineStyle) => {
   const fillStr = `rgba(${ fill.r }, ${ fill.g }, ${ fill.b }, ${ fill.a })`;
   const strokeStr = `rgba(${ stroke.r }, ${ stroke.g }, ${ stroke.b }, ${ stroke.a })`;
   let style = new OlStyleStyle({
@@ -380,15 +393,19 @@ export const createDrawingStyle = (type, size, fill, stroke) => {
       break;
     case 'LineString':
       style = new OlStyleStyle({
-          stroke: new OlStyleStroke({ color: strokeStr, width: parseInt(size, 10) })
+          stroke: new OlStyleStroke({
+            color: strokeStr,
+            width: parseInt(size, 10),
+            ...drawingLineDash(lineStyle, parseInt(size, 10), undefined)
+          })
       });
       break;
     case 'Polygon':
       style = new OlStyleStyle({
         stroke: new OlStyleStroke({
           color: strokeStr,
-          lineDash: [4],
-          width: parseInt(size, 10)
+          width: parseInt(size, 10),
+          ...drawingLineDash(lineStyle, parseInt(size, 10), [4])
         }),
         fill: new OlStyleFill({ color: fillStr})
       });

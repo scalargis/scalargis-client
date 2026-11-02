@@ -11,7 +11,7 @@ const HELP_TEXTS = {
   point: ['drawingHelpPoint', 'Clique no mapa para adicionar um ponto.'],
   line: ['drawingHelpLine', 'Clique para cada vértice. Duplo clique termina a linha.'],
   polygon: ['drawingHelpPolygon', 'Clique para cada vértice. Duplo clique termina o polígono.'],
-  select: ['drawingHelpSelect', 'Clique num desenho para o editar. Shift e clique junta mais desenhos: a cor, o tamanho e Apagar aplicam-se a todos. Com um só desenho, arraste um vértice para o mover. Shift e clique num vértice apaga-o.'],
+  select: ['drawingHelpSelect', 'Clique num desenho para o editar. Shift e clique junta mais desenhos: o estilo e Apagar aplicam-se a todos. Com um só desenho, arraste um vértice para o mover. Shift e clique num vértice apaga-o.'],
   transform: ['drawingHelpTransform', 'Clique num desenho. Shift e clique junta mais desenhos. Arraste a seleção para a mover, um canto para a escalar e o círculo para a rodar. Um ponto, símbolo ou texto sozinho só se move.'],
   square: ['drawingHelpSquare', 'Defina o lado em metros e a rotação. Clique no mapa para colocar o centro do quadrado.'],
   rectangle: ['drawingHelpRectangle', 'Defina a largura e a altura em metros e a rotação. Clique no mapa para colocar o centro do retângulo.'],
@@ -37,11 +37,11 @@ const writeEnabled = (value) => {
   }
 };
 
-/** Help text for the active drawing tool, with a toggle kept in localStorage. */
-export default function HelpBox({ tool }) {
+/** Help text for the active drawing tool, with a toggle kept in localStorage. `snap` false hides the snap hint. */
+export default function HelpBox({ tool, snap = true }) {
   const [enabled, setEnabled] = useState(readEnabled);
   const [key, fallback] = HELP_TEXTS[tool] || HELP_TEXTS.none;
-  const showSnap = SNAP_TOOLS.includes(tool);
+  const showSnap = snap && SNAP_TOOLS.includes(tool);
 
   const toggle = (event) => {
     const value = event.currentTarget.checked;
@@ -61,7 +61,7 @@ export default function HelpBox({ tool }) {
         <Switch size="xs" checked={enabled} onChange={toggle} aria-label={label} title={label} />
       </Group>
       {enabled ? <Text size="xs" mt={6} lh={1.45}>{i18next.t(key, fallback)}</Text> : null}
-      {enabled && showSnap ? <Text size="xs" mt={4} lh={1.45} c="dimmed">{i18next.t('drawingHelpSnap', 'Ative Atrair para o cursor aderir aos vértices e às arestas dos desenhos e das camadas vetoriais visíveis.')}</Text> : null}
+      {enabled && showSnap ? <Text size="xs" mt={4} lh={1.45} c="dimmed">{i18next.t('drawingHelpSnap', 'Com Atrair (Snapping) ligado, o cursor adere aos vértices e às arestas dos desenhos e das camadas vetoriais visíveis.')}</Text> : null}
     </Paper>
   );
 }

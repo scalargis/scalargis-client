@@ -102,9 +102,45 @@ const textFontOptions = [
   { key: '2', label: 'Georgia', value: 'Georgia, serif' },
 ];
 
+const lineStyleOptions = [
+  { value: 'solid', label: 'drawingLineSolid', labelDefault: 'Contínua' },
+  { value: 'dashed', label: 'drawingLineDashed', labelDefault: 'Tracejada' },
+  { value: 'dotted', label: 'drawingLineDotted', labelDefault: 'Pontilhada' }
+];
+
 const SELECTED_STROKE = { r: 255, g: 0, b: 0, a: 1 };
 
-const STYLE_FIELDS = ['fill', 'stroke', 'size', 'symbol_type', 'text_style', 'text_size', 'text_font', 'text_value'];
+const STYLE_FIELDS = ['fill', 'stroke', 'size', 'symbol_type', 'text_style', 'text_size', 'text_font', 'text_value', 'line_style'];
+
+const TOOL_KINDS = {
+  point: 'Point',
+  line: 'LineString',
+  polygon: 'Polygon',
+  square: 'Polygon',
+  rectangle: 'Polygon',
+  grid: 'Polygon',
+  symbol: 'Symbol',
+  text: 'Text'
+};
+
+const KIND_FIELDS = {
+  LineString: ['stroke', 'size', 'line_style'],
+  Polygon: ['fill', 'stroke', 'size', 'line_style'],
+  Point: ['fill', 'stroke', 'size'],
+  Symbol: ['symbol_type', 'fill', 'stroke', 'size'],
+  Text: ['text_value', 'text_style', 'text_size', 'text_font', 'fill', 'stroke']
+};
+
+const DEFAULT_FIELDS = ['fill', 'stroke', 'size'];
+
+const FIELD_ORDER = ['text_value', 'text_style', 'text_size', 'text_font', 'symbol_type', 'fill', 'stroke', 'size', 'line_style'];
+
+/** The style fields that all the given drawing kinds share. */
+const sharedFields = (kinds) => FIELD_ORDER.filter(field =>
+  kinds.every(kind => (KIND_FIELDS[kind] || DEFAULT_FIELDS).includes(field)));
+
+/** The line style a drawing with no `line_style` key shows on the map. */
+const legacyLineStyle = (type) => type === 'Polygon' ? 'dashed' : 'solid';
 
 const DOUBLE_CLICK_GUARD_MS = 350;
 
@@ -122,6 +158,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     text_size: '20px',
     text_font: 'Arial, Helvetica, sans-serif',
     text_value: i18next.t('drawingSampleText', 'Exemplo de texto'),
+    line_style: 'solid',
+    styleKind: null,
     ...DRAW_FLAGS,
     displayFillPicker: false,
     displayStrokePicker: false,
@@ -134,7 +172,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     gridRows: 3,
     gridCols: 3,
     gridCell: 5,
-    snap: false,
+    snap: true,
     selectedTool: null,
     page: 1,
     pageSize: 10
@@ -164,7 +202,16 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const placementRef = useRef(null);
   const handlersRef = useRef({});
 
-  const showShapes = !(record.config_json && record.config_json.show_shapes === false);
+  const componentConfig = record.config_json || {};
+  const showShapes = componentConfig.show_shapes !== false;
+  const showSnap = componentConfig.show_snap !== false;
+  const showHelp = componentConfig.show_help !== false;
+  const showExport = componentConfig.show_export !== false;
+  const allowedTools = Array.isArray(record.config_json && record.config_json.tools) ? record.config_json.tools : null;
+  const toolAllowed = (opt) => !allowedTools || allowedTools.includes(opt.value);
+  const drawToolsShown = drawElementsOptions.filter(toolAllowed);
+  const shapeToolsShown = showShapes ? shapeTools.filter(toolAllowed) : [];
+  const editToolsShown = selectTools.filter(toolAllowed);
 
   const exportFormats = useMemo(() => {
     const componentCfg = record.config_json;
@@ -231,8 +278,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const createFeatureStyle = (feature, stroke) => {
     const u = propsRef.current.utils;
     const props = feature.getProperties();
-    const { symbol_type, size, fill, text_style, text_size, text_font, text_value } = props.state;
-    let style = u.createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke);
+    const { symbol_type, size, fill, text_style, text_size, text_font, text_value, line_style } = props.state;
+    let style = u.createDrawingStyle(feature.getGeometry().getType(), size, fill, stroke, line_style);
     if (props.type === 'Symbol') {
       style = u.createDrawingSymbol(symbol_type, size, fill, stroke);
     }
@@ -250,7 +297,9 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     if (!snapRef.current) {
       snapRef.current = createSnap({ map: getMap(), getDrawingsSource: getSource });
     }
-    snapRef.current.setEnabled(panelRef.current.snap);
+    const record = propsRef.current.record;
+    const allowed = !(record && record.config_json && record.config_json.show_snap === false);
+    snapRef.current.setEnabled(allowed && panelRef.current.snap);
     snapRef.current.refresh({ draw: drawRef.current });
   };
 
@@ -379,9 +428,12 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
   const editFeature = (feature) => {
     removeModify();
+    const state = feature.get('state');
+    const type = feature.get('type');
     patch({
-      editing: { ids: [feature.get('id')], type: feature.get('type') },
-      ...feature.get('state')
+      editing: { ids: [feature.get('id')], type, kinds: [type] },
+      ...state,
+      line_style: state.line_style || legacyLineStyle(type)
     });
     const features = new OlCollection();
     features.push(feature);
@@ -443,7 +495,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
         ...DRAW_FLAGS,
         draw_symbol: features.every(feature => feature.get('type') === 'Symbol'),
         draw_text: features.every(feature => feature.get('type') === 'Text'),
-        editing: { ids: features.map(feature => feature.get('id')) }
+        editing: { ids: features.map(feature => feature.get('id')), kinds: features.map(feature => feature.get('type')) }
       });
     }
   };
@@ -554,6 +606,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     }
 
     history.seal();
+
+    if (TOOL_KINDS[type]) patch({ styleKind: TOOL_KINDS[type] });
 
     if (type === 'transform') {
       const kept = selectedDrawings();
@@ -669,6 +723,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     if (current.editing) finishEditing();
     stopTransform();
     removeModify();
+    if (snapRef.current) snapRef.current.dispose();
     patch({ enabled: false, selectedTool: null, ...DRAW_FLAGS, editing: null });
   };
 
@@ -769,8 +824,6 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   };
 
   const {
-    draw_text,
-    draw_symbol,
     size,
     fill,
     stroke,
@@ -779,11 +832,24 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
     text_size,
     text_font,
     text_value,
+    line_style,
+    styleKind,
     editing,
     transformCount,
     selectedTool,
     pageSize
   } = panel;
+
+  let styleFields;
+  if (editing && editing.kinds && editing.kinds.length) {
+    styleFields = sharedFields(editing.kinds);
+  } else if (TOOL_KINDS[selectedTool]) {
+    styleFields = sharedFields([TOOL_KINDS[selectedTool]]);
+  } else {
+    styleFields = sharedFields([styleKind]);
+  }
+  const hasField = (field) => styleFields.includes(field);
+  const hasTextFields = ['text_value', 'text_style', 'text_size', 'text_font'].some(hasField);
 
   const drawings = viewer.config_json.drawings;
   const totalPages = Math.max(1, Math.ceil(drawings.length / pageSize));
@@ -888,17 +954,89 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       <Paper withBorder radius="md" p="sm" className="toolbar">
         <Stack gap="sm">
 
-          {section(i18next.t("drawingSectionDraw", "Desenhar"), drawElementsOptions.map(toolButton))}
+          {drawToolsShown.length ? section(i18next.t("drawingSectionDraw", "Desenhar"), drawToolsShown.map(toolButton)) : null}
 
           <Group gap={12} wrap="wrap" align="flex-start">
-            {showShapes ? section(i18next.t("drawingSectionShapes", "Formas"), shapeTools.map(toolButton)) : null}
-            {section(i18next.t("drawingSectionEdit", "Editar"), selectTools.map(toolButton))}
+            {shapeToolsShown.length ? section(i18next.t("drawingSectionShapes", "Formas"), shapeToolsShown.map(toolButton)) : null}
+            {editToolsShown.length ? section(i18next.t("drawingSectionEdit", "Editar"), editToolsShown.map(toolButton)) : null}
+            {section(i18next.t("drawingSectionHistory", "Histórico"), historyTools.map(historyButton))}
           </Group>
 
-          <Group gap={12} wrap="wrap" align="flex-start">
-            {section(i18next.t("drawingSectionStyle", "Estilo"), (
-              <>
-                {colorTools.map(colorButton)}
+          <Stack gap={6} className="draw-section">
+            <Text className="draw-section-label">{i18next.t("drawingSectionStyle", "Estilo")}</Text>
+            {hasTextFields ? (
+              <Stack gap="xs">
+                {hasField('text_value') ? (
+                  <TextInput
+                    size="sm"
+                    label={i18next.t("textLabel", "Texto para a etiqueta")}
+                    value={text_value}
+                    onChange={e => styleChange({ text_value: e.target.value })}
+                    title={i18next.t("textLabel", "Texto para a etiqueta")}
+                    aria-label={i18next.t("textLabel", "Texto para a etiqueta")}
+                    placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
+                    onClick={e => e.target.select()}
+                  />
+                ) : null}
+                <SimpleGrid cols={2} spacing="xs">
+                  {hasField('text_style') ? (
+                    <Select
+                      size="sm"
+                      label={i18next.t("textStyle", "Estilo do Texto")}
+                      title={i18next.t("textStyle", "Estilo do Texto")}
+                      aria-label={i18next.t("textStyle", "Estilo do Texto")}
+                      value={text_style}
+                      data={textStyleOptions}
+                      onChange={value => styleChange({ text_style: value })}
+                      allowDeselect={false}
+                      comboboxProps={{ withinPortal: true }}
+                    />
+                  ) : null}
+                  {hasField('text_size') ? (
+                    <Select
+                      size="sm"
+                      label={i18next.t("textSize", "Tamanho do Texto")}
+                      title={i18next.t("textSize", "Tamanho do Texto")}
+                      aria-label={i18next.t("textSize", "Tamanho do Texto")}
+                      value={text_size}
+                      data={textSizeOptions}
+                      onChange={value => styleChange({ text_size: value })}
+                      allowDeselect={false}
+                      comboboxProps={{ withinPortal: true }}
+                    />
+                  ) : null}
+                </SimpleGrid>
+                {hasField('text_font') ? (
+                  <Select
+                    size="sm"
+                    label={i18next.t("fontType", "Tipo de Letra")}
+                    title={i18next.t("fontType", "Tipo de Letra")}
+                    aria-label={i18next.t("fontType", "Tipo de Letra")}
+                    value={text_font}
+                    data={textFontOptions}
+                    onChange={value => styleChange({ text_font: value })}
+                    allowDeselect={false}
+                    comboboxProps={{ withinPortal: true }}
+                  />
+                ) : null}
+              </Stack>
+            ) : null}
+            <Group gap={4} wrap="wrap" align="center">
+              {hasField('symbol_type') ? (
+                <Select
+                  size="sm"
+                  w={120}
+                  title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
+                  aria-label={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
+                  value={symbol_type}
+                  data={symbolOptions.map(o => ({ ...o, label: i18next.t(o.label, o.labelDefault) }))}
+                  onChange={value => styleChange({ symbol_type: value })}
+                  allowDeselect={false}
+                  comboboxProps={{ withinPortal: true }}
+                />
+              ) : null}
+              {colorTools.filter(opt => hasField(opt.value)).map(colorButton)}
+              {hasField('size') ? (
                 <Select
                   size="sm"
                   w={56}
@@ -910,24 +1048,39 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
                   allowDeselect={false}
                   comboboxProps={{ withinPortal: true }}
                 />
-              </>
-            ))}
-            {section(i18next.t("drawingSectionHistory", "Histórico"), historyTools.map(historyButton))}
-          </Group>
+              ) : null}
+              {hasField('line_style') ? (
+                <Select
+                  size="sm"
+                  w={120}
+                  title={i18next.t("drawingLineStyle", "Tipo de linha")}
+                  aria-label={i18next.t("drawingLineStyle", "Tipo de linha")}
+                  value={line_style || 'solid'}
+                  data={lineStyleOptions.map(o => ({ value: o.value, label: i18next.t(o.label, o.labelDefault) }))}
+                  onChange={value => styleChange({ line_style: value })}
+                  allowDeselect={false}
+                  comboboxProps={{ withinPortal: true }}
+                />
+              ) : null}
+            </Group>
+          </Stack>
 
-          <Divider />
-
-          <Switch
-            size="xs"
-            checked={panel.snap}
-            onChange={toggleSnap}
-            label={i18next.t("drawingSnap", "Atrair para desenhos e camadas")}
-          />
+          {showSnap ? (
+            <>
+              <Divider />
+              <Switch
+                size="xs"
+                checked={panel.snap}
+                onChange={toggleSnap}
+                label={i18next.t("drawingSnap", "Atrair (Snapping)")}
+              />
+            </>
+          ) : null}
 
         </Stack>
       </Paper>
 
-      <HelpBox tool={selectedTool || 'none'} />
+      {showHelp ? <HelpBox tool={selectedTool || 'none'} snap={showSnap} /> : null}
 
       {PLACEMENT_TOOLS.includes(selectedTool) ? (
         <Paper withBorder radius="md" p="sm" mt="sm" className="draw-shape-inputs">
@@ -1004,72 +1157,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
         </Paper>
       ) : null}
 
-      {draw_symbol ? (
-        <Paper withBorder radius="md" p="sm" mt="sm">
-          <Text size="sm" fw={600} mb="xs">{i18next.t("drawingSymbolOptions", "Opções de Simbologia")}</Text>
-          <Select
-            size="xs"
-            title={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
-            aria-label={i18next.t("drawingSelectSymbol", "Escolha o Símbolo")}
-            value={symbol_type}
-            data={symbolOptions.map(o => { return { ...o, "label": i18next.t(o.label, o.labelDefault) } })}
-            onChange={value => styleChange({ symbol_type: value })}
-            allowDeselect={false}
-          />
-        </Paper>
-      ) : null}
-
-      {draw_text ? (
-        <Paper withBorder radius="md" p="sm" mt="sm">
-          <Text size="sm" fw={600} mb="xs">{i18next.t("textOptions", "Opções de Texto")}</Text>
-          <Stack gap="xs">
-            <TextInput
-              size="sm"
-              label={i18next.t("textLabel", "Texto para a etiqueta")}
-              value={text_value}
-              onChange={e => styleChange({ text_value: e.target.value })}
-              title={i18next.t("textLabel", "Texto para a etiqueta")}
-              aria-label={i18next.t("textLabel", "Texto para a etiqueta")}
-              placeholder={i18next.t("drawingInsertTextMsg", "Introduza o texto...")}
-              onClick={e => e.target.select()}
-            />
-            <SimpleGrid cols={2} spacing="xs">
-              <Select
-                size="sm"
-                label={i18next.t("textStyle", "Estilo do Texto")}
-                title={i18next.t("textStyle", "Estilo do Texto")}
-                aria-label={i18next.t("textStyle", "Estilo do Texto")}
-                value={text_style}
-                data={textStyleOptions}
-                onChange={value => styleChange({ text_style: value })}
-                allowDeselect={false}
-              />
-              <Select
-                size="sm"
-                label={i18next.t("textSize", "Tamanho do Texto")}
-                title={i18next.t("textSize", "Tamanho do Texto")}
-                aria-label={i18next.t("textSize", "Tamanho do Texto")}
-                value={text_size}
-                data={textSizeOptions}
-                onChange={value => styleChange({ text_size: value })}
-                allowDeselect={false}
-              />
-            </SimpleGrid>
-            <Select
-              size="sm"
-              label={i18next.t("fontType", "Tipo de Letra")}
-              title={i18next.t("fontType", "Tipo de Letra")}
-              aria-label={i18next.t("fontType", "Tipo de Letra")}
-              value={text_font}
-              data={textFontOptions}
-              onChange={value => styleChange({ text_font: value })}
-              allowDeselect={false}
-            />
-          </Stack>
-        </Paper>
-      ) : null}
-
-      {drawings.length > 0 ? (
+      {showExport && drawings.length > 0 ? (
         <Stack gap={4} mt="md" className="draw-section">
           <Text className="draw-section-label">{i18next.t("drawingSectionExport", "Exportar")}</Text>
           <Group gap={6}>
