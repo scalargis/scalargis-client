@@ -94,7 +94,7 @@
   "drawingSectionHistory": "History",
   "drawingSectionExport": "Export",
   "drawingHelpTitle": "Help",
-  "drawingSnap": "Snapping",
+  "drawingSnap": "Snapping to geometries",
   "drawingHelpSnap": "With Snapping on, the cursor sticks to the vertices and edges of the drawings and of the visible vector layers.",
   "drawingDeleteSelection": "Delete selection",
   "drawingHelpSymbol": "Click on the map to place the symbol.",

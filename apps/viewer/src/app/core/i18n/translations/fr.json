@@ -94,7 +94,7 @@
   "drawingSectionHistory": "Historique",
   "drawingSectionExport": "Exporter",
   "drawingHelpTitle": "Aide",
-  "drawingSnap": "Aimanter (Snapping)",
+  "drawingSnap": "Aimanter (Snapping) aux géométries",
   "drawingHelpSnap": "Avec Aimanter (Snapping) activé, le curseur s'accroche aux sommets et aux arêtes des dessins et des couches vectorielles visibles.",
   "drawingDeleteSelection": "Supprimer la sélection",
   "drawingHelpSymbol": "Cliquez sur la carte pour placer le symbole.",

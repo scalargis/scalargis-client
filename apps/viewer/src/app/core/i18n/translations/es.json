@@ -94,7 +94,7 @@
   "drawingSectionHistory": "Historial",
   "drawingSectionExport": "Exportar",
   "drawingHelpTitle": "Ayuda",
-  "drawingSnap": "Atraer (Snapping)",
+  "drawingSnap": "Atraer (Snapping) a geometrías",
   "drawingHelpSnap": "Con Atraer (Snapping) activo, el cursor se adhiere a los vértices y aristas de los dibujos y de las capas vectoriales visibles.",
   "drawingDeleteSelection": "Eliminar selección",
   "drawingHelpSymbol": "Haga clic en el mapa para colocar el símbolo.",

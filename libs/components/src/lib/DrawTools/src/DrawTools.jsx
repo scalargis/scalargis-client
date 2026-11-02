@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import i18next from "i18next";
-import { ActionIcon, Badge, Button, ColorSwatch, Divider, Group, NumberInput, Paper, Popover, Select, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
+import { ActionIcon, Badge, Button, ColorSwatch, Divider, Group, NumberInput, Paper, Popover, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
 import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconDownload, IconSave, IconSearch, IconCopy } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
 import { createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
@@ -103,10 +103,22 @@ const textFontOptions = [
 ];
 
 const lineStyleOptions = [
-  { value: 'solid', label: 'drawingLineSolid', labelDefault: 'Contínua' },
-  { value: 'dashed', label: 'drawingLineDashed', labelDefault: 'Tracejada' },
-  { value: 'dotted', label: 'drawingLineDotted', labelDefault: 'Pontilhada' }
+  { value: 'solid', label: 'drawingLineSolid', labelDefault: 'Contínua', dash: undefined, cap: 'butt' },
+  { value: 'dashed', label: 'drawingLineDashed', labelDefault: 'Tracejada', dash: '6 4', cap: 'butt' },
+  { value: 'dotted', label: 'drawingLineDotted', labelDefault: 'Pontilhada', dash: '0 5', cap: 'round' }
 ];
+
+/** A short line drawn in the pattern of a line style option. */
+const LineStylePreview = ({ option }) => {
+  const name = i18next.t(option.label, option.labelDefault);
+  return (
+    <span title={name} aria-label={name} style={{ display: 'flex', alignItems: 'center' }}>
+      <svg width="26" height="10" aria-hidden="true">
+        <line x1="2" y1="5" x2="24" y2="5" stroke="currentColor" strokeWidth="2.5" strokeDasharray={option.dash} strokeLinecap={option.cap} />
+      </svg>
+    </span>
+  );
+};
 
 const SELECTED_STROKE = { r: 255, g: 0, b: 0, a: 1 };
 
@@ -625,6 +637,10 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
     const keptFromTransform = type === 'select' && transformRef.current ? transformRef.current.getSelection() : [];
     stopTransform();
+    if (type !== 'select') {
+      if (select.getFeatures().getLength()) finishEditing();
+      removeModify();
+    }
 
     if (PLACEMENT_TOOLS.includes(type)) {
       stopDraw();
@@ -1050,16 +1066,13 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
                 />
               ) : null}
               {hasField('line_style') ? (
-                <Select
-                  size="sm"
-                  w={120}
+                <SegmentedControl
+                  size="xs"
                   title={i18next.t("drawingLineStyle", "Tipo de linha")}
                   aria-label={i18next.t("drawingLineStyle", "Tipo de linha")}
                   value={line_style || 'solid'}
-                  data={lineStyleOptions.map(o => ({ value: o.value, label: i18next.t(o.label, o.labelDefault) }))}
+                  data={lineStyleOptions.map(o => ({ value: o.value, label: <LineStylePreview option={o} /> }))}
                   onChange={value => styleChange({ line_style: value })}
-                  allowDeselect={false}
-                  comboboxProps={{ withinPortal: true }}
                 />
               ) : null}
             </Group>
@@ -1072,7 +1085,7 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
                 size="xs"
                 checked={panel.snap}
                 onChange={toggleSnap}
-                label={i18next.t("drawingSnap", "Atrair (Snapping)")}
+                label={i18next.t("drawingSnap", "Atrair (Snapping) às geometrias")}
               />
             </>
           ) : null}
