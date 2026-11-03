@@ -11,7 +11,7 @@ import {
 } from 'chart.js';
 import { defaults } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { Box, Button, Grid, Loader, Select } from '@mantine/core';
+import { Alert, Box, Button, Grid, Loader, Select } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { IconDownload } from '@scalargis/ui';
 import dayjs from 'dayjs';
@@ -54,9 +54,15 @@ function fillDays(dates, counts, first, last) {
     return [new_dates, new_values];
 }
 
+/** Tells if a range value is a positive number of days, 'all', or 'custom'. */
+function isValidRange(value) {
+    const days = Number(value);
+    return (Number.isInteger(days) && days > 0) || value === 'all' || value === 'custom';
+}
+
 /** Returns [dates, counts] of a range value for a reply of days with visits. */
 function getRangeData(value, dates, counts, customRange) {
-    if (!dates?.length) return [null, null];
+    if (!dates?.length || !isValidRange(value)) return [null, null];
 
     const today = dayjs().startOf('day');
     const days = Number(value);
@@ -341,7 +347,12 @@ export default function ViewerVisitsChart(props) {
                 </Grid.Col>
 
 
-                <Line data={data} options={options} />
+                { isValidRange(timerange)
+                    ? <Line data={data} options={options} />
+                    : <Alert color="danger" w="100%">
+                        O intervalo "{String(timerange)}" não é válido na configuração do backoffice (stats.timeranges ou stats.selected_timerange). Use um número de dias, "all" ou "custom".
+                      </Alert>
+                }
             </Grid>
         </PageSection>
     )
