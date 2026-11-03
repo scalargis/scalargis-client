@@ -33,10 +33,47 @@ ChartJS.register(
     Legend
   );
 
-// The @mantine/dates pickers exchange 'YYYY-MM-DD' strings; customRange keeps
-// Dates because getDataByCustomRange compares them.
 const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
 const fromPickerDate = (value) => (value ? dayjs(value).toDate() : null);
+
+const DAY_FORMAT = 'YYYY-MM-DD';
+
+/** Lists every calendar day from first to last, with the count of the reply or 0. */
+function fillDays(dates, counts, first, last) {
+    const byDate = {};
+    dates.forEach((d, i) => { byDate[d] = counts[i]; });
+
+    const new_dates = [];
+    const new_values = [];
+    const end = dayjs(last).startOf('day');
+    for (let day = dayjs(first).startOf('day'); !day.isAfter(end); day = day.add(1, 'day')) {
+        const key = day.format(DAY_FORMAT);
+        new_dates.push(key);
+        new_values.push(byDate[key] || 0);
+    }
+    return [new_dates, new_values];
+}
+
+/** Returns [dates, counts] of a range value for a reply of days with visits. */
+function getRangeData(value, dates, counts, customRange) {
+    if (!dates?.length) return [null, null];
+
+    const today = dayjs().startOf('day');
+    const days = Number(value);
+
+    if (Number.isInteger(days) && days > 0) {
+        return fillDays(dates, counts, today.subtract(days - 1, 'day'), today);
+    }
+
+    if (value === 'custom') {
+        if (customRange?.length > 1 && customRange[0] && customRange[1]) {
+            return fillDays(dates, counts, customRange[0], customRange[1]);
+        }
+        return [[...dates], [...counts]];
+    }
+
+    return fillDays(dates, counts, dates[0], today);
+}
 
 export default function ViewerVisitsChart(props) {
 
@@ -114,27 +151,9 @@ export default function ViewerVisitsChart(props) {
                 set_input_dates_str(input_d)
                 set_input_data_values(input_v)
 
-                if (timerange === 'all') {
-                    changeDates_str(input_d)
-                    changeData_values(input_v)
-                    return
-                }
-
-                if (timerange === 'custom') {
-                    const new_data = getDataByCustomRange(input_d, input_v)
-                    changeDates_str(new_data[0])
-                    changeData_values(new_data[1])
-                    return
-                }
-
-                let pos = input_d.length - 1 - parseInt(timerange)
-                if (pos < 0) pos = 0
-
-                const new_dates = input_d.slice(pos, input_d.length - 1)
-                const new_values = input_v.slice(pos, input_v.length - 1)
-
-                changeDates_str(new_dates)
-                changeData_values(new_values)
+                const new_data = getRangeData(timerange, input_d, input_v, customRange)
+                changeDates_str(new_data[0])
+                changeData_values(new_data[1])
             } else {
                 set_input_dates_str(null);
                 set_input_data_values(null);
@@ -153,7 +172,7 @@ export default function ViewerVisitsChart(props) {
     useEffect(() => {
         if (timerange !== 'custom') return;
 
-        const new_data = getDataByCustomRange(input_dates_str, input_data_values);
+        const new_data = getRangeData('custom', input_dates_str, input_data_values, customRange);
         changeDates_str(new_data[0]);
         changeData_values(new_data[1]);
     }, [customRange]);
@@ -191,50 +210,20 @@ export default function ViewerVisitsChart(props) {
         }
     }
 
-    function getDataByCustomRange(dates_str, dates_values) {
-        let new_dates_str = [];
-        let  new_dates_values = [];
-        if (customRange?.length > 1) {
-            dates_str.forEach((d, i) => {
-                const date = dayjs(d).toDate();
-                if (customRange[0]<= date && customRange[1] >= date) {
-                    new_dates_str.push(dates_str[i]);
-                    new_dates_values.push(dates_values[i]);
-                }
-            });
-        } else {
-            new_dates_str = [...dates_str];
-            new_dates_values = [...data_values];
-        }
-        return [new_dates_str, new_dates_values]
-    }
-
-
     function changeTimeRangeAction(value) {
 
         changeTimeRange(value)
 
-        if (value === 'all') {
-            changeDates_str(input_dates_str)
-            changeData_values(input_data_values)
-            return
-        }
-
         if (value === 'custom') {
-            setCustomRange([dayjs(dates_str[0]).toDate(), dayjs(dates_str[dates_str.length - 1]).toDate()])
+            if (dates_str?.length) {
+                setCustomRange([dayjs(dates_str[0]).toDate(), dayjs(dates_str[dates_str.length - 1]).toDate()])
+            }
             return;
         }
 
-        if (input_dates_str) {
-            let pos = input_dates_str.length - 1 - parseInt(value)
-            if (pos < 0) pos = 0
-
-            const new_dates = input_dates_str.slice(pos, input_dates_str.length - 1)
-            const new_values = input_data_values.slice(pos, input_data_values.length - 1)
-
-            changeDates_str(new_dates)
-            changeData_values(new_values)
-        }
+        const new_data = getRangeData(value, input_dates_str, input_data_values, customRange)
+        changeDates_str(new_data[0])
+        changeData_values(new_data[1])
     }
 
     function changeOpType(value) {
