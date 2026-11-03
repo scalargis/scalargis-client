@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -102,9 +102,6 @@ export default function ViewerVisitsChart(props) {
 
     const [timerange, changeTimeRange] = useState("100")
 
-    const [dates_str, changeDates_str] = useState()
-    const [data_values, changeData_values] = useState()
-
     const [input_dates_str, set_input_dates_str] = useState()
     const [input_data_values, set_input_data_values] = useState()
 
@@ -131,6 +128,7 @@ export default function ViewerVisitsChart(props) {
     }, [props.stats]);
 
     useEffect(() => {
+        let cancelled = false;
         set_loading_data_chart(true)
 
         let url = API_URL + '/portal/stats/viewer_visits?type_code=' + op_type;
@@ -142,40 +140,30 @@ export default function ViewerVisitsChart(props) {
 
         httpClient(url).then(({ headers, json }) => json)
         .then (result => {
+            if (cancelled) return;
             set_loading_data_chart(false)
 
             if (result.values) {
-                const input_d = result.values.map(e => e.date)
-                const input_v = result.values.map(e => e.count)
-
-                set_input_dates_str(input_d)
-                set_input_data_values(input_v)
-
-                const new_data = getRangeData(timerange, input_d, input_v, customRange)
-                changeDates_str(new_data[0])
-                changeData_values(new_data[1])
+                set_input_dates_str(result.values.map(e => e.date))
+                set_input_data_values(result.values.map(e => e.count))
             } else {
                 set_input_dates_str(null);
                 set_input_data_values(null);
-
-                changeDates_str(null);
-                changeData_values(null);
             }
         })
         .catch(error => {
+            if (cancelled) return;
             console.log("fetch error")
             set_loading_data_chart(false)
         });
+
+        return () => { cancelled = true; };
     }, [op_type, selected_viewer])
 
-
-    useEffect(() => {
-        if (timerange !== 'custom') return;
-
-        const new_data = getRangeData('custom', input_dates_str, input_data_values, customRange);
-        changeDates_str(new_data[0]);
-        changeData_values(new_data[1]);
-    }, [customRange]);
+    const [dates_str, data_values] = useMemo(
+        () => getRangeData(timerange, input_dates_str, input_data_values, customRange),
+        [timerange, input_dates_str, input_data_values, customRange]
+    );
 
     const data = {
         labels: dates_str,
@@ -218,12 +206,7 @@ export default function ViewerVisitsChart(props) {
             if (dates_str?.length) {
                 setCustomRange([dayjs(dates_str[0]).toDate(), dayjs(dates_str[dates_str.length - 1]).toDate()])
             }
-            return;
         }
-
-        const new_data = getRangeData(value, input_dates_str, input_data_values, customRange)
-        changeDates_str(new_data[0])
-        changeData_values(new_data[1])
     }
 
     function changeOpType(value) {
