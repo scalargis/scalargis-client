@@ -182,8 +182,6 @@ class PrintGroupChildsEditor extends Component {
 
     this.state = {
       data: props.data || {},
-      printsList: props.printsList || [],
-      groupsList: props.groupsList || [],
       showGroupForm: false,
       showFieldForm: false,
     };
@@ -221,7 +219,7 @@ class PrintGroupChildsEditor extends Component {
                 <Grid.Col span={12}>
                   <RecordSelector
                     data={this.state.data.prints}
-                    list={this.state.printsList}
+                    list={this.props.printsList}
                     onChange={(data) => {
                       this.onPrintsChange(data);
                     }}
@@ -252,7 +250,7 @@ class PrintGroupChildsEditor extends Component {
                 <Grid.Col span={12}>
                   <RecordSelector
                     data={this.state.data.groups}
-                    list={this.state.groupsList}
+                    list={this.props.groupsList}
                     onChange={(data) => {
                       this.onGroupsChange(data);
                     }}
