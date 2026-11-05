@@ -69,8 +69,9 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
 
   const createStyle = (props, rotation) => {
 
-    const { fill, stroke, image } = props;
+    const { fill, stroke, image } = props || {};
     const style = streetviewStyle.clone();
+    style.getImage().setRotation(rotation);
 
     try {
       if (fill) {
