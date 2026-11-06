@@ -241,7 +241,7 @@ const GroupFields = props => {
             </Box>
           }
 
-          {Object.entries(group.data.fields).map((g,i) => {
+          {Object.entries(group.data.fields || {}).map((g,i) => {
               return {id: g[0], ...g[1]}
             }).map((field, index) => {
               return (
@@ -496,12 +496,16 @@ const Fields = props => {
   );
 };
 
+/** Gives a form definition both of its sections, as a stored one can have only one. */
+const withSections = (data) => ({ fields: {}, groups: {}, ...data });
+
 class FormFieldsEditor extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      data: props.data || {},
+      source: props.data,
+      data: withSections(props.data),
       showGroupForm: false,
       showFieldForm: false,
     };
@@ -522,8 +526,8 @@ class FormFieldsEditor extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.data !== state.data) {
-      return { data: props.data };
+    if (props.data !== state.source) {
+      return { source: props.data, data: withSections(props.data) };
     }
     return null;
   }
