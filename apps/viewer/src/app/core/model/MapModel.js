@@ -1083,6 +1083,16 @@ export const getGeometryFromWKT = function (wkt, options) {
   return geom;
 };
 
+/** Returns the attribution text of a print entry or its layer, or null. */
+const getPrintAttribution = function (layer, pitem) {
+  const value = pitem && pitem.attributions ? pitem.attributions : layer.get('attributions');
+  if (Array.isArray(value)) {
+    const texts = value.filter(v => typeof v === 'string' && v);
+    return texts.length ? texts.join(' ') : null;
+  }
+  return typeof value === 'string' && value ? value : null;
+};
+
 export const getWMSVisibleLayers = function (map, scale) {
   const vlayers = [];
 
@@ -1135,6 +1145,8 @@ export const getWMSVisibleLayers = function (map, scale) {
                   ldata['maxScale'] = pitem.maxScale;
                 }
 
+                ldata['attributions'] = getPrintAttribution(layer, pitem);
+
                 list.push(ldata);
               }
             });
@@ -1167,6 +1179,8 @@ export const getWMSVisibleLayers = function (map, scale) {
             if (layer.getMinResolution && layer.getMinResolution() > 0) {
                 ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
             }
+
+            ldata['attributions'] = getPrintAttribution(layer);
 
             list.push(ldata);
         }
@@ -1234,6 +1248,8 @@ export const getArcGISVisibleLayers = function (map, scale) {
                 ldata['maxScale'] = pitem.maxScale;
               }
 
+              ldata['attributions'] = getPrintAttribution(layer, pitem);
+
               list.push(ldata);
             }
           });
@@ -1266,6 +1282,8 @@ export const getArcGISVisibleLayers = function (map, scale) {
           if (layer.getMinResolution && layer.getMinResolution() > 0) {
               ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
           }
+
+          ldata['attributions'] = getPrintAttribution(layer);
 
           list.push(ldata);
         }

@@ -102,6 +102,7 @@ const ArcGISMapLayer = ({ config, group, checked, viewer }) => {
     if (t && config.datasource) t.set("datasource", config.datasource);
     if (t && config.get_feature_info_layers) t.set('get_feature_info_layers', config.get_feature_info_layers);
     if (t && config.get_feature_info_tolerance) t.set('get_feature_info_tolerance', config.get_feature_info_tolerance);
+    if (t && config.attributions) t.set('attributions', config.attributions);
 
     if (t && config.min_resolution) {
       t.setMinResolution(config.min_resolution);

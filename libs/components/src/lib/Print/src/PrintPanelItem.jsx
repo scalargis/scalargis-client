@@ -352,6 +352,9 @@ export default function PrintPanelItem(props) {
 
     if (allLayers.length) {
       data += '&' + allLayers.map(l => 'layers[]=' + l).join('&');
+
+      const layersAttributions = [...wmsLayers, ...arcgisLayers].map(l => l.attributions || null);
+      data += '&layersAttributions=' + encodeURIComponent(JSON.stringify(layersAttributions));
     }
 
     const opts = {
