@@ -107,12 +107,12 @@ export default function PrintPanel3(props) {
       </Alert>
 
       <div className="p-fluid">
-        <h4>Formato</h4>
+        <h4>{t("format", "Formato")}</h4>
         <Field name="layout" control={formControl}>
           {(field) => (
             <Select
               id={field.id}
-              aria-label="Formato"
+              aria-label={t("format", "Formato")}
               data={(formats || []).map(f => ({ value: f.format + '|' + f.orientation, label: f.label }))}
               value={field.value ? field.value.format + '|' + field.value.orientation : null}
               onChange={(v) => {
@@ -120,13 +120,13 @@ export default function PrintPanel3(props) {
                 if (f) field.onChange(f);
               }}
               allowDeselect={false}
-              placeholder={t("selectFormat", "Selecione um Formato")} />
+              placeholder={t("selectFormat", "Selecione um formato")} />
           )}
         </Field>
       </div>
 
       <div className="p-fluid">
-        <h4>Plantas</h4>
+        <h4>{t("prints", "Plantas")}</h4>
         <PrintGroupItem
           config={config}
           actions={actions}

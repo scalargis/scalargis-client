@@ -200,7 +200,7 @@ export default function PrintPanel4(props) {
       });
 
       if (hasInvalidPrints) {
-        notify.warn(printDetails.title || 'Emissão de plantas',
+        notify.warn(printDetails.title || t("printTitle", "Emissão de plantas"),
           t("printAllError", "Não foi possível gerar todas as plantas"));
       }
 

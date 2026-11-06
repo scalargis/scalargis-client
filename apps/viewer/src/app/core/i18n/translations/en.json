@@ -201,6 +201,10 @@
   "invalidEmailFormat": "Invalid Email. E.g. example@email.pt",
   "errorCreatingFile": "An error occurred when generating the file",
   "errorPrinting": "An error occurred when generating the print",
+  "openPdf": "Open PDF",
+  "prints": "Prints",
+  "printTitle": "Print issuing",
+  "copyFeature": "Copy geometry",
   "contactForm": "Contact Form",
   "contact": "Contact",
   "themes": "Themes",
@@ -382,9 +386,9 @@
   "selectGroups": "Select groups",
   "tables": "Tables",
 
-  "copyGeometry": "Copiar geometria",
+  "copyGeometry": "Copy geometry",
   "copyGeometryConfirmation": "Do you want to copy the selected geometry?",
-  "copyGeometryNotSupportedMsg": "O tipo de geometria não é permitido ({{type}}).",
+  "copyGeometryNotSupportedMsg": "The geometry type is not allowed ({{type}}).",
 
   "information": "Information",
 

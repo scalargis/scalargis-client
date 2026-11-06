@@ -376,11 +376,11 @@ export default function PrintPanelItem(props) {
               </Anchor>, { autoClose: RESULT_TOAST_MS });
           }
         } else {
-          throw (res.Message || 'Ocorreu um erro ao gerar a planta');
+          throw (res.Message || t("errorPrinting", "Ocorreu um erro ao gerar a planta"));
         }
       }).catch(error => {
         setIsPrinting(false);
-        notify.warn(printItem.title || 'Emissão de plantas',
+        notify.warn(printItem.title || t("printTitle", "Emissão de plantas"),
           t("printError", "Não foi possível gerar a planta"));
       });
   }

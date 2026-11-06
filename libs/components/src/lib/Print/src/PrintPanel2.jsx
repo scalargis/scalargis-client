@@ -357,7 +357,7 @@ export default function PrintPanel2(props) {
           }, 500);
 
           notify.warn(t("copyGeometry", "Copiar geometria"),
-            t("copyGeometryNotSupportedMsgs", "O tipo de geometria não é permitido ({{type}}).", { type: feature.getGeometry().getType()}));
+            t("copyGeometryNotSupportedMsg", "O tipo de geometria não é permitido ({{type}}).", { type: feature.getGeometry().getType()}));
 
           return true;
         }
