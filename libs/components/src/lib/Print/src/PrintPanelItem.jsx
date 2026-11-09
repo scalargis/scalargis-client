@@ -477,6 +477,30 @@ export default function PrintPanelItem(props) {
   }, [i18n.resolvedLanguage]);
 
 
+  /** Scale of the print area box, or null when the print has none. */
+  function previewScale() {
+    if (selectedScaleMode === 'map') return getScaleForResolution(mainMap.getView().getResolution(), 'm');
+    if (selectedScaleMode === 'free') return freeScale;
+    if (selectedScaleMode === 'restricted') return restrictedScale;
+    return printItem.scale || null;
+  }
+
+  /** Map frame size in mm of the selected layout, or null when its config holds none. */
+  function previewMapSize() {
+    const layout_conf = (printItem.layouts || []).find(e => e.orientation === (fields?.layout?.orientation || printItem.orientation) && e.format === (fields?.layout?.format || printItem.format));
+    if (!layout_conf?.config) return null;
+    let map;
+    try {
+      map = JSON.parse(layout_conf.config)?.[0]?.map;
+    } catch (e) {
+      return null;
+    }
+    return map?.width && map?.height ? { w: map.width, h: map.height } : null;
+  }
+
+  const canPreview = !!previewMapSize() &&
+    !!(printItem.scale > 0 || printItem.restrict_scales || printItem.free_scale || printItem.map_scale);
+
   // draw paper box
   function drawPaperBox() {
     if (!paperBoxLayer.current.getSource()) { return null }
@@ -487,21 +511,11 @@ export default function PrintPanelItem(props) {
     if (selected_menu !== control.id) { return null }
 
 
-    let scale;
+    const scale = previewScale();
+    if (!scale) return null;
 
-
-    if (selectedScaleMode === 'map') {
-      scale = getScaleForResolution(mainMap.getView().getResolution(), 'm')
-    } else if (selectedScaleMode === 'free') {
-      scale = freeScale
-    } else if (selectedScaleMode === 'restricted') {
-      scale = restrictedScale
-    } else if (printItem.scale) {
-      scale = printItem.scale;
-    } else {
-      // ?
-      return null
-    }
+    const mapSize = previewMapSize();
+    if (!mapSize) return null;
 
 
     let center_x
@@ -523,16 +537,8 @@ export default function PrintPanelItem(props) {
     // const units = "meter"
     const inch_per_units = 39.37
 
-    // find layout serv conf
-    const layout_conf = printItem.layouts.find(e => e.orientation === (fields?.layout?.orientation || printItem.orientation) && e.format === (fields?.layout?.format || printItem.format))
-    if (!layout_conf || !layout_conf.config) return null; // TODO need clean up !??
-
-    const layout_conf_json = JSON.parse(layout_conf?.config)[0]
-
-    const img_w = layout_conf_json?.map?.width;
-    const img_h = layout_conf_json?.map?.height;
-
-    if (!img_w || !img_h) return null;
+    const img_w = mapSize.w;
+    const img_h = mapSize.h;
 
     const magic = 22;
     const res = 1 / ((1 / scale) * inch_per_units * magic);
@@ -804,7 +810,7 @@ export default function PrintPanelItem(props) {
           </Button>
         </Group>
       </Group>
-      {config.showPreview ? <div className="mt-2">
+      {config.showPreview && canPreview ? <div className="mt-2">
         <Checkbox
           checked={paperBox}
           onChange={e => setPaperBox(e.currentTarget.checked)}
