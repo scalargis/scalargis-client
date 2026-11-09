@@ -98,7 +98,7 @@ function RegistrationWidget(props) {
             <IconCheckCircle style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }} />
             <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
           </div>
-          <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
+          <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas {{hours}} horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email, hours: auth?.response?.confirm_within_hours || 24})}} />
 
           { onResendConfirmation && <ResendConfirmationButton onResend={() => onResendConfirmation(auth.response.email)} /> }
 
@@ -220,7 +220,7 @@ function RegistrationWidget(props) {
           <IconCheckCircle style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }} />
           <h3>{i18nUtils.translateValue("userRegistrationSuccess", "Registo realizado com sucesso")}!</h3>
         </div>
-        <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email})}} />
+        <p className="line-height-3 text-justify" dangerouslySetInnerHTML={{__html: i18nUtils.translateValue("userRegistrationSuccessMsg", "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas {{hours}} horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.", undefined, undefined, undefined, {username: auth?.response?.username, email: auth?.response?.email, hours: auth?.response?.confirm_within_hours || 24})}} />
         { onResendConfirmation && <ResendConfirmationButton onResend={() => onResendConfirmation(auth.response.email)} /> }
         <div className='text-center py-2'>
           <Anchor component="button" type="button"

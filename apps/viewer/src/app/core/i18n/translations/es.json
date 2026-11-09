@@ -330,7 +330,7 @@
   "termsAndConditions": "terms and conditions",
   
   "userRegistrationSuccess": "User created with success",
-  "userRegistrationSuccessMsg": "Your account was created with the <b>{{username}}</b> username, you must activate it within the next 24 hours. Please check the account activation instructions sent to <b>{{email}}</b>.",
+  "userRegistrationSuccessMsg": "Your account was created with the <b>{{username}}</b> username, you must activate it within the next {{hours}} hours. Please check the account activation instructions sent to <b>{{email}}</b>.",
   "userRegistrationErrorAlreadyExists": "Ya existe un usuario con el nombre de usuario o correo electrónico especificado",
   "createUser": "Crear usuario",
 
@@ -405,6 +405,8 @@
   "registration_confirmation_sent_if_exists": "Si el correo electrónico está asociado a una cuenta, se enviará una confirmación de registro.",
   "registration_confirmation_invalid": "Confirmación de registro inválida.",
   "registration_confirmation_expired": "La confirmación de registro ha expirado.",
+  "registration_confirmed": "Registro de usuario confirmado. Ya puede iniciar sesión con su usuario y contraseña.",
+  "registration_already_confirmed": "Este registro ya está confirmado. Puede iniciar sesión con su usuario y contraseña.",
   "password_reset_email_sent_if_exists": "Si existe una cuenta asociada, se enviará un correo electrónico con las instrucciones para la recuperación de la contraseña.",
   "password_reset_validation_invalid": "Confirmación de cambio de contraseña inválida.",
   "password_reset_validation_expired": "La confirmación de cambio de contraseña ha expirado.",

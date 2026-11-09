@@ -447,36 +447,6 @@ export function registration_http_loading() {
   return action;
 }
 
-export function registration_post(post, history, redirect) {
-  return function (dispatch, getState) {
-    dispatch(registration_http_loading());
-    
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(post)
-    }
-
-    const url = API_URL + '/security/registration/confirmation';
-    fetch(url, options)
-      .then(res => res.json())
-      .then(res => {
-        dispatch(registration_response(res));
-        if (res.authenticated) {
-          const cookies = new Cookies();
-          const expireDate = new Date();
-          expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-          cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
-          if (redirect && history?.navigate) history.navigate(redirect); 
-          else window.location.reload();
-        } else {
-          //dispatch(registration_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
-        }
-      }).catch(error => {
-        dispatch(registration_http_error());
-      });
-  }
-}
-
 export function registration_confirmation(post, history, redirect) {
   return function (dispatch, getState) {
     dispatch(login_http_loading());

@@ -10,7 +10,6 @@ import { i18n as i18nUtils } from '@scalargis/components';
 function RegistrationConfirmationWidget({ core, token, auth, registration, history, redirect, urlRedirect }) {
 
   const [emailConfirmation, setEmailConfirmation] = useState('');
-  const [goRedirect, setGoRedirect] = useState(false);
   const [validating, setValidating] = useState(!!token);
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState(null);
@@ -18,7 +17,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
   // Enable redux actions
   const dispatch = useDispatch();
 
-  const { registration_confirmation, resend_confirmation, login, logout } = core.actions;
+  const { registration_confirmation, resend_confirmation, logout } = core.actions;
 
   useEffect(() => {
     if (auth?.data?.token) return;
@@ -73,22 +72,19 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
     );
   }
 
-  if (registration.response && !!registration.response && !!registration.response.authenticated) {
+  if (registration.response?.confirmed) {
+    const message = registration.response.message;
     return (
       <div>
           <div className="flex align-items-center justify-content-center flex-column px-3">
             <h3>{i18nUtils.translateValue("createUser", "Criar utilizador")}</h3>
             <IconCheckCircle style={{ fontSize: '5rem', color: 'var(--mantine-color-success-6)' }} />
-            <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
+            <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue(message || "userRegistrationConfirmationSuccess", i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso"))}</p>
             <Button className="my-3"
               type="button"
               leftSection={<IconCheck />}
-              loading={goRedirect}
-              onClick={ e => {
-                setGoRedirect(true);
-                dispatch(login(registration.response, history, redirect, urlRedirect));
-              }}
-            >{i18nUtils.translateValue("continue", "Continuar")}</Button>
+              onClick={() => history.navigate('/login?redirect=' + (redirect || '/'))}
+            >{i18nUtils.translateValue("login", "Login")}</Button>
           </div>
         </div>
     )

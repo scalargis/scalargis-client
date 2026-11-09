@@ -330,7 +330,7 @@
   "termsAndConditions": "termos e condições de utilização",
 
   "userRegistrationSuccess": "Registo realizado com sucesso",
-  "userRegistrationSuccessMsg": "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas 24 horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.",
+  "userRegistrationSuccessMsg": "A sua conta foi criada com o username <b>{{username}}</b>, deverá proceder à sua ativação durante as próximas {{hours}} horas. Por favor, verifique as instruções de ativação da conta enviadas para o email <b>{{email}}</b>.",
   "userRegistrationErrorAlreadyExists": "Já existe um utilizador com o username ou email indicado",
   "createUser": "Criar utilizador",
 
@@ -405,6 +405,8 @@
   "registration_confirmation_sent_if_exists": "Caso o email indicado esteja associado a uma conta, será enviada uma confirmação de registo.",
   "registration_confirmation_invalid": "Confirmação de registo inválida.",
   "registration_confirmation_expired": "Confirmação de registo expirada.",
+  "registration_confirmed": "Registo de utilizador confirmado. Já pode entrar com o seu username e password.",
+  "registration_already_confirmed": "Este registo já está confirmado. Pode entrar com o seu username e password.",
   "password_reset_email_sent_if_exists": "Caso exista uma conta associada, será enviado um email com as instruções para recuperação da palavra-passe.",
   "password_reset_validation_invalid": "Confirmação de alteração de palavra-passe inválida.",
   "password_reset_validation_expired": "Confirmação de alteração de palavra-passe expirada.",
