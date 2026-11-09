@@ -64,7 +64,8 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
     );
   }
 
-  if (registration.response && !!registration.response && !!registration.response.authenticated) {
+  if (registration.response?.authenticated || registration.response?.confirmed) {
+    const signedIn = !!registration.response.authenticated;
     return (
       <div>
           <div className="flex align-items-center justify-content-center flex-column px-3">
@@ -72,8 +73,12 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
             <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>        
             <p style={{ lineHeight: 1.5 }}>{i18nUtils.translateValue("userRegistrationConfirmationSuccess", "Registo de utilizador confirmado com sucesso")}!</p>
             <Button className=" my-3" 
-              label={i18nUtils.translateValue("continue", "Continuar")} 
+              label={signedIn ? i18nUtils.translateValue("continue", "Continuar") : i18nUtils.translateValue("login", "Login")} 
               onClick={ e => {
+                if (!signedIn) {
+                  history.navigate('/login?redirect=' + (redirect || '/'));
+                  return;
+                }
                 setGoRedirect(true);
                 dispatch(login(registration.response, history, redirect, urlRedirect));
               }}
