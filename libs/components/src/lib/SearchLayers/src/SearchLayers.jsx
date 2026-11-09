@@ -147,7 +147,7 @@ export default function SearchLayers(props) {
   const listTemplate = (items) => {
       if (!items || items.length === 0) return null;
 
-      let list = items.map((item, index) => {
+      const list = items.map((item, index) => {
           return itemTemplate(item, index);
       });
 

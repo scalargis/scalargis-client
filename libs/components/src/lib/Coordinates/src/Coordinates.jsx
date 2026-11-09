@@ -625,7 +625,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                     onChange={(e) => {
                         if (e.target.value) {
                           const txtval = e.target.value.replace(",", ".");
-                          let val = parseFloat(txtval);
+                          const val = parseFloat(txtval);
                           if (typeof val === 'number' && isFinite(val) && val < 0) {
                             setOptLongitude('W');
                             setCoordX(txtval.substring(1));
@@ -649,7 +649,7 @@ export default function Coordinates({ core, config, actions, dispatch, record })
                   <input type="text" value={coordY} onKeyDown={positivenumberFieldStrictInput}
                       onChange={(e) => {
                         if (e.target.value) {
-                          let val = parseFloat(e.target.value);
+                          const val = parseFloat(e.target.value);
                           if (typeof val === 'number' && isFinite(val) && val < 0) {
                             setOptLatitude('S');
                             setCoordY(e.target.value.substring(1));
