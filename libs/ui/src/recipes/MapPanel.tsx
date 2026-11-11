@@ -2,7 +2,7 @@
  *  (Affix + Paper + Transition), sharing one controlled open state, a
  *  close button, a headerActions slot, and a collapse-to-pill toggle. */
 
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import {
   Affix,
   Box,
@@ -66,13 +66,6 @@ const TOPBAR = SHEET_TOPBAR;
 const PILL_LIFT = 68;
 const PANEL_Z = 200;
 
-const MapPanelOpenedContext = createContext(true);
-
-/** The open state of the enclosing MapPanel, or `true` outside a MapPanel. */
-export function useMapPanelOpened(): boolean {
-  return useContext(MapPanelOpenedContext);
-}
-
 /** The closed pill on a phone: bottom centre, above the map attribution row. */
 function MobilePill({ offsetBottom, children }: { offsetBottom: number; children: React.ReactNode }) {
   return (
@@ -94,7 +87,6 @@ export function MapPanel(props: MapPanelProps) {
   const footerHeight = useFooterHeight();
   const topbarOffset = useTopbarOffset(TOPBAR);
   const pill = opened ? null : collapsedControl;
-  const body = <MapPanelOpenedContext.Provider value={opened}>{children}</MapPanelOpenedContext.Provider>;
   const closeLabel = uiText('mappanel.close', 'Close');
   const roundedTop = headerColor
     ? { borderTopLeftRadius: 'var(--mantine-radius-md)', borderTopRightRadius: 'var(--mantine-radius-md)' }
@@ -118,7 +110,7 @@ export function MapPanel(props: MapPanelProps) {
             zIndex={PANEL_Z}
             hidden={!opened}
           >
-            {body}
+            {children}
           </BottomSheet>
         </>
       );
@@ -158,7 +150,7 @@ export function MapPanel(props: MapPanelProps) {
                     overflowX: 'hidden',
                   }}
                 >
-                  {body}
+                  {children}
                 </Box>
               </Paper>
             )}
@@ -200,7 +192,7 @@ export function MapPanel(props: MapPanelProps) {
               <Drawer.CloseButton aria-label={closeLabel} />
             </Group>
           </Drawer.Header>
-          <Drawer.Body>{body}</Drawer.Body>
+          <Drawer.Body>{children}</Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>
     </>
