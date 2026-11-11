@@ -2,7 +2,7 @@
  *  (Affix + Paper + Transition), sharing one controlled open state, a
  *  close button, a headerActions slot, and a collapse-to-pill toggle. */
 
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import {
   Affix,
   Box,
@@ -66,6 +66,13 @@ const TOPBAR = SHEET_TOPBAR;
 const PILL_LIFT = 68;
 const PANEL_Z = 200;
 
+const MapPanelOpenedContext = createContext(true);
+
+/** The open state of the enclosing MapPanel, or `true` outside a MapPanel. */
+export function useMapPanelOpened(): boolean {
+  return useContext(MapPanelOpenedContext);
+}
+
 /** The closed pill on a phone: bottom centre, above the map attribution row. */
 function MobilePill({ offsetBottom, children }: { offsetBottom: number; children: React.ReactNode }) {
   return (
@@ -87,6 +94,7 @@ export function MapPanel(props: MapPanelProps) {
   const footerHeight = useFooterHeight();
   const topbarOffset = useTopbarOffset(TOPBAR);
   const pill = opened ? null : collapsedControl;
+  const body = <MapPanelOpenedContext.Provider value={opened}>{children}</MapPanelOpenedContext.Provider>;
   const closeLabel = uiText('mappanel.close', 'Close');
   const roundedTop = headerColor
     ? { borderTopLeftRadius: 'var(--mantine-radius-md)', borderTopRightRadius: 'var(--mantine-radius-md)' }
@@ -101,18 +109,17 @@ export function MapPanel(props: MapPanelProps) {
       return (
         <>
           {pill && <MobilePill offsetBottom={offsetBottom}>{pill}</MobilePill>}
-          {opened && (
-            <BottomSheet
-              title={title}
-              headerColor={headerColor}
-              headerActions={headerActions}
-              onClose={onClose}
-              offsetBottom={offsetBottom}
-              zIndex={PANEL_Z}
-            >
-              {children}
-            </BottomSheet>
-          )}
+          <BottomSheet
+            title={title}
+            headerColor={headerColor}
+            headerActions={headerActions}
+            onClose={onClose}
+            offsetBottom={offsetBottom}
+            zIndex={PANEL_Z}
+            hidden={!opened}
+          >
+            {body}
+          </BottomSheet>
         </>
       );
     }
@@ -125,7 +132,7 @@ export function MapPanel(props: MapPanelProps) {
           </Affix>
         )}
         <Affix position={affixPosition}>
-          <Transition mounted={opened} transition={transition}>
+          <Transition mounted={opened} transition={transition} keepMounted keepMountedMode="display-none">
             {(styles) => (
               <Paper style={{ ...styles, width: size, maxWidth: 'calc(100vw - 32px)' }} shadow="md" radius="md" withBorder>
                 <Box pos="relative" p="xs" bg={headerColor} style={roundedTop}>
@@ -151,7 +158,7 @@ export function MapPanel(props: MapPanelProps) {
                     overflowX: 'hidden',
                   }}
                 >
-                  {children}
+                  {body}
                 </Box>
               </Paper>
             )}
@@ -175,6 +182,8 @@ export function MapPanel(props: MapPanelProps) {
       <Drawer.Root
         opened={opened}
         onClose={onClose}
+        keepMounted
+        keepMountedMode="display-none"
         position={position}
         size={size}
         trapFocus={false}
@@ -191,7 +200,7 @@ export function MapPanel(props: MapPanelProps) {
               <Drawer.CloseButton aria-label={closeLabel} />
             </Group>
           </Drawer.Header>
-          <Drawer.Body>{children}</Drawer.Body>
+          <Drawer.Body>{body}</Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>
     </>

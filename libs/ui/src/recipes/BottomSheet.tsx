@@ -28,6 +28,8 @@ export interface BottomSheetProps {
   initialStop?: number;
   /** Close on the Escape key. */
   closeOnEscape?: boolean;
+  /** Hides the sheet and keeps its body mounted. */
+  hidden?: boolean;
   children?: React.ReactNode;
 }
 
@@ -42,6 +44,7 @@ export function BottomSheet({
   zIndex,
   initialStop = 0,
   closeOnEscape = false,
+  hidden = false,
   children,
 }: BottomSheetProps) {
   const [stop, setStop] = useState(initialStop);
@@ -51,7 +54,7 @@ export function BottomSheet({
   const suppressClick = useRef(false);
 
   useWindowEvent('keydown', (e) => {
-    if (closeOnEscape && e.key === 'Escape') onClose();
+    if (closeOnEscape && !hidden && e.key === 'Escape') onClose();
   });
 
   const maxPx = () => window.innerHeight - SHEET_TOPBAR - offsetBottom;
@@ -125,7 +128,9 @@ export function BottomSheet({
         role="region"
         aria-label={typeof title === 'string' ? title : undefined}
         data-stop={stop}
+        aria-hidden={hidden || undefined}
         style={{
+          display: hidden ? 'none' : undefined,
           bottom: offsetBottom,
           height,
           maxWidth: 'none',
