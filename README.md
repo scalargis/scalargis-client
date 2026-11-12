@@ -31,8 +31,7 @@ npx nx serve backoffice   # http://localhost:4201/backoffice
 Both apps ask for port 4200. The app that starts second gets the next free port, 4201.
 
 npm 11 refuses `npm ci` on the current lock file (two optional `@emnapi` entries are missing). Use `npm install`, then
-`git restore package-lock.json`. npm 11 also skips some install scripts. The apps serve without them. The Cypress e2e
-tests need `npm approve-scripts cypress`.
+`git restore package-lock.json`. npm 11 also skips some install scripts. The apps serve without them.
 
 The dev server proxies `/api`, `/proxy`, `/spatial_toolbox`, and in the viewer also `/file`, to `http://localhost:5000`.
 
