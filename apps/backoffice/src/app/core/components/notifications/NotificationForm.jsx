@@ -31,6 +31,29 @@ function NotificationForm(props) {
 
   const API_URL = core.API_URL; 
 
+  const downloadFile = (event, file) => {
+    event.preventDefault();
+    const headers = {};
+    const logged = core.getLoggedUser();
+    if (logged?.token) headers['X-API-KEY'] = logged.token;
+    fetch(file.url, { headers })
+      .then(response => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.blob();
+      })
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      })
+      .catch(() => toast.current.show({life: 3000, severity: 'error', summary: 'Ficheiros', detail: 'Não foi possível obter o ficheiro'}));
+  }
+
   const goBack = () => {
     if (location.state && location.state.from) {
       /*
@@ -159,7 +182,7 @@ function NotificationForm(props) {
       <>
         <div className="col md:col-9">
           <div className="m-2">
-            <a href={file.url} target="_blank" rel="noreferrer" download={file.filename}>{file.filename}</a>
+            <a href={file.url} onClick={(event) => downloadFile(event, file)}>{file.filename}</a>
           </div>
         </div>
         <div className="col md:col-3">
