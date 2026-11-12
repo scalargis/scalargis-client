@@ -24,6 +24,29 @@ function NotificationForm(props) {
 
   const API_URL = core.API_URL;
 
+  const downloadFile = (event, file) => {
+    event.preventDefault();
+    const headers = {};
+    const logged = core.getLoggedUser();
+    if (logged?.token) headers['X-API-KEY'] = logged.token;
+    fetch(file.url, { headers })
+      .then(response => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.blob();
+      })
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      })
+      .catch(() => notify.error('Ficheiros', 'Não foi possível obter o ficheiro'));
+  }
+
   const goBack = () => {
     if (location.state && location.state.from) {
       const state = {
@@ -111,7 +134,7 @@ function NotificationForm(props) {
                       <Grid gap="sm" key={file.url || index}>
                         <Grid.Col span={{ base: "auto", md: 9 }}>
                           <Box m="xs">
-                            <a href={file.url} target="_blank" rel="noreferrer" download={file.filename}>{file.filename}</a>
+                            <a href={file.url} onClick={(event) => downloadFile(event, file)}>{file.filename}</a>
                           </Box>
                         </Grid.Col>
                         <Grid.Col span={{ base: "auto", md: 3 }}>
