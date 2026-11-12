@@ -1,8 +1,14 @@
 # ScalarGIS Client
 
-React frontend (Nx monorepo) — public **Viewer** (map viewer, port 4200) and admin **Backoffice** (port 4201).
+ScalarGIS is an open source WebGIS platform: map viewers, an admin backoffice, and a plugin system.
+This repo is the React frontend (Nx monorepo): the public **Viewer** (port 4200) and the admin **Backoffice** (port 4201).
 
-> **Setup order:** the server must be running before the client dev server can work. → [scalargis-server README](../scalargis-server/README.md)
+[![CI](https://img.shields.io/github/actions/workflow/status/scalargis/scalargis-client/ci.yml?branch=main&label=CI)](https://github.com/scalargis/scalargis-client/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/scalargis/scalargis-client?include_prereleases)](https://github.com/scalargis/scalargis-client/releases)
+
+[Website](https://scalargis.com) · [Docs](https://docs.scalargis.com) · [Demo](https://demo.scalargis.com) · [Server repo](https://github.com/scalargis/scalargis-server#readme)
+
+> **Setup order:** the [server](https://github.com/scalargis/scalargis-server#readme) must be running before the client dev server can work.
 
 ---
 
@@ -20,7 +26,7 @@ Clone this repo next to `scalargis-server`. The build writes into `../scalargis-
 ## Windows Development
 
 ```powershell
-git clone <scalargis-client-repo-url> scalargis-client
+git clone https://github.com/scalargis/scalargis-client.git
 cd scalargis-client
 npm install
 
@@ -59,7 +65,7 @@ Access via the server: `http://localhost:5000/mapa/demo` and `http://localhost:5
 
 ## Components (Frontend Plugins)
 
-Components extend the viewer and backoffice with custom UI, routes, and state. Put each one in the app's `components/` folder.
+The [components and extensions guide](https://docs.scalargis.com/development/components-extensions/) shows how to write one. Components extend the viewer and backoffice with custom UI, routes, and state. Put each one in the app's `components/` folder.
 Folder names are case-sensitive. Git ignores the contents of these folders.
 
 | App | Folder |
