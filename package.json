@@ -89,6 +89,7 @@
     "@swc/cli": "0.8.1",
     "@swc/core": "1.15.33",
     "@swc/helpers": "0.5.21",
+    "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.2",
     "@types/file-saver": "2.0.7",
     "@types/lodash": "^4.17.24",
