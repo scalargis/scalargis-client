@@ -506,12 +506,12 @@ export const showOnPortal = (children) => {
   return <Portal>{children}</Portal>;
 }
 
-export const traverseLayersTree = (layers, parent, cb) => {
+export const traverseLayersTree = (layers, parent, cb, path = []) => {
   const items = parent ? layers.filter(l => l.id === parent) : layers;
   items.forEach((l, i) => {
-    if (l.children) {
+    if (l.children && !path.includes(l.id)) {
       l.children.forEach(cid => {
-        traverseLayersTree(layers, cid, cb);
+        traverseLayersTree(layers, cid, cb, [...path, l.id]);
       });
     }
     cb(l, i, parent);

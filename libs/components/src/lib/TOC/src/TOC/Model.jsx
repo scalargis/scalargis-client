@@ -51,24 +51,24 @@ export const traverseTreeUpRecursiveById = (node, id, level = 0) => {
 }
 */
 
-export const findAllParents = (layers, id, level = 0) => {
+export const findAllParents = (layers, id, seen = new Set([id])) => {
   let result = [];
   for (let i = 0; i < layers.length; i++) {
-    if (Array.isArray(layers[i].children) && layers[i].children.includes(id)) {
+    if (Array.isArray(layers[i].children) && layers[i].children.includes(id) && !seen.has(layers[i].id)) {
+      seen.add(layers[i].id);
       result.push(layers[i].id);
-      const result2 = findAllParents(layers, layers[i].id, level+1);
-      result = result.concat(result2);
+      result = result.concat(findAllParents(layers, layers[i].id, seen));
     }
   }
   return result;
 }
 
-export const findAllChildren = (layers, ids, level = 0) => {
+export const findAllChildren = (layers, ids, seen = new Set()) => {
   let result = Object.assign([], ids);
   for (let i = 0; i < layers.length; i++) {
-    if (ids.includes(layers[i].id) && Array.isArray(layers[i].children)) {
-      const result2 = findAllChildren(layers, layers[i].children, level+1);
-      if (Array.isArray(result2)) result = result.concat(result2);
+    if (ids.includes(layers[i].id) && Array.isArray(layers[i].children) && !seen.has(layers[i].id)) {
+      seen.add(layers[i].id);
+      result = result.concat(findAllChildren(layers, layers[i].children, seen));
     }
   }
   return result;
