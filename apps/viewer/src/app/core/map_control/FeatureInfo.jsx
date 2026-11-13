@@ -659,8 +659,8 @@ class FeatureInfoUtils  {
   }
 
   
-  getFeatureInfoGeoJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/geojson');
+  getFeatureInfoGeoJSON(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject) {
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, format || 'application/geojson');
     fetch(url)
     .then(res => res.json())
     .then(geojson => {
@@ -691,8 +691,8 @@ class FeatureInfoUtils  {
     })
   }
   
-  getFeatureInfoJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'application/json'); 
+  getFeatureInfoJSON(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject) {
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, format || 'application/json');
     fetch(url)
     .then(res => res.json())
     .then(json => {
@@ -722,8 +722,8 @@ class FeatureInfoUtils  {
     })
   }
   
-  getFeatureInfoXML(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/xml');  
+  getFeatureInfoXML(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject) {
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, format || 'text/xml');
     fetch(url)
     .then(res => res.text())
     .then(xml => {
@@ -838,8 +838,8 @@ class FeatureInfoUtils  {
     });
   }
   
-  getFeatureInfoHtml(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/html');  
+  getFeatureInfoHtml(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject) {
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, format || 'text/html');
     fetch(url)
     .then(res => res.text())
     .then(text => {
@@ -850,8 +850,8 @@ class FeatureInfoUtils  {
     });
   }
   
-  getFeatureInfoText(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject) {
-    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, 'text/plain');
+  getFeatureInfoText(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject) {
+    const url = requestBuilder.call(this, map, l, viewResolution, coordinate, crs, format || 'text/plain');
     fetch(url)
     .then(res => res.text())
     .then(text => {
@@ -915,19 +915,19 @@ class FeatureInfoUtils  {
         if (/gml/ig.test(format)) {
           this.getFeatureInfoGML(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         } else if (/xml/ig.test(format)) {
-          this.getFeatureInfoXML(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject);
+          this.getFeatureInfoXML(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         }
         else if (/geojson/ig.test(format)) {
-          this.getFeatureInfoGeoJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject);
+          this.getFeatureInfoGeoJSON(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         }
         else if (/json/ig.test(format)) {
-          this.getFeatureInfoJSON(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject);
+          this.getFeatureInfoJSON(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         }
         else if (/html/ig.test(format)) {
-          this.getFeatureInfoHtml(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject);
+          this.getFeatureInfoHtml(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         }
         else if (/plain/ig.test(format)) {
-          this.getFeatureInfoText(map, l, viewResolution, coordinate, crs, requestBuilder, resolve, reject);
+          this.getFeatureInfoText(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         }
         else reject();
       });
