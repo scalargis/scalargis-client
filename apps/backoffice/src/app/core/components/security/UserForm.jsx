@@ -271,6 +271,7 @@ function UserForm(props) {
         data: {...new_data}
       }
       provider.update('users', params).then(d => {
+        setData(prev => ({...prev, state: d?.data?.state}));
         notify.success('Editar Registo', 'Registo alterado com sucesso');
         setValue('password', '', {
           shouldValidate: true,
@@ -420,7 +421,9 @@ function UserForm(props) {
                 render={({ field }) => (
                   <Switch
                     size="md"
-                    label={field.value ? 'Utilizador Ativo' : 'Utilizador Não Ativo'}
+                    label={field.value ? 'Utilizador Ativo' : (data.state === 'pending' ? 'Registo por confirmar' : 'Utilizador Não Ativo')}
+                    description={data.state === 'pending' && !field.value ?
+                      'O utilizador ainda não confirmou o email. Gravar mantém o registo pendente.' : undefined}
                     checked={!!field.value}
                     onChange={(e) => field.onChange(e.currentTarget.checked)}
                   />

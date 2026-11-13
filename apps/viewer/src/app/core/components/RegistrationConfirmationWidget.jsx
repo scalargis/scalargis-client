@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
 
-import { Alert, Anchor, Button, Group, Loader, TextInput } from '@mantine/core';
+import { Alert, Anchor, Button, Group, Loader, PasswordInput, TextInput } from '@mantine/core';
 
 import { IconCheck, IconCheckCircle, IconInfoCircle, IconXCircle } from '@scalargis/ui';
 import { i18n as i18nUtils } from '@scalargis/components';
@@ -10,7 +10,9 @@ import { i18n as i18nUtils } from '@scalargis/components';
 function RegistrationConfirmationWidget({ core, token, auth, registration, history, redirect, urlRedirect }) {
 
   const [emailConfirmation, setEmailConfirmation] = useState('');
-  const [validating, setValidating] = useState(!!token);
+  const [password, setPassword] = useState('');
+  const [askPassword, setAskPassword] = useState(!!token);
+  const [validating, setValidating] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState(null);
 
@@ -19,17 +21,21 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
   const { registration_confirmation, resend_confirmation, logout } = core.actions;
 
-  useEffect(() => {
-    if (auth?.data?.token) return;
-
-    dispatch(registration_confirmation({ token }, history, redirect));
-  }, []);
+  const wrongPassword = auth.http_error && auth.response?.code === 'registration_confirmation_wrong_password';
 
   useEffect(() => {
     if (validating && (registration.response || auth.http_error)) {
       setValidating(false);
+      if (auth.http_error && auth.response?.code !== 'registration_confirmation_wrong_password') setAskPassword(false);
     }
   }, [registration.response, auth.http_error]);
+
+  const confirmRegistration = (e) => {
+    e.preventDefault();
+    if (!password) return;
+    setValidating(true);
+    dispatch(registration_confirmation({ token, password }, history, redirect));
+  }
 
   // Render user
   if (auth?.data?.token) {
@@ -87,6 +93,36 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
             >{i18nUtils.translateValue("login", "Login")}</Button>
           </div>
         </div>
+    )
+  }
+
+  if (askPassword) {
+    return (
+      <form onSubmit={confirmRegistration}>
+        <div className="text-center mb-2">
+          <div className="text-900 text-2xl font-medium mb-3">{i18nUtils.translateValue("userRegistrationConfirmation", "Confirmação de registo de utilizador")}</div>
+          <span className="text-900 font-medium line-height-3">{i18nUtils.translateValue("userRegistrationFillPassword", "Indique a palavra-passe que escolheu no registo para concluir a confirmação")}.</span>
+        </div>
+
+        <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} label={i18nUtils.translateValue("password", "Palavra-passe")} autoComplete="current-password" className="w-full mb-1" />
+
+        { wrongPassword &&
+          <div className="w-full my-4">
+            <Alert color="danger" py="xs">
+              <Group justify="center" gap="xs" wrap="nowrap">
+                <IconXCircle />
+                <span>{auth.response.message}</span>
+              </Group>
+            </Alert>
+          </div>
+        }
+
+        <div className="mt-4 mb-4">
+          <Button type="submit" fullWidth leftSection={<IconCheck />} disabled={!password}>
+            {i18nUtils.translateValue("confirm", "Confirmar")}
+          </Button>
+        </div>
+      </form>
     )
   }
 
