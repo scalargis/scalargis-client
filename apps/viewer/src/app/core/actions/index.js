@@ -483,9 +483,9 @@ export function registration_confirmation(post, history, redirect) {
         } else {
           const msg = i18nUtils.translateValue(res.message, res.message, undefined, undefined, undefined, res);
           if (res.status === 401) {
-            dispatch(login_http_error({status: res.status, message: msg}));
+            dispatch(login_http_error({status: res.status, code: res.message, message: msg}));
           } else {
-            dispatch(login_http_error({status: res.status, valid_token: false, message: msg}));
+            dispatch(login_http_error({status: res.status, code: res.message, valid_token: false, message: msg}));
           }
         }
       }).catch(error => {

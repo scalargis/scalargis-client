@@ -293,6 +293,7 @@
   "userRegistrationConfirmationSuccess": "Registo de utilizador confirmado com sucesso",
   "userRegistrationInvalid": "Confirmação de registo inválida",
   "userRegistrationFillEmail": "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo",
+  "userRegistrationFillPassword": "Indique a palavra-passe que escolheu no registo para concluir a confirmação",
   "userRegistrationConfirmationSentToEmail": "A confirmação de registo de utilizador foi enviada para o email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "Não existe nenhum registo de utilizador com o email indicado.",
 
@@ -351,6 +352,7 @@
   "registration_confirmation_sent_if_exists": "Caso o email indicado esteja associado a uma conta, será enviada uma confirmação de registo.",
   "registration_confirmation_invalid": "Confirmação de registo inválida.",
   "registration_confirmation_expired": "Confirmação de registo expirada.",
+  "registration_confirmation_wrong_password": "A palavra-passe não corresponde à do registo. Se não fez este registo, ignore o email.",
   "password_reset_email_sent_if_exists": "Caso exista uma conta associada, será enviado um email com as instruções para recuperação da palavra-passe.",
   "password_reset_validation_invalid": "Confirmação de alteração de palavra-passe inválida.",
   "password_reset_validation_expired": "Confirmação de alteração de palavra-passe expirada.",

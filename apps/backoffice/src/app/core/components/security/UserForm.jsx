@@ -249,7 +249,8 @@ function UserForm(props) {
         id: data.id,
         data: {...new_data}
       }
-      provider.update('users', params).then(d => {       
+      provider.update('users', params).then(d => {
+        setData(prev => ({...prev, state: d?.data?.state}));
         toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
         setValue('password', '', {
           shouldValidate: true,
@@ -404,9 +405,11 @@ function UserForm(props) {
                 control={control}
                 name="active"
                 render={({ field }) => {
-                  return <ToggleButton {...field} checked={field.value} onChange={(e) => field.onChange(e.target.value)} onLabel="Utilizador Ativo" offLabel="Utilizador Não Ativo" onIcon="pi pi-check" offIcon="pi pi-times" />
-                }} 
-              />                    
+                  return <ToggleButton {...field} checked={field.value} onChange={(e) => field.onChange(e.target.value)} onLabel="Utilizador Ativo" offLabel={data.state === 'pending' ? 'Registo por confirmar' : 'Utilizador Não Ativo'} onIcon="pi pi-check" offIcon="pi pi-times" />
+                }}
+              />
+              { data.state === 'pending' && !watch('active') &&
+                <small className="block mt-1">O utilizador ainda não confirmou o email. Gravar mantém o registo pendente.</small> }
             </div>
           </div>            
         </div>
