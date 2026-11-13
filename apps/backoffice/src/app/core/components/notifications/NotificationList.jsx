@@ -10,29 +10,15 @@ import { CollapsiblePanel, DataGrid, exportGridCSV, notify, IconPencil, IconUplo
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
 import PageSection from '../common/PageSection';
+import { NOTIFICATION_STATUS, NOTIFICATION_STATUS_OPTIONS, refreshNotificationsTotal } from './status';
 
 
 const initialSearchParams = {
   page: 1,
   pageSize: 5,
   sortStatus: { columnAccessor: 'id', direction: 'asc' },
-  filters: { "status": [0] }
+  filters: { "status": [NOTIFICATION_STATUS.OPEN] }
 };
-
-const status = [
-  {
-    value: 0,
-    name: 'Por abrir'
-  },
-  {
-    value: 1,
-    name: 'Lida'
-  },
-  {
-    value: 2,
-    name: 'Encerrado'
-  }
-];
 
 const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
@@ -51,7 +37,7 @@ function NotificationList(props) {
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedRecords, setSelectedRecords] = useState([]);
 
-  const [filter] = useState(props.filter || { "status": [0] });
+  const [filter] = useState(props.filter || { "status": [NOTIFICATION_STATUS.OPEN] });
   const [searchParams, setSearchParams] = useState({ ...initialSearchParams });
 
   const API_URL = core.API_URL;
@@ -68,6 +54,7 @@ function NotificationList(props) {
     }).catch((error) => {
       console.log(error)
     });
+    refreshNotificationsTotal(API_URL, props.dispatch);
   }, []);
 
   useEffect(() => {
@@ -172,11 +159,11 @@ function NotificationList(props) {
         render: (record) => {
           const status = record.status || {}
 
-          if (status.value === 0) {
+          if (status.value === NOTIFICATION_STATUS.OPEN) {
             return <span className="badge badge-danger" title={`${status.label || 'Por abrir'}`}><i className="fas fa-envelope"></i></span>
-          } else if (status.value === 1) {
+          } else if (status.value === NOTIFICATION_STATUS.READ) {
             return <span className="badge badge-warning" title={`${status.label || 'Lida'} (${formatDay(status.date)})`}><i className="fas fa-envelope-open"></i></span>
-          } else if (status.value === 2) {
+          } else if (status.value === NOTIFICATION_STATUS.CLOSED) {
             return <span className="badge badge-success" title={`${status.label || 'Encerrada'} (${formatDay(status.date)})`}><i className="fas fa-check"></i></span>
           }
 
@@ -265,7 +252,7 @@ function NotificationList(props) {
                       render={({ field }) => (
                         <MultiSelect
                           label="Estado"
-                          data={status.map(s => ({ value: String(s.value), label: s.name }))}
+                          data={NOTIFICATION_STATUS_OPTIONS.map(s => ({ value: String(s.value), label: s.name }))}
                           value={(field.value || []).map(String)}
                           onChange={(values) => field.onChange(values.length ? values.map(Number) : null)}
                           clearable />

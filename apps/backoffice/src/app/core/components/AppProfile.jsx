@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 import { Box, Collapse, UnstyledButton } from '@mantine/core';
 import { IconCog, IconUser, IconInbox, IconPowerOff } from '@scalargis/ui';
@@ -11,7 +12,7 @@ export const AppProfile = (props) => {
     const auth = props.auth?.data || {};
     const { name, username } = auth;
 
-    const cfg = core?.config?.config_json;
+    const notificationsTotal = useSelector(state => state.backoffice?.config_json?.notifications?.total);
 
     const [expanded, setExpanded] = useState(false);
 
@@ -33,7 +34,7 @@ export const AppProfile = (props) => {
                     </li>
                     <li>
                         <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/notifications/list">
-                            <IconInbox fixedWidth /><span>Notificações</span><span className="menuitem-badge">{cfg?.notifications?.total || 0}</span>
+                            <IconInbox fixedWidth /><span>Notificações</span><span className="menuitem-badge">{notificationsTotal || 0}</span>
                         </NavLink>
                     </li>
                     <li>

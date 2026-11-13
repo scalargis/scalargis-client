@@ -1,12 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 import { UnstyledButton } from '@mantine/core';
 import { IconMenu, IconInbox, IconUser } from '@scalargis/ui';
-import AppContext from '../../AppContext';
 
 export const AppTopbar = (props) => {
-    const ctx = useContext(AppContext);
-    const cfg = ctx?.core?.config?.config_json;
+    const notificationsTotal = useSelector(state => state.backoffice?.config_json?.notifications?.total);
 
     return (
         <div className="layout-topbar clearfix">
@@ -17,7 +16,7 @@ export const AppTopbar = (props) => {
                 <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/notifications/list" title="Notificações" aria-label="Notificações">
                     <span className="layout-topbar-item-text">Notificações</span>
                     <IconInbox className="layout-topbar-icon" style={{ fontSize: '1.5em' }} />
-                    <span className="layout-topbar-badge">{cfg?.notifications?.total || 0}</span>
+                    <span className="layout-topbar-badge">{notificationsTotal || 0}</span>
                 </NavLink>
                 <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to="/account" title="Conta" aria-label="Conta">
                     <span className="layout-topbar-item-text">Conta</span>

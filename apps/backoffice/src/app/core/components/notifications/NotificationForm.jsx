@@ -7,6 +7,7 @@ import { notify, IconArrowLeft } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { NOTIFICATION_STATUS, refreshNotificationsTotal } from './status';
 
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
@@ -58,33 +59,13 @@ function NotificationForm(props) {
     }
   }
 
-  const onCheck = () => {
-    const values = {
-      checked: true
-    }
-    updateNotification(values);
-  }
+  const onCheck = () => updateNotification({ checked: true });
 
-  const onClose = () => {
-    const values = {
-      closed: true
-    }
-    updateNotification(values);
-  }
+  const onClose = () => updateNotification({ closed: true });
 
-  const onReopen = () => {
-    const values = {
-      closed: false
-    }
-    updateNotification(values);
-  }
+  const onReopen = () => updateNotification({ closed: false });
 
-  const onSave = () => {
-    const values = {
-      notes: data.notes
-    }
-    updateNotification(values);
-  }
+  const onSave = () => updateNotification({});
 
   const updateNotification = (values) => {
     setIsSaving(true);
@@ -92,11 +73,15 @@ function NotificationForm(props) {
     const provider = dataProvider(API_URL + '/portal');
     const params = {
       id: data.id,
-      data: values
+      data: { ...values, notes: data.notes ?? null }
     }
+    const previousStatus = data?.status?.value;
     provider.update('notifications', params).then(d => {
       notify.success('Editar Registo', 'Registo alterado com sucesso');
       setData({...d.data});
+      if (d.data?.status?.value !== previousStatus) {
+        refreshNotificationsTotal(API_URL, props.dispatch);
+      }
     }).catch(e => {
       notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
     }).finally(() => {
@@ -187,15 +172,15 @@ function NotificationForm(props) {
               leftSection={<IconArrowLeft />}
               disabled={isSaving}
               onClick={goBack}>Voltar</Button>
-            { data?.status?.value === 0 && <Button
+            { data?.status?.value === NOTIFICATION_STATUS.OPEN && <Button
               type="button"
               disabled={isSaving}
               onClick={onCheck}>Lida</Button> }
-            { data?.status?.value !== 2 && <Button
+            { data?.status?.value !== NOTIFICATION_STATUS.CLOSED && <Button
               type="button"
               disabled={isSaving}
               onClick={onClose}>Encerrar</Button> }
-            { data?.status?.value === 2 && <Button
+            { data?.status?.value === NOTIFICATION_STATUS.CLOSED && <Button
               type="button"
               disabled={isSaving}
               onClick={onReopen}>Reabrir</Button> }

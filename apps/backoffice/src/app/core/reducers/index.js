@@ -11,6 +11,7 @@ import {
   BACKOFFICE_UNLOAD_COMPONENTS,
   BACKOFFICE_LOAD_DONE,
   BACKOFFICE_SET_CONFIG,
+  BACKOFFICE_SET_NOTIFICATIONS_TOTAL,
   AUTH_HTTP_ERROR,
   AUTH_HTTP_LOADING,
   AUTH_RESPONSE,
@@ -114,6 +115,21 @@ const reducer = (
         backoffice: {
           ...initialBackoffice,
           ...action.backoffice
+        }
+      }
+
+    case BACKOFFICE_SET_NOTIFICATIONS_TOTAL:
+      return {
+        ...state,
+        backoffice: {
+          ...state.backoffice,
+          config_json: {
+            ...state.backoffice.config_json,
+            notifications: {
+              ...state.backoffice.config_json?.notifications,
+              total: action.total
+            }
+          }
         }
       }
 
