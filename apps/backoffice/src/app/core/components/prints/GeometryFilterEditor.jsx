@@ -211,7 +211,11 @@ const GeometryFilterEditor = props => {
 
   useEffect(() => {
     if (props.coordinateSystems) {
-      setCoordinateSystems(props.coordinateSystems.map( c => { return { value: parseInt(c.config_json.srid), label: c.config_json.title }; }));
+      setCoordinateSystems(props.coordinateSystems.map( c => {
+        const code = c.code || c.config_json?.code;
+        const title = c.config_json?.title;
+        return { value: parseInt(c.config_json.srid), label: code ? `(${code}) ${title}` : title };
+      }));
       const projections = props.coordinateSystems.map( c => {
         return {
           srid: parseInt(c.config_json.srid),
