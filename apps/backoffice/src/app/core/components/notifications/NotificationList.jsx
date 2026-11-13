@@ -17,10 +17,11 @@ import dayjs from 'dayjs';
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
 import { first } from 'underscore';
+import { NOTIFICATION_STATUS, NOTIFICATION_STATUS_OPTIONS, refreshNotificationsTotal } from './status';
 
 
 const initialSearchParams = {
-  filters: {"status": [0]},
+  filters: {"status": [NOTIFICATION_STATUS.OPEN]},
   first: 0,
   //rows: 20,
   rows: 5,
@@ -28,21 +29,6 @@ const initialSearchParams = {
   sortField: 'id',
   sortOrder: 1
 };
-
-const status = [
-  {
-    value: 0,
-    name: 'Por abrir'
-  },
-  {
-    value: 1,
-    name: 'Lida'
-  },
-  {
-    value: 2,
-    name: 'Encerrado'
-  }
-];
 
 const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
@@ -62,7 +48,7 @@ function NotificationList(props) {
   const [records, setRecords] = useState([]);
   const [selectedRecords, setSelectedRecords] = useState(null);
 
-  const [filter, setFilter] = useState(props.filter || {"status": [0]});
+  const [filter, setFilter] = useState(props.filter || {"status": [NOTIFICATION_STATUS.OPEN]});
   const [searchParams, setSearchParams] = useState({...initialSearchParams});
 
   const dt = useRef(null);
@@ -82,7 +68,8 @@ function NotificationList(props) {
       setViewersOptions(result[0].data || []);
     }).catch((error) => {
       console.log(error)
-    }); 
+    });
+    refreshNotificationsTotal(API_URL, props.dispatch);
   }, []);
 
   useEffect(() => {
@@ -230,11 +217,11 @@ function NotificationList(props) {
   const statusTemplate = (rowData) => {
     const status = rowData.status || {}
 
-    if (status.value === 0) {
+    if (status.value === NOTIFICATION_STATUS.OPEN) {
       return <span className="badge badge-danger" title={`${status.label || 'Por abrir'}`}><i className="fas fa-envelope"></i></span>
-    } else if (status.value === 1) {
+    } else if (status.value === NOTIFICATION_STATUS.READ) {
       return <span className="badge badge-warning" title={`${status.label || 'Lida'} (${formatDay(status.date)})`}><i className="fas fa-envelope-open"></i></span>
-    } else if (status.value === 2) {
+    } else if (status.value === NOTIFICATION_STATUS.CLOSED) {
       return <span className="badge badge-success" title={`${status.label || 'Encerrada'} (${formatDay(status.date)})`}><i className="fas fa-check"></i></span>
     }
 
@@ -340,7 +327,7 @@ function NotificationList(props) {
                                 return <MultiSelect 
                                 optionLabel="name" 
                                 optionValue="value"
-                                options={status}
+                                options={NOTIFICATION_STATUS_OPTIONS}
                                 value={field.value}                                 
                                 showClear
                                 showSelectAll={false}

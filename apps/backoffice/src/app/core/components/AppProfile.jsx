@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 import classNames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
@@ -12,7 +13,7 @@ export const AppProfile = (props) => {
     const auth = props.auth?.data || {};
     const { name, username, email } = auth;
 
-    const cfg = core?.config?.config_json;
+    const notificationsTotal = useSelector(state => state.backoffice?.config_json?.notifications?.total);
 
     const [expanded, setExpanded] = useState(false);
     const profileMenuRef = useRef(null);
@@ -45,7 +46,7 @@ export const AppProfile = (props) => {
                     </li>
                     <li>
                         <NavLink className={({ isActive }) => isActive ? 'active-route' : undefined} to={'/notifications/list'} target={null}>
-                            <button type="button" className="p-link"><i className="pi pi-fw pi-inbox" /><span>Notificações</span><span className="menuitem-badge">{cfg?.notifications?.total || 0}</span></button>
+                            <button type="button" className="p-link"><i className="pi pi-fw pi-inbox" /><span>Notificações</span><span className="menuitem-badge">{notificationsTotal || 0}</span></button>
                         </NavLink>
                     </li>
                     <li><button type="button" className="p-link" onClick={e => dispatch(logout())}><i className="pi pi-fw pi-power-off" /><span>Sair</span></button></li>

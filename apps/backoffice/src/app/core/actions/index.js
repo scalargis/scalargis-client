@@ -18,6 +18,7 @@ export const BACKOFFICE_NOT_FOUND           = 'BACKOFFICE_NOT_FOUND'
 export const BACKOFFICE_NOT_AUTHORIZED      = 'BACKOFFICE_NOT_AUTHORIZED'
 export const BACKOFFICE_LOAD_COMPONENTS     = 'BACKOFFICE_LOAD_COMPONENTS'
 export const BACKOFFICE_UNLOAD_COMPONENTS   = 'BACKOFFICE_UNLOAD_COMPONENTS'
+export const BACKOFFICE_SET_NOTIFICATIONS_TOTAL = 'BACKOFFICE_SET_NOTIFICATIONS_TOTAL'
 
 
 export const LAYOUT_WRAPPER_CLICK       = 'LAYOUT_WRAPPER_CLICK'
@@ -156,6 +157,14 @@ export function backoffice_set_config(config) {
     type: BACKOFFICE_SET_CONFIG,
     config,
     backoffice: config
+  }
+  return action;
+}
+
+export function backoffice_set_notifications_total(total) {
+  const action = {
+    type: BACKOFFICE_SET_NOTIFICATIONS_TOTAL,
+    total
   }
   return action;
 }

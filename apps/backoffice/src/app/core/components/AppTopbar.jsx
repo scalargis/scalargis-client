@@ -1,11 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 import { InputText } from 'primereact/inputtext';
-import AppContext from '../../AppContext';
 
 export const AppTopbar = (props) => {
-    const ctx = useContext(AppContext);
-    const cfg = ctx?.core?.config?.config_json;
+    const notificationsTotal = useSelector(state => state.backoffice?.config_json?.notifications?.total);
 
     return (
         <div className="layout-topbar clearfix">
@@ -17,7 +16,7 @@ export const AppTopbar = (props) => {
                     <button type="button" className="p-link" title="Notificações">
                         <span className="layout-topbar-item-text">Notificações</span>
                         <span className="layout-topbar-icon pi pi-inbox" />
-                        <span className="layout-topbar-badge">{cfg?.notifications?.total || 0}</span>
+                        <span className="layout-topbar-badge">{notificationsTotal || 0}</span>
                     </button>
                 </NavLink>
                 {/*

@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { NOTIFICATION_STATUS, refreshNotificationsTotal } from './status';
 
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
@@ -74,45 +75,29 @@ function NotificationForm(props) {
     }
   }
 
-  const onCheck = () => {  
-    const values = {
-      checked: true
-    }
-    updateNotification(values);  
-  }
+  const onCheck = () => updateNotification({ checked: true });
 
-  const onClose = () => {
-    const values = {
-      closed: true
-    }
-    updateNotification(values);
-  }
+  const onClose = () => updateNotification({ closed: true });
 
-  const onReopen = () => {
-    const values = {
-      closed: false
-    }
-    updateNotification(values);
-  }
+  const onReopen = () => updateNotification({ closed: false });
 
-  const onSave = () => {
-    const values = {
-      notes: data.notes
-    }
-    updateNotification(values);
-  }  
+  const onSave = () => updateNotification({});
 
   const updateNotification = (values) => {
-    setIsSaving(true); 
+    setIsSaving(true);
 
-    const provider = dataProvider(API_URL + '/portal');      
+    const provider = dataProvider(API_URL + '/portal');
     const params = {
       id: data.id,
-      data: values
+      data: { ...values, notes: data.notes ?? null }
     }
-    provider.update('notifications', params).then(d => {       
-      toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});      
+    const previousStatus = data?.status?.value;
+    provider.update('notifications', params).then(d => {
+      toast.current.show({life: 3000, severity: 'success', summary: 'Editar Registo', detail: 'Registo alterado com sucesso'});
       setData({...d.data});
+      if (d.data?.status?.value !== previousStatus) {
+        refreshNotificationsTotal(API_URL, props.dispatch);
+      }
     }).catch(e => {
       toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: 'Ocorreu um erro ao alterar o registo'});        
     }).finally(() => {
@@ -130,21 +115,21 @@ function NotificationForm(props) {
             severity="secondary" className="mr-4"
             disabled={isSaving ? true : false}
             onClick={goBack} />
-          { data?.status?.value === 0 && <Button
+          { data?.status?.value === NOTIFICATION_STATUS.OPEN && <Button
             type="button" 
             label="Lida"
             className="mr-2"
             icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
             disabled={isSaving ? true : false} 
             onClick={onCheck} /> }
-          { data?.status?.value !== 2 && <Button
+          { data?.status?.value !== NOTIFICATION_STATUS.CLOSED && <Button
             type="button" 
             label="Encerrar"
             className="mr-2"
             icon_={isSaving ? "pi pi-save pi-spinner" : "pi pi-save" }
             disabled={isSaving ? true : false}
             onClick={onClose} /> }
-          { data?.status?.value === 2 && <Button
+          { data?.status?.value === NOTIFICATION_STATUS.CLOSED && <Button
             type="button" 
             label="Reabrir"
             className="mr-2"
