@@ -294,6 +294,7 @@
   "userRegistrationInvalid": "Invalid user confirmation",
   "userRegistrationFillEmail": "Enter the email used to create the user so that a new confirmation can be sent",
   "userRegistrationFillPassword": "Indiquez le mot de passe choisi lors de l'inscription pour terminer la confirmation",
+  "confirmRegistration": "Confirmer",
   "userRegistrationConfirmationSentToEmail": "User creation confirmation sent to email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "There is no user with the email indicated.",
 

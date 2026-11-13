@@ -114,7 +114,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
         }
 
         <div className="flex align-items-center justify-content-between mt-4 mb-4 p-dialog-myfooter">
-          <Button type="submit" icon="pi pi-check" label={i18nUtils.translateValue("confirm", "Confirmar")}
+          <Button type="submit" icon="pi pi-check" label={i18nUtils.translateValue("confirmRegistration", "Confirmar")}
             className="w-full" disabled={!password} />
         </div>
       </form>
