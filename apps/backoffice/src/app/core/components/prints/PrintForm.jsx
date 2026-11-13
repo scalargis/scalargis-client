@@ -159,7 +159,11 @@ function PrintForm(props) {
       }
 
       const crs_result = result[2]?.data || [];
-      setCoordinateSystems(crs_result.map( c => { return { value: parseInt(c.config_json.srid), label: c.config_json.title }; }));
+      setCoordinateSystems(crs_result.map( c => {
+        const code = c.code || c.config_json?.code;
+        const title = c.config_json?.title;
+        return { value: parseInt(c.config_json.srid), label: code ? `(${code}) ${title}` : title };
+      }));
 
     }).catch((error) => {
       console.log(error)
