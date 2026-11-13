@@ -144,11 +144,9 @@ class Main extends React.Component {
 
   opacity(e, theme, value) {
     const { layers } = this.props.config.viewer.config_json;
-    const index = layers.findIndex(i => i.id === theme.id);
     const update = Object.assign({}, theme);
     update.opacity = value / 100;
-    layers.splice(index, 1, update);
-    this.setState({ ...this.state, layers });
+    this.setState({ ...this.state, layers: layers.map(l => l.id === theme.id ? update : l) });
     if (this.props.actions.layers_update_theme && this.props.config.dispatch) {
       this.props.config.dispatch(this.props.actions.layers_update_theme(update));
     }
@@ -163,10 +161,8 @@ class Main extends React.Component {
 
   applyThemeChanges(theme) {
     const { layers } = this.props.config.viewer.config_json;
-    const index = layers.findIndex(i => i.id === theme.id);
     const update = Object.assign({}, theme);
-    layers.splice(index, 1, update);
-    this.setState({ ...this.state, layers });
+    this.setState({ ...this.state, layers: layers.map(l => l.id === theme.id ? update : l) });
     if (this.props.actions.layers_update_theme && this.props.config.dispatch) {
       this.props.config.dispatch(this.props.actions.layers_update_theme(update));
     }
@@ -174,32 +170,33 @@ class Main extends React.Component {
 
   moveTheme(fromIndex, fromParent, toIndex, toParent) {
     const { layers } = this.props.config.viewer.config_json;
-    const updated = Object.assign([], layers);
 
-    const parentIndex = updated.findIndex(i => i.id === fromParent);
-    const targetIndex = updated.findIndex(i => i.id === toParent);
-    const idIndex = updated[parentIndex].children.indexOf(fromIndex);
-    const target = Object.assign({}, updated[targetIndex]);
+    const parentIndex = layers.findIndex(i => i.id === fromParent);
+    const targetIndex = layers.findIndex(i => i.id === toParent);
+    const idIndex = parentIndex > -1 && Array.isArray(layers[parentIndex].children)
+      ? layers[parentIndex].children.indexOf(fromIndex) : -1;
 
-    // Disallow drag into children
-    if (target.children.includes(toParent)) {
+    if (idIndex === -1 || targetIndex === -1 || findAllChildren(layers, [fromIndex]).includes(toParent)) {
       return this.setState({ ...this.state, dragging: false });
     }
 
-    // Fix index when drag n drop in the same parent and drag lesser index
     if (fromParent === toParent && idIndex < toIndex) toIndex--;
 
-    // Update themes
-    updated[parentIndex].children.splice(idIndex, 1);
+    const updated = Object.assign([], layers);
+    const source = { ...layers[parentIndex], children: [...layers[parentIndex].children] };
+    updated.splice(parentIndex, 1, source);
+    const target = fromParent === toParent
+      ? source
+      : { ...layers[targetIndex], children: [...(layers[targetIndex].children || [])] };
+
+    source.children.splice(idIndex, 1);
     target.children.splice(toIndex, 0, fromIndex);
     updated.splice(targetIndex, 1, target);
     this.setState({ ...this.state, layers: updated, dragging: false });
 
-    // Dispatch update global store
     if (this.props.actions.layers_update_theme && this.props.config.dispatch) {
-      this.props.config.dispatch(this.props.actions.layers_update_theme(updated[parentIndex]));
-      this.props.config.dispatch(this.props.actions.layers_update_theme(target));
-      //if (checked.includes(fromIndex)) this.toggle(fromIndex);
+      this.props.config.dispatch(this.props.actions.layers_update_theme(source));
+      if (target !== source) this.props.config.dispatch(this.props.actions.layers_update_theme(target));
     }
   };
 
