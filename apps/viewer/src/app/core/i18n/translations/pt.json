@@ -343,6 +343,7 @@
   "userRegistrationInvalid": "Confirmação de registo inválida",
   "userRegistrationFillEmail": "Indique o email utilizado no registo do utilizador para que seja enviada nova confirmação de registo",
   "userRegistrationFillPassword": "Indique a palavra-passe que escolheu no registo para concluir a confirmação",
+  "confirmRegistration": "Confirmar",
   "userRegistrationConfirmationSentToEmail": "A confirmação de registo de utilizador foi enviada para o email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "Não existe nenhum registo de utilizador com o email indicado.",
   "resendEmail": "Reenviar email",

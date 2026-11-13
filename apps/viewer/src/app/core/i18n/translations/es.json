@@ -343,6 +343,7 @@
   "userRegistrationInvalid": "Invalid user confirmation",
   "userRegistrationFillEmail": "Enter the email used to create the user so that a new confirmation can be sent",
   "userRegistrationFillPassword": "Indique la contraseña que eligió en el registro para completar la confirmación",
+  "confirmRegistration": "Confirmar",
   "userRegistrationConfirmationSentToEmail": "User creation confirmation sent to email {{email}}.",
   "userRegistrationConfirmationWrongEmail": "There is no user with the email indicated.",
   "resendEmail": "Reenviar correo",

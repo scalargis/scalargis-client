@@ -119,7 +119,7 @@ function RegistrationConfirmationWidget({ core, token, auth, registration, histo
 
         <div className="mt-4 mb-4">
           <Button type="submit" fullWidth leftSection={<IconCheck />} disabled={!password}>
-            {i18nUtils.translateValue("confirm", "Confirmar")}
+            {i18nUtils.translateValue("confirmRegistration", "Confirmar")}
           </Button>
         </div>
       </form>
