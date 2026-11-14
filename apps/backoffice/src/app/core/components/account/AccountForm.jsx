@@ -64,7 +64,9 @@ function AccountForm(props) {
       if (d?.data) dispatch(auth_update(d?.data));
 
     }).catch(e => {
-      const msg = e.message || 'Ocorreu um erro ao alterar o registo';
+      const msg = e.body?.message === 'auth_token_taken'
+        ? 'O token de autenticação já pertence a outro utilizador'
+        : (e.message || 'Ocorreu um erro ao alterar o registo');
       toast.current.show({life: 3000, severity: 'error', summary: 'Editar Registo', detail: msg});        
     }).finally(() => {
       setIsSaving(false);

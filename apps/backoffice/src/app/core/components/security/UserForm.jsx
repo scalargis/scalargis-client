@@ -257,7 +257,7 @@ function UserForm(props) {
           shouldDirty: true
         });
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Editar Registo', detail: e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo'});        
+        toast.current.show({life: 5000, severity: 'error', summary: 'Editar Registo', detail: e.body?.message === 'auth_token_taken' ? 'O token de autenticação já pertence a outro utilizador' : (e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo')});        
       }).finally(() => {
         setIsSaving(false);
       });
@@ -269,7 +269,7 @@ function UserForm(props) {
         setData({...data, id: d.data.id});
         toast.current.show({life: 5000, severity: 'success', summary: 'Criar Registo', detail: 'Registo criada com sucesso'});
       }).catch(e => {
-        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: e.body?.message || e.message || 'Ocorreu um erro ao criar o registo'});
+        toast.current.show({life: 5000, severity: 'error', summary: 'Criar Registo', detail: e.body?.message === 'auth_token_taken' ? 'O token de autenticação já pertence a outro utilizador' : (e.body?.message || e.message || 'Ocorreu um erro ao criar o registo')});
       }).finally(() => {
         setIsSaving(false);
       });       

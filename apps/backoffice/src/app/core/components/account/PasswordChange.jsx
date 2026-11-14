@@ -81,6 +81,7 @@ export default function PasswordChange(props) {
     }
 
     const defaultValues = {
+        currentPassword: "",
         newPassword: "",
         confirmPassword: ""
       }
@@ -94,7 +95,7 @@ export default function PasswordChange(props) {
         setIsSaving(true);    
     
         const params = {
-            data: {password: data.newPassword}
+            data: {current_password: data.currentPassword, password: data.newPassword}
         }
         provider.update('update_password', params).then(d => {
             toast.current.show({life: 3000, severity: 'success', summary: 'Alterar Password', detail: 'Password alterada com sucesso'});
@@ -110,7 +111,9 @@ export default function PasswordChange(props) {
 
             setShowPasswordDialog(false);
         }).catch(e => {
-            toast.current.show({life: 5000, severity: 'error', summary: 'Alterar Password', detail: e.body?.message || e.message || 'Ocorreu um erro ao alterar a password'});        
+            toast.current.show({life: 5000, severity: 'error', summary: 'Alterar Password', detail: e.body?.message === 'password_current_invalid'
+                ? 'A password atual não está correta'
+                : (e.body?.message || e.message || 'Ocorreu um erro ao alterar a password')});        
         }).finally(() => {
             setIsSaving(false);
         });
@@ -136,6 +139,21 @@ export default function PasswordChange(props) {
                         handleSubmit(onSubmit)();
                     }}
                     autoComplete="off">
+                        <div className="field">
+                            <label htmlFor="currentPassword">Password atual</label>
+                            <Controller name="currentPassword" control={control}
+                                rules={{ required: "Campo obrigatório" }}
+                                render={({ field, fieldState }) => (
+                                    <Password id={field.name} {...field}
+                                        feedback={false}
+                                        toggleMask
+                                        className={classNames({ 'p-invalid': fieldState.invalid })}
+                                        autoComplete="current-password" />
+                                )}
+                            />
+                            {getFormErrorMessage(errors, 'currentPassword')}
+                        </div>
+
                         <div className="field">
                             <label htmlFor="newPassword">Nova password</label>
                             <Controller name="newPassword" control={control} 
