@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
@@ -98,6 +98,18 @@ export default function Main(props) {
   const [selected, setSelected] = useState({});
   const [loading, setLoading] = useState(false);
   const [types, setTypes] = useState(source_types);
+  const loadVersion = useRef(0);
+
+  /** Starts a load and returns a check that is true while no later load or reset has started. */
+  function beginLoad() {
+    const version = ++loadVersion.current;
+    return () => loadVersion.current === version;
+  }
+
+  function cancelLoads() {
+    loadVersion.current += 1;
+    setLoading(false);
+  }
 
   useEffect(() => {
     if (!core?.pubsub?.subscribe) return;
@@ -123,10 +135,13 @@ export default function Main(props) {
   }, [translation?.i18n?.resolvedLanguage]);
 
   function externalLoad(data) {
+    cancelLoads();
     setActiveIndex(1);
     setSelected({});
     setWizardData({
-      ...wizardData,
+      ...initialData,
+      dataitems: [],
+      items: [],
       key: String(uuidV4()),
       type: data.type ? data.type.toLowerCase() : '',
       url: data.url || '',
@@ -137,6 +152,7 @@ export default function Main(props) {
   }
 
   function reset() {
+    cancelLoads();
     setSelected({});
     setWizardData({...initialData, dataitems: [], items:[]});
   }
@@ -253,6 +269,7 @@ export default function Main(props) {
             viewer={props.config.viewer}
             loading={loading}
             setLoading={setLoading}
+            beginLoad={beginLoad}
             selected={selected}
             setSelected={setSelected}
             onChange={stepdata => {
@@ -277,6 +294,7 @@ export default function Main(props) {
             initialData={{...initialData, dataitems: [], items:[]}}
             wizardData={wizardData}
             onChange={type => {
+              cancelLoads();
               setSelected({});
               setWizardData({...initialData, dataitems: [], items:[], type})
             }}
