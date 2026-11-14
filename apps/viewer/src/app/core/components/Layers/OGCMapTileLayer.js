@@ -11,13 +11,14 @@ const OGCMapTileLayer = ({ config, source, group, checked }) => {
   useEffect(() => {
     if (!mainMap) return;
 
-    if (config.attributions) {
+    if (source && config.attributions) {
       source.setAttributions(config.attributions);
     }
 
     const options = { url: config.url };
     if (config.projection) options.projection = config.projection;
     if (config.mediaType) options.mediaType = config.mediaType;
+    if (config.attributions) options.attributions = config.attributions;
 
     layer.current = new OLTileLayer({
       ...config,

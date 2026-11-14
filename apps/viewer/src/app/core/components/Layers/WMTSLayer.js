@@ -9,9 +9,12 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
   const { core, mainMap } = useContext(AppContext);
   const layer = useRef();
 
-  const auth = core.store.getState().root.auth;
+  const SOURCE_KEYS = ['url', 'layer', 'wmts_capabilities', 'wmts_tilematrixset', 'wmts_style', 'wmts_format',
+    'attributions', 'proxy_http_image_requests'];
+  const sourceConfig = useRef();
 
-  function createLayer(config) {
+  /** Builds the WMTS source with the style, format, auth key, proxy, and attributions of the config. */
+  function createSource(config) {
     const url = config.url;
 
     let proxy_requests = false;
@@ -27,7 +30,7 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
       matrixSet: config.wmts_tilematrixset || 'EPSG:900913',
       format: 'image/png'
     }
-    
+
     try {
       wmts_options = optionsFromCapabilities(config.wmts_capabilities, {
         layer: config.layer,
@@ -38,7 +41,14 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
       console.log(`Coul not load WMTS layer capabilities: ${config?.title}`);
     }
 
-    //Add user authentication token
+    if (config.wmts_style) {
+      wmts_options.style = config.wmts_style;
+    }
+    if (config.wmts_format && config.wmts_format.toLowerCase().indexOf('image/') !== -1) {
+      wmts_options.format = config.wmts_format;
+    }
+
+    const auth = core.store.getState().root.auth;
     if (isUrlAppHostname(url) && viewer.integrated_authentication) {
       if (auth && auth.data && auth.data.auth_token) {
         const authkey = viewer?.integrated_authentication_key || 'authkey';
@@ -61,29 +71,26 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
           wmts_options["tileLoadFunction"] = function(imageTile, src) {
             imageTile.getImage().src = core.MAP_PROXY_URL + encodeURIComponent(src);
           };
-        } else {
-          proxy_requests = false;
         }
-      } else {
-        proxy_requests = false;
       }
-    }    
+    }
 
     if (config.attributions) {
       wmts_options['attributions'] = config.attributions;
     }
-    
-    return new OLTileLayer({
-      ...config,
-      visible: config.active,
-      source: new OlSourceWMTS(wmts_options)
-    });
+
+    sourceConfig.current = config;
+    return new OlSourceWMTS(wmts_options);
   }
-  
+
   useEffect(() => {
     if (!mainMap) return;
 
-    layer.current = createLayer(config);
+    layer.current = new OLTileLayer({
+      ...config,
+      visible: config.active,
+      source: createSource(config)
+    });
     group.getLayers().push(layer.current);
 
     return () => {
@@ -99,29 +106,11 @@ const WMTSLayer = ({ config, group, checked, viewer }) => {
 
   // Changed config
   useEffect(() => {
-    let wmts_options = {
-      layer: config.layer,
-      matrixSet: config.wmts_tilematrixset || 'EPSG:900913',
-      format: 'image/png'
+    if (!layer.current) return;
+    const previous = sourceConfig.current;
+    if (!previous || SOURCE_KEYS.some(k => previous[k] !== config[k])) {
+      layer.current.setSource(createSource(config));
     }
-
-    try {
-      wmts_options = optionsFromCapabilities(config.wmts_capabilities, {
-        layer: config.layer,
-        matrixSet: config.wmts_tilematrixset || 'EPSG:900913',
-        format: 'image/png'
-      });
-    } catch (error) {
-      console.log(`Coul not load WMTS layer capabilities: ${config?.title}`);
-    }
-    
-    if (config.wmts_style) {
-      wmts_options.style = config.wmts_style;
-    }
-    if (config.wmts_format && config.wmts_format.toLowerCase().indexOf('image/') !== -1) {
-      wmts_options.format = config.wmts_format;
-    }
-    layer.current.setSource(new OlSourceWMTS(wmts_options));
     layer.current.set('selectable', config.selectable);
     layer.current.set('wmts_format', config.wmts_format);
     layer.current.set('wmts_style', config.wmts_style);    
