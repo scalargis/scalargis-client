@@ -278,7 +278,9 @@ function UserForm(props) {
           shouldDirty: true
         });
       }).catch(e => {
-        notify.error('Editar Registo', e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo');
+        notify.error('Editar Registo', e.body?.message === 'auth_token_taken'
+          ? 'O token de autenticação já pertence a outro utilizador'
+          : (e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo'));
       }).finally(() => {
         setIsSaving(false);
       });
@@ -294,7 +296,9 @@ function UserForm(props) {
         setData({...data, id: d.data.id});
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
-        notify.error('Criar Registo', e.body?.message || e.message || 'Ocorreu um erro ao criar o registo');
+        notify.error('Criar Registo', e.body?.message === 'auth_token_taken'
+          ? 'O token de autenticação já pertence a outro utilizador'
+          : (e.body?.message || e.message || 'Ocorreu um erro ao criar o registo'));
       }).finally(() => {
         setIsSaving(false);
       });

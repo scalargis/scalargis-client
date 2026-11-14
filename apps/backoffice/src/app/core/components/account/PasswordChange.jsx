@@ -40,6 +40,7 @@ export default function PasswordChange(props) {
     };
 
     const defaultValues = {
+        currentPassword: "",
         newPassword: "",
         confirmPassword: ""
       }
@@ -53,7 +54,7 @@ export default function PasswordChange(props) {
         setIsSaving(true);
 
         const params = {
-            data: {password: data.newPassword}
+            data: {current_password: data.currentPassword, password: data.newPassword}
         }
         provider.update('update_password', params).then(d => {
             notify.success('Alterar Password', 'Password alterada com sucesso');
@@ -69,7 +70,10 @@ export default function PasswordChange(props) {
 
             close();
         }).catch(e => {
-            notify.error('Alterar Password', e.body?.message || e.message || 'Ocorreu um erro ao alterar a password');
+            const message = e.body?.message === 'password_current_invalid'
+                ? 'A password atual não está correta'
+                : (e.body?.message || e.message || 'Ocorreu um erro ao alterar a password');
+            notify.error('Alterar Password', message);
         }).finally(() => {
             setIsSaving(false);
         });
@@ -95,6 +99,21 @@ export default function PasswordChange(props) {
                     }}
                     autoComplete="off">
                         <Box mb="sm">
+                            <Controller name="currentPassword" control={control}
+                                rules={{ required: "Campo obrigatório" }}
+                                render={({ field }) => (
+                                    <PasswordInput id={field.name}
+                                        label="Password atual"
+                                        value={field.value || ''}
+                                        onChange={(e) => field.onChange(e.currentTarget.value)}
+                                        error={fieldError(errors, 'currentPassword')}
+                                        autoComplete="current-password"
+                                        data-autofocus />
+                                )}
+                            />
+                        </Box>
+
+                        <Box mb="sm">
                             <Controller name="newPassword" control={control}
                                 rules={{
                                     required: "Campo obrigatório",
@@ -111,8 +130,7 @@ export default function PasswordChange(props) {
                                         value={field.value || ''}
                                         onChange={(e) => field.onChange(e.currentTarget.value)}
                                         error={fieldError(errors, 'newPassword')}
-                                        autoComplete="off"
-                                        data-autofocus />
+                                        autoComplete="new-password" />
                                 )}
                             />
                             <PasswordRules policy={passwordPolicy} password={watchFields[0]} />
