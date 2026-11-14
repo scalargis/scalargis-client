@@ -5,6 +5,7 @@ import { FileUpload, notify, IconSearch } from '@scalargis/ui';
 import {parseString} from 'xml2js';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
+import { uploadVectorFile } from '../upload';
 
 
 export default function KML(props) {
@@ -16,110 +17,51 @@ export default function KML(props) {
     editField('crs', 4326);
   }, []);
 
-  const loadKMLData = (file, name) => {
-    const { core, mainMap, viewer, data, setLoading, setData, setError, Models, fastFetch } = props;
-    const { isUrlAppOrigin } = Models.Utils;
-    const endpoint = viewer.upload_url || core.UPLOAD_URL;
-    
-    const upload = new FormData();
-    upload.append('files', file);
-    upload.append('ext', 'kml');
-
-    setLoading(true);
-    const options = { method: 'POST', body: upload };
-    fastFetch(endpoint, options, 8000)
-      .then(res => res.json())
-      .then(res => {
-
-        // Validate response
-        if (!res.Success) {
-          setError(t("errorProcessingKMLFile", "Ocorreu um erro ao processar o ficheiro KML."));
-          return setLoading(false);
-        }
-        
-        const orginal_url = core.API_URL + res.Data.url;
-        let url = orginal_url;
-        if (!isUrlAppOrigin(url)) {
-          url = core.MAP_PROXY_URL + encodeURIComponent(url);
-        };        
-        fetch(url)
-          .then(res => res.json())
-          .then(res => {
-            data.dataitems = Models.OWSModel.convertGeoJSON2Themes(res, orginal_url, name, data.crs);
-            setData(Object.assign({}, data));
-            setLoading(false);
-        })
-
-        // Catch download error
-        .catch(error => {
-          setLoading(false);
-          setError(''+error);
-        });
-      })
-      
-      // Catch upload error
-      .catch(error => {
-        setLoading(false);
-        setError(''+error);
-      });
-  }
-
-  /**
-   * Event handler for load file
-   * 
-   * @param {Object} e 
-   */
-  const loadKMLFile = (e) => {
-    const name = e.files[0].name;
-    const file = e.files[0];
-    loadKMLData(file, name);
-  }
+  const loadKMLFile = (e) => uploadVectorFile(props, t, e.files[0], 'kml', t("errorProcessingKMLFile", "Ocorreu um erro ao processar o ficheiro KML."));
 
   const changeURL = (value) => {
-    const { data, setData } = props;
-    data.url = value.trim();
-    setData(Object.assign({}, data));
+    props.patchData({ url: value.trim() });
   }
 
   const loadFromUserURL = () => {
-    const { core, data, setData, setSelected, setError, cookies, setLoading, Models, } = props;
+    const { core, data, setSelected, setError, cookies, setLoading, patchData, beginLoad, Models } = props;
     const { isUrlAppOrigin, rememberUrl } = Models.Utils;
-    const name = 'KML';
-    let url = data.url || '';
+    const sourceUrl = data.url || '';
+    const crs = data.crs;
+    const invalidResponse = t("invalidResponse", "Não foi possível obter uma resposta válida.");
 
-    if (!url.trim()) return;
+    if (!sourceUrl.trim()) return;
 
-    if (!isUrlAppOrigin(url)) {
-      url = core.MAP_PROXY_URL + encodeURIComponent(url);
-    };
+    const url = isUrlAppOrigin(sourceUrl) ? sourceUrl : core.MAP_PROXY_URL + encodeURIComponent(sourceUrl);
+    const isCurrent = beginLoad();
     setLoading(true);
-
     fetch(url)
-      .then(res => res.text())
       .then(res => {
-        try {
-          parseString(res, function (err, kml) { 
-            data.dataitems = Models.OWSModel.convertKML2Themes(kml, data.url, res, data.crs);
-            if (data.dataitems && data.dataitems.length > 0) {
-              setLoading(false);
-              setData(Object.assign({}, data));
-              // Add to cookies history
-              if (cookies) rememberUrl(cookies, 'kml', data.url);              
-            } else {
-              throw Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
-            }
-          });
-        } catch (e) {
-          setLoading(false);
-          setError(''+e);
-        }          
+        if (!res.ok) throw new Error(invalidResponse);
+        return res.text();
+      })
+      .then(text => new Promise((resolve, reject) => {
+        parseString(text, (err, kml) => {
+          if (err) return reject(err);
+          const dataitems = Models.OWSModel.convertKML2Themes(kml, sourceUrl, text, crs);
+          if (!dataitems || !dataitems.length) return reject(new Error(invalidResponse));
+          resolve(dataitems);
+        });
+      }))
+      .then(dataitems => {
+        if (!isCurrent()) return;
+        patchData({ dataitems });
+        if (cookies) rememberUrl(cookies, 'kml', sourceUrl);
       })
       .catch(error => {
-        setData({ ...data, dataitems: [] });
+        if (!isCurrent()) return;
+        patchData({ dataitems: [] });
         setSelected({});
-        setLoading(false);
         setError(''+error);
       })
+      .finally(() => {
+        if (isCurrent()) setLoading(false);
+      });
   }
 
   /**
@@ -147,7 +89,7 @@ export default function KML(props) {
                   chooseLabel={t("choose", "Escolher")}
                   uploadLabel={t("load", "Carregar")}
                   cancelLabel={t("cancel", "Cancelar")}
-                  onUpload={async (files) => loadKMLFile({ files })}
+                  onUpload={(files) => loadKMLFile({ files })}
                 />
                 { (props.maxFileSize && props.maxFileSize > 0) ?
                 <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>

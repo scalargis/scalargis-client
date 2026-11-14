@@ -21,7 +21,7 @@ export default function ArcGISMap(props) {
    * Event handler for load ArcGIS Map Service capabilities
    */
   const loadArcGISMapCapabilities = () => {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
+    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -41,6 +41,8 @@ export default function ArcGISMap(props) {
       lurl = core.MAP_PROXY_URL + encodeURIComponent(lurl);
     }
 
+    const sourceUrl = data.url;
+    const isCurrent = beginLoad();
     setLoading(true);
 
     Promise.all([
@@ -58,16 +60,16 @@ export default function ArcGISMap(props) {
       }
       return capabilities;
     }).then((capabilities) => {
-      const dataitems = Models.OWSModel.convertArcGISMap2Themes(capabilities, data.url, options);
-      setData({ ...data, dataitems });        
-
-      // Add to cookies history
-      if (cookies) rememberUrl(cookies, 'arcgismap', data.url);
-      setLoading(false);
+      const dataitems = Models.OWSModel.convertArcGISMap2Themes(capabilities, sourceUrl, options);
+      if (!isCurrent()) return;
+      patchData({ dataitems });
+      if (cookies) rememberUrl(cookies, 'arcgismap', sourceUrl);
     }).catch((error) => {
-      setData({ ...data, dataitems: [] });
-      setLoading(false);
+      if (!isCurrent()) return;
+      patchData({ dataitems: [] });
       setError(''+error);
+    }).finally(() => {
+      if (isCurrent()) setLoading(false);
     });
   }
 

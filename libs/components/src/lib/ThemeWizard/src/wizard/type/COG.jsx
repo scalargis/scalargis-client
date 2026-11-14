@@ -11,7 +11,7 @@ import { I18N_NAMESPACE } from './../../i18n/index';
 
 export default function COG(props) {
 
-  const { core, auth, mainMap, viewer, data, loading, setLoading, setData, setError, editField, cookies, Models } = props;
+  const { core, auth, mainMap, viewer, data, loading, setLoading, setData, patchData, beginLoad, setError, editField, cookies, Models } = props;
   const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
   const { hasProjection, addProjections } = Models.MapModel;
   const { getCOGImageProjCode } = Models.OWSModel;
@@ -48,13 +48,15 @@ export default function COG(props) {
       }
     }
 
+    const sourceUrl = data.url;
+    const isCurrent = beginLoad();
     setLoading(true);
 
     let proxyRequests = false;
 
     GeoTIFFLib.fromUrl(url)
     .catch(error => {
-      if (isUrlAppOrigin(url)) throw new error();
+      if (isUrlAppOrigin(url)) throw error;
 
       proxyRequests = true;
 
@@ -97,23 +99,24 @@ export default function COG(props) {
       }
 
       // Extract filename from url path
-      const baseUrl = data.url.indexOf('?') === -1 ? data.url : data.url.slice(0, data.url.indexOf('?'));
+      const baseUrl = sourceUrl.indexOf('?') === -1 ? sourceUrl : sourceUrl.slice(0, sourceUrl.indexOf('?'));
       const [...parts] = baseUrl.split('/');
       const filename = parts.pop();
 
-      const dataitems = Models.OWSModel.convertCOG2Themes(image, data.url, filename, proxyRequests, options);
-      setData({ ...data, options, dataitems });
+      const dataitems = Models.OWSModel.convertCOG2Themes(image, sourceUrl, filename, proxyRequests, options);
+      if (!isCurrent()) return;
+      patchData({ options, dataitems });
 
       // Add to cookies history
-      if (cookies) rememberUrl(cookies, 'cog', data.url);
+      if (cookies) rememberUrl(cookies, 'cog', sourceUrl);
       
     }).catch((error) => {
+      if (!isCurrent()) return;
       console.log(error);
-      setData({ ...data, dataitems: [] });
-      setLoading(false);
+      patchData({ dataitems: [] });
       setError('' + error);
     }).finally(()=>{
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     });
   }
 

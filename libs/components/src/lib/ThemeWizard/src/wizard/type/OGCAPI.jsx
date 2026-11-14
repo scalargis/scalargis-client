@@ -30,7 +30,7 @@ export default function OGCAPI(props) {
    * Event handler for load OGC API collections
    */
   const loadCollections = () => {
-    const { core, data, setLoading, setData, setSelected, setError, cookies, Models } = props;
+    const { core, data, setLoading, patchData, beginLoad, setSelected, setError, cookies, Models } = props;
     const { isUrlAppOrigin, rememberUrl } = Models.Utils;
 
     const base = serviceBase(data.url);
@@ -41,6 +41,8 @@ export default function OGCAPI(props) {
       url = core.MAP_PROXY_URL + encodeURIComponent(url);
     }
 
+    const sourceUrl = data.url;
+    const isCurrent = beginLoad();
     setLoading(true);
     fetch(url)
       .then(res => {
@@ -56,18 +58,19 @@ export default function OGCAPI(props) {
         const dataitems = Models.OWSModel.convertOGCAPI2Themes(json, base, options);
         const total = (json?.collections || []).length;
         const skipped = total - dataitems.length;
-
-        setData({ ...data, dataType: undefined, dataitems, ogcSkipped: skipped });
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems, ogcSkipped: skipped });
         setSelected({});
-
-        if (cookies) rememberUrl(cookies, 'ogcapi', data.url);
-        setLoading(false);
+        if (cookies) rememberUrl(cookies, 'ogcapi', sourceUrl);
       })
       .catch(error => {
-        setData({ ...data, dataType: undefined, dataitems: [], ogcSkipped: 0 });
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems: [], ogcSkipped: 0 });
         setSelected({});
         setError('' + error);
-        setLoading(false);
+      })
+      .finally(() => {
+        if (isCurrent()) setLoading(false);
       });
   }
 

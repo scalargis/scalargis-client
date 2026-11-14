@@ -24,7 +24,7 @@ export default function WMTS(props) {
    * @param {Object} e The click handler
    */
   const loadWMTSCapabilities = () => {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
+    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -60,37 +60,31 @@ export default function WMTS(props) {
       turl = core.MAP_PROXY_URL + encodeURIComponent(turl);
     };
 
+    const sourceUrl = data.url;
+    const isCurrent = beginLoad();
     setLoading(true);
     fetch(turl)
-    .then(res => {
-      if (!res.ok) throw Error(res.statusText);
-      return res;
-    })
-    .then(res => res.text())
-    .then((r) => {
-      try {
+      .then(res => {
+        if (!res.ok) throw Error(res.statusText);
+        return res.text();
+      })
+      .then((r) => {
         const parser = new WMTSCapabilities();
         const wmts = parser.read(r);
-        const dataitems = Models.OWSModel.convertWMTS2Themes(wmts, data.url, options);
-        data.wmtsTileMatrixSet = [];
-        if (wmts.Contents && wmts.Contents.TileMatrixSet) {
-          data.wmtsTileMatrixSet = wmts.Contents.TileMatrixSet.map(m => ({ Identifier: m.Identifier, SupportedCRS: m.SupportedCRS }));
-        }
-        setData({ ...data, dataType: undefined, dataitems });
-
-        // Add to cookies history
-        if (cookies) rememberUrl(cookies, 'wmts', data.url);
-        setLoading(false);
-
-      } catch (e) {
-        setError(''+e);
-        setLoading(false);
-      }
-    }).catch((error) => {
-      setData({ ...data, dataType: undefined, dataitems: [] });
-      setError(''+error);
-      setLoading(false);
-    });
+        const dataitems = Models.OWSModel.convertWMTS2Themes(wmts, sourceUrl, options);
+        const wmtsTileMatrixSet = (wmts.Contents && wmts.Contents.TileMatrixSet)
+          ? wmts.Contents.TileMatrixSet.map(m => ({ Identifier: m.Identifier, SupportedCRS: m.SupportedCRS }))
+          : [];
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems, wmtsTileMatrixSet });
+        if (cookies) rememberUrl(cookies, 'wmts', sourceUrl);
+      }).catch((error) => {
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems: [] });
+        setError(''+error);
+      }).finally(() => {
+        if (isCurrent()) setLoading(false);
+      });
   }
 
 
