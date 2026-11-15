@@ -67,6 +67,7 @@ export default function PrintPanelItem(props) {
   const [freeScale, setFreeScale] = useState(null);
 
   const [isPrinting, setIsPrinting] = useState(false);
+  const printStarted = useRef(false);
   const [geometryError, setGeometryError] = useState(false);
 
   const [printFile, setPrintFile] = useState(null);
@@ -215,7 +216,17 @@ export default function PrintPanelItem(props) {
     props.changeActivePanel('p1');
   }
 
-  async function doPrint() {  //---------------------------------------------------------------------------------- DO PRINT
+  async function doPrint() {
+    if (printStarted.current) return;
+    printStarted.current = true;
+    try {
+      await startPrint();
+    } finally {
+      printStarted.current = false;
+    }
+  }
+
+  async function startPrint() {  //---------------------------------------------------------------------------------- DO PRINT
 
     // trigger() forces react-hook-form to validate the (still-untouched) fields
     // so their required errors actually paint — the flat `fields` gate below only
