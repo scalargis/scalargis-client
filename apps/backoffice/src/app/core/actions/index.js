@@ -45,11 +45,11 @@ function writeAuthCookie(auth) {
   });
 }
 
-/** Removes the auth cookie and the redux session. */
+/** Removes the auth cookie and the redux session, and keeps the removed token as ended. */
 export function session_clear() {
-  return function (dispatch) {
+  return function (dispatch, getState) {
     new Cookies().remove(cookieAuthName, { path: '/' });
-    dispatch({ type: AUTH_LOGOUT });
+    dispatch({ type: AUTH_LOGOUT, ended: getState().auth?.data?.token });
   }
 }
 

@@ -12,9 +12,11 @@ function currentRoute() {
     return path + window.location.search;
 }
 
-/** Asks the account route if the token is dead, and on a 401 clears the session and opens the login form. */
+/** Resolves false for a dead token: a 401 of the account route clears the session and opens the login form. */
 export function checkSession(token) {
-    if (!token || core.getLoggedUser()?.token !== token) return Promise.resolve(true);
+    if (!token) return Promise.resolve(true);
+    if (core.store.getState()?.auth?.ended === token) return Promise.resolve(false);
+    if (core.getLoggedUser()?.token !== token) return Promise.resolve(true);
     if (!sessionProbe) {
         sessionProbe = fetch(getAppApiUrl() + '/security/account', { headers: { 'X-API-KEY': token } })
             .then(res => {
@@ -93,17 +95,13 @@ export const fetchJson = (url, options = {}) => {
             } catch (e) {
                 // not json, no big deal
             }
-            if (status === 401 && requestHeaders.has('X-API-KEY')) {
-                checkSession(requestHeaders.get('X-API-KEY'));
-            }
             if (status < 200 || status >= 300) {
-                return Promise.reject(
-                    new HttpError(
-                        (json && json.message) || statusText,
-                        status,
-                        json
-                    )
-                );
+                const error = new HttpError((json && json.message) || statusText, status, json);
+                if (status === 401 && requestHeaders.has('X-API-KEY')) {
+                    return checkSession(requestHeaders.get('X-API-KEY'))
+                        .then(alive => alive ? Promise.reject(error) : new Promise(() => undefined));
+                }
+                return Promise.reject(error);
             }
             return Promise.resolve({ status, headers, body, json });
         });

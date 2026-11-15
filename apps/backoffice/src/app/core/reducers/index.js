@@ -97,7 +97,7 @@ const reducer = (
     case AUTH_LOGOUT:
       return {
         ...state,
-        auth: {}
+        auth: { ended: action.ended }
       }
 
     // Update user auth
