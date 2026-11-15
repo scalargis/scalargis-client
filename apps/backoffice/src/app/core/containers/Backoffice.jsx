@@ -3,6 +3,7 @@ import { connect, useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import AppContext from '../../AppContext';
 import Layout from './Layout';
+import PageBootError from '../components/PageBootError';
 
 /**
  * Backoffice layout container
@@ -21,7 +22,7 @@ function Backoffice(props) {
     params
   }
 
-  const { dispatch, loading, backoffice, config } = props;
+  const { dispatch, loading, backoffice, config, bootError } = props;
   //const history = useHistory();
 
   // Enable redux actions
@@ -38,6 +39,10 @@ function Backoffice(props) {
   // TODO: improve loading UI
   if (loading) return null;
 
+  if (bootError) {
+    return <PageBootError error={bootError} onRetry={() => dispatch(backoffice_load(core, history))} />;
+  }
+
   return (
     <Layout
       history={history}
@@ -51,4 +56,4 @@ function Backoffice(props) {
   );
 }
 
-export default connect(state => ({ backoffice: state.backoffice }))(Backoffice);
+export default connect(state => ({ backoffice: state.backoffice, bootError: state.bootError }))(Backoffice);

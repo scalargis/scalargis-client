@@ -7,6 +7,7 @@ import {
   LAYOUT_SET_MODE,
   LAYOUT_SET_COLORMODE,
   BACKOFFICE_LOAD,
+  BACKOFFICE_LOAD_ERROR,
   BACKOFFICE_LOAD_COMPONENTS,
   BACKOFFICE_UNLOAD_COMPONENTS,
   BACKOFFICE_LOAD_DONE,
@@ -36,6 +37,7 @@ const cookieAuthName = getCookieAuthName();
 const reducer = (
   state = { 
     loading: true,
+    bootError: null,
     auth: { data: cookies.get(cookieAuthName)},
     config: null,
     backoffice: initialBackoffice,
@@ -104,7 +106,14 @@ const reducer = (
     case BACKOFFICE_LOAD:
       return {
         ...state,
-        loading: true
+        loading: true,
+        bootError: null
+      }
+
+    case BACKOFFICE_LOAD_ERROR:
+      return {
+        ...state,
+        bootError: action.error
       }
 
     // Set viewer config
