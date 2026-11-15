@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router';
 import { ActionIcon, Button, Group, Select, TextInput } from '@mantine/core';
@@ -7,6 +7,7 @@ import { DataGrid, confirm, notify, IconCheck, IconX, IconPencil, IconTrash, Ico
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
 import PageSection from '../common/PageSection';
+import useListSearch from '../common/useListSearch';
 
 
 const initialSearchParams = {
@@ -16,10 +17,6 @@ const initialSearchParams = {
   filters: { id: '', username: '', email: '', name: '', active: true }
 };
 
-// ?? not ||: the active filter is a boolean, and false must not collapse into ''.
-const sameFilters = (a, b) =>
-  Object.keys(initialSearchParams.filters).every((k) => (a?.[k] ?? '') === (b?.[k] ?? ''));
-
 
 function UserList(props) {
   // Routing
@@ -28,40 +25,19 @@ function UserList(props) {
 
   const { core } = useContext(AppContext);
 
-  const [fetching, setFetching] = useState(false);
-  const [records, setRecords] = useState([]);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [selectedRecords, setSelectedRecords] = useState([]);
-
-  // One object so the list⇄form navigation round-trip (previousSearchParams)
-  // keeps working unchanged.
-  const [searchParams, setSearchParams] = useState(() =>
-    location?.state?.searchParams ? { ...location.state.searchParams } : { ...initialSearchParams }
-  );
-  // Text the user is typing; committed into searchParams after the debounce.
-  const [filterDraft, setFilterDraft] = useState(searchParams.filters);
-
   const API_URL = core.API_URL;
 
-  useEffect(() => {
-    loadData();
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (sameFilters(filterDraft, searchParams.filters)) return;
-
-    const handler = setTimeout(() => {
-      setSearchParams((sp) => ({ ...sp, filters: { ...filterDraft }, page: 1 }));
-    }, 500);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [filterDraft, searchParams.filters]);
+  const { filterDraft, setFilterDraft, commitFilters, clearFilters, selectedRecords, reload, currentSearchParams, gridProps } = useListSearch({
+    initialSearchParams,
+    restoredSearchParams: location?.state?.searchParams,
+    fetchList: (params) => dataProvider(API_URL + '/security').getList('users', params),
+    errorTitle: 'Pesquisa de Utilizadores'
+  });
 
   const newRecord = () => {
     const state = {
       from: location.pathname,
-      previousSearchParams: {...searchParams}
+      previousSearchParams: currentSearchParams()
     }
     navigate('/security/users/create', { state });
   }
@@ -69,7 +45,7 @@ function UserList(props) {
   const editRecord = (record) => {
     const state = {
       from: location.pathname,
-      previousSearchParams: {...searchParams}
+      previousSearchParams: currentSearchParams()
     }
     navigate(`/security/users/edit/${record.id}`, { state });
   }
@@ -88,7 +64,7 @@ function UserList(props) {
         }
         provider.deleteMany('users', params).then(d => {
           notify.success('Eliminar Registo(s)', 'Registo(s) eliminado(s) com sucesso');
-          loadData();
+          reload();
         }).catch(e => {
           notify.error('Eliminar Registo(s)', 'Ocorreu um erro ao eliminar o(s) registo(s)');
         });
@@ -110,7 +86,7 @@ function UserList(props) {
         }
         provider.delete('users', params).then(d => {
           notify.success('Eliminar Registo', 'Registo eliminado com sucesso');
-          loadData();
+          reload();
         }).catch(e => {
           notify.error('Eliminar Registo', 'Ocorreu um erro ao eliminar o registo');
         });
@@ -118,51 +94,14 @@ function UserList(props) {
     });
   }
 
-  const loadData = () => {
-    const provider = dataProvider(API_URL + '/security');
-
-    const _filter = {};
-    Object.entries(searchParams.filters || {}).forEach(([key, value]) => {
-      // active: false is a real filter value; only '' and null mean "not set".
-      if (value !== '' && value != null) {
-        _filter[key] = value;
-      }
-    });
-
-    const params = {
-      pagination: { page: searchParams.page, perPage: searchParams.pageSize },
-      sort: {
-        field: searchParams.sortStatus.columnAccessor,
-        order: searchParams.sortStatus.direction === 'desc' ? 'Desc' : 'Asc'
-      },
-      filter: _filter
-    }
-
-    setFetching(true);
-
-    provider.getList('users', params).then(d => {
-      setSelectedRecords([]);
-      setRecords(d.data);
-      setTotalRecords(d.total);
-      setFetching(false);
-    }).catch(e => {
-      setFetching(false);
-      notify.error('Pesquisa de Utilizadores', 'Ocorreu um erro na pesquisa');
-    });
-  }
-
   const onFilterClear = () => {
-    setFilterDraft({ ...initialSearchParams.filters });
-    setSearchParams({ ...initialSearchParams });
+    clearFilters();
   }
 
-  // Select commits immediately (only text filters ride the debounce), taking
-  // any pending text draft along with it.
   const onActiveFilterChange = (value) => {
     const active = value == null ? null : value === 'true';
     const filters = { ...filterDraft, active };
-    setFilterDraft(filters);
-    setSearchParams((sp) => ({ ...sp, filters, page: 1 }));
+    commitFilters(filters);
   }
 
   const columns = useMemo(
@@ -297,16 +236,7 @@ function UserList(props) {
     >
       <DataGrid
         idAccessor="id"
-        records={records}
-        totalRecords={totalRecords}
-        fetching={fetching}
-        page={searchParams.page}
-        onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
-        recordsPerPage={searchParams.pageSize}
-        sortStatus={searchParams.sortStatus}
-        onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
-        selectedRecords={selectedRecords}
-        onSelectedRecordsChange={setSelectedRecords}
+        {...gridProps}
         isRecordSelectable={(record) => !record.read_only}
         columns={columns}
         noRecordsText="Não foram encontrados registos."
