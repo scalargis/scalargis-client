@@ -4,6 +4,7 @@ import { CollapsiblePanel, useIsMobile, IconBullseye } from '@scalargis/ui'
 
 import { MainMenuButton } from '../../components'
 import { MAPCONTROL_NAME } from './utils'
+import { mapToolOff } from '../../utils/mapTools'
 import Coordinates from './Coordinates'
 import './style.css'
 
@@ -35,7 +36,7 @@ export function MainMenu({ className, config, actions, record }) {
         if (exclusive_mapcontrol !== MAPCONTROL_NAME) {
           config.dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
         } else {
-          config.dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+          config.dispatch(mapToolOff(actions, viewer, MAPCONTROL_NAME));
         }
       }}
     />
@@ -47,7 +48,6 @@ export default function Main({ as, core, config, actions, record }) {
   const { viewer, dispatch, Models } = config;
   const { showOnPortal } = Models.Utils;
   const { selected_menu } = viewer.config_json;
-  const { exclusive_mapcontrol } = viewer;
 
   const component_cfg = record.config_json || {};
 
@@ -58,12 +58,9 @@ export default function Main({ as, core, config, actions, record }) {
 
   const isMobile = useIsMobile();
 
-  // Arming on the way in is only half of it: whoever armed the control has to
-  // release it on the way out, or the tool stays live on the map under the next
-  // menu. Only ever released when it is still ours to release.
   useEffect(() => {
     if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
-    else if (exclusive_mapcontrol === MAPCONTROL_NAME) dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+    else dispatch(actions.viewer_release_exclusive_mapcontrol(MAPCONTROL_NAME));
   }, [selected_menu]);
 
   useEffect(() => {

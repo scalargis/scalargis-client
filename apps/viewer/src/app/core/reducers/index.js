@@ -14,7 +14,8 @@ import {
   VIEWER_SET_CONFIG,
   VIEWER_SET_CONFIGJSON,
   VIEWER_SET_SELECTEDMENU,
-  VIEWER_SET_EXCUSIVE_MAPCONTROL,
+  VIEWER_SET_EXCLUSIVE_MAPCONTROL,
+  VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL,
   LAYERS_UPDATE_THEME,
   LAYERS_REMOVE_ITEMS,
   MAP_SET_EXTENT,
@@ -309,7 +310,7 @@ const root = (
         }
       }
 
-    case VIEWER_SET_EXCUSIVE_MAPCONTROL:
+    case VIEWER_SET_EXCLUSIVE_MAPCONTROL:
       return {
         ...state,
         viewer: {
@@ -317,6 +318,18 @@ const root = (
           exclusive_mapcontrol: action.exclusive_mapcontrol
         }
       }
+
+    case VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL: {
+      const next = state.viewer.default_mapcontrol || null;
+      if (state.viewer.exclusive_mapcontrol !== action.exclusive_mapcontrol || next === action.exclusive_mapcontrol) return state;
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          exclusive_mapcontrol: next
+        }
+      }
+    }
 
     case VIEWER_SET_LOCALE:
       return {

@@ -20,6 +20,11 @@ export function MainMenu({ className, core, config, actions, record }) {
 
   const [showPopup, { open, close }] = useDisclosure(false);
 
+  const closePopup = () => {
+    dispatch(actions.viewer_release_exclusive_mapcontrol(MAPCONTROL_NAME));
+    close();
+  };
+
   const component_cfg = record.config_json || {};
   const headerCfg = component_cfg?.header;
   const title = headerCfg
@@ -42,8 +47,8 @@ export function MainMenu({ className, core, config, actions, record }) {
         <Dialog
           title={header}
           opened={showPopup}
-          onClose={close}
-          footer={<Button onClick={close}>{closeLabel}</Button>}>
+          onClose={closePopup}
+          footer={<Button onClick={closePopup}>{closeLabel}</Button>}>
 
           <Print
             core={core}
@@ -87,6 +92,7 @@ export default function Main({ type, region, as, core, config, actions, record, 
 
   useEffect(() => {
     if (selected_menu === record.id) dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
+    else dispatch(actions.viewer_release_exclusive_mapcontrol(MAPCONTROL_NAME));
   }, [selected_menu]);
 
   // Render content

@@ -5,6 +5,7 @@ import { CollapsiblePanel, IconPlusCircle } from '@scalargis/ui';
 import { v4 as uuidV4 } from 'uuid';
 
 import { i18n, MainMenuButton } from '../../components';
+import { findComponentId } from '../../utils/mapTools';
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index';
 import WizardStepType from './wizard/stepType';
 import WizardStepData from './wizard/stepData';
@@ -228,7 +229,7 @@ export default function Main(props) {
       // Reset
       reset();
       setActiveIndex(0);
-      dispatch(viewer_set_selectedmenu('toc'));
+      dispatch(viewer_set_selectedmenu(findComponentId(viewer, 'TOC') || 'toc'));
     }
 
     // TODO: Reset wizard?

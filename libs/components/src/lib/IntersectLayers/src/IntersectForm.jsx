@@ -25,7 +25,7 @@ import { i18n, DrawingToolbar } from '../../components';
 
 import IntersectResults from './IntersectResults';
 
-import { DEFAULT_DRAWING_TOOLS } from './utils';
+import { DEFAULT_DRAWING_TOOLS, MAPCONTROL_NAME } from './utils';
 
 import './style.css';
 
@@ -303,9 +303,10 @@ export default function IntersectForm(props) {
 
   useEffect(() => {
     if (drawTool) {
-      dispatch(actions.viewer_set_exclusive_mapcontrol('Print'));
+      dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
       addInteraction(drawTool);
     } else {
+      dispatch(actions.viewer_release_exclusive_mapcontrol(MAPCONTROL_NAME));
       if (draw) {
         mainMap.removeInteraction(draw);
         setDraw(null);
@@ -318,18 +319,13 @@ export default function IntersectForm(props) {
 
 
   useEffect(() => {
-    if (viewer?.config_json?.selected_menu != componentId) {
-      if (copyGeometry.current) {
-        const _drawTool = drawTool || "";
-        if (_drawTool.toLocaleLowerCase() == "copy") {
-          setDrawTool(null);
-        }
-      }
+    if (viewer?.config_json?.selected_menu != componentId && drawTool) {
+      setDrawTool(null);
     }
   },  [viewer?.config_json?.selected_menu]);
 
   useEffect(() => {
-    if (drawTool && exclusive_mapcontrol != 'Print') {
+    if (drawTool && exclusive_mapcontrol !== MAPCONTROL_NAME) {
       setDrawTool(null);
     }
   }, [exclusive_mapcontrol]);

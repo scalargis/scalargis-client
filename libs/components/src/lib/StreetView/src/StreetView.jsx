@@ -19,6 +19,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 
 import { I18N_NAMESPACE } from './i18n/index';
+import { MAP_TOOLS, mapToolOff } from '../../utils/mapTools';
 import './style.css';
 
 
@@ -135,7 +136,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
   useEffect(() => {
     if (!exclusive_mapcontrol) return;
 
-    if (exclusive_mapcontrol === 'StreetView') mainMap.on('singleclick', streetviewSingleClick);
+    if (exclusive_mapcontrol === MAP_TOOLS.STREET_VIEW) mainMap.on('singleclick', streetviewSingleClick);
     else mainMap.un('singleclick', streetviewSingleClick);
 
     return () => {
@@ -187,7 +188,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
 
     let tooltipTimer;
 
-    if (exclusive_mapcontrol === 'StreetView') {
+    if (exclusive_mapcontrol === MAP_TOOLS.STREET_VIEW) {
       createHelpTooltip();
       mainMap.on('pointermove', pointerMoveHandler.current);
       mainMap.getViewport().addEventListener('mouseout', onMouseOutViewport);
@@ -201,7 +202,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
 
     return () => {
       if (tooltipTimer) clearTimeout(tooltipTimer);
-      if (exclusive_mapcontrol === 'StreetView') {
+      if (exclusive_mapcontrol === MAP_TOOLS.STREET_VIEW) {
         mainMap.un('pointermove', pointerMoveHandler.current);
         mainMap.getViewport().removeEventListener('mouseout', onMouseOutViewport);
       }
@@ -212,8 +213,8 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
 
   // Toggle StreetView control
   function toggleStreetViewControl() {
-    if (exclusive_mapcontrol !== 'StreetView') {
-      dispatch(viewer_set_exclusive_mapcontrol('StreetView'));
+    if (exclusive_mapcontrol !== MAP_TOOLS.STREET_VIEW) {
+      dispatch(viewer_set_exclusive_mapcontrol(MAP_TOOLS.STREET_VIEW));
       dispatch(viewer_add_notification({
         group: "viewer",
         message: {
@@ -223,7 +224,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
         }
       }));
     } else {
-      dispatch(viewer_set_exclusive_mapcontrol(null));
+      dispatch(mapToolOff(actions, viewer, MAP_TOOLS.STREET_VIEW));
       dispatch(viewer_add_notification({
         group: "viewer",
         message: {
@@ -391,7 +392,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
         <MapToolButton
           title={title}
           icon="fas fa-street-view"
-          active={exclusive_mapcontrol === 'StreetView'}
+          active={exclusive_mapcontrol === MAP_TOOLS.STREET_VIEW}
           onClick={e => { e.currentTarget.blur(); toggleStreetViewControl() }}
         />
       </div>
@@ -413,9 +414,7 @@ export default function StreetView({ core, viewer, mainMap, dispatch, actions, r
           }
           if (panorama?.current) panorama.current = null;
           closeStreetView();
-          if (exclusive_mapcontrol === 'StreetView') {
-            dispatch(viewer_set_exclusive_mapcontrol(null));
-          }
+          dispatch(actions.viewer_release_exclusive_mapcontrol(MAP_TOOLS.STREET_VIEW));
         }}>
         <div ref={setPanoNode} style={{ width: '100%', height: '100%' }} />
       </Dialog>

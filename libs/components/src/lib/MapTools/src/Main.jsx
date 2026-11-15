@@ -4,6 +4,7 @@ import { CollapsiblePanel, useIsMobile } from '@scalargis/ui';
 import { MainMenuButton, MapToolButton } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
+import { mapToolOff } from '../../utils/mapTools';
 import MapTools from './MapTools';
 
 
@@ -31,8 +32,8 @@ export function MainMenu({ className, config, actions, record }) {
       onClick={e => {
         if (selected_menu !== record.id) {
           config.dispatch(actions.viewer_set_selectedmenu(record.id));
-        } else if (exclusive_mapcontrol === MAPCONTROL_NAME) {
-          config.dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+        } else {
+          config.dispatch(mapToolOff(actions, viewer, MAPCONTROL_NAME));
         }
       }}
     />
@@ -61,7 +62,7 @@ export default function Main(props) {
 
 
   useEffect(() => {
-    if (selected_menu === 'maptools') dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+    if (selected_menu !== record.id) dispatch(actions.viewer_release_exclusive_mapcontrol(MAPCONTROL_NAME));
   }, [selected_menu]);
 
   function renderContent() {

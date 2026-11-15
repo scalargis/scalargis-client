@@ -3,6 +3,7 @@ import { useTranslation} from "react-i18next"
 import { CollapsiblePanel, IconPalette } from '@scalargis/ui'
 import { MainMenuButton, MapToolButton } from '../../components'
 import DrawTools from './DrawTools'
+import { MAP_TOOLS } from '../../utils/mapTools'
 
 /**
  * Main menu component
@@ -17,7 +18,7 @@ export function MainMenu({ className, config, actions, record }) {
 
   const title = record.title || t("drawingTools", "Ferramentas de Desenho");
 
-  const isInactive = selected_menu === record.id && exclusive_mapcontrol !== 'DrawTools';
+  const isInactive = selected_menu === record.id && exclusive_mapcontrol !== MAP_TOOLS.DRAW_TOOLS;
 
   return (
     <MainMenuButton
@@ -47,7 +48,7 @@ export default function Main({ type, region, as, config, actions, record, utils 
   const isMobile = wsize[0] <= 768;
 
   useEffect(() => {
-    if (selected_menu === 'drawtools') dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+    if (selected_menu !== record.id) dispatch(actions.viewer_release_exclusive_mapcontrol(MAP_TOOLS.DRAW_TOOLS));
   }, [selected_menu])
 
 

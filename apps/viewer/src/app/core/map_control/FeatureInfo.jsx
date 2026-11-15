@@ -45,6 +45,7 @@ export default function FeatureInfo({ core, config, actions }) {
   const { viewer, mainMap, dispatch } = config;
   const { featureinfo } = viewer;
   const feature_info_control = viewer.config_json.map_controls.find(c => c.id === 'FeatureInfo');
+  const featureInfoActive = !!feature_info_control && (feature_info_control.exclusive ? viewer.exclusive_mapcontrol === feature_info_control.id : !!feature_info_control.active);
   const feature_info_component = viewer.config_json.components.find(c => c?.config_json?.map_control === 'FeatureInfo');
   const layers = viewer.config_json.layers;
 
@@ -446,12 +447,12 @@ export default function FeatureInfo({ core, config, actions }) {
 
   useEffect(() => {
     if (!feature_info_control) return;
-    if (feature_info_control.active) mainMap.on('singleclick', selectSingleClick);
+    if (featureInfoActive) mainMap.on('singleclick', selectSingleClick);
     else mainMap.un('singleclick', selectSingleClick);
     return () => {
       mainMap.un('singleclick', selectSingleClick);
     }
-  }, [feature_info_control]);  
+  }, [feature_info_control, featureInfoActive]);  
 
   useEffect(() => {
     if (search) searchAll(search.coords, search.pixel);

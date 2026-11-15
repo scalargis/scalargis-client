@@ -36,7 +36,6 @@ function ViewerEmbedded(props) {
   // Get router props
   const { id } = params;
   const { viewer, notifications } = props;
-  const { exclusive_mapcontrol } = viewer;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
   
@@ -55,7 +54,7 @@ function ViewerEmbedded(props) {
   // Enable redux actions
   const dispatch = useDispatch();
   const { core, mainMap } = useContext(AppContext);
-  const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu, viewer_update_mapcontrols } = core.actions;
+  const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu } = core.actions;
 
   const gaTrackingId = import.meta.env.VITE_APP_GA_TRACKING_ID;
 
@@ -94,13 +93,6 @@ function ViewerEmbedded(props) {
     }
   }, [location]);
 
-  useEffect(() => {
-    if (!viewer.config_json) return;
-    const changed = viewer.config_json.map_controls
-      .filter(c => c.exclusive && !!c.active !== (c.id === exclusive_mapcontrol))
-      .map(c => ({ ...c, active: c.id === exclusive_mapcontrol }));
-    if (changed.length) dispatch(viewer_update_mapcontrols(changed));
-  }, [exclusive_mapcontrol]);
 
   let rlayers = ['overlays', 'main', 'background', 'basemaps'];
   if (viewer.config_json && viewer.config_json.root_layers && viewer.config_json.root_layers.length > 0) {

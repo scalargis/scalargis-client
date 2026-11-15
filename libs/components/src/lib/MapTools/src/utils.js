@@ -1,4 +1,6 @@
-export const MAPCONTROL_NAME = "MapTools";
+import { MAP_TOOLS } from '../../utils/mapTools';
+
+export const MAPCONTROL_NAME = MAP_TOOLS.MAP_TOOLS;
 
 /** Gives a length in metres as text: km with 2 decimals from 1 km, m with 2 decimals below. */
 export function defaultLengthText(length) {

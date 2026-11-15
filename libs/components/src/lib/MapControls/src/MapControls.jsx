@@ -3,6 +3,7 @@ import { useTranslation} from "react-i18next";
 import { Checkbox } from '@mantine/core';
 import { IconBullseye, IconInfoCircle, IconGlobe, IconList } from '@scalargis/ui';
 import { MapToolButton } from '../../components';
+import { MAP_TOOLS, mapToolOff, findComponentId } from '../../utils/mapTools';
 import ZoomToExtent from 'ol/control/ZoomToExtent';
 import DragBox from 'ol/interaction/DragBox';
 import {
@@ -21,9 +22,9 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
   const { exclusive_mapcontrol } = viewer;
   const coordinates_control = viewer.config_json.map_controls.find(c => c.id === 'Coordinates');
-  const coordinatesActive = !!coordinates_control?.active;
+  const coordinatesActive = !!coordinates_control && (coordinates_control.exclusive ? exclusive_mapcontrol === MAP_TOOLS.COORDINATES : !!coordinates_control.active);
   const feature_info_control = viewer.config_json.map_controls.find(c => c.id === 'FeatureInfo');
-  const featureInfoActive = !!feature_info_control?.active;
+  const featureInfoActive = !!feature_info_control && (feature_info_control.exclusive ? exclusive_mapcontrol === MAP_TOOLS.FEATURE_INFO : !!feature_info_control.active);
   const geo_location_control = viewer.config_json.map_controls.find(c => c.id === 'GeoLocation');
   // Coerced, not just defaulted - see the same lines in GeoLocation.jsx: a
   // control declared without a tracking key fed `checked={undefined}` to the
@@ -142,25 +143,24 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
 
   // Toggle coordinates control
   function toggleCoordinatesControl() {
-    const active = !coordinatesActive;
-    dispatch(viewer_update_mapcontrol({ ...coordinates_control, active }));
-    if (active) {
-      dispatch(viewer_set_selectedmenu('coordinates'));
-      dispatch(viewer_set_exclusive_mapcontrol('Coordinates'));
-    } else {
-      dispatch(viewer_set_exclusive_mapcontrol(null));
-    }
+    toggleExclusiveControl(coordinates_control, coordinatesActive, MAP_TOOLS.COORDINATES);
   }
 
   // Toggle feature info control
   function toggleFeatureInfoControl() {
-    const active = !featureInfoActive;
-    dispatch(viewer_update_mapcontrol({ ...feature_info_control, active }));
+    toggleExclusiveControl(feature_info_control, featureInfoActive, MAP_TOOLS.FEATURE_INFO);
+  }
+
+  /** Turns a map click tool on or off, and opens its menu when it turns on. */
+  function toggleExclusiveControl(control, isActive, name) {
+    const active = !isActive;
+    if (!control.exclusive) dispatch(viewer_update_mapcontrol({ ...control, active }));
     if (active) {
-      dispatch(viewer_set_selectedmenu('featureinfo'));
-      dispatch(viewer_set_exclusive_mapcontrol('FeatureInfo'));
+      const menuId = viewer.config_json.components.find(c => c?.config_json?.map_control === name)?.id || findComponentId(viewer, name);
+      if (menuId) dispatch(viewer_set_selectedmenu(menuId));
+      dispatch(viewer_set_exclusive_mapcontrol(name));
     } else {
-      dispatch(viewer_set_exclusive_mapcontrol(null));
+      dispatch(mapToolOff(actions, viewer, name));
     }
   }
 
@@ -182,7 +182,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         <MapToolButton key={type}
           title={coordinates_control.title || t("getCoordinates","Obter coordenadas")}
           icon={<IconBullseye />}
-          active={exclusive_mapcontrol === 'Coordinates'}
+          active={coordinatesActive}
           onClick={e => { e.currentTarget.blur(); toggleCoordinatesControl() }}
         /> : null;
     } else if (type === 'FeatureInfo') {
@@ -190,7 +190,7 @@ export default function MapControls({ viewer, mainMap, core, dispatch, actions, 
         <MapToolButton key={type}
           title={feature_info_control.title || t("identifyElements", "Identificar elementos")}
           icon={<IconInfoCircle />}
-          active={exclusive_mapcontrol === 'FeatureInfo'}
+          active={featureInfoActive}
           onClick={e => { e.currentTarget.blur(); toggleFeatureInfoControl() }}
         /> : null;
     } else if (type === 'GeoLocation') {

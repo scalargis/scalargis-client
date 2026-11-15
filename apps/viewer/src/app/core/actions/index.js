@@ -61,7 +61,8 @@ export const VIEWER_REMOVE_THEMES       = 'VIEWER_REMOVE_THEMES'
 export const VIEWER_SET_CONFIGJSON      = 'VIEWER_SET_CONFIGJSON'
 export const VIEWER_UPDATE_MAPCONTROL   = 'VIEWER_UPDATE_MAPCONTROL'
 export const VIEWER_UPDATE_MAPCONTROLS  = 'VIEWER_UPDATE_MAPCONTROLS'
-export const VIEWER_SET_EXCUSIVE_MAPCONTROL = 'VIEWER_SET_EXCUSIVE_MAPCONTROL'
+export const VIEWER_SET_EXCLUSIVE_MAPCONTROL = 'VIEWER_SET_EXCLUSIVE_MAPCONTROL'
+export const VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL = 'VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL'
 
 export const LAYOUT_WRAPPER_CLICK       = 'LAYOUT_WRAPPER_CLICK'
 export const LAYOUT_TOGGLE_OVERLAYMENU  = 'LAYOUT_TOGGLE_OVERLAYMENU'
@@ -633,7 +634,16 @@ export function viewer_set_selectedmenu(selected_menu) {
 
 export function viewer_set_exclusive_mapcontrol(exclusive_mapcontrol) {
   const action = {
-    type: VIEWER_SET_EXCUSIVE_MAPCONTROL,
+    type: VIEWER_SET_EXCLUSIVE_MAPCONTROL,
+    exclusive_mapcontrol
+  }
+  return action;
+}
+
+/** Gives the map back to the start tool of the viewer when the named tool still holds it. */
+export function viewer_release_exclusive_mapcontrol(exclusive_mapcontrol) {
+  const action = {
+    type: VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL,
     exclusive_mapcontrol
   }
   return action;
@@ -691,7 +701,8 @@ export function viewer_load(core, id, history) {
       config['featureinfo'] = [];
       config['geolocation'] = null;
       config['coordinates'] = [];
-      config['exclusive_mapcontrol'] = null;
+      config['default_mapcontrol'] = (config.config_json.map_controls || []).find(c => c.exclusive && c.active)?.id || null;
+      config['exclusive_mapcontrol'] = config['default_mapcontrol'];
       core.setConfig(config);
 
       if (config?.config_json?.show_menu === false || !config?.config_json?.selected_menu) {
