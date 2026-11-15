@@ -27,8 +27,23 @@ const DRAWER_REVEAL_MS = 320;
 const wait = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
+/** What the tour changed in the menu layout, shared by every reveal step of one viewer. */
+export interface RevealSession {
+  prior: string | null;
+  priorCaptured: boolean;
+  openedMobileDrawer: boolean;
+  openedSidebar: boolean;
+}
+
+/** A clean reveal session. */
+export function createRevealSession(): RevealSession {
+  return { prior: null, priorCaptured: false, openedMobileDrawer: false, openedSidebar: false };
+}
+
 /** The bits of the open viewer that the reveal hooks need at runtime. */
 export interface RevealHooksContext {
+  /** The reveal session; it outlives a rebuild of the steps. */
+  session: RevealSession;
   /** config_json.components[] */
   components: { type?: unknown; id?: unknown; target?: unknown }[];
   /** redux dispatch (core.store.dispatch) */
@@ -93,43 +108,31 @@ function attachOnePanelReveal(
   // way out the step's own after runs, then the prior menu is restored.
   const ownBefore = step.before;
   const ownAfter = step.after;
-  // The menu the user had selected before this step first revealed its panel.
-  // Captured once per tour session, never re-read (F8): a dismiss (pause) skips
-  // the after hook by design, so the panel stays open. If before re-read the
-  // selection on resume it would capture the tour's own open panel, and the next
-  // move would then restore to that panel, not to the user's original menu.
-  let prior: string | null = null;
-  let priorCaptured = false;
-  // Set only when this step opened the mobile drawer, so the after hook closes
-  // just the drawer it opened and never a drawer the user had open (bugs/04).
-  let openedMobileDrawer = false;
-  // Set only when this step opened the collapsed static sidebar, so the after
-  // hook collapses just the sidebar it opened. Without this the desktop reveal
-  // left the sidebar expanded after the tour and showed the default TOC panel.
-  let openedSidebar = false;
+  const session = ctx.session;
   step.before = async () => {
-    if (!priorCaptured) {
-      prior = ctx.getSelectedMenu();
-      priorCaptured = true;
+    if (!session.priorCaptured) {
+      session.prior = ctx.getSelectedMenu();
+      session.priorCaptured = true;
     }
     if (ctx.isMobile()) {
       // Mobile: the panel lives in the slide-in drawer, gated on
       // mobileMenuActive, not the static sidebar (bugs/04). Open the drawer,
       // select the menu, then wait for the slide so #content measures a
       // non-zero rect on screen instead of falling back to the center card.
-      if (ctx.isMobileMenuClosed()) {
+      const opening = ctx.isMobileMenuClosed();
+      if (opening) {
         ctx.openMobileMenu();
-        openedMobileDrawer = true;
+        session.openedMobileDrawer = true;
       }
       ctx.dispatch(ctx.setSelectedMenu(menuId));
-      if (openedMobileDrawer) await wait(DRAWER_REVEAL_MS);
+      if (opening) await wait(DRAWER_REVEAL_MS);
     } else {
       // Desktop: open the static sidebar first when it is collapsed, so the
       // panel content inside #content is no longer display:none and measures
       // to a non-zero rect (layout.scss :233).
       if (ctx.isSidebarClosed()) {
         ctx.showMenu();
-        openedSidebar = true;
+        session.openedSidebar = true;
       }
       ctx.dispatch(ctx.setSelectedMenu(menuId));
     }
@@ -137,24 +140,21 @@ function attachOnePanelReveal(
   };
   step.after = () => {
     if (ownAfter) ownAfter();
-    if (prior != null) {
-      ctx.dispatch(ctx.setSelectedMenu(prior));
+    if (session.prior != null) {
+      ctx.dispatch(ctx.setSelectedMenu(session.prior));
     }
     // Close the drawer this step opened, so a following map or topbar step is
     // not left behind the drawer overlay on mobile.
-    if (openedMobileDrawer) {
+    if (session.openedMobileDrawer) {
       ctx.closeMobileMenu();
-      openedMobileDrawer = false;
     }
     // Collapse the static sidebar this step opened, so leaving the tour on a
     // desktop panel step restores the sidebar the user had collapsed. Guard on
     // the live state so a sidebar the user reopened by hand is not toggled shut.
-    if (openedSidebar) {
-      if (!ctx.isSidebarClosed()) {
-        ctx.hideMenu();
-      }
-      openedSidebar = false;
+    if (session.openedSidebar && !ctx.isSidebarClosed()) {
+      ctx.hideMenu();
     }
+    Object.assign(session, createRevealSession());
   };
 }
 

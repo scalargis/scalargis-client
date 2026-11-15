@@ -24,3 +24,6 @@ export const POPOVER_Z = 9100;
  * this catches the near-empty case above zero.
  */
 export const LIVE_RECT_MIN_SIZE = 4;
+
+/** Animation frames the renderer waits for a target that is not registered yet before it skips the step. */
+export const LATE_TARGET_FRAMES = 3;

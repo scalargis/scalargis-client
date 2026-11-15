@@ -19,7 +19,7 @@ import type { OnboardingStep } from '@scalargis/ui';
 import { registerOnboardingTranslations } from './i18n';
 import { selectBaseTourSteps, enabledComponentTypes } from './membership';
 import type { ConditionContext } from './conditions';
-import { attachRevealHooks, attachPanelRevealForType } from './hooks';
+import { attachRevealHooks, attachPanelRevealForType, createRevealSession } from './hooks';
 import type { RevealHooksContext } from './hooks';
 import { applyTourSections, tourSections } from './sections';
 
@@ -71,6 +71,7 @@ export function useOnboardingSteps(
   const selfKey = Object.keys(selfMap).sort().join('|');
   const sections = tourSections(viewer?.config_json);
   const sectionsKey = sections ? sections.join('|') : '';
+  const revealSession = useMemo(() => createRevealSession(), [viewerId]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => {
@@ -94,6 +95,7 @@ export function useOnboardingSteps(
 
     if (core?.store && core?.actions?.viewer_set_selectedmenu) {
       const revealCtx: RevealHooksContext = {
+        session: revealSession,
         components: (viewer?.config_json?.components || []) as RevealHooksContext['components'],
         dispatch: (a: unknown) => core.store!.dispatch!(a),
         setSelectedMenu: (id: string) => core.actions!.viewer_set_selectedmenu!(id),
@@ -153,5 +155,5 @@ export function useOnboardingSteps(
     // parts and their order.
     const merged = sections ? applyTourSections(baseSteps, selfByType, sections) : [...baseSteps, ...selfSteps];
     return merged.sort(byOrder);
-  }, [viewerId, typesKey, token, isOwner, selfKey, sectionsKey, core]);
+  }, [viewerId, typesKey, token, isOwner, selfKey, sectionsKey, core, revealSession]);
 }
