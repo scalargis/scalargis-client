@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useTranslation } from "react-i18next"
 import VectorLayer from 'ol/layer/Vector'
 import { Vector } from 'ol/source';
 import OlVectorTileLayer from "ol/layer/VectorTile";
@@ -49,11 +48,10 @@ export default function FeatureInfo({ core, config, actions }) {
   const feature_info_component = viewer.config_json.components.find(c => c?.config_json?.map_control === 'FeatureInfo');
   const layers = viewer.config_json.layers;
 
-  const { t } = useTranslation();
-
   const [search, setSearch] = useState(null);
 
   const selectionLayer = useRef();
+  const searchSeq = useRef(0);
 
   const utils = new FeatureInfoUtils(core);
   
@@ -64,17 +62,30 @@ export default function FeatureInfo({ core, config, actions }) {
 
   function searchAll(coordinate, pixel) {
 
+    const seq = ++searchSeq.current;
     const acc = [];
     const features = [];
     let ogcFound = 0;
+    let pending = 0;
 
     let frame = null;
     const publish = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
         frame = null;
-        dispatch(actions.viewer_set_featureinfo(acc));
+        if (seq !== searchSeq.current) return;
+        dispatch(actions.viewer_set_featureinfo(acc, pending > 0));
       });
+    };
+    const track = () => {
+      pending++;
+      let ended = false;
+      return () => {
+        if (ended) return;
+        ended = true;
+        pending--;
+        publish();
+      };
     };
 
     // Display vector feature
@@ -168,6 +179,7 @@ export default function FeatureInfo({ core, config, actions }) {
           bbox = transformExtent([coordinate[0] - buffer, coordinate[1] - buffer,coordinate[0] + buffer, coordinate[1] + buffer], mainMap.getView().getProjection().getCode(), nativeCRS);
         }
 
+        const done = track();
         utils.getOGCAPIFeaturesFilterByCQL(
           url,
           filter,
@@ -194,7 +206,8 @@ export default function FeatureInfo({ core, config, actions }) {
           publish(); 
 
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log(err))
+        .finally(done);
       } else {
         const nativeCRS = item.layer.get("datasource").crs || 'EPSG:4326';
         //replace based on XY coordinates
@@ -202,6 +215,7 @@ export default function FeatureInfo({ core, config, actions }) {
         filter = filter.replaceAll('{X}', coords[0]);
         filter = filter.replaceAll('{Y}', coords[1]);
 
+        const done = track();
         utils.getWFSFeaturesFilterByGeom(
           item.layer.get("datasource").url, 
           item.layer.get("datasource").typeNames,
@@ -228,7 +242,8 @@ export default function FeatureInfo({ core, config, actions }) {
           });
           publish();          
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log(err))
+        .finally(done);
       }
     });
 
@@ -277,6 +292,7 @@ export default function FeatureInfo({ core, config, actions }) {
           const buffer = l.get("datasource").identify_buffer ? l.get("datasource").identify_buffer : 0;
           bbox = transformExtent([coordinate[0] - buffer, coordinate[1] - buffer,coordinate[0] + buffer, coordinate[1] + buffer], mainMap.getView().getProjection().getCode(), nativeCRS);
 
+          const done = track();
           utils.getOGCAPIFeaturesFilterByCQL(
             url,
             null,
@@ -303,12 +319,14 @@ export default function FeatureInfo({ core, config, actions }) {
             publish(); 
 
           })
-          .catch(err => console.log(err));
+          .catch(err => console.log(err))
+          .finally(done);
         } else {
           const buffer = 2;
           const nativeCRS = l.get("datasource").crs || 'EPSG:4326';
           const bbox = [coordinate[0]-buffer, coordinate[1]-buffer, coordinate[0]+buffer, coordinate[1]+buffer];
           const nativeBBOX = transformExtent(bbox, mapCRS, nativeCRS);
+          const done = track();
           utils.getWFSFeaturesFilterByGeom(
             l.get("datasource").url, 
             l.get("datasource").typeNames,
@@ -335,11 +353,13 @@ export default function FeatureInfo({ core, config, actions }) {
             });
             publish();          
           })
-          .catch(err => console.log(err));
+          .catch(err => console.log(err))
+          .finally(done);
         }
 
       // Get features using any other strategy
       } else {
+        const done = track();
         utils.parseFeatureInfo(mainMap, l, viewResolution, coordinate, mapCRS, (result) => {
           const format = l.getProperties().get_feature_info_format || 'application/json';
           if (!result) acc.push({ id: uuidV4(), type: 'error', format });
@@ -354,7 +374,7 @@ export default function FeatureInfo({ core, config, actions }) {
           } else {
            acc.push({id: uuidV4(), type: 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
           }
-          publish();
+          done();
         });
       }
     });
@@ -401,6 +421,7 @@ export default function FeatureInfo({ core, config, actions }) {
       // Get features using any other strategy
       */      
       } else {
+        const done = track();
         utils.parseArcGISFeatureInfo(mainMap, l, viewResolution, coordinate, mapCRS, (result) => {
           const format = l.getProperties().get_feature_info_format || 'application/json';
           if (!result) acc.push({ id: uuidV4(), type: 'error', format });
@@ -415,21 +436,12 @@ export default function FeatureInfo({ core, config, actions }) {
           } else {
            acc.push({id: uuidV4(), type: 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
           }
-          publish();
+          done();
         });
       }
     });    
 
-    // No layers found, disable GetFeatureInfo
-    //if (features.length === 0 && lrs.length === 0) {
-      if (features.length === 0 && fvt_remote.length === 0 && ogcFound === 0) {
-      const emptyResults = [{
-        id: uuidV4(),
-        type: 'text',
-        data: `<p>${t("noResultsFound", "Não foram encontrados resultados")}</p>`
-      }];
-      dispatch(actions.viewer_set_featureinfo(emptyResults));
-    }
+    publish();
   }
 
   useEffect(() => {
@@ -444,6 +456,8 @@ export default function FeatureInfo({ core, config, actions }) {
   useEffect(() => {
     if (search) searchAll(search.coords, search.pixel);
   }, [search]);
+
+  useEffect(() => () => { searchSeq.current++; }, []);
 
   // Add highlight layer
   useEffect(() => {

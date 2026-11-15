@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Accordion, ActionIcon, Alert, Button, Group } from '@mantine/core';
+import { Accordion, ActionIcon, Alert, Button, Group, Loader } from '@mantine/core';
 import { AttributeTable, IconInfoCircle, IconX, IconDownload, IconSearch } from '@scalargis/ui';
 import OlCollection from 'ol/Collection';
 import OlFeature from 'ol/Feature';
@@ -16,7 +16,7 @@ export default function FeatureResults({ core, config, features, layers, actions
   const { viewer, Models } = config;
   const { findOlLayer } = Models.Utils;
   const { selected_menu } = viewer.config_json;
-  const { exclusive_mapcontrol } = viewer;
+  const { exclusive_mapcontrol, featureinfo_searching } = viewer;
   const { publish, subscribe } = pubsub ? pubsub : {};
 
   const { t } = useTranslation();
@@ -179,7 +179,17 @@ export default function FeatureResults({ core, config, features, layers, actions
     </Alert>
   );
 
+  const searchingMessage = (
+    <Alert color="informative" py="xs">
+      <Group justify="center" gap="xs" wrap="nowrap">
+        <Loader size="xs" />
+        <span>{t("identifySearching", "A pesquisar...")}</span>
+      </Group>
+    </Alert>
+  );
+
   if (Object.keys(grouped).length === 0) {
+    if (featureinfo_searching) return searchingMessage;
     let msg = t("identifyNoResults", "Sem resultados. Clique no mapa para identificar.");
     if (isInactive) msg = `${t("noResults", "Sem resultados")}. ${t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.")}`;
     return infoMessage(msg);
@@ -191,6 +201,8 @@ export default function FeatureResults({ core, config, features, layers, actions
       { isInactive &&
         infoMessage(t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos."))
       }
+
+      { featureinfo_searching && searchingMessage }
 
       <Group justify="flex-end" gap="xs" py="xs" px="md">
         <Button

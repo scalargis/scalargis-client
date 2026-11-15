@@ -354,7 +354,8 @@ const root = (
         ...state,
         viewer: {
           ...state.viewer,
-          featureinfo: [...action.data]
+          featureinfo: [...action.data],
+          featureinfo_searching: !!action.searching
         }
       }
 
