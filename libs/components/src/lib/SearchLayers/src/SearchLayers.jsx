@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { UnstyledButton } from '@mantine/core';
+import { Alert, Button, Group, Text, UnstyledButton } from '@mantine/core';
 import classNames from 'classnames';
+import { IconAlertTriangle, IconChevronLeft, IconRefresh } from '@scalargis/ui';
+
+import { i18n } from '../../components';
 
 import { getDescribeFeatureType } from './service';
 import SearchLayerForm from './SearchLayerForm';
@@ -11,12 +14,10 @@ export default function SearchLayers(props) {
   const component_cfg = record.config_json ? { show_icon: true, ...record.config_json } : { show_icon: true};
   const { show_icon } = component_cfg;
 
-  const [loaded, setLoaded] = useState(false);
-
   const [active, setActive] = useState(null);
   const [schemas, setSchemas] = useState({});
-
-  const [errorSchema, setErrorSchema] = useState(null);
+  const [load, setLoad] = useState({ status: 'idle' });
+  const [attempt, setAttempt] = useState(0);
 
   const schemaConfig = useMemo(() => {
     if (!active) return null;
@@ -37,46 +38,53 @@ export default function SearchLayers(props) {
   }, [active, schemas]);
 
   useEffect(() => {
-    setErrorSchema(null);
-    if (!active) return;
-
-    const {schema={}, uischema={}, geometry_field} = schemaConfig || {};
-
-    if (schema && Object.keys(schema).length > 0 && uischema && Object.keys(uischema).length) {
-      updateLayerSchema(active.id, {schema, uischema, geometry_field: null});
-      setLoaded(true);
+    if (!active) {
+      setLoad({ status: 'idle' });
       return;
     }
 
-    setLoaded(false);
+    const {schema={}, uischema={}} = schemaConfig || {};
 
+    if (schemas[active.id]) {
+      setLoad({ status: 'ready', layer: active });
+      return;
+    }
+
+    if (schema && Object.keys(schema).length > 0 && uischema && Object.keys(uischema).length) {
+      updateLayerSchema(active.id, {schema, uischema, geometry_field: null});
+      setLoad({ status: 'ready', layer: active });
+      return;
+    }
+
+    let current = true;
+    setLoad({ status: 'loading', layer: active });
     props.setBlockedPanel(true);
 
     getDescribeFeatureType({cfg: active, core, viewer, auth}).then(data => {
-      try {
-        if (active?.uischema) {
-          updateLayerSchema(active.id, {
-            ...data,
-            uischema: {
-              type: 'VerticalLayout',
-              elements: [...(data?.uischema?.elements ?? [])],
-              ...active?.uischema
-            }
-          });
-        } else {
-          updateLayerSchema(active.id, data);
-        }
-      } catch (err) {
-        return Promise.reject(err);
+      if (!current) return;
+      if (active?.uischema) {
+        updateLayerSchema(active.id, {
+          ...data,
+          uischema: {
+            type: 'VerticalLayout',
+            elements: [...(data?.uischema?.elements ?? [])],
+            ...active?.uischema
+          }
+        });
+      } else {
+        updateLayerSchema(active.id, data);
       }
-      setLoaded(true);
+      setLoad({ status: 'ready', layer: active });
     }).catch(error => {
       console.log(error);
-      setErrorSchema({message:'Não foi possível obter informação do tema'});
+      if (!current) return;
+      setLoad({ status: 'failed', layer: active, detail: error?.message || null });
     }).finally(()=> {
       props.setBlockedPanel(false);
     });
-  }, [active, schemaConfig?.id]);
+
+    return () => { current = false; };
+  }, [active, attempt]);
 
   useEffect(() => {
     if (layers.length === 1 && (!component_cfg.show_main || layers[0].is_standalone)) {
@@ -85,16 +93,49 @@ export default function SearchLayers(props) {
   }, [layers, component_cfg.show_main]);
 
   const updateLayerSchema = (id, data) => {
-    const sch = {...schemas};
-    sch[id] = data;
-    setSchemas(sch);
+    setSchemas(prev => ({...prev, [id]: data}));
   }
 
-  if (loaded && active) {
-    const showPanelPrev = (
-      (component_cfg.layers && component_cfg.layers.length > 1) || component_cfg.show_main === true
-      ) ? true : false;
+  const showPanelPrev = (
+    (component_cfg.layers && component_cfg.layers.length > 1) || component_cfg.show_main === true
+    ) ? true : false;
 
+  const goBack = showPanelPrev && ((e) =>
+    {
+      layer.current.getSource().clear();
+      setActive(null);
+      setLayersList();
+    }
+  );
+
+  if (active && load.layer === active && load.status === 'failed') {
+    const title = active.title ? i18n.translateValue(active.title, active.title) : '';
+    return (
+      <>
+        {goBack && <div className="mt-2">
+          <Button size="xs" leftSection={<IconChevronLeft />} onClick={goBack}>
+            {i18n.translateValue("back", "Voltar")}
+          </Button>
+        </div>}
+        <div className="mt-2">{title}</div>
+        <hr />
+        <Alert color="warning" py="xs" role="alert">
+          <Group justify="center" gap="xs" wrap="nowrap">
+            <IconAlertTriangle />
+            <span>{i18n.translateValue("searchLayerSchemaError", "Não foi possível obter informação do tema")}</span>
+          </Group>
+          {load.detail && <Text size="sm" ta="center" mt="xs">{load.detail}</Text>}
+        </Alert>
+        <Group justify="center" mt="md">
+          <Button type="button" variant="default" leftSection={<IconRefresh />} onClick={() => setAttempt(n => n + 1)}>
+            {i18n.translateValue("tryAgain", "Tentar de novo")}
+          </Button>
+        </Group>
+      </>
+    )
+  }
+
+  if (active && load.layer === active && load.status === 'ready') {
     return <SearchLayerForm
       core={core}
       viewer={viewer}
@@ -108,14 +149,7 @@ export default function SearchLayers(props) {
       layer={layer}
       searchConfig={active}
       schemaConfig={schemaConfig}
-      goPanelSearchPrev={showPanelPrev && ((e) =>
-        {
-          layer.current.getSource().clear();
-          setActive(null);
-          setLayersList();
-        }
-      )}
-      errorSchema={errorSchema}
+      goPanelSearchPrev={goBack}
       setBlockedPanel={props.setBlockedPanel}
     />
   }

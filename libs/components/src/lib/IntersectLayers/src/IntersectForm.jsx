@@ -51,12 +51,11 @@ export default function IntersectForm(props) {
     
   const [isLoading, setIsLoading] = useState(false);
   const [geometryIntersection, setGeometryIntersection] = useState([]);
-  const [showGeometry, setShowGeometry] = useState(true);
 
   const [buffer, setBuffer] = useState(0);
 
-  const [searchParams, setSearchParams] = useState(null);
-  const [results, setResults] = useState([]);
+  const [search, setSearch] = useState({ params: null, results: [] });
+  const { params: searchParams, results } = search;
   const [showNoResultsMsg, { open: openNoResultsMsg, close: closeNoResultsMsg }] = useDisclosure(false);
 
   const geometryCol = useRef(new Collection([]));
@@ -266,15 +265,13 @@ export default function IntersectForm(props) {
       'out_srid': getProjectionSrid(outProj)
     };
 
-    setSearchParams({...data});
-
     setDrawTool(null);
 
     setBlockedPanel(true);
 
     provider.getSimple(path, data).then(result => {
+      setSearch({ params: {...data}, results: result?.data });
       openNoResultsMsg();
-      setResults(result?.data);
     }).catch(error => {
       notify.error('Error', 'Ocorreu um erro ao executar a análise.');
       console.log('error', error);
@@ -286,12 +283,10 @@ export default function IntersectForm(props) {
 
   const clearAll = () => {
     setDrawTool(null);
-    setResults([]);
+    setSearch({ params: null, results: [] });
     closeNoResultsMsg();
     setGeometryIntersection([]);
-    setShowGeometry(false);
     setBuffer(0);
-    setSearchParams(null);
     geometryCol.current.clear();
 
     intersectLayer.current.getSource().getFeatures().forEach((f) => {
@@ -494,8 +489,6 @@ export default function IntersectForm(props) {
           searchParams={searchParams}
           results={results}
           groupResults={intersectConfig?.groupResults || false}
-          showGeometry={showGeometry}
-          setShowGeometry={setShowGeometry}
         /> :
         showNoResultsMsg && <div className="p-fluid mt-4">
           <Alert color="informative" py="xs">

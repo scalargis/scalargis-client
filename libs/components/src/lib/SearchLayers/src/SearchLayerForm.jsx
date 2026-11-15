@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FigTreeEvaluator } from 'fig-tree-evaluator';
 import { Alert, Button, Group } from '@mantine/core';
-import { notify, IconChevronLeft, IconAlertTriangle, IconInfoCircle } from '@scalargis/ui';
+import { notify, IconChevronLeft, IconInfoCircle } from '@scalargis/ui';
 
 import {
   i18n,
@@ -78,14 +78,6 @@ export default function SearchLayerForm(props) {
 
       <div className="mt-2">{searchTitle}</div>
       <hr />
-
-      { props?.errorSchema &&
-        <Alert color="warning" py="xs">
-          <Group justify="center" gap="xs" wrap="nowrap">
-            <IconAlertTriangle />
-            <span>{props?.errorSchema.message}</span>
-          </Group>
-        </Alert> }
 
       <React.Fragment>
         <div className="mt-3">
