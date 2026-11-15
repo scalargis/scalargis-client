@@ -8,10 +8,18 @@ import { i18n } from '../components';
 import { checkDate, getAsOneOfObjects } from './util/customFunctions';
 
 
-const fig = new FigTreeEvaluator({ evaluateFullObject: true, functions: { checkDate, getAsOneOfObjects } });
+const defaultFunctions = { checkDate, getAsOneOfObjects };
+
+/** Builds the evaluator of one form, with the default functions and the form options. */
+const createEvaluator = (figOptions) => new FigTreeEvaluator({
+  evaluateFullObject: true,
+  ...figOptions,
+  functions: { ...defaultFunctions, ...figOptions?.functions }
+});
 
 
 export const useFigTreeEvaluator = (data, schema, uischema, figOptions, loadingElement) => {
+  const [fig] = useState(() => createEvaluator(figOptions));
   const [evaluatedSchema, setEvaluatedSchema] = useState();
   const [evaluatedUiSchema, setEvaluatedUiSchema] = useState(loadingElement ? loadingElement : {
     type: 'VerticalLayout',
@@ -27,31 +35,22 @@ export const useFigTreeEvaluator = (data, schema, uischema, figOptions, loadingE
   }, [schema, uischema]);
 
   useEffect(() => {
-    if (figOptions) {
-      let options = fig.getOptions();
-      options = {
-        ...options,
-        ...figOptions
-      }
-      fig.updateOptions(options);
-    }
-  }, []);
+    let current = true;
 
-  useEffect(() => {
     if (schemaEvaluated)
       fig.evaluate(uischema, { data }).then((result) => {
-        replaceRules(result, simplifiedRulePaths);
-        setEvaluatedUiSchema(result);
+        if (!current) return;
+        setEvaluatedUiSchema(replaceRules(result, simplifiedRulePaths));
       });
 
     fig.evaluate(schema, { data }).then((result) => {
-      //console.log({data, result});
+      if (!current) return;
       setEvaluatedSchema(result);
       setSchemaEvaluated(true);
     });
-  }, [data, simplifiedRulePaths, schemaEvaluated]);
 
-  //console.log({data, evaluatedSchema, evaluatedUiSchema});
+    return () => { current = false; };
+  }, [data, simplifiedRulePaths, schemaEvaluated]);
 
   return { evaluatedSchema, evaluatedUiSchema };
 };
@@ -93,6 +92,7 @@ const replaceRules = (schema, paths) => {
     rules.set(basePath, { ...rules.get(basePath), [type]: value });
   });
 
+  let output = schema;
   rules.forEach((values, basePath) => {
     const { enabled = true, visible = true } = values;
     const ruleType =
@@ -105,10 +105,7 @@ const replaceRules = (schema, paths) => {
         : !enabled && !visible
         ? 'HIDE'
         : null;
-    // This is a hacky way to circumvent the limitations of JsonForms rules --
-    // we're intentionally supplying an invalid condition so that it "falls
-    // through" and always returns `true` and we rely on the `ruleType` being
-    // changed dynamically instead
-    if (ruleType) assign(schema, basePath + '.rule', { effect: ruleType, condition: true });
+    if (ruleType) output = assign(output, basePath + '.rule', { effect: ruleType, condition: true });
   });
+  return output;
 };

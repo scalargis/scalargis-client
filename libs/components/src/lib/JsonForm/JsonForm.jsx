@@ -34,18 +34,7 @@ export const JsonForm = (props) => {
   }, [i18next.resolvedLanguage]);
 
   const translation = useMemo(() => {
-    let translations = merge(i18nDefaults, getTranslations());  
-    
-    //console.log(ctx?.translations);
-
-    if (ctx?.translations) {
-      translations = merge(translations, ctx.translations);
-    }
-    if (props.translations) {
-      translations = merge(translations, props.translations);
-    }
-
-    //console.log(translations);
+    const translations = merge({}, i18nDefaults, getTranslations(), ctx?.translations, props.translations);
 
     const createTranslator = (locale) => (key, defaultMessage) => {
       //console.log({ key, defaultMessage});
@@ -56,7 +45,7 @@ export const JsonForm = (props) => {
       return msg;
     };
     return createTranslator(locale);
-  },  [props.locale, props.translations, props.i18n, i18next.resolvedLanguage]);
+  },  [props.locale, props.translations, props.i18n, ctx?.translations, i18next.resolvedLanguage]);
 
 
   const ajv = useMemo(() => {
