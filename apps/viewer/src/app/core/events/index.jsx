@@ -11,14 +11,13 @@ export const VIEWER_REMOVE_THEME = 'Viewer/RemoveTheme';
 export const VIEWER_SHOW_DOCUMENTS = 'Viewer/ShowDocuments';
 
 
-export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => {
+export const viewer_add_theme = ({data, mainMap, getViewer, core, dispatch, t}) => {
     const { actions } = core;
     const { viewer_add_themes, layers_set_checked, transform_extent, map_set_extent, viewer_add_notification } = actions;
 
     const themeId = data.themeId || uuid();
 
-    const layer = viewer.config_json.layers.find( l => l.id === themeId);
-    if (layer) {
+    const warnExists = () => {
         if (data.showError) {
             const msg = {
                 severity: "warn",
@@ -27,6 +26,10 @@ export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => 
             }
             dispatch(viewer_add_notification({group: "viewer", message: msg}));
         }
+    }
+
+    if (getViewer().config_json.layers.find( l => l.id === themeId)) {
+        warnExists();
         return;
     }
 
@@ -46,6 +49,12 @@ export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => 
     }
 
     const doAction = () => {
+        const viewer = getViewer();
+        if (viewer.config_json.layers.find( l => l.id === themeId)) {
+            warnExists();
+            return;
+        }
+
         if (data.parentId) {
             const parent = viewer.config_json.layers.find( l => l.id === data.parentId);
             if (parent) dispatch(viewer_add_themes(parent.id, [theme], true));
@@ -55,9 +64,8 @@ export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => 
         }
 
         if (data.checked !== false) {
-            let checked = [...viewer.config_json.checked];
-            checked = checked.concat([themeId]);
-            dispatch(layers_set_checked(checked));
+            const checked = getViewer().config_json.checked;
+            if (!checked.includes(themeId)) dispatch(layers_set_checked([...checked, themeId]));
         }
 
         if (data.zoomExtent) {
@@ -98,13 +106,13 @@ export const viewer_add_theme = ({data, mainMap, viewer, core, dispatch, t}) => 
     }
 };
 
-export const viewer_remove_theme = ({data, mainMap, viewer, core, dispatch, t}) => {
+export const viewer_remove_theme = ({data, mainMap, getViewer, core, dispatch, t}) => {
     const { actions } = core;
     const { viewer_remove_themes, viewer_add_notification } = actions;
     const { themeId } = data;
 
     const doAction = () => {
-        const layer = viewer.config_json.layers.find( l => l.id === themeId);
+        const layer = getViewer().config_json.layers.find( l => l.id === themeId);
         if (!layer) {
             if (data.showError) {
                 const msg = {
@@ -143,11 +151,12 @@ export const viewer_remove_theme = ({data, mainMap, viewer, core, dispatch, t}) 
     }
 }
 
-export const viewer_show_documents = ({data, mainMap, viewer, core, dispatch, t}) => {
+export const viewer_show_documents = ({data, mainMap, getViewer, core, dispatch, t}) => {
     const { actions } = core;
     const { viewer_add_dialog_window, viewer_update_dialog_window } = actions;
 
     const key = data.dialogKey || new Date().getTime();
+    const viewer = getViewer();
 
     if (viewer?.dialogWindows?.length > 0) {
         const dw = viewer.dialogWindows.find(w => w.key === key);

@@ -22,10 +22,11 @@ export default function EventManager(props) {
         Object.keys(list).forEach(k => {
             const topic = list[k].topic;
             const unsubscribe = props.core.pubsub.subscribe(topic, (data) => {
-                const { mainMap, viewer, core, dispatch } = propsRef.current;
+                const { mainMap, core, dispatch } = propsRef.current;
+                const getViewer = () => core?.store?.getState()?.root?.viewer || propsRef.current.viewer;
                 const fn = list[k].fn;
 
-                fn({data, mainMap, viewer, core, dispatch, t});
+                fn({data, mainMap, getViewer, core, dispatch, t});
             });
             events.push(unsubscribe);
         });
