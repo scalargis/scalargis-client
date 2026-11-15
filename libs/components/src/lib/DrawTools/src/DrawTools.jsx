@@ -224,6 +224,15 @@ const DOUBLE_CLICK_GUARD_MS = 350;
 
 const DRAW_FLAGS = { draw_geom: false, draw_symbol: false, draw_text: false };
 
+const DRAW_GEOMETRY = { line: 'LineString', polygon: 'Polygon' };
+
+/** The draw flags of a drawing made with a draw tool. */
+const toolFlags = (tool) => ({
+  draw_geom: tool !== 'symbol' && tool !== 'text',
+  draw_symbol: tool === 'symbol',
+  draw_text: tool === 'text'
+});
+
 /** Drawing tools panel. */
 function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const [panel, setPanel] = useState(() => ({
@@ -682,20 +691,21 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       getMap().removeInteraction(drawRef.current);
       drawRef.current = null;
       syncSnap();
+      setNavigation(true);
     }
   };
 
-  const addInteraction = (type) => {
+  const addInteraction = (tool) => {
     const { actions: act, dispatch: dsp, utils: u } = propsRef.current;
     stopDraw();
-    const draw = new OlInteractionDraw({ features: new OlCollection(), type });
+    const draw = new OlInteractionDraw({ features: new OlCollection(), type: DRAW_GEOMETRY[tool] || 'Point' });
     drawRef.current = draw;
     setNavigation(false);
     dsp(act.viewer_set_exclusive_mapcontrol('DrawTools'));
     getMap().addInteraction(draw);
     syncSnap();
     draw.on('drawend', (e) => {
-      const [geojson] = withNums([e.feature], [u.serializeDrawing(e.feature, panelRef.current, viewCrs())]);
+      const [geojson] = withNums([e.feature], [u.serializeDrawing(e.feature, { ...panelRef.current, ...toolFlags(tool) }, viewCrs())]);
       history.commit([...currentDrawings(), geojson]);
       patch({ selectedTool: null, ...DRAW_FLAGS });
       stopDraw();
@@ -715,7 +725,6 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
         select.setActive(false);
       } else {
         stopDraw();
-        setNavigation(true);
       }
       patch({ selectedTool: null, ...DRAW_FLAGS });
       dispatch(actions.viewer_set_exclusive_mapcontrol(null));
@@ -730,7 +739,6 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       const kept = selectedDrawings();
       if (panelRef.current.editing) finishEditing();
       stopDraw();
-      setNavigation(true);
       select.setActive(false);
       patch({ selectedTool: type, ...DRAW_FLAGS, editing: null });
       ensureTransform().setActive(true);
@@ -749,7 +757,6 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
     if (PLACEMENT_TOOLS.includes(type)) {
       stopDraw();
-      setNavigation(true);
       select.setActive(false);
       patch({ selectedTool: type, ...DRAW_FLAGS, editing: null });
       startPlacement();
@@ -769,29 +776,9 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       return;
     }
 
-    patch({ selectedTool: type });
+    patch({ selectedTool: type, ...toolFlags(type), editing: null });
     select.setActive(false);
-    switch (type) {
-      case 'symbol':
-        patch({ ...DRAW_FLAGS, draw_symbol: true, editing: null });
-        addInteraction('Point');
-        break;
-      case 'text':
-        patch({ ...DRAW_FLAGS, draw_text: true, editing: null });
-        addInteraction('Point');
-        break;
-      case 'line':
-        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
-        addInteraction('LineString');
-        break;
-      case 'polygon':
-        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
-        addInteraction('Polygon');
-        break;
-      default:
-        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
-        addInteraction('Point');
-    }
+    addInteraction(type);
   };
 
   const clickUndo = (e) => {
@@ -859,12 +846,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   };
 
   const disableTools = () => {
-    const current = panelRef.current;
-    if (current.selectedTool) {
-      stopDraw();
-      setNavigation(true);
-    }
-    if (current.editing) finishEditing();
+    stopDraw();
+    if (panelRef.current.editing) finishEditing();
     stopTransform();
     removeModify();
     if (snapRef.current) snapRef.current.dispose();
