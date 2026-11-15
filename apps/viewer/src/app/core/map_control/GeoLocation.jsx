@@ -39,9 +39,13 @@ export default function GeoLocation({ config, actions }) {
     const [olgeolocation, setOlgeolocation] = useState(null);
 
     const locationLayer = useRef();
+    const activeRef = useRef(!!geo_location_control?.active);
+    const requestRef = useRef(0);
 
 
     function getGeoLocation (cb) {
+        const request = requestRef.current;
+        const isCurrent = () => activeRef.current && request === requestRef.current;
         const coordinates = olgeolocation ? olgeolocation.getPosition() : null;
         if (coordinates) {
             const pos = {
@@ -56,6 +60,7 @@ export default function GeoLocation({ config, actions }) {
             if (cb) cb(pos);
         } else {
             window.navigator.geolocation.getCurrentPosition((position) => {
+                if (!isCurrent()) return;
                 if (position.coords) {                    
                     const pos = { 
                         coordinates: [position.coords.longitude, position.coords.latitude],
@@ -71,6 +76,7 @@ export default function GeoLocation({ config, actions }) {
                     saveGeoLocation({ error: { code: 0, message: t("myLocationNoInformation", "Não foi possível obter localização.")} });
                 }
             }, (error) => {
+                if (!isCurrent()) return;
                 const pos = { 
                     error: {
                         code: error.code || 0,
@@ -107,10 +113,17 @@ export default function GeoLocation({ config, actions }) {
 
     useEffect(() => {
         if (!geo_location_control) return;
-        
+
+        activeRef.current = !!geo_location_control.active;
+        requestRef.current += 1;
+        const checked = viewer.config_json.checked || [];
+
         if (!geo_location_control.active) {
             olgeolocation && olgeolocation.setTracking(false);
             dispatch(actions.viewer_set_geolocation(null));
+            if (checked.includes('geolocation')) {
+                dispatch(actions.layers_set_checked(checked.filter(id => id !== 'geolocation')));
+            }
             return;
         }
 
@@ -122,7 +135,9 @@ export default function GeoLocation({ config, actions }) {
                 getGeoLocation();
             }
         }
-        dispatch(actions.layers_set_checked([ ...viewer.config_json.checked, 'geolocation']));
+        if (!checked.includes('geolocation')) {
+            dispatch(actions.layers_set_checked([ ...checked, 'geolocation']));
+        }
     }, [geo_location_control.active]);   
 
 
@@ -223,6 +238,7 @@ export default function GeoLocation({ config, actions }) {
             });
 
             olgeolocation.on('change', function () {
+                if (!activeRef.current) return;
                 const pos = {
                     coordinates: olgeolocation.getPosition(),
                     accuracy: olgeolocation.getAccuracy(), //[m]
@@ -235,6 +251,7 @@ export default function GeoLocation({ config, actions }) {
             });
 
             olgeolocation.on('error', function (error) {
+                if (!activeRef.current) return;
                 const pos = {
                     error: {
                         code: error.code,
