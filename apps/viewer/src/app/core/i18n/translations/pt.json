@@ -267,6 +267,7 @@
 
   "addTheme": "Adicionar Tema",
   "warnThemeExists": "O tema já foi adicionado ao mapa.",
+  "addThemeNoParent": "O tema não foi adicionado: o visualizador não tem o grupo de temas onde o colocar.",
   "warnThemeNotFound": "Não foi possível encontrar o tema na lista de temas do mapa",
 
   "successActionMsg": "Operação realizada com sucesso",

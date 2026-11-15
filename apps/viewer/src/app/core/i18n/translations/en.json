@@ -267,6 +267,7 @@
 
   "addTheme": "Add Theme",
   "warnThemeExists": "The theme has already been added to the map",
+  "addThemeNoParent": "The theme was not added: the viewer has no theme group to hold it.",
   "warnThemeNotFound": "Couldn't find theme in map themes list",
 
   "successActionMsg": "Operation successfully completed",

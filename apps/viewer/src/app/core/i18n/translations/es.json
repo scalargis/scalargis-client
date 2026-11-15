@@ -267,6 +267,7 @@
 
   "addTheme": "Añadir Capa",
   "warnThemeExists": "La capa ya ha sido añadido al mapa",
+  "addThemeNoParent": "La capa no se ha añadido: el visor no tiene un grupo de capas donde colocarla.",
   "warnThemeNotFound": "No se ha podido encontrar la capa en la lista de capas del mapa",
 
   "successActionMsg": "Operación realizada con éxito",

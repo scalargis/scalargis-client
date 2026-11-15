@@ -17,7 +17,6 @@ import {
   VIEWER_SET_EXCLUSIVE_MAPCONTROL,
   VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL,
   LAYERS_UPDATE_THEME,
-  LAYERS_REMOVE_ITEMS,
   MAP_SET_EXTENT,
   MAP_SET_SIZE,
   MAP_SET_CLASS,
@@ -60,6 +59,7 @@ import {
 
   VIEWER_SET_TRANSLATION_NAMESPACES
 } from '../actions';
+import { i18n as i18nUtils } from '@scalargis/components';
 import { traverseLayersTree, getCookieAuthName } from '../utils';
 
 const initialViewer = {
@@ -484,43 +484,6 @@ const root = (
       }
     }
 
-    // Remove layers
-    case LAYERS_REMOVE_ITEMS: {
-      const updated = Object.assign([], state.viewer.config_json.layers);
-
-      // Update session layers list
-      let removedLayers = [];
-      traverseLayersTree(updated.filter(l => action.ids.includes(l.id)), null, (l, i) => {
-        removedLayers.push(l.id);
-        if (l?.children?.length) {
-          removedLayers = [...removedLayers, ...l.children];
-        }
-      });
-      const sessionLayers = Object.assign([], state.viewer.session_layers).filter(l => !removedLayers.includes(l));
-
-      // Remove as child layers
-      traverseLayersTree(updated, null, (l, i) => {
-        if (l.children) l.children = l.children.filter(cid => action.ids.includes(cid) === false);
-      });
-
-      // Remove layers
-      traverseLayersTree(updated, null, (l, i) => {
-        if (action.ids.includes(l.id)) updated.splice(updated.indexOf(l), 1);
-      });
-
-      return {
-        ...state,
-        viewer: {
-          ...state.viewer,
-          session_layers: sessionLayers,
-          config_json: {
-            ...state.viewer.config_json,
-            layers: updated
-          }
-        }
-      }
-    }
-
     case VIEWER_SET_DISPLAYCRS:
       return {
         ...state,
@@ -545,15 +508,23 @@ const root = (
         opacity: (t.opacity != undefined) ? t.opacity : 1
       })));
 
-      // Find parent index
-      const parentId = action.parentId || 'main';
-      const parentIndex = newlayers.findIndex(i => i.id === parentId);
-      const parent = Object.assign({}, newlayers[parentIndex]);
-      if (action.top) {
-        parent.children = action.themes.map(t => t.id).concat(parent.children);
-      } else {
-        parent.children = parent.children.concat(action.themes.map(t => t.id));
+      let parentIndex = action.parentId ? newlayers.findIndex(i => i.id === action.parentId) : -1;
+      if (parentIndex < 0) parentIndex = newlayers.findIndex(i => i.id === 'main');
+      if (parentIndex < 0) {
+        const message = {
+          severity: 'warn',
+          summary: i18nUtils.translateValue('addTheme', 'Adicionar Tema'),
+          detail: i18nUtils.translateValue('addThemeNoParent', 'O tema não foi adicionado: o visualizador não tem o grupo de temas onde o colocar.')
+        };
+        return {
+          ...state,
+          notifications: [...state.notifications.slice(-5), { group: 'viewer', message }]
+        }
       }
+      const parent = Object.assign({}, newlayers[parentIndex]);
+      const childIds = Array.isArray(parent.children) ? parent.children : [];
+      const newIds = action.themes.map(t => t.id);
+      parent.children = action.top ? newIds.concat(childIds) : childIds.concat(newIds);
       newlayers.splice(parentIndex, 1, parent);
 
       // Update session layers list
@@ -592,12 +563,9 @@ const root = (
         });
         let updated = Object.assign([], state.viewer.config_json.layers);
 
-        // Remove as child layers
-        traverseLayersTree(updated, null, (l, i) => {
-          if (l.children) l.children = l.children.filter(cid => allIds.includes(cid) === false);
-        });
-        // Remove layers
-        updated = updated.filter(l => !allIds.includes(l.id));
+        updated = updated
+          .filter(l => !allIds.includes(l.id))
+          .map(l => l.children?.some(cid => allIds.includes(cid)) ? { ...l, children: l.children.filter(cid => !allIds.includes(cid)) } : l);
 
         //Update opened list
         let opened = Object.assign([], state.viewer.config_json.opened);

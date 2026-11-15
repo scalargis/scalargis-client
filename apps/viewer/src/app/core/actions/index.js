@@ -54,7 +54,6 @@ export const MAP_REMOVE_CLASS           = 'MAP_REMOVE_CLASS'
 export const LAYERS_SET_CHECKED         = 'LAYERS_SET_CHECKED'
 export const LAYERS_SET_OPENED          = 'LAYERS_SET_OPENED'
 export const LAYERS_UPDATE_THEME        = 'LAYERS_UPDATE_THEME'
-export const LAYERS_REMOVE_ITEMS        = 'LAYERS_REMOVE_ITEMS'
 export const VIEWER_SET_DISPLAYCRS      = 'VIEWER_SET_DISPLAYCRS'
 export const VIEWER_ADD_THEMES          = 'VIEWER_ADD_THEMES'
 export const VIEWER_REMOVE_THEMES       = 'VIEWER_REMOVE_THEMES'
@@ -837,14 +836,6 @@ export function viewer_add_themes(parentId, themes = [], top, isSession=false) {
     themes, 
     top,
     isSession
-  }
-  return action;
-}
-
-export function layers_remove_items(ids) {
-  const action = {
-    type: LAYERS_REMOVE_ITEMS,
-    ids
   }
   return action;
 }

@@ -127,8 +127,8 @@ const processOpacity = (ollayers, layers) => {
 
 const processRemoveThemes = (layers, ids) => {
   if (!layers) return;
-  layers.forEach((layer, i) => {
-    if (layer && ids.includes(String(layer.get('id')))) layers.removeAt(i);
+  layers.getArray().slice().forEach((layer) => {
+    if (layer && ids.includes(String(layer.get('id')))) layers.remove(layer);
     if (layer instanceof OlGroup) {
       processRemoveThemes(layer.getLayers(), ids);
     }

@@ -267,6 +267,7 @@
 
   "addTheme": "Ajouter une couche",
   "warnThemeExists": "La couche existe déjà",
+  "addThemeNoParent": "La couche n'a pas été ajoutée : la visionneuse n'a aucun groupe de couches pour la placer.",
   "warnThemeNotFound": "La couche est introuvable dans la liste des couches de la carte",
 
   "successActionMsg": "Opération réalisée avec succès",
