@@ -19,9 +19,13 @@ export function traverseOlLayers(collection, cb) {
 export default function Main({ config }) {
 
   //console.log('ExportMapFeatures', config);
-  const { layer, actions, dispatch, mainMap } = config;
+  const { layer, actions, dispatch, mainMap, viewer } = config;
+  const mapControlName = `ExportMapFeatures:${layer.id}`;
+  const exclusiveMapControl = viewer?.exclusive_mapcontrol;
 
   const [active, setActive] = useState(false);
+  const activeRef = useRef(active);
+  activeRef.current = active;
   const [selected, setSelected] = useState({ items: [], coord: null });
 
   // Resolve the OL layer on every render. A useMemo keyed on [mainMap, layer.id]
@@ -72,6 +76,7 @@ export default function Main({ config }) {
         coord: e.mapBrowserEvent.coordinate,
       });
     })
+    select.setActive(activeRef.current);
     mainMap.addInteraction(select);
     selectSingleClick.current = select;
     return () => {
@@ -82,7 +87,14 @@ export default function Main({ config }) {
 
   useEffect(() => {
     if (selectSingleClick.current) selectSingleClick.current.setActive(active);
-  }, [active]);
+    if (!active) return;
+    dispatch(actions.viewer_set_exclusive_mapcontrol(mapControlName));
+    return () => dispatch(actions.viewer_release_exclusive_mapcontrol(mapControlName));
+  }, [active, mapControlName]);
+
+  useEffect(() => {
+    if (activeRef.current && exclusiveMapControl !== mapControlName) setActive(false);
+  }, [exclusiveMapControl, mapControlName]);
 
   // Filter by layer type
   if (!olLayer) return null;
