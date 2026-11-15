@@ -24,7 +24,6 @@ export const REGISTRATION_HTTP_LOADING  = 'REGISTRATION_HTTP_LOADING'
 export const REGISTRATION_HTTP_ERROR    = 'REGISTRATION_HTTP_ERROR'
 export const REGISTRATION_RESPONSE      = 'REGISTRATION_RESPONSE'
 
-export const VIEWER_LOAD                = 'VIEWER_LOAD'
 export const VIEWER_LOAD_DONE           = 'VIEWER_LOAD_DONE'
 export const VIEWER_SAVE_HTTP_LOADING   = 'VIEWER_SAVE_HTTP_LOADING'
 export const VIEWER_SAVE_HTTP_ERROR     = 'VIEWER_SAVE_HTTP_ERROR'
@@ -640,8 +639,14 @@ export function viewer_set_exclusive_mapcontrol(exclusive_mapcontrol) {
   return action;
 }
 
+let viewerLoadSeq = 0;
+
+/** Loads a viewer config and its components. Only the latest call writes to the store. */
 export function viewer_load(core, id, history) {
   return function (dispatch, getState) {
+
+    const seq = ++viewerLoadSeq;
+    const isCurrent = () => seq === viewerLoadSeq;
 
     // Get logged user
     const logged = core.getLoggedUser();
@@ -668,10 +673,12 @@ export function viewer_load(core, id, history) {
       return structuredClone(res.json);
 
     }).then(config => {
-      
+      if (!isCurrent()) return;
+
       // Validate config
       if (!config) return dispatch(viewer_not_found(history));
       if (!config.config_json) return dispatch(viewer_not_found(history));
+      if (!Array.isArray(config.config_json.components)) config.config_json.components = [];
 
       if (logged?.token && fromApi && !config.user_info) dispatch(session_clear());
 
@@ -695,12 +702,13 @@ export function viewer_load(core, id, history) {
 
       // Load viewer custom translations
       loadTranslations(config.id, (data, error, ns) => {
-        dispatch(viewer_set_translation_namespaces(ns));
+        if (isCurrent()) dispatch(viewer_set_translation_namespaces(ns));
       });
 
       // Load components
       const { components } = config.config_json;
-      Promise.allSettled(components.map(component => core.addComponent(core, component))).then(() => {
+      Promise.allSettled(components.map(component => core.addComponent(core, component, null, isCurrent))).then(() => {
+        if (!isCurrent()) return;
 
         // Index by id
         const pitems = {};
@@ -708,9 +716,11 @@ export function viewer_load(core, id, history) {
 
         // Finally, load into redux store
         dispatch(viewer_load_components(pitems));
-        window.requestAnimationFrame(() => dispatch(viewer_load_done()));
+        window.requestAnimationFrame(() => isCurrent() && dispatch(viewer_load_done()));
       });
-    }).catch(error => {
+    }, error => {
+      if (!isCurrent()) return;
+
       // Redirect to login or error pages
       if (error.message === 'Unauthorized') {
         if (logged?.token) dispatch(session_clear());
@@ -718,7 +728,7 @@ export function viewer_load(core, id, history) {
       } else if (error.message === 'Forbidden') {
         dispatch(viewer_not_authorized(history));
       } else dispatch(viewer_not_found(history));
-    })
+    }).catch(error => console.error('Error applying viewer config:', error));
   }
 }
 

@@ -34,9 +34,8 @@ function ViewerEmbedded(props) {
   const params = useParams();
 
   // Get router props
-  const url = location?.pathname || '';
   const { id } = params;
-  const { loading, viewer, config, notifications, dialogWindows } = props;
+  const { viewer, notifications } = props;
   const { exclusive_mapcontrol } = viewer;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
@@ -67,11 +66,7 @@ function ViewerEmbedded(props) {
       PageView();
     }
 
-    if (url.indexOf('/session') < 0) {
-      dispatch(viewer_load(core, id, history));
-    } else {
-      dispatch(viewer_load(core, id, history, true));
-    }
+    dispatch(viewer_load(core, id, history));
   }, [id]);
 
   useEffect(() => {
@@ -107,9 +102,6 @@ function ViewerEmbedded(props) {
     if (changed.length) dispatch(viewer_update_mapcontrols(changed));
   }, [exclusive_mapcontrol]);
 
-  // TODO: improve loading UI
-  if (loading) return null;
-
   let rlayers = ['overlays', 'main', 'background', 'basemaps'];
   if (viewer.config_json && viewer.config_json.root_layers && viewer.config_json.root_layers.length > 0) {
     rlayers = viewer.config_json.root_layers;
@@ -123,7 +115,6 @@ function ViewerEmbedded(props) {
       core={core}
       viewer={viewer}
       notifications={notifications}
-      dialogWindows={dialogWindows}
       layout_wrapper_click={e => dispatch(layout_wrapper_click())}
       layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
       mainMenu={<MainMenu history={history} onMenuClick={isDesktop => dispatch(layout_show_menu(isDesktop))} />}
@@ -134,7 +125,6 @@ function ViewerEmbedded(props) {
     >
       <MainMap 
         olMap={mainMap}
-        config={config}
         viewer={viewer}
         mainMapEl={mainMapEl}
         dispatch={dispatch}
