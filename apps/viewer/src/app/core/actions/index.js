@@ -14,6 +14,7 @@ export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
 export const AUTH_CLEAR_ERROR           = 'AUTH_CLEAR_ERROR'
 export const AUTH_RESPONSE              = 'AUTH_RESPONSE'
 export const AUTH_LOGIN                 = 'AUTH_LOGIN'
+export const AUTH_LOGOUT                = 'AUTH_LOGOUT'
 
 export const PASSWORD_HTTP_LOADING      = 'PASSWORD_HTTP_LOADING'
 export const PASSWORD_HTTP_ERROR        = 'PASSWORD_HTTP_ERROR'
@@ -86,6 +87,26 @@ const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
 const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/'; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
+
+/** Writes the auth cookie with its path, expiry, SameSite, and Secure on https. */
+function writeAuthCookie(auth) {
+  const expireDate = new Date();
+  expireDate.setDate(expireDate.getDate() + cookieExpiresDays);
+  new Cookies().set(cookieAuthName, auth, {
+    path: cookiePath,
+    expires: expireDate,
+    sameSite: 'lax',
+    secure: window.location.protocol === 'https:'
+  });
+}
+
+/** Removes the auth cookie and the redux session. */
+export function session_clear() {
+  return function (dispatch) {
+    new Cookies().remove(cookieAuthName, { path: cookiePath });
+    dispatch({ type: AUTH_LOGOUT });
+  }
+}
 
 
 export function site_load(core, callback) {
@@ -220,10 +241,7 @@ export function login_post(core, payload, apiUrl=null, history=null, redirect=nu
       .then(res => {
         //dispatch(login_response(res));
         if (res.authenticated) {
-          const cookies = new Cookies();
-          const expireDate = new Date();
-          expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-          cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
+          writeAuthCookie(res);
           dispatch(auth_login(res));
           const safeUrlRedirect = sameOriginUrl(urlRedirect);
           if (safeUrlRedirect) {
@@ -247,10 +265,7 @@ export function login(auth, history, redirect, urlRedirect) {
   return function (dispatch, getState) {
     dispatch(login_response(auth));
     if (auth.authenticated) {
-      const cookies = new Cookies();
-      const expireDate = new Date();
-      expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-      cookies.set(cookieAuthName, auth, { path: cookiePath, expires: expireDate });
+      writeAuthCookie(auth);
       dispatch(auth_login(auth));
       const safeUrlRedirect = sameOriginUrl(urlRedirect);
       if (safeUrlRedirect) {
@@ -266,8 +281,7 @@ export function login(auth, history, redirect, urlRedirect) {
 
 export function logout(history=null, redirect=null) {
   return function (dispatch, getState) {
-    const cookies = new Cookies();
-    cookies.remove(cookieAuthName, { path: cookiePath });
+    dispatch(session_clear());
     if (redirect && history?.navigate) {
       history.navigate(redirect);
     } else {
@@ -633,6 +647,7 @@ export function viewer_load(core, id, history) {
 
     // Fetch viewer
     let url = id ? API_URL + '/app/viewer/' + id + (history.location.search || '') : CONFIG_URL;
+    const fromApi = !!id || !CONFIG_URL;
     if (!url) {
       url = API_URL + '/app/viewer' + (history.location.search || '')
     }
@@ -647,7 +662,8 @@ export function viewer_load(core, id, history) {
 
       // Validate response
       if (res.status === 401) throw new Error('Unauthorized');
-      else if (res.status !== 200) throw new Error('Not found');
+      if (res.status === 403) throw new Error('Forbidden');
+      if (res.status !== 200) throw new Error('Not found');
       return structuredClone(res.json);
 
     }).then(config => {
@@ -656,10 +672,7 @@ export function viewer_load(core, id, history) {
       if (!config) return dispatch(viewer_not_found(history));
       if (!config.config_json) return dispatch(viewer_not_found(history));
 
-      // Note: Previously this code cleared the auth cookie when config lacked user_info.username.
-      // This was too aggressive - it would clear valid sessions when loading public viewers
-      // or during redirect flows. The server already returns 401 for actual auth failures,
-      // which is handled in the catch block below. Removing this cookie-clearing logic.
+      if (logged?.token && fromApi && !config.user_info) dispatch(session_clear());
 
       // Unload components
       dispatch(viewer_unload_components(core));
@@ -699,22 +712,10 @@ export function viewer_load(core, id, history) {
     }).catch(error => {
       // Redirect to login or error pages
       if (error.message === 'Unauthorized') {
-        if (!logged) {
-          //let redirect = '/login?redirect=/mapa/' + (id || '/');
-          const redirect = '/login?redirect=' + history.location.pathname;
-          /*
-          if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'mapa') > -1) {
-            redirect += '&path=/mapa/';
-          } else if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'map') > -1) {
-            redirect += '&path=/map/';
-          } else if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL) < 0) {
-            redirect += '&url_redirect=/' + id;
-          }
-          */
-          history.navigate(redirect);
-        } else {
-          dispatch(viewer_not_authorized(history));
-        }
+        if (logged?.token) dispatch(session_clear());
+        history.navigate('/login?redirect=' + encodeURIComponent(history.location.pathname + (history.location.search || '')));
+      } else if (error.message === 'Forbidden') {
+        dispatch(viewer_not_authorized(history));
       } else dispatch(viewer_not_found(history));
     })
   }

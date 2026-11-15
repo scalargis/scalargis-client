@@ -8,6 +8,7 @@ export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
 export const AUTH_RESPONSE              = 'AUTH_RESPONSE'
 export const AUTH_LOGIN                 = 'AUTH_LOGIN'
 export const AUTH_UPDATE                = 'AUTH_UPDATE'
+export const AUTH_LOGOUT                = 'AUTH_LOGOUT'
 
 export const BACKOFFICE_LOAD            = 'BACKOFFICE_LOAD'
 export const BACKOFFICE_LOAD_DONE       = 'BACKOFFICE_LOAD_DONE'
@@ -34,6 +35,23 @@ export const LAYOUT_SET_COLORMODE   = 'LAYOUT_SET_COLORMODE'
 const CONFIG_URL = import.meta.env.VITE_APP_CONFIG_URL || getAppApiUrl() + '/app/backoffice';
 const API_URL = getAppApiUrl();
 const cookieAuthName = getCookieAuthName();
+
+/** Writes the auth cookie with its path, SameSite, and Secure on https. */
+function writeAuthCookie(auth) {
+  new Cookies().set(cookieAuthName, auth, {
+    path: '/',
+    sameSite: 'lax',
+    secure: window.location.protocol === 'https:'
+  });
+}
+
+/** Removes the auth cookie and the redux session. */
+export function session_clear() {
+  return function (dispatch) {
+    new Cookies().remove(cookieAuthName, { path: '/' });
+    dispatch({ type: AUTH_LOGOUT });
+  }
+}
 
 
 export function site_load(core, callback) {
@@ -89,33 +107,32 @@ export function login_post(post, history, redirect) {
       .then(res => {
         //dispatch(login_response(res));
         if (res.authenticated) {
+          writeAuthCookie(res);
           dispatch(login(res));
-          const cookies = new Cookies();
-          cookies.set(cookieAuthName, res, { path: '/' });
           if (redirect) window.location.assign(getBackofficeBaseUrl() + redirect.replace(/^\//, ''));
           else window.location.reload();
         } else {
-          dispatch(login_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
+          dispatch(login_http_error({ kind: 'rejected', status: 401 }));
         }
       }).catch(error => {
         console.log('error', error);
-        dispatch(login_http_error(null));
+        dispatch(login_http_error({ kind: 'unavailable' }));
       });
   }
 }
 
-export function refresh_auth(auth) {
+/** Merges the fields into the session and writes the cookie and redux together. */
+export function refresh_auth(fields) {
   return function (dispatch, getState) {
-    const cookies = new Cookies();
-    cookies.set(cookieAuthName, auth, { path: '/' });
+    const auth = { ...getState().auth?.data, ...fields };
+    writeAuthCookie(auth);
     dispatch(auth_update(auth));
   }
 }
 
 export function logout() {
   return function (dispatch, getState) {
-    const cookies = new Cookies();
-    cookies.remove(cookieAuthName, { path: '/' });
+    dispatch(session_clear());
     window.location.reload();
   }
 }
@@ -291,9 +308,13 @@ export function backoffice_load(core, history) {
       const target = encodeURIComponent(`${history.location?.pathname || '/'}${history.location?.search || ''}`);
       const kind = error instanceof BootError ? error.kind : 'invalid';
 
-      if (kind === 'unauthorized' || kind === 'forbidden') {
-        if (!logged) history.navigate(`/login?redirect=${target}`);
-        else dispatch(backoffice_not_authorized(history));
+      if (kind === 'unauthorized' || (kind === 'forbidden' && !logged)) {
+        if (logged) dispatch(session_clear());
+        history.navigate(`/login?redirect=${target}`);
+        return;
+      }
+      if (kind === 'forbidden') {
+        dispatch(backoffice_not_authorized(history));
         return;
       }
 

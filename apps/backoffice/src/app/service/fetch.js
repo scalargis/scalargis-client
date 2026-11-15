@@ -1,4 +1,35 @@
 import { core } from '../AppContext';
+import { getAppApiUrl, getBackofficeBaseUrl } from '../core/utils';
+
+let sessionProbe = null;
+
+/** Returns the backoffice route of the current page, with its query. */
+function currentRoute() {
+    const base = new URL(getBackofficeBaseUrl(), window.location.origin).pathname;
+    const path = window.location.pathname.startsWith(base)
+        ? '/' + window.location.pathname.slice(base.length)
+        : '/';
+    return path + window.location.search;
+}
+
+/** Asks the account route if the token is dead, and on a 401 clears the session and opens the login form. */
+export function checkSession(token) {
+    if (!token || core.getLoggedUser()?.token !== token) return Promise.resolve(true);
+    if (!sessionProbe) {
+        sessionProbe = fetch(getAppApiUrl() + '/security/account', { headers: { 'X-API-KEY': token } })
+            .then(res => {
+                if (res.status !== 401) return true;
+                if (core.getLoggedUser()?.token === token) {
+                    core.store.dispatch(core.actions.session_clear());
+                    window.location.assign(getBackofficeBaseUrl() + 'login?redirect=' + encodeURIComponent(currentRoute()));
+                }
+                return false;
+            })
+            .catch(() => true)
+            .finally(() => { sessionProbe = null; });
+    }
+    return sessionProbe;
+}
 
 class HttpError extends Error {
   constructor(message, status,body = null) {
@@ -61,6 +92,9 @@ export const fetchJson = (url, options = {}) => {
                 json = JSON.parse(body);
             } catch (e) {
                 // not json, no big deal
+            }
+            if (status === 401 && requestHeaders.has('X-API-KEY')) {
+                checkSession(requestHeaders.get('X-API-KEY'));
             }
             if (status < 200 || status >= 300) {
                 return Promise.reject(

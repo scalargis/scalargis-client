@@ -18,6 +18,7 @@ import {
   AUTH_RESPONSE,
   AUTH_LOGIN,
   AUTH_UPDATE,
+  AUTH_LOGOUT,
 } from '../actions'
 import { getCookieAuthName } from '../utils'
 
@@ -52,6 +53,7 @@ const reducer = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: true,
           http_error: false,
           error: null
@@ -63,8 +65,10 @@ const reducer = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: false,
           http_error: true,
+          error: action.res?.kind || 'unavailable',
           response: action.res
         }
       }
@@ -74,6 +78,7 @@ const reducer = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: false,
           response: action.res
         }
@@ -87,6 +92,12 @@ const reducer = (
           loading: false,
           data: action.data
         }
+      }
+
+    case AUTH_LOGOUT:
+      return {
+        ...state,
+        auth: {}
       }
 
     // Update user auth

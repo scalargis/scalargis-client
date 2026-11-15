@@ -71,7 +71,7 @@ function LoginWidget({ auth, history, redirect }) {
           loading={auth.loading}>Entrar</Button>
       </div>
 
-      { auth.http_error && !auth.response &&
+      { auth.error === 'unavailable' &&
         <Box pt="md">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">
@@ -82,7 +82,7 @@ function LoginWidget({ auth, history, redirect }) {
         </Box>
       }
 
-      { !!auth.response?.message &&
+      { auth.error === 'rejected' &&
         <Box pt="md">
           <Alert color="danger" py="xs">
             <Group justify="center" gap="xs" wrap="nowrap">

@@ -543,7 +543,7 @@ export const traverseLayersTree = (layers, parent, cb, path = []) => {
 export const isAdminOrManager = (auth) => {
   let retVal = false;
 
-  const roles = auth?.data ? (auth.data.userroles || []) : (auth?.response?.userroles || []);
+  const roles = auth?.data?.userroles || [];
 
   retVal = roles.map(s => s.toLowerCase()).filter(x => ['admin','manager'].includes(x)).length > 0;
 

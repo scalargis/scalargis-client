@@ -29,6 +29,7 @@ import {
   AUTH_HTTP_LOADING,
   AUTH_RESPONSE,
   AUTH_LOGIN,
+  AUTH_LOGOUT,
   PASSWORD_HTTP_ERROR,
   PASSWORD_HTTP_LOADING,
   PASSWORD_RESPONSE,
@@ -99,6 +100,7 @@ const root = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: true,
           http_error: false,
           error: null
@@ -110,6 +112,7 @@ const root = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: false,
           http_error: true,
           response: action.res
@@ -121,6 +124,7 @@ const root = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: false,
           http_error: false,
           response: null
@@ -132,6 +136,7 @@ const root = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: false,
           response: action.res
         }
@@ -145,6 +150,12 @@ const root = (
           loading: false,
           data: action.data
         }
+      }
+
+    case AUTH_LOGOUT:
+      return {
+        ...state,
+        auth: {}
       }
 
     // Password loading

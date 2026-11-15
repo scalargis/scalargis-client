@@ -23,7 +23,7 @@ function AccountForm(props) {
 
   const { core } = useContext(AppContext);
 
-  const { auth_update, logout } = core?.actions ?? {};
+  const { refresh_auth, logout } = core?.actions ?? {};
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,7 +59,7 @@ function AccountForm(props) {
 
       setData(new_data);
 
-      if (d?.data) dispatch(auth_update(d?.data));
+      if (d?.data) dispatch(refresh_auth(d?.data));
 
     }).catch(e => {
       const msg = e.body?.message === 'auth_token_taken'
