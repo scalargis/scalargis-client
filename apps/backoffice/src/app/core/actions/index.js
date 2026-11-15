@@ -187,24 +187,29 @@ export function backoffice_unload_components(core) {
   }
 }
 
-export function backoffice_error(history) {
+/** Error of the backoffice boot, with kind network, server, invalid, unauthorized, or forbidden. */
+export class BootError extends Error {
+  constructor(kind, status) {
+    super(kind);
+    this.kind = kind;
+    this.status = status;
+  }
+}
+
+export function backoffice_load_error(error) {
   const action = {
     type: BACKOFFICE_LOAD_ERROR,
-    redirect: '/not-found'
+    error
   }
-  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
 
-export function backoffice_not_found(history) {
-  const action =  {
-    type: BACKOFFICE_NOT_FOUND,
-    redirect: '/not-found'
+export function backoffice_load_start() {
+  const action = {
+    type: BACKOFFICE_LOAD
   }
-  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
-
 
 export function backoffice_not_authorized(history, redirect) {
   const action = {
@@ -236,21 +241,25 @@ export function backoffice_load(core, history) {
     // Add logged user token
     if (logged?.token) options.headers['X-API-KEY'] = logged.token;
     
-    // Make request
-    fetch(url, options).then(res => {
+    dispatch(backoffice_load_start());
 
-      // Validate response
-      if (res.status === 401) throw new Error('Unauthorized');
-      else if (res.status !== 200) throw new Error('Not found');
-      return res.json();
-      
+    fetch(url, options).catch(() => {
+      throw new BootError('network');
+    }).then(res => {
+      if (res.status === 401) throw new BootError('unauthorized', 401);
+      if (res.status === 403) throw new BootError('forbidden', 403);
+      if (res.status !== 200) throw new BootError('server', res.status);
+      return res.json().catch(() => {
+        throw new BootError('invalid', res.status);
+      });
+
     }).then(data => {      
-      const config = { ...data, config_json: data.config };
+      const config = { ...data, config_json: data?.config };
       delete config.config;
 
-      // Validate config
-      if (!config) return dispatch(backoffice_not_found(history));
-      if (!config.config_json) return dispatch(backoffice_not_found(history));
+      if (!config.config_json || !Array.isArray(config.config_json.components)) {
+        throw new BootError('invalid', 200);
+      }
 
       // Unload components
       dispatch(backoffice_unload_components(core));
@@ -280,20 +289,16 @@ export function backoffice_load(core, history) {
 
     }).catch(error => {
       const target = encodeURIComponent(`${history.location?.pathname || '/'}${history.location?.search || ''}`);
+      const kind = error instanceof BootError ? error.kind : 'invalid';
 
-      // Redirect to login or error pages
-      if (error.message === 'Not found') {
-        //TODO: Bad API endpoint, redirect to page with more info to user
-        const redirect = `/login?redirect=${target}`;
-        history.navigate(redirect);
-      } else if (error.message === 'Unauthorized') {
-        if (!logged) {
-          const redirect = `/login?redirect=${target}`;
-          history.navigate(redirect);
-        } else dispatch(backoffice_not_authorized(history));
-      } else {
-        dispatch(logout());
+      if (kind === 'unauthorized' || kind === 'forbidden') {
+        if (!logged) history.navigate(`/login?redirect=${target}`);
+        else dispatch(backoffice_not_authorized(history));
+        return;
       }
+
+      if (!(error instanceof BootError)) console.error(error);
+      dispatch(backoffice_load_error({ kind, status: error?.status }));
     })
   }
 }
