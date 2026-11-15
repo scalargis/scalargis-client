@@ -12,6 +12,7 @@ export const AUTH_LOGOUT                = 'AUTH_LOGOUT'
 
 export const BACKOFFICE_LOAD            = 'BACKOFFICE_LOAD'
 export const BACKOFFICE_LOAD_DONE       = 'BACKOFFICE_LOAD_DONE'
+export const BACKOFFICE_LOAD_RESET      = 'BACKOFFICE_LOAD_RESET'
 
 export const BACKOFFICE_SET_CONFIG      = 'BACKOFFICE_SET_CONFIG'
 export const BACKOFFICE_LOAD_ERROR      = 'BACKOFFICE_LOAD_ERROR'
@@ -237,15 +238,25 @@ export function backoffice_not_authorized(history, redirect) {
   return action;
 }
 
-export function backoffice_load_done(components) {
+export function backoffice_load_done() {
   const action = {
     type: BACKOFFICE_LOAD_DONE
   }
   return action;
 }
 
+let bootRun = 0;
+
+/** Drops the boot in flight and sets the boot phase back to idle. */
+export function backoffice_load_reset() {
+  bootRun++;
+  return { type: BACKOFFICE_LOAD_RESET };
+}
+
 export function backoffice_load(core, history) {
   return function (dispatch, getState) {
+    const run = ++bootRun;
+    const current = () => run === bootRun;
 
     // Get logged user
     const logged = core.getLoggedUser();
@@ -270,7 +281,8 @@ export function backoffice_load(core, history) {
         throw new BootError('invalid', res.status);
       });
 
-    }).then(data => {      
+    }).then(data => {
+      if (!current()) return;
       const config = { ...data, config_json: data?.config };
       delete config.config;
 
@@ -285,26 +297,30 @@ export function backoffice_load(core, history) {
       core.setConfig(config);
       dispatch(backoffice_set_config(config));
 
-      // Load components
-      let count = 0;
       const { components } = config.config_json;
+      const finish = () => {
+        if (!current()) return;
+        const pitems = {};
+        components.forEach(c => pitems[c.id] = c);
+        dispatch(backoffice_load_components(pitems));
+        dispatch(backoffice_load_done());
+      };
+
+      if (!components.length) {
+        finish();
+        return;
+      }
+
+      let count = 0;
       components.forEach(component => {
         core.addComponent(core, component, () => {
           count++;
-          if (count === components.length) {
-
-            // Index by id
-            const pitems = {};
-            components.forEach(c => pitems[c.id] = c);
-
-            // Finally, load into redux store
-            dispatch(backoffice_load_components(pitems));
-            dispatch(backoffice_load_done());
-          }
+          if (count === components.length) finish();
         })
       })
 
     }).catch(error => {
+      if (!current()) return;
       const target = encodeURIComponent(`${history.location?.pathname || '/'}${history.location?.search || ''}`);
       const kind = error instanceof BootError ? error.kind : 'invalid';
 

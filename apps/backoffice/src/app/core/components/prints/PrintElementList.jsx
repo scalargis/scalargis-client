@@ -193,4 +193,4 @@ function PrintElementList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(PrintElementList);
+export default connect(state => ({ filters: state.filters }))(PrintElementList);

@@ -275,4 +275,4 @@ function PrintList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(PrintList);
+export default connect(state => ({ filters: state.filters }))(PrintList);

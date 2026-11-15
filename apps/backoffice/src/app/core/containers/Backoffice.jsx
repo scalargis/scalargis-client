@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import AppContext from '../../AppContext';
 import Layout from './Layout';
 import PageBootError from '../components/PageBootError';
+import LoadingScreen from '../components/LoadingScreen';
 
 /**
  * Backoffice layout container
@@ -22,25 +23,25 @@ function Backoffice(props) {
     params
   }
 
-  const { dispatch, loading, backoffice, config, bootError } = props;
+  const { dispatch, backoffice, boot } = props;
   //const history = useHistory();
 
   // Enable redux actions
   //const dispatch = useDispatch();
   const { core } = useContext(AppContext);
-  const { backoffice_load, layout_wrapper_click, layout_toggle_menu } = core.actions;
+  const { backoffice_load, backoffice_load_reset, layout_wrapper_click, layout_toggle_menu } = core.actions;
 
   // Get config
   React.useEffect(() => {
-    dispatch(backoffice_load(core, history, true));
+    dispatch(backoffice_load(core, history));
+    return () => dispatch(backoffice_load_reset());
   }, []);
 
-  // TODO: improve loading UI
-  if (loading) return null;
-
-  if (bootError) {
-    return <PageBootError error={bootError} onRetry={() => dispatch(backoffice_load(core, history))} />;
+  if (boot.phase === 'failed') {
+    return <PageBootError error={boot.error} onRetry={() => dispatch(backoffice_load(core, history))} />;
   }
+
+  if (boot.phase !== 'ready') return <LoadingScreen />;
 
   return (
     <Layout
@@ -53,4 +54,4 @@ function Backoffice(props) {
   );
 }
 
-export default connect(state => ({ backoffice: state.backoffice, bootError: state.bootError }))(Backoffice);
+export default connect(state => ({ backoffice: state.backoffice, boot: state.boot }))(Backoffice);

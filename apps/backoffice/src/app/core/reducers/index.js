@@ -11,6 +11,7 @@ import {
   BACKOFFICE_LOAD_COMPONENTS,
   BACKOFFICE_UNLOAD_COMPONENTS,
   BACKOFFICE_LOAD_DONE,
+  BACKOFFICE_LOAD_RESET,
   BACKOFFICE_SET_CONFIG,
   BACKOFFICE_SET_NOTIFICATIONS_TOTAL,
   AUTH_HTTP_ERROR,
@@ -37,8 +38,7 @@ const cookieAuthName = getCookieAuthName();
 
 const reducer = (
   state = { 
-    loading: true,
-    bootError: null,
+    boot: { phase: 'idle', error: null },
     auth: { data: cookies.get(cookieAuthName)},
     config: null,
     backoffice: initialBackoffice,
@@ -117,14 +117,13 @@ const reducer = (
     case BACKOFFICE_LOAD:
       return {
         ...state,
-        loading: true,
-        bootError: null
+        boot: { phase: 'config', error: null }
       }
 
     case BACKOFFICE_LOAD_ERROR:
       return {
         ...state,
-        bootError: action.error
+        boot: { phase: 'failed', error: action.error }
       }
 
     // Set viewer config
@@ -132,6 +131,7 @@ const reducer = (
       return {
         ...state,
         config: action.config,
+        boot: { phase: 'registering', error: null },
         backoffice: {
           ...initialBackoffice,
           ...action.backoffice
@@ -168,7 +168,13 @@ const reducer = (
     case BACKOFFICE_LOAD_DONE:
       return {
         ...state,
-        loading: false
+        boot: { phase: 'ready', error: null }
+      }
+
+    case BACKOFFICE_LOAD_RESET:
+      return {
+        ...state,
+        boot: { phase: 'idle', error: null }
       }
 
     // On click layout

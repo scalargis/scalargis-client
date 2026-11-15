@@ -254,4 +254,4 @@ function PrintGroupList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(PrintGroupList);
+export default connect(state => ({ filters: state.filters }))(PrintGroupList);

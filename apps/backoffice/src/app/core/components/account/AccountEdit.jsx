@@ -31,4 +31,4 @@ function AccountEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(AccountEdit);
+export default connect(state => ({ auth: state.auth, filters: state.filters }))(AccountEdit);

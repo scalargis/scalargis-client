@@ -30,4 +30,4 @@ function PrintEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, backoffice: state.backoffice }))(PrintEdit);
+export default connect(state => ({ backoffice: state.backoffice }))(PrintEdit);

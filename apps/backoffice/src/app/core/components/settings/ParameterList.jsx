@@ -253,4 +253,4 @@ function ParameterList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(ParameterList);
+export default connect(state => ({ auth: state.auth, filters: state.filters }))(ParameterList);

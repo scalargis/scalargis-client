@@ -29,4 +29,4 @@ function ViewerEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading }))(ViewerEdit);
+export default connect()(ViewerEdit);

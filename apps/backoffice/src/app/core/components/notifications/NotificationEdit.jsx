@@ -29,4 +29,4 @@ function NotificationEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading }))(NotificationEdit);
+export default connect()(NotificationEdit);

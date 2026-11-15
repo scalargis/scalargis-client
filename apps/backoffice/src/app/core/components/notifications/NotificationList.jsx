@@ -263,4 +263,4 @@ function NotificationList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(NotificationList);
+export default connect(state => ({ filters: state.filters }))(NotificationList);

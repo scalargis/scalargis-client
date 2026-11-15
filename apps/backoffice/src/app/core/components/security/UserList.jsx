@@ -246,4 +246,4 @@ function UserList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(UserList);
+export default connect(state => ({ auth: state.auth, filters: state.filters }))(UserList);

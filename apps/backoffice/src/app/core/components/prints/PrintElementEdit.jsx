@@ -30,4 +30,4 @@ function PrintElementEdit(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading }))(PrintElementEdit);
+export default connect()(PrintElementEdit);

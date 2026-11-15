@@ -199,4 +199,4 @@ function RoleList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, auth: state.auth, filters: state.filters }))(RoleList);
+export default connect(state => ({ auth: state.auth, filters: state.filters }))(RoleList);
