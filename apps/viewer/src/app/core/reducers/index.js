@@ -43,6 +43,7 @@ import {
   VIEWER_SAVE_HTTP_LOADING,
   VIEWER_SAVE_HTTP_ERROR,
   VIEWER_SAVE_RESPONSE,
+  VIEWER_SAVE_RESET,
 
   VIEWER_SESSION_SAVED,
 
@@ -72,6 +73,21 @@ const initialViewer = {
     layers: [],
     removed: [],
     map_controls: []
+  }
+}
+
+/** Sets the request state of one save slot of the viewer. */
+function withSaveSlot(state, slot, value) {
+  const key = slot || 'save';
+  return {
+    ...state,
+    viewer: {
+      ...state.viewer,
+      save_slots: {
+        ...(state.viewer.save_slots || {}),
+        [key]: value
+      }
+    }
   }
 }
 
@@ -232,49 +248,35 @@ const root = (
         }
       }
 
-    // Save loading
     case VIEWER_SAVE_HTTP_LOADING:
-      return {
-        ...state,
-        viewer: {          
-          ...state.viewer,
-          save_loading: true,
-          save_response: null,
-          save_error: null
-        }
-      }      
+      return withSaveSlot(state, action.slot, { status: 'loading', response: null });
 
-    // Set save viewer HTTP error
     case VIEWER_SAVE_HTTP_ERROR:
-      return {
-        ...state,
-        viewer: {
-          ...state.viewer,
-          save_loading: false,
-          save_error: action.error
-        }
-      }
+      return withSaveSlot(state, action.slot, { status: 'unavailable', response: null });
 
-    // Set save viewer last response
+    case VIEWER_SAVE_RESET:
+      return withSaveSlot(state, action.slot, { status: 'idle', response: null });
+
     case VIEWER_SAVE_RESPONSE: {
-      const save_options = {
-        name: action.save_options ? action.save_options.name : state.viewer.name,
-        title: action.save_options ? action.save_options.title : state.viewer.title,
-        description: action.save_options ? action.save_options.description : state.viewer.description,
-        allow_anonymous: action.save_options ? action.save_options.allow_anonymous : state.viewer.allow_anonymous,
-        allow_user_session : action.save_options ? action.save_options.allow_user_session : state.viewer.allow_user_session,
-        is_active: action.save_options ? action.save_options.is_active : state.viewer.is_active
-      }
+      const next = withSaveSlot(state, action.slot, {
+        status: action.success ? 'success' : 'failed',
+        response: action.res
+      });
+      if (!action.success || !action.save_options) return next;
+      const o = action.save_options;
       return {
-        ...state,
+        ...next,
         viewer: {
-          ...state.viewer,
-          ...save_options,
-          save_loading: false,
-          save_response: action.res
+          ...next.viewer,
+          name: o.name,
+          title: o.title,
+          description: o.description,
+          allow_anonymous: o.allow_anonymous,
+          allow_user_session: o.allow_user_session,
+          is_active: o.is_active
         }
       }
-    }     
+    }
 
     case VIEWER_LOAD_COMPONENTS:
       return {
@@ -624,10 +626,7 @@ const root = (
         viewer: {
           ...state.viewer,
           is_session: true,
-          session: action.session,
-          save_loading: false,
-          save_response: null,
-          save_error: null          
+          session: action.session
         }
       }
 

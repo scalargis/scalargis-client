@@ -28,6 +28,7 @@ export const VIEWER_LOAD_DONE           = 'VIEWER_LOAD_DONE'
 export const VIEWER_SAVE_HTTP_LOADING   = 'VIEWER_SAVE_HTTP_LOADING'
 export const VIEWER_SAVE_HTTP_ERROR     = 'VIEWER_SAVE_HTTP_ERROR'
 export const VIEWER_SAVE_RESPONSE       = 'VIEWER_SAVE_RESPONSE'
+export const VIEWER_SAVE_RESET          = 'VIEWER_SAVE_RESET'
 
 export const VIEWER_SESSION_LOAD        = 'VIEWER_SESSION_LOAD'
 export const VIEWER_SESSION_SAVED       = 'VIEWER_SESSION_SAVED'
@@ -137,31 +138,29 @@ export function site_load(core, callback) {
 }
 
 
-export function viewer_save_record(core, record, history, redirect, cb) {
+export function viewer_save_record(core, record, history, redirect, cb, slot = 'save') {
   return function (dispatch, getState) {
-    dispatch(viewer_save_http_loading());
+    dispatch(viewer_save_http_loading(slot));
 
-    // Save request
     const options = {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'        
+        'Content-Type': 'application/json'
       },
       method: record.id ? 'PUT' : 'POST',
       body: JSON.stringify(record)
     }
 
-    // Get logged user
     const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
-    // Auth url. TODO: check for proxy
     let url = API_URL + '/app/viewer';
     if (record.id) url += '/' + record.id;
     fetch(url, options)
-      .then(res => res.json())
-      .then(res => {
-        const save_options = record.id ? { 
+      .then(res => res.json().then(body => ({ ok: res.ok, body })))
+      .then(({ ok, body }) => {
+        const success = ok && body?.success === true;
+        const save_options = success && record.id ? {
           name: record.name,
           title: record.title,
           description: record.description,
@@ -169,35 +168,48 @@ export function viewer_save_record(core, record, history, redirect, cb) {
           allow_anonymous: record.allow_anonymous,
           is_active: record.is_active
         } : null;
-        if (cb) cb(res);
-        dispatch(viewer_save_response(res, save_options));
+        if (cb) cb(success ? body : { ...body, success: false });
+        dispatch(viewer_save_response(body, save_options, slot, success));
       }).catch(error => {
         console.log('error', error);
-        dispatch(viewer_save_http_error());
+        if (cb) cb({ success: false });
+        dispatch(viewer_save_http_error(slot));
       });
   }
 }
 
-export function viewer_save_http_error() {
+export function viewer_save_http_error(slot = 'save') {
   const action = {
     type: VIEWER_SAVE_HTTP_ERROR,
+    slot,
     error: true
   }
   return action;
 }
 
-export function viewer_save_http_loading() {
+export function viewer_save_http_loading(slot = 'save') {
   const action = {
-    type: VIEWER_SAVE_HTTP_LOADING
+    type: VIEWER_SAVE_HTTP_LOADING,
+    slot
   }
   return action;
 }
 
-export function viewer_save_response(res, save_options) {
+export function viewer_save_response(res, save_options, slot = 'save', success = !!res?.success) {
   const action = {
     type: VIEWER_SAVE_RESPONSE,
     res,
-    save_options
+    save_options,
+    slot,
+    success
+  }
+  return action;
+}
+
+export function viewer_save_reset(slot = 'save') {
+  const action = {
+    type: VIEWER_SAVE_RESET,
+    slot
   }
   return action;
 }
