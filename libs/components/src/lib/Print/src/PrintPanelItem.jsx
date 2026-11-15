@@ -87,11 +87,17 @@ export default function PrintPanelItem(props) {
     else setDrawTool(null);
   }
 
+  function setDragPan(active) {
+    const dragPan = findOLInteraction(mainMap, OlInteractionDragPan);
+    if (dragPan) dragPan.setActive(active);
+  }
+
   function addInteraction(type) {
     if (draw) mainMap.removeInteraction(draw);
     if (copyGeometry.current) copyGeometry.current.setActive(false);
     if (select.current) select.current.setActive(false);
     if (modify.current) modify.current.setActive(false);
+    setDragPan(type !== 'Modify');
 
     if (['Point', 'LineString', 'Polygon'].includes(type)) {
       const source = printLayer.current.getSource();
@@ -118,7 +124,6 @@ export default function PrintPanelItem(props) {
     } else if (type === 'Select') {
       select.current.setActive(true);
     } else if (type === 'Modify') {
-      findOLInteraction(mainMap, OlInteractionDragPan).setActive(false);
       modify.current.setActive(true);
     }
   }
@@ -643,9 +648,7 @@ export default function PrintPanelItem(props) {
       if (copyGeometry.current) copyGeometry.current.setActive(false);
       if (select.current) select.current.setActive(false);
       if (modify.current) modify.current.setActive(false);
-
-      const olit = findOLInteraction(mainMap, OlInteractionDragPan);
-      if (olit) olit.setActive(true);
+      setDragPan(true);
     }
   }, [drawTool]);
 
@@ -737,6 +740,7 @@ export default function PrintPanelItem(props) {
       if (copyGeom) mainMap.removeInteraction(copyGeom);
       if (slct) mainMap.removeInteraction(slct);
       if (mdf) mainMap.removeInteraction(mdf);
+      setDragPan(true);
     }
   }, [mainMap]);
 

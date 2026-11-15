@@ -482,7 +482,12 @@ class DrawTools extends React.Component {
         this.select.setActive(true);
 
         const { mainMap, actions, dispatch } = this.props;
-        if (this.draw) mainMap.removeInteraction(this.draw);
+        if (this.draw) {
+          mainMap.removeInteraction(this.draw);
+          this.findInteraction(OlInteractionDragPan).setActive(true);
+          this.findInteraction(OlInteractionDoubleClickZoom).setActive(true);
+          this.findInteraction(OlInteractionPinchZoom).setActive(true);
+        }
 
         dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
         //this.addInteraction(type);
