@@ -558,10 +558,11 @@ export function viewer_set_drawings(data) {
   return action;
 }
 
-export function viewer_set_featureinfo(data) {
+export function viewer_set_featureinfo(data, searching = false) {
   const action = {
     type: VIEWER_SET_FEATUREINFO,
-    data
+    data,
+    searching
   }
   return action;
 }

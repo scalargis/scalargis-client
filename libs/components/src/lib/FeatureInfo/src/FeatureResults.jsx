@@ -19,7 +19,7 @@ export default function FeatureResults({ core, config, features, layers, actions
   const { viewer, Models } = config;
   const { findOlLayer } = Models.Utils;
   const { selected_menu } = viewer.config_json;
-  const { exclusive_mapcontrol } = viewer;
+  const { exclusive_mapcontrol, featureinfo_searching } = viewer;
   const { publish, subscribe } = pubsub ? pubsub : {};
 
   const { t } = useTranslation();
@@ -168,7 +168,16 @@ export default function FeatureResults({ core, config, features, layers, actions
     return val;
   }
 
+  const searchingMessage = (
+    <Message
+      severity="info"
+      icon="pi pi-spin pi-spinner"
+      text={t("identifySearching", "A pesquisar...")}
+    />
+  );
+
   if (Object.keys(grouped).length === 0) {
+    if (featureinfo_searching) return searchingMessage;
     let msg = t("identifyNoResults", "Sem resultados. Clique no mapa para identificar.");
     if (isInactive) msg = `${t("noResults", "Sem resultados")}. ${t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.")}`;
     return (
@@ -188,6 +197,8 @@ export default function FeatureResults({ core, config, features, layers, actions
           text={t("identifyNotActive", "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.")} 
         />
       }
+
+      { featureinfo_searching && searchingMessage }
 
       <div style={ {padding: "0.571rem 1rem", textAlign: "right"} }>
         <Button

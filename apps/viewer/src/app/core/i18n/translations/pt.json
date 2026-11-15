@@ -54,6 +54,7 @@
   "noResults": "Sem resultados",
   "identifyElements": "Identificar Elementos",
   "identifyNoResults": "Sem resultados. Clique no mapa para identificar.",
+  "identifySearching": "A pesquisar...",
   "identifyNotActive": "Clique no botão do menu principal para ativar a ferramenta, depois clique no mapa para identificar elementos.",
   "exportElement": "Exportar elemento",
   "mapTools": "Ferramentas do Mapa",
