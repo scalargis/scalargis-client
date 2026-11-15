@@ -4,7 +4,6 @@ import {
   LAYOUT_TOGGLE_OVERLAYMENU,
   LAYOUT_TOGGLE_STATICMENU,
   LAYOUT_WRAPPER_CLICK,
-  VIEWER_LOAD,
   VIEWER_LOAD_COMPONENTS,
   VIEWER_UNLOAD_COMPONENTS,
   VIEWER_LOAD_DONE,
@@ -78,7 +77,6 @@ const cookieAuthName = getCookieAuthName();
 
 const root = (
     state = {
-      loading: true,
       auth: { data: cookies.get(cookieAuthName)},
       registration: {},
       password: {},
@@ -210,13 +208,6 @@ const root = (
         }
       }      
     
-    // Start loading viewer config
-    case VIEWER_LOAD:
-      return {
-        ...state,
-        loading: true
-      }
-
     // Set viewer config
     case VIEWER_SET_CONFIG:
       return {
@@ -287,7 +278,6 @@ const root = (
     case VIEWER_LOAD_DONE:
       return {
         ...state,
-        loading: false,
         viewer: {
           ...state.viewer,
           loaded: true

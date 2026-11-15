@@ -184,7 +184,8 @@ Core.prototype.setConfig = function(config) {
 }
 
 // Add components
-Core.prototype.addComponent = function(core, component, done) {
+/** Loads one viewer component, and skips the registration of a plugin module when isCurrent returns false. */
+Core.prototype.addComponent = function(core, component, done, isCurrent) {
 
   const components = { ...local_components, ...core_components};
   
@@ -247,6 +248,8 @@ Core.prototype.addComponent = function(core, component, done) {
       }
       return c;
     })().then(c => {
+      if (isCurrent && !isCurrent()) return done();
+
       // Add component actions
       if (c.actions && typeof c.actions === 'object') {
         try {
