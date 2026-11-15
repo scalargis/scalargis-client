@@ -1,10 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router';
-import { Box, LoadingOverlay } from '@mantine/core';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import useRecord, { useRecordNavigation } from '../common/useRecord';
+import RecordView from '../common/RecordView';
 
 import ViewerForm from './ViewerForm';
 
@@ -12,49 +13,18 @@ function ViewerEdit(props) {
 
   const { core } = useContext(AppContext);
 
-  const {
-    dispatch
-  } = props;
-
   const { id } = useParams();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [record, setRecord] = useState(null);
+  const { goBack } = useRecordNavigation('/viewers');
 
-  const API_URL = core.API_URL;
-
-  useEffect(() => {
-    if (id) {
-      loadData();
-    } else {
-      setIsLoading(false);
-      setRecord({});
-    }
-  }, []);
-
-  const loadData = () => {
-    const provider = dataProvider(API_URL + '/portal');
-
-    const params = {
-      id: id
-    }
-
-    setIsLoading(true);
-
-    provider.getOne('viewers', params).then(d => {
-      setRecord(d.data);
-    }).catch(e => {
-      console.error(e);
-    }).finally(() => {
-      setIsLoading(false);
-    });
-  }
+  const state = useRecord(id, (key) =>
+    dataProvider(core.API_URL + '/portal').getOne('viewers', { id: key }).then(d => d.data)
+  );
 
   return (
-    <Box pos="relative">
-      <LoadingOverlay visible={isLoading} />
-      { record ? <ViewerForm data={record} /> : <div /> }
-    </Box>
+    <RecordView state={state} onBack={goBack}>
+      {(record) => <ViewerForm data={record} />}
+    </RecordView>
   );
 
 }

@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, useMemo, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
@@ -25,6 +24,7 @@ import { CodeEditor, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconR
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 import { isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
@@ -96,10 +96,6 @@ function ViewerForm(props) {
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -224,16 +220,7 @@ function ViewerForm(props) {
     setSelectedRoles(null);
   }
 
-  const goBack = () => {
-    if (location?.state?.from) {
-      const state = {
-        searchParams: {...location.state.previousSearchParams}
-      }
-      navigate(location.state.from, { state });
-    } else {
-      navigate(-1);
-    }
-  }
+  const { goBack, openCreated } = useRecordNavigation('/viewers');
 
   const onSubmit = (formData) => {
     let manifest_json = null;
@@ -297,7 +284,7 @@ function ViewerForm(props) {
         data: {...new_data}
       }
       provider.create('viewers', params).then(d => {
-        setData({...data, id: d.data.id});
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');

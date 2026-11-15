@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
@@ -26,6 +25,7 @@ import PrintLayoutsEditor from "./PrintLayoutsEditor";
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 import PageSection from '../common/PageSection';
 
 const buildScaleList = (list1, list2) => {
@@ -44,10 +44,6 @@ const pageFormatList = ['A4', 'A3', 'A2', 'A1', 'A0'];
 const pageOrientationList = ['Retrato', 'Paisagem'];
 
 function PrintForm(props) {
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const {
     dispatch
@@ -141,12 +137,7 @@ function PrintForm(props) {
     }
   }
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/prints');
 
   const onSubmit = (formData) => {
     let new_data = {
@@ -183,8 +174,7 @@ function PrintForm(props) {
         data: {...new_data}
       }
       provider.create('prints', params).then(d => {
-        setData({...data, id: d.data.id});
-        setLayouts(d?.data ? [...(d.data.layouts || [])] : []);
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');

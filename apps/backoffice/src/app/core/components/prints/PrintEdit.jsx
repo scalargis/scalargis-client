@@ -1,70 +1,31 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import useRecord, { useRecordNavigation } from '../common/useRecord';
+import RecordView from '../common/RecordView';
+import { scalesToArray } from '../common/utils';
 
 import PrintForm from './PrintForm';
-
 
 function PrintEdit(props) {
 
   const { core } = useContext(AppContext);
 
-  const {
-    dispatch
-  } = props;
-
   const { id } = useParams();
 
-  const [loading, setLoading] = useState(false);
-  const [record, setRecord] = useState(null);
-  const [roles, setRoles] = useState([]);
+  const { goBack } = useRecordNavigation('/prints');
 
-  const toast = useRef(null);
-
-  const API_URL = core.API_URL;
-
-  useEffect(() => {
-    if (id) {
-      loadData();
-    } else {
-      setRecord({});
-    }
-  }, []);
-
-  const loadData = () => {
-    const provider = dataProvider(API_URL + '/portal');
-
-    const params = {
-      id: id
-    }
-
-    setLoading(true);  
-
-    provider.getOne('prints', params).then(d => {
-      //Change restrict_scales_list from string to array
-      const tmp_data = d.data;
-      if (tmp_data.restrict_scales_list && ((typeof tmp_data.restrict_scales_list === 'string' || tmp_data.restrict_scales_list instanceof String))) {
-        tmp_data.restrict_scales_list = tmp_data.restrict_scales_list.split(',').map(s => parseInt(s));
-      }
-      setRecord(tmp_data);
-      setLoading(false);
-    }).catch(e => {
-      setLoading(false);
-      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de intervenções'});
-    });
-  }  
+  const state = useRecord(id, (key) =>
+    dataProvider(core.API_URL + '/portal').getOne('prints', { id: key }).then(d => scalesToArray(d.data))
+  );
 
   return (
-    <React.Fragment>
-    { record ?
-      <PrintForm data={record} coordinateSystems={ props?.backoffice?.config_json ? props.backoffice.config_json.coordinate_systems || [] : []} />
-      :
-      <div>loading...</div>
-    }
-    </React.Fragment>
+    <RecordView state={state} onBack={goBack}>
+      {(record) => <PrintForm data={record} coordinateSystems={props?.backoffice?.config_json?.coordinate_systems || []} />}
+    </RecordView>
   );
 
 }

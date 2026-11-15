@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
 import {
   Alert,
@@ -19,6 +18,7 @@ import { notify, IconAlertTriangle, IconArrowLeft, IconSave } from '@scalargis/u
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 
 const sortRolesArray = (data) => {
   if (!data) return data;
@@ -69,10 +69,6 @@ function GroupForm(props) {
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -174,12 +170,7 @@ function GroupForm(props) {
     setSelectedUsers(null);
   }
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/security/groups');
 
   const onSubmit = (formData) => {
     const new_data = {
@@ -209,7 +200,7 @@ function GroupForm(props) {
         data: {...new_data}
       }
       provider.create('groups', params).then(d => {
-        setData({...data, id: d.data.id});
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');

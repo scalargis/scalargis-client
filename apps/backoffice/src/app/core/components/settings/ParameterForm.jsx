@@ -1,22 +1,18 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { Button, Grid, Group, TextInput, Textarea } from '@mantine/core';
 import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 
 function ParameterForm(props) {
 
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const parameters_table = props.parametersTable || 'site';
 
@@ -33,12 +29,7 @@ function ParameterForm(props) {
     defaultValues: {...data}
   });
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/settings/parameters');
 
   const onSubmit = (formData) => {
     const new_data = {
@@ -68,7 +59,7 @@ function ParameterForm(props) {
         data: {...new_data}
       }
       provider.create(parameters_table, params).then(d => {
-        setData({...data, id: d.data.id});
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');

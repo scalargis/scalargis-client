@@ -55,3 +55,13 @@ export const getFieldListStyle = isDraggingOver => ({
   padding: 4,
   //width: 250
 });
+
+/** Turns a comma list of restrict_scales_list into numbers; no record gives null. */
+export const scalesToArray = (record) => {
+  if (!record) return null;
+  const scales = record.restrict_scales_list;
+  if (typeof scales === 'string' || scales instanceof String) {
+    return { ...record, restrict_scales_list: scales ? scales.split(',').map(s => parseInt(s)) : scales };
+  }
+  return record;
+};

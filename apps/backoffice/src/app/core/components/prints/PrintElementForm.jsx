@@ -1,22 +1,18 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Grid, Group, Input, TextInput } from '@mantine/core';
 import { CodeEditor, notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 
 function PrintElementForm(props) {
 
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -31,12 +27,7 @@ function PrintElementForm(props) {
     defaultValues: {...data}
   });
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/prints/elements');
 
   const onSubmit = (formData) => {
     const new_data = {
@@ -65,7 +56,7 @@ function PrintElementForm(props) {
         data: {...new_data}
       }
       provider.create('prints/elements', params).then(d => {
-        setData({...data, id: d.data.id});
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');

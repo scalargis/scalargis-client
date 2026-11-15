@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
@@ -25,6 +24,7 @@ import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 import PageSection from '../common/PageSection';
 
 
@@ -48,10 +48,6 @@ function PrintGroupForm(props) {
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -140,12 +136,7 @@ function PrintGroupForm(props) {
     }
   }
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/prints/groups');
 
   const onSubmit = (formData) => {
 
@@ -185,8 +176,7 @@ function PrintGroupForm(props) {
         data: {...new_data}
       }
       provider.create('prints/groups', params).then(d => {
-        setData({...data, id: d.data.id});
-        setLayouts(d?.data ? [...(d.data.layouts || [])] : []);
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');
