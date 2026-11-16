@@ -23,7 +23,7 @@ function ParameterEdit(props) {
 
   return (
     <RecordView state={state} onBack={goBack}>
-      {(record) => <ParameterForm data={record} />}
+      {(record) => <ParameterForm data={record} onReload={state.reload} />}
     </RecordView>
   );
 

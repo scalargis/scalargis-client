@@ -7,6 +7,7 @@ import { CodeEditor, notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
+import { useChangeSummary } from '../common/ChangeSummary';
 
 function PrintElementForm(props) {
 
@@ -29,29 +30,27 @@ function PrintElementForm(props) {
 
   const { goBack, openCreated } = useRecordNavigation('/prints/elements');
 
+  const buildData = (formData) => ({
+    code: formData.code,
+    name: formData.name,
+    config: formData.config
+  });
+
+  const summary = useChangeSummary({
+    record: data,
+    initialPayload: () => buildData(data),
+    save: (payload) => dataProvider(API_URL + '/portal').update('prints/elements', { id: data.id, data: payload }),
+    onReload: props.onReload
+  });
+
   const onSubmit = (formData) => {
-    const new_data = {
-      code: formData.code,
-      name: formData.name,
-      config: formData.config
-    }
+    const new_data = buildData(formData);
 
-    setIsSaving(true);
-
-    const provider = dataProvider(API_URL + '/portal');
     if (data.id) {
-      const params = {
-        id: data.id,
-        data: {...new_data}
-      }
-      provider.update('prints/elements', params).then(d => {
-        notify.success('Editar Registo', 'Registo alterado com sucesso');
-      }).catch(e => {
-        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
-      }).finally(() => {
-        setIsSaving(false);
-      });
+      summary.submit(new_data);
     } else {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/portal');
       const params = {
         data: {...new_data}
       }
@@ -131,8 +130,10 @@ function PrintElementForm(props) {
           <Button
             type="submit"
             leftSection={<IconSave />}
-            loading={isSaving}>Gravar</Button>
+            loading={isSaving || summary.saving}>Gravar</Button>
         </Group>
+
+        {summary.dialog}
 
       </form>
   );

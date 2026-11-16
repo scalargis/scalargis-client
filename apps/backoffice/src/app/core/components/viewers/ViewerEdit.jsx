@@ -23,7 +23,7 @@ function ViewerEdit(props) {
 
   return (
     <RecordView state={state} onBack={goBack}>
-      {(record) => <ViewerForm data={record} />}
+      {(record) => <ViewerForm data={record} onReload={state.reload} />}
     </RecordView>
   );
 

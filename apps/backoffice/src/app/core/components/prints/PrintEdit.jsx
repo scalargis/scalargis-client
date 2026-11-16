@@ -24,7 +24,7 @@ function PrintEdit(props) {
 
   return (
     <RecordView state={state} onBack={goBack}>
-      {(record) => <PrintForm data={record} coordinateSystems={props?.backoffice?.config_json?.coordinate_systems || []} />}
+      {(record) => <PrintForm data={record} onReload={state.reload} coordinateSystems={props?.backoffice?.config_json?.coordinate_systems || []} />}
     </RecordView>
   );
 

@@ -7,6 +7,7 @@ import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
+import { useChangeSummary } from '../common/ChangeSummary';
 
 function ParameterForm(props) {
 
@@ -31,30 +32,28 @@ function ParameterForm(props) {
 
   const { goBack, openCreated } = useRecordNavigation('/settings/parameters');
 
+  const buildData = (formData) => ({
+    code: formData.code,
+    name: formData.name,
+    notes: formData.notes,
+    setting_value: formData.setting_value
+  });
+
+  const summary = useChangeSummary({
+    record: data,
+    initialPayload: () => buildData(data),
+    save: (payload) => dataProvider(API_URL + '/portal/settings').update(parameters_table, { id: data.id, data: payload }),
+    onReload: props.onReload
+  });
+
   const onSubmit = (formData) => {
-    const new_data = {
-      code: formData.code,
-      name: formData.name,
-      notes: formData.notes,
-      setting_value: formData.setting_value
-    }
+    const new_data = buildData(formData);
 
-    setIsSaving(true);
-
-    const provider = dataProvider(API_URL + '/portal/settings');
     if (data.id) {
-      const params = {
-        id: data.id,
-        data: {...new_data}
-      }
-      provider.update(parameters_table, params).then(d => {
-        notify.success('Editar Registo', 'Registo alterado com sucesso');
-      }).catch(e => {
-        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
-      }).finally(() => {
-        setIsSaving(false);
-      });
+      summary.submit(new_data);
     } else {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/portal/settings');
       const params = {
         data: {...new_data}
       }
@@ -128,8 +127,10 @@ function ParameterForm(props) {
           <Button
             type="submit"
             leftSection={<IconSave />}
-            loading={isSaving}>Gravar</Button>
+            loading={isSaving || summary.saving}>Gravar</Button>
         </Group>
+
+        {summary.dialog}
 
       </form>
   );

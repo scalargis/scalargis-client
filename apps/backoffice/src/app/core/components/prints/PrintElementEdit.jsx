@@ -24,7 +24,7 @@ function PrintElementEdit(props) {
 
   return (
     <RecordView state={state} onBack={goBack}>
-      {(record) => <PrintElementForm data={record} />}
+      {(record) => <PrintElementForm data={record} onReload={state.reload} />}
     </RecordView>
   );
 

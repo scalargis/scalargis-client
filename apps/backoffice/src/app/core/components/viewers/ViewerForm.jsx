@@ -25,6 +25,7 @@ import { CodeEditor, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconR
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
+import { useChangeSummary } from '../common/ChangeSummary';
 import { isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
@@ -222,7 +223,7 @@ function ViewerForm(props) {
 
   const { goBack, openCreated } = useRecordNavigation('/viewers');
 
-  const onSubmit = (formData) => {
+  const buildData = (formData) => {
     let manifest_json = null;
     let config_json = null;
 
@@ -230,17 +231,17 @@ function ViewerForm(props) {
       manifest_json = manifestJson ?  JSON.parse(manifestJson) : null;
     } catch (e) {
         notify.error('Gravar Registo', 'O App Manifest não é JSON válido');
-        return false;
+        return null;
     }
 
     try {
       config_json = JSON.parse(configJson);
     } catch (e) {
         notify.error('Gravar Registo', 'A Configuração não é JSON válido');
-        return false;
+        return null;
     }
 
-    const new_data = {
+    return {
       id: formData.id,
       name: formData.name,
       title: formData.title,
@@ -263,23 +264,24 @@ function ViewerForm(props) {
       prints: printChilds?.prints ? printChilds.prints : [],
       print_groups: printChilds?.groups ? printChilds.groups : []
     }
+  };
 
-    setIsSaving(true);
+  const summary = useChangeSummary({
+    record: data,
+    initialPayload: () => buildData(data),
+    save: (payload) => dataProvider(API_URL + '/portal').update('viewers', { id: data.id, data: payload }),
+    onReload: props.onReload
+  });
 
-    const provider = dataProvider(API_URL + '/portal');
+  const onSubmit = (formData) => {
+    const new_data = buildData(formData);
+    if (!new_data) return false;
+
     if (data.id) {
-      const params = {
-        id: data.id,
-        data: {...new_data}
-      }
-      provider.update('viewers', params).then(d => {
-        notify.success('Editar Registo', 'Registo alterado com sucesso');
-      }).catch(e => {
-        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
-      }).finally(() => {
-        setIsSaving(false);
-      });
+      summary.submit(new_data);
     } else {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/portal');
       const params = {
         data: {...new_data}
       }
@@ -643,8 +645,10 @@ function ViewerForm(props) {
           <Button
             type="submit"
             leftSection={<IconSave />}
-            loading={isSaving}>Gravar</Button>
+            loading={isSaving || summary.saving}>Gravar</Button>
         </Group>
+
+        {summary.dialog}
 
       </form>
 

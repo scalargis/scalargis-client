@@ -26,6 +26,7 @@ import PrintLayoutsEditor from "./PrintLayoutsEditor";
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
+import { useChangeSummary } from '../common/ChangeSummary';
 import PageSection from '../common/PageSection';
 
 const buildScaleList = (list1, list2) => {
@@ -74,7 +75,7 @@ function PrintForm(props) {
   const API_URL = core.API_URL;
 
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, control, handleSubmit, watch, formState: { errors }, setValue, getValues } = useForm({
     defaultValues: {
       id: data.id,
       code: data.code,
@@ -139,37 +140,49 @@ function PrintForm(props) {
 
   const { goBack, openCreated } = useRecordNavigation('/prints');
 
-  const onSubmit = (formData) => {
+  const buildData = (formData, geometry) => {
     let new_data = {
       ...formData,
       form_fields: formFields ? {...formFields}  : {},
       layouts: layouts ? [...layouts]: []
     }
 
-    if (geometryFilter) {
+    if (geometry) {
       new_data = {
         ...new_data,
-        ...geometryFilter
+        ...geometry
       }
     }
 
-    setIsSaving(true);
+    return new_data;
+  };
 
-    const provider = dataProvider(API_URL + '/portal');
+  const savedGeometry = {
+    geom_filter: data.geom_filter,
+    geom_filter_srid: data.geom_filter_srid,
+    tolerance_filter: data.tolerance_filter
+  };
+
+  const summary = useChangeSummary({
+    record: data,
+    initialPayload: () => buildData(getValues(), savedGeometry),
+    save: (payload) => dataProvider(API_URL + '/portal').update('prints', { id: data.id, data: payload }),
+    onSaved: (d, payload) => {
+      const savedLayouts = d?.data ? [...(d.data.layouts || [])] : [];
+      setLayouts(savedLayouts);
+      return { ...payload, layouts: savedLayouts };
+    },
+    onReload: props.onReload
+  });
+
+  const onSubmit = (formData) => {
+    const new_data = buildData(formData, geometryFilter);
+
     if (data.id) {
-      const params = {
-        id: data.id,
-        data: {...new_data}
-      }
-      provider.update('prints', params).then(d => {
-        notify.success('Editar Registo', 'Registo alterado com sucesso');
-        setLayouts(d?.data ? [...(d.data.layouts || [])] : []);
-      }).catch(e => {
-        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
-      }).finally(() => {
-        setIsSaving(false);
-      });
+      summary.submit(new_data);
     } else {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/portal');
       const params = {
         data: {...new_data}
       }
@@ -554,8 +567,10 @@ function PrintForm(props) {
           <Button
             type="submit"
             leftSection={<IconSave />}
-            loading={isSaving}>Gravar</Button>
+            loading={isSaving || summary.saving}>Gravar</Button>
         </Group>
+
+        {summary.dialog}
 
       </form>
 
