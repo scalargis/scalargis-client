@@ -1025,6 +1025,7 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
         active: false,
         open: false,
         opacity: 1,
+        tiled: typeof options.tiled === 'undefined' ? true : options.tiled,
         type: 'OGCMap',
         url,
         children: []

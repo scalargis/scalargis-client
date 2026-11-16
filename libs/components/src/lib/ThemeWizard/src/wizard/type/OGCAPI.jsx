@@ -51,7 +51,8 @@ export default function OGCAPI(props) {
         const options = {
           use_proxy: !!data.ogcUseProxy,
           strategy: data.ogcLoadAll ? 'all' : 'bbox',
-          featureRender: data.ogcAsTiles ? 'tiles' : 'features'
+          featureRender: data.ogcAsTiles ? 'tiles' : 'features',
+          tiled: !!data.ogcTiled
         };
         const dataitems = Models.OWSModel.convertOGCAPI2Themes(json, base, options);
         const total = (json?.collections || []).length;
@@ -76,6 +77,7 @@ export default function OGCAPI(props) {
    */
   const render = () => {
     const { loading, data, editField, getUrlHistory } = props;
+    const { ogcTiled } = data;
 
     return (
       <React.Fragment>
@@ -144,6 +146,18 @@ export default function OGCAPI(props) {
                     style={{ display: 'inline-block' }}
                     checked={!!data.ogcLoadAll}
                     onChange={e => editField('ogcLoadAll', !data.ogcLoadAll)}
+                  />
+                </div>
+              </div>
+
+              <div className="field grid">
+                <label className="col-12 md:col-7">{t("useTiles", "Usar quadrículas")}</label>
+                <div className="col-12 md:col-5" style={{ textAlign: 'right' }}>
+                  <Switch
+                    size="md"
+                    style={{ display: 'inline-block' }}
+                    checked={ogcTiled}
+                    onChange={e => editField('ogcTiled', !ogcTiled)}
                   />
                 </div>
               </div>

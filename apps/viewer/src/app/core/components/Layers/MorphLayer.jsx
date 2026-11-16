@@ -13,7 +13,7 @@ import COGLayer from "./COGLayer";
 import OGCMapTileLayer from "./OGCMapTileLayer";
 import OGCVectorTileLayer from "./OGCVectorTileLayer";
 import OGCFeaturesLayer from "./OGCFeaturesLayer";
-import OGCMap from "./OGCMap";
+import OGCMapLayer from "./OGCMapLayer";
 
 import GroupLayer from './GroupLayer';
 
@@ -88,6 +88,10 @@ const MorphLayer = React.memo(({ layers, config, group, checked, viewer }) => {
       LayerComponent = COGLayer;
       break;
 
+    case 'OGCMap':
+      LayerComponent = OGCMapLayer;
+      break;
+
     case 'OGCMapTile':
       LayerComponent = OGCMapTileLayer;
       break;
@@ -98,10 +102,6 @@ const MorphLayer = React.memo(({ layers, config, group, checked, viewer }) => {
 
     case 'OGCFeatures':
       LayerComponent = OGCFeaturesLayer;
-      break;
-
-    case 'OGCMap':
-      LayerComponent = OGCMap;
       break;
 
     case 'GROUP':
