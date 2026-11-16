@@ -257,8 +257,8 @@ function registerComponentModule(core, type, c) {
   }
 }
 
-/** Loads one viewer component. The promise always resolves, after it calls done. */
-Core.prototype.addComponent = function(core, component, done) {
+/** Loads one viewer component, and skips the registration when isCurrent returns false. The promise always resolves. */
+Core.prototype.addComponent = function(core, component, done, isCurrent) {
 
   const components = { ...local_components, ...core_components};
 
@@ -267,7 +267,7 @@ Core.prototype.addComponent = function(core, component, done) {
     : importComponentModule(component.type);
 
   return load
-    .then(c => registerComponentModule(core, component.type, c))
+    .then(c => (!isCurrent || isCurrent()) && registerComponentModule(core, component.type, c))
     .catch(err => console.error(`Error loading component "${component.type}":`, err))
     .finally(() => done && done());
 }

@@ -8,9 +8,11 @@ export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
 export const AUTH_RESPONSE              = 'AUTH_RESPONSE'
 export const AUTH_LOGIN                 = 'AUTH_LOGIN'
 export const AUTH_UPDATE                = 'AUTH_UPDATE'
+export const AUTH_LOGOUT                = 'AUTH_LOGOUT'
 
 export const BACKOFFICE_LOAD            = 'BACKOFFICE_LOAD'
 export const BACKOFFICE_LOAD_DONE       = 'BACKOFFICE_LOAD_DONE'
+export const BACKOFFICE_LOAD_RESET      = 'BACKOFFICE_LOAD_RESET'
 
 export const BACKOFFICE_SET_CONFIG      = 'BACKOFFICE_SET_CONFIG'
 export const BACKOFFICE_LOAD_ERROR      = 'BACKOFFICE_LOAD_ERROR'
@@ -34,6 +36,23 @@ export const LAYOUT_SET_COLORMODE   = 'LAYOUT_SET_COLORMODE'
 const CONFIG_URL = import.meta.env.VITE_APP_CONFIG_URL || getAppApiUrl() + '/app/backoffice';
 const API_URL = getAppApiUrl();
 const cookieAuthName = getCookieAuthName();
+
+/** Writes the auth cookie with its path, SameSite, and Secure on https. */
+function writeAuthCookie(auth) {
+  new Cookies().set(cookieAuthName, auth, {
+    path: '/',
+    sameSite: 'lax',
+    secure: window.location.protocol === 'https:'
+  });
+}
+
+/** Removes the auth cookie and the redux session, and keeps the removed token as ended. */
+export function session_clear() {
+  return function (dispatch, getState) {
+    new Cookies().remove(cookieAuthName, { path: '/' });
+    dispatch({ type: AUTH_LOGOUT, ended: getState().auth?.data?.token });
+  }
+}
 
 
 export function site_load(core, callback) {
@@ -89,33 +108,32 @@ export function login_post(post, history, redirect) {
       .then(res => {
         //dispatch(login_response(res));
         if (res.authenticated) {
+          writeAuthCookie(res);
           dispatch(login(res));
-          const cookies = new Cookies();
-          cookies.set(cookieAuthName, res, { path: '/' });
           if (redirect) window.location.assign(getBackofficeBaseUrl() + redirect.replace(/^\//, ''));
           else window.location.reload();
         } else {
-          dispatch(login_http_error({ status: 401, message: 'Nome de Utilizador ou Palavra-passe inválido'}));
+          dispatch(login_http_error({ kind: 'rejected', status: 401 }));
         }
       }).catch(error => {
         console.log('error', error);
-        dispatch(login_http_error(null));
+        dispatch(login_http_error({ kind: 'unavailable' }));
       });
   }
 }
 
-export function refresh_auth(auth) {
+/** Merges the fields into the session and writes the cookie and redux together. */
+export function refresh_auth(fields) {
   return function (dispatch, getState) {
-    const cookies = new Cookies();
-    cookies.set(cookieAuthName, auth, { path: '/' });
+    const auth = { ...getState().auth?.data, ...fields };
+    writeAuthCookie(auth);
     dispatch(auth_update(auth));
   }
 }
 
 export function logout() {
   return function (dispatch, getState) {
-    const cookies = new Cookies();
-    cookies.remove(cookieAuthName, { path: '/' });
+    dispatch(session_clear());
     window.location.reload();
   }
 }
@@ -187,24 +205,29 @@ export function backoffice_unload_components(core) {
   }
 }
 
-export function backoffice_error(history) {
+/** Error of the backoffice boot, with kind network, server, invalid, unauthorized, or forbidden. */
+export class BootError extends Error {
+  constructor(kind, status) {
+    super(kind);
+    this.kind = kind;
+    this.status = status;
+  }
+}
+
+export function backoffice_load_error(error) {
   const action = {
     type: BACKOFFICE_LOAD_ERROR,
-    redirect: '/not-found'
+    error
   }
-  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
 
-export function backoffice_not_found(history) {
-  const action =  {
-    type: BACKOFFICE_NOT_FOUND,
-    redirect: '/not-found'
+export function backoffice_load_start() {
+  const action = {
+    type: BACKOFFICE_LOAD
   }
-  if (action.redirect && history?.navigate) history.navigate(action.redirect)
   return action;
 }
-
 
 export function backoffice_not_authorized(history, redirect) {
   const action = {
@@ -215,15 +238,25 @@ export function backoffice_not_authorized(history, redirect) {
   return action;
 }
 
-export function backoffice_load_done(components) {
+export function backoffice_load_done() {
   const action = {
     type: BACKOFFICE_LOAD_DONE
   }
   return action;
 }
 
+let bootRun = 0;
+
+/** Drops the boot in flight and sets the boot phase back to idle. */
+export function backoffice_load_reset() {
+  bootRun++;
+  return { type: BACKOFFICE_LOAD_RESET };
+}
+
 export function backoffice_load(core, history) {
   return function (dispatch, getState) {
+    const run = ++bootRun;
+    const current = () => run === bootRun;
 
     // Get logged user
     const logged = core.getLoggedUser();
@@ -236,21 +269,26 @@ export function backoffice_load(core, history) {
     // Add logged user token
     if (logged?.token) options.headers['X-API-KEY'] = logged.token;
     
-    // Make request
-    fetch(url, options).then(res => {
+    dispatch(backoffice_load_start());
 
-      // Validate response
-      if (res.status === 401) throw new Error('Unauthorized');
-      else if (res.status !== 200) throw new Error('Not found');
-      return res.json();
-      
-    }).then(data => {      
-      const config = { ...data, config_json: data.config };
+    fetch(url, options).catch(() => {
+      throw new BootError('network');
+    }).then(res => {
+      if (res.status === 401) throw new BootError('unauthorized', 401);
+      if (res.status === 403) throw new BootError('forbidden', 403);
+      if (res.status !== 200) throw new BootError('server', res.status);
+      return res.json().catch(() => {
+        throw new BootError('invalid', res.status);
+      });
+
+    }).then(data => {
+      if (!current()) return;
+      const config = { ...data, config_json: data?.config };
       delete config.config;
 
-      // Validate config
-      if (!config) return dispatch(backoffice_not_found(history));
-      if (!config.config_json) return dispatch(backoffice_not_found(history));
+      if (!config.config_json || !Array.isArray(config.config_json.components)) {
+        throw new BootError('invalid', 200);
+      }
 
       // Unload components
       dispatch(backoffice_unload_components(core));
@@ -259,41 +297,45 @@ export function backoffice_load(core, history) {
       core.setConfig(config);
       dispatch(backoffice_set_config(config));
 
-      // Load components
-      let count = 0;
       const { components } = config.config_json;
+      const finish = () => {
+        if (!current()) return;
+        const pitems = {};
+        components.forEach(c => pitems[c.id] = c);
+        dispatch(backoffice_load_components(pitems));
+        dispatch(backoffice_load_done());
+      };
+
+      if (!components.length) {
+        finish();
+        return;
+      }
+
+      let count = 0;
       components.forEach(component => {
         core.addComponent(core, component, () => {
           count++;
-          if (count === components.length) {
-
-            // Index by id
-            const pitems = {};
-            components.forEach(c => pitems[c.id] = c);
-
-            // Finally, load into redux store
-            dispatch(backoffice_load_components(pitems));
-            dispatch(backoffice_load_done());
-          }
+          if (count === components.length) finish();
         })
       })
 
     }).catch(error => {
+      if (!current()) return;
       const target = encodeURIComponent(`${history.location?.pathname || '/'}${history.location?.search || ''}`);
+      const kind = error instanceof BootError ? error.kind : 'invalid';
 
-      // Redirect to login or error pages
-      if (error.message === 'Not found') {
-        //TODO: Bad API endpoint, redirect to page with more info to user
-        const redirect = `/login?redirect=${target}`;
-        history.navigate(redirect);
-      } else if (error.message === 'Unauthorized') {
-        if (!logged) {
-          const redirect = `/login?redirect=${target}`;
-          history.navigate(redirect);
-        } else dispatch(backoffice_not_authorized(history));
-      } else {
-        dispatch(logout());
+      if (kind === 'unauthorized' || (kind === 'forbidden' && !logged)) {
+        if (logged) dispatch(session_clear());
+        history.navigate(`/login?redirect=${target}`);
+        return;
       }
+      if (kind === 'forbidden') {
+        dispatch(backoffice_not_authorized(history));
+        return;
+      }
+
+      if (!(error instanceof BootError)) console.error(error);
+      dispatch(backoffice_load_error({ kind, status: error?.status }));
     })
   }
 }

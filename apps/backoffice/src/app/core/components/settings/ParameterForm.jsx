@@ -1,22 +1,20 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { Button, Grid, Group, TextInput, Textarea } from '@mantine/core';
 import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
+import { useChangeSummary } from '../common/ChangeSummary';
+import { useRecordHistory } from '../common/RecordHistory';
 
 function ParameterForm(props) {
 
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const parameters_table = props.parametersTable || 'site';
 
@@ -29,46 +27,47 @@ function ParameterForm(props) {
 
   const API_URL = core.API_URL;
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, control, handleSubmit, watch, formState: { errors }, setValue, getValues } = useForm({
     defaultValues: {...data}
   });
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/settings/parameters');
+
+  const buildData = (formData) => ({
+    code: formData.code,
+    name: formData.name,
+    notes: formData.notes,
+    setting_value: formData.setting_value
+  });
+
+  const summary = useChangeSummary({
+    record: data,
+    initialPayload: () => buildData(data),
+    save: (payload) => dataProvider(API_URL + '/portal/settings').update(parameters_table, { id: data.id, data: payload }),
+    onReload: props.onReload
+  });
+
+  const history = useRecordHistory({
+    url: data.id ? `${API_URL}/portal/settings/${parameters_table}/${data.id}/history` : null,
+    savedCount: summary.savedCount,
+    current: () => buildData(getValues()),
+    fromSnapshot: (s) => ({ code: s.code, name: s.name, notes: s.notes, setting_value: s.setting_value }),
+    onRestore: (p) => Object.keys(p).forEach((k) => setValue(k, p[k] ?? '', { shouldDirty: true }))
+  });
 
   const onSubmit = (formData) => {
-    const new_data = {
-      code: formData.code,
-      name: formData.name,
-      notes: formData.notes,
-      setting_value: formData.setting_value
-    }
+    const new_data = buildData(formData);
 
-    setIsSaving(true);
-
-    const provider = dataProvider(API_URL + '/portal/settings');
     if (data.id) {
-      const params = {
-        id: data.id,
-        data: {...new_data}
-      }
-      provider.update(parameters_table, params).then(d => {
-        notify.success('Editar Registo', 'Registo alterado com sucesso');
-      }).catch(e => {
-        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
-      }).finally(() => {
-        setIsSaving(false);
-      });
+      summary.submit(new_data);
     } else {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/portal/settings');
       const params = {
         data: {...new_data}
       }
       provider.create(parameters_table, params).then(d => {
-        setData({...data, id: d.data.id});
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');
@@ -95,6 +94,8 @@ function ParameterForm(props) {
 
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
+
+          {history.notice}
 
           <Grid gap="sm">
             <Grid.Col span={{ base: 12, md: 2 }}>
@@ -128,6 +129,7 @@ function ParameterForm(props) {
           </Grid>
 
         <Group justify="flex-end" mt="md" mb="md">
+          {history.button}
           <Button
             type="button"
             variant="default"
@@ -137,8 +139,12 @@ function ParameterForm(props) {
           <Button
             type="submit"
             leftSection={<IconSave />}
-            loading={isSaving}>Gravar</Button>
+            loading={isSaving || summary.saving}>Gravar</Button>
         </Group>
+
+        {summary.dialog}
+        {history.modal}
+        {history.dialog}
 
       </form>
   );

@@ -1,9 +1,11 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import useRecord, { useRecordNavigation } from '../common/useRecord';
+import RecordView from '../common/RecordView';
 
 import RoleForm from './RoleForm';
 
@@ -11,55 +13,18 @@ function RoleEdit(props) {
 
   const { core } = useContext(AppContext);
 
-  const {
-    dispatch
-  } = props;
-
   const { id } = useParams();
 
-  const [loading, setLoading] = useState(false);
-  const [record, setRecord] = useState(null);
+  const { goBack } = useRecordNavigation('/security/roles');
 
-  const toast = useRef(null);
-
-  const API_URL = core.API_URL;
-
-  useEffect(() => {
-    if (id) {
-      loadData();
-    } else {
-      setRecord({});
-    }
-  }, []);
-
-  const loadData = () => {
-    const provider = dataProvider(API_URL + '/security');
-
-    const params = {
-      id: id
-    }
-
-    setLoading(true);    
-
-    provider.getOne('roles', params).then(d => {
-      const data = {...d.data}
-      setRecord(data);      
-      setLoading(false);
-    }).catch(e => {
-      setLoading(false);
-      console.log(e);
-      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de intervenções'});
-    });
-  }  
+  const state = useRecord(id, (key) =>
+    dataProvider(core.API_URL + '/security').getOne('roles', { id: key }).then(d => d.data)
+  );
 
   return (
-    <React.Fragment>
-    { record ?      
-        <RoleForm data={record} />
-      :
-      <div>loading...</div>
-    }
-    </React.Fragment>
+    <RecordView state={state} onBack={goBack}>
+      {(record) => <RoleForm data={record} />}
+    </RecordView>
   );
 
 }

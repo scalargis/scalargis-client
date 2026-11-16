@@ -27,11 +27,11 @@ export default function PrintPanel4(props) {
   }
 
   function getFinalPrintsTotal() {
-    const total = finalPrints.map(p => p.error ? 0 : 1).reduce((sum, val) => sum + val);
+    const total = finalPrints.map(p => p.error ? 0 : 1).reduce((sum, val) => sum + val, 0);
     return total;
   }
 
-  function mergePrintFiles(prints) {
+  function mergePrintFiles(prints, signal) {
     const files = [];
 
     if (prints) {
@@ -59,7 +59,8 @@ export default function PrintPanel4(props) {
         'Content-Type': 'application/json'
       },
       method: 'POST',
-      body: JSON.stringify(record)
+      body: JSON.stringify(record),
+      signal
     }
 
     // Get logged user
@@ -81,6 +82,7 @@ export default function PrintPanel4(props) {
           throw(t("errorCreatingFile", "Ocorreu um erro ao gerar o ficheiro"));
         }
       }).catch(error => {
+        if (signal?.aborted) return;
         setIsMergingFiles(false);
         setMergedFile(null);
       });
@@ -101,10 +103,20 @@ export default function PrintPanel4(props) {
     const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
-    // Make a shallow copy of the print items
+    const controller = new AbortController();
+    const { signal } = controller;
+    let mergeTimer = null;
+
     const newFinalPrints = [...finalPrints];
 
-    const promises = finalPrints.map(async (print) => {
+    const settle = (index, item) => {
+      if (signal.aborted) return item;
+      newFinalPrints[index] = item;
+      setFinalPrints([...newFinalPrints]);
+      return item;
+    };
+
+    const promises = finalPrints.map(async (print, index) => {
 
       const url = API_URL + '/app/viewer/' + viewer.id + '/print/' + print.code + '/generate';
 
@@ -154,44 +166,30 @@ export default function PrintPanel4(props) {
         body: data
       }
 
-      return runJob(url + '/job', API_URL + '/jobs', opts, { fallbackUrl: url })
+      return runJob(url + '/job', API_URL + '/jobs', opts, { fallbackUrl: url, signal })
         .then(res => {
-          // Make a shallow copy of the item we want to mutate
-          const item = {...print};
-          if (res.Success) {
-            // 1. Get print array index
-            const index = finalPrints.findIndex(p => p.uuid == print.uuid);
-
-            // 2. Replace the property we're intested in
-            item.processed = true;
-            item.processing = false;
-            item.error = false;
-            item.filename = res.Data.filename;
-            item.url = res.Data.url;
-            // 3. Put it back into our array.
-            newFinalPrints[index] = item;
-            // 4. Set the state to our new copy
-            setTimeout(function(){ setFinalPrints(newFinalPrints); }, 500);
-          } else {
+          if (!res.Success) {
             throw(res.Message || t("errorPrinting", "Ocorreu um erro ao gerar a planta"));
           }
-          return {...item};
-        }).catch(error => {
-          const index = finalPrints.findIndex(p => p.uuid == print.uuid);
-
-          const item = {...print};
-          item.processed = false;
-          item.processing = false;
-          item.error = t("printError", "Não foi possível gerar a planta");
-
-          newFinalPrints[index] = item;
-          setTimeout(function(){ setFinalPrints(newFinalPrints); }, 500);
-
-          return {...item};
-        });
+          return settle(index, {
+            ...print,
+            processed: true,
+            processing: false,
+            error: false,
+            filename: res.Data.filename,
+            url: res.Data.url
+          });
+        }).catch(error => settle(index, {
+          ...print,
+          processed: false,
+          processing: false,
+          error: t("printError", "Não foi possível gerar a planta")
+        }));
     });
 
     Promise.all(promises).then(res => {
+      if (signal.aborted) return;
+
       let hasInvalidPrints = false;
       res.forEach(print => {
         if (print.error) {
@@ -207,10 +205,14 @@ export default function PrintPanel4(props) {
       setFinalPrints([...res]);
       setIsProcessing(false);
       if (printDetails.merge_prints) {
-        setTimeout(mergePrintFiles([...res]), 1000);
+        mergeTimer = setTimeout(() => mergePrintFiles([...res], signal), 1000);
       }
     });
 
+    return () => {
+      controller.abort();
+      clearTimeout(mergeTimer);
+    };
   }, []);
 
   return (

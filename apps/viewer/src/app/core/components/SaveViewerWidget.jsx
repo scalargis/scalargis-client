@@ -27,9 +27,11 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
 
   // Enable redux actions
   const dispatch = useDispatch();
-  const { viewer_save_record, viewer_add_notification } = core.actions;
+  const { viewer_save_record, viewer_save_reset, viewer_add_notification } = core.actions;
+  const slot = viewer.save_slots?.save || { status: 'idle' };
 
   function openForm() {
+    dispatch(viewer_save_reset('save'));
     setId(viewer.id);
     setName(viewer.name);
     setTitle(viewer.title);
@@ -74,7 +76,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
         }
         dispatch(viewer_add_notification({group: "viewer", message: msg}));
       }
-    }));
+    }, 'save'));
   }
 
   // Render save button
@@ -177,11 +179,11 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
               <Button
                 type="submit"
                 leftSection={<IconCheck />}
-                loading={viewer.save_loading}
+                loading={slot.status === 'loading'}
               >{t("save", "Gravar")}</Button>
             </Group>
 
-            { viewer.save_error &&
+            { slot.status === 'unavailable' &&
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
@@ -192,7 +194,7 @@ function SaveViewerWidget({ auth, core, type, viewer }) {
               </div>
             }
 
-            { viewer.save_response && !!viewer.save_response.message &&
+            { slot.status === 'failed' &&
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">

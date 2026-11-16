@@ -41,7 +41,7 @@ import { Button, CloseButton, FocusTrap, Popover, Portal, Text } from '@mantine/
 import { TourContext } from './TourContext';
 import type { OnboardingStep, PopoverPosition } from './types';
 import type { OnboardingController } from './controller';
-import { OVERLAY_Z, POPOVER_Z, LIVE_RECT_MIN_SIZE } from './constants';
+import { OVERLAY_Z, POPOVER_Z, LIVE_RECT_MIN_SIZE, LATE_TARGET_FRAMES } from './constants';
 
 /* --------------------------------------------------------------------------
    Defaults
@@ -72,6 +72,13 @@ function measureTarget(el: HTMLElement | undefined): Rect | null {
   const r = el.getBoundingClientRect();
   if (r.width === 0 && r.height === 0) return null; // hidden target
   return { left: r.left, top: r.top, width: r.width, height: r.height };
+}
+
+/** Whether two rects match to the half pixel. */
+function sameRect(a: Rect | null, b: Rect | null): boolean {
+  if (!a || !b) return a === b;
+  return Math.abs(a.left - b.left) < 0.5 && Math.abs(a.top - b.top) < 0.5
+    && Math.abs(a.width - b.width) < 0.5 && Math.abs(a.height - b.height) < 0.5;
 }
 
 /**
@@ -186,8 +193,10 @@ export default function TourOverlay() {
 
   /* ---- target & rect ---- */
 
+  const [lateTarget, setLateTarget] = useState<{ id: string; el: HTMLElement } | null>(null);
   const targetEl =
-    currentStep && registry ? registry.get(currentStep.id) : undefined;
+    (currentStep && registry ? registry.get(currentStep.id) : undefined) ??
+    (currentStep && lateTarget?.id === currentStep.id ? lateTarget.el : undefined);
   const [rect, setRect] = useState<Rect | null>(null);
   // The popover stays hidden until the first rAF measurement lands.
   // Without this, it appears at the center fallback for one frame.
@@ -238,8 +247,20 @@ export default function TourOverlay() {
       setRect(null);
       setReady(false);
     }
-    const raf = requestAnimationFrame(() => {
-      const measured = measureTarget(targetEl);
+    let raf = 0;
+    let frames = 0;
+    const measure = () => {
+      const el = targetEl ?? registry?.get(currentStep.id);
+      if (el && el !== targetEl) {
+        setLateTarget({ id: currentStep.id, el });
+        return;
+      }
+      if (!el && frames < LATE_TARGET_FRAMES) {
+        frames += 1;
+        raf = requestAnimationFrame(measure);
+        return;
+      }
+      const measured = measureTarget(el);
       setRect(measured);
       // Auto-skip a dead step (improvement 02). When the landed step has no
       // live target, hide the card and ask the controller to move on in the
@@ -248,35 +269,27 @@ export default function TourOverlay() {
       // never shows.
       if (!isLiveRect(measured)) {
         setReady(false);
-        controller?.skipDeadStep();
+        controller?.skipDeadStep(currentStep.id);
         return;
       }
       setReady(true);
-    });
+    };
+    raf = requestAnimationFrame(measure);
     return () => cancelAnimationFrame(raf);
-  }, [active, currentStep, targetEl, controller]);
+  }, [active, currentStep, targetEl, controller, registry]);
 
   // Keep the rect fresh during the step.
   useEffect(() => {
     if (!active || !currentStep || !targetEl) return;
 
-    const ro = new ResizeObserver(() => {
-      setRect(measureTarget(targetEl));
-    });
-    ro.observe(targetEl);
-
-    function onMove() {
-      setRect(measureTarget(targetEl));
-    }
-    // Capture phase so we catch scroll events from any ancestor.
-    window.addEventListener('scroll', onMove, true);
-    window.addEventListener('resize', onMove);
-
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('scroll', onMove, true);
-      window.removeEventListener('resize', onMove);
+    let raf = 0;
+    const track = () => {
+      const next = measureTarget(targetEl);
+      setRect((prev) => (sameRect(prev, next) ? prev : next));
+      raf = requestAnimationFrame(track);
     };
+    raf = requestAnimationFrame(track);
+    return () => cancelAnimationFrame(raf);
   }, [active, currentStep, targetEl]);
 
   // Advance on the real target click (improvement 07, D14). Bind a one-shot

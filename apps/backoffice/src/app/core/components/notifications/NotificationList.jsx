@@ -5,11 +5,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { ActionIcon, Badge, Button, Grid, Group, MultiSelect, TextInput } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import dayjs from 'dayjs';
-import { CollapsiblePanel, DataGrid, exportGridCSV, notify, IconPencil, IconUpload } from '@scalargis/ui';
+import { CollapsiblePanel, DataGrid, exportGridCSV, IconPencil, IconUpload } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext'
 import dataProvider from '../../../service/DataProvider';
 import PageSection from '../common/PageSection';
+import useListSearch from '../common/useListSearch';
 import { NOTIFICATION_STATUS, NOTIFICATION_STATUS_OPTIONS, refreshNotificationsTotal } from './status';
 
 
@@ -22,6 +23,11 @@ const initialSearchParams = {
 
 const toPickerDate = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : null);
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
+const notificationFilter = (filters) => Object.fromEntries(
+  Object.entries(filters || {})
+    .filter(([key, value]) => key && value)
+    .map(([key, value]) => [key, ['start_date', 'end_date'].includes(key) ? toPickerDate(value) : value])
+);
 
 function NotificationList(props) {
 
@@ -32,18 +38,19 @@ function NotificationList(props) {
   const { core } = useContext(AppContext);
 
   const [viewersOptions, setViewersOptions] = useState([]);
-  const [fetching, setFetching] = useState(false);
-  const [records, setRecords] = useState([]);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [selectedRecords, setSelectedRecords] = useState([]);
-
-  const [filter] = useState(props.filter || { "status": [NOTIFICATION_STATUS.OPEN] });
-  const [searchParams, setSearchParams] = useState({ ...initialSearchParams });
-
   const API_URL = core.API_URL;
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
-    defaultValues: {...filter}
+  const { setSearchParams, records, totalRecords, currentSearchParams, gridProps } = useListSearch({
+    initialSearchParams,
+    restoredSearchParams: location?.state?.searchParams,
+    fetchList: (params) => dataProvider(API_URL + '/portal').getList('notifications', params),
+    toFilter: notificationFilter,
+    errorTitle: 'Pesquisa de Notificações',
+    debounceFilters: false
+  });
+
+  const { register, control, handleSubmit, setValue } = useForm({
+    defaultValues: { ...(location?.state?.searchParams?.filters || initialSearchParams.filters) }
   });
 
   useEffect(() => {
@@ -57,48 +64,12 @@ function NotificationList(props) {
     refreshNotificationsTotal(API_URL, props.dispatch);
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [searchParams]);
-
   const editRecord = (record) => {
     const state = {
       from: location.pathname,
-      previousSearchParams: {...searchParams}
+      previousSearchParams: currentSearchParams()
     }
     navigate(`/notifications/edit/${record.id}`, { state });
-  }
-
-  const loadData = () => {
-    const provider = dataProvider(API_URL + '/portal');
-
-    const _filter = {};
-    Object.entries(searchParams.filters || {}).forEach(([key, value]) => {
-      if (key && value) {
-        _filter[key] = ['start_date', 'end_date'].includes(key) ? toPickerDate(value) : value;
-      }
-    });
-
-    const params = {
-      pagination: { page: searchParams.page, perPage: searchParams.pageSize },
-      sort: {
-        field: searchParams.sortStatus.columnAccessor,
-        order: searchParams.sortStatus.direction === 'desc' ? 'Desc' : 'Asc'
-      },
-      filter: _filter
-    }
-
-    setFetching(true);
-
-    provider.getList('notifications', params).then(d => {
-      setSelectedRecords([]);
-      setRecords(d.data);
-      setTotalRecords(d.total);
-      setFetching(false);
-    }).catch(e => {
-      setFetching(false);
-      notify.error('Pesquisa de Notificações', 'Ocorreu um erro na pesquisa');
-    });
   }
 
   const onFilterSubmit = (formData) => {
@@ -283,16 +254,7 @@ function NotificationList(props) {
 
       <DataGrid
         idAccessor="id"
-        records={records}
-        totalRecords={totalRecords}
-        fetching={fetching}
-        page={searchParams.page}
-        onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
-        recordsPerPage={searchParams.pageSize}
-        sortStatus={searchParams.sortStatus}
-        onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
-        selectedRecords={selectedRecords}
-        onSelectedRecordsChange={setSelectedRecords}
+        {...gridProps}
         columns={columns}
         noRecordsText="Não foram encontradas notificações."
       />
@@ -301,4 +263,4 @@ function NotificationList(props) {
 
 }
 
-export default connect(state => ({ loading: state.loading, filters: state.filters }))(NotificationList);
+export default connect(state => ({ filters: state.filters }))(NotificationList);

@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
@@ -16,7 +15,7 @@ import {
   Tabs,
   TextInput,
 } from '@mantine/core';
-import { CollapsiblePanel, notify, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog } from '@scalargis/ui';
+import { CollapsiblePanel, notify, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog, IconHistory } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import PrintLayoutsEditor from "./PrintLayoutsEditor";
@@ -25,6 +24,10 @@ import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
+import { useChangeSummary } from '../common/ChangeSummary';
+import { useRecordHistory } from '../common/RecordHistory';
+import { scalesToArray } from '../common/utils';
 import PageSection from '../common/PageSection';
 
 
@@ -40,6 +43,8 @@ const tabItems = [
   { value: 'childs', label: 'Plantas e Grupos', icon: IconCog }
 ];
 
+const HISTORY_TAB = { value: 'history', label: 'Histórico', icon: IconHistory };
+
 const pageFormatList = ['A4', 'A3', 'A2', 'A1', 'A0'];
 const pageOrientationList = ['Retrato', 'Paisagem'];
 
@@ -48,10 +53,6 @@ function PrintGroupForm(props) {
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -77,7 +78,7 @@ function PrintGroupForm(props) {
 
   const API_URL = core.API_URL;
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, control, handleSubmit, watch, formState: { errors }, setValue, getValues } = useForm({
     defaultValues: {
       id: data.id,
       code: data.code,
@@ -140,14 +141,9 @@ function PrintGroupForm(props) {
     }
   }
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/prints/groups');
 
-  const onSubmit = (formData) => {
+  const buildData = (formData, geometry) => {
 
     let new_data = {
       ...formData,
@@ -157,36 +153,79 @@ function PrintGroupForm(props) {
       groups: groupChilds?.groups ? groupChilds.groups : []
     }
 
-    if (geometryFilter) {
+    if (geometry) {
       new_data = {
         ...new_data,
-        ...geometryFilter
+        ...geometry
       }
     }
 
-    setIsSaving(true);
+    return new_data;
+  };
 
-    const provider = dataProvider(API_URL + '/portal');
-    if (data.id) {
-      const params = {
-        id: data.id,
-        data: {...new_data}
+  const savedGeometry = {
+    geom_filter: data.geom_filter,
+    geom_filter_srid: data.geom_filter_srid,
+    tolerance_filter: data.tolerance_filter
+  };
+
+  const summary = useChangeSummary({
+    record: data,
+    initialPayload: () => buildData(getValues(), savedGeometry),
+    save: (payload) => dataProvider(API_URL + '/portal').update('prints/groups', { id: data.id, data: payload }),
+    onSaved: (d, payload) => {
+      const savedLayouts = d?.data ? [...(d.data.layouts || [])] : [];
+      setLayouts(savedLayouts);
+      return { ...payload, layouts: savedLayouts };
+    },
+    onReload: props.onReload
+  });
+
+  const history = useRecordHistory({
+    url: data.id ? `${API_URL}/portal/prints/groups/${data.id}/history` : null,
+    savedCount: summary.savedCount,
+    current: () => buildData(getValues(), geometryFilter || savedGeometry),
+    fromSnapshot: (snapshot) => {
+      const s = scalesToArray({ ...snapshot });
+      const values = {};
+      Object.keys(getValues()).forEach((k) => { values[k] = s[k] ?? null; });
+      if ('config_json' in values) {
+        values.config_json = s.config_json && typeof s.config_json === 'object' ? JSON.stringify(s.config_json) : (s.config_json || '');
       }
-      provider.update('prints/groups', params).then(d => {
-        notify.success('Editar Registo', 'Registo alterado com sucesso');
-        setLayouts(d?.data ? [...(d.data.layouts || [])] : []);
-      }).catch(e => {
-        notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
-      }).finally(() => {
-        setIsSaving(false);
-      });
+      return {
+        ...values,
+        form_fields: s.form_fields || { fields: {}, groups: {} },
+        layouts: s.layouts || [],
+        prints: (s.prints || []).map((id) => printsList.find((p) => p.id === id) || { id }),
+        groups: (s.groups || []).map((id) => groupsList.find((g) => g.id === id) || { id }),
+        geom_filter: s.geom_filter ?? null,
+        geom_filter_srid: s.geom_filter_srid ?? null,
+        tolerance_filter: s.tolerance_filter ?? null
+      };
+    },
+    onRestore: (p) => {
+      Object.keys(getValues()).forEach((k) => setValue(k, p[k], { shouldDirty: true }));
+      setScaleList(buildScaleList(scaleList, p.restrict_scales_list || []));
+      setFormFields(p.form_fields);
+      setLayouts(p.layouts);
+      setGroupChilds({ prints: p.prints, groups: p.groups });
+      setGeometryFilter({ geom_filter: p.geom_filter, geom_filter_srid: p.geom_filter_srid, tolerance_filter: p.tolerance_filter });
+    }
+  });
+
+  const onSubmit = (formData) => {
+    const new_data = buildData(formData, geometryFilter);
+
+    if (data.id) {
+      summary.submit(new_data);
     } else {
+      setIsSaving(true);
+      const provider = dataProvider(API_URL + '/portal');
       const params = {
         data: {...new_data}
       }
       provider.create('prints/groups', params).then(d => {
-        setData({...data, id: d.data.id});
-        setLayouts(d?.data ? [...(d.data.layouts || [])] : []);
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');
@@ -217,7 +256,7 @@ function PrintGroupForm(props) {
 
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
-          {tabItems.map((item) => (
+          {(data.id ? [...tabItems, HISTORY_TAB] : tabItems).map((item) => (
             <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
               {item.label}
             </Tabs.Tab>
@@ -226,6 +265,8 @@ function PrintGroupForm(props) {
       </Tabs>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+
+        {history.notice}
 
         {activeTab === 'base' ?
 
@@ -511,6 +552,8 @@ function PrintGroupForm(props) {
 
         : null}
 
+        {activeTab === 'history' && <PageSection>{history.table}</PageSection>}
+
 
         <Group justify="flex-end" mt="md" mb="md">
           <Button
@@ -522,8 +565,11 @@ function PrintGroupForm(props) {
           <Button
             type="submit"
             leftSection={<IconSave />}
-            loading={isSaving}>Gravar</Button>
+            loading={isSaving || summary.saving}>Gravar</Button>
         </Group>
+
+        {summary.dialog}
+        {history.dialog}
 
       </form>
 

@@ -4,120 +4,52 @@ import { ActionIcon, Group, Select, Tabs, TextInput } from '@mantine/core';
 import { FileUpload, notify, IconSearch } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
+import { uploadVectorFile } from '../upload';
 
 
 export default function GeoJSON (props) {
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
-  /**
-   * Event handler for load file
-   * 
-   * @param {Object} e 
-   */
-  const loadGeoJSONFile = (e) => {
-    const { core, mainMap, viewer, data, setLoading, setData, setError, Models, fastFetch } = props;
-    const { isUrlAppOrigin } = Models.Utils;
-    const endpoint = viewer.upload_url || core.UPLOAD_URL;
-    const name = e.files[0].name;
-
-    const file = e.files[0];
-    const upload = new FormData();
-    upload.append('files', file);
-    upload.append('ext', 'geojson');
-
-    setLoading(true);
-    const options = { method: 'POST', body: upload };
-    fastFetch(endpoint, options, 8000)
-      .then(res => {
-        if (!res || !res.ok) {
-          throw new Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
-        } else {
-          return res.json();
-        }        
-      })
-      .then(res => {
-        // Validate response
-        if (!res.Success) {
-          setError(t("errorProcessingGeoJSONFile", "Ocorreu um erro ao processar o ficheiro GeoJSON."));
-          return setLoading(false);
-        }
-
-        const orginal_url = core.API_URL + res.Data.url;
-        let url = orginal_url;
-        if (!isUrlAppOrigin(url)) {
-          url = core.MAP_PROXY_URL + encodeURIComponent(url);
-        };        
-        fetch(url)
-          .then(res => res.json())
-          .then(res => {
-            data.dataitems = Models.OWSModel.convertGeoJSON2Themes(res, orginal_url, name, data.crs);
-            setData(Object.assign({}, data));
-            setLoading(false);
-        })
-
-        // Catch download error
-        .catch(error => {
-          setLoading(false);
-          setError(''+error);
-        });
-    })
-
-    // Catch upload error
-    .catch(error => {
-      setLoading(false);
-      setError(''+error);
-    });
-  }
+  const loadGeoJSONFile = (e) => uploadVectorFile(props, t, e.files[0], 'geojson', t("errorProcessingGeoJSONFile", "Ocorreu um erro ao processar o ficheiro GeoJSON."));
 
   const changeURL = (value) => {
-    const { data, setData } = props;
-    data.url = value.trim();
-    setData(Object.assign({}, data));
+    props.patchData({ url: value.trim() });
   }
 
   const loadFromUserURL = () => {
-    const { core, data, setData, setSelected, setError, cookies, setLoading, Models } = props;
+    const { core, data, setSelected, setError, cookies, setLoading, patchData, beginLoad, Models } = props;
     const { isUrlAppOrigin, rememberUrl } = Models.Utils;
     const name = 'GeoJSON';
-    let url = data.url || '';
+    const sourceUrl = data.url || '';
+    const crs = data.crs;
+    const invalidResponse = t("invalidResponse", "Não foi possível obter uma resposta válida.");
 
-    if (!url.trim()) return;
+    if (!sourceUrl.trim()) return;
 
-    if (!isUrlAppOrigin(url)) {
-      url = core.MAP_PROXY_URL + encodeURIComponent(url);
-    };
+    const url = isUrlAppOrigin(sourceUrl) ? sourceUrl : core.MAP_PROXY_URL + encodeURIComponent(sourceUrl);
+    const isCurrent = beginLoad();
     setLoading(true);
     fetch(url)
-      .then(res => {     
-        if (!res.ok) {
-          throw new Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
-        } else {
-          return res.json();
-        }                   
+      .then(res => {
+        if (!res.ok) throw new Error(invalidResponse);
+        return res.json();
       })
       .then(res => {
-        try {
-          data.dataitems = Models.OWSModel.convertGeoJSON2Themes(res, data.url, name, data.crs);
-          if (data.dataitems && data.dataitems.length > 0) {
-            setLoading(false);
-            setData(Object.assign({}, data));
-            // Add to cookies history
-            if (cookies) rememberUrl(cookies, 'geojson', data.url);
-          } else {
-            throw Error(t("invalidResponse", "Não foi possível obter uma resposta válida."));
-          }
-        } catch (e) {
-          setLoading(false);
-          setError(''+e);
-        }          
+        const dataitems = Models.OWSModel.convertGeoJSON2Themes(res, sourceUrl, name, crs);
+        if (!dataitems || !dataitems.length) throw new Error(invalidResponse);
+        if (!isCurrent()) return;
+        patchData({ dataitems });
+        if (cookies) rememberUrl(cookies, 'geojson', sourceUrl);
       })
-      // Catch download error
       .catch(error => {
-        setData({ ...data, dataitems: [] });
+        if (!isCurrent()) return;
+        patchData({ dataitems: [] });
         setSelected({});
-        setLoading(false);
         setError(''+error);
+      })
+      .finally(() => {
+        if (isCurrent()) setLoading(false);
       });
   }
 
@@ -156,7 +88,7 @@ export default function GeoJSON (props) {
                   chooseLabel={t("choose", "Escolher")}
                   uploadLabel={t("load", "Carregar")}
                   cancelLabel={t("cancel", "Cancelar")}
-                  onUpload={async (files) => loadGeoJSONFile({ files })}
+                  onUpload={(files) => loadGeoJSONFile({ files })}
                 />
                 { (props.maxFileSize && props.maxFileSize > 0) ?
                 <small id="upload-help" className="p-warn">{t("maxFileSizeInfo", "Dimensão máxima do ficheiro: {{size}} MB",  {size: (Math.round((props.maxFileSize/1024) * 100) / 100)})}</small>

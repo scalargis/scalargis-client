@@ -1,11 +1,12 @@
-import React, { useContext, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { ActionIcon, Badge, Group, Select, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { DataGrid, notify, Dialog, IconMenu } from '@scalargis/ui';
+import { DataGrid, Dialog, IconMenu } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import useListSearch from '../common/useListSearch';
 
 
 const initialSearchParams = {
@@ -15,10 +16,6 @@ const initialSearchParams = {
   filters: { id: '', name: '', title: '', is_active: null, is_shared: null }
 };
 
-// ?? not ||: is_active/is_shared are booleans, and false must not collapse into ''.
-const sameFilters = (a, b) =>
-  Object.keys(initialSearchParams.filters).every((k) => (a?.[k] ?? '') === (b?.[k] ?? ''));
-
 
 function ViewersList(props) {
 
@@ -26,83 +23,29 @@ function ViewersList(props) {
 
   const [visible, { open: openViewers, close: closeViewers }] = useDisclosure(false);
 
-  const [fetching, setFetching] = useState(false);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [records, setRecords] = useState([]);
-
-  const [searchParams, setSearchParams] = useState({ ...initialSearchParams });
-  const [filterDraft, setFilterDraft] = useState(initialSearchParams.filters);
-
   const API_URL = core.API_URL;
 
-  useEffect(() => {
-    if (!visible) return;
+  const { filterDraft, setFilterDraft, commitFilters, reset, reload, totalRecords, gridProps } = useListSearch({
+    initialSearchParams,
+    fetchList: (params) => dataProvider(API_URL + '/portal').getList(`${props.elementType}/${props.id}/viewers`, params),
+    errorTitle: 'Pesquisa de Visualizadores',
+    enabled: visible
+  });
 
-    loadData();
-  }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (!visible) return;
-    if (sameFilters(filterDraft, searchParams.filters)) return;
-
-    const handler = setTimeout(() => {
-      setSearchParams((sp) => ({ ...sp, filters: { ...filterDraft }, page: 1 }));
-    }, 500);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [filterDraft, searchParams.filters]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const loadData = () => {
-      setFetching(true);
-
-      const provider = dataProvider(API_URL + '/portal');
-
-      const _filter = {};
-      Object.entries(searchParams.filters || {}).forEach(([key, value]) => {
-        // false is a real filter value; only '' and null mean "not set".
-        if (value !== '' && value != null) {
-          _filter[key] = value;
-        }
-      });
-
-      const params = {
-        pagination: { page: searchParams.page, perPage: searchParams.pageSize },
-        sort: {
-          field: searchParams.sortStatus.columnAccessor,
-          order: searchParams.sortStatus.direction === 'desc' ? 'Desc' : 'Asc'
-        },
-        filter: _filter
-      }
-
-      provider.getList(`${props.elementType}/${props.id}/viewers`, params).then(d => {
-        setTotalRecords(d.total);
-        setRecords(d.data);
-        setFetching(false);
-
-        openViewers();
-      }).catch(e => {
-        setFetching(false);
-        notify.error('Pesquisa de Visualizadores', 'Ocorreu um erro na pesquisa');
-      });
-
+  const onOpen = () => {
+    reload().then((d) => {
+      if (d) openViewers();
+    });
   }
 
   const onHide = () => {
     closeViewers();
-    setSearchParams({ ...initialSearchParams });
-    setFilterDraft({ ...initialSearchParams.filters });
-    setFetching(false);
-    setTotalRecords(0);
-    setRecords([]);
+    reset();
   }
 
-  // Selects commit immediately (only text filters ride the debounce).
   const onBoolFilterChange = (key, value) => {
     const parsed = value == null ? null : value === 'true';
-    const filters = { ...filterDraft, [key]: parsed };
-    setFilterDraft(filters);
-    setSearchParams((sp) => ({ ...sp, filters, page: 1 }));
+    commitFilters({ ...filterDraft, [key]: parsed });
   }
 
   const columns = useMemo(
@@ -206,8 +149,8 @@ function ViewersList(props) {
 
   return (
     <React.Fragment>
-      <ActionIcon variant="outline" aria-label="Ver visualizadores" loading={fetching && !visible}
-        onClick={() => loadData()}>
+      <ActionIcon variant="outline" aria-label="Ver visualizadores" loading={gridProps.fetching && !visible}
+        onClick={onOpen}>
         <IconMenu />
       </ActionIcon>
 
@@ -218,14 +161,14 @@ function ViewersList(props) {
         </Group>
         <DataGrid
           idAccessor="id"
-          records={records}
-          totalRecords={totalRecords}
-          fetching={fetching}
-          page={searchParams.page}
-          onPageChange={(page) => setSearchParams((sp) => ({ ...sp, page }))}
-          recordsPerPage={searchParams.pageSize}
-          sortStatus={searchParams.sortStatus}
-          onSortStatusChange={(sortStatus) => setSearchParams((sp) => ({ ...sp, sortStatus, page: 1 }))}
+          records={gridProps.records}
+          totalRecords={gridProps.totalRecords}
+          fetching={gridProps.fetching}
+          page={gridProps.page}
+          onPageChange={gridProps.onPageChange}
+          recordsPerPage={gridProps.recordsPerPage}
+          sortStatus={gridProps.sortStatus}
+          onSortStatusChange={gridProps.onSortStatusChange}
           columns={columns}
           noRecordsText="Não foram encontrados registos"
         />

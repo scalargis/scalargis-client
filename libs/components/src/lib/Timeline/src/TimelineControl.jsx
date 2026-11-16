@@ -323,42 +323,31 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   const controlLayer = useRef();
   
   const [currentPos, setCurrentPos] = useState(0);
-  const [intervalId, setIntervalId] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const loop = record?.config_json?.loop === true;
 
-  // Start the interval
-  const startIntervalHandler = () => {
+  const startPlaying = () => {
     if (!timeData?.length) return;
+    if (currentPos >= timeData.length - 1) setCurrentPos(0);
+    setPlaying(true);
+  };
 
-    //Start interval condition
-    if (currentPos >= timeData?.length - 1) {
-      setCurrentPos(0);
-    }
-
-    const newIntervalId = setInterval(() => {
-      setCurrentPos((val) => {
-        if (val + 1 >= (timeData?.length ?? 0)) {
-          if (record?.config_json?.loop === true) {
-            setCurrentPos(0);
-          } else {
-            clearInterval(newIntervalId);
-            setIntervalId(0);
-          }
-
-          return val;
-        }
-        return val + 1;
-      });
+  useEffect(() => {
+    if (!playing) return;
+    const lastPos = timeData.length - 1;
+    const id = setInterval(() => {
+      setCurrentPos((val) => (val < lastPos ? val + 1 : (loop ? 0 : val)));
     }, 1000 / frameRate);
+    return () => clearInterval(id);
+  }, [playing, timeData, frameRate, loop]);
 
-    setIntervalId(newIntervalId);
-  };
+  useEffect(() => {
+    if (playing && !loop && currentPos >= timeData.length - 1) setPlaying(false);
+  }, [playing, loop, currentPos, timeData]);
 
-  // Stopping the interval
-  const stopIntervalHandler = () => {
-    clearInterval(intervalId);
-    setIntervalId(0);
-  };
-
+  useEffect(() => {
+    if (!opened) setPlaying(false);
+  }, [opened]);
 
   useEffect(() => {
     controlLayer.current = null;
@@ -375,6 +364,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   }, [mainMap, theme]);
 
   useEffect(() => {
+    setPlaying(false);
     if (!mainMap) return;
     if (!dimension?.values) {
       setTimeData([]);
@@ -389,22 +379,10 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
   }, [mainMap, dimension]);
 
   useEffect(() => {
-    if (!intervalId) return;
-
     if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
-      stopIntervalHandler();
+      setPlaying(false);
     }
-  }, [viewer?.config_json?.checked]);
-
-
-  useEffect(()=> {
-    if (intervalId === 0) {
-      //setCurrentPos(0);
-    }
-
-    //Clear interval on unmount
-    return () => { if (intervalId) clearInterval(intervalId); }
-  }, [intervalId])
+  }, [viewer?.config_json?.checked, theme?.id]);
 
   useEffect(() => {
     if (!timeData?.length) return;
@@ -450,17 +428,17 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
           value={currentPos != null ? String(currentPos) : null}
           data={options}
           searchable={options?.length > 20}
-          clearable
+          allowDeselect={false}
           placeholder="Escolha uma data"
           disabled={!hasTimeData}
-          onChange={(value) => { setCurrentPos(value != null ? Number(value) : null) }}
+          onChange={(value) => { if (value != null) setCurrentPos(Number(value)) }}
         />
       </div>
       <Slider
         className="mb-3"
         size="sm"
         label={null}
-        value={currentPos || 0}
+        value={currentPos}
         onChange={(value) => { setCurrentPos(value) }}
         max={hasTimeData ? timeData.length - 1 : 100}
         disabled={!hasTimeData}
@@ -478,22 +456,22 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
             icon={<IconAngleLeft />}
             title="Data anterior"
             onClick={(e) => {
-              if (currentPos) setCurrentPos(currentPos - 1);
+              if (currentPos > 0) setCurrentPos(currentPos - 1);
             }}
             disabled={!hasTimeData}
           />
-          { intervalId ?
+          { playing ?
             <MapToolButton
               variant="filled" size="lg"
               icon={<IconPause />}
               title="Pausar"
-              onClick={(e) => { stopIntervalHandler(); }}
+              onClick={(e) => { setPlaying(false); }}
             /> :
             <MapToolButton
               variant="filled" size="lg"
               icon={<IconPlay />}
               title="Reproduzir"
-              onClick={(e) => { startIntervalHandler(); }} disabled={!hasTimeData}
+              onClick={(e) => { startPlaying(); }} disabled={!hasTimeData}
             />
           }
           <MapToolButton
@@ -504,7 +482,7 @@ export default function TimelineConstrol({ core, viewer, mainMap, dispatch, acti
               if (timeData?.length) {
                 if (currentPos + 1 < timeData.length) {
                   setCurrentPos(currentPos + 1);
-                } else if (record?.config_json?.loop === true) {
+                } else if (loop) {
                   setCurrentPos(0);
                 }
               }

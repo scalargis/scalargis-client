@@ -21,6 +21,12 @@ function isCoordInExtent(coords, proj_coords, extent) {
   return containsCoordinate(parseExtent(extent), wgsCoords);
 }
 
+/** Picks the listed CRS that holds the center: 4326 first, then list order. */
+function pickFallbackCRS(listCRS, center, proj_code) {
+  const holds = listCRS.filter(i => isCoordInExtent(center, proj_code, i.extent));
+  return holds.find(i => i.srid === 4326) || holds[0] || null;
+}
+
 export default function Main({ core, config, actions, record }) {
   const { viewer, mainMap, dispatch } = config;
   const { display_crs, center } = viewer.config_json;
@@ -84,6 +90,7 @@ export default function Main({ core, config, actions, record }) {
 
   useEffect(() => {
     const selected = listCRS.find(v => v.srid === display_crs);
+    if (!selected) return;
     let precision = String(selected.precision).length-1;
 
     if (selected.precision_roles?.length && userRoles?.length) {
@@ -102,9 +109,7 @@ export default function Main({ core, config, actions, record }) {
     const mousePosition = new MousePosition({
       target:  cursorRef.current,
       coordinateFormat: function(coordinate) {
-        const proj_code = mainMap.getView().getProjection().getCode();
-        const selected = listCRS.find(v => v.srid === display_crs);
-        const extent = selected?.extent;
+        const extent = selected.extent;
         const precision = String(selected.precision).length-1;
 
         if (!extent || !record?.config_json?.valid_extent) return createStringXY(precision)(coordinate);
@@ -138,31 +143,31 @@ export default function Main({ core, config, actions, record }) {
     }
   }, [display_crs]);
 
-  // On change center, change display_crs if necessary
   useEffect(() => {
-    let changeCRS = false;
+    if (!mainMap || !center || !listCRS.length) return;
     const proj_code = mainMap.getView().getProjection().getCode();
-    if (display_crs && center && record?.config_json?.auto_crs_change !== false) {
-      listCRS.map(i => {
-        const inExtent = isCoordInExtent(center, proj_code, i.extent)
-        if ((i.srid === display_crs) && !inExtent) changeCRS = true;
-        return i;
-      });
-      if (changeCRS) dispatch(viewer_set_displaycrs(4326));
+    const current = listCRS.find(i => i.srid === display_crs);
+    if (current) {
+      if (record?.config_json?.auto_crs_change === false) return;
+      if (isCoordInExtent(center, proj_code, current.extent)) return;
     }
-  }, [center]);
+    const next = pickFallbackCRS(listCRS, center, proj_code) || (current ? null : listCRS[0]);
+    if (next && next.srid !== display_crs) dispatch(viewer_set_displaycrs(next.srid));
+  }, [center, listCRS]);
 
   // Prepare render options
   if (listCRS.length === 0) return null;
   const proj_code = mainMap ? mainMap.getView().getProjection().getCode() : 'EPSG:3857';
   let display = center;
   const selected = listCRS.find(v => v.srid === display_crs);
-  try {
-    if (selected.code !== proj_code) display = transform(center, proj_code, 'EPSG:' + selected.srid);
-    const fixedLength = String(selected.precision).length-1;
-    display = display.map(v => (Math.round(parseFloat(v) * selected.precision) / selected.precision).toFixed(fixedLength));
-  } catch (e) {
-    console.log(e);
+  if (selected) {
+    try {
+      if (selected.code !== proj_code) display = transform(center, proj_code, 'EPSG:' + selected.srid);
+      const fixedLength = String(selected.precision).length-1;
+      display = display.map(v => (Math.round(parseFloat(v) * selected.precision) / selected.precision).toFixed(fixedLength));
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return (

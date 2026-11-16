@@ -1,10 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router';
-import { Box, LoadingOverlay } from '@mantine/core';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import useRecord, { useRecordNavigation } from '../common/useRecord';
+import RecordView from '../common/RecordView';
 
 import NotificationForm from './NotificationForm';
 
@@ -14,46 +15,18 @@ function NotificationEdit(props) {
 
   const { id } = useParams();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [record, setRecord] = useState(null);
+  const { goBack } = useRecordNavigation('/notifications');
 
-  const API_URL = core.API_URL;
-
-  useEffect(() => {
-    if (id) {
-      loadData();
-    } else {
-      setIsLoading(false);
-      setRecord({});
-    }
-  }, []);
-
-  const loadData = () => {
-    const provider = dataProvider(API_URL + '/portal');
-
-    const params = {
-      id: id
-    }
-
-    setIsLoading(true);
-
-    provider.getOne('notifications', params).then(d => {
-      setRecord(d.data);
-    }).catch(e => {
-      console.error(e);
-    }).finally(() => {
-      setIsLoading(false);
-    });
-  }
-
-  return (
-    <Box pos="relative">
-      <LoadingOverlay visible={isLoading} />
-      { record ? <NotificationForm data={record} /> : <div /> }
-    </Box>
+  const state = useRecord(id, (key) =>
+    dataProvider(core.API_URL + '/portal').getOne('notifications', { id: key }).then(d => d.data)
   );
 
+  return (
+    <RecordView state={state} onBack={goBack}>
+      {(record) => <NotificationForm data={record} />}
+    </RecordView>
+  );
 
 }
 
-export default connect(state => ({ loading: state.loading }))(NotificationEdit);
+export default connect()(NotificationEdit);

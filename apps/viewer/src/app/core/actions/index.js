@@ -14,6 +14,7 @@ export const AUTH_HTTP_ERROR            = 'AUTH_HTTP_ERROR'
 export const AUTH_CLEAR_ERROR           = 'AUTH_CLEAR_ERROR'
 export const AUTH_RESPONSE              = 'AUTH_RESPONSE'
 export const AUTH_LOGIN                 = 'AUTH_LOGIN'
+export const AUTH_LOGOUT                = 'AUTH_LOGOUT'
 
 export const PASSWORD_HTTP_LOADING      = 'PASSWORD_HTTP_LOADING'
 export const PASSWORD_HTTP_ERROR        = 'PASSWORD_HTTP_ERROR'
@@ -23,11 +24,11 @@ export const REGISTRATION_HTTP_LOADING  = 'REGISTRATION_HTTP_LOADING'
 export const REGISTRATION_HTTP_ERROR    = 'REGISTRATION_HTTP_ERROR'
 export const REGISTRATION_RESPONSE      = 'REGISTRATION_RESPONSE'
 
-export const VIEWER_LOAD                = 'VIEWER_LOAD'
 export const VIEWER_LOAD_DONE           = 'VIEWER_LOAD_DONE'
 export const VIEWER_SAVE_HTTP_LOADING   = 'VIEWER_SAVE_HTTP_LOADING'
 export const VIEWER_SAVE_HTTP_ERROR     = 'VIEWER_SAVE_HTTP_ERROR'
 export const VIEWER_SAVE_RESPONSE       = 'VIEWER_SAVE_RESPONSE'
+export const VIEWER_SAVE_RESET          = 'VIEWER_SAVE_RESET'
 
 export const VIEWER_SESSION_LOAD        = 'VIEWER_SESSION_LOAD'
 export const VIEWER_SESSION_SAVED       = 'VIEWER_SESSION_SAVED'
@@ -54,14 +55,14 @@ export const MAP_REMOVE_CLASS           = 'MAP_REMOVE_CLASS'
 export const LAYERS_SET_CHECKED         = 'LAYERS_SET_CHECKED'
 export const LAYERS_SET_OPENED          = 'LAYERS_SET_OPENED'
 export const LAYERS_UPDATE_THEME        = 'LAYERS_UPDATE_THEME'
-export const LAYERS_REMOVE_ITEMS        = 'LAYERS_REMOVE_ITEMS'
 export const VIEWER_SET_DISPLAYCRS      = 'VIEWER_SET_DISPLAYCRS'
 export const VIEWER_ADD_THEMES          = 'VIEWER_ADD_THEMES'
 export const VIEWER_REMOVE_THEMES       = 'VIEWER_REMOVE_THEMES'
 export const VIEWER_SET_CONFIGJSON      = 'VIEWER_SET_CONFIGJSON'
 export const VIEWER_UPDATE_MAPCONTROL   = 'VIEWER_UPDATE_MAPCONTROL'
 export const VIEWER_UPDATE_MAPCONTROLS  = 'VIEWER_UPDATE_MAPCONTROLS'
-export const VIEWER_SET_EXCUSIVE_MAPCONTROL = 'VIEWER_SET_EXCUSIVE_MAPCONTROL'
+export const VIEWER_SET_EXCLUSIVE_MAPCONTROL = 'VIEWER_SET_EXCLUSIVE_MAPCONTROL'
+export const VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL = 'VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL'
 
 export const LAYOUT_WRAPPER_CLICK       = 'LAYOUT_WRAPPER_CLICK'
 export const LAYOUT_TOGGLE_OVERLAYMENU  = 'LAYOUT_TOGGLE_OVERLAYMENU'
@@ -86,6 +87,26 @@ const MAP_PROXY = getAppMapProxyUrl();
 const cookieAuthName = getCookieAuthName();
 const cookiePath = import.meta.env.VITE_APP_COOKIE_PATH || '/'; 
 const cookieExpiresDays = parseInt(import.meta.env.VITE_APP_COOKIE_EXPIRES_DAYS || '150', 10);
+
+/** Writes the auth cookie with its path, expiry, SameSite, and Secure on https. */
+function writeAuthCookie(auth) {
+  const expireDate = new Date();
+  expireDate.setDate(expireDate.getDate() + cookieExpiresDays);
+  new Cookies().set(cookieAuthName, auth, {
+    path: cookiePath,
+    expires: expireDate,
+    sameSite: 'lax',
+    secure: window.location.protocol === 'https:'
+  });
+}
+
+/** Removes the auth cookie and the redux session. */
+export function session_clear() {
+  return function (dispatch) {
+    new Cookies().remove(cookieAuthName, { path: cookiePath });
+    dispatch({ type: AUTH_LOGOUT });
+  }
+}
 
 
 export function site_load(core, callback) {
@@ -117,31 +138,29 @@ export function site_load(core, callback) {
 }
 
 
-export function viewer_save_record(core, record, history, redirect, cb) {
+export function viewer_save_record(core, record, history, redirect, cb, slot = 'save') {
   return function (dispatch, getState) {
-    dispatch(viewer_save_http_loading());
+    dispatch(viewer_save_http_loading(slot));
 
-    // Save request
     const options = {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'        
+        'Content-Type': 'application/json'
       },
       method: record.id ? 'PUT' : 'POST',
       body: JSON.stringify(record)
     }
 
-    // Get logged user
     const logged = core.getLoggedUser();
     if (logged) options.headers['X-API-KEY'] = logged.token;
 
-    // Auth url. TODO: check for proxy
     let url = API_URL + '/app/viewer';
     if (record.id) url += '/' + record.id;
     fetch(url, options)
-      .then(res => res.json())
-      .then(res => {
-        const save_options = record.id ? { 
+      .then(res => res.json().then(body => ({ ok: res.ok, body })))
+      .then(({ ok, body }) => {
+        const success = ok && body?.success === true;
+        const save_options = success && record.id ? {
           name: record.name,
           title: record.title,
           description: record.description,
@@ -149,35 +168,48 @@ export function viewer_save_record(core, record, history, redirect, cb) {
           allow_anonymous: record.allow_anonymous,
           is_active: record.is_active
         } : null;
-        if (cb) cb(res);
-        dispatch(viewer_save_response(res, save_options));
+        if (cb) cb(success ? body : { ...body, success: false });
+        dispatch(viewer_save_response(body, save_options, slot, success));
       }).catch(error => {
         console.log('error', error);
-        dispatch(viewer_save_http_error());
+        if (cb) cb({ success: false });
+        dispatch(viewer_save_http_error(slot));
       });
   }
 }
 
-export function viewer_save_http_error() {
+export function viewer_save_http_error(slot = 'save') {
   const action = {
     type: VIEWER_SAVE_HTTP_ERROR,
+    slot,
     error: true
   }
   return action;
 }
 
-export function viewer_save_http_loading() {
+export function viewer_save_http_loading(slot = 'save') {
   const action = {
-    type: VIEWER_SAVE_HTTP_LOADING
+    type: VIEWER_SAVE_HTTP_LOADING,
+    slot
   }
   return action;
 }
 
-export function viewer_save_response(res, save_options) {
+export function viewer_save_response(res, save_options, slot = 'save', success = !!res?.success) {
   const action = {
     type: VIEWER_SAVE_RESPONSE,
     res,
-    save_options
+    save_options,
+    slot,
+    success
+  }
+  return action;
+}
+
+export function viewer_save_reset(slot = 'save') {
+  const action = {
+    type: VIEWER_SAVE_RESET,
+    slot
   }
   return action;
 }
@@ -220,10 +252,7 @@ export function login_post(core, payload, apiUrl=null, history=null, redirect=nu
       .then(res => {
         //dispatch(login_response(res));
         if (res.authenticated) {
-          const cookies = new Cookies();
-          const expireDate = new Date();
-          expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-          cookies.set(cookieAuthName, res, { path: cookiePath, expires: expireDate });
+          writeAuthCookie(res);
           dispatch(auth_login(res));
           const safeUrlRedirect = sameOriginUrl(urlRedirect);
           if (safeUrlRedirect) {
@@ -247,10 +276,7 @@ export function login(auth, history, redirect, urlRedirect) {
   return function (dispatch, getState) {
     dispatch(login_response(auth));
     if (auth.authenticated) {
-      const cookies = new Cookies();
-      const expireDate = new Date();
-      expireDate.setDate(expireDate.getDate() + parseInt(cookieExpiresDays));
-      cookies.set(cookieAuthName, auth, { path: cookiePath, expires: expireDate });
+      writeAuthCookie(auth);
       dispatch(auth_login(auth));
       const safeUrlRedirect = sameOriginUrl(urlRedirect);
       if (safeUrlRedirect) {
@@ -266,8 +292,7 @@ export function login(auth, history, redirect, urlRedirect) {
 
 export function logout(history=null, redirect=null) {
   return function (dispatch, getState) {
-    const cookies = new Cookies();
-    cookies.remove(cookieAuthName, { path: cookiePath });
+    dispatch(session_clear());
     if (redirect && history?.navigate) {
       history.navigate(redirect);
     } else {
@@ -524,10 +549,11 @@ export function viewer_set_drawings(data) {
   return action;
 }
 
-export function viewer_set_featureinfo(data) {
+export function viewer_set_featureinfo(data, searching = false) {
   const action = {
     type: VIEWER_SET_FEATUREINFO,
-    data
+    data,
+    searching
   }
   return action;
 }
@@ -619,20 +645,36 @@ export function viewer_set_selectedmenu(selected_menu) {
 
 export function viewer_set_exclusive_mapcontrol(exclusive_mapcontrol) {
   const action = {
-    type: VIEWER_SET_EXCUSIVE_MAPCONTROL,
+    type: VIEWER_SET_EXCLUSIVE_MAPCONTROL,
     exclusive_mapcontrol
   }
   return action;
 }
 
+/** Gives the map back to the start tool of the viewer when the named tool still holds it. */
+export function viewer_release_exclusive_mapcontrol(exclusive_mapcontrol) {
+  const action = {
+    type: VIEWER_RELEASE_EXCLUSIVE_MAPCONTROL,
+    exclusive_mapcontrol
+  }
+  return action;
+}
+
+let viewerLoadSeq = 0;
+
+/** Loads a viewer config and its components. Only the latest call writes to the store. */
 export function viewer_load(core, id, history) {
   return function (dispatch, getState) {
+
+    const seq = ++viewerLoadSeq;
+    const isCurrent = () => seq === viewerLoadSeq;
 
     // Get logged user
     const logged = core.getLoggedUser();
 
     // Fetch viewer
     let url = id ? API_URL + '/app/viewer/' + id + (history.location.search || '') : CONFIG_URL;
+    const fromApi = !!id || !CONFIG_URL;
     if (!url) {
       url = API_URL + '/app/viewer' + (history.location.search || '')
     }
@@ -647,19 +689,19 @@ export function viewer_load(core, id, history) {
 
       // Validate response
       if (res.status === 401) throw new Error('Unauthorized');
-      else if (res.status !== 200) throw new Error('Not found');
+      if (res.status === 403) throw new Error('Forbidden');
+      if (res.status !== 200) throw new Error('Not found');
       return structuredClone(res.json);
 
     }).then(config => {
-      
+      if (!isCurrent()) return;
+
       // Validate config
       if (!config) return dispatch(viewer_not_found(history));
       if (!config.config_json) return dispatch(viewer_not_found(history));
+      if (!Array.isArray(config.config_json.components)) config.config_json.components = [];
 
-      // Note: Previously this code cleared the auth cookie when config lacked user_info.username.
-      // This was too aggressive - it would clear valid sessions when loading public viewers
-      // or during redirect flows. The server already returns 401 for actual auth failures,
-      // which is handled in the catch block below. Removing this cookie-clearing logic.
+      if (logged?.token && fromApi && !config.user_info) dispatch(session_clear());
 
       // Unload components
       dispatch(viewer_unload_components(core));
@@ -670,7 +712,8 @@ export function viewer_load(core, id, history) {
       config['featureinfo'] = [];
       config['geolocation'] = null;
       config['coordinates'] = [];
-      config['exclusive_mapcontrol'] = null;
+      config['default_mapcontrol'] = (config.config_json.map_controls || []).find(c => c.exclusive && c.active)?.id || null;
+      config['exclusive_mapcontrol'] = config['default_mapcontrol'];
       core.setConfig(config);
 
       if (config?.config_json?.show_menu === false || !config?.config_json?.selected_menu) {
@@ -681,12 +724,13 @@ export function viewer_load(core, id, history) {
 
       // Load viewer custom translations
       loadTranslations(config.id, (data, error, ns) => {
-        dispatch(viewer_set_translation_namespaces(ns));
+        if (isCurrent()) dispatch(viewer_set_translation_namespaces(ns));
       });
 
       // Load components
       const { components } = config.config_json;
-      Promise.allSettled(components.map(component => core.addComponent(core, component))).then(() => {
+      Promise.allSettled(components.map(component => core.addComponent(core, component, null, isCurrent))).then(() => {
+        if (!isCurrent()) return;
 
         // Index by id
         const pitems = {};
@@ -694,29 +738,19 @@ export function viewer_load(core, id, history) {
 
         // Finally, load into redux store
         dispatch(viewer_load_components(pitems));
-        window.requestAnimationFrame(() => dispatch(viewer_load_done()));
+        window.requestAnimationFrame(() => isCurrent() && dispatch(viewer_load_done()));
       });
-    }).catch(error => {
+    }, error => {
+      if (!isCurrent()) return;
+
       // Redirect to login or error pages
       if (error.message === 'Unauthorized') {
-        if (!logged) {
-          //let redirect = '/login?redirect=/mapa/' + (id || '/');
-          const redirect = '/login?redirect=' + history.location.pathname;
-          /*
-          if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'mapa') > -1) {
-            redirect += '&path=/mapa/';
-          } else if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL + 'map') > -1) {
-            redirect += '&path=/map/';
-          } else if (window.location.pathname.toLowerCase().indexOf(core.BASE_URL) < 0) {
-            redirect += '&url_redirect=/' + id;
-          }
-          */
-          history.navigate(redirect);
-        } else {
-          dispatch(viewer_not_authorized(history));
-        }
+        if (logged?.token) dispatch(session_clear());
+        history.navigate('/login?redirect=' + encodeURIComponent(history.location.pathname + (history.location.search || '')));
+      } else if (error.message === 'Forbidden') {
+        dispatch(viewer_not_authorized(history));
       } else dispatch(viewer_not_found(history));
-    })
+    }).catch(error => console.error('Error applying viewer config:', error));
   }
 }
 
@@ -814,14 +848,6 @@ export function viewer_add_themes(parentId, themes = [], top, isSession=false) {
     themes, 
     top,
     isSession
-  }
-  return action;
-}
-
-export function layers_remove_items(ids) {
-  const action = {
-    type: LAYERS_REMOVE_ITEMS,
-    ids
   }
   return action;
 }

@@ -22,7 +22,7 @@ export default function WFS(props) {
    * Event handler for load WFS Capabilities
    */
   const loadWFSCapabilities = () => {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
+    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -61,35 +61,29 @@ export default function WFS(props) {
       turl = core.MAP_PROXY_URL + encodeURIComponent(turl);
     };
 
+    const sourceUrl = data.url;
+    const isCurrent = beginLoad();
     setLoading(true);
-
     fetch(turl)
-    .then(res => {
-      if (!res.ok) throw Error(res.statusText);
-      return res;
-    })
-    .then(res => res.text())
-    .then((r) => {
-      xml2js.parseString(r, (err, capabilities) => {
-        if (err) {
-          console.error(err);
-          setError(''+err);
-          setLoading(false);
-          return;
-        }
-        const dataitems = Models.OWSModel.convertWFS2Themes(capabilities, data.url, options);
-        setData({ ...data, dataType: undefined, dataitems });
-
-        // Add to cookies history
-        if (cookies) rememberUrl(cookies, 'wfs', data.url);
-        setLoading(false);
-
+      .then(res => {
+        if (!res.ok) throw Error(res.statusText);
+        return res.text();
+      })
+      .then(r => new Promise((resolve, reject) => {
+        xml2js.parseString(r, (err, capabilities) => err ? reject(err) : resolve(capabilities));
+      }))
+      .then((capabilities) => {
+        const dataitems = Models.OWSModel.convertWFS2Themes(capabilities, sourceUrl, options);
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems });
+        if (cookies) rememberUrl(cookies, 'wfs', sourceUrl);
+      }).catch((error) => {
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems: [] });
+        setError(''+error);
+      }).finally(() => {
+        if (isCurrent()) setLoading(false);
       });
-    }).catch((error) => {
-      setData({ ...data, dataType: undefined, dataitems: [] });
-      setError(''+error);
-      setLoading(false);
-    });
   }
 
   /**

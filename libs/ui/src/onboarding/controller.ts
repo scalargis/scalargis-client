@@ -105,7 +105,7 @@ export interface OnboardingController {
    * on the current landing. Moves one step in lastDir (improvement 02). Returns
    * to the caller nothing; it notifies, so the renderer re-measures.
    */
-  skipDeadStep(): Promise<void>;
+  skipDeadStep(stepId?: string): Promise<void>;
   /** Jump to a specific step by index. */
   goTo(index: number): Promise<void>;
   /** Tear down the tour without marking it completed. */
@@ -173,7 +173,38 @@ export function createController(
   // (skipDeadStep) moves this way, so a dead step lands the tour on the next
   // live step in the same direction the user was going (improvement 02).
   let lastDir: 1 | -1 = 1;
+  let seen = false;
+  let epoch = 0;
+  let chain: Promise<void> = Promise.resolve();
+  let userMove: Promise<void> | null = null;
   const listeners = new Set<ControllerListener>();
+
+  /** Queue a task after the pending ones; a task queued before a cancel does not run. */
+  function run(task: (gen: number) => Promise<void> | void, always = false): Promise<void> {
+    const gen = epoch;
+    const p = chain.then(() => {
+      if (!always && gen !== epoch) return;
+      return task(epoch);
+    });
+    chain = p.catch(() => undefined);
+    return p;
+  }
+
+  /** Drop the pending and queued moves. */
+  function cancelMoves(): void {
+    epoch += 1;
+    userMove = null;
+  }
+
+  /** Run a user move; a move asked while another is pending is dropped. */
+  function move(task: (gen: number) => Promise<void>): Promise<void> {
+    if (userMove) return userMove;
+    const p = run(task).finally(() => {
+      if (userMove === p) userMove = null;
+    });
+    userMove = p;
+    return p;
+  }
 
   function notify(): void {
     for (const fn of listeners) fn(ctrl);
@@ -207,9 +238,10 @@ export function createController(
    * caller runs the leaving step's after hook first. Shared by next / prev /
    * skipDeadStep.
    */
-  async function moveTo(index: number): Promise<void> {
+  async function moveTo(index: number, gen: number): Promise<void> {
     const step = runList[index];
     if (step) await doBefore(step);
+    if (gen !== epoch || !active) return;
     currentIndex = index;
     persistCurrentStep();
     notify();
@@ -218,6 +250,16 @@ export function createController(
   /** Mark the tour done and tear the overlay down. */
   function completeInternal(): void {
     markCompleted(viewerId, activeFlow);
+    active = false;
+    notify();
+  }
+
+  /** Run out of steps: complete when the user moved through the tour, else stop with no mark. */
+  function finishRun(): void {
+    if (seen) {
+      completeInternal();
+      return;
+    }
     active = false;
     notify();
   }
@@ -239,65 +281,78 @@ export function createController(
       return activeFlow;
     },
 
-    async start(startOptions?: { flow?: string; reset?: boolean }) {
-      // Derive the run list for this run's flow first, so every check below and
-      // every navigation reads the scoped list.
+    start(startOptions?: { flow?: string; reset?: boolean }) {
       const flow = startOptions?.flow ?? null;
-      activeFlow = flow;
-      runList = deriveRunList(flow);
-      if (runList.length === 0) return;
+      if (deriveRunList(flow).length === 0) return Promise.resolve();
+      cancelMoves();
+      const gen = epoch;
+      return (async () => {
+        const list = deriveRunList(flow);
+        if (list.length === 0) return;
+        activeFlow = flow;
+        runList = list;
 
-      // P1 (Phase 4): a finished tour restarts from the top. start() must
-      // not reopen on the last step. resetState clears the completed flag and
-      // the saved step so this run tracks and completes cleanly. A partly-done
-      // tour (not completed) still resumes from its last step. The persistence
-      // is flow-keyed, so a scoped run reads its own slot.
-      const restart =
-        !!options?.reset || !!startOptions?.reset || isCompleted(viewerId, flow);
-      if (restart) resetState(viewerId, flow);
-      // Resume resolves the saved step id to its index in the current list. A
-      // membership change since the pause (login, is_owner, config) can drop
-      // that step; resolveLastStep returns 0 then, so the tour restarts from the
-      // first live step instead of resuming on a different step at the old index.
-      const startIdx = restart ? 0 : resolveLastStep(viewerId, runList, flow);
+        // P1 (Phase 4): a finished tour restarts from the top. start() must
+        // not reopen on the last step. resetState clears the completed flag and
+        // the saved step so this run tracks and completes cleanly. A partly-done
+        // tour (not completed) still resumes from its last step. The persistence
+        // is flow-keyed, so a scoped run reads its own slot.
+        const restart =
+          !!options?.reset || !!startOptions?.reset || isCompleted(viewerId, flow);
+        if (restart) resetState(viewerId, flow);
+        // Resume resolves the saved step id to its index in the current list. A
+        // membership change since the pause (login, is_owner, config) can drop
+        // that step; resolveLastStep returns 0 then, so the tour restarts from the
+        // first live step instead of resuming on a different step at the old index.
+        const startIdx = restart ? 0 : resolveLastStep(viewerId, runList, flow);
 
-      const step = runList[startIdx];
-      if (step) await doBefore(step);
+        const step = runList[startIdx];
+        if (step) await doBefore(step);
+        if (gen !== epoch) return;
 
-      active = true;
-      currentIndex = startIdx;
-      // A resume onto a saved step backs up if that step is now dead; a fresh
-      // start at the top moves forward (improvement 02/04).
-      lastDir = startIdx > 0 ? -1 : 1;
-      persistCurrentStep();
-      notify();
+        active = true;
+        seen = false;
+        currentIndex = startIdx;
+        // A resume onto a saved step backs up if that step is now dead; a fresh
+        // start at the top moves forward (improvement 02/04).
+        lastDir = startIdx > 0 ? -1 : 1;
+        persistCurrentStep();
+        notify();
+      })();
     },
 
-    async next() {
-      if (!active) return;
-      lastDir = 1;
-      const current = runList[currentIndex];
-      if (current) doAfter(current);
+    next() {
+      return move(async (gen) => {
+        if (!active) return;
+        lastDir = 1;
+        seen = true;
+        const current = runList[currentIndex];
+        if (current) doAfter(current);
 
-      const nextIdx = currentIndex + 1;
-      if (nextIdx >= runList.length) {
-        completeInternal();
-        return;
-      }
+        const nextIdx = currentIndex + 1;
+        if (nextIdx >= runList.length) {
+          completeInternal();
+          return;
+        }
 
-      await moveTo(nextIdx);
+        await moveTo(nextIdx, gen);
+      });
     },
 
-    async prev() {
-      if (!active || currentIndex <= 0) return;
-      lastDir = -1;
-      const current = runList[currentIndex];
-      if (current) doAfter(current);
+    prev() {
+      return move(async (gen) => {
+        if (!active || currentIndex <= 0) return;
+        lastDir = -1;
+        seen = true;
+        const current = runList[currentIndex];
+        if (current) doAfter(current);
 
-      await moveTo(currentIndex - 1);
+        await moveTo(currentIndex - 1, gen);
+      });
     },
 
     pause() {
+      cancelMoves();
       if (!active) return;
       // Dismiss freezes the viewer as-is. pause() does NOT run the leaving
       // step's after hook, so a panel or menu the step revealed stays open and
@@ -312,6 +367,7 @@ export function createController(
     },
 
     complete() {
+      cancelMoves();
       if (!active) return;
       const current = runList[currentIndex];
       if (current) doAfter(current);
@@ -323,51 +379,58 @@ export function createController(
       ctrl.pause();
     },
 
-    async skipDeadStep() {
-      if (!active) return;
-      const current = runList[currentIndex];
-      if (current) doAfter(current); // restore any reveal this dead step ran
+    skipDeadStep(stepId?: string) {
+      return run(async (gen) => {
+        if (!active) return;
+        if (stepId !== undefined && runList[currentIndex]?.id !== stepId) return;
+        const current = runList[currentIndex];
+        if (current) doAfter(current); // restore any reveal this dead step ran
 
-      if (lastDir > 0) {
-        const nextIdx = currentIndex + 1;
-        // Ran out of live steps forward: the previous live step was the last,
-        // so the tour completes.
-        if (nextIdx >= runList.length) {
-          completeInternal();
+        if (lastDir > 0) {
+          const nextIdx = currentIndex + 1;
+          // Ran out of live steps forward: the previous live step was the last,
+          // so the tour completes.
+          if (nextIdx >= runList.length) {
+            finishRun();
+            return;
+          }
+          await moveTo(nextIdx, gen);
           return;
         }
-        await moveTo(nextIdx);
-        return;
-      }
 
-      const prevIdx = currentIndex - 1;
-      if (prevIdx < 0) {
-        // Nowhere to back up and this step is dead. Search forward instead, so
-        // a dead first step never stays on screen.
-        lastDir = 1;
-        const nextIdx = currentIndex + 1;
-        if (nextIdx >= runList.length) {
-          completeInternal();
+        const prevIdx = currentIndex - 1;
+        if (prevIdx < 0) {
+          // Nowhere to back up and this step is dead. Search forward instead, so
+          // a dead first step never stays on screen.
+          lastDir = 1;
+          const nextIdx = currentIndex + 1;
+          if (nextIdx >= runList.length) {
+            finishRun();
+            return;
+          }
+          await moveTo(nextIdx, gen);
           return;
         }
-        await moveTo(nextIdx);
-        return;
-      }
-      await moveTo(prevIdx);
+        await moveTo(prevIdx, gen);
+      });
     },
 
-    async goTo(index: number) {
-      if (!active || index < 0 || index >= runList.length) return;
-      if (index === currentIndex) return;
+    goTo(index: number) {
+      return move(async (gen) => {
+        if (!active || index < 0 || index >= runList.length) return;
+        if (index === currentIndex) return;
 
-      lastDir = index > currentIndex ? 1 : -1;
-      const current = runList[currentIndex];
-      if (current) doAfter(current);
+        lastDir = index > currentIndex ? 1 : -1;
+        seen = true;
+        const current = runList[currentIndex];
+        if (current) doAfter(current);
 
-      await moveTo(index);
+        await moveTo(index, gen);
+      });
     },
 
     end() {
+      cancelMoves();
       if (active) {
         const current = runList[currentIndex];
         if (current) doAfter(current);
@@ -376,64 +439,66 @@ export function createController(
       notify();
     },
 
-    async setSteps(next: readonly OnboardingStep[]) {
-      const sorted = [...next].sort(byOrder);
-      // The user navigates within the run list, so the remap works against it,
-      // not the full list. Capture the old run list before the swap.
-      const oldRunList = runList;
-      const oldIdx = currentIndex;
-      const oldStep = active ? oldRunList[oldIdx] : undefined;
+    setSteps(next: readonly OnboardingStep[]) {
+      return run(async (gen) => {
+        const sorted = [...next].sort(byOrder);
+        // The user navigates within the run list, so the remap works against it,
+        // not the full list. Capture the old run list before the swap.
+        const oldRunList = runList;
+        const oldIdx = currentIndex;
+        const oldStep = active ? oldRunList[oldIdx] : undefined;
 
-      allSteps = sorted;
-      // Re-derive the run list by the same flow, so a membership change during a
-      // scoped run keeps the scope.
-      runList = deriveRunList(activeFlow);
+        allSteps = sorted;
+        // Re-derive the run list by the same flow, so a membership change during a
+        // scoped run keeps the scope.
+        runList = deriveRunList(activeFlow);
 
-      // Idle: nothing is on screen. Swap the list and let a later start()
-      // resolve the saved id against it (F3). No hooks run.
-      if (!active || !oldStep) {
-        notify();
-        return;
-      }
-
-      // The step the user is on survived the change. Remap its index in
-      // silence: the step is already revealed and on screen, so the before and
-      // after hooks do not run again. Persist the id at its new index and
-      // notify so the card counter and controls refresh.
-      const survivedIdx = runList.findIndex((s) => s.id === oldStep.id);
-      if (survivedIdx >= 0) {
-        currentIndex = survivedIdx;
-        persistCurrentStep();
-        notify();
-        return;
-      }
-
-      // The step the user was on left the list. Restore its reveal, then land
-      // on the nearest surviving neighbour in the last direction. This mirrors
-      // skipDeadStep: a backward search that finds nothing flips forward, and
-      // the tour completes when no neighbour survives. The walk uses the old
-      // run list for position and the new run list for membership and the
-      // landing index, so it holds even when several steps leave at once.
-      doAfter(oldStep);
-      const newIndexById = new Map(runList.map((s, i) => [s.id, i] as const));
-      const survivorFrom = (dir: 1 | -1): number | null => {
-        for (let i = oldIdx + dir; i >= 0 && i < oldRunList.length; i += dir) {
-          const hit = newIndexById.get(oldRunList[i].id);
-          if (hit !== undefined) return hit;
+        // Idle: nothing is on screen. Swap the list and let a later start()
+        // resolve the saved id against it (F3). No hooks run.
+        if (!active || !oldStep) {
+          notify();
+          return;
         }
-        return null;
-      };
 
-      let landIdx = survivorFrom(lastDir);
-      if (landIdx === null && lastDir < 0) {
-        lastDir = 1;
-        landIdx = survivorFrom(1);
-      }
-      if (landIdx === null) {
-        completeInternal();
-        return;
-      }
-      await moveTo(landIdx);
+        // The step the user is on survived the change. Remap its index in
+        // silence: the step is already revealed and on screen, so the before and
+        // after hooks do not run again. Persist the id at its new index and
+        // notify so the card counter and controls refresh.
+        const survivedIdx = runList.findIndex((s) => s.id === oldStep.id);
+        if (survivedIdx >= 0) {
+          currentIndex = survivedIdx;
+          persistCurrentStep();
+          notify();
+          return;
+        }
+
+        // The step the user was on left the list. Restore its reveal, then land
+        // on the nearest surviving neighbour in the last direction. This mirrors
+        // skipDeadStep: a backward search that finds nothing flips forward, and
+        // the tour completes when no neighbour survives. The walk uses the old
+        // run list for position and the new run list for membership and the
+        // landing index, so it holds even when several steps leave at once.
+        doAfter(oldStep);
+        const newIndexById = new Map(runList.map((s, i) => [s.id, i] as const));
+        const survivorFrom = (dir: 1 | -1): number | null => {
+          for (let i = oldIdx + dir; i >= 0 && i < oldRunList.length; i += dir) {
+            const hit = newIndexById.get(oldRunList[i].id);
+            if (hit !== undefined) return hit;
+          }
+          return null;
+        };
+
+        let landIdx = survivorFrom(lastDir);
+        if (landIdx === null && lastDir < 0) {
+          lastDir = 1;
+          landIdx = survivorFrom(1);
+        }
+        if (landIdx === null) {
+          finishRun();
+          return;
+        }
+        await moveTo(landIdx, gen);
+      }, true);
     },
 
     subscribe(fn: ControllerListener) {
@@ -444,6 +509,7 @@ export function createController(
     },
 
     destroy() {
+      cancelMoves();
       listeners.clear();
     },
   };

@@ -28,7 +28,9 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
 
   // Enable redux actions
   const dispatch = useDispatch();
-  const { viewer_save_record, viewer_save_response } = core.actions;
+  const { viewer_save_record, viewer_save_reset } = core.actions;
+  const slot = viewer.save_slots?.share || { status: 'idle' };
+  const sharedUuid = slot.status === 'success' ? slot.response?.uuid : null;
 
   let allow_sharing = true;
   if (viewer?.allow_sharing === false) {
@@ -41,7 +43,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
   }
 
   function openForm() {
-    dispatch(viewer_save_response(null));
+    dispatch(viewer_save_reset('share'));
     setId(null);
     setName(null);
     setTitle(viewer.title);
@@ -87,7 +89,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
       config_json: JSON.stringify(newconfig),
       parent_id: viewer.id
     }
-    dispatch(viewer_save_record(core, record, null, null))
+    dispatch(viewer_save_record(core, record, null, null, null, 'share'))
   }
 
   const copyToClipboard = str => {
@@ -183,12 +185,12 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               </div> }
             </div>
 
-            { viewer.save_response &&
+            { !!sharedUuid &&
             <div className="grid">
                 <label className="col-12 pb-0"><strong>Url</strong></label>
                 <div className="col-12 md:col-10 align-content-center">
-                    <a style={{wordBreak: "break-all"}} href={getViewerPublicUrl(viewer.save_response.uuid)}
-                      target="_blank" rel="noopener noreferrer">{getViewerPublicUrl(viewer.save_response.uuid)}</a>
+                    <a style={{wordBreak: "break-all"}} href={getViewerPublicUrl(sharedUuid)}
+                      target="_blank" rel="noopener noreferrer">{getViewerPublicUrl(sharedUuid)}</a>
                 </div>
                 <div className="col-12 md:col-2 pr-3 text-right">
                     <ActionIcon
@@ -198,7 +200,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
                         size="md"
                         title={t("copyUrl", "Copiar Url")}
                         aria-label={t("copyUrl", "Copiar Url")}
-                        onClick={(e) => { e.preventDefault(); e.currentTarget.blur(); copyToClipboard(getViewerPublicUrl(viewer.save_response.uuid)) }}
+                        onClick={(e) => { e.preventDefault(); e.currentTarget.blur(); copyToClipboard(getViewerPublicUrl(sharedUuid)) }}
                     >
                         <IconCopy />
                     </ActionIcon>
@@ -210,11 +212,11 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               <Button
                 type="submit"
                 leftSection={<IconCheck />}
-                loading={viewer.save_loading}
+                loading={slot.status === 'loading'}
               >{t("getLink", "Obter Link")}</Button>
             </Group>
 
-            { viewer.save_error &&
+            { slot.status === 'unavailable' &&
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">
@@ -225,7 +227,7 @@ function ShareViewerWidget({ auth, core, type, viewer, record }) {
               </div>
             }
 
-            { viewer.save_response && !!viewer.save_response.message &&
+            { slot.status === 'failed' &&
               <div className="mt-3">
                 <Alert color="danger" py="xs">
                   <Group justify="center" gap="xs" wrap="nowrap">

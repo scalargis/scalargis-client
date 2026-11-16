@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
 import { Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -17,7 +17,7 @@ export default function Main(props) {
 
   const { as, core, config, utils, actions, record } = props;
 
-  const { mainMap, viewer, dispatch, Models } = config;
+  const { mainMap, viewer, dispatch, Models, auth } = config;
 
   const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
 
@@ -31,116 +31,114 @@ export default function Main(props) {
   const [theme, setTheme] = useState();
   const [dimension, setDimension] = useState();
 
+  const addedThemeId = useRef(null);
+
   useEffect(() => {
     if (!viewer?.config_json?.layers) return;
 
-    let _theme;
+    const layers = viewer.config_json.layers;
+    const datasource = component_cfg?.datasource;
+    const configId = datasource?.layer?.id != null ? String(datasource.layer.id) : null;
+    const themeId = addedThemeId.current || datasource?.layer_id || configId;
 
-    if (component_cfg?.datasource?.layer_id) {
-      _theme = viewer.config_json.layers.find(l => l.id === component_cfg?.datasource?.layer_id);
-    }
-
+    const _theme = themeId ? layers.find(l => l.id === themeId) : null;
     if (_theme) {
       setTheme(_theme);
-    } else {
-      if (component_cfg?.datasource?.layer) {
-        _theme = { id: String(uuidV4()), ...component_cfg?.datasource?.layer}
-        const _parent = component_cfg?.datasource?.parent_id || "main";
-        dispatch(actions.viewer_add_themes(
-          _parent,
-          [_theme],
-          true
-        ));
-        dispatch(actions.layers_set_checked([ ...(viewer?.config_json?.checked || []), _theme.id])); 
-        setTheme(_theme);
-      }
+      return;
     }
 
-  }, [viewer?.config_json?.layers, viewer?.config_json?.layers?.length, component_cfg?.datasource?.layer_id, component_cfg?.datasource?.layer]);
+    if (!datasource?.layer || addedThemeId.current) return;
+
+    const newTheme = { ...datasource.layer, id: configId || String(uuidV4()) };
+    addedThemeId.current = newTheme.id;
+
+    const _parent = datasource.parent_id || "main";
+    dispatch(actions.viewer_add_themes(_parent, [newTheme], true));
+    dispatch(actions.layers_set_checked([ ...(viewer?.config_json?.checked || []), newTheme.id]));
+    setTheme(newTheme);
+  }, [viewer?.config_json?.layers, component_cfg?.datasource?.layer_id, component_cfg?.datasource?.layer]);
 
   useEffect(() => {
-
     if (!mainMap) return;
-    if (!theme) return;
+    if (!theme) {
+      setDimension(undefined);
+      return;
+    }
 
     let dimension;
     let dimension_name = component_cfg?.dimension?.name;
-      
-    if (theme) {
-      if (theme.dimension_name) dimension_name = theme.dimension_name;
+    if (theme.dimension_name) dimension_name = theme.dimension_name;
 
-      if (theme?.dimensions?.length) {
-        dimension = dimension_name ? theme.dimensions.find(d => d.name === dimension_name) : theme.dimensions[0];
-      }
-
-      if (dimension) {
-        //Set Dimension to state
-        setDimension(dimension);
-      } else {
-        let url = theme.url;;
-        url = removeUrlParam(url, 'request')
-        url = removeUrlParam(url, 'service')
-        url = removeUrlParam(url, 'version')
-        url = url + (url.indexOf('?') > -1 ? '' : '?')
-        url = url + '&SERVICE=WMS&REQUEST=GetCapabilities';
-        if (theme?.version) {
-          url = url + '&VERSION=' + theme.version;
-        }
-    
-        //Add user authentication token
-        if (isUrlAppHostname(url) && viewer.integrated_authentication) {
-          if (auth && auth.data && auth.data.auth_token) {
-            const authkey = viewer?.integrated_authentication_key || 'authkey';
-            url = url + '&' + authkey + '=' + auth.data.auth_token;
-          }
-        }
-    
-        if (!isUrlAppOrigin(url)) {
-          url = core.MAP_PROXY_URL + encodeURIComponent(url);
-        }
-
-        fetch(url)
-        .then(res => {
-          if (!res.ok) throw Error(res.statusText);
-          return res;
-        })
-        .then(res => res.text())
-        .then((r) => {
-          try {
-            const parser = new WMSCapabilities();
-            const wms = parser.read(r);
-
-            let layer;
-            if (wms?.Capability?.Layer?.Layer.length) {
-              layer = wms.Capability.Layer.Layer.find(l => l.Name === theme.layers);
-            } else {
-              layer = wms.Capability.Layer.Layer;
-            }
-
-            if (layer) {
-              if (layer?.Dimension?.length) {
-                dimension = dimension_name ? layer.Dimension.find(d => d.name === dimension_name) : layer.Dimension[0];
-              } else if (layer.Dimension) {
-                dimension = layer.Dimension || null;
-              }
-              
-              if (dimension) {
-                //Set Dimension to state
-                setDimension(dimension);
-              }
-            }
-          } catch (e) {
-            console.log(e);
-          }
-        }).catch((error) => {
-            console.log(error);
-        });
-      }
-    } else {
-      //TODO
+    if (theme?.dimensions?.length) {
+      dimension = dimension_name ? theme.dimensions.find(d => d.name === dimension_name) : theme.dimensions[0];
     }
 
-  }, [mainMap, theme, component_cfg?.dimension?.name]);
+    if (dimension) {
+      setDimension(dimension);
+      return;
+    }
+
+    setDimension(undefined);
+    if (!theme.url) return;
+
+    let url = theme.url;
+    url = removeUrlParam(url, 'request')
+    url = removeUrlParam(url, 'service')
+    url = removeUrlParam(url, 'version')
+    url = url + (url.indexOf('?') > -1 ? '' : '?')
+    url = url + '&SERVICE=WMS&REQUEST=GetCapabilities';
+    if (theme?.version) {
+      url = url + '&VERSION=' + theme.version;
+    }
+
+    if (isUrlAppHostname(url) && viewer.integrated_authentication && auth?.data?.auth_token) {
+      const authkey = viewer?.integrated_authentication_key || 'authkey';
+      url = url + '&' + authkey + '=' + auth.data.auth_token;
+    }
+
+    if (!isUrlAppOrigin(url)) {
+      url = core.MAP_PROXY_URL + encodeURIComponent(url);
+    }
+
+    const controller = new AbortController();
+
+    fetch(url, { signal: controller.signal })
+    .then(res => {
+      if (!res.ok) throw Error(res.statusText);
+      return res;
+    })
+    .then(res => res.text())
+    .then((r) => {
+      if (controller.signal.aborted) return;
+      try {
+        const parser = new WMSCapabilities();
+        const wms = parser.read(r);
+
+        let layer;
+        if (wms?.Capability?.Layer?.Layer.length) {
+          layer = wms.Capability.Layer.Layer.find(l => l.Name === theme.layers);
+        } else {
+          layer = wms.Capability.Layer.Layer;
+        }
+
+        if (layer) {
+          if (layer?.Dimension?.length) {
+            dimension = dimension_name ? layer.Dimension.find(d => d.name === dimension_name) : layer.Dimension[0];
+          } else if (layer.Dimension) {
+            dimension = layer.Dimension || null;
+          }
+
+          if (dimension) setDimension(dimension);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }).catch((error) => {
+      if (error?.name !== 'AbortError') console.log(error);
+    });
+
+    return () => controller.abort();
+  }, [mainMap, theme?.id, theme?.url, theme?.layers, theme?.version, theme?.dimensions, theme?.dimension_name, component_cfg?.dimension?.name]);
 
   useEffect(() => {
     if (!mainMap) return;

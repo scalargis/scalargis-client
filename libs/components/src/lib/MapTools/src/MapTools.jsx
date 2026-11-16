@@ -14,7 +14,7 @@ import OlCircle from 'ol/style/Circle';
 import OlFill from 'ol/style/Fill';
 import OlStroke from 'ol/style/Stroke';
 import convert from 'convert';
-import { defaultLengthText } from './utils';
+import { defaultLengthText, MAPCONTROL_NAME } from './utils';
 import './style.css';
 
 
@@ -137,7 +137,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
   }, [viewer?.loaded, mainMap]);
 
   useEffect(() => {
-    if (!(viewer?.exclusive_mapcontrol === 'MapTools')) {
+    if (viewer?.exclusive_mapcontrol !== MAPCONTROL_NAME) {
       onControlSelect(null);
     }
   }, [viewer?.exclusive_mapcontrol]);
@@ -160,9 +160,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
 
     if(!selectedControl) {
       clearHelpTooltip();
-      if (exclusive_mapcontrol === 'MapTools') {
-        dispatch(actions.viewer_set_exclusive_mapcontrol(null));
-      }
+      dispatch(actions.viewer_release_exclusive_mapcontrol(MAPCONTROL_NAME));
       return;
     }
 
@@ -171,7 +169,7 @@ export default function MapTools({ selectedControl, onControlSelect, core, viewe
     // Show area tool help
     if (selectedControl === 'area' && !helpAreaShowed) openHelp();
 
-    dispatch(actions.viewer_set_exclusive_mapcontrol('MapTools'));
+    dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
 
     const source = layer.current.getSource();
 

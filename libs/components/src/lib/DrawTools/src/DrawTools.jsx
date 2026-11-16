@@ -5,6 +5,7 @@ import { DataGrid, notify, IconReplay, IconRefresh, IconTrash, IconDownload, Ico
 import { MapToolButton } from '../../components';
 import { createBoxSelect, createGrid, createSizedShape, createSnap, createTransform, duplicateFeatures, HelpBox } from './editing';
 import { getAppRootPath } from '../../utils/common';
+import { MAP_TOOLS } from '../../utils/mapTools';
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import OlInteractionDragPan from "ol/interaction/DragPan";
 import OlInteractionDoubleClickZoom from "ol/interaction/DoubleClickZoom";
@@ -223,6 +224,15 @@ const legacyLineStyle = (type) => type === 'Polygon' ? 'dashed' : 'solid';
 const DOUBLE_CLICK_GUARD_MS = 350;
 
 const DRAW_FLAGS = { draw_geom: false, draw_symbol: false, draw_text: false };
+
+const DRAW_GEOMETRY = { line: 'LineString', polygon: 'Polygon' };
+
+/** The draw flags of a drawing made with a draw tool. */
+const toolFlags = (tool) => ({
+  draw_geom: tool !== 'symbol' && tool !== 'text',
+  draw_symbol: tool === 'symbol',
+  draw_text: tool === 'text'
+});
 
 /** Drawing tools panel. */
 function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
@@ -682,25 +692,26 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       getMap().removeInteraction(drawRef.current);
       drawRef.current = null;
       syncSnap();
+      setNavigation(true);
     }
   };
 
-  const addInteraction = (type) => {
+  const addInteraction = (tool) => {
     const { actions: act, dispatch: dsp, utils: u } = propsRef.current;
     stopDraw();
-    const draw = new OlInteractionDraw({ features: new OlCollection(), type });
+    const draw = new OlInteractionDraw({ features: new OlCollection(), type: DRAW_GEOMETRY[tool] || 'Point' });
     drawRef.current = draw;
     setNavigation(false);
-    dsp(act.viewer_set_exclusive_mapcontrol('DrawTools'));
+    dsp(act.viewer_set_exclusive_mapcontrol(MAP_TOOLS.DRAW_TOOLS));
     getMap().addInteraction(draw);
     syncSnap();
     draw.on('drawend', (e) => {
-      const [geojson] = withNums([e.feature], [u.serializeDrawing(e.feature, panelRef.current, viewCrs())]);
+      const [geojson] = withNums([e.feature], [u.serializeDrawing(e.feature, { ...panelRef.current, ...toolFlags(tool) }, viewCrs())]);
       history.commit([...currentDrawings(), geojson]);
       patch({ selectedTool: null, ...DRAW_FLAGS });
       stopDraw();
       restoreNavigation();
-      dsp(act.viewer_set_exclusive_mapcontrol(null));
+      dsp(act.viewer_release_exclusive_mapcontrol(MAP_TOOLS.DRAW_TOOLS));
     });
   };
 
@@ -715,10 +726,9 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
         select.setActive(false);
       } else {
         stopDraw();
-        setNavigation(true);
       }
       patch({ selectedTool: null, ...DRAW_FLAGS });
-      dispatch(actions.viewer_set_exclusive_mapcontrol(null));
+      dispatch(actions.viewer_release_exclusive_mapcontrol(MAP_TOOLS.DRAW_TOOLS));
       return;
     }
 
@@ -730,13 +740,12 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
       const kept = selectedDrawings();
       if (panelRef.current.editing) finishEditing();
       stopDraw();
-      setNavigation(true);
       select.setActive(false);
       patch({ selectedTool: type, ...DRAW_FLAGS, editing: null });
       ensureTransform().setActive(true);
       if (kept.length) transformRef.current.selectFeatures(kept);
       syncSnap();
-      dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+      dispatch(actions.viewer_set_exclusive_mapcontrol(MAP_TOOLS.DRAW_TOOLS));
       return;
     }
 
@@ -749,11 +758,10 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
 
     if (PLACEMENT_TOOLS.includes(type)) {
       stopDraw();
-      setNavigation(true);
       select.setActive(false);
       patch({ selectedTool: type, ...DRAW_FLAGS, editing: null });
       startPlacement();
-      dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+      dispatch(actions.viewer_set_exclusive_mapcontrol(MAP_TOOLS.DRAW_TOOLS));
       return;
     }
 
@@ -765,33 +773,13 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
         handlersRef.current.onSelect({ selected: keptFromTransform, deselected: [] });
       }
       stopDraw();
-      dispatch(actions.viewer_set_exclusive_mapcontrol('DrawTools'));
+      dispatch(actions.viewer_set_exclusive_mapcontrol(MAP_TOOLS.DRAW_TOOLS));
       return;
     }
 
-    patch({ selectedTool: type });
+    patch({ selectedTool: type, ...toolFlags(type), editing: null });
     select.setActive(false);
-    switch (type) {
-      case 'symbol':
-        patch({ ...DRAW_FLAGS, draw_symbol: true, editing: null });
-        addInteraction('Point');
-        break;
-      case 'text':
-        patch({ ...DRAW_FLAGS, draw_text: true, editing: null });
-        addInteraction('Point');
-        break;
-      case 'line':
-        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
-        addInteraction('LineString');
-        break;
-      case 'polygon':
-        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
-        addInteraction('Polygon');
-        break;
-      default:
-        patch({ ...DRAW_FLAGS, draw_geom: true, editing: null });
-        addInteraction('Point');
-    }
+    addInteraction(type);
   };
 
   const clickUndo = (e) => {
@@ -859,12 +847,8 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   };
 
   const disableTools = () => {
-    const current = panelRef.current;
-    if (current.selectedTool) {
-      stopDraw();
-      setNavigation(true);
-    }
-    if (current.editing) finishEditing();
+    stopDraw();
+    if (panelRef.current.editing) finishEditing();
     stopTransform();
     removeModify();
     if (snapRef.current) snapRef.current.dispose();
@@ -875,13 +859,13 @@ function DrawTools({ record, viewer, actions, dispatch, mainMap, utils }) {
   const exclusive = viewer.exclusive_mapcontrol;
 
   useEffect(() => {
-    const active = selectedMenu === 'drawtools' && exclusive === 'DrawTools';
+    const active = selectedMenu === record.id && exclusive === MAP_TOOLS.DRAW_TOOLS;
     if (panelRef.current.enabled && !active) {
       disableTools();
     } else if (!panelRef.current.enabled && active) {
       patch({ enabled: true });
     }
-    if (panelRef.current.selectedTool && selectedMenu !== 'drawtools') {
+    if (panelRef.current.selectedTool && selectedMenu !== record.id) {
       select.setActive(false);
       stopTransform();
       patch({ selectedTool: null });

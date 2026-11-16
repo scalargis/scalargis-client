@@ -54,6 +54,7 @@
   "noResults": "Aucun resultat",
   "identifyElements": "Identifier les éléments",
   "identifyNoResults": "Aucun résultat. Cliquez sur la carte pour vous identifier.",
+  "identifySearching": "Recherche en cours...",
   "identifyNotActive": "Cliquez sur le bouton du menu principal pour activer l'outil, puis cliquez sur la carte pour identifier les éléments.",
   "exportElement": "Exporter un élément",
   "mapTools": "Outils cartographiques",
@@ -266,6 +267,7 @@
 
   "addTheme": "Ajouter une couche",
   "warnThemeExists": "La couche existe déjà",
+  "addThemeNoParent": "La couche n'a pas été ajoutée : la visionneuse n'a aucun groupe de couches pour la placer.",
   "warnThemeNotFound": "La couche est introuvable dans la liste des couches de la carte",
 
   "successActionMsg": "Opération réalisée avec succès",

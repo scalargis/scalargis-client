@@ -1,79 +1,49 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import useRecord, { useRecordNavigation } from '../common/useRecord';
+import RecordView from '../common/RecordView';
 
 import CoordinateSystemForm from './CoordinateSystemForm';
+
+const toFormData = (record) => {
+  if (!record) return null;
+  const extent = record.config_json?.extent ? record.config_json.extent.split(' ') : null;
+  return {
+    id: record.id,
+    code: record.code,
+    name: record.name,
+    description: record.description,
+    srid: record.config_json?.srid,
+    label: record.config_json?.label,
+    defs: record.config_json?.defs,
+    minx: extent ? extent[0] : null,
+    miny: extent ? extent[1] : null,
+    maxx: extent ? extent[2] : null,
+    maxy: extent ? extent[3] : null,
+    precision: record.config_json?.precision
+  };
+};
 
 function CoordinateSystemEdit(props) {
 
   const { core } = useContext(AppContext);
 
-  const {
-    dispatch
-  } = props;
-
   const { id } = useParams();
 
-  const [loading, setLoading] = useState(false);
-  const [record, setRecord] = useState(null);
-  const [roles, setRoles] = useState([]);
+  const { goBack } = useRecordNavigation('/settings/coordinate_systems');
 
-  const toast = useRef(null);
-
-  const API_URL = core.API_URL;
-
-  useEffect(() => {
-    if (id) {
-      loadData();
-    } else {
-      setRecord({});
-    }
-  }, []);
-
-  const loadData = () => {
-    const provider = dataProvider(API_URL + '/portal/lists');
-
-    const params = {
-      id: id
-    }
-
-    setLoading(true);    
-
-    provider.getOne('coordinate_systems', params).then(d => {
-      const data = {
-        id: d.data?.id,
-        code: d.data?.code,
-        name: d.data?.name,
-        description: d.data?.description,
-        srid: d.data?.config_json?.srid,
-        label: d.data?.config_json?.label,
-        defs: d.data?.config_json?.defs,
-        minx: d.data?.config_json?.extent ? d.data?.config_json?.extent.split(' ')[0] : null,
-        miny: d.data?.config_json?.extent ? d.data?.config_json?.extent.split(' ')[1] : null,
-        maxx: d.data?.config_json?.extent ? d.data?.config_json?.extent.split(' ')[2] : null,
-        maxy: d.data?.config_json?.extent ? d.data?.config_json?.extent.split(' ')[3] : null,
-        precision: d.data?.config_json?.precision
-      }
-      setRecord(data);      
-      setLoading(false);
-    }).catch(e => {
-      setLoading(false);
-      console.log(e);
-      //toast.current.show({life: 5000, severity: 'error', summary: 'Pesquisa de Visualizadores', detail: 'Ocorreu um erro na pesquisa de intervenções'});
-    });
-  }  
+  const state = useRecord(id, (key) =>
+    dataProvider(core.API_URL + '/portal/lists').getOne('coordinate_systems', { id: key }).then(d => toFormData(d.data))
+  );
 
   return (
-    <React.Fragment>
-    { record ?      
-        <CoordinateSystemForm data={record} />
-      :
-      <div>loading...</div>
-    }
-    </React.Fragment>
+    <RecordView state={state} onBack={goBack}>
+      {(record) => <CoordinateSystemForm data={record} />}
+    </RecordView>
   );
 
 }

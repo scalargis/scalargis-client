@@ -47,4 +47,4 @@ function Dashboard(props) {
     );
 }
 
-export default connect(state => ({ loading: state.loading, backoffice: state.backoffice }))(Dashboard);
+export default connect(state => ({ backoffice: state.backoffice }))(Dashboard);

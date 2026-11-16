@@ -390,13 +390,11 @@ class Main extends React.Component {
                   <Button variant="subtle" size="compact-sm" type="button"
                     leftSection={<IconFolderOpen />}
                     onClick={e => this.loadSession()}
-                    disabled={(config.viewer.save_loading)}
                     title={i18n.translateValue("sessionSaveInfo", `Gravada em ${formatStamp(config.viewer.session.date)}`, undefined, undefined, undefined, {info: formatStamp(config.viewer.session.date)})}>
                     {i18n.translateValue("loadSession","Abrir sessão")}
                   </Button>}
                 <Button variant="subtle" size="compact-sm" type="button"
                   leftSection={<IconSave />}
-                  loading={config.viewer.save_loading}
                   onClick={e => this.saveSession()}>
                   {i18n.translateValue("saveSession", "Gravar sessão")}
                 </Button>

@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Grid, Group, Select, TextInput } from '@mantine/core';
 import { notify, IconArrowLeft, IconSave } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 
 const precisionOptions = [0,1,2,3,4,5,6,7,8,9,10].map(val => {
   return {
@@ -21,10 +21,6 @@ function CoordinateSystemForm(props) {
     dispatch
   } = props;
 
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
-
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -38,12 +34,7 @@ function CoordinateSystemForm(props) {
     defaultValues: {...data}
   });
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/settings/coordinate_systems');
 
   const onSubmit = (formData) => {
     const new_data = {
@@ -83,7 +74,7 @@ function CoordinateSystemForm(props) {
         data: {...new_data}
       }
       provider.create('coordinate_systems', params).then(d => {
-        setData({...data, id: d.data.id});
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
         notify.error('Criar Registo', 'Ocorreu um erro ao criar o registo');

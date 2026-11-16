@@ -124,21 +124,19 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
     buildResultsTable();
   }, [geolocation]);
 
-  if (geolocation && geolocation.error) return (
-    <StatusMessage
-      color="warning"
-      icon={<IconAlertTriangle />}
-      text={getErrorMessage(geolocation.error, component_cfg?.messages)}
-    />
-  )
-
   return (
     <div>
-      <StatusMessage
-        color="informative"
-        icon={<IconInfoCircle />}
-        text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : t("myLocationSelectOption","Selecione a opção 'Ver Posição' para ativar a visualização da sua posição.")}
-      />
+      {geolocation?.error ?
+        <StatusMessage
+          color="warning"
+          icon={<IconAlertTriangle />}
+          text={getErrorMessage(geolocation.error, component_cfg?.messages)}
+        /> :
+        <StatusMessage
+          color="informative"
+          icon={<IconInfoCircle />}
+          text={component_cfg?.messages?.intro?.text ? component_cfg.messages.intro.text : t("myLocationSelectOption","Selecione a opção 'Ver Posição' para ativar a visualização da sua posição.")}
+        />}
 
       <div className="mt-3 pt-3 pr-2 pl-2 pb-2" style={{"border": "1px solid rgb(111 57 57 / 12%)"}}>
         <div className="grid">
@@ -174,7 +172,7 @@ export default function GeoLocation({ config, actions, dispatch, record }) {
         </div>
       </div>
 
-      { geolocation &&
+      { geolocation?.coordinates &&
       <div className="card pt-2 p-0">
           <AttributeTable rows={results.map(r => ({ key: r.field, label: r.field, value: r.value }))} />
       </div> }

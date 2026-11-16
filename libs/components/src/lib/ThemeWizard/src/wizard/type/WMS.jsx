@@ -24,7 +24,7 @@ export default function WMS(props) {
    * @param {Object} e The click handler
    */
   const loadWMSCapabilities = () => {
-    const { core, auth, mainMap, viewer, data, setLoading, setData, setError, cookies, Models } = props;
+    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, cookies, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -62,33 +62,28 @@ export default function WMS(props) {
       turl = core.MAP_PROXY_URL + encodeURIComponent(turl);
     }
 
+    const sourceUrl = data.url;
+    const isCurrent = beginLoad();
     setLoading(true);
     fetch(turl)
-    .then(res => {
-      if (!res.ok) throw Error(res.statusText);
-      return res;
-    })
-    .then(res => res.text())
-    .then((r) => {
-      try {
+      .then(res => {
+        if (!res.ok) throw Error(res.statusText);
+        return res.text();
+      })
+      .then((r) => {
         const parser = new WMSCapabilities();
         const wms = parser.read(r);
-        const dataitems = Models.OWSModel.convertWMS2Themes(wms, data.url, options);
-        setData({ ...data, dataType: undefined, dataitems });
-
-        // Add to cookies history
-        if (cookies) rememberUrl(cookies, 'wms', data.url);
-        setLoading(false);
-
-      } catch (e) {
-        setLoading(false);
-        setError(''+e);
-      }
-    }).catch((error) => {
-      setData({ ...data, dataType: undefined, dataitems: [] });
-      setLoading(false);
-      setError(''+error);
-    });
+        const dataitems = Models.OWSModel.convertWMS2Themes(wms, sourceUrl, options);
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems });
+        if (cookies) rememberUrl(cookies, 'wms', sourceUrl);
+      }).catch((error) => {
+        if (!isCurrent()) return;
+        patchData({ dataType: undefined, dataitems: [] });
+        setError(''+error);
+      }).finally(() => {
+        if (isCurrent()) setLoading(false);
+      });
   }
 
 

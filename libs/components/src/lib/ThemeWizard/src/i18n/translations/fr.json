@@ -53,6 +53,9 @@
 
   "errorProcessingKMLFile": "Une erreur s'est produite lors du traitement du fichier KML.",
   "errorProcessingGeoJSONFile": "Une erreur s'est produite lors du traitement du fichier GeoJSON.",
+  "errorProcessingShapefile": "Une erreur s'est produite lors du traitement du fichier Shapefile.",
+  "errorProcessingDXFFile": "Une erreur s'est produite lors du traitement du fichier DXF.",
+  "errorProcessingGMLFile": "Une erreur s'est produite lors du traitement du fichier GML.",
   "invalidResponse": "Il n'a pas été possible d'obtenir une réponse valable.",
 
   "bands": "Bandes",

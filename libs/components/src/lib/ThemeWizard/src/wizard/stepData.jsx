@@ -46,6 +46,10 @@ export default function WizardStepData(props) {
     props.onChange(d);
   }
 
+  function patchData(patch) {
+    props.onChange(current => ({ ...current, ...patch }));
+  }
+
   function editField(field, value) {
     props.onChange({ ...data, [field]: value });
   }
@@ -73,9 +77,8 @@ export default function WizardStepData(props) {
 
     let clone = JSON.parse(JSON.stringify(data.dataitems));
     clone = filterSelectedLayerItems(clone);
-    data.items = clone;
 
-    props.onSave(data);
+    props.onSave({ ...data, items: clone });
   }
 
   let TypeComponent = null;
@@ -107,8 +110,10 @@ export default function WizardStepData(props) {
         viewer={props.viewer}
         loading={props.loading}
         setLoading={props.setLoading}
+        beginLoad={props.beginLoad}
         setError={setError}
         setData={updateData}
+        patchData={patchData}
         setSelected={setSelected}
         getUrlHistory={getUrlHistory}
         editField={editField}

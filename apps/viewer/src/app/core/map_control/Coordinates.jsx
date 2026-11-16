@@ -51,6 +51,7 @@ function Coordinates({ auth, core, config, actions }) {
   const { coordinates } = viewer;
   const [newCoord, setNewCoord] = useState(null);
   const coordinates_control = viewer.config_json.map_controls.find(c => c.id === 'Coordinates');
+  const coordinatesActive = !!coordinates_control && (coordinates_control.exclusive ? viewer.exclusive_mapcontrol === coordinates_control.id : !!coordinates_control.active);
   const coordinates_component = viewer.config_json.components.find(c => c.config_json && 
               c.config_json.map_control === 'Coordinates');
 
@@ -163,17 +164,17 @@ function Coordinates({ auth, core, config, actions }) {
 
   useEffect(() => {
     if (!coordinates_control) return;
-    if (coordinates_control.active) mainMap.on('singleclick', coordinatesSingleClick);
+    if (coordinatesActive) mainMap.on('singleclick', coordinatesSingleClick);
     else mainMap.un('singleclick', coordinatesSingleClick);
 
-    if (coordinates_control.active && !viewer.config_json.checked.includes('coordinates')) {
+    if (coordinatesActive && !viewer.config_json.checked.includes('coordinates')) {
       dispatch(actions.layers_set_checked([ ...viewer.config_json.checked, 'coordinates']));
     }
 
     return () => {
       mainMap.un('singleclick', coordinatesSingleClick);
     }
-  }, [coordinates_control]);  
+  }, [coordinates_control, coordinatesActive]);  
 
   // Add coordinates layer
   useEffect(() => {

@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
@@ -28,6 +27,7 @@ import { v4 as uuidV4 } from 'uuid'
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 
 const PASSWORD_MIN_LENGTH = 12;
 const PASSWORD_MAX_LENGTH = 32;
@@ -126,10 +126,6 @@ function UserForm(props) {
   const {
     dispatch
   } = props;
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -241,12 +237,7 @@ function UserForm(props) {
     setSelectedGroups(null);
   }
 
-  const goBack = () => {
-    const state = {
-      searchParams: {...location.state.previousSearchParams}
-    }
-    navigate(location.state.from, { state });
-  }
+  const { goBack, openCreated } = useRecordNavigation('/security/users');
 
   const onSubmit = (formData) => {
     const new_data = {
@@ -278,7 +269,9 @@ function UserForm(props) {
           shouldDirty: true
         });
       }).catch(e => {
-        notify.error('Editar Registo', e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo');
+        notify.error('Editar Registo', e.body?.message === 'auth_token_taken'
+          ? 'O token de autenticação já pertence a outro utilizador'
+          : (e.body?.message || e.message || 'Ocorreu um erro ao alterar o registo'));
       }).finally(() => {
         setIsSaving(false);
       });
@@ -291,10 +284,12 @@ function UserForm(props) {
         data: {...new_data}
       }
       provider.create('users', params).then(d => {
-        setData({...data, id: d.data.id});
+        openCreated(d.data.id);
         notify.success('Criar Registo', 'Registo criado com sucesso');
       }).catch(e => {
-        notify.error('Criar Registo', e.body?.message || e.message || 'Ocorreu um erro ao criar o registo');
+        notify.error('Criar Registo', e.body?.message === 'auth_token_taken'
+          ? 'O token de autenticação já pertence a outro utilizador'
+          : (e.body?.message || e.message || 'Ocorreu um erro ao criar o registo'));
       }).finally(() => {
         setIsSaving(false);
       });

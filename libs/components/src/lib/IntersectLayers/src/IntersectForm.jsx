@@ -25,7 +25,7 @@ import { i18n, DrawingToolbar } from '../../components';
 
 import IntersectResults from './IntersectResults';
 
-import { DEFAULT_DRAWING_TOOLS } from './utils';
+import { DEFAULT_DRAWING_TOOLS, MAPCONTROL_NAME } from './utils';
 
 import './style.css';
 
@@ -51,12 +51,11 @@ export default function IntersectForm(props) {
     
   const [isLoading, setIsLoading] = useState(false);
   const [geometryIntersection, setGeometryIntersection] = useState([]);
-  const [showGeometry, setShowGeometry] = useState(true);
 
   const [buffer, setBuffer] = useState(0);
 
-  const [searchParams, setSearchParams] = useState(null);
-  const [results, setResults] = useState([]);
+  const [search, setSearch] = useState({ params: null, results: [] });
+  const { params: searchParams, results } = search;
   const [showNoResultsMsg, { open: openNoResultsMsg, close: closeNoResultsMsg }] = useDisclosure(false);
 
   const geometryCol = useRef(new Collection([]));
@@ -266,15 +265,13 @@ export default function IntersectForm(props) {
       'out_srid': getProjectionSrid(outProj)
     };
 
-    setSearchParams({...data});
-
     setDrawTool(null);
 
     setBlockedPanel(true);
 
     provider.getSimple(path, data).then(result => {
+      setSearch({ params: {...data}, results: result?.data });
       openNoResultsMsg();
-      setResults(result?.data);
     }).catch(error => {
       notify.error('Error', 'Ocorreu um erro ao executar a análise.');
       console.log('error', error);
@@ -286,12 +283,10 @@ export default function IntersectForm(props) {
 
   const clearAll = () => {
     setDrawTool(null);
-    setResults([]);
+    setSearch({ params: null, results: [] });
     closeNoResultsMsg();
     setGeometryIntersection([]);
-    setShowGeometry(false);
     setBuffer(0);
-    setSearchParams(null);
     geometryCol.current.clear();
 
     intersectLayer.current.getSource().getFeatures().forEach((f) => {
@@ -303,9 +298,10 @@ export default function IntersectForm(props) {
 
   useEffect(() => {
     if (drawTool) {
-      dispatch(actions.viewer_set_exclusive_mapcontrol('Print'));
+      dispatch(actions.viewer_set_exclusive_mapcontrol(MAPCONTROL_NAME));
       addInteraction(drawTool);
     } else {
+      dispatch(actions.viewer_release_exclusive_mapcontrol(MAPCONTROL_NAME));
       if (draw) {
         mainMap.removeInteraction(draw);
         setDraw(null);
@@ -318,18 +314,13 @@ export default function IntersectForm(props) {
 
 
   useEffect(() => {
-    if (viewer?.config_json?.selected_menu != componentId) {
-      if (copyGeometry.current) {
-        const _drawTool = drawTool || "";
-        if (_drawTool.toLocaleLowerCase() == "copy") {
-          setDrawTool(null);
-        }
-      }
+    if (viewer?.config_json?.selected_menu != componentId && drawTool) {
+      setDrawTool(null);
     }
   },  [viewer?.config_json?.selected_menu]);
 
   useEffect(() => {
-    if (drawTool && exclusive_mapcontrol != 'Print') {
+    if (drawTool && exclusive_mapcontrol !== MAPCONTROL_NAME) {
       setDrawTool(null);
     }
   }, [exclusive_mapcontrol]);
@@ -498,8 +489,6 @@ export default function IntersectForm(props) {
           searchParams={searchParams}
           results={results}
           groupResults={intersectConfig?.groupResults || false}
-          showGeometry={showGeometry}
-          setShowGeometry={setShowGeometry}
         /> :
         showNoResultsMsg && <div className="p-fluid mt-4">
           <Alert color="informative" py="xs">

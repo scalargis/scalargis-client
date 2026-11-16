@@ -6,7 +6,7 @@ This repo is the React frontend (Nx monorepo): the public **Viewer** (port 4200)
 [![CI](https://img.shields.io/github/actions/workflow/status/scalargis/scalargis-client/ci.yml?branch=main&label=CI)](https://github.com/scalargis/scalargis-client/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/scalargis/scalargis-client?include_prereleases)](https://github.com/scalargis/scalargis-client/releases)
 
-[Website](https://scalargis.com) · [Docs](https://docs.scalargis.com) · [Demo](https://demo.scalargis.com) · [Server repo](https://github.com/scalargis/scalargis-server#readme)
+[Website](https://scalargis.com) · [Docs](https://docs.scalargis.com) · [Demo](https://demo.scalargis.com) · [Server repo](https://github.com/scalargis/scalargis-server#readme) · [Install with Docker](https://github.com/scalargis/scalargis-stack#readme)
 
 <img src=".github/assets/demo-viewer.png" alt="A ScalarGIS map viewer with Sentinel-2 imagery and the administrative boundaries of Portugal" width="600">
 

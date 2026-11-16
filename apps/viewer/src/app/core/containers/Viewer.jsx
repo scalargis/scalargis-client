@@ -36,10 +36,8 @@ function Viewer(props) {
   const params = useParams();
 
   // Get router props
-  const url = location?.pathname || '';
   const { id } = params;
-  const { loading, viewer, auth, config, notifications, dialogWindows } = props;
-  const { exclusive_mapcontrol } = viewer;
+  const { viewer, auth, notifications } = props;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
   
@@ -63,7 +61,7 @@ function Viewer(props) {
   // Enable redux actions
   const dispatch = useDispatch();
   const { core, mainMap } = useContext(AppContext);
-  const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu, viewer_update_mapcontrols } = core.actions;
+  const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu } = core.actions;
 
   const gaTrackingId = import.meta.env.VITE_APP_GA_TRACKING_ID;
   
@@ -75,11 +73,7 @@ function Viewer(props) {
       PageView();
     }
 
-    if (url.indexOf('/session') < 0) {
-      dispatch(viewer_load(core, id, history));
-    } else {
-      dispatch(viewer_load(core, id, history, true));
-    }
+    dispatch(viewer_load(core, id, history));
   }, [id]);
 
   useEffect(() => {
@@ -107,21 +101,11 @@ function Viewer(props) {
     }
   }, [location]);
 
-  useEffect(() => {
-    if (!viewer.config_json) return;
-    const changed = viewer.config_json.map_controls
-      .filter(c => c.exclusive && !!c.active !== (c.id === exclusive_mapcontrol))
-      .map(c => ({ ...c, active: c.id === exclusive_mapcontrol }));
-    if (changed.length) dispatch(viewer_update_mapcontrols(changed));
-  }, [exclusive_mapcontrol]);
 
   // Base onboarding tour for the open viewer: membership from
   // config_json.components[], gated by step conditions, mapped to runtime
   // steps with locale-following copy (Phase 3 adds the reveal hooks).
   const onboardingSteps = useOnboardingSteps(viewer, auth, core);
-
-  // TODO: improve loading UI
-  if (loading) return null;
 
   let rlayers = ['overlays', 'main', 'background', 'basemaps'];
   if (viewer.config_json && viewer.config_json.root_layers && viewer.config_json.root_layers.length > 0) {
@@ -140,7 +124,6 @@ function Viewer(props) {
         core={core}
         viewer={viewer}
         notifications={notifications}
-        dialogWindows={dialogWindows}
         layout_wrapper_click={e => dispatch(layout_wrapper_click())}
         layout_toggle_menu={isDesktop => dispatch(layout_toggle_menu(isDesktop))}
         mainMenu={<MainMenu history={history} onMenuClick={isDesktop => dispatch(layout_show_menu(isDesktop))} />}
@@ -151,7 +134,6 @@ function Viewer(props) {
       >
       <MainMap 
         olMap={mainMap}
-        config={config}
         viewer={viewer}
         mainMapEl={mainMapEl}
         dispatch={dispatch}

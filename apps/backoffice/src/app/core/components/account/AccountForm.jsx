@@ -23,7 +23,7 @@ function AccountForm(props) {
 
   const { core } = useContext(AppContext);
 
-  const { auth_update, logout } = core?.actions ?? {};
+  const { refresh_auth, logout } = core?.actions ?? {};
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,10 +59,12 @@ function AccountForm(props) {
 
       setData(new_data);
 
-      if (d?.data) dispatch(auth_update(d?.data));
+      if (d?.data) dispatch(refresh_auth(d?.data));
 
     }).catch(e => {
-      const msg = e.message || 'Ocorreu um erro ao alterar o registo';
+      const msg = e.body?.message === 'auth_token_taken'
+        ? 'O token de autenticação já pertence a outro utilizador'
+        : (e.message || 'Ocorreu um erro ao alterar o registo');
       notify.error('Editar Registo', msg);
     }).finally(() => {
       setIsSaving(false);

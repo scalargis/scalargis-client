@@ -1,28 +1,15 @@
-import { v4 as uuid } from 'uuid';
 const topics = {};
 
 export function subscribe(topic, fn, override=true) {
-  const id = uuid();
-
-  if (!topics[topic]) {
+  if (!topics[topic] || override) {
     topics[topic] = fn;
-  } else {
-    if (override) {
-      topics[topic] = null;
-      delete topics[topic];
-
-      topics[topic] = fn;
-    }
   }
-
 
   return () => {
-    if (!topics[topic]) {
-      topics[topic] = null;
+    if (topics[topic] === fn) {
       delete topics[topic];
     }
   }
-
 }
 
 export function publish(topic, args) {

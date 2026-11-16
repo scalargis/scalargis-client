@@ -1,21 +1,17 @@
 import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router';
 import { Alert, Badge, Box, Button, Grid, Group, Input, TextInput, Textarea } from '@mantine/core';
 import dayjs from 'dayjs';
 import { notify, IconArrowLeft } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
+import { useRecordNavigation } from '../common/useRecord';
 import { NOTIFICATION_STATUS, refreshNotificationsTotal } from './status';
 
 const formatDay = (value) => (value ? dayjs(value).format('YYYY-MM-DD') : '');
 
 function NotificationForm(props) {
-
-  // Routing
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -48,16 +44,7 @@ function NotificationForm(props) {
       .catch(() => notify.error('Ficheiros', 'Não foi possível obter o ficheiro'));
   }
 
-  const goBack = () => {
-    if (location.state && location.state.from) {
-      const state = {
-        searchParams: {...location.state.previousSearchParams}
-      }
-      navigate(location.state.from, { replace: true, state })
-    } else {
-      navigate(-1);
-    }
-  }
+  const { goBack } = useRecordNavigation('/notifications');
 
   const onCheck = () => updateNotification({ checked: true });
 

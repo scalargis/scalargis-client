@@ -7,9 +7,11 @@ import {
   LAYOUT_SET_MODE,
   LAYOUT_SET_COLORMODE,
   BACKOFFICE_LOAD,
+  BACKOFFICE_LOAD_ERROR,
   BACKOFFICE_LOAD_COMPONENTS,
   BACKOFFICE_UNLOAD_COMPONENTS,
   BACKOFFICE_LOAD_DONE,
+  BACKOFFICE_LOAD_RESET,
   BACKOFFICE_SET_CONFIG,
   BACKOFFICE_SET_NOTIFICATIONS_TOTAL,
   AUTH_HTTP_ERROR,
@@ -17,6 +19,7 @@ import {
   AUTH_RESPONSE,
   AUTH_LOGIN,
   AUTH_UPDATE,
+  AUTH_LOGOUT,
 } from '../actions'
 import { getCookieAuthName } from '../utils'
 
@@ -35,7 +38,7 @@ const cookieAuthName = getCookieAuthName();
 
 const reducer = (
   state = { 
-    loading: true,
+    boot: { phase: 'idle', error: null },
     auth: { data: cookies.get(cookieAuthName)},
     config: null,
     backoffice: initialBackoffice,
@@ -50,6 +53,7 @@ const reducer = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: true,
           http_error: false,
           error: null
@@ -61,8 +65,10 @@ const reducer = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: false,
           http_error: true,
+          error: action.res?.kind || 'unavailable',
           response: action.res
         }
       }
@@ -72,6 +78,7 @@ const reducer = (
       return {
         ...state,
         auth: {
+          data: state.auth?.data,
           loading: false,
           response: action.res
         }
@@ -85,6 +92,12 @@ const reducer = (
           loading: false,
           data: action.data
         }
+      }
+
+    case AUTH_LOGOUT:
+      return {
+        ...state,
+        auth: { ended: action.ended }
       }
 
     // Update user auth
@@ -104,7 +117,13 @@ const reducer = (
     case BACKOFFICE_LOAD:
       return {
         ...state,
-        loading: true
+        boot: { phase: 'config', error: null }
+      }
+
+    case BACKOFFICE_LOAD_ERROR:
+      return {
+        ...state,
+        boot: { phase: 'failed', error: action.error }
       }
 
     // Set viewer config
@@ -112,6 +131,7 @@ const reducer = (
       return {
         ...state,
         config: action.config,
+        boot: { phase: 'registering', error: null },
         backoffice: {
           ...initialBackoffice,
           ...action.backoffice
@@ -148,7 +168,13 @@ const reducer = (
     case BACKOFFICE_LOAD_DONE:
       return {
         ...state,
-        loading: false
+        boot: { phase: 'ready', error: null }
+      }
+
+    case BACKOFFICE_LOAD_RESET:
+      return {
+        ...state,
+        boot: { phase: 'idle', error: null }
       }
 
     // On click layout
