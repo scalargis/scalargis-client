@@ -17,7 +17,7 @@ import {
   Tabs,
   TextInput,
 } from '@mantine/core';
-import { CodeEditor, CollapsiblePanel, notify, TabPanel, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog } from '@scalargis/ui';
+import { CodeEditor, CollapsiblePanel, notify, TabPanel, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog, IconHistory } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import FormFieldsEditor from "../common/FormFieldsEditor";
@@ -27,6 +27,8 @@ import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
 import { useChangeSummary } from '../common/ChangeSummary';
+import { useRecordHistory } from '../common/RecordHistory';
+import { scalesToArray } from '../common/utils';
 import PageSection from '../common/PageSection';
 
 const buildScaleList = (list1, list2) => {
@@ -40,6 +42,8 @@ const tabItems = [
   { value: 'form', label: 'Formulário', icon: IconHome },
   { value: 'layouts', label: 'Layouts', icon: IconHome }
 ];
+
+const HISTORY_TAB = { value: 'history', label: 'Histórico', icon: IconHistory };
 
 const pageFormatList = ['A4', 'A3', 'A2', 'A1', 'A0'];
 const pageOrientationList = ['Retrato', 'Paisagem'];
@@ -175,6 +179,35 @@ function PrintForm(props) {
     onReload: props.onReload
   });
 
+  const history = useRecordHistory({
+    url: data.id ? `${API_URL}/portal/prints/${data.id}/history` : null,
+    savedCount: summary.savedCount,
+    current: () => buildData(getValues(), geometryFilter || savedGeometry),
+    fromSnapshot: (snapshot) => {
+      const s = scalesToArray({ ...snapshot });
+      const values = {};
+      Object.keys(getValues()).forEach((k) => { values[k] = s[k] ?? null; });
+      if ('config_json' in values) {
+        values.config_json = s.config_json && typeof s.config_json === 'object' ? JSON.stringify(s.config_json) : (s.config_json || '');
+      }
+      return {
+        ...values,
+        form_fields: s.form_fields || { fields: {}, groups: {} },
+        layouts: s.layouts || [],
+        geom_filter: s.geom_filter ?? null,
+        geom_filter_srid: s.geom_filter_srid ?? null,
+        tolerance_filter: s.tolerance_filter ?? null
+      };
+    },
+    onRestore: (p) => {
+      Object.keys(getValues()).forEach((k) => setValue(k, p[k], { shouldDirty: true }));
+      setScaleList(buildScaleList(scaleList, p.restrict_scales_list || []));
+      setFormFields(p.form_fields);
+      setLayouts(p.layouts);
+      setGeometryFilter({ geom_filter: p.geom_filter, geom_filter_srid: p.geom_filter_srid, tolerance_filter: p.tolerance_filter });
+    }
+  });
+
   const onSubmit = (formData) => {
     const new_data = buildData(formData, geometryFilter);
 
@@ -218,7 +251,7 @@ function PrintForm(props) {
 
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
-          {tabItems.map((item) => (
+          {(data.id ? [...tabItems, HISTORY_TAB] : tabItems).map((item) => (
             <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
               {item.label}
             </Tabs.Tab>
@@ -227,6 +260,8 @@ function PrintForm(props) {
       </Tabs>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+
+        {history.notice}
 
         <TabPanel active={activeTab === 'base'} mount="eager">
         <PageSection>
@@ -557,6 +592,8 @@ function PrintForm(props) {
           </PageSection>
         </TabPanel>
 
+        {activeTab === 'history' && <PageSection>{history.table}</PageSection>}
+
         <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
@@ -571,6 +608,7 @@ function PrintForm(props) {
         </Group>
 
         {summary.dialog}
+        {history.dialog}
 
       </form>
 

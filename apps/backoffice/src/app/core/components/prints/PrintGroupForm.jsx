@@ -15,7 +15,7 @@ import {
   Tabs,
   TextInput,
 } from '@mantine/core';
-import { CollapsiblePanel, notify, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog } from '@scalargis/ui';
+import { CollapsiblePanel, notify, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog, IconHistory } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import PrintLayoutsEditor from "./PrintLayoutsEditor";
@@ -26,6 +26,8 @@ import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
 import { useChangeSummary } from '../common/ChangeSummary';
+import { useRecordHistory } from '../common/RecordHistory';
+import { scalesToArray } from '../common/utils';
 import PageSection from '../common/PageSection';
 
 
@@ -40,6 +42,8 @@ const tabItems = [
   { value: 'layouts', label: 'Layouts', icon: IconHome },
   { value: 'childs', label: 'Plantas e Grupos', icon: IconCog }
 ];
+
+const HISTORY_TAB = { value: 'history', label: 'Histórico', icon: IconHistory };
 
 const pageFormatList = ['A4', 'A3', 'A2', 'A1', 'A0'];
 const pageOrientationList = ['Retrato', 'Paisagem'];
@@ -177,6 +181,38 @@ function PrintGroupForm(props) {
     onReload: props.onReload
   });
 
+  const history = useRecordHistory({
+    url: data.id ? `${API_URL}/portal/prints/groups/${data.id}/history` : null,
+    savedCount: summary.savedCount,
+    current: () => buildData(getValues(), geometryFilter || savedGeometry),
+    fromSnapshot: (snapshot) => {
+      const s = scalesToArray({ ...snapshot });
+      const values = {};
+      Object.keys(getValues()).forEach((k) => { values[k] = s[k] ?? null; });
+      if ('config_json' in values) {
+        values.config_json = s.config_json && typeof s.config_json === 'object' ? JSON.stringify(s.config_json) : (s.config_json || '');
+      }
+      return {
+        ...values,
+        form_fields: s.form_fields || { fields: {}, groups: {} },
+        layouts: s.layouts || [],
+        prints: (s.prints || []).map((id) => printsList.find((p) => p.id === id) || { id }),
+        groups: (s.groups || []).map((id) => groupsList.find((g) => g.id === id) || { id }),
+        geom_filter: s.geom_filter ?? null,
+        geom_filter_srid: s.geom_filter_srid ?? null,
+        tolerance_filter: s.tolerance_filter ?? null
+      };
+    },
+    onRestore: (p) => {
+      Object.keys(getValues()).forEach((k) => setValue(k, p[k], { shouldDirty: true }));
+      setScaleList(buildScaleList(scaleList, p.restrict_scales_list || []));
+      setFormFields(p.form_fields);
+      setLayouts(p.layouts);
+      setGroupChilds({ prints: p.prints, groups: p.groups });
+      setGeometryFilter({ geom_filter: p.geom_filter, geom_filter_srid: p.geom_filter_srid, tolerance_filter: p.tolerance_filter });
+    }
+  });
+
   const onSubmit = (formData) => {
     const new_data = buildData(formData, geometryFilter);
 
@@ -220,7 +256,7 @@ function PrintGroupForm(props) {
 
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
-          {tabItems.map((item) => (
+          {(data.id ? [...tabItems, HISTORY_TAB] : tabItems).map((item) => (
             <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
               {item.label}
             </Tabs.Tab>
@@ -229,6 +265,8 @@ function PrintGroupForm(props) {
       </Tabs>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+
+        {history.notice}
 
         {activeTab === 'base' ?
 
@@ -514,6 +552,8 @@ function PrintGroupForm(props) {
 
         : null}
 
+        {activeTab === 'history' && <PageSection>{history.table}</PageSection>}
+
 
         <Group justify="flex-end" mt="md" mb="md">
           <Button
@@ -529,6 +569,7 @@ function PrintGroupForm(props) {
         </Group>
 
         {summary.dialog}
+        {history.dialog}
 
       </form>
 

@@ -8,6 +8,7 @@ import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
 import { useChangeSummary } from '../common/ChangeSummary';
+import { useRecordHistory } from '../common/RecordHistory';
 
 function PrintElementForm(props) {
 
@@ -24,7 +25,7 @@ function PrintElementForm(props) {
 
   const API_URL = core.API_URL;
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, control, handleSubmit, watch, formState: { errors }, setValue, getValues } = useForm({
     defaultValues: {...data}
   });
 
@@ -41,6 +42,14 @@ function PrintElementForm(props) {
     initialPayload: () => buildData(data),
     save: (payload) => dataProvider(API_URL + '/portal').update('prints/elements', { id: data.id, data: payload }),
     onReload: props.onReload
+  });
+
+  const history = useRecordHistory({
+    url: data.id ? `${API_URL}/portal/prints/elements/${data.id}/history` : null,
+    savedCount: summary.savedCount,
+    current: () => buildData(getValues()),
+    fromSnapshot: (s) => ({ code: s.code, name: s.name, config: s.config }),
+    onRestore: (p) => Object.keys(p).forEach((k) => setValue(k, p[k] ?? '', { shouldDirty: true }))
   });
 
   const onSubmit = (formData) => {
@@ -83,6 +92,8 @@ function PrintElementForm(props) {
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
+          {history.notice}
+
           <Grid gap="sm">
             <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="id" label="Id" value={data.id || ''} disabled />
@@ -121,6 +132,7 @@ function PrintElementForm(props) {
           </Grid>
 
         <Group justify="flex-end" mt="md" mb="md">
+          {history.button}
           <Button
             type="button"
             variant="default"
@@ -134,6 +146,8 @@ function PrintElementForm(props) {
         </Group>
 
         {summary.dialog}
+        {history.modal}
+        {history.dialog}
 
       </form>
   );

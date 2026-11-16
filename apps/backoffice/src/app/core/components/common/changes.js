@@ -1,5 +1,13 @@
 const IGNORED_KEYS = new Set(['updated_at', 'created_at']);
 
+const ID_LIST_KEYS = new Set(['roles', 'prints', 'print_groups', 'groups']);
+
+const toLayouts = (value) => (Array.isArray(value)
+  ? value.map((item) => ({ format: item?.format, orientation: item?.orientation, config: item?.config }))
+  : value);
+
+const toIds = (value) => (Array.isArray(value) ? value.map((item) => (item && typeof item === 'object' ? item.id : item)) : value);
+
 const isPlainObject = (value) => Object.prototype.toString.call(value) === '[object Object]';
 
 const isEmpty = (value) => value === null || value === undefined || value === '';
@@ -50,7 +58,13 @@ export function diffRecords(before, after) {
   const out = [];
   Object.keys(after || {})
     .filter((key) => !IGNORED_KEYS.has(key))
-    .forEach((key) => walk((before || {})[key], after[key], key, out));
+    .forEach((key) => {
+      const left = (before || {})[key];
+      const right = after[key];
+      if (ID_LIST_KEYS.has(key)) walk(toIds(left), toIds(right), key, out);
+      else if (key === 'layouts') walk(toLayouts(left), toLayouts(right), key, out);
+      else walk(left, right, key, out);
+    });
   return out;
 }
 

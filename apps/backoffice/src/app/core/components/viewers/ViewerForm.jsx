@@ -20,12 +20,13 @@ import {
   TagsInput,
   TextInput,
 } from '@mantine/core';
-import { CodeEditor, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint } from '@scalargis/ui';
+import { CodeEditor, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
 import { useChangeSummary } from '../common/ChangeSummary';
+import { useRecordHistory } from '../common/RecordHistory';
 import { isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
@@ -49,6 +50,9 @@ const HIDDEN = {
   visibility: 'hidden',
   pointerEvents: 'none',
 };
+
+const VIEWER_FORM_KEYS = ['name', 'title', 'description', 'slug', 'keywords', 'is_active', 'show_help', 'show_credits',
+  'show_contact', 'on_homepage', 'img_icon', 'img_logo', 'img_logo_alt'];
 
 const sortRolesArray = (data) => {
   if (!data) return data;
@@ -90,6 +94,8 @@ const tabItems = [
   { value: 'config', label: 'Configuração', icon: IconCog },
   { value: 'prints', label: 'Plantas', icon: IconPrint }
 ];
+
+const HISTORY_TAB = { value: 'history', label: 'Histórico', icon: IconHistory };
 
 
 function ViewerForm(props) {
@@ -137,7 +143,7 @@ function ViewerForm(props) {
 
   const API_URL = core.API_URL;
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, control, handleSubmit, watch, formState: { errors }, setValue, getValues } = useForm({
     defaultValues: {...data}
   });
 
@@ -273,6 +279,47 @@ function ViewerForm(props) {
     onReload: props.onReload
   });
 
+  const history = useRecordHistory({
+    url: data.id ? `${API_URL}/portal/viewers/${data.id}/history` : null,
+    savedCount: summary.savedCount,
+    current: () => buildData(getValues()),
+    fromSnapshot: (s) => ({
+      id: s.id,
+      name: s.name,
+      title: s.title,
+      description: s.description,
+      slug: s.slug,
+      keywords: s.keywords,
+      is_active: s.is_active,
+      show_help: s.show_help,
+      show_credits: s.show_credits,
+      show_contact: s.show_contact,
+      on_homepage: s.on_homepage,
+      img_icon: s.img_icon || null,
+      img_logo: s.img_logo || null,
+      img_logo_alt: s.img_logo_alt || null,
+      manifest_json: s.manifest_json ?? null,
+      custom_style: s.custom_style || null,
+      config_json: s.config_json ?? {},
+      owner_id: s.owner_id ?? null,
+      roles: s.roles || [],
+      prints: (s.prints || []).map((id) => printsList.find((p) => p.id === id) || { id }),
+      print_groups: (s.print_groups || []).map((id) => groupsList.find((g) => g.id === id) || { id })
+    }),
+    onRestore: (p) => {
+      VIEWER_FORM_KEYS.forEach((k) => setValue(k, p[k] ?? null, { shouldDirty: true }));
+      setConfigJson(JSON.stringify(p.config_json || {}, null, 2));
+      setManifestJson(p.manifest_json ? JSON.stringify(p.manifest_json, null, 2) : null);
+      setCustomStyle(p.custom_style || null);
+      const allRoles = [...roles, ...(availableRoles || [])];
+      setRoles(sortRolesArray(allRoles.filter((r) => p.roles.includes(r.id))));
+      setAvailableRoles(sortRolesArray(allRoles.filter((r) => !p.roles.includes(r.id))));
+      const owner = (availableUsers || []).find((u) => u.id === p.owner_id);
+      setSelectedOwner(owner ? { ...owner } : (p.owner_id ? { id: p.owner_id } : null));
+      setPrintChilds({ prints: p.prints, groups: p.print_groups });
+    }
+  });
+
   const onSubmit = (formData) => {
     const new_data = buildData(formData);
     if (!new_data) return false;
@@ -346,7 +393,7 @@ function ViewerForm(props) {
 
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
-          {tabItems.map((item) => (
+          {(data.id ? [...tabItems, HISTORY_TAB] : tabItems).map((item) => (
             <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
               {item.label}
             </Tabs.Tab>
@@ -355,6 +402,8 @@ function ViewerForm(props) {
       </Tabs>
 
       <form onSubmit={handleSubmit(onSubmit)} style={{ position: 'relative' }}>
+
+        {history.notice}
 
         <PageSection style={activeTab === 'base' ? undefined : HIDDEN}>
 
@@ -635,6 +684,8 @@ function ViewerForm(props) {
 
           </PageSection>
 
+        {activeTab === 'history' && <PageSection>{history.table}</PageSection>}
+
         <Group justify="flex-end" mt="md" mb="md">
           <Button
             type="button"
@@ -649,6 +700,7 @@ function ViewerForm(props) {
         </Group>
 
         {summary.dialog}
+        {history.dialog}
 
       </form>
 

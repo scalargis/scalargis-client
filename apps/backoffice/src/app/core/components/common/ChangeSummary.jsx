@@ -5,7 +5,7 @@ import { MergeView } from '@codemirror/merge';
 import { EditorState } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
-import { Dialog, notify, IconAlertTriangle, IconCheck, IconEye, IconEyeSlash, IconRefresh, IconX } from '@scalargis/ui';
+import { Dialog, notify, IconAlertTriangle, IconCheck, IconEye, IconEyeSlash, IconRefresh, IconUndo, IconX } from '@scalargis/ui';
 
 import { diffRecords, fieldOf, fieldText, formatValue, isLongField, parseJsonText } from './changes';
 
@@ -58,8 +58,8 @@ const conflictText = (conflict) => {
   return `${who} gravou ${when ? `em ${when}` : 'este registo'}. Recarregue.`;
 };
 
-/** Dialog that lists the changes of a save and asks for a confirm. */
-export function ChangeSummary({ opened, before, after, changes, saving, conflict, onConfirm, onCancel, onReload }) {
+/** Dialog that lists the changes of a save and asks for a confirm, or in read mode compares an old state with the form. */
+export function ChangeSummary({ opened, before, after, changes, saving, conflict, onConfirm, onCancel, onReload, title, readMode, onRestore }) {
   const [showDiff, setShowDiff] = useState(false);
 
   useEffect(() => {
@@ -69,7 +69,12 @@ export function ChangeSummary({ opened, before, after, changes, saving, conflict
   const fields = [...new Set(changes.map((c) => fieldOf(c.path)))];
   const longFields = fields.filter((field) => isLongField(before?.[field], after?.[field]));
 
-  const footer = (
+  const footer = readMode ? (
+    <Group justify="flex-end">
+      <Button variant="default" leftSection={<IconX />} onClick={onCancel}>Fechar</Button>
+      <Button leftSection={<IconUndo />} onClick={onRestore}>Restaurar</Button>
+    </Group>
+  ) : (
     <Group justify="flex-end">
       <Button variant="default" leftSection={<IconX />} onClick={onCancel} disabled={saving}>Cancelar</Button>
       {conflict ? (
@@ -81,7 +86,7 @@ export function ChangeSummary({ opened, before, after, changes, saving, conflict
   );
 
   return (
-    <Dialog title="Confirmar alterações" opened={opened} onClose={onCancel} size="60vw" footer={footer} maximizable>
+    <Dialog title={title || 'Confirmar alterações'} opened={opened} onClose={onCancel} size="60vw" footer={footer} maximizable>
       <Stack gap="sm">
         {conflict && (
           <Alert color="danger" icon={<IconAlertTriangle />} data-testid="change-summary-conflict">
@@ -89,9 +94,11 @@ export function ChangeSummary({ opened, before, after, changes, saving, conflict
           </Alert>
         )}
         <Text size="sm">
-          {changes.length === 1 ? '1 alteração' : `${changes.length} alterações`} em {fields.length === 1 ? '1 campo' : `${fields.length} campos`}.
+          {readMode && changes.length === 0 && 'Este estado é igual ao formulário.'}
+          {readMode && changes.length > 0 && `${changes.length === 1 ? '1 diferença' : `${changes.length} diferenças`} entre este estado (Antes) e o formulário (Depois), em ${fields.length === 1 ? '1 campo' : `${fields.length} campos`}.`}
+          {!readMode && `${changes.length === 1 ? '1 alteração' : `${changes.length} alterações`} em ${fields.length === 1 ? '1 campo' : `${fields.length} campos`}.`}
         </Text>
-        <Table striped withTableBorder fz="xs" data-testid="change-summary-list">
+        {changes.length > 0 && <Table striped withTableBorder fz="xs" data-testid="change-summary-list">
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Campo</Table.Th>
@@ -108,7 +115,7 @@ export function ChangeSummary({ opened, before, after, changes, saving, conflict
               </Table.Tr>
             ))}
           </Table.Tbody>
-        </Table>
+        </Table>}
         {changes.length > MAX_ROWS && (
           <Text size="xs" c="dimmed">Mais {changes.length - MAX_ROWS} alterações não listadas.</Text>
         )}
@@ -141,6 +148,7 @@ export function useChangeSummary({ record, initialPayload, save, onSaved, onRelo
   const updatedAt = useRef(record?.updated_at);
   const [state, setState] = useState({ opened: false, after: null, changes: [], conflict: null });
   const [saving, setSaving] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
 
   const submit = (payload) => {
     const changes = diffRecords(baseline.current, payload);
@@ -161,6 +169,7 @@ export function useChangeSummary({ record, initialPayload, save, onSaved, onRelo
         updatedAt.current = response?.data?.updated_at ?? updatedAt.current;
         baseline.current = (onSaved && onSaved(response, payload)) || payload;
         notify.success('Editar Registo', 'Registo alterado com sucesso');
+        setSavedCount((n) => n + 1);
         close();
       })
       .catch((e) => {
@@ -192,5 +201,5 @@ export function useChangeSummary({ record, initialPayload, save, onSaved, onRelo
     />
   );
 
-  return { submit, saving, dialog };
+  return { submit, saving, savedCount, dialog };
 }

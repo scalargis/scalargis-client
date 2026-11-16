@@ -8,6 +8,7 @@ import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
 import { useChangeSummary } from '../common/ChangeSummary';
+import { useRecordHistory } from '../common/RecordHistory';
 
 function ParameterForm(props) {
 
@@ -26,7 +27,7 @@ function ParameterForm(props) {
 
   const API_URL = core.API_URL;
 
-  const { register, control, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, control, handleSubmit, watch, formState: { errors }, setValue, getValues } = useForm({
     defaultValues: {...data}
   });
 
@@ -44,6 +45,14 @@ function ParameterForm(props) {
     initialPayload: () => buildData(data),
     save: (payload) => dataProvider(API_URL + '/portal/settings').update(parameters_table, { id: data.id, data: payload }),
     onReload: props.onReload
+  });
+
+  const history = useRecordHistory({
+    url: data.id ? `${API_URL}/portal/settings/${parameters_table}/${data.id}/history` : null,
+    savedCount: summary.savedCount,
+    current: () => buildData(getValues()),
+    fromSnapshot: (s) => ({ code: s.code, name: s.name, notes: s.notes, setting_value: s.setting_value }),
+    onRestore: (p) => Object.keys(p).forEach((k) => setValue(k, p[k] ?? '', { shouldDirty: true }))
   });
 
   const onSubmit = (formData) => {
@@ -86,6 +95,8 @@ function ParameterForm(props) {
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
 
+          {history.notice}
+
           <Grid gap="sm">
             <Grid.Col span={{ base: 12, md: 2 }}>
               <TextInput id="id" label="Id" value={data.id || ''} disabled />
@@ -118,6 +129,7 @@ function ParameterForm(props) {
           </Grid>
 
         <Group justify="flex-end" mt="md" mb="md">
+          {history.button}
           <Button
             type="button"
             variant="default"
@@ -131,6 +143,8 @@ function ParameterForm(props) {
         </Group>
 
         {summary.dialog}
+        {history.modal}
+        {history.dialog}
 
       </form>
   );
