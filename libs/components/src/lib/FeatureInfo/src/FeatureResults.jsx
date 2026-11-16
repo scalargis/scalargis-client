@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Accordion, ActionIcon, Alert, Button, Group, Loader } from '@mantine/core';
 import { AttributeTable, IconInfoCircle, IconX, IconDownload, IconSearch } from '@scalargis/ui';
@@ -157,6 +157,8 @@ export default function FeatureResults({ core, config, features, layers, actions
       } else {
         val = null;
       }
+    } else if (rowData.type === 'remote-html') {
+      val = <RemoteHtml markup={rowData.value} />
     } else if ((rowData.type || '') === 'html') {
       if (rowData.value && rowData.value.includes('<script')) {
         val = <ScriptHtmlContent markup={rowData.value} />
@@ -273,7 +275,7 @@ export default function FeatureResults({ core, config, features, layers, actions
                   const rows = getFeatureRows(feat, layer);
 
                   const hasGeometry = (feat.getGeometry && feat.getGeometry() != null);
-                  const isText = (feat.type === 'text');
+                  const isText = (feat.type === 'text' || feat.type === 'html');
                   return (
                     <div key={key} className="fi-result-feat">
                       <div className="fi-result-tools">
@@ -330,10 +332,29 @@ export default function FeatureResults({ core, config, features, layers, actions
   )
 }
 
+/** Shows HTML from a remote server in a sandboxed frame where no script runs. */
+function RemoteHtml({ markup }) {
+  const ref = useRef(null);
+  const fit = () => {
+    const doc = ref.current && ref.current.contentDocument;
+    if (doc && doc.documentElement) ref.current.style.height = doc.documentElement.scrollHeight + 'px';
+  };
+  return (
+    <iframe
+      ref={ref}
+      title="feature-info"
+      sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      srcDoc={'<base target="_blank">' + (markup || '')}
+      onLoad={fit}
+      style={{ width: '100%', border: 0, display: 'block', background: '#fff' }}
+    />
+  );
+}
+
 function getFeatureRows(feat, layer) {
   const rows = [];
-  if (feat.type === 'text') {
-    rows.push({ name: 'name', value: feat.data, type: 'text' });
+  if (feat.type === 'text' || feat.type === 'html') {
+    rows.push({ name: 'name', value: feat.data, type: feat.type === 'html' ? 'remote-html' : 'text' });
   } else {
     let feature_tpl = null;
     if (layer && layer?.feature_tpl?.fields?.length) {
