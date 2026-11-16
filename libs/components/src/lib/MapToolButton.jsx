@@ -4,6 +4,23 @@ import { ActionIcon } from '@mantine/core';
 import './map-tool-button.css';
 
 /**
+ * @typedef {object} MapToolButtonOwnProps
+ * @property {React.ReactNode} [icon]
+ * @property {string} [title]
+ * @property {boolean} [active]
+ * @property {string} [className]
+ * @property {React.CSSProperties} [style]
+ * @property {React.MouseEventHandler<HTMLButtonElement>} [onClick]
+ * @property {React.ReactNode} [children]
+ * @property {import('@mantine/core').ActionIconProps['size']} [size]
+ * @property {import('@mantine/core').ActionIconProps['variant']} [variant]
+ * @property {import('@mantine/core').ActionIconProps['color']} [color]
+ * @property {import('@mantine/core').ActionIconProps['radius']} [radius]
+ */
+
+/** @typedef {MapToolButtonOwnProps & Record<string, any>} MapToolButtonProps */
+
+/**
  * Round raised button floating on the map surface (the map-region chrome:
  * MapControls, Basemaps toggle, and the cluster-C tools that follow).
  *
@@ -19,6 +36,8 @@ import './map-tool-button.css';
  * map-surface adopters, which never pass them, stay byte-identical.
  * `MapToolButton.Group` wraps children in `<ActionIcon.Group>` for
  * segmented strips like Timeline's transport row.
+ *
+ * @param {MapToolButtonProps} props
  */
 export default function MapToolButton({
   icon,

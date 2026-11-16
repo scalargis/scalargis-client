@@ -1,8 +1,20 @@
 import React from 'react';
 import { ActionIcon, rem } from '@mantine/core';
 
+/**
+ * @typedef {object} MainMenuButtonProps
+ * @property {string} [className]
+ * @property {string} [title]
+ * @property {React.ReactNode} [icon]
+ * @property {React.CSSProperties} [style]
+ * @property {boolean} [active]
+ * @property {boolean} [inactive]
+ * @property {React.MouseEventHandler<HTMLButtonElement>} [onClick]
+ * @property {React.ReactNode} [children]
+ */
+
 /** Round main menu button: filled when selected, light with a primary border when its panel waits for a map tool, outline otherwise. */
-const MainMenuButton = React.forwardRef(function MainMenuButton(
+const MainMenuButton = React.forwardRef(/** @param {MainMenuButtonProps} props @param {React.ForwardedRef<HTMLButtonElement>} ref */ function MainMenuButton(
   {
     className = '',
     title,
