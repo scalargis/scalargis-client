@@ -1,0 +1,518 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do visualizador",
+  "description": "Configuração JSON de um visualizador: mapa, sistemas de coordenadas, árvore de camadas e componentes.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["center", "extent", "crs_list", "layers", "checked", "map_controls"],
+  "properties": {
+    "center": {
+      "title": "Centro inicial",
+      "description": "Centro do mapa ao abrir o visualizador, em coordenadas do mapa [x, y].",
+      "$ref": "#/definitions/coordinate"
+    },
+    "extent": {
+      "title": "Extensão inicial",
+      "description": "Extensão do mapa ao abrir o visualizador [minx, miny, maxx, maxy]. Define a resolução inicial.",
+      "$ref": "#/definitions/extent"
+    },
+    "full_extent": {
+      "title": "Extensão total",
+      "description": "Extensão do botão de zoom à extensão total e do assistente de temas.",
+      "$ref": "#/definitions/extent"
+    },
+    "restricted_extent": {
+      "title": "Extensão restrita",
+      "description": "Extensão que o assistente de temas usa quando não há extensão total.",
+      "$ref": "#/definitions/extent"
+    },
+    "constrained_extent": {
+      "title": "Extensão limite",
+      "description": "Extensão fora da qual o mapa não se desloca.",
+      "$ref": "#/definitions/extent"
+    },
+    "min_zoom": {
+      "title": "Zoom mínimo",
+      "description": "Nível de zoom mínimo do mapa.",
+      "type": "number"
+    },
+    "max_zoom": {
+      "title": "Zoom máximo",
+      "description": "Nível de zoom máximo do mapa.",
+      "type": "number"
+    },
+    "min_resolution": {
+      "title": "Resolução mínima",
+      "description": "Resolução mínima do mapa, em unidades do mapa por píxel.",
+      "type": "number"
+    },
+    "max_resolution": {
+      "title": "Resolução máxima",
+      "description": "Resolução máxima do mapa, em unidades do mapa por píxel.",
+      "type": "number"
+    },
+    "min_zoom_authenticated": {
+      "title": "Zoom mínimo com sessão",
+      "description": "Nível de zoom mínimo para um utilizador com sessão iniciada. Substitui min_zoom.",
+      "type": "number"
+    },
+    "max_zoom_authenticated": {
+      "title": "Zoom máximo com sessão",
+      "description": "Nível de zoom máximo para um utilizador com sessão iniciada. Substitui max_zoom.",
+      "type": "number"
+    },
+    "min_resolution_authenticated": {
+      "title": "Resolução mínima com sessão",
+      "description": "Resolução mínima para um utilizador com sessão iniciada. Substitui min_resolution.",
+      "type": "number"
+    },
+    "max_resolution_authenticated": {
+      "title": "Resolução máxima com sessão",
+      "description": "Resolução máxima para um utilizador com sessão iniciada. Substitui max_resolution.",
+      "type": "number"
+    },
+    "crs_list": {
+      "title": "Sistemas de coordenadas",
+      "description": "Sistemas de coordenadas que o visualizador regista e que os componentes oferecem.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/crs" }
+    },
+    "display_crs": {
+      "title": "Sistema de coordenadas do mapa",
+      "description": "SRID do sistema de coordenadas em que o mapa mostra as coordenadas.",
+      "type": "integer"
+    },
+    "export_crs": {
+      "title": "Sistema de coordenadas de exportação",
+      "description": "SRID das exportações. Sem valor, as exportações usam display_crs.",
+      "type": "integer"
+    },
+    "layers": {
+      "title": "Camadas",
+      "description": "Lista plana dos nós da árvore de camadas. Um grupo liga os filhos pelo id em children.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/layer" }
+    },
+    "root_layers": {
+      "title": "Camadas de topo",
+      "description": "Ids dos nós de topo da árvore de camadas.",
+      "default": ["overlays", "main", "background", "basemaps"],
+      "$ref": "#/definitions/stringList"
+    },
+    "checked": {
+      "title": "Camadas visíveis",
+      "description": "Ids das camadas visíveis ao abrir o visualizador.",
+      "default": [],
+      "$ref": "#/definitions/stringList"
+    },
+    "opened": {
+      "title": "Grupos abertos",
+      "description": "Ids dos grupos abertos na árvore de temas ao abrir o visualizador.",
+      "default": [],
+      "$ref": "#/definitions/stringList"
+    },
+    "components": {
+      "title": "Componentes",
+      "description": "Componentes do visualizador. Cada registo diz o tipo, a zona e a configuração própria.",
+      "default": [],
+      "type": "array",
+      "items": { "$ref": "#/definitions/component" }
+    },
+    "map_controls": {
+      "title": "Controlos do mapa",
+      "description": "Controlos de mapa do núcleo (Coordinates, FeatureInfo, GeoLocation, TOC) e o seu estado inicial.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/mapControl" }
+    },
+    "exclude_map_controls": {
+      "title": "Controlos excluídos",
+      "description": "Controlos OpenLayers a não mostrar: zoom, rotate, fullscreen, zoomtoextent.",
+      "type": "array",
+      "items": { "type": "string", "examples": ["zoom", "rotate", "fullscreen", "zoomtoextent"] }
+    },
+    "selected_menu": {
+      "title": "Menu aberto",
+      "description": "Id do componente do menu principal aberto ao abrir o visualizador. Sem valor, o menu fica fechado.",
+      "type": ["string", "null"]
+    },
+    "show_menu": {
+      "title": "Mostrar o menu",
+      "description": "Com false, o menu principal começa fechado.",
+      "type": "boolean",
+      "default": true
+    },
+    "drawings": {
+      "title": "Desenhos",
+      "description": "Desenhos do utilizador guardados com o visualizador, como elementos GeoJSON.",
+      "default": [],
+      "type": "array",
+      "items": { "$ref": "#/definitions/drawing" }
+    },
+    "theme": {
+      "title": "Tema visual",
+      "description": "Nome do tema visual do visualizador. Substitui o tema do site.",
+      "type": "string",
+      "examples": ["default", "lime", "cyan", "red", "dark-green", "brown"]
+    },
+    "layout_class": {
+      "title": "Classe do layout",
+      "description": "Classe CSS que o visualizador junta ao elemento body.",
+      "type": "string"
+    },
+    "className": {
+      "title": "Classe do mapa",
+      "description": "Classe CSS que o visualizador junta ao mapa.",
+      "type": "string"
+    },
+    "title_logo": {
+      "title": "Logótipo do título",
+      "description": "URL da imagem que a barra de topo mostra ao lado do título.",
+      "type": "string"
+    },
+    "entity": {
+      "title": "Entidade",
+      "description": "Entidade que o rodapé mostra.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "title": "Nome", "description": "Nome da entidade.", "type": "string" },
+        "name_short": { "title": "Nome curto", "description": "Nome curto da entidade, para ecrãs pequenos.", "type": "string" },
+        "url": { "title": "Endereço", "description": "URL do sítio da entidade.", "type": "string" }
+      }
+    },
+    "entity_info_show": {
+      "title": "Mostrar a entidade",
+      "description": "Com false, o rodapé não mostra a entidade.",
+      "type": "boolean",
+      "default": true
+    },
+    "entity_info_hidden_mobile": {
+      "title": "Esconder a entidade no telemóvel",
+      "description": "Com true, o rodapé esconde a entidade em ecrãs pequenos.",
+      "type": "boolean",
+      "default": false
+    },
+    "mobile_show_logo": {
+      "title": "Logótipo no telemóvel",
+      "description": "Com false, a barra de topo esconde o logótipo em ecrãs pequenos.",
+      "type": "boolean",
+      "default": true
+    },
+    "embedded_show_logo": {
+      "title": "Logótipo no modo embebido",
+      "description": "Com true, o visualizador embebido mostra o logótipo.",
+      "type": "boolean",
+      "default": false
+    },
+    "topbar_right": {
+      "title": "Barra de topo",
+      "description": "Opções da zona direita da barra de topo.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "menu_mobile": {
+          "title": "Menu do telemóvel",
+          "description": "Componentes da barra de topo que passam para um menu em ecrãs pequenos.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "children": {
+              "title": "Componentes",
+              "description": "Ids dos componentes do menu.",
+              "$ref": "#/definitions/stringList"
+            }
+          }
+        }
+      }
+    },
+    "attributions": {
+      "title": "Atribuições",
+      "description": "Texto de atribuição do mapa.",
+      "$ref": "#/definitions/attributions"
+    },
+    "proxy_http_image_requests": {
+      "title": "Proxy para imagens HTTP",
+      "description": "Com true, os pedidos de imagem por HTTP passam pelo proxy do servidor.",
+      "type": "boolean",
+      "default": false
+    },
+    "exclude_components": {
+      "title": "Componentes excluídos das camadas",
+      "description": "Tipos de componente que as ferramentas de camada não mostram.",
+      "$ref": "#/definitions/stringList"
+    },
+    "exclude_export_formats": {
+      "title": "Formatos de exportação excluídos",
+      "description": "Formatos que as exportações não oferecem.",
+      "$ref": "#/definitions/stringList"
+    },
+    "allow_sharing": {
+      "title": "Permitir partilha",
+      "description": "Com false, o visualizador não deixa partilhar o mapa.",
+      "type": "boolean"
+    },
+    "addThemesTop": {
+      "title": "Temas novos no topo",
+      "description": "Com true, o assistente de temas junta os temas novos no topo da árvore.",
+      "type": "boolean",
+      "default": true
+    },
+    "locales": {
+      "title": "Idiomas",
+      "description": "Códigos dos idiomas que o seletor de idioma oferece.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "help_url": {
+      "title": "Endereço da ajuda",
+      "description": "URL da ajuda, quando o componente de ajuda não tem um.",
+      "type": "string"
+    },
+    "terms_of_service_url": {
+      "title": "Termos de utilização",
+      "description": "URL dos termos de utilização que o registo mostra.",
+      "type": "string"
+    },
+    "onboarding": {
+      "title": "Visita guiada",
+      "description": "Opções da visita guiada do visualizador.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "title": "Ativa",
+          "description": "Com true, o botão de ajuda oferece a visita guiada.",
+          "type": "boolean",
+          "default": false
+        },
+        "sections": {
+          "title": "Secções",
+          "description": "Ordem das secções da visita: core e os tipos de componente.",
+          "$ref": "#/definitions/stringList"
+        }
+      }
+    },
+    "id": {
+      "title": "Id (antigo)",
+      "description": "Chave antiga. O visualizador não a lê.",
+      "type": "string"
+    },
+    "title": {
+      "title": "Título (antigo)",
+      "description": "Chave antiga. O visualizador não a lê.",
+      "type": "string"
+    },
+    "state": {
+      "title": "Estado (antigo)",
+      "description": "Chave antiga. O visualizador não a lê.",
+      "type": "string"
+    },
+    "activeIndex": {
+      "title": "Índice ativo (antigo)",
+      "description": "Chave antiga. O visualizador não a lê.",
+      "type": "number"
+    },
+    "displayConfig": {
+      "title": "Configuração de apresentação (antiga)",
+      "description": "Chave antiga. O visualizador não a lê.",
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "coordinate": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "extent": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "attributions": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    },
+    "crs": {
+      "title": "Sistema de coordenadas",
+      "description": "Um sistema de coordenadas do visualizador.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["srid"],
+      "properties": {
+        "srid": { "title": "SRID", "description": "Código EPSG do sistema.", "type": "integer" },
+        "code": { "title": "Código", "description": "Código do sistema, como EPSG:3763.", "type": "string" },
+        "title": { "title": "Título", "description": "Nome do sistema nas listas.", "type": "string" },
+        "label": { "title": "Etiqueta", "description": "Nome curto do sistema.", "type": "string" },
+        "description": { "title": "Descrição", "description": "Descrição do sistema.", "type": "string" },
+        "defs": { "title": "Definição proj4", "description": "Definição proj4 do sistema. O mapa já conhece EPSG:3857 e EPSG:4326.", "type": "string" },
+        "extent": { "title": "Extensão geográfica", "description": "Extensão em graus, como texto: \"minlon minlat maxlon maxlat\".", "type": "string" },
+        "precision": { "title": "Precisão", "description": "Fator de arredondamento das coordenadas mostradas.", "type": "number" },
+        "precision_roles": { "title": "Precisão por perfil", "description": "Precisão das coordenadas por perfil de utilizador.", "type": "array" }
+      }
+    },
+    "mapControl": {
+      "title": "Controlo do mapa",
+      "description": "Um controlo de mapa do núcleo.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id"],
+      "properties": {
+        "id": { "title": "Id", "description": "Id do controlo: Coordinates, FeatureInfo, GeoLocation ou TOC.", "type": "string" },
+        "type": { "title": "Tipo", "description": "Tipo do botão do controlo.", "type": "string" },
+        "title": { "title": "Título", "description": "Texto do botão.", "type": "string" },
+        "menu": { "title": "Menu", "description": "Id do menu que o botão TOC abre.", "type": "string" },
+        "active": { "title": "Ativo", "description": "Com true, o controlo começa ativo.", "type": "boolean", "default": false },
+        "exclusive": { "title": "Exclusivo", "description": "Com true, ativar o controlo desativa os outros controlos exclusivos.", "type": "boolean", "default": false },
+        "show_button": { "title": "Mostrar o botão", "description": "Com true, o mapa mostra o botão do controlo.", "type": "boolean", "default": false },
+        "zoom": { "title": "Zoom", "description": "Com true, o controlo faz zoom ao resultado.", "type": "boolean" },
+        "zoom_init": { "title": "Zoom inicial", "description": "Com true, a geolocalização faz zoom à posição ao ativar.", "type": "boolean" },
+        "collapsible": { "title": "Recolhível", "description": "Com true, o painel do controlo pode recolher.", "type": "boolean" },
+        "collapsed": { "title": "Recolhido", "description": "Com true, o painel do controlo começa recolhido.", "type": "boolean" }
+      }
+    },
+    "drawing": {
+      "title": "Desenho",
+      "description": "Um elemento GeoJSON desenhado pelo utilizador.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["type", "geometry"],
+      "properties": {
+        "id": { "title": "Id", "description": "Id do desenho.", "type": "string" },
+        "type": { "title": "Tipo", "description": "Tipo GeoJSON: Feature.", "type": "string" },
+        "geometry": { "title": "Geometria", "description": "Geometria GeoJSON.", "type": "object" },
+        "properties": { "title": "Propriedades", "description": "Propriedades e estilo do desenho.", "type": ["object", "null"] },
+        "crs": { "title": "Sistema de coordenadas", "description": "Sistema de coordenadas da geometria.", "type": "object" }
+      }
+    },
+    "layer": {
+      "title": "Nó de camada",
+      "description": "Um tema, um grupo ou uma camada da árvore de camadas.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "title": "Id", "description": "Id único do nó.", "type": "string" },
+        "type": {
+          "title": "Tipo",
+          "description": "Tipo do nó. Um tipo fora da lista não aparece no mapa.",
+          "type": "string",
+          "enum": ["GROUP", "WMS", "WFS", "WMTS", "WMTSXYZ", "XYZ", "OSM", "BING", "TileJSON", "VTILE", "VECTOR", "GeoJSON", "KML", "ArcGISMap", "COG", "OGCMapTile", "OGCVectorTile", "OGCFeatures", "OGCMap"]
+        },
+        "title": { "title": "Título", "description": "Nome do nó na árvore de temas.", "type": "string" },
+        "description": { "title": "Descrição", "description": "Descrição do nó.", "type": "string" },
+        "children": { "title": "Filhos", "description": "Ids dos nós filhos, por ordem.", "$ref": "#/definitions/stringList" },
+        "active": { "title": "Ativo", "description": "Visibilidade inicial da camada OpenLayers.", "type": "boolean" },
+        "opacity": { "title": "Opacidade", "description": "Opacidade de 0 a 1.", "type": "number", "minimum": 0, "maximum": 1, "default": 1 },
+        "open": { "title": "Aberto", "description": "Com true, o grupo começa aberto na árvore de temas.", "type": "boolean" },
+        "selectable": { "title": "Selecionável", "description": "Com true, a identificação de elementos consulta a camada.", "type": "boolean" },
+        "system": { "title": "Sistema", "description": "Com true, o nó é do sistema e o utilizador não o remove.", "type": "boolean" },
+        "filtered": { "title": "Filtrado", "description": "Com true, o nó fica fora da pesquisa de temas.", "type": "boolean" },
+        "hidden": { "title": "Escondido", "description": "Com true, a árvore de temas não mostra o nó.", "type": "boolean" },
+        "exclusive": { "title": "Exclusivo", "description": "Com true, só um filho do grupo fica visível.", "type": "boolean" },
+        "show_zoom_extent": { "title": "Zoom à extensão", "description": "Com true, o nó mostra o botão de zoom à extensão.", "type": "boolean" },
+        "show_details": { "title": "Mostrar detalhes", "description": "Com true, o nó mostra os detalhes na árvore.", "type": "boolean" },
+        "details_opened": { "title": "Detalhes abertos", "description": "Com true, os detalhes começam abertos.", "type": "boolean" },
+        "toc_style": { "title": "Estilo na árvore", "description": "Estilo do nó na árvore de temas.", "type": "string" },
+        "thumbnail": { "title": "Miniatura", "description": "URL da miniatura do nó.", "type": "string" },
+        "url": { "title": "Endereço", "description": "URL do serviço ou do ficheiro.", "type": "string" },
+        "layers": { "title": "Camadas do serviço", "description": "Nomes das camadas do serviço, separados por vírgula.", "type": "string" },
+        "layer": { "title": "Camada do serviço", "description": "Nome da camada WMTS.", "type": "string" },
+        "version": { "title": "Versão", "description": "Versão do serviço.", "type": "string" },
+        "servertype": { "title": "Tipo de servidor", "description": "Tipo de servidor do serviço, como geoserver ou mapserver.", "type": "string" },
+        "format": { "title": "Formato", "description": "Formato da imagem pedida.", "type": "string" },
+        "get_map_format": { "title": "Formato GetMap", "description": "Formato dos pedidos GetMap.", "type": "string" },
+        "get_feature_info_format": { "title": "Formato GetFeatureInfo", "description": "Formato dos pedidos GetFeatureInfo.", "type": "string" },
+        "tiled": { "title": "Em mosaico", "description": "Com true, a camada WMS pede mosaicos.", "type": "boolean" },
+        "crs": { "title": "Sistema de coordenadas", "description": "SRID ou código do sistema de coordenadas da camada.", "type": ["integer", "string"] },
+        "bbox": {
+          "title": "Extensão",
+          "description": "Extensão da camada.",
+          "anyOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "number" } }
+          ]
+        },
+        "wms_style": { "title": "Estilo WMS", "description": "Estilo WMS pedido.", "type": "string" },
+        "styles": { "title": "Estilos", "description": "Estilos WMS pedidos.", "type": "string" },
+        "legend_url": { "title": "Legenda", "description": "URL da imagem da legenda.", "type": "string" },
+        "legend_type": { "title": "Tipo de legenda", "description": "Tipo da legenda.", "type": "string" },
+        "legend_html": { "title": "Legenda HTML", "description": "Legenda em HTML.", "type": "string" },
+        "legend_label": { "title": "Etiqueta da legenda", "description": "Texto da legenda.", "type": "string" },
+        "metadata": { "title": "Metadados", "description": "Metadados do nó.", "type": "object" },
+        "datatable": { "title": "Tabela de atributos", "description": "Opções da tabela de atributos da camada.", "type": "object" },
+        "download": { "title": "Descarga", "description": "Opções da descarga da camada.", "type": "object" },
+        "print": { "title": "Impressão", "description": "Opções da camada nas impressões.", "type": ["object", "array"] },
+        "dimensions": { "title": "Dimensões", "description": "Dimensões WMS da camada, como o tempo.", "type": "array" },
+        "attributions": { "title": "Atribuições", "description": "Atribuição da camada.", "$ref": "#/definitions/attributions" },
+        "min_scale": { "title": "Escala mínima", "description": "Denominador da escala mínima de visibilidade.", "type": "number" },
+        "max_scale": { "title": "Escala máxima", "description": "Denominador da escala máxima de visibilidade.", "type": "number" },
+        "min_resolution": { "title": "Resolução mínima", "description": "Resolução mínima de visibilidade.", "type": "number" },
+        "max_resolution": { "title": "Resolução máxima", "description": "Resolução máxima de visibilidade.", "type": "number" },
+        "source_min_scale": { "title": "Escala mínima da origem", "description": "Escala mínima que o serviço indica.", "type": ["number", "null"] },
+        "source_max_scale": { "title": "Escala máxima da origem", "description": "Escala máxima que o serviço indica.", "type": ["number", "null"] },
+        "exclude_components": { "title": "Componentes excluídos", "description": "Tipos de componente que as ferramentas da camada não mostram.", "$ref": "#/definitions/stringList" },
+        "include_components": { "title": "Componentes incluídos", "description": "Tipos de componente que as ferramentas da camada mostram sempre.", "$ref": "#/definitions/stringList" },
+        "proxy_http_image_requests": { "title": "Proxy para imagens HTTP", "description": "Com true, os pedidos de imagem por HTTP da camada passam pelo proxy.", "type": "boolean" },
+        "use_proxy": { "title": "Usar proxy", "description": "Com true, os pedidos da camada passam pelo proxy.", "type": "boolean" },
+        "style_color": { "title": "Cor de preenchimento", "description": "Cor de preenchimento dos elementos.", "type": ["string", "null"] },
+        "style_stroke_color": { "title": "Cor do contorno", "description": "Cor do contorno dos elementos.", "type": ["string", "null"] },
+        "style_stroke_width": { "title": "Largura do contorno", "description": "Largura do contorno dos elementos, em píxeis.", "type": "number" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "enum": ["WMS", "WFS", "WMTS", "WMTSXYZ", "XYZ", "TileJSON", "VTILE", "GeoJSON", "KML", "ArcGISMap", "COG", "OGCMapTile", "OGCVectorTile", "OGCFeatures", "OGCMap"] } },
+            "required": ["type"]
+          },
+          "then": { "required": ["url"] }
+        }
+      ]
+    },
+    "component": {
+      "title": "Componente",
+      "description": "Um registo de componente do visualizador.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "title": "Id", "description": "Id único do componente no visualizador.", "type": "string" },
+        "type": { "title": "Tipo", "description": "Tipo do componente, como TOC ou Print.", "type": "string" },
+        "target": {
+          "title": "Zona",
+          "description": "Zona do visualizador onde o componente aparece.",
+          "type": "string",
+          "examples": ["mainmenu", "mainmenu-bottom", "topbar_right", "footer_left", "footer_right", "popup", "layer_tools", "layer_tools_block", "theme_info_tools", "map_controls_left", "map_controls_top_left", "map_controls_top_center", "map_controls_top_right", "map_controls_bottom_left", "map_controls_bottom_center", "map_controls_bottom_right"]
+        },
+        "links": { "title": "Zona de ligação", "description": "Zona onde o componente aparece como ligação, como map_controls_left.", "type": "string" },
+        "section": { "title": "Secção do menu", "description": "Secção do menu principal do botão do componente.", "type": "string" },
+        "title": {
+          "title": "Título",
+          "description": "Título do componente, em texto ou por idioma.",
+          "type": ["string", "object"]
+        },
+        "icon": { "title": "Ícone", "description": "Classe do ícone do componente.", "type": "string" },
+        "as": { "title": "Abrir como", "description": "Forma de abrir o componente, como popup ou external.", "type": "string" },
+        "order": { "title": "Ordem", "description": "Posição do componente.", "type": "number" },
+        "children": { "title": "Filhos", "description": "Ids dos componentes filhos.", "$ref": "#/definitions/stringList" },
+        "regions": { "title": "Regiões", "description": "Regiões do componente.", "type": "array" },
+        "roles": { "title": "Perfis", "description": "Perfis de utilizador que veem o componente.", "type": "array" },
+        "config_version": { "title": "Versão da configuração", "description": "Versão do formato de config_json.", "type": "string" },
+        "config_json": {
+          "title": "Configuração do componente",
+          "description": "Configuração própria do componente. O esquema depende do tipo.",
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

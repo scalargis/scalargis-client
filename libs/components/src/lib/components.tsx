@@ -72,6 +72,12 @@ import {
   ValidationMode
 } from './JsonForm'
 
+import {
+  viewerConfigSchema,
+  getViewerConfigSchema,
+  validateViewerConfig
+} from './ViewerConfig'
+
 import * as i18n from './utils/i18n';
 import * as utils from './utils/common';
 import { runJob, JobError } from './utils/jobs';
@@ -153,6 +159,10 @@ export {
   FormErrors,
   useFigTreeEvaluator,
   ValidationMode as JsonFormValidationMode,
+
+  viewerConfigSchema,
+  getViewerConfigSchema,
+  validateViewerConfig,
 
   i18n,
   utils,
