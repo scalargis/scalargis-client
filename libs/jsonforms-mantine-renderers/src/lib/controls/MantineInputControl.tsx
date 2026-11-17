@@ -23,7 +23,8 @@ export interface WithInput {
  *
  * Description/error parity with the Prime lib's two helper lines:
  * description shows while the field is focused (or always, with
- * `showUnfocusedDescription`); the error shows whenever invalid.
+ * `showUnfocusedDescription`) and keeps its slot and its ARIA link while
+ * hidden, so focus never moves the input; the error shows whenever invalid.
  */
 export const MantineInputControl = (props: ControlProps & WithInput) => {
   const [focused, onFocus, onBlur] = useFocus();
@@ -69,7 +70,13 @@ export const MantineInputControl = (props: ControlProps & WithInput) => {
         isValid={isValid}
         visible={visible}
         label={label}
-        description={showDescription ? description : undefined}
+        description={
+          visible && description ? (
+            <span style={showDescription ? undefined : { opacity: 0 }}>
+              {description}
+            </span>
+          ) : undefined
+        }
         error={isValid ? undefined : errors}
         withAsterisk={showAsRequired(
           required || false,
