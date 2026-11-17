@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Accordion, Alert, Box, Grid, Group, Paper, Text } from '@mantine/core';
 import { isEqual } from 'lodash';
-import { JsonForm, viewerConfigSchema } from '@scalargis/components';
+import { JsonForm, viewerConfigSchema, describeViewerConfigFault } from '@scalargis/components';
 import { IconAlertTriangle } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
@@ -16,6 +16,35 @@ const MAP_CONTROL_COLUMNS = ['id', 'type', 'title', 'active', 'exclusive', 'show
 
 const AJV_OPTIONS = { useDefaults: false };
 
+const FORM_CONFIG = { formatNumber: false };
+
+const ARRAY_TEXTS = {
+  addTooltip: 'Adicionar',
+  addAriaLabel: 'Adicionar',
+  removeTooltip: 'Remover',
+  removeAriaLabel: 'Remover',
+  upAriaLabel: 'Subir',
+  downAriaLabel: 'Descer',
+  noDataMessage: 'Sem itens.',
+  noSelection: 'Sem seleção.',
+  deleteDialogTitle: 'Remover',
+  deleteDialogMessage: 'Remover este item?',
+  deleteDialogAccept: 'Sim',
+  deleteDialogDecline: 'Não'
+};
+
+const FORM_I18N = {
+  locale: 'pt',
+  translate: (key, defaultMessage, values) => {
+    const error = values?.error;
+    if (error?.keyword) {
+      return describeViewerConfigFault({ pointer: error.instancePath, keyword: error.keyword, message: error.message, params: error.params });
+    }
+    const last = String(key || '').split('.').pop();
+    return ARRAY_TEXTS[last] ?? defaultMessage;
+  }
+};
+
 /** Returns the listed keys of an object that it holds. */
 function pick(source, keys) {
   const out = {};
@@ -25,20 +54,27 @@ function pick(source, keys) {
   return out;
 }
 
+/** Returns a schema node with each local $ref replaced by its definition. The keys next to a $ref win. */
+function inlineRefs(node, defs) {
+  if (Array.isArray(node)) return node.map((item) => inlineRefs(item, defs));
+  if (!node || typeof node !== 'object') return node;
+  const out = {};
+  for (const [key, value] of Object.entries(node)) {
+    if (key !== '$ref') out[key] = inlineRefs(value, defs);
+  }
+  const name = typeof node.$ref === 'string' ? node.$ref.replace(/^#\/definitions\//, '') : null;
+  return name && defs[name] ? { ...inlineRefs(defs[name], defs), ...out } : out;
+}
+
 /** Returns the schema of the Map section, cut from the viewer schema. */
 function buildMapSchema() {
   const root = JSON.parse(JSON.stringify(viewerConfigSchema));
-  const defs = root.definitions;
-  return {
-    type: 'object',
-    definitions: {
-      coordinate: defs.coordinate,
-      extent: defs.extent,
-      crs: { ...defs.crs, properties: pick(defs.crs.properties, CRS_COLUMNS) },
-      mapControl: { ...defs.mapControl, properties: pick(defs.mapControl.properties, MAP_CONTROL_COLUMNS) }
-    },
-    properties: pick(root.properties, MAP_KEYS)
+  const defs = {
+    ...root.definitions,
+    crs: { ...root.definitions.crs, properties: pick(root.definitions.crs.properties, CRS_COLUMNS) },
+    mapControl: { ...root.definitions.mapControl, properties: pick(root.definitions.mapControl.properties, MAP_CONTROL_COLUMNS) }
   };
+  return { type: 'object', properties: inlineRefs(pick(root.properties, MAP_KEYS), defs) };
 }
 
 /** Returns a UI schema control for one key. */
@@ -155,6 +191,8 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
                   data={mapData}
                   onChange={onMapChange}
                   ajvOptions={AJV_OPTIONS}
+                  config={FORM_CONFIG}
+                  i18n={FORM_I18N}
                   readonly={!parsed}
                 />
               </Box>

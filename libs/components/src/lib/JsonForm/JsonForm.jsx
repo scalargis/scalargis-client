@@ -25,7 +25,8 @@ export const JsonForm = (props) => {
     validationMode,
     figTreeEvaluatorOptions,
     loadingElement,
-    readonly
+    readonly,
+    config
   } = props;
 
   const ctx = useContext(JsonFormContext);
@@ -112,6 +113,7 @@ export const JsonForm = (props) => {
       ajv={ajv}
       validationMode={validationMode}
       readonly={readonly}
+      config={config}
     />
   );
 }
