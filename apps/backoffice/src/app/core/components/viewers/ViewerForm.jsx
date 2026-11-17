@@ -5,6 +5,7 @@ import {
   ActionIcon,
   Alert,
   Anchor,
+  Badge,
   Box,
   Button,
   Checkbox,
@@ -23,7 +24,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { findUnknownKeys, validateViewerConfig, describeViewerConfigFault } from '@scalargis/components';
-import { CodeEditor, jsonPointerRange, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory } from '@scalargis/ui';
+import { CodeEditor, jsonPointerRange, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory, IconFileEdit } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -34,6 +35,7 @@ import { isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 import PageSection from '../common/PageSection';
+import ViewerFormView from './ViewerFormView';
 
 // Inactive tabs stay mounted (so editor state and history survive a tab
 // switch) but are hidden off-flow. We deliberately do NOT use display:none:
@@ -128,6 +130,7 @@ const tabItems = [
   { value: 'base', label: 'Dados Base', icon: IconHome },
   { value: 'ui', label: 'UI', icon: IconHome },
   { value: 'config', label: 'Configuração', icon: IconCog },
+  { value: 'form', label: 'Formulário', icon: IconFileEdit, badge: 'Beta' },
   { value: 'prints', label: 'Plantas', icon: IconPrint }
 ];
 
@@ -440,7 +443,8 @@ function ViewerForm(props) {
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
           {(data.id ? [...tabItems, HISTORY_TAB] : tabItems).map((item) => (
-            <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
+            <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}
+              rightSection={item.badge ? <Badge size="xs" variant="light">{item.badge}</Badge> : null}>
               {item.label}
             </Tabs.Tab>
           ))}
@@ -730,6 +734,15 @@ function ViewerForm(props) {
               lint={configLint}
               height="calc(100vh - 300px)"
               aria-label="Config JSON"
+            />
+          </PageSection>
+
+        <PageSection style={activeTab === 'form' ? undefined : HIDDEN}>
+            <ViewerFormView
+              configText={configJson}
+              onConfigTextChange={setConfigJson}
+              viewerId={data.id}
+              active={activeTab === 'form'}
             />
           </PageSection>
 
