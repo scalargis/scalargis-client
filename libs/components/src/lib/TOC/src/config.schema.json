@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da árvore de temas",
+  "description": "Filtro, ligação entre grupos e camadas, arrasto e legendas da árvore de temas.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel, em texto ou por idioma. Sem valor, usa o título do componente.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "show_filter": {
+      "title": "Mostrar o filtro",
+      "description": "Com false, a árvore não mostra a caixa de filtro.",
+      "type": "boolean",
+      "default": true
+    },
+    "activate_parents": {
+      "title": "Ligar os grupos",
+      "description": "Com true, ligar uma camada liga os grupos acima dela. activate_parents da camada tem prioridade.",
+      "type": "boolean",
+      "default": false
+    },
+    "deactivate_children": {
+      "title": "Desligar os filhos",
+      "description": "Com true, desligar um grupo desliga as camadas dentro dele. deactivate_children da camada tem prioridade.",
+      "type": "boolean",
+      "default": false
+    },
+    "open_children": {
+      "title": "Abrir os filhos",
+      "description": "Com true, ligar um grupo abre os seus filhos. open_children da camada tem prioridade.",
+      "type": "boolean",
+      "default": false
+    },
+    "draggable": {
+      "title": "Arrastar",
+      "description": "Com false, as camadas não mudam de ordem por arrasto.",
+      "type": "boolean",
+      "default": true
+    },
+    "open_legend_image": {
+      "title": "Abrir a imagem da legenda",
+      "description": "Com false, a imagem da legenda não é uma ligação que a abre num novo separador.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

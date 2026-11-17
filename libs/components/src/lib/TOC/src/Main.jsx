@@ -11,6 +11,7 @@ import Tree from './TOC/Tree';
 import { traverseTree, findAllParents, findAllChildren } from './TOC/Model';
 
 import './TOC/style.css';
+export { default as configSchema } from './config.schema.json';
 
 
 /**

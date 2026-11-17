@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from "react-router"
 import { transform, transformExtent } from 'ol/proj'
 import { boundingExtent } from 'ol/extent';
+export { default as configSchema } from './config.schema.json';
 
 /** The ids of the url layers that the viewer has, with each group above them. */
 function urlLayersChecked(param, layers) {

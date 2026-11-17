@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do painel HTML",
+  "description": "HTML que o painel ou a janela mostra, escrito aqui ou obtido de um endereço.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel ou da janela. Sem valor, usa o título do componente.",
+      "type": ["string", "null"]
+    },
+    "html": {
+      "title": "HTML",
+      "description": "HTML a mostrar. Também é o conteúdo quando o pedido de url falha.",
+      "type": "string"
+    },
+    "url": {
+      "title": "Endereço",
+      "description": "Página a obter em vez de html.",
+      "type": "string"
+    },
+    "closeLabel": {
+      "title": "Texto do botão fechar",
+      "description": "Texto do botão que fecha a janela, quando o componente abre como popup.",
+      "type": "string",
+      "default": "Fechar"
+    },
+    "btn_icon": {
+      "title": "Ícone do botão",
+      "description": "Classe do ícone do botão do menu, como pi pi-info-circle.",
+      "type": "string"
+    },
+    "btn_image": {
+      "title": "Imagem do botão",
+      "description": "URL de uma imagem de fundo do botão do menu. Tem prioridade sobre btn_icon.",
+      "type": "string"
+    }
+  }
+}

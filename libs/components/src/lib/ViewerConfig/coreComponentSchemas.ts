@@ -20,6 +20,24 @@ import LayerMetadata from '../LayerMetadata/src/config.schema.json';
 import LayerOpacity from '../LayerOpacity/src/config.schema.json';
 import LayerRemove from '../LayerRemove/src/config.schema.json';
 import LocaleSelector from '../LocaleSelector/src/config.schema.json';
+import MainMenuHtmlContent from '../MainMenuHtmlContent.config.schema.json';
+import MapControls from '../MapControls/src/config.schema.json';
+import MapScaleInput from '../MapScaleInput/src/config.schema.json';
+import MapScaleLine from '../MapScaleLine/src/config.schema.json';
+import MapTools from '../MapTools/src/config.schema.json';
+import PanelHTML from '../PanelHTML/src/config.schema.json';
+import PanelJSON from '../PanelJSON/src/config.schema.json';
+import PlacesSearch from '../PlacesSearch/src/config.schema.json';
+import PopupInfo from '../PopupInfo/src/config.schema.json';
+import Print from '../Print/src/config.schema.json';
+import SearchLayers from '../SearchLayers/src/config.schema.json';
+import StreetView from '../StreetView/src/config.schema.json';
+import ThemeWizard from '../ThemeWizard/src/config.schema.json';
+import Timeline from '../Timeline/src/config.schema.json';
+import TOC from '../TOC/src/config.schema.json';
+import URLlayers from '../URLlayers/src/config.schema.json';
+import URLparams from '../URLparams/src/config.schema.json';
+import UserLogin from '../UserLogin/src/config.schema.json';
 
 /** The config_json schema of each core component, by component type. */
 export const coreComponentSchemas: Record<string, JsonSchema> = {
@@ -43,5 +61,23 @@ export const coreComponentSchemas: Record<string, JsonSchema> = {
   LayerMetadata,
   LayerOpacity,
   LayerRemove,
-  LocaleSelector
+  LocaleSelector,
+  MainMenuHtmlContent,
+  MapControls,
+  MapScaleInput,
+  MapScaleLine,
+  MapTools,
+  PanelHTML,
+  PanelJSON,
+  PlacesSearch,
+  PopupInfo,
+  Print,
+  SearchLayers,
+  StreetView,
+  ThemeWizard,
+  Timeline,
+  TOC,
+  URLlayers,
+  URLparams,
+  UserLogin
 } as unknown as Record<string, JsonSchema>;

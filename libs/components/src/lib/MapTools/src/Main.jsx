@@ -6,6 +6,7 @@ import { MainMenuButton, MapToolButton } from '../../components';
 import { MAPCONTROL_NAME } from './utils';
 import { mapToolOff } from '../../utils/mapTools';
 import MapTools from './MapTools';
+export { default as configSchema } from './config.schema.json';
 
 
 /**

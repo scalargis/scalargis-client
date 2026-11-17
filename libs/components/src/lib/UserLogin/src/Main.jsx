@@ -11,6 +11,7 @@ import LoginWidget from './LoginWidget';
 import RegistrationWidget from './RegistrationWidget';
 import ResetPasswordWidget from './ResetPasswordWidget';
 import componentMessages from './messages';
+export { default as configSchema } from './config.schema.json';
 
 
 const appEntityNameAbrev = import.meta.env.VITE_APP_ENTITY_NAME_ABREV || 'ScalarGIS';

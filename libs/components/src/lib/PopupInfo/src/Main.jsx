@@ -9,6 +9,7 @@ import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
 import { LocaleSelectorComponent } from '../../components';
 
 import './index.css';
+export { default as configSchema } from './config.schema.json';
 
 
 const cookiePopupName = import.meta.env.VITE_APP_COOKIE_POPUP_NAME || 'scalargis_popup';

@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração das camadas do URL",
+  "description": "O componente lê a camada WMS e a extensão dos parâmetros do URL da página e não lê chaves próprias.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {}
+}

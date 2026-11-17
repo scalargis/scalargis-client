@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da caixa de escala",
+  "description": "A caixa de escala mostra e muda a escala do mapa e não lê chaves próprias.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {}
+}

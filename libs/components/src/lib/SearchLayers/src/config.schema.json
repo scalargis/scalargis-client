@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da pesquisa de temas",
+  "description": "Lista de camadas WFS a pesquisar, com o formulário, as colunas dos resultados e o estilo no mapa.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "show_icon": {
+      "title": "Mostrar ícones",
+      "description": "Com false, os cartões da lista de camadas não mostram ícone.",
+      "type": "boolean",
+      "default": true
+    },
+    "show_main": {
+      "title": "Mostrar a lista",
+      "description": "Com true, mostra a lista de camadas e o botão Voltar mesmo com uma só camada.",
+      "type": "boolean",
+      "default": false
+    },
+    "exclusive_layer": {
+      "title": "Camada própria no mapa",
+      "description": "Com true, os resultados vão para uma camada do mapa só deste componente. Sem true, partilham a camada searchlayers.",
+      "type": "boolean",
+      "default": false
+    },
+    "style": {
+      "title": "Estilo dos resultados",
+      "description": "Estilo OpenLayers dos resultados no mapa.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "fill": {
+          "title": "Preenchimento",
+          "description": "Opções de preenchimento, como color.",
+          "type": "object"
+        },
+        "stroke": {
+          "title": "Contorno",
+          "description": "Opções de contorno, como color e width.",
+          "type": "object"
+        },
+        "image": {
+          "title": "Ponto",
+          "description": "Círculo dos pontos, com radius, fill e stroke.",
+          "type": "object"
+        }
+      }
+    },
+    "use_layers_datatables": {
+      "title": "Usar as tabelas das camadas",
+      "description": "Com true, a lista vem do datatable das camadas do visualizador e não de layers.",
+      "type": "boolean",
+      "default": false
+    },
+    "include_layers": {
+      "title": "Camadas incluídas",
+      "description": "Com use_layers_datatables, ids das camadas a mostrar. Sem valor, mostra todas.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "exclude_layers": {
+      "title": "Camadas excluídas",
+      "description": "Com use_layers_datatables, ids das camadas a esconder.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "include_datatables": {
+      "title": "Tabelas incluídas",
+      "description": "Com use_layers_datatables, ids de datatable a mostrar. Sem valor, mostra todas.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "exclude_datatables": {
+      "title": "Tabelas excluídas",
+      "description": "Com use_layers_datatables, ids de datatable a esconder.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "layers": {
+      "title": "Camadas de pesquisa",
+      "description": "Cada entrada é uma camada WFS que o utilizador pode pesquisar.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "description": "Id da camada de pesquisa.",
+            "type": "string"
+          },
+          "title": {
+            "title": "Título",
+            "description": "Título do cartão e do formulário.",
+            "type": "string"
+          },
+          "subtitle": {
+            "title": "Subtítulo",
+            "description": "Texto por baixo do título do cartão.",
+            "type": "string"
+          },
+          "description": {
+            "title": "Descrição",
+            "description": "HTML do cartão.",
+            "type": "string"
+          },
+          "icon": {
+            "title": "Ícone",
+            "description": "Classe do ícone do cartão, como pi pi-table.",
+            "type": "string"
+          },
+          "tooltip": {
+            "title": "Dica",
+            "description": "Texto ao passar o rato sobre o cartão.",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Endereço do WFS",
+            "description": "URL do serviço WFS.",
+            "type": "string"
+          },
+          "feature_type": {
+            "title": "Tipo de elemento",
+            "description": "Nome do tipo de elemento no WFS, sem prefixo.",
+            "type": "string"
+          },
+          "feature_prefix": {
+            "title": "Prefixo",
+            "description": "Prefixo do espaço de nomes do tipo de elemento.",
+            "type": "string"
+          },
+          "feature_namespace": {
+            "title": "Espaço de nomes",
+            "description": "URI do espaço de nomes do tipo de elemento.",
+            "type": "string"
+          },
+          "geometry_field": {
+            "title": "Campo da geometria",
+            "description": "Campo da geometria. Sem valor, vem do DescribeFeatureType.",
+            "type": "string"
+          },
+          "all_geometries": {
+            "title": "Pedir a geometria",
+            "description": "Com true e com fields_list, o pedido inclui também o campo da geometria.",
+            "type": "boolean",
+            "default": false
+          },
+          "schema": {
+            "title": "Esquema do formulário",
+            "description": "JSON Schema do formulário. Com uischema, a camada não pede DescribeFeatureType.",
+            "type": "object"
+          },
+          "uischema": {
+            "title": "Esquema visual do formulário",
+            "description": "UI schema de JSON Forms do formulário.",
+            "type": "object"
+          },
+          "validationMode": {
+            "title": "Validação",
+            "description": "Modo de validação do formulário.",
+            "type": "string",
+            "enum": ["ValidateAndShow", "ValidateAndHide", "NoValidation"]
+          },
+          "transformer": {
+            "title": "Transformação",
+            "description": "Expressão FigTree que transforma os dados do formulário antes do pedido.",
+            "type": "object"
+          },
+          "fields_exclude_query": {
+            "title": "Campos fora do filtro",
+            "description": "Campos do formulário que não entram no filtro do pedido.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "fields_form": {
+            "title": "Expressões dos campos",
+            "description": "Por campo, uma expression em que {value} e {campo} passam a ser os valores do formulário. Um campo fora do formulário é um campo virtual.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "expression": { "title": "Expressão", "description": "Valor do campo no filtro.", "type": "string" }
+              }
+            }
+          },
+          "fields_list": {
+            "title": "Colunas dos resultados",
+            "description": "Por campo, a coluna da tabela de resultados. Sem valor, mostra todos os campos.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "label": { "title": "Etiqueta", "description": "Título da coluna. Sem valor, usa o nome do campo.", "type": "string" },
+                "type": { "title": "Tipo", "description": "html mostra value como HTML. action mostra um botão de action. Outro valor mostra o texto.", "type": "string" },
+                "value": { "title": "Valor", "description": "Texto da célula, em que {campo} passa a ser o valor do campo.", "type": "string" },
+                "action": { "title": "Ação", "description": "Botão da célula, com type, label, icon e data.", "type": "object" },
+                "style": { "title": "Estilo", "description": "Estilo CSS das células da coluna.", "type": "object" },
+                "fields": { "title": "Campos pedidos", "description": "Campos a pedir para esta coluna.", "type": ["array", "string"] }
+              }
+            }
+          },
+          "fields_sort": {
+            "title": "Campos ordenáveis",
+            "description": "Campos que ordenam a tabela. O primeiro é a ordem inicial.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "sort": {
+            "title": "Ordem",
+            "description": "Ordem do pedido por campo, como ASC ou DESC, quando nem o utilizador nem fields_sort dão outra.",
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "pagination": {
+            "title": "Paginação",
+            "description": "Com false, pede todos os resultados de uma vez.",
+            "type": "boolean",
+            "default": true
+          },
+          "maxFeatures": {
+            "title": "Resultados por página",
+            "description": "Número de resultados por página.",
+            "type": "integer",
+            "default": 10
+          },
+          "zoom_buffer": {
+            "title": "Margem do zoom",
+            "description": "Margem à volta dos resultados no zoom, em unidades do mapa.",
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

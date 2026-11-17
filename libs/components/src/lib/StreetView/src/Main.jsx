@@ -4,6 +4,7 @@ import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 
 import { I18N_NAMESPACE, loadTranslations } from './i18n/index'
 import StreetView from './StreetView';
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Component Translations

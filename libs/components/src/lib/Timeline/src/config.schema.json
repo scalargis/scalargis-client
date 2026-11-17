@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da linha temporal",
+  "description": "Camada WMS, datas e reprodução da dimensão de tempo.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "datasource": {
+      "title": "Camada",
+      "description": "Camada que o controlo move.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "layer_id": {
+          "title": "Id da camada",
+          "description": "Id de uma camada de layers do visualizador.",
+          "type": "string"
+        },
+        "layer": {
+          "title": "Registo da camada",
+          "description": "Camada que o controlo junta uma vez ao visualizador, ligada, quando nenhuma camada tem o seu id.",
+          "type": "object"
+        },
+        "parent_id": {
+          "title": "Grupo",
+          "description": "Grupo da camada que layer junta.",
+          "type": "string",
+          "default": "main"
+        }
+      }
+    },
+    "dimension": {
+      "title": "Dimensão",
+      "description": "Dimensão a ler.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "title": "Nome",
+          "description": "Nome da dimensão. dimension_name da camada tem prioridade. Sem valor, usa a primeira dimensão.",
+          "type": "string",
+          "examples": ["time"]
+        }
+      }
+    },
+    "value": {
+      "title": "Data de referência",
+      "description": "now, today, tomorrow, yesterday ou uma duração ISO 8601 a partir de agora, como P1D ou -P1D.",
+      "type": "string"
+    },
+    "steps": {
+      "title": "Passos",
+      "description": "Número de datas de cada lado da data de referência, como número ou como [antes, depois].",
+      "type": ["integer", "array"],
+      "items": { "type": "integer" }
+    },
+    "delta": {
+      "title": "Intervalo à volta",
+      "description": "Duração de cada lado da data de referência, como duração ou como [antes, depois].",
+      "type": ["string", "array"],
+      "items": { "type": "string" }
+    },
+    "interval": {
+      "title": "Intervalo",
+      "description": "Primeira e última data da lista, como duas datas ISO.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "selectedIndex": {
+      "title": "Data inicial",
+      "description": "first, last ou uma posição que começa em 1.",
+      "type": ["string", "integer"],
+      "examples": ["first", "last", 1]
+    },
+    "loop": {
+      "title": "Repetir",
+      "description": "Com true, passa da última data para a primeira, na reprodução e no botão seguinte.",
+      "type": "boolean",
+      "default": false
+    },
+    "speed": {
+      "title": "Velocidade",
+      "description": "Datas por segundo na reprodução.",
+      "type": "number",
+      "default": 0.5
+    },
+    "displayFormat": {
+      "title": "Formato da data",
+      "description": "Texto da data, com {dd}, {mm}, {yyyy}, {h}, {m} e {s}.",
+      "type": "string",
+      "examples": ["{dd}-{mm}-{yyyy}"]
+    },
+    "hideLayerOnCollapse": {
+      "title": "Esconder a camada ao fechar",
+      "description": "Com true, desliga a camada enquanto o painel está fechado.",
+      "type": "boolean",
+      "default": false
+    },
+    "showLegend": {
+      "title": "Mostrar a legenda",
+      "description": "Com true, mostra a legenda da camada acima da lista de datas.",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

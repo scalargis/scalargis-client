@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from "react-router";
 import { v4 as uuid } from 'uuid';
+export { default as configSchema } from './config.schema.json';
 
 
 const addLayer = (data, dispatch, actions, viewer) => {

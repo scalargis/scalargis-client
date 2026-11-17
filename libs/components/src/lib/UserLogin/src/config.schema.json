@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da entrada de utilizador",
+  "description": "Títulos, opções de registo e de recuperação, widgets e mensagens da janela de entrada.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título da janela de entrada, em texto ou por idioma. Sem valor, usa Entrar e o nome curto da entidade.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "header_registration": {
+      "title": "Cabeçalho do registo",
+      "description": "Com valor, a janela de registo usa o texto de header como título.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "header_password": {
+      "title": "Cabeçalho da recuperação",
+      "description": "Com valor, a janela de recuperação da password usa o texto de header como título.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "tooltip_login": {
+      "title": "Dica do botão",
+      "description": "Texto ao passar o rato sobre o botão de entrada.",
+      "type": "string"
+    },
+    "closable": {
+      "title": "Pode fechar",
+      "description": "Com false, a janela de entrada não tem botão fechar.",
+      "type": "boolean",
+      "default": true
+    },
+    "user_registration": {
+      "title": "Registo de utilizador",
+      "description": "Com true, a janela mostra a ligação para o registo.",
+      "type": "boolean",
+      "default": false
+    },
+    "reset_password": {
+      "title": "Recuperar a password",
+      "description": "Com true, a janela mostra a ligação para recuperar a password.",
+      "type": "boolean",
+      "default": false
+    },
+    "reset_password_login_error": {
+      "title": "Recuperar a password após erro",
+      "description": "Com true, a ligação para recuperar a password aparece depois de uma entrada falhada.",
+      "type": "boolean",
+      "default": false
+    },
+    "widgets": {
+      "title": "Widgets",
+      "description": "Widgets de um componente que substituem os formulários base, no formato Tipo.Widget. Têm prioridade sobre os de SITE_CONFIG.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "login": { "title": "Entrada", "description": "Widget do formulário de entrada.", "type": "string" },
+        "registration": { "title": "Registo", "description": "Widget do formulário de registo.", "type": "string" },
+        "password": { "title": "Recuperação", "description": "Widget do formulário de recuperação da password.", "type": "string" }
+      }
+    },
+    "actions": {
+      "title": "Ações",
+      "description": "Mensagens que o componente publica em vez do pedido base de cada passo. Outro componente trata o passo.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "login": { "title": "Entrada", "description": "Mensagem publicada no botão Entrar, em vez do pedido de entrada.", "type": "string" },
+        "registration": { "title": "Registo", "description": "Mensagem publicada na ligação para o registo, em vez do formulário de registo.", "type": "string" },
+        "reset_password": { "title": "Recuperação", "description": "Mensagem publicada no pedido de recuperação da password, em vez do pedido base.", "type": "string" }
+      }
+    }
+  }
+}
