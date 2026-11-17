@@ -3,7 +3,7 @@ import { Box, Button, Group, Text } from '@mantine/core';
 import { isEqual } from 'lodash';
 import { JsonForm, viewerConfigSchema } from '@scalargis/components';
 
-import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N, control, inlineRefs, pick } from './formViewShared';
+import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N, control, inlineRefs, objectElements, pick } from './formViewShared';
 import { componentList } from './viewerComponents';
 
 export const HEADER_KEYS = ['title_logo', 'mobile_show_logo', 'embedded_show_logo', 'topbar_right', 'show_menu', 'selected_menu'];
@@ -11,7 +11,8 @@ export const HEADER_KEYS = ['title_logo', 'mobile_show_logo', 'embedded_show_log
 const UISCHEMA = {
   type: 'VerticalLayout',
   elements: [
-    { type: 'Group', label: 'Barra de topo', elements: ['title_logo', 'mobile_show_logo', 'embedded_show_logo', 'topbar_right'].map(control) },
+    { type: 'Group', label: 'Logótipo', elements: ['title_logo', 'mobile_show_logo', 'embedded_show_logo'].map(control) },
+    ...objectElements({ topbar_right: viewerConfigSchema.properties.topbar_right }),
     { type: 'Group', label: 'Menu principal', elements: ['show_menu', 'selected_menu'].map(control) }
   ]
 };

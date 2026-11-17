@@ -1,4 +1,4 @@
-import { inlineRefs } from './formViewShared';
+import { inlineRefs, objectElements } from './formViewShared';
 
 const SIMPLE_TYPES = ['string', 'number', 'integer', 'boolean'];
 
@@ -89,8 +89,8 @@ function pickType(types, value) {
   return list.find((t) => SIMPLE_TYPES.includes(t)) || list[0] || null;
 }
 
-/** Returns a schema node that the form can render for a value, or null when the node has no renderer. */
-function formNode(node, value) {
+/** Returns a schema node that the form can render for a value, or null when the node has no renderer. An object inside a list item has none. */
+function formNode(node, value, inItem = false) {
   if (!node || typeof node !== 'object') return null;
   const out = { ...node };
   if (Array.isArray(out.type)) {
@@ -100,9 +100,10 @@ function formNode(node, value) {
     if (type !== 'object') delete out.additionalProperties;
   }
   if (out.type === 'object') {
+    if (inItem === 'nested') return null;
     const properties = {};
     for (const [key, child] of Object.entries(out.properties || {})) {
-      const next = formNode(child, value && typeof value === 'object' ? value[key] : undefined);
+      const next = formNode(child, value && typeof value === 'object' ? value[key] : undefined, inItem ? 'nested' : false);
       if (next) properties[key] = next;
     }
     if (!Object.keys(properties).length) return null;
@@ -112,7 +113,8 @@ function formNode(node, value) {
   }
   if (out.type === 'array') {
     if (!out.items || Array.isArray(out.items)) return null;
-    const item = formNode(out.items, Array.isArray(value) ? value.find((v) => v !== undefined && v !== null) : undefined);
+    if (inItem) return null;
+    const item = formNode(out.items, Array.isArray(value) ? value.find((v) => v !== undefined && v !== null) : undefined, true);
     if (!item) return null;
     out.items = item;
     return out;
@@ -140,6 +142,6 @@ export function componentForm(configSchema, configJson) {
   const required = Array.isArray(root.required) ? root.required.filter((key) => key in properties) : [];
   return {
     schema: { type: 'object', additionalProperties: true, properties, ...(required.length ? { required } : {}) },
-    uischema: { type: 'VerticalLayout', elements: keys.map((key) => ({ type: 'Control', scope: `#/properties/${key}` })) }
+    uischema: { type: 'VerticalLayout', elements: objectElements(properties) }
   };
 }

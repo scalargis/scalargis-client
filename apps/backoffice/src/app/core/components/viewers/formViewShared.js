@@ -2,7 +2,7 @@ import { describeViewerConfigFault } from '@scalargis/components';
 
 export const AJV_OPTIONS = { useDefaults: false };
 
-export const FORM_CONFIG = { formatNumber: false };
+export const FORM_CONFIG = { formatNumber: false, showUnfocusedDescription: true };
 
 const ARRAY_TEXTS = {
   addTooltip: 'Adicionar',
@@ -54,3 +54,14 @@ export function inlineRefs(node, defs) {
 
 /** Returns a UI schema control for one key. */
 export const control = (key) => ({ type: 'Control', scope: `#/properties/${key}` });
+
+/** Returns the UI schema elements of object properties: a control for each key, and a group for an object key. */
+export function objectElements(properties, scope = '#') {
+  return Object.entries(properties || {}).map(([key, node]) => {
+    const path = `${scope}/properties/${key}`;
+    if (node?.type === 'object' && node.properties) {
+      return { type: 'Group', label: node.title || key, elements: objectElements(node.properties, path) };
+    }
+    return { type: 'Control', scope: path };
+  });
+}
