@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation} from "react-i18next";
 import { Slider } from '@mantine/core';
+export { default as configSchema } from './config.schema.json';
 
 
 export default function Main({ config }) {

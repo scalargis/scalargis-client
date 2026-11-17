@@ -3,6 +3,7 @@ import { ActionIcon } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Dialog, useIsMobile, IconTable } from '@scalargis/ui';
 import ThemeAttributes from './ThemeAttributes';
+export { default as configSchema } from './config.schema.json';
 
 function hasAttributes(theme) {
   return !['GROUP'].includes(theme.type) || theme.datatable;

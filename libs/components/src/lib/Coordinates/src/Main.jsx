@@ -7,6 +7,7 @@ import { MAPCONTROL_NAME } from './utils'
 import { mapToolOff } from '../../utils/mapTools'
 import Coordinates from './Coordinates'
 import './style.css'
+export { default as configSchema } from './config.schema.json';
 
 
 /**

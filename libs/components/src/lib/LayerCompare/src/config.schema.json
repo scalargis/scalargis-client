@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da comparação de camadas",
+  "description": "Camadas e controlos da comparação de camadas.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel, em texto ou por idioma. Sem valor, usa o título do componente.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "layers": {
+      "title": "Camadas",
+      "description": "Ids das camadas da árvore que a comparação oferece.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "showMapSelectControls": {
+      "title": "Seletores no mapa",
+      "description": "Com false, esconde os seletores de camada no mapa durante a comparação com cortina.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

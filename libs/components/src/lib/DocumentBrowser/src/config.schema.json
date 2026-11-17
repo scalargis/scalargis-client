@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do navegador de documentos",
+  "description": "Pasta do servidor que o navegador de documentos mostra, e opções do botão e do painel.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "folder": {
+      "title": "Pasta",
+      "description": "Chave da pasta. Tem de ser igual ao codigo de uma linha de document_directory.",
+      "type": "string"
+    },
+    "url": {
+      "title": "Endereço",
+      "description": "Em vez de folder: um endereço que devolve a mesma árvore de ficheiros.",
+      "type": "string"
+    },
+    "path": {
+      "title": "Subpasta",
+      "description": "Subpasta de folder que o navegador abre.",
+      "type": "string"
+    },
+    "baseUrl": {
+      "title": "Prefixo das ligações",
+      "description": "Prefixo antes do endereço de cada ficheiro, quando outro servidor serve os ficheiros.",
+      "type": "string"
+    },
+    "showFilter": {
+      "title": "Mostrar filtro",
+      "description": "Com true, mostra a caixa de filtro.",
+      "type": "boolean",
+      "default": false
+    },
+    "showExpandButtons": {
+      "title": "Mostrar expandir e recolher",
+      "description": "Com true, mostra os botões que expandem e recolhem a árvore.",
+      "type": "boolean",
+      "default": false
+    },
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "btn_icon": {
+      "title": "Ícone do botão",
+      "description": "Classe do ícone do botão do menu.",
+      "type": "string"
+    },
+    "btn_image": {
+      "title": "Imagem do botão",
+      "description": "URL de uma imagem de fundo do botão. Tem prioridade sobre btn_icon.",
+      "type": "string"
+    },
+    "dialogKey": {
+      "title": "Chave da janela",
+      "description": "Chave da janela quando o componente abre como popup. Sem valor, usa DocumentBrowser- e o id do componente.",
+      "type": "string"
+    },
+    "dialogOptions": {
+      "title": "Opções da janela",
+      "description": "Opções da janela quando o componente abre como popup.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "header": {
+          "title": "Cabeçalho da janela",
+          "description": "Título da janela. Sem valor, usa header.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

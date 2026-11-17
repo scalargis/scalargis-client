@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da localização",
+  "description": "Opções do painel da posição do dispositivo.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "map_control": {
+      "title": "Controlo do mapa",
+      "description": "Nome do controlo do mapa que abre este painel. O visualizador procura o valor GeoLocation.",
+      "type": "string",
+      "examples": ["GeoLocation"]
+    },
+    "messages": {
+      "title": "Mensagens",
+      "description": "Textos que substituem os textos de origem do painel.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "intro": {
+          "title": "Introdução",
+          "description": "Texto do painel antes de ativar a posição.",
+          "type": "object",
+          "properties": { "text": { "title": "Texto", "type": "string" } }
+        },
+        "error": {
+          "title": "Erro",
+          "description": "Texto de um erro sem código conhecido.",
+          "type": "object",
+          "properties": { "text": { "title": "Texto", "type": "string" } }
+        },
+        "error1": {
+          "title": "Erro 1",
+          "description": "Texto quando o browser recusa a permissão.",
+          "type": "object",
+          "properties": { "text": { "title": "Texto", "type": "string" } }
+        },
+        "error2": {
+          "title": "Erro 2",
+          "description": "Texto quando o browser não obtém a posição.",
+          "type": "object",
+          "properties": { "text": { "title": "Texto", "type": "string" } }
+        },
+        "error3": {
+          "title": "Erro 3",
+          "description": "Texto quando o pedido da posição excede o tempo.",
+          "type": "object",
+          "properties": { "text": { "title": "Texto", "type": "string" } }
+        }
+      }
+    }
+  }
+}

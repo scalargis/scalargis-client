@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração dos mapas de base",
+  "description": "Opções do seletor de mapas de base.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "auto_close": {
+      "title": "Fechar ao escolher",
+      "description": "Com true, o seletor fecha depois de escolher um mapa de base.",
+      "type": "boolean",
+      "default": false
+    },
+    "opened": {
+      "title": "Aberto ao iniciar",
+      "description": "Com true, o seletor do mapa começa aberto.",
+      "type": "boolean",
+      "default": false
+    },
+    "vertical": {
+      "title": "Vertical",
+      "description": "Com true, o seletor do mapa mostra os mapas de base em coluna.",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

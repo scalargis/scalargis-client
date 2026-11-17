@@ -1,0 +1,167 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da interseção de temas",
+  "description": "Pedido ao servidor, desenho, resultados e exportação da interseção de temas.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "config_id": {
+      "title": "Configuração do servidor",
+      "description": "Vai como code no pedido e tem de ser igual a um site_settings.code. Sem valor, o servidor usa config_intersect.",
+      "type": ["string", "null"],
+      "default": null
+    },
+    "apiUrl": {
+      "title": "Endereço da análise",
+      "description": "Endereço da análise e base da exportação. Sem valor, usa /spatial_toolbox/api com o caminho intersect.",
+      "type": "string"
+    },
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel e início do título da janela das tabelas, em texto ou por idioma.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "classname": {
+      "title": "Classe CSS",
+      "description": "Classe CSS a mais do painel.",
+      "type": "string"
+    },
+    "btn_icon": {
+      "title": "Ícone do botão",
+      "description": "Classe do ícone do botão do menu.",
+      "type": "string",
+      "default": "pi pi-objects-column"
+    },
+    "btn_image": {
+      "title": "Imagem do botão",
+      "description": "URL de uma imagem de fundo do botão. Tem prioridade sobre btn_icon.",
+      "type": "string"
+    },
+    "content": {
+      "title": "Conteúdo",
+      "description": "Título e texto no topo do painel.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "title": {
+          "title": "Título",
+          "description": "Título no topo do painel, em texto ou por idioma.",
+          "type": ["string", "object"],
+          "additionalProperties": { "type": "string" }
+        },
+        "description": {
+          "title": "Descrição",
+          "description": "Texto em HTML no topo do painel, em texto ou por idioma.",
+          "type": ["string", "object"],
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "drawTools": {
+      "title": "Ferramentas de desenho",
+      "description": "Ferramentas da barra de desenho.",
+      "type": "array",
+      "items": { "type": "string", "examples": ["Point", "LineString", "Polygon", "Copy", "Select", "Modify"] },
+      "default": ["Point", "LineString", "Polygon", "Copy", "Modify"]
+    },
+    "bufferOption": {
+      "title": "Área de influência",
+      "description": "Com false, esconde o campo da área de influência.",
+      "type": "boolean",
+      "default": true
+    },
+    "maxArea": {
+      "title": "Área máxima",
+      "description": "Limite da área em m², verificado no cliente com um aviso.",
+      "type": "number",
+      "minimum": 0
+    },
+    "dataSrid": {
+      "title": "SRID dos dados",
+      "description": "SRID da verificação de maxArea e da área de influência em metros. Sem valor, usa a projeção do mapa.",
+      "type": "integer"
+    },
+    "groupResults": {
+      "title": "Agrupar resultados",
+      "description": "Com true, agrupa as camadas por grupo na lista de resultados.",
+      "type": "boolean",
+      "default": false
+    },
+    "showExport": {
+      "title": "Mostrar exportação",
+      "description": "Com false, esconde a barra de exportação.",
+      "type": "boolean",
+      "default": true
+    },
+    "exportFormats": {
+      "title": "Formatos de exportação",
+      "description": "Formatos da exportação. Com mais de 3, a barra passa a um menu.",
+      "type": "array",
+      "items": { "type": "string", "examples": ["xls", "csv", "pdf", "gpkg"] },
+      "default": ["xls", "csv", "pdf", "gpkg"]
+    },
+    "export": {
+      "title": "Exportação por formato",
+      "description": "Opções de cada formato, por nome do formato.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "apiUrl": {
+            "title": "Endereço",
+            "description": "Endereço da exportação deste formato.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "export_crs": {
+      "title": "SRID da exportação",
+      "description": "SRID dos ficheiros exportados. Sem valor, usa export_crs e depois display_crs do visualizador.",
+      "type": "integer"
+    },
+    "showResultMeasure": {
+      "title": "Mostrar medida",
+      "description": "Com false, esconde a coluna da área ou do comprimento.",
+      "type": "boolean",
+      "default": true
+    },
+    "showResultPercentage": {
+      "title": "Mostrar percentagem",
+      "description": "Com false, esconde a coluna da percentagem.",
+      "type": "boolean",
+      "default": true
+    },
+    "showResultGeometries": {
+      "title": "Mostrar geometrias",
+      "description": "Com false, os resultados não têm caixas de seleção para pintar ou aproximar a geometria.",
+      "type": "boolean",
+      "default": true
+    },
+    "highlightFeatures": {
+      "title": "Realçar elementos",
+      "description": "Com false, um clique no registo não pinta o elemento.",
+      "type": "boolean",
+      "default": true
+    },
+    "zoomToFeatures": {
+      "title": "Aproximar aos elementos",
+      "description": "Com false, um clique no registo não aproxima ao elemento.",
+      "type": "boolean",
+      "default": true
+    },
+    "showTables": {
+      "title": "Mostrar tabelas",
+      "description": "Com true, mostra o botão Tabelas e a janela das tabelas.",
+      "type": "boolean",
+      "default": false
+    },
+    "styles": {
+      "title": "Estilos",
+      "description": "Estilos OpenLayers da camada intersect, por chave (input, output, results, selected, default). Uma lista junta-se à de origem. Um valor único substitui-a.",
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { useTranslation} from "react-i18next";
 import { ActionIcon } from '@mantine/core';
 import { Dialog, useIsMobile, IconPencil } from '@scalargis/ui';
 import EditNode from './EditNode';
+export { default as configSchema } from './config.schema.json';
 
 export default function Main(props) {
 

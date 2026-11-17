@@ -8,6 +8,7 @@ import { i18n as i18nUtils, MainMenuButton } from '../../components';
 import HelpHtmlContent from './HelpHmtlContent';
 
 import './style.css';
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Whether this viewer offers the guided tour from the Help launcher (D1/D5).

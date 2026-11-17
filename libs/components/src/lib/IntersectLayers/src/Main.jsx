@@ -7,6 +7,7 @@ import { i18n, MainMenuButton } from '../../components';
 import Intersect from './Intersect';
 
 import './style.css';
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

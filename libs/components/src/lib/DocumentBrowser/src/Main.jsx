@@ -4,6 +4,7 @@ import { CollapsiblePanel, IconFolderOpen } from '@scalargis/ui';
 import { i18n, MainMenuButton } from '../../components';
 
 import DocumentList from './DocumentList';
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

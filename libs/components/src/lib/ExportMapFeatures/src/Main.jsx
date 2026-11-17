@@ -8,6 +8,7 @@ import OLGroupLayer from "ol/layer/Group"
 import Select from 'ol/interaction/Select'
 import VectorSource from "ol/source/Vector"
 import './index.css'
+export { default as configSchema } from './config.schema.json';
 
 export function traverseOlLayers(collection, cb) {
   collection.forEach(l => {

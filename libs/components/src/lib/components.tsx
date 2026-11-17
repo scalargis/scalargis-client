@@ -74,6 +74,7 @@ import {
 
 import {
   viewerConfigSchema,
+  coreComponentSchemas,
   getViewerConfigSchema,
   validateViewerConfig
 } from './ViewerConfig'
@@ -161,6 +162,7 @@ export {
   ValidationMode as JsonFormValidationMode,
 
   viewerConfigSchema,
+  coreComponentSchemas,
   getViewerConfigSchema,
   validateViewerConfig,
 

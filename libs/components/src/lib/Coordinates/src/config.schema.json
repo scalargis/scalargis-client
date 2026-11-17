@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração das coordenadas",
+  "description": "Opções do painel de coordenadas e da sua exportação.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "map_control": {
+      "title": "Controlo do mapa",
+      "description": "Nome do controlo do mapa que abre este painel. O visualizador procura o valor Coordinates.",
+      "type": "string",
+      "examples": ["Coordinates"]
+    },
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "crs_list": {
+      "title": "Sistemas de coordenadas",
+      "description": "SRID dos sistemas que o painel oferece, entre os de crs_list do visualizador. Sem valor, oferece todos.",
+      "type": "array",
+      "items": { "type": "integer" }
+    },
+    "selected_crs": {
+      "title": "Sistema inicial",
+      "description": "Sistema escolhido ao abrir, por SRID (número) ou por código (texto).",
+      "type": ["integer", "string"]
+    },
+    "export_crs": {
+      "title": "SRID da exportação",
+      "description": "SRID das coordenadas exportadas. Sem valor, usa export_crs e depois display_crs do visualizador.",
+      "type": "integer"
+    },
+    "expand_menu": {
+      "title": "Expandir o menu",
+      "description": "Com true, o menu lateral expande quando o painel abre num ecrã grande.",
+      "type": "boolean",
+      "default": false
+    },
+    "expand_menu_mobile": {
+      "title": "Expandir o menu no telemóvel",
+      "description": "Com true, o menu lateral expande quando o painel abre num ecrã pequeno.",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

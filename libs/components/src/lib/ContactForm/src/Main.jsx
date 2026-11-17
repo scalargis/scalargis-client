@@ -10,6 +10,7 @@ import ContactForm from './ContactForm';
 import ContactInfo from './ContactInfo';
 
 import './index.css';
+export { default as configSchema } from './config.schema.json';
 
 // As regiões do rodapé do viewer (`FooterLeft.jsx` / `FooterRight.jsx`). O
 // `Core.renderComponents` já as monta como qualquer outra região - o que não

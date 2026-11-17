@@ -8,6 +8,7 @@ import { MAPCONTROL_NAME } from './utils'
 import { mapToolOff } from '../../utils/mapTools'
 import FeatureResults from './FeatureResults'
 import './index.css'
+export { default as configSchema } from './config.schema.json';
 
 
 export function traverseOlLayers(collection, cb) {

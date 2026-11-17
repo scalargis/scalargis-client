@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do formulário de contacto",
+  "description": "Opções do formulário de contacto, do bloco de informação de contacto e dos anexos.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título da janela ou do painel. Sem valor, usa o título do componente e depois \"Formulário de Contacto\".",
+      "type": "string"
+    },
+    "closeLabel": {
+      "title": "Texto do botão fechar",
+      "description": "Texto do botão que fecha a janela.",
+      "type": "string",
+      "default": "Fechar"
+    },
+    "footerLabel": {
+      "title": "Texto no rodapé",
+      "description": "Só nas zonas do rodapé. Texto ao lado do ícone. Com \"\", mostra só o ícone.",
+      "type": "string",
+      "default": "Contacto"
+    },
+    "hideForm": {
+      "title": "Esconder formulário",
+      "description": "Com true, mostra só a informação de contacto, sem formulário.",
+      "type": "boolean",
+      "default": false
+    },
+    "hideContactInfo": {
+      "title": "Esconder informação de contacto",
+      "description": "Com true, esconde o bloco de informação de contacto.",
+      "type": "boolean",
+      "default": false
+    },
+    "contact_info": {
+      "title": "Informação de contacto",
+      "description": "HTML do bloco de contacto, em texto ou por idioma. Sem valor, usa contact_info do visualizador.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "requiredFieldMessage": {
+      "title": "Mensagem de campo obrigatório",
+      "description": "Mensagem por baixo de um campo obrigatório vazio.",
+      "type": "string",
+      "default": "Campo de preenchimento obrigatório"
+    },
+    "upload": {
+      "title": "Anexos",
+      "description": "Opções dos anexos. Sem enabled a true, o formulário não aceita anexos.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "title": "Ativo",
+          "description": "Com true, mostra o bloco de anexos.",
+          "type": "boolean",
+          "default": false
+        },
+        "minFiles": {
+          "title": "Mínimo de ficheiros",
+          "description": "Número mínimo de ficheiros, verificado ao enviar.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxFiles": {
+          "title": "Máximo de ficheiros",
+          "description": "Número máximo de ficheiros, verificado ao enviar.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxFileSize": {
+          "title": "Tamanho máximo",
+          "description": "Tamanho máximo de cada ficheiro, em bytes.",
+          "type": "integer",
+          "minimum": 0,
+          "default": 1000000
+        },
+        "accept": {
+          "title": "Tipos aceites",
+          "description": "Tipos de ficheiro aceites, separados por vírgulas.",
+          "type": "string",
+          "default": "image/*, application/pdf"
+        },
+        "chooseLabel": {
+          "title": "Texto do botão selecionar",
+          "description": "Texto do botão que escolhe os ficheiros.",
+          "type": "string",
+          "default": "Selecionar"
+        },
+        "cancelLabel": {
+          "title": "Texto do botão limpar",
+          "description": "Texto do botão que limpa os ficheiros.",
+          "type": "string",
+          "default": "Limpar"
+        },
+        "emptyMessage": {
+          "title": "Texto da zona de largar",
+          "description": "Texto da zona onde se largam os ficheiros.",
+          "type": "string",
+          "default": "Arraste para aqui os ficheiros a enviar."
+        },
+        "invalidFileSizeMessageDetail": {
+          "title": "Mensagem de tamanho excedido",
+          "description": "Mensagem de um ficheiro grande demais. {0} passa a ser o tamanho máximo em MB.",
+          "type": "string",
+          "default": "Ficheiro com dimensão superior ao permitido ({0})."
+        }
+      }
+    }
+  }
+}

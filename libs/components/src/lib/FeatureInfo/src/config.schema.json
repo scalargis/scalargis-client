@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da identificação de elementos",
+  "description": "Opções do painel de identificação de elementos e da exportação dos resultados.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "map_control": {
+      "title": "Controlo do mapa",
+      "description": "Nome do controlo do mapa que abre este painel. O visualizador procura o valor FeatureInfo.",
+      "type": "string",
+      "examples": ["FeatureInfo"]
+    },
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel, traduzido. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "expand_menu": {
+      "title": "Expandir o menu",
+      "description": "Com true, o menu lateral expande quando o painel abre num ecrã grande.",
+      "type": "boolean",
+      "default": false
+    },
+    "expand_menu_mobile": {
+      "title": "Expandir o menu no telemóvel",
+      "description": "Com true, o menu lateral expande quando o painel abre num ecrã pequeno.",
+      "type": "boolean",
+      "default": false
+    },
+    "export_crs": {
+      "title": "SRID da exportação",
+      "description": "SRID dos resultados exportados. Sem valor, usa export_crs e depois display_crs do visualizador.",
+      "type": "integer"
+    },
+    "export_all": {
+      "title": "Exportar todos",
+      "description": "Com false, esconde a exportação de todos os resultados.",
+      "type": "boolean",
+      "default": true
+    },
+    "export_record": {
+      "title": "Exportar registo",
+      "description": "Com false, esconde a exportação de cada registo.",
+      "type": "boolean",
+      "default": true
+    },
+    "export_roles": {
+      "title": "Perfis da exportação",
+      "description": "Perfis que veem a exportação. Sem valor, todos a veem.",
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

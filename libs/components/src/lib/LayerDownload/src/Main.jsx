@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Button } from '@mantine/core';
 import { notify, IconFile, IconExternalLink } from '@scalargis/ui';
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
+export { default as configSchema } from './config.schema.json';
 
 /*
 // TODO: implement theme download

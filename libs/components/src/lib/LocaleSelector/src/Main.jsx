@@ -2,6 +2,7 @@ import React from 'react';
 
 import LocaleSelector from './LocaleSelector';
 import './style.css';
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component
