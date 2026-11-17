@@ -29,6 +29,10 @@ import {
   motionTransitionProps,
 } from './motion';
 
+/** Options list scrollbar of the Combobox-based inputs: always visible on overflow, at a usable width. */
+const optionsScrollAreaProps = { type: 'auto', scrollbarSize: 8 } as const;
+const optionsDropdownInputs = ['Select', 'MultiSelect', 'Autocomplete', 'TagsInput'];
+
 /* ─── ROOT FONT-SIZE COMPENSATION ──────────────────────────────────
    The viewer/backoffice shells pin `html { font-size: 14px }` (viewer
    apps/viewer/src/app/core/themes/default/layout.scss, loaded on every
@@ -222,7 +226,17 @@ export const adsBaseTheme = createTheme({
         'TimeInput',
         'MonthPickerInput',
         'YearPickerInput',
-      ].map((name) => [name, { defaultProps: { size: 'md' } }])
+      ].map((name) => [
+        name,
+        {
+          defaultProps: {
+            size: 'md',
+            ...(optionsDropdownInputs.includes(name) && {
+              scrollAreaProps: optionsScrollAreaProps,
+            }),
+          },
+        },
+      ])
     ),
 
     // Standalone <Input.Label> (section headers) has no wrapper to size it, so
