@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { FigTreeEvaluator } from 'fig-tree-evaluator';
 import extractProperty from 'object-property-extractor';
 import assign from 'object-property-assigner';
+import isEqual from 'lodash/isEqual';
 
 import { i18n } from '../components';
 
@@ -40,12 +41,13 @@ export const useFigTreeEvaluator = (data, schema, uischema, figOptions, loadingE
     if (schemaEvaluated)
       fig.evaluate(uischema, { data }).then((result) => {
         if (!current) return;
-        setEvaluatedUiSchema(replaceRules(result, simplifiedRulePaths));
+        const next = replaceRules(result, simplifiedRulePaths);
+        setEvaluatedUiSchema((prev) => (isEqual(prev, next) ? prev : next));
       });
 
     fig.evaluate(schema, { data }).then((result) => {
       if (!current) return;
-      setEvaluatedSchema(result);
+      setEvaluatedSchema((prev) => (isEqual(prev, result) ? prev : result));
       setSchemaEvaluated(true);
     });
 
