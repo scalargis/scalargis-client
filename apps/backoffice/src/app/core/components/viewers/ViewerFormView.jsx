@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Accordion, Alert, Box, Grid, Group, Paper, Text } from '@mantine/core';
+import { Accordion, ActionIcon, Alert, Box, Grid, Group, Paper, Text } from '@mantine/core';
 import { isEqual } from 'lodash';
 import { JsonForm, viewerConfigSchema, describeViewerConfigFault } from '@scalargis/components';
-import { IconAlertTriangle } from '@scalargis/ui';
+import { IconAlertTriangle, IconRefresh } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 
 const PREVIEW_DELAY_MS = 800;
+
+const OWN_TEXTS_KEPT = 5;
 
 const MAP_KEYS = ['center', 'extent', 'full_extent', 'restricted_extent', 'constrained_extent',
   'display_crs', 'crs_list', 'map_controls', 'exclude_map_controls'];
@@ -117,17 +119,32 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
   if (parsed) lastGood.current = parsed;
   const config = parsed || lastGood.current;
 
-  const mapData = useMemo(() => pick(config, MAP_KEYS), [config]);
+  const latest = useRef(parsed);
+  latest.current = parsed;
+
+  const ownTexts = useRef([]);
+  const formData = useRef(null);
+  const mapData = useMemo(() => {
+    if (formData.current && ownTexts.current.includes(configText)) return formData.current;
+    ownTexts.current = [];
+    formData.current = null;
+    return pick(config, MAP_KEYS);
+  }, [config, configText]);
 
   const onMapChange = ({ data }) => {
-    if (!parsed) return;
-    const next = { ...parsed };
+    const base = latest.current;
+    if (!base) return;
+    const next = { ...base };
     for (const key of MAP_KEYS) {
       if (data?.[key] === undefined) delete next[key];
       else next[key] = data[key];
     }
-    if (isEqual(pick(next, MAP_KEYS), pick(parsed, MAP_KEYS))) return;
-    onConfigTextChange(JSON.stringify(next, null, 2));
+    if (isEqual(pick(next, MAP_KEYS), pick(base, MAP_KEYS))) return;
+    const text = JSON.stringify(next, null, 2);
+    formData.current = data;
+    ownTexts.current = [...ownTexts.current.slice(1 - OWN_TEXTS_KEPT), text];
+    latest.current = next;
+    onConfigTextChange(text);
   };
 
   const [frameOpened, setFrameOpened] = useState(false);
@@ -141,8 +158,13 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
   const frame = useRef(null);
   const ready = useRef(false);
   const lastSent = useRef(null);
-  const latest = useRef(parsed);
-  latest.current = parsed;
+  const [frameKey, setFrameKey] = useState(0);
+
+  const reloadPreview = () => {
+    ready.current = false;
+    lastSent.current = null;
+    setFrameKey((k) => k + 1);
+  };
 
   const send = (value) => {
     const target = frame.current?.contentWindow;
@@ -204,10 +226,19 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
         <Paper withBorder style={{ overflow: 'hidden' }}>
           <Group justify="space-between" px="sm" py={6}>
             <Text size="sm" fw={500}>Pré-visualização</Text>
-            <Text size="xs" c="dimmed">Mostra o estado por gravar. Não grava.</Text>
+            <Group gap="xs" wrap="nowrap">
+              <Text size="xs" c="dimmed">Mostra o estado por gravar. Não grava.</Text>
+              {frameOpened && previewUrl &&
+                <ActionIcon type="button" variant="subtle" size="sm" onClick={reloadPreview}
+                  aria-label="Recarregar a pré-visualização" title="Recarregar a pré-visualização">
+                  <IconRefresh />
+                </ActionIcon>
+              }
+            </Group>
           </Group>
           {previewUrl && frameOpened ?
             <iframe
+              key={frameKey}
               ref={frame}
               src={previewUrl}
               title="Pré-visualização do visualizador"

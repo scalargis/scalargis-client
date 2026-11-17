@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { View } from 'ol'
+import { isEmpty } from 'ol/extent'
 import 'ol/ol.css'
 import './mainmap.css'
 import { connect } from 'react-redux'
@@ -30,6 +31,11 @@ function getViewConstraints(config_json, auth) {
   return viewOptions;
 }
 
+/** Returns true for an extent of four finite numbers that is not empty. */
+function isUsableExtent(extent) {
+  return Array.isArray(extent) && extent.length === 4 && extent.every(Number.isFinite) && !isEmpty(extent);
+}
+
 function MainMap(props) {
   const { olMap, config, viewer, mainMapEl, core, dispatch, auth } = props;
 
@@ -46,9 +52,8 @@ function MainMap(props) {
     appliedConstraints.current = JSON.stringify(constraints);
     if (constraints || (previous && previous !== 'null')) olMap.setView(new View(constraints || {}));
 
-    const resolution = olMap.getView().getResolutionForExtent(extent);
-    olMap.getView().setCenter(center);
-    olMap.getView().setResolution(resolution);
+    if (center) olMap.getView().setCenter(center);
+    if (isUsableExtent(extent)) olMap.getView().setResolution(olMap.getView().getResolutionForExtent(extent));
 
     // Attach on change center event
     function onMoveEnd() {
@@ -79,7 +84,7 @@ function MainMap(props) {
     if (center === lastMapMove.current.center && extent === lastMapMove.current.extent) return;
 
     // Apply programatic center and extent
-    if (extent) {
+    if (isUsableExtent(extent)) {
       const resolution = olMap.getView().getResolutionForExtent(extent);
       olMap.getView().setResolution(resolution);
       olMap.getView().fit(extent, olMap.getSize(), { closest: true });
