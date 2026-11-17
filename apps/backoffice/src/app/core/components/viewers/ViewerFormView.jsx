@@ -6,6 +6,8 @@ import { IconAlertTriangle, IconRefresh } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N, control, inlineRefs, pick } from './formViewShared';
+import ViewerComponentsSection from './ViewerComponentsSection';
+import ViewerHeaderSection from './ViewerHeaderSection';
 import ViewerLayersSection from './ViewerLayersSection';
 
 const PREVIEW_DELAY_MS = 800;
@@ -100,6 +102,13 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
     writeConfig(next);
   };
 
+  const [openSections, setOpenSections] = useState(['map', 'layers']);
+  const [componentId, setComponentId] = useState(null);
+  const openComponent = (id) => {
+    setComponentId(id);
+    setOpenSections((list) => (list.includes('components') ? list : [...list, 'components']));
+  };
+
   const [frameOpened, setFrameOpened] = useState(false);
   useEffect(() => {
     if (active && viewerId) setFrameOpened(true);
@@ -155,7 +164,7 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
             JSON inválido no separador Configuração. O formulário fica só de leitura até o texto ser válido.
           </Alert>
         }
-        <Accordion multiple defaultValue={['map', 'layers']} variant="separated">
+        <Accordion multiple value={openSections} onChange={setOpenSections} variant="separated">
           <Accordion.Item value="map">
             <Accordion.Control>Mapa</Accordion.Control>
             <Accordion.Panel>
@@ -182,6 +191,33 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
                 dataGeneration={generation.current}
                 writeConfig={writeConfig}
                 getLatest={() => latest.current}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value="components">
+            <Accordion.Control>Componentes</Accordion.Control>
+            <Accordion.Panel>
+              <ViewerComponentsSection
+                config={config}
+                readonly={!parsed}
+                dataGeneration={generation.current}
+                writeConfig={writeConfig}
+                getLatest={() => latest.current}
+                selectedId={componentId}
+                onSelect={setComponentId}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value="header">
+            <Accordion.Control>Topo e menu</Accordion.Control>
+            <Accordion.Panel>
+              <ViewerHeaderSection
+                config={config}
+                readonly={!parsed}
+                dataGeneration={generation.current}
+                writeConfig={writeConfig}
+                getLatest={() => latest.current}
+                onOpenComponent={openComponent}
               />
             </Accordion.Panel>
           </Accordion.Item>
