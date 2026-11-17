@@ -8,8 +8,6 @@ import AppContext from '../../../AppContext';
 
 const PREVIEW_DELAY_MS = 800;
 
-const OWN_TEXTS_KEPT = 5;
-
 const MAP_KEYS = ['center', 'extent', 'full_extent', 'restricted_extent', 'constrained_extent',
   'display_crs', 'crs_list', 'map_controls', 'exclude_map_controls'];
 
@@ -122,14 +120,17 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
   const latest = useRef(parsed);
   latest.current = parsed;
 
-  const ownTexts = useRef([]);
-  const formData = useRef(null);
-  const mapData = useMemo(() => {
-    if (formData.current && ownTexts.current.includes(configText)) return formData.current;
-    ownTexts.current = [];
-    formData.current = null;
-    return pick(config, MAP_KEYS);
-  }, [config, configText]);
+  const ownText = useRef(null);
+  const seenText = useRef(null);
+  const formInput = useRef(null);
+  if (seenText.current !== configText || !formInput.current) {
+    seenText.current = configText;
+    if (ownText.current !== configText || !formInput.current) {
+      ownText.current = null;
+      formInput.current = pick(config, MAP_KEYS);
+    }
+  }
+  const mapData = formInput.current;
 
   const onMapChange = ({ data }) => {
     const base = latest.current;
@@ -141,8 +142,7 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
     }
     if (isEqual(pick(next, MAP_KEYS), pick(base, MAP_KEYS))) return;
     const text = JSON.stringify(next, null, 2);
-    formData.current = data;
-    ownTexts.current = [...ownTexts.current.slice(1 - OWN_TEXTS_KEPT), text];
+    ownText.current = text;
     latest.current = next;
     onConfigTextChange(text);
   };
