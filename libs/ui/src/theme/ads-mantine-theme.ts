@@ -30,7 +30,7 @@ import {
 } from './motion';
 
 /** Options list scrollbar of the Combobox-based inputs: always visible on overflow, at a usable width. */
-const optionsScrollAreaProps = { type: 'auto', scrollbarSize: 8 } as const;
+const optionsScrollAreaProps = { type: 'auto', scrollbarSize: 10 } as const;
 const optionsDropdownInputs = ['Select', 'MultiSelect', 'Autocomplete', 'TagsInput'];
 
 /* ─── ROOT FONT-SIZE COMPENSATION ──────────────────────────────────
