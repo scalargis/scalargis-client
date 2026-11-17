@@ -22,6 +22,25 @@ import OlControls from '../map_control'
 import DialogWindows from './DialogWindows'
 import {PageView, initGA} from '../components/Tracking'
 
+const PREVIEW_ORIGIN = import.meta.env.VITE_APP_PREVIEW_ORIGIN;
+
+/** Returns the origins that may post a preview config, or receive a preview message. */
+function previewOrigins() {
+  return [window.location.origin, PREVIEW_ORIGIN].filter(Boolean);
+}
+
+/** Posts one preview message to the parent page, for each allowed origin. */
+function postToParent(message) {
+  if (window.parent === window) return;
+  for (const origin of previewOrigins()) {
+    try {
+      window.parent.postMessage(message, origin);
+    } catch (e) {
+      console.error('Preview message failed:', e);
+    }
+  }
+}
+
 /**
  * Embedded Viewer layout container
  * @param {Object} props 
@@ -35,7 +54,7 @@ function ViewerEmbedded(props) {
 
   // Get router props
   const { id } = params;
-  const { viewer, notifications } = props;
+  const { viewer, notifications, preview } = props;
   const { layers } = viewer.config_json;
   const { map_controls } = viewer.config_json;
   
@@ -54,7 +73,10 @@ function ViewerEmbedded(props) {
   // Enable redux actions
   const dispatch = useDispatch();
   const { core, mainMap } = useContext(AppContext);
-  const { viewer_load, layout_wrapper_click, layout_toggle_menu, layout_show_menu } = core.actions;
+  const { viewer_load, viewer_preview_config, layout_wrapper_click, layout_toggle_menu, layout_show_menu } = core.actions;
+
+  const previewRecord = useRef(null);
+  const previewReady = useRef(false);
 
   const gaTrackingId = import.meta.env.VITE_APP_GA_TRACKING_ID;
 
@@ -65,8 +87,30 @@ function ViewerEmbedded(props) {
       PageView();
     }
 
-    dispatch(viewer_load(core, id, history));
+    previewRecord.current = null;
+    previewReady.current = false;
+    dispatch(viewer_load(core, id, history, preview ? (record) => { previewRecord.current = record; } : undefined));
   }, [id]);
+
+  useEffect(() => {
+    if (!preview || !viewer.loaded || previewReady.current || !previewRecord.current) return;
+    previewReady.current = true;
+    postToParent({ type: 'sg-preview-ready', id: previewRecord.current.id });
+  }, [preview, viewer.loaded]);
+
+  useEffect(() => {
+    if (!preview) return undefined;
+    const onMessage = (event) => {
+      if (event.source !== window.parent || !previewOrigins().includes(event.origin)) return;
+      const message = event.data;
+      if (!message || message.type !== 'sg-preview-config') return;
+      const config = message.config_json;
+      if (!config || typeof config !== 'object' || Array.isArray(config) || !previewRecord.current) return;
+      dispatch(viewer_preview_config(core, previewRecord.current, config));
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [preview]);
 
   useEffect(() => {
     // Only change language if:

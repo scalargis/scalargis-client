@@ -54,7 +54,11 @@ export type {
   CodeEditorProps,
   CodeEditorHandle,
   CodeEditorLanguage,
+  CodeEditorLint,
 } from './recipes/CodeEditor';
+export { jsonPointerRange } from './recipes/jsonPointer';
+export type { JsonRange } from './recipes/jsonPointer';
+export type { Diagnostic as CodeEditorDiagnostic } from '@codemirror/lint';
 
 export { FileUpload } from './recipes/FileUpload';
 export type { FileUploadProps } from './recipes/FileUpload';

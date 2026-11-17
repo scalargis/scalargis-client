@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da tabela de atributos",
+  "description": "A tabela de atributos recebe os dados e os campos de quem a abre e não lê chaves próprias.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {}
+}

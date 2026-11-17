@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TextInput } from '@mantine/core';
 import './style.css'
+export { default as configSchema } from './config.schema.json';
 
 export default function Main({ config, actions }) {
   const { viewer, mainMap, dispatch, Models } = config;

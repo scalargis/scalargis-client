@@ -5,6 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { CollapsiblePanel, IconAngleUp, IconAngleDown } from '@scalargis/ui';
 import TimelineControl from './TimelineControl';
 import { WMSCapabilities } from 'ol/format';
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

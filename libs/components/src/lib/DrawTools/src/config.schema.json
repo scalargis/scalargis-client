@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração das ferramentas de desenho",
+  "description": "Ferramentas, secções e exportação do painel de desenho.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "tools": {
+      "title": "Ferramentas",
+      "description": "Ferramentas que o painel mostra. Sem valor, mostra todas. O painel mantém a sua ordem dos botões.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["point", "line", "polygon", "symbol", "text", "square", "rectangle", "grid", "select", "transform"]
+      }
+    },
+    "show_shapes": {
+      "title": "Mostrar formas",
+      "description": "Com false, esconde o grupo Formas (quadrado, retângulo, grelha), mesmo que tools o nomeie.",
+      "type": "boolean",
+      "default": true
+    },
+    "show_snap": {
+      "title": "Mostrar atração",
+      "description": "Com false, esconde o interruptor de atração (snapping) e desliga a atração.",
+      "type": "boolean",
+      "default": true
+    },
+    "show_help": {
+      "title": "Mostrar ajuda",
+      "description": "Com false, esconde a caixa de ajuda.",
+      "type": "boolean",
+      "default": true
+    },
+    "show_export": {
+      "title": "Mostrar exportação",
+      "description": "Com false, esconde os botões de exportação.",
+      "type": "boolean",
+      "default": true
+    },
+    "exclude_export_formats": {
+      "title": "Formatos excluídos",
+      "description": "Formatos de exportação que o painel esconde. Sem valor, usa exclude_export_formats do visualizador.",
+      "type": "array",
+      "items": { "type": "string", "enum": ["geojson", "gml", "shape", "kml"] }
+    },
+    "export_crs": {
+      "title": "SRID da exportação",
+      "description": "SRID da exportação. Sem valor, usa export_crs e depois display_crs do visualizador, e por fim 4326.",
+      "type": "integer"
+    }
+  }
+}

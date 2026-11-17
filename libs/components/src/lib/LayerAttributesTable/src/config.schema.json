@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da tabela de atributos da camada",
+  "description": "Componente de pesquisa que abre a tabela de atributos de uma camada.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "title": "Componente da tabela",
+      "description": "Id do componente de pesquisa que mostra a tabela. datatable.target da camada tem prioridade.",
+      "type": "string"
+    }
+  }
+}

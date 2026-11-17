@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { ActionIcon, TextInput } from '@mantine/core'
 import { DataGrid, Dialog, IconTable, IconExternalLink } from '@scalargis/ui'
+export { default as configSchema } from './config.schema.json';
 
 export default function Main({ open, as, onOpen, onClose, data, fields }) {
 

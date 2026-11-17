@@ -4,6 +4,7 @@ import { CollapsiblePanel, IconPalette } from '@scalargis/ui'
 import { MainMenuButton, MapToolButton } from '../../components'
 import DrawTools from './DrawTools'
 import { MAP_TOOLS } from '../../utils/mapTools'
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

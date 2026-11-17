@@ -6,6 +6,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Dialog, useIsMobile, IconInfoCircle } from '@scalargis/ui';
 
 import ThemeInfo from './ThemeInfo';
+export { default as configSchema } from './config.schema.json';
 
 
 export default function Main({ core, config }) {

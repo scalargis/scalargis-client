@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation} from "react-i18next";
 import { CollapsiblePanel } from '@scalargis/ui';
 import MapControls from './MapControls'
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

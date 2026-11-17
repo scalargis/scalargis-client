@@ -5,6 +5,7 @@ import { MainMenuButton } from '../../components'
 import GeoLocation from './GeoLocation'
 
 import './style.css'
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

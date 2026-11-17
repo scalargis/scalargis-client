@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração dos metadados de camada",
+  "description": "Os metadados de camada leem a camada da linha da árvore e não leem chaves próprias.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {}
+}

@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da pesquisa de locais",
+  "description": "Serviço de nomes geográficos, fontes, modelos da lista e desenho do local escolhido.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "url": {
+      "title": "Endereço da pesquisa",
+      "description": "URL do serviço. {filter} passa a ser o texto escrito, e {max_rows} e {min_similarity} passam a ser os valores destas chaves. Sem valor, usa a pesquisa de nomes geográficos da API.",
+      "type": "string"
+    },
+    "providers": {
+      "title": "Fornecedores",
+      "description": "Serviços a pesquisar em paralelo, em vez de url. A lista junta as linhas dos que respondem.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "url": {
+            "title": "Endereço",
+            "description": "URL do serviço, com os mesmos marcadores de url.",
+            "type": "string"
+          },
+          "attribution": {
+            "title": "Atribuição",
+            "description": "Texto da fonte, mostrado por baixo da lista quando o serviço dá linhas.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "max_rows": {
+      "title": "Número máximo de linhas",
+      "description": "Valor de {max_rows} no endereço.",
+      "type": ["integer", "string"]
+    },
+    "min_similarity": {
+      "title": "Semelhança mínima",
+      "description": "Valor de {min_similarity} no endereço.",
+      "type": ["number", "string"]
+    },
+    "delay": {
+      "title": "Espera",
+      "description": "Milissegundos entre a última tecla e o pedido.",
+      "type": "number",
+      "default": 300
+    },
+    "placeholder": {
+      "title": "Texto de ajuda",
+      "description": "Texto da caixa vazia. Sem valor, mostra Pesquisar...",
+      "type": "string"
+    },
+    "buffer": {
+      "title": "Margem",
+      "description": "Margem à volta do local escolhido no zoom, em unidades do mapa.",
+      "type": "number",
+      "default": 1000
+    },
+    "sources": {
+      "title": "Fontes",
+      "description": "Fontes das linhas, pelo campo source. Com uma fonte ativa, a lista mostra só as linhas das fontes ativas.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "title": "Código",
+            "description": "Valor do campo source das linhas desta fonte.",
+            "type": "string"
+          },
+          "title": {
+            "title": "Título",
+            "description": "Nome da fonte.",
+            "type": "string"
+          },
+          "active": {
+            "title": "Ativa",
+            "description": "Com true, a lista mostra as linhas desta fonte.",
+            "type": "boolean",
+            "default": false
+          },
+          "buffer": {
+            "title": "Margem",
+            "description": "Margem do zoom para os locais desta fonte. Tem prioridade sobre buffer.",
+            "type": "number"
+          }
+        }
+      }
+    },
+    "geometrySRID": {
+      "title": "SRID da geometria",
+      "description": "SRID da geometria WKT das linhas. Sem valor, usa geom_srid da linha e depois 4326.",
+      "type": "integer"
+    },
+    "drawGeometry": {
+      "title": "Desenhar a geometria",
+      "description": "Com false, o local escolhido não é desenhado no mapa.",
+      "type": "boolean",
+      "default": true
+    },
+    "unselectOnHide": {
+      "title": "Limpar ao fechar a lista",
+      "description": "Com true, o local escolhido deixa de estar escolhido quando a lista fecha.",
+      "type": "boolean",
+      "default": false
+    },
+    "types": {
+      "title": "Modelos da lista",
+      "description": "Modelo de cada linha da lista, pelo valor de um campo.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "field": {
+          "title": "Campo",
+          "description": "Campo da linha que escolhe o modelo pelo id.",
+          "type": "string",
+          "examples": ["type"]
+        },
+        "templates": {
+          "title": "Modelos",
+          "description": "Modelos por valor do campo.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "id": { "title": "Valor", "description": "Valor do campo que usa este modelo.", "type": "string" },
+              "iconClass": { "title": "Ícone", "description": "Classe do ícone pi, como pi-chevron-right, quando não há html.", "type": "string" },
+              "html": { "title": "HTML", "description": "HTML da linha, em que {campo} passa a ser o valor do campo.", "type": "string" },
+              "drawGeometry": { "title": "Desenhar a geometria", "description": "Com false, um local deste modelo não é desenhado no mapa.", "type": "boolean" }
+            }
+          }
+        },
+        "default": {
+          "title": "Modelo por omissão",
+          "description": "Modelo das linhas sem modelo próprio.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "iconClass": { "title": "Ícone", "description": "Classe do ícone pi, como pi-circle-on.", "type": "string" },
+            "html": { "title": "HTML", "description": "HTML da linha, em que {campo} passa a ser o valor do campo.", "type": "string" },
+            "drawGeometry": { "title": "Desenhar a geometria", "description": "Com false, estes locais não são desenhados no mapa.", "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}

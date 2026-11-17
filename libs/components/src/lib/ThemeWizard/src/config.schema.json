@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do assistente de temas",
+  "description": "Valores iniciais do assistente, tipos de fonte, ficheiros e posição dos temas juntos.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["data"],
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel, em texto ou por idioma. Sem valor, usa o título do componente.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "data": {
+      "title": "Dados iniciais",
+      "description": "Valores iniciais do assistente. O assistente não abre sem esta chave. Com type, abre no passo dos dados, e com items abre na confirmação.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "title": "Tipo de fonte",
+          "description": "Tipo escolhido ao abrir, como wms. Vazio abre na escolha do tipo.",
+          "type": "string",
+          "examples": ["", "wms", "wmts", "wfs", "ogcapi", "arcgismap", "shape", "kml", "gml", "geojson", "dxf", "cog", "group"]
+        },
+        "url": {
+          "title": "Endereço",
+          "description": "Endereço inicial do serviço.",
+          "type": "string"
+        },
+        "crs": {
+          "title": "SRID",
+          "description": "SRID inicial dos dados.",
+          "type": ["string", "integer"]
+        },
+        "items": {
+          "title": "Temas escolhidos",
+          "description": "Temas escolhidos ao abrir. Com type, esta lista tem de existir.",
+          "type": "array"
+        },
+        "dataitems": {
+          "title": "Temas do serviço",
+          "description": "Temas que o serviço oferece.",
+          "type": "array"
+        },
+        "wmsVersion": { "title": "Versão WMS", "description": "Versão inicial do pedido WMS.", "type": "string", "examples": ["1.3.0"] },
+        "wmsTiled": { "title": "WMS em mosaico", "description": "Valor inicial da opção de mosaico dos temas WMS e ArcGIS.", "type": "boolean" },
+        "wmsIgnoreServiceUrl": { "title": "Ignorar o endereço do serviço WMS", "description": "Valor inicial da opção que ignora o endereço que o GetCapabilities indica.", "type": "boolean" },
+        "wmtsVersion": { "title": "Versão WMTS", "description": "Versão inicial do pedido WMTS.", "type": "string", "examples": ["1.0.0"] },
+        "wmtsIgnoreServiceUrl": { "title": "Ignorar o endereço do serviço WMTS", "description": "Valor inicial da opção que ignora o endereço que o GetCapabilities indica.", "type": "boolean" },
+        "get_map_format": { "title": "Formato da imagem", "description": "Formato do GetMap dos temas juntos.", "type": "string", "examples": ["image/png"] },
+        "get_feature_info_format": { "title": "Formato da informação", "description": "Formato do GetFeatureInfo dos temas juntos.", "type": "string", "examples": ["text/plain"] }
+      }
+    },
+    "exclude_types": {
+      "title": "Tipos excluídos",
+      "description": "Tipos de fonte que o assistente não oferece, como gml ou dxf.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "examples": ["wms", "wmts", "wfs", "ogcapi", "arcgismap", "shape", "kml", "gml", "geojson", "dxf", "cog", "group"]
+      }
+    },
+    "upload_maxfilesize": {
+      "title": "Tamanho máximo do ficheiro",
+      "description": "Tamanho máximo de um ficheiro, em KB. Sem valor, usa upload_maxfilesize do visualizador e depois 2048.",
+      "type": "number"
+    },
+    "addThemesTop": {
+      "title": "Juntar no topo",
+      "description": "Com false, os temas juntos ficam no fim da árvore. Sem valor, usa addThemesTop do visualizador e depois true.",
+      "type": "boolean"
+    },
+    "layer_visible": {
+      "title": "Temas ligados",
+      "description": "Com true, os temas juntos ficam ligados.",
+      "type": "boolean",
+      "default": false
+    },
+    "layer_group_opened": {
+      "title": "Grupos abertos",
+      "description": "Com true, os grupos dos temas juntos ficam abertos.",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

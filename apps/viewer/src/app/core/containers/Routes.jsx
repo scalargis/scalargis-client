@@ -30,6 +30,7 @@ const Routes = ({core, pages}) => {
 
             <Route path="/embedded/mapa/:id?" element={<ViewerEmbedded />} />
             <Route path="/embedded/map/:id?" element={<ViewerEmbedded />} />
+            <Route path="/preview/:id" element={<ViewerEmbedded preview />} />
 
             <Route path="/mapa/session/:id?" element={<Viewer />} />
             <Route path="/map/session/:id?" element={<Viewer />} />

@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração das ferramentas de medição",
+  "description": "Sistema de cálculo e formato das medidas de comprimento e de área.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "crs": {
+      "title": "SRID do cálculo",
+      "description": "SRID, entre os de crs_list do visualizador, em que as medidas são calculadas. Sem valor, usa a medida esférica.",
+      "type": "integer"
+    },
+    "length": {
+      "title": "Comprimento",
+      "description": "Formato das medidas de comprimento.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "format": {
+          "title": "Formato",
+          "description": "Formato do valor medido. Sem format, usa km a partir de 1000 m e m abaixo, com 2 casas decimais.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "source_unit": {
+              "title": "Unidade de origem",
+              "description": "Unidade do valor medido, como m. A conversão só corre com source_unit e output_unit.",
+              "type": "string",
+              "examples": ["m"]
+            },
+            "output_unit": {
+              "title": "Unidade de saída",
+              "description": "Unidade do valor mostrado, como km.",
+              "type": "string",
+              "examples": ["km"]
+            },
+            "locale": {
+              "title": "Locale",
+              "description": "Locale da formatação do número, com options.",
+              "type": "string",
+              "default": "en-US"
+            },
+            "options": {
+              "title": "Opções do número",
+              "description": "Opções de toLocaleString, como minimumFractionDigits. Com useGrouping diferente de false, o separador de milhares é um espaço.",
+              "type": "object"
+            },
+            "expression": {
+              "title": "Expressão",
+              "description": "Texto do valor, em que {value} passa a ser o número.",
+              "type": "string",
+              "examples": ["{value} m"]
+            }
+          }
+        }
+      }
+    }
+    ,
+    "area": {
+      "title": "Área",
+      "description": "Formato das medidas de área.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "format": {
+          "title": "Formato",
+          "description": "Formato do valor medido. Sem format, usa km2 acima de 100000 m2 e m2 abaixo.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "source_unit": {
+              "title": "Unidade de origem",
+              "description": "Unidade do valor medido, como m2. A conversão só corre com source_unit e output_unit.",
+              "type": "string",
+              "examples": ["m2"]
+            },
+            "output_unit": {
+              "title": "Unidade de saída",
+              "description": "Unidade do valor mostrado, como hectare.",
+              "type": "string",
+              "examples": ["hectare"]
+            },
+            "locale": {
+              "title": "Locale",
+              "description": "Locale da formatação do número, com options.",
+              "type": "string",
+              "default": "en-US"
+            },
+            "options": {
+              "title": "Opções do número",
+              "description": "Opções de toLocaleString, como minimumFractionDigits. Com useGrouping diferente de false, o separador de milhares é um espaço.",
+              "type": "object"
+            },
+            "expression": {
+              "title": "Expressão",
+              "description": "Texto do valor, em que {value} passa a ser o número.",
+              "type": "string",
+              "examples": ["{value} ha"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

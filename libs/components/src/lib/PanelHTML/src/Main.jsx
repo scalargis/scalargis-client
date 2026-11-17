@@ -7,6 +7,7 @@ import { MainMenuButton } from '../../components';
 
 import PanelHtmlContent from './PanelHmtlContent'
 import './style.css'
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

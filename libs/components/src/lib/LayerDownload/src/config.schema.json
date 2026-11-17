@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da descarga de tema",
+  "description": "Formatos e sistema de coordenadas da descarga de uma camada.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "exclude_export_formats": {
+      "title": "Formatos excluídos",
+      "description": "Formatos que a descarga esconde. exclude_export_formats da camada tem prioridade. Sem valor, usa o do visualizador.",
+      "type": "array",
+      "items": { "type": "string", "enum": ["geojson", "gml", "shape", "kml"] }
+    },
+    "export_crs": {
+      "title": "SRID da exportação",
+      "description": "SRID da descarga. Sem valor, usa export_crs e depois display_crs do visualizador.",
+      "type": "integer"
+    }
+  }
+}

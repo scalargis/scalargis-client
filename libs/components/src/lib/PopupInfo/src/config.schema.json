@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da janela de informação",
+  "description": "Janela que abre com o visualizador, com o seu texto, o tamanho e o cookie que a esconde.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título da janela, em texto ou por idioma (chave default e códigos de idioma).",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "html": {
+      "title": "HTML",
+      "description": "Conteúdo da janela, em texto ou por idioma (chave default e códigos de idioma).",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "closeLabel": {
+      "title": "Texto do botão fechar",
+      "description": "Texto do botão que fecha a janela.",
+      "type": "string",
+      "default": "Fechar"
+    },
+    "modal": {
+      "title": "Modal",
+      "description": "Com false, a janela não cobre o mapa nem prende o foco.",
+      "type": "boolean",
+      "default": true
+    },
+    "dialogWidth": {
+      "title": "Largura",
+      "description": "Largura da janela num ecrã grande, em unidades CSS.",
+      "type": "string",
+      "default": "35vw"
+    },
+    "modileDialogWidth": {
+      "title": "Largura no telemóvel",
+      "description": "Largura da janela num ecrã pequeno, em unidades CSS. A chave tem este nome.",
+      "type": "string",
+      "default": "90%"
+    },
+    "hideOption": {
+      "title": "Opção de esconder",
+      "description": "Com false, a janela mostra o interruptor Não mostrar novamente e respeita o cookie. Outro valor mostra sempre a janela.",
+      "type": "boolean"
+    },
+    "hideAuthenticated": {
+      "title": "Esconder com sessão",
+      "description": "Com true, a janela não abre para um utilizador com sessão.",
+      "type": "boolean",
+      "default": false
+    },
+    "cookieName": {
+      "title": "Nome do cookie",
+      "description": "Cookie que guarda a escolha Não mostrar novamente.",
+      "type": "string"
+    },
+    "maxAge": {
+      "title": "Validade do cookie",
+      "description": "Segundos de validade do cookie quando o utilizador escolhe Não mostrar novamente. Sem valor, um ano.",
+      "type": "integer"
+    },
+    "showLocaleSelector": {
+      "title": "Mostrar o seletor de idioma",
+      "description": "Com true, a janela mostra o seletor de idioma acima do conteúdo.",
+      "type": "boolean",
+      "default": false
+    },
+    "localeSelector": {
+      "title": "Seletor de idioma",
+      "description": "Opções do seletor de idioma da janela. A forma por omissão é dropdown.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "mode": {
+          "title": "Forma",
+          "description": "inline mostra os idiomas lado a lado. dropdown mostra um menu.",
+          "type": "string",
+          "enum": ["inline", "dropdown"],
+          "default": "dropdown"
+        },
+        "show_always": {
+          "title": "Mostrar sempre",
+          "description": "Com true, mostra o seletor mesmo com um só idioma.",
+          "type": "boolean",
+          "default": false
+        },
+        "locales": {
+          "title": "Idiomas",
+          "description": "Idiomas do seletor, como códigos ou como objetos com label e value. Sem valor, usa locales do visualizador.",
+          "type": "array",
+          "items": { "type": ["string", "object"] }
+        }
+      }
+    },
+    "actions": {
+      "title": "Ações",
+      "description": "Mensagens que a janela publica.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "hide": {
+          "title": "Ao fechar",
+          "description": "Mensagem publicada quando a janela fecha ou não abre, como UserLogin/Show.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

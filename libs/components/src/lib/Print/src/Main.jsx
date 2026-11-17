@@ -9,6 +9,7 @@ import { i18n, MainMenuButton, MapToolButton } from '../../components';
 
 import { MAPCONTROL_NAME } from './utils';
 import './style.css'
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

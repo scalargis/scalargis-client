@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do conteúdo HTML",
+  "description": "HTML que o componente mostra, escrito aqui ou obtido de um endereço.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "html": {
+      "title": "HTML",
+      "description": "HTML a mostrar. Um bloco style dentro dele aplica-se à página inteira. Também é o conteúdo quando o pedido de url falha.",
+      "type": "string"
+    },
+    "url": {
+      "title": "Endereço",
+      "description": "Página a obter em vez de html.",
+      "type": "string"
+    },
+    "classname": {
+      "title": "Classe CSS",
+      "description": "Classe do div que envolve o HTML.",
+      "type": "string"
+    }
+  }
+}

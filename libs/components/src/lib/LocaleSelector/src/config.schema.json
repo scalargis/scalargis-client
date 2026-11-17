@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do seletor de idioma",
+  "description": "Idiomas e forma do seletor de idioma.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "mode": {
+      "title": "Forma",
+      "description": "inline mostra os idiomas lado a lado. dropdown mostra um menu. Sem valor, usa inline até 3 idiomas e dropdown acima.",
+      "type": "string",
+      "enum": ["inline", "dropdown"]
+    },
+    "show_always": {
+      "title": "Mostrar sempre",
+      "description": "Com true, mostra o seletor mesmo com um só idioma.",
+      "type": "boolean",
+      "default": false
+    },
+    "locales": {
+      "title": "Idiomas",
+      "description": "Idiomas do seletor, como códigos ou como objetos com label e value. Sem valor, usa locales do visualizador.",
+      "type": "array",
+      "items": {
+        "type": ["string", "object"],
+        "properties": {
+          "label": { "title": "Etiqueta", "description": "Texto do idioma no seletor.", "type": "string" },
+          "value": { "title": "Código", "description": "Código do idioma.", "type": "string" }
+        }
+      }
+    }
+  }
+}

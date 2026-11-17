@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração dos parâmetros do URL",
+  "description": "O componente lê urlparams, extent, extent_srid e layers do URL da página e não lê chaves próprias.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {}
+}

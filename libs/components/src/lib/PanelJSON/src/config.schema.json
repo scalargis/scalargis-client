@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do painel JSON",
+  "description": "Elementos que o painel ou a janela desenha a partir de uma lista JSON, escrita aqui ou obtida de um endereço.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel ou da janela. Sem valor, usa o título do componente.",
+      "type": ["string", "null"]
+    },
+    "url": {
+      "title": "Endereço",
+      "description": "URL que devolve a lista de elementos em JSON. Tem prioridade sobre data. O pedido leva a chave do utilizador com sessão.",
+      "type": "string"
+    },
+    "data": {
+      "title": "Elementos",
+      "description": "Lista de elementos a desenhar quando não há url.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "component": {
+            "title": "Elemento",
+            "description": "Nome de um elemento HTML, como ul ou a, ou tree e button.",
+            "type": "string"
+          },
+          "props": {
+            "title": "Propriedades",
+            "description": "Atributos do elemento.",
+            "type": "object"
+          },
+          "className": {
+            "title": "Classe CSS",
+            "description": "Classe do elemento.",
+            "type": "string"
+          },
+          "style": {
+            "title": "Estilo",
+            "description": "Estilo do elemento, em propriedades CSS.",
+            "type": "object"
+          },
+          "children": {
+            "title": "Conteúdo",
+            "description": "Texto do elemento ou lista de elementos filhos com a mesma forma.",
+            "type": ["string", "array"]
+          }
+        }
+      }
+    },
+    "closeLabel": {
+      "title": "Texto do botão fechar",
+      "description": "Texto do botão que fecha a janela, quando o componente abre como popup.",
+      "type": "string",
+      "default": "Fechar"
+    },
+    "btn_icon": {
+      "title": "Ícone do botão",
+      "description": "Classe do ícone do botão do menu, como pi pi-info-circle.",
+      "type": "string"
+    },
+    "btn_image": {
+      "title": "Imagem do botão",
+      "description": "URL de uma imagem de fundo do botão do menu. Tem prioridade sobre btn_icon.",
+      "type": "string"
+    }
+  }
+}

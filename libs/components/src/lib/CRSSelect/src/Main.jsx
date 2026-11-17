@@ -8,6 +8,7 @@ import { createStringXY } from 'ol/coordinate';
 import { i18n } from '../../components';
 
 import './index.css';
+export { default as configSchema } from './config.schema.json';
 
 
 function parseExtent(extent) {

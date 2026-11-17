@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do Street View",
+  "description": "Abertura do Google Street View, marcador no mapa e seguimento da posição.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel. Sem valor, usa o título do componente.",
+      "type": "string"
+    },
+    "openNewWindow": {
+      "title": "Abrir noutro separador",
+      "description": "Com true, abre o Street View num novo separador do browser.",
+      "type": "boolean",
+      "default": false
+    },
+    "tracking": {
+      "title": "Seguimento",
+      "description": "extent move o mapa só quando a posição sai da vista. always move o mapa a cada mudança. Sem valor, o mapa não se move.",
+      "type": "string",
+      "enum": ["extent", "always"]
+    },
+    "style": {
+      "title": "Estilo do marcador",
+      "description": "Estilo OpenLayers do marcador da posição.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "fill": {
+          "title": "Preenchimento",
+          "description": "Opções de preenchimento, como color.",
+          "type": "object"
+        },
+        "stroke": {
+          "title": "Contorno",
+          "description": "Opções de contorno, como color e width.",
+          "type": "object"
+        },
+        "image": {
+          "title": "Imagem",
+          "description": "Um ícone em icon (src relativo ao cliente, imgSize, scale, color) ou um círculo (radius, fill, stroke).",
+          "type": "object"
+        }
+      }
+    }
+  }
+}

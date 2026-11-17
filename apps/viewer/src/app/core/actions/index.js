@@ -662,8 +662,56 @@ export function viewer_release_exclusive_mapcontrol(exclusive_mapcontrol) {
 
 let viewerLoadSeq = 0;
 
-/** Loads a viewer config and its components. Only the latest call writes to the store. */
-export function viewer_load(core, id, history) {
+/** Puts a viewer record in the store and loads its components while isCurrent holds. */
+function applyViewerConfig(dispatch, core, config, isCurrent) {
+  dispatch(viewer_unload_components(core));
+
+  config['checked'] = config.config_json.checked ? config.config_json.checked : [];
+  config['removed'] = [];
+  config['featureinfo'] = [];
+  config['geolocation'] = null;
+  config['coordinates'] = [];
+  config['default_mapcontrol'] = (config.config_json.map_controls || []).find(c => c.exclusive && c.active)?.id || null;
+  config['exclusive_mapcontrol'] = config['default_mapcontrol'];
+  core.setConfig(config);
+
+  if (config?.config_json?.show_menu === false || !config?.config_json?.selected_menu) {
+    config['staticMenuInactive'] = true;
+  }
+
+  dispatch(viewer_set_config(config));
+
+  loadTranslations(config.id, (data, error, ns) => {
+    if (isCurrent()) dispatch(viewer_set_translation_namespaces(ns));
+  });
+
+  const { components } = config.config_json;
+  Promise.allSettled(components.map(component => core.addComponent(core, component, null, isCurrent))).then(() => {
+    if (!isCurrent()) return;
+    const pitems = {};
+    components.forEach(c => pitems[c.id] = c);
+    dispatch(viewer_load_components(pitems));
+    window.requestAnimationFrame(() => isCurrent() && dispatch(viewer_load_done()));
+  });
+}
+
+/** Applies a viewer record with another config_json as a load does. Nothing is saved. */
+export function viewer_preview_config(core, record, config_json) {
+  return function (dispatch) {
+    const seq = ++viewerLoadSeq;
+    const isCurrent = () => seq === viewerLoadSeq;
+    const config = structuredClone({ ...record, config_json });
+    if (!Array.isArray(config.config_json.components)) config.config_json.components = [];
+    try {
+      applyViewerConfig(dispatch, core, config, isCurrent);
+    } catch (error) {
+      console.error('Error applying preview config:', error);
+    }
+  }
+}
+
+/** Loads a viewer config and its components. Only the latest call writes to the store. onRecord gets a copy of the record as the server sent it. */
+export function viewer_load(core, id, history, onRecord) {
   return function (dispatch, getState) {
 
     const seq = ++viewerLoadSeq;
@@ -703,43 +751,9 @@ export function viewer_load(core, id, history) {
 
       if (logged?.token && fromApi && !config.user_info) dispatch(session_clear());
 
-      // Unload components
-      dispatch(viewer_unload_components(core));
+      if (onRecord) onRecord(structuredClone(config));
 
-      // Setup config
-      config['checked'] = config.config_json.checked ? config.config_json.checked : [];
-      config['removed'] = [];
-      config['featureinfo'] = [];
-      config['geolocation'] = null;
-      config['coordinates'] = [];
-      config['default_mapcontrol'] = (config.config_json.map_controls || []).find(c => c.exclusive && c.active)?.id || null;
-      config['exclusive_mapcontrol'] = config['default_mapcontrol'];
-      core.setConfig(config);
-
-      if (config?.config_json?.show_menu === false || !config?.config_json?.selected_menu) {
-        config['staticMenuInactive'] = true;
-      }
-
-      dispatch(viewer_set_config(config));
-
-      // Load viewer custom translations
-      loadTranslations(config.id, (data, error, ns) => {
-        if (isCurrent()) dispatch(viewer_set_translation_namespaces(ns));
-      });
-
-      // Load components
-      const { components } = config.config_json;
-      Promise.allSettled(components.map(component => core.addComponent(core, component, null, isCurrent))).then(() => {
-        if (!isCurrent()) return;
-
-        // Index by id
-        const pitems = {};
-        components.forEach(c => pitems[c.id] = c);
-
-        // Finally, load into redux store
-        dispatch(viewer_load_components(pitems));
-        window.requestAnimationFrame(() => isCurrent() && dispatch(viewer_load_done()));
-      });
+      applyViewerConfig(dispatch, core, config, isCurrent);
     }, error => {
       if (!isCurrent()) return;
 

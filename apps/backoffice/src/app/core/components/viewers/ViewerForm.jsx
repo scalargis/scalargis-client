@@ -1,9 +1,11 @@
-import React, { useContext, useState, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useState, useEffect, useMemo, useRef } from 'react';
 import { connect } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActionIcon,
   Alert,
+  Anchor,
+  Badge,
   Box,
   Button,
   Checkbox,
@@ -18,9 +20,11 @@ import {
   Switch,
   Tabs,
   TagsInput,
+  Text,
   TextInput,
 } from '@mantine/core';
-import { CodeEditor, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory } from '@scalargis/ui';
+import { findUnknownKeys, validateViewerConfig, describeViewerConfigFault } from '@scalargis/components';
+import { CodeEditor, jsonPointerRange, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory, IconFileEdit } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
@@ -31,6 +35,7 @@ import { isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 import PageSection from '../common/PageSection';
+import ViewerFormView from './ViewerFormView';
 
 // Inactive tabs stay mounted (so editor state and history survive a tab
 // switch) but are hidden off-flow. We deliberately do NOT use display:none:
@@ -50,6 +55,39 @@ const HIDDEN = {
   visibility: 'hidden',
   pointerEvents: 'none',
 };
+
+/** Returns the schema diagnostics of the viewer config text, or none when the text is not valid JSON. */
+function viewerConfigDiagnostics(view) {
+  let config;
+  try {
+    config = JSON.parse(view.state.doc.toString());
+  } catch (e) {
+    return [];
+  }
+  const out = [];
+  const seen = new Set();
+  for (const fault of validateViewerConfig(config).faults) {
+    const range = jsonPointerRange(view.state, fault.pointer) || { from: 0, to: Math.min(1, view.state.doc.length) };
+    const message = describeViewerConfigFault(fault);
+    const key = `${range.from}:${message}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ from: range.from, to: range.to, severity: 'warning', source: 'Esquema', message });
+  }
+  for (const unknown of findUnknownKeys(config)) {
+    const range = jsonPointerRange(view.state, unknown.pointer, { key: true });
+    if (range) out.push({ from: range.from, to: range.to, severity: 'info', source: 'Esquema', message: `Chave "${unknown.key}" fora do esquema.` });
+  }
+  return out.sort((a, b) => a.from - b.from);
+}
+
+/** Returns the text of the schema count above the config editor. */
+function schemaCountText({ warnings, infos }) {
+  const parts = [];
+  if (warnings) parts.push(warnings === 1 ? '1 aviso de esquema' : `${warnings} avisos de esquema`);
+  if (infos) parts.push(infos === 1 ? '1 chave desconhecida' : `${infos} chaves desconhecidas`);
+  return parts.join(' · ');
+}
 
 const VIEWER_FORM_KEYS = ['name', 'title', 'description', 'slug', 'keywords', 'is_active', 'show_help', 'show_credits',
   'show_contact', 'on_homepage', 'img_icon', 'img_logo', 'img_logo_alt'];
@@ -92,6 +130,7 @@ const tabItems = [
   { value: 'base', label: 'Dados Base', icon: IconHome },
   { value: 'ui', label: 'UI', icon: IconHome },
   { value: 'config', label: 'Configuração', icon: IconCog },
+  { value: 'form', label: 'Formulário', icon: IconFileEdit, badge: 'Beta' },
   { value: 'prints', label: 'Plantas', icon: IconPrint }
 ];
 
@@ -136,6 +175,16 @@ function ViewerForm(props) {
 
   const customStyleEditor = useRef(null);
   const jsonConfigEditor = useRef(null);
+  const [schemaLint, setSchemaLint] = useState({ warnings: 0, infos: 0, first: null });
+
+  const configLint = useCallback((view) => {
+    const diagnostics = viewerConfigDiagnostics(view);
+    const warnings = diagnostics.filter(d => d.severity === 'warning');
+    const infos = diagnostics.length - warnings.length;
+    const first = (warnings[0] || diagnostics[0])?.from ?? null;
+    setSchemaLint({ warnings: warnings.length, infos, first });
+    return diagnostics;
+  }, []);
 
   const { core } = useContext(AppContext);
 
@@ -394,7 +443,8 @@ function ViewerForm(props) {
       <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
           {(data.id ? [...tabItems, HISTORY_TAB] : tabItems).map((item) => (
-            <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}>
+            <Tabs.Tab key={item.value} value={item.value} leftSection={<item.icon fixedWidth />}
+              rightSection={item.badge ? <Badge size="xs" variant="light">{item.badge}</Badge> : null}>
               {item.label}
             </Tabs.Tab>
           ))}
@@ -638,36 +688,61 @@ function ViewerForm(props) {
           </PageSection>
 
         <PageSection style={activeTab === 'config' ? undefined : HIDDEN}>
-            <Group justify="flex-end" gap="xs" wrap="nowrap" mb={4}>
-              <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
-                onClick={e => {
-                  e.preventDefault();
-                  jsonConfigEditor.current?.undo();
-                }}>
-                <IconUndo />
-              </ActionIcon>
-              <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
-                onClick={e => {
-                  e.preventDefault();
-                  jsonConfigEditor.current?.redo();
-                }}>
-                <IconRefresh />
-              </ActionIcon>
-              <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
-                onClick={e => {
-                  e.preventDefault();
-                  jsonConfigEditor.current?.openSearch();
-                }}>
-                <IconSearch />
-              </ActionIcon>
+            <Group justify="space-between" gap="xs" wrap="nowrap" mb={4}>
+              <Group gap="xs" wrap="nowrap">
+                {(schemaLint.warnings > 0 || schemaLint.infos > 0) && <>
+                  <Text size="sm" c={schemaLint.warnings ? 'warning' : 'dimmed'} data-testid="schema-lint-count">
+                    {schemaCountText(schemaLint)}
+                  </Text>
+                  <Anchor component="button" type="button" size="sm" data-testid="schema-lint-first"
+                    onClick={() => {
+                      if (schemaLint.first !== null) jsonConfigEditor.current?.goTo(schemaLint.first);
+                    }}>
+                    Ir para o primeiro
+                  </Anchor>
+                </>}
+              </Group>
+              <Group gap="xs" wrap="nowrap">
+                <ActionIcon type="button" size="input-md" aria-label="Undo" title="Undo"
+                  onClick={e => {
+                    e.preventDefault();
+                    jsonConfigEditor.current?.undo();
+                  }}>
+                  <IconUndo />
+                </ActionIcon>
+                <ActionIcon type="button" size="input-md" aria-label="Redo" title="Redo"
+                  onClick={e => {
+                    e.preventDefault();
+                    jsonConfigEditor.current?.redo();
+                  }}>
+                  <IconRefresh />
+                </ActionIcon>
+                <ActionIcon type="button" size="input-md" color="warning" aria-label="Pesquisar texto" title="Pesquisar texto"
+                  onClick={e => {
+                    e.preventDefault();
+                    jsonConfigEditor.current?.openSearch();
+                  }}>
+                  <IconSearch />
+                </ActionIcon>
+              </Group>
             </Group>
             <CodeEditor
               ref={jsonConfigEditor}
               language="json"
               value={configJson}
               onChange={setConfigJson}
+              lint={configLint}
               height="calc(100vh - 300px)"
               aria-label="Config JSON"
+            />
+          </PageSection>
+
+        <PageSection style={activeTab === 'form' ? undefined : HIDDEN}>
+            <ViewerFormView
+              configText={configJson}
+              onConfigTextChange={setConfigJson}
+              viewerId={data.id}
+              active={activeTab === 'form'}
             />
           </PageSection>
 

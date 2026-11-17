@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do botão de ajuda",
+  "description": "Endereço, conteúdo e textos da ajuda do visualizador.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título da janela ou do painel, em texto ou por idioma. Sem valor, usa o título do componente.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "url": {
+      "title": "Endereço",
+      "description": "URL da ajuda. Aceita {lang} e {language}, que passam a ser o idioma ativo. Sem valor, usa default_url e depois help_url do visualizador.",
+      "type": "string"
+    },
+    "default_url": {
+      "title": "Endereço por omissão",
+      "description": "URL da ajuda quando o idioma não dá nenhum.",
+      "type": "string"
+    },
+    "closeLabel": {
+      "title": "Texto do botão fechar",
+      "description": "Texto do botão que fecha a janela, em texto ou por idioma.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" },
+      "default": "Fechar"
+    },
+    "iframe": {
+      "title": "Mostrar num iframe",
+      "description": "Com true e como popup, mostra o URL num iframe em vez do HTML obtido.",
+      "type": "boolean",
+      "default": false
+    },
+    "elementType": {
+      "title": "Tipo de elemento",
+      "description": "Com link, o controlo externo da barra de topo é uma ligação simples. Outro valor mantém o botão com ícone e texto.",
+      "type": "string",
+      "examples": ["link"]
+    },
+    "html": {
+      "title": "HTML",
+      "description": "HTML da ajuda quando não há url ou quando o pedido falha, em texto ou por idioma.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

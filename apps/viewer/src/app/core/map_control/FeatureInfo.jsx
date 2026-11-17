@@ -361,7 +361,7 @@ export default function FeatureInfo({ core, config, actions }) {
       // Get features using any other strategy
       } else {
         const done = track();
-        utils.parseFeatureInfo(mainMap, l, viewResolution, coordinate, mapCRS, (result) => {
+        utils.parseFeatureInfo(mainMap, l, viewResolution, coordinate, mapCRS, (result, kind) => {
           const format = l.getProperties().get_feature_info_format || 'application/json';
           if (!result) acc.push({ id: uuidV4(), type: 'error', format });
           if (typeof result === 'object') {
@@ -373,7 +373,7 @@ export default function FeatureInfo({ core, config, actions }) {
               acc.push(displayFeature(result, l));
             }          
           } else {
-           acc.push({id: uuidV4(), type: 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
+           acc.push({id: uuidV4(), type: kind === 'html' ? 'html' : 'text', data: result, layer: l ? l.get('title') : '', "layerId": l ? l.get('id') : null});
           }
           done();
         });
@@ -921,6 +921,7 @@ class FeatureInfoUtils  {
   }
   
   async parseFeatureInfo (map, l, viewResolution, coordinate, crs, cb) {
+    let kind = 'text';
     const callFormat = (format) => {
       return new Promise((resolve, reject) => {
         let requestBuilder = this.buildFeatureInfoWMSUrl;
@@ -939,6 +940,7 @@ class FeatureInfoUtils  {
           this.getFeatureInfoJSON(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         }
         else if (/html/ig.test(format)) {
+          kind = 'html';
           this.getFeatureInfoHtml(map, l, viewResolution, coordinate, crs, format, requestBuilder, resolve, reject);
         }
         else if (/plain/ig.test(format)) {
@@ -953,7 +955,7 @@ class FeatureInfoUtils  {
     const format = layerProps.get_feature_info_format || 'application/json';
     callFormat(format)
     .then(result => {
-      cb(result);
+      cb(result, kind);
     })
     .catch(err => {
       cb(false);

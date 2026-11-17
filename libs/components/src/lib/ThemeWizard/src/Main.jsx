@@ -11,6 +11,7 @@ import WizardStepType from './wizard/stepType';
 import WizardStepData from './wizard/stepData';
 import WizardStepConfirm from './wizard/stepConfirm';
 import componentMessages from './messages';
+export { default as configSchema } from './config.schema.json';
 
 
 const items = [

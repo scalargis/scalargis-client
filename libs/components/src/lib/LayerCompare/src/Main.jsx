@@ -10,6 +10,7 @@ import useLayerSwipe from './useLayerSwipe';
 
 import './style.css';
 import './control.css';
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

@@ -12,6 +12,7 @@ import parse from 'html-react-parser';
 
 import './style.css'
 import useOutsideClick from './useOutsideClick';
+export { default as configSchema } from './config.schema.json';
 
 
 const featureStyle = new Style({

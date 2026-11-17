@@ -10,6 +10,7 @@ import componentReducers from './reducers';
 import SearchLayers from './SearchLayers';
 import { createLayer } from './map';
 import './style.scss';
+export { default as configSchema } from './config.schema.json';
 
 
 /**

@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração do seletor de sistema de coordenadas",
+  "description": "Opções do seletor do sistema de coordenadas de visualização e das coordenadas do rato.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "crs_list": {
+      "title": "Sistemas de coordenadas",
+      "description": "SRID que o seletor oferece, entre os de crs_list do visualizador. Sem valor, oferece todos.",
+      "type": "array",
+      "items": { "type": "integer" }
+    },
+    "auto_crs_change": {
+      "title": "Mudança automática",
+      "description": "Com false, mantém o sistema de visualização quando o centro do mapa sai da sua extensão.",
+      "type": "boolean",
+      "default": true
+    },
+    "valid_extent": {
+      "title": "Validar a extensão",
+      "description": "Com true, uma coordenada fora da extensão do sistema mostra invalid_extent_message.",
+      "type": "boolean",
+      "default": false
+    },
+    "invalid_extent_message": {
+      "title": "Mensagem fora da extensão",
+      "description": "Texto de uma coordenada fora da extensão, em texto ou por idioma.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

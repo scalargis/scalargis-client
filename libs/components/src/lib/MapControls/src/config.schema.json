@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração dos controlos do mapa",
+  "description": "Os controlos do mapa leem map_controls, exclude_map_controls e full_extent do visualizador e não leem chaves próprias.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {}
+}

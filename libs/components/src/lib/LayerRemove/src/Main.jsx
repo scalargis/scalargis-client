@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation} from "react-i18next";
 import { ActionIcon } from '@mantine/core';
 import { confirm, IconXCircle } from '@scalargis/ui';
+export { default as configSchema } from './config.schema.json';
 
 export default function Main(props) {
 

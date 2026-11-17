@@ -3,6 +3,7 @@ import { useTranslation} from "react-i18next";
 import { CollapsiblePanel, IconImage } from '@scalargis/ui';
 import { MainMenuButton } from '../../components';
 import Basemaps from './Basemaps'
+export { default as configSchema } from './config.schema.json';
 
 /**
  * Main menu component

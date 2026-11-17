@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+export { default as configSchema } from './MainMenuHtmlContent.config.schema.json';
 
 export function MainMenu({ region, as, config, actions, record }) {
   const component_cfg = record.config_json || {};

@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuração da impressão",
+  "description": "Textos, escala inicial, pré-visualização e ferramentas de desenho do painel de impressão.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "header": {
+      "title": "Cabeçalho",
+      "description": "Título do painel ou da janela, em texto ou por idioma. Sem valor, usa o título do componente.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
+    },
+    "closeLabel": {
+      "title": "Texto do botão fechar",
+      "description": "Texto do botão que fecha a janela, quando o componente abre como popup.",
+      "type": "string",
+      "default": "Fechar"
+    },
+    "defaultScaleSelector": {
+      "title": "Escala inicial",
+      "description": "Separador de escala escolhido ao abrir, entre os que a impressão permite. predefined usa as escalas fixas, freescale uma escala livre e map a escala do mapa.",
+      "type": "string",
+      "enum": ["predefined", "freescale", "map"]
+    },
+    "showPreview": {
+      "title": "Pré-visualização",
+      "description": "Com true, mostra a opção que desenha a área da folha no mapa.",
+      "type": "boolean",
+      "default": false
+    },
+    "drawingOptions": {
+      "title": "Opções de desenho",
+      "description": "Ferramentas de desenho da geometria da impressão.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "tools": {
+          "title": "Ferramentas",
+          "description": "Ferramentas a mostrar, sem distinção de maiúsculas. Sem valor, mostra Point, LineString, Polygon, Select e Modify.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "examples": ["Point", "LineString", "Polygon", "Copy", "Select", "Modify"]
+          }
+        }
+      }
+    }
+  }
+}

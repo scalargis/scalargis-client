@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import OlScaleLine from 'ol/control/ScaleLine';
 import './style.css'
+export { default as configSchema } from './config.schema.json';
 
 export default function Main({ config, actions }) {
   const { mainMap } = config;
