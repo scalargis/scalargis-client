@@ -76,7 +76,9 @@ import {
   viewerConfigSchema,
   coreComponentSchemas,
   getViewerConfigSchema,
-  validateViewerConfig
+  validateViewerConfig,
+  findUnknownKeys,
+  describeViewerConfigFault
 } from './ViewerConfig'
 
 import * as i18n from './utils/i18n';
@@ -165,6 +167,8 @@ export {
   coreComponentSchemas,
   getViewerConfigSchema,
   validateViewerConfig,
+  findUnknownKeys,
+  describeViewerConfigFault,
 
   i18n,
   utils,

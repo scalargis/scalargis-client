@@ -41,8 +41,10 @@ import {
   foldGutter,
 } from '@codemirror/language';
 import { autocompletion } from '@codemirror/autocomplete';
+import { linter, lintGutter, type Diagnostic } from '@codemirror/lint';
 import { keymap, lineNumbers, type EditorView } from '@codemirror/view';
 import {
+  EditorSelection,
   EditorState,
   StateEffect,
   type Extension,
@@ -50,6 +52,9 @@ import {
 } from '@codemirror/state';
 
 export type CodeEditorLanguage = 'json' | 'css';
+
+/** A lint source: returns the diagnostics of the current text. */
+export type CodeEditorLint = (view: EditorView) => Diagnostic[] | Promise<Diagnostic[]>;
 
 /**
  * Search-scroll fix. Two problems with CodeMirror's default search scrolling in
@@ -100,6 +105,8 @@ export interface CodeEditorHandle {
   closeSearch(): void;
   /** Force an immediate re-measure (e.g. right after a tab reveals the editor). */
   requestMeasure(): void;
+  /** Moves the cursor to a text position, focuses the editor, and scrolls the editor to it. */
+  goTo(pos: number): void;
 }
 
 export interface CodeEditorProps {
@@ -112,6 +119,8 @@ export interface CodeEditorProps {
   maxHeight?: string;
   minHeight?: string;
   readOnly?: boolean;
+  /** Marks the text with the diagnostics of this source, 500 ms after the last change. */
+  lint?: CodeEditorLint;
   /** Accessible name for the editing surface. */
   'aria-label'?: string;
 }
@@ -124,7 +133,8 @@ const languageExtension: Record<CodeEditorLanguage, () => Extension> = { json, c
  * a two-space tab, and the default/history/search key bindings (so Ctrl+F,
  * Ctrl+Z etc. work). Rebuilt only when the language changes.
  */
-function buildExtensions(language: CodeEditorLanguage): Extension[] {
+function buildExtensions(language: CodeEditorLanguage, lint?: CodeEditorLint): Extension[] {
+  const lintExtensions = lint ? [linter(lint, { delay: 500 }), lintGutter()] : [];
   return [
     languageExtension[language](),
     lineNumbers(),
@@ -136,17 +146,18 @@ function buildExtensions(language: CodeEditorLanguage): Extension[] {
     autocompletion(),
     EditorState.tabSize.of(2),
     keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
+    ...lintExtensions,
   ];
 }
 
 export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(
   function CodeEditor(
-    { value, onChange, language, height, maxHeight, minHeight, readOnly, ...rest },
+    { value, onChange, language, height, maxHeight, minHeight, readOnly, lint, ...rest },
     ref
   ) {
     const cmRef = useRef<ReactCodeMirrorRef>(null);
 
-    const extensions = useMemo(() => buildExtensions(language), [language]);
+    const extensions = useMemo(() => buildExtensions(language, lint), [language, lint]);
 
     useImperativeHandle(
       ref,
@@ -172,6 +183,14 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(
         },
         requestMeasure() {
           cmRef.current?.view?.requestMeasure();
+        },
+        goTo(pos: number) {
+          const view = cmRef.current?.view;
+          if (!view) return;
+          const anchor = Math.max(0, Math.min(pos, view.state.doc.length));
+          const range = EditorSelection.cursor(anchor);
+          view.dispatch({ selection: EditorSelection.create([range]), effects: deferredScrollToMatch(range, view) });
+          view.focus();
         },
       }),
       []
