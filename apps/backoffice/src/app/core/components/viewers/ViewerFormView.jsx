@@ -188,7 +188,7 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
         </Accordion>
       </Grid.Col>
       <Grid.Col span={{ base: 12, lg: 7 }}>
-        <Paper withBorder style={{ overflow: 'hidden' }}>
+        <Paper withBorder style={{ overflow: 'hidden', position: 'sticky', top: 64 }}>
           <Group justify="space-between" px="sm" py={6}>
             <Text size="sm" fw={500}>Pré-visualização</Text>
             <Group gap="xs" wrap="nowrap">
@@ -208,7 +208,7 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
               src={previewUrl}
               title="Pré-visualização do visualizador"
               data-testid="form-view-preview"
-              style={{ display: 'block', width: '100%', height: 'max(420px, calc(100vh - 320px))', border: 0 }}
+              style={{ display: 'block', width: '100%', height: 'max(420px, calc(100vh - 140px))', border: 0 }}
             /> :
             <Text size="sm" c="dimmed" p="sm">
               {viewerId ? 'A pré-visualização abre com este separador.' : 'Grave o visualizador para ver a pré-visualização.'}

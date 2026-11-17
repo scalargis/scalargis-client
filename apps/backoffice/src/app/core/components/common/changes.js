@@ -33,6 +33,28 @@ function sameValue(a, b) {
   return false;
 }
 
+/** True when each item is an object with a string id that no other item has. */
+function hasUniqueIds(list) {
+  if (!list.length || !list.every((item) => isPlainObject(item) && typeof item.id === 'string' && item.id)) return false;
+  return new Set(list.map((item) => item.id)).size === list.length;
+}
+
+/** Compares two lists of objects by id: one change for each added, removed, or edited item, and one for a new order. */
+function walkById(left, right, path, out) {
+  const byLeft = new Map(left.map((item) => [item.id, item]));
+  const byRight = new Map(right.map((item) => [item.id, item]));
+  left.forEach((item) => {
+    if (byRight.has(item.id)) walk(item, byRight.get(item.id), `${path}[${item.id}]`, out);
+    else out.push({ path: `${path}[${item.id}]`, before: item, after: undefined });
+  });
+  right.forEach((item) => {
+    if (!byLeft.has(item.id)) out.push({ path: `${path}[${item.id}]`, before: undefined, after: item });
+  });
+  const leftOrder = left.filter((item) => byRight.has(item.id)).map((item) => item.id);
+  const rightOrder = right.filter((item) => byLeft.has(item.id)).map((item) => item.id);
+  if (JSON.stringify(leftOrder) !== JSON.stringify(rightOrder)) out.push({ path: `${path} (ordem)`, before: leftOrder, after: rightOrder });
+}
+
 function walk(a, b, path, out) {
   const left = parseJsonText(a);
   const right = parseJsonText(b);
@@ -44,6 +66,10 @@ function walk(a, b, path, out) {
   if (Array.isArray(left) && Array.isArray(right)) {
     if (left.every(isPrimitive) && right.every(isPrimitive)) {
       if (JSON.stringify(left) !== JSON.stringify(right)) out.push({ path, before: left, after: right });
+      return;
+    }
+    if (hasUniqueIds(left) && hasUniqueIds(right)) {
+      walkById(left, right, path, out);
       return;
     }
     const length = Math.max(left.length, right.length);
