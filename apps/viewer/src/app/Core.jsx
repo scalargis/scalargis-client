@@ -404,7 +404,7 @@ Core.prototype.renderComponents = function({ region, as = '', mobileMenu = [], p
   let { components } = this.config.config_json;
 
   // Filter by parent
-  if (parent) components = components.filter(c => parent.children.includes(c.id));
+  if (parent) components = components.filter(c => (parent.children || []).includes(c.id));
 
   // Filter by region
   const regionComponents = components.filter(c => c.target === region && !mobileMenu.includes(c.id));
@@ -453,7 +453,7 @@ Core.prototype.renderComponentsMenu = function({ region, as = '', mobileMenu = [
   let { components } = this.config.config_json;
   
   // Filter by parent
-  if (parent) components = components.filter(c => parent.children.includes(c.id));
+  if (parent) components = components.filter(c => (parent.children || []).includes(c.id));
 
   // Filter by region
   const regionComponents = components.filter(c => c.target === region);
@@ -509,7 +509,7 @@ Core.prototype.renderComponentsLinks = function({ region, as = '', props, parent
   let { components } = this.config.config_json;
   
   // Filter by parent
-  if (parent) components = components.filter(c => parent.children.includes(c.id));
+  if (parent) components = components.filter(c => (parent.children || []).includes(c.id));
 
   // Filter by region
   const regionComponents = components.filter(c => c.links === region);

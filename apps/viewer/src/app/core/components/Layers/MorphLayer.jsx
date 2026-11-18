@@ -17,6 +17,8 @@ import OGCMap from "./OGCMap";
 
 import GroupLayer from './GroupLayer';
 
+const URL_TYPES = ['WMS', 'WMTS', 'ArcGISMap'];
+
 export function dumpLayers(collection, only) {
   collection.forEach(l => {
     //console.log(l.get('id'), l.get('type'), l.get('title'), l.getVisible());
@@ -27,6 +29,7 @@ export function dumpLayers(collection, only) {
 const MorphLayer = React.memo(({ layers, config, group, checked, viewer }) => {
 
   if (!config) return null;
+  if (URL_TYPES.includes(config.type) && !config.url) return null;
 
   // Create component layer
   let LayerComponent;
