@@ -30,7 +30,7 @@ export const MantineToggle = memo(function MantineToggle(props: MantineCellProps
       label={withAsterisk ? <>{label} *</> : label}
       description={description}
       error={error}
-      checked={!!data}
+      checked={data === undefined ? props.schema?.default === true : !!data}
       onChange={(ev) => handleChange(path, ev.currentTarget.checked)}
       disabled={!enabled}
       autoFocus={!!appliedUiSchemaOptions.focus}

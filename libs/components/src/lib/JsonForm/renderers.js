@@ -19,7 +19,9 @@ import {
   TextDisplay,
   textDisplayTester,
   HtmlDisplay,
-  htmlDisplayTester
+  htmlDisplayTester,
+  FixedNumberListControl,
+  fixedNumberListControlTester
 } from './controls';
 
 // The Mantine renderer set already registers the group/vertical/horizontal/
@@ -33,6 +35,7 @@ export const defaultRenderers = [
   { tester: fileControlTester, renderer: FileControl },
   { tester: textDisplayTester, renderer: TextDisplay},
   { tester: htmlDisplayTester, renderer: HtmlDisplay},
+  { tester: fixedNumberListControlTester, renderer: FixedNumberListControl },
   { tester: arrayPhotoControlTester, renderer: ArrayPhotoControlRenderer },
   { tester: arrayFileControlTester, renderer: ArrayFileControlRenderer }
 ];

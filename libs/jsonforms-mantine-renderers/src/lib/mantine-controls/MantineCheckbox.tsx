@@ -36,7 +36,7 @@ export const MantineCheckbox = memo(function MantineCheckbox(
       label={withAsterisk ? <>{label} *</> : label}
       description={description}
       error={error}
-      checked={!!data}
+      checked={data === undefined ? props.schema?.default === true : !!data}
       onChange={(ev) => handleChange(path, ev.currentTarget.checked)}
       disabled={!enabled}
       autoFocus={!!appliedUiSchemaOptions.focus}
