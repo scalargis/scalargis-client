@@ -435,7 +435,7 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
       if (layer.Style) {
         if (typeof layer.Style === 'object' && layer.Style.length) {
           layer.Style.map(style => {
-            wms_styles.push(style.Name);
+            if (style.Name && !wms_styles.includes(style.Name)) wms_styles.push(style.Name);
             if (!legend_url && typeof style.LegendURL === 'object' && style.LegendURL.length) {
               legend_url = removeAuthToken(style.LegendURL[0].OnlineResource, options.authToken);
             }
@@ -620,11 +620,13 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
   //}
 
   // Warn user about different version
+  const serviceVersion = wmts.version || wmts.ServiceIdentification?.ServiceTypeVersion || null;
   if (options.version
     && (options.version !== "default")
-    && (wmts.version !== options.version)
+    && serviceVersion
+    && (serviceVersion !== options.version)
   ) {
-    throw new Error('O serviço respondeu com a versão ' + wmts.version);
+    throw new Error('O serviço respondeu com a versão ' + serviceVersion);
   }
 
   wmts.Contents.Layer.map((l, i) => {
@@ -653,7 +655,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
     if (l.Style) {
       if (typeof l.Style === 'object' && l.Style.length) {
         l.Style.map(style => {
-          wmts_styles.push(style.Identifier);
+          if (style.Identifier && !wmts_styles.includes(style.Identifier)) wmts_styles.push(style.Identifier);
           if (!legend_url && typeof style.LegendURL === 'object' && style.LegendURL.length) {
             legend_url = removeAuthToken(style.LegendURL[0].href, options.authToken);
           }
@@ -691,7 +693,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
         type: 'WMTS',
         url: finalUrl,
         layer: l.Identifier,
-        version: wmts.version,
+        version: serviceVersion,
         crs: crs,
         bbox: l.WGS84BoundingBox && l.WGS84BoundingBox.length > 0 ? l.WGS84BoundingBox.join(' ') : null,
         servertype: 'mapserver',
