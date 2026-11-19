@@ -1,10 +1,14 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Accordion, ActionIcon, Alert, Box, Grid, Group, Paper, Text } from '@mantine/core';
 import { isEqual } from 'lodash';
-import { JsonForm, viewerConfigSchema, describeViewerConfigFault } from '@scalargis/components';
+import { JsonForm, viewerConfigSchema } from '@scalargis/components';
 import { IconAlertTriangle, IconRefresh } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
+import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N, control, inlineRefs, pick } from './formViewShared';
+import ViewerComponentsSection from './ViewerComponentsSection';
+import ViewerHeaderSection from './ViewerHeaderSection';
+import ViewerLayersSection from './ViewerLayersSection';
 
 const PREVIEW_DELAY_MS = 800;
 
@@ -13,58 +17,6 @@ const MAP_KEYS = ['center', 'extent', 'full_extent', 'restricted_extent', 'const
 
 const CRS_COLUMNS = ['srid', 'code', 'title', 'defs', 'precision'];
 const MAP_CONTROL_COLUMNS = ['id', 'type', 'title', 'active', 'exclusive', 'show_button'];
-
-const AJV_OPTIONS = { useDefaults: false };
-
-const FORM_CONFIG = { formatNumber: false };
-
-const ARRAY_TEXTS = {
-  addTooltip: 'Adicionar',
-  addAriaLabel: 'Adicionar',
-  removeTooltip: 'Remover',
-  removeAriaLabel: 'Remover',
-  upAriaLabel: 'Subir',
-  downAriaLabel: 'Descer',
-  noDataMessage: 'Sem itens.',
-  noSelection: 'Sem seleção.',
-  deleteDialogTitle: 'Remover',
-  deleteDialogMessage: 'Remover este item?',
-  deleteDialogAccept: 'Sim',
-  deleteDialogDecline: 'Não'
-};
-
-const FORM_I18N = {
-  locale: 'pt',
-  translate: (key, defaultMessage, values) => {
-    const error = values?.error;
-    if (error?.keyword) {
-      return describeViewerConfigFault({ pointer: error.instancePath, keyword: error.keyword, message: error.message, params: error.params });
-    }
-    const last = String(key || '').split('.').pop();
-    return ARRAY_TEXTS[last] ?? defaultMessage;
-  }
-};
-
-/** Returns the listed keys of an object that it holds. */
-function pick(source, keys) {
-  const out = {};
-  for (const key of keys) {
-    if (source && source[key] !== undefined) out[key] = source[key];
-  }
-  return out;
-}
-
-/** Returns a schema node with each local $ref replaced by its definition. The keys next to a $ref win. */
-function inlineRefs(node, defs) {
-  if (Array.isArray(node)) return node.map((item) => inlineRefs(item, defs));
-  if (!node || typeof node !== 'object') return node;
-  const out = {};
-  for (const [key, value] of Object.entries(node)) {
-    if (key !== '$ref') out[key] = inlineRefs(value, defs);
-  }
-  const name = typeof node.$ref === 'string' ? node.$ref.replace(/^#\/definitions\//, '') : null;
-  return name && defs[name] ? { ...inlineRefs(defs[name], defs), ...out } : out;
-}
 
 /** Returns the schema of the Map section, cut from the viewer schema. */
 function buildMapSchema() {
@@ -76,9 +28,6 @@ function buildMapSchema() {
   };
   return { type: 'object', properties: inlineRefs(pick(root.properties, MAP_KEYS), defs) };
 }
-
-/** Returns a UI schema control for one key. */
-const control = (key) => ({ type: 'Control', scope: `#/properties/${key}` });
 
 const MAP_SCHEMA = buildMapSchema();
 
@@ -122,15 +71,24 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
 
   const ownText = useRef(null);
   const seenText = useRef(null);
+  const generation = useRef(0);
   const formInput = useRef(null);
   if (seenText.current !== configText || !formInput.current) {
     seenText.current = configText;
     if (ownText.current !== configText || !formInput.current) {
       ownText.current = null;
+      generation.current += 1;
       formInput.current = pick(config, MAP_KEYS);
     }
   }
   const mapData = formInput.current;
+
+  const writeConfig = (next) => {
+    const text = JSON.stringify(next, null, 2);
+    ownText.current = text;
+    latest.current = next;
+    onConfigTextChange(text);
+  };
 
   const onMapChange = ({ data }) => {
     const base = latest.current;
@@ -141,10 +99,14 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
       else next[key] = data[key];
     }
     if (isEqual(pick(next, MAP_KEYS), pick(base, MAP_KEYS))) return;
-    const text = JSON.stringify(next, null, 2);
-    ownText.current = text;
-    latest.current = next;
-    onConfigTextChange(text);
+    writeConfig(next);
+  };
+
+  const [openSections, setOpenSections] = useState(['map', 'layers']);
+  const [componentId, setComponentId] = useState(null);
+  const openComponent = (id) => {
+    setComponentId(id);
+    setOpenSections((list) => (list.includes('components') ? list : [...list, 'components']));
   };
 
   const [frameOpened, setFrameOpened] = useState(false);
@@ -202,7 +164,7 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
             JSON inválido no separador Configuração. O formulário fica só de leitura até o texto ser válido.
           </Alert>
         }
-        <Accordion multiple defaultValue={['map']} variant="separated">
+        <Accordion multiple value={openSections} onChange={setOpenSections} variant="separated">
           <Accordion.Item value="map">
             <Accordion.Control>Mapa</Accordion.Control>
             <Accordion.Panel>
@@ -220,10 +182,49 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
               </Box>
             </Accordion.Panel>
           </Accordion.Item>
+          <Accordion.Item value="layers">
+            <Accordion.Control>Camadas</Accordion.Control>
+            <Accordion.Panel>
+              <ViewerLayersSection
+                config={config}
+                readonly={!parsed}
+                dataGeneration={generation.current}
+                writeConfig={writeConfig}
+                getLatest={() => latest.current}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value="components">
+            <Accordion.Control>Componentes</Accordion.Control>
+            <Accordion.Panel>
+              <ViewerComponentsSection
+                config={config}
+                readonly={!parsed}
+                dataGeneration={generation.current}
+                writeConfig={writeConfig}
+                getLatest={() => latest.current}
+                selectedId={componentId}
+                onSelect={setComponentId}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value="header">
+            <Accordion.Control>Topo e menu</Accordion.Control>
+            <Accordion.Panel>
+              <ViewerHeaderSection
+                config={config}
+                readonly={!parsed}
+                dataGeneration={generation.current}
+                writeConfig={writeConfig}
+                getLatest={() => latest.current}
+                onOpenComponent={openComponent}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
         </Accordion>
       </Grid.Col>
       <Grid.Col span={{ base: 12, lg: 7 }}>
-        <Paper withBorder style={{ overflow: 'hidden' }}>
+        <Paper withBorder style={{ overflow: 'hidden', position: 'sticky', top: 64 }}>
           <Group justify="space-between" px="sm" py={6}>
             <Text size="sm" fw={500}>Pré-visualização</Text>
             <Group gap="xs" wrap="nowrap">
@@ -243,7 +244,7 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
               src={previewUrl}
               title="Pré-visualização do visualizador"
               data-testid="form-view-preview"
-              style={{ display: 'block', width: '100%', height: 'max(420px, calc(100vh - 320px))', border: 0 }}
+              style={{ display: 'block', width: '100%', height: 'max(420px, calc(100vh - 140px))', border: 0 }}
             /> :
             <Text size="sm" c="dimmed" p="sm">
               {viewerId ? 'A pré-visualização abre com este separador.' : 'Grave o visualizador para ver a pré-visualização.'}

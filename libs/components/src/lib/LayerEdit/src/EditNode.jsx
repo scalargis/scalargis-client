@@ -7,6 +7,25 @@ import { i18n } from '../../components';
 
 import COG from './type/COG';
 
+/** Splits a comma-separated list, without empty or repeated items. */
+function splitList(value) {
+  return [...new Set(String(value || '').split(',').map(v => v.trim()).filter(Boolean))];
+}
+
+/** Maps a list of values to Select options. */
+function toOptions(values) {
+  return [...new Set(values)].map((v, j) => ({ key: j, value: v, label: v }));
+}
+
+/** Returns the style identifiers of a WMTS layer from its capabilities, or null. */
+function wmtsCapabilityStyles(edit) {
+  const layers = edit?.wmts_capabilities?.Contents?.Layer;
+  if (!Array.isArray(layers)) return null;
+  const layer = layers.find(l => l.Identifier === edit.layer);
+  if (!layer || !Array.isArray(layer.Style)) return null;
+  const ids = layer.Style.map(s => s.Identifier).filter(Boolean);
+  return ids.length ? ids : null;
+}
 
 class EditNode extends React.Component {
 
@@ -79,40 +98,17 @@ class EditNode extends React.Component {
     const wmtsStyleOptions = [{ key: 999, value: '', label: this.props.t("notDefined", "Não Especificado") }];
 
     if (edit.type === 'WMS') {
-      const map_formats = edit.get_map_formats || '';
-      const finfo_formats = edit.get_feature_info_formats || '';
-      const wstyles = edit.wms_styles || '';
-      // Mantine's Select rejects duplicate option values; an empty string
-      // splits to [''] and would push a second value="" beside the seeded
-      // "Não Especificado", so drop empties before building the options.
-      wmsFormatOptions = map_formats.split(',').filter(Boolean).map((i, j) => {
-        return { key: j, value: i, label: i};
-      });
-      wmsFeatureFormatOptions = finfo_formats.split(',').filter(Boolean).map((i, j) => {
-        return { key: j, value: i, label: i};
-      });
-      wstyles.split(',').filter(Boolean).forEach((i, j) => {
-        wmsStyleOptions.push({ key: j, value: i, label: i})
-        return i;
-      });
+      wmsFormatOptions = toOptions(splitList(edit.get_map_formats));
+      wmsFeatureFormatOptions = toOptions(splitList(edit.get_feature_info_formats));
+      wmsStyleOptions.push(...toOptions(splitList(edit.wms_styles)));
     }
 
     if (['WMTS', 'WMTSXYZ'].includes(edit.type)) {
-      const tile_formats = edit.wmts_formats || '';
-      const wmts_finfo_formats = edit.get_feature_info_formats || '';
-      const wstyles = edit.wmts_styles || '';
-      wmtsFormatOptions = tile_formats.split(',')
-      .filter(v => v && v.toLowerCase().indexOf('image/') !== -1)
-      .map((i, j) => {
-        return { key: j, value: i, label: i};
-      });
-      wmtsFeatureFormatOptions = wmts_finfo_formats.split(',').filter(Boolean).map((i, j) => {
-        return { key: j, value: i, label: i};
-      });
-      wstyles.split(',').filter(Boolean).forEach((i, j) => {
-        wmtsStyleOptions.push({ key: j, value: i, label: i})
-        return i;
-      });
+      wmtsFormatOptions = toOptions(splitList(edit.wmts_formats)
+        .filter(v => v.toLowerCase().indexOf('image/') !== -1));
+      wmtsFeatureFormatOptions = toOptions(splitList(edit.get_feature_info_formats));
+      const capStyles = wmtsCapabilityStyles(edit);
+      wmtsStyleOptions.push(...toOptions(capStyles || splitList(edit.wmts_styles)));
     }
 
     return (

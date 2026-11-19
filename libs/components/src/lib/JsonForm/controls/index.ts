@@ -18,6 +18,10 @@ import TextDisplay, {
   textDisplayTester
 } from './TextDisplay';
 
+import FixedNumberListControl, {
+  fixedNumberListControlTester
+} from './FixedNumberListControl';
+
 import HtmlDisplay, {
   htmlDisplayTester
 } from './HtmlDisplay';
@@ -34,5 +38,7 @@ export {
   TextDisplay,
   textDisplayTester,
   HtmlDisplay,
-  htmlDisplayTester
+  htmlDisplayTester,
+  FixedNumberListControl,
+  fixedNumberListControlTester
 }

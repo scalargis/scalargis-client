@@ -44,6 +44,22 @@ const GroupLayer = ({ layers, config, group, checked, viewer }) => {
     if (layer?.current?.setOpacity) layer.current.setOpacity(config.opacity);
   }, [config.opacity]);
 
+  useEffect(() => {
+    const collection = layer.current?.getLayers();
+    if (!collection || !Array.isArray(config.children)) return;
+    const order = [...config.children].reverse();
+    const rank = (l) => {
+      const at = order.indexOf(l.get('id'));
+      return at === -1 ? order.length : at;
+    };
+    const current = collection.getArray().slice();
+    const sorted = current.slice().sort((a, b) => rank(a) - rank(b));
+    if (sorted.some((l, i) => l !== current[i])) {
+      collection.clear();
+      collection.extend(sorted);
+    }
+  });
+
   // Validate children prop
   if (!config.children) return null;
   if (!loaded) return null;
