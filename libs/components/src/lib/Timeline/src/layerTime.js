@@ -20,8 +20,6 @@ export function updateLayerTime(layer, value, name = 'time') {
   }
 }
 
-// Only explicitly configured coverage restricts visibility. Capabilities bounds
-// describe advertised instants; they must not suppress the selected TIME.
 export function applyLayerTime(layer, theme, current, name, hidden) {
   updateLayerTime(layer, iso(current), name);
   const configured = theme.dimensions?.find(d => d.name?.toLowerCase() === name.toLowerCase());

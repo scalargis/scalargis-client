@@ -1,5 +1,3 @@
-/* Native datetime segments need more room in Gecko than in Chromium.
-   Keep the calendar button clear of the minutes without shrinking the text. */
 .timeline-picker {
   flex: 0 0 auto;
 }

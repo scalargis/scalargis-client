@@ -1,7 +1,6 @@
 const children = (node, name) => Array.from(node.children).filter(child => child.localName === name);
 const text = (node, name) => children(node, name)[0]?.textContent.trim();
 
-// Includes inherited WMS dimensions, WMS 1.1.1 Extent and namespaced WMTS.
 export function readTimeDimension(xml, theme, name = 'time') {
   const document = new DOMParser().parseFromString(xml, 'application/xml');
   if (document.getElementsByTagName('parsererror').length) throw new Error('Invalid capabilities XML');

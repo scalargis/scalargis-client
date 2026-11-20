@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { TextInput } from '@mantine/core';
 
-// Let the browser own incomplete date segments while the user is typing.
-// A controlled value can reset Chromium's year segment after every keystroke.
 export default function DateInput({ value, onCommit, onEdit, ...props }) {
   const input = useRef(null);
   const editing = useRef(false);
@@ -14,7 +12,6 @@ export default function DateInput({ value, onCommit, onEdit, ...props }) {
     onBlur={event => {
       editing.current = false;
       const committed = onCommit(event.currentTarget.value);
-      // Normalise accepted values and restore invalid/incomplete input.
       event.currentTarget.value = committed ?? value;
     }}
     onKeyDown={event => {

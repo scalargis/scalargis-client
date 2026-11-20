@@ -60,7 +60,6 @@ export default function TimelineControl({ core, viewer, mainMap, actions, record
       }
     }
     apply();
-    // Re-resolve layers after the viewer replaces sources during TOC reordering.
     const timer = setTimeout(apply, 0);
     return () => clearTimeout(timer);
   }, [current, mainMap, layersKey, dimensions, themes, utils, cfg.dimension?.name]);

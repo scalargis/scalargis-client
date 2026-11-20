@@ -1,5 +1,3 @@
-// Temporal navigation adapted from Pedro Venancio's ScalarGIS.Timeline.Component.
-// Keep ranges compact: an hourly archive must not allocate one item per hour.
 const DAY = 86400000;
 const durationPattern = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/;
 
@@ -34,7 +32,6 @@ export function timestamp(value) {
   if (value == null || value === '') return NaN;
   if (typeof value === 'number') return value;
   if (value === 'current' || value === 'now') return Date.now();
-  // OGC timestamps without a zone are interpreted consistently in UTC.
   const text = String(value).trim();
   return Date.parse(/^\d{4}-\d\d-\d\dT\d\d:\d\d(?::\d\d(?:\.\d+)?)?$/.test(text) ? text + 'Z' : text);
 }
@@ -102,7 +99,6 @@ function rangeIndex(range, target) {
   return lo;
 }
 
-// mode -1/1 selects an available date before/after the target; 0 selects nearest.
 export function snapDate(target, dimension, mode = dimension?.nearestValue ? 0 : -1) {
   if (!dimension || !Number.isFinite(target)) return null;
   const bounded = Math.max(dimension.min, Math.min(dimension.max, target));
@@ -129,7 +125,6 @@ export function clampDate(value, dimension) {
 
 export function selectDate(value, dimension, step, dateOnly = false) {
   if (!step) return snapDate(value, dimension, dateOnly ? 1 : undefined);
-  // A local date represents the first UTC step boundary on or after local midnight.
   let aligned = snapStepPeriod(value, step);
   if (dateOnly && aligned < value) aligned = addDuration(aligned, step);
   return clampDate(aligned, dimension);
@@ -172,8 +167,6 @@ export function initialNow(dimension, step, now = Date.now()) {
   const upper = Math.min(now, dimension.max);
   const aligned = snapStepPeriod(upper, step);
   if (aligned >= dimension.min) return aligned;
-  // Future-only/narrow coverage has no aligned instant at or before now.
-  // Prefer the first aligned instant in coverage, otherwise its exact start.
   const first = snapStepPeriod(dimension.min, step);
   const next = first < dimension.min ? addDuration(first, step) : first;
   return Number.isFinite(next) && next <= dimension.max ? next : dimension.min;
@@ -236,11 +229,9 @@ export function localInput(value, hasTime = true) {
 
 export function parseLocalInput(value, current) {
   if (!value) return NaN;
-  // Preserve the selected occurrence of an ambiguous autumn clock time.
   if (current != null && localInput(current).startsWith(value)) return current;
   const date = new Date(value.length === 10 ? value + 'T00:00:00' : value);
   const result = date.getTime();
-  // Reject nonexistent local times during the spring clock change.
   return Number.isFinite(result) && localInput(result).startsWith(value) ? result : NaN;
 }
 
