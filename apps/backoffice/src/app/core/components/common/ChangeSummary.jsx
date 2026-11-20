@@ -142,7 +142,7 @@ export function ChangeSummary({ opened, before, after, changes, saving, conflict
 }
 
 /** Save of an existing record through the change summary, with the stale check of updated_at. */
-export function useChangeSummary({ record, initialPayload, save, onSaved, onReload }) {
+export function useChangeSummary({ record, initialPayload, save, onSaved, onReload, onError }) {
   const baseline = useRef(null);
   if (baseline.current === null) baseline.current = initialPayload();
   const updatedAt = useRef(record?.updated_at);
@@ -173,7 +173,9 @@ export function useChangeSummary({ record, initialPayload, save, onSaved, onRelo
         close();
       })
       .catch((e) => {
-        if (e?.status === 409) {
+        if (onError && onError(e)) {
+          close();
+        } else if (e?.status === 409) {
           setState((s) => ({ ...s, conflict: e.body || {} }));
         } else {
           notify.error('Editar Registo', 'Ocorreu um erro ao alterar o registo');
