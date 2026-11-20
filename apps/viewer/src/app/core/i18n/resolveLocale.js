@@ -32,11 +32,8 @@ const matchLocale = (candidate, allowed) => {
   return allowed.find(a => baseOf(a) === base) || null;
 };
 
-/** Returns the languages a viewer allows: its own list, the LocaleSelector list, or its single locale. */
+/** Returns the languages a viewer allows: the LocaleSelector list, its own list, or its single language. */
 export const getViewerLocales = (viewer) => {
-  const fromViewer = normalizeLocales(viewer?.config_json?.locales);
-  if (fromViewer.length) return fromViewer;
-
   const components = viewer?.config_json?.components;
   if (Array.isArray(components)) {
     for (const component of components) {
@@ -46,10 +43,13 @@ export const getViewerLocales = (viewer) => {
     }
   }
 
-  return normalizeLocales([viewer?.locale]);
+  const fromViewer = normalizeLocales(viewer?.config_json?.locales);
+  if (fromViewer.length) return fromViewer;
+
+  return normalizeLocales([viewer?.lang]);
 };
 
-/** Picks the viewer language: stored pick, then browser language, both only if the viewer allows them, then viewer locale, then site default. */
+/** Picks the viewer language: stored pick, then browser language, both only if the viewer allows them, then the viewer language, then the site default. */
 export const resolveViewerLocale = (viewer) => {
   const allowed = getViewerLocales(viewer);
 
@@ -64,7 +64,7 @@ export const resolveViewerLocale = (viewer) => {
     if (matched) return matched;
   }
 
-  return viewer?.locale || getAppDefaultLocale() || undefined;
+  return viewer?.lang || getAppDefaultLocale() || undefined;
 };
 
 /** Applies the resolved viewer language to i18next, and the lang query param when present. */
@@ -80,5 +80,5 @@ export const useViewerLocale = (viewer, location) => {
     if (lang && lang !== i18n.language) {
       i18n.changeLanguage(lang);
     }
-  }, [loaded, viewer?.locale, allowedKey, location?.search]);
+  }, [loaded, viewer?.lang, allowedKey, location?.search]);
 };
