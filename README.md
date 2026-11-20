@@ -117,3 +117,9 @@ npx nx run-many -t test --all
 npx nx run viewer:build
 npx nx run backoffice:build
 ```
+
+---
+
+## Contribute
+
+Read the [contribution rules](https://docs.scalargis.com/contributing/) before you open a pull request. Coding agents read [`AGENTS.md`](AGENTS.md).
