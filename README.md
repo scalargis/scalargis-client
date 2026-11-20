@@ -18,7 +18,7 @@ This repo is the React frontend (Nx monorepo): the public **Viewer** (port 4200)
 
 | | Version | Notes |
 |---|---|---|
-| Node.js | 24.22.1 or later (Vite 7 needs 20.19+ or 22.12+) | Use [NVM for Windows](https://github.com/coreybutler/nvm-windows): `nvm install 24` then `nvm use 24` |
+| Node.js | 24.22.3 or later (Vite 7 needs 20.19+ or 22.12+) | Use [NVM for Windows](https://github.com/coreybutler/nvm-windows): `nvm install 24` then `nvm use 24` |
 | scalargis-server | running | Default: `http://localhost:5000` |
 
 Clone this repo next to `scalargis-server`. The build writes into `../scalargis-server`.
