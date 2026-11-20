@@ -6,8 +6,6 @@ import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { addSharedPointer, layerList } from './viewerLayerTree';
 
-const TOP_LEVEL = '__top__';
-
 /** Loads the shared layer library for an admin. Returns the rows, or null while it loads, when it fails, or for a non-admin. */
 export function useSharedLibrary(enabled) {
   const { core } = useContext(AppContext);
@@ -31,11 +29,11 @@ export function unknownSharedCodes(codes, library) {
   return codes.filter((c) => !known.has(c));
 }
 
-/** Dialog "Adicionar camada partilhada": picks a library layer and a target group, then adds a pointer to the config. */
+/** Dialog "Adicionar camada partilhada": picks a library layer and a group of the viewer, then adds a pointer to the config. The viewer draws only groups at the top of the tree, so the target is always a group. */
 function SharedLayerPicker({ opened, onClose, config, library, defaultTarget, onAdd }) {
   const [query, setQuery] = useState('');
   const [code, setCode] = useState(null);
-  const [target, setTarget] = useState(TOP_LEVEL);
+  const [target, setTarget] = useState(null);
 
   const groups = useMemo(() => layerList(config).filter((l) => l.type === 'GROUP'), [config]);
 
@@ -43,7 +41,7 @@ function SharedLayerPicker({ opened, onClose, config, library, defaultTarget, on
     if (!opened) return;
     setQuery('');
     setCode(null);
-    const fallback = groups.some((g) => g.id === 'main') ? 'main' : TOP_LEVEL;
+    const fallback = groups.some((g) => g.id === 'main') ? 'main' : (groups[0]?.id ?? null);
     setTarget(defaultTarget && groups.some((g) => g.id === defaultTarget) ? defaultTarget : fallback);
   }, [opened]);
 
@@ -55,14 +53,11 @@ function SharedLayerPicker({ opened, onClose, config, library, defaultTarget, on
       || (r.type || '').toLowerCase().includes(q));
   }, [library, query]);
 
-  const targetData = [
-    { value: TOP_LEVEL, label: 'Topo da árvore' },
-    ...groups.map((g) => ({ value: g.id, label: `${g.title || g.id} (${g.id})` }))
-  ];
+  const targetData = groups.map((g) => ({ value: g.id, label: `${g.title || g.id} (${g.id})` }));
 
   const add = () => {
-    if (!code) return;
-    const result = addSharedPointer(config, code, target === TOP_LEVEL ? null : target);
+    if (!code || !target) return;
+    const result = addSharedPointer(config, code, target);
     onAdd(result.config, result.id);
     onClose();
   };
@@ -76,7 +71,7 @@ function SharedLayerPicker({ opened, onClose, config, library, defaultTarget, on
       footer={
         <Group justify="flex-end">
           <Button variant="default" leftSection={<IconX />} onClick={onClose}>Cancelar</Button>
-          <Button leftSection={<IconCheck />} disabled={!code} onClick={add} data-testid="shared-picker-add">Adicionar</Button>
+          <Button leftSection={<IconCheck />} disabled={!code || !target} onClick={add} data-testid="shared-picker-add">Adicionar</Button>
         </Group>
       }
     >
@@ -117,7 +112,8 @@ function SharedLayerPicker({ opened, onClose, config, library, defaultTarget, on
               </Table>
           }
         </Paper>
-        <Select label="Adicionar em" data={targetData} value={target} onChange={(v) => v && setTarget(v)}
+        {groups.length === 0 && <Text size="sm" c="warning">O visualizador não tem grupos. Crie um grupo primeiro.</Text>}
+        <Select label="Adicionar no grupo" data={targetData} value={target} onChange={(v) => v && setTarget(v)}
           allowDeselect={false} searchable data-testid="shared-picker-target" />
         <Text size="xs" c="dimmed">A camada entra desligada. O visualizador recebe a versão atual da biblioteca em cada carregamento.</Text>
       </Stack>

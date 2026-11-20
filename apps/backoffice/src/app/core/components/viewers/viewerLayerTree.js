@@ -183,11 +183,11 @@ export function sharedCodes(config) {
   return codes;
 }
 
-/** Returns the config with a pointer to a shared layer at the end of a group, or at the top level when the target is null, and the new node id. The layer starts off. */
+/** Returns the config with a pointer to a shared layer at the end of a group, and the new node id. The layer starts off. */
 export function addSharedPointer(config, code, targetId) {
   const taken = layerList(config).some((l) => l.id === code);
   const id = taken ? uniqueId(config, code) : code;
-  const next = addNode(config, { id, shared: code }, targetId || null);
+  const next = addNode(config, { id, shared: code }, targetId);
   if (Array.isArray(config.checked)) next.checked = config.checked;
   else delete next.checked;
   return { config: next, id };
