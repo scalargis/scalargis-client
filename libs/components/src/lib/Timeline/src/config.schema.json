@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Configuração da linha temporal",
-  "description": "Camada WMS, datas e reprodução da dimensão de tempo.",
+  "description": "Camadas WMS e WMTS, datas e reprodução da dimensão de tempo.",
   "type": "object",
   "additionalProperties": true,
   "properties": {
@@ -16,6 +16,17 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
+        "layer_ids": {
+          "title": "Camadas controladas",
+          "description": "Ids das camadas que partilham o relógio. Tem prioridade sobre layer_id.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "extra_layer_ids": {
+          "title": "Camadas adicionais",
+          "type": "array",
+          "items": { "type": "string" }
+        },
         "layer_id": {
           "title": "Id da camada",
           "description": "Id de uma camada de layers do visualizador.",
@@ -42,7 +53,7 @@
       "properties": {
         "name": {
           "title": "Nome",
-          "description": "Nome da dimensão. dimension_name da camada tem prioridade. Sem valor, usa a primeira dimensão.",
+          "description": "Nome da dimensão temporal. dimension_name da camada tem prioridade. O valor por omissão é time.",
           "type": "string",
           "examples": ["time"]
         }
@@ -73,9 +84,37 @@
     },
     "selectedIndex": {
       "title": "Data inicial",
-      "description": "first, last ou uma posição que começa em 1.",
+      "description": "first, last, now ou uma posição que começa em 1.",
       "type": ["string", "integer"],
-      "examples": ["first", "last", 1]
+      "examples": ["first", "last", "now", 1]
+    },
+    "defaultVisible": {
+      "title": "Mostrar o controlo ao abrir o mapa",
+      "type": "boolean",
+      "default": true
+    },
+    "stepOptions": {
+      "title": "Passos de navegação",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": "string", "examples": ["PT10M", "PT1H", "P1D"] }
+        }
+      }
+    },
+    "refreshInterval": {
+      "title": "Intervalo de atualização das dimensões (segundos)",
+      "type": "number",
+      "minimum": 0
+    },
+    "capabilitiesTimeout": {
+      "title": "Tempo de espera por GetCapabilities (segundos)",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "default": 10
     },
     "loop": {
       "title": "Repetir",

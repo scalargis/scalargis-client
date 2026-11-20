@@ -237,6 +237,15 @@ const root = (
         }
       }      
     
+    case 'TIMELINE_SET_WIDGET_VISIBLE':
+      return {
+        ...state,
+        viewer: {
+          ...state.viewer,
+          timelineVisibility: { ...state.viewer.timelineVisibility, [action.id]: action.visible },
+        },
+      };
+
     // Set viewer config
     case VIEWER_SET_CONFIG:
       return {

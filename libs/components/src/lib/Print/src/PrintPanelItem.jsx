@@ -360,14 +360,17 @@ export default function PrintPanelItem(props) {
         //Add user authentication token
         if (isUrlAppHostname(l.url) && auth?.data?.auth_token) {
             vals += ";" + auth.data.auth_token;
+        } else {
+            vals += ";";
         }
+        vals += ';' + (l.params.TIME || l.params.time || '');
         return vals;
       }),
       ...arcgisLayers.map(l => 'esri_rest' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '')),
     ];
 
     if (allLayers.length) {
-      data += '&' + allLayers.map(l => 'layers[]=' + l).join('&');
+      data += '&' + allLayers.map(l => 'layers[]=' + encodeURIComponent(l)).join('&');
 
       const layersAttributions = [...wmsLayers, ...arcgisLayers].map(l => l.attributions || null);
       data += '&layersAttributions=' + encodeURIComponent(JSON.stringify(layersAttributions));
