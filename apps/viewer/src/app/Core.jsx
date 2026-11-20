@@ -308,11 +308,11 @@ Core.prototype.renderMainMenu = function({ selected_menu, section, props }) {
   const { components } = this.config.config_json;
 
   // Filter by mainmenu components (main section)
-  let mainmenuComponents = components.filter(c => c.target === 'mainmenu' && !c.section);
+  let mainmenuComponents = components.filter(c => (c.target === 'mainmenu' || c.type === 'Timeline') && !c.section);
 
   // Filter by section
   if (section) {
-    mainmenuComponents = components.filter(c => c.target === 'mainmenu' && c.section === section);
+    mainmenuComponents = components.filter(c => (c.target === 'mainmenu' || c.type === 'Timeline') && c.section === section);
   }
   
   // Render components
