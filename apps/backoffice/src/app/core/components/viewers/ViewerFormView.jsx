@@ -58,7 +58,7 @@ function previewBaseUrl(core) {
 }
 
 /** The beta form view of the viewer config: sections on the left, a preview of the unsaved config on the right. */
-function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
+function ViewerFormView({ configText, onConfigTextChange, viewerId, active, sharedLibrary }) {
   const { core } = useContext(AppContext);
 
   const parsed = useMemo(() => parseConfig(configText), [configText]);
@@ -191,6 +191,7 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active }) {
                 dataGeneration={generation.current}
                 writeConfig={writeConfig}
                 getLatest={() => latest.current}
+                sharedLibrary={sharedLibrary}
               />
             </Accordion.Panel>
           </Accordion.Item>

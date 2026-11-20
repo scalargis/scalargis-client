@@ -1,502 +1,140 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-
-import { Alert, Group, Select, Slider } from '@mantine/core';
-import { IconInfoCircle, IconAngleDoubleLeft, IconAngleLeft, IconPause, IconPlay, IconAngleRight, IconAngleDoubleRight } from '@scalargis/ui';
-
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Button, Group, Slider, Text } from '@mantine/core';
+import { IconAngleDoubleLeft, IconAngleLeft, IconPause, IconPlay, IconAngleRight, IconAngleDoubleRight } from '@scalargis/ui';
 import { Legend, MapToolButton } from '../../components';
+import './timeline.css';
+import DateInput from './DateInput';
+import { applyLayerTime } from './layerTime';
+import { durationSeconds, formatDate, initialDate, clampDate, selectDate, snapStepPeriod, stepDate, localInput, parseLocalInput } from './time';
 
-
-function parseTimeValues (data) {
-
-  let values = [];
-
-  if (data.includes("/")) {
-    const parts = data.split("/");
-  } else {
-    values = data?.split ? data.split(',') : [];
-  }
-
-  return values; 
-}
-
-
-function isoDateWithoutTimeZone(date) {
-  if (date == null) return date;
-  const timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
-  const correctDate = new Date(timestamp);
-  // correctDate.setUTCHours(0, 0, 0, 0); // uncomment this if you want to remove the time
-  return correctDate.toISOString();
-}
-
-function addDurationToDate(date, duration) {
-  // Regular expression pattern for ISO 8601 duration
-  const durationPattern = /P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?/;
-  
-  const match = duration.match(durationPattern);
-  
-  if (!match) {
-      throw new Error("Invalid duration format");
-  }
-  
-  const [
-      , // full match
-      years = 0,
-      months = 0,
-      weeks = 0,
-      days = 0,
-      hours = 0,
-      minutes = 0,
-      seconds = 0
-  ] = match.map(num => parseFloat(num) || 0);
-
-  // Create a new Date instance from the input date to avoid mutating the original date
-  const resultDate = new Date(date);
-
-  // Add duration components to the date
-  resultDate.setFullYear(resultDate.getFullYear() + years);
-  resultDate.setMonth(resultDate.getMonth() + months);
-  resultDate.setDate(resultDate.getDate() + weeks * 7 + days);
-  resultDate.setHours(resultDate.getHours() + hours);
-  resultDate.setMinutes(resultDate.getMinutes() + minutes);
-  resultDate.setSeconds(resultDate.getSeconds() + seconds);
-
-  return resultDate;
-}
-
-function subtractDurationToDate(date, duration) {
-  // Regular expression pattern for ISO 8601 duration
-  const durationPattern = /P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?/;
-  
-  const match = duration.match(durationPattern);
-  
-  if (!match) {
-      throw new Error("Invalid duration format");
-  }
-  
-  const [
-      , // full match
-      years = 0,
-      months = 0,
-      weeks = 0,
-      days = 0,
-      hours = 0,
-      minutes = 0,
-      seconds = 0
-  ] = match.map(num => parseFloat(num) || 0);
-
-  // Create a new Date instance from the input date to avoid mutating the original date
-  const resultDate = new Date(date);
-
-  // Add duration components to the date
-  resultDate.setFullYear(resultDate.getFullYear() - years);
-  resultDate.setMonth(resultDate.getMonth() - months);
-  resultDate.setDate(resultDate.getDate() - (weeks * 7 + days));
-  resultDate.setHours(resultDate.getHours() - hours);
-  resultDate.setMinutes(resultDate.getMinutes() - minutes);
-  resultDate.setSeconds(resultDate.getSeconds() - seconds);
-
-  return resultDate;
-}
-
-function parseDateTimeList(inputString) {
-  // Regular expression patterns for datetime and duration
-  const dateTimePattern = /\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?\b/;
-  const durationPattern = /\bP(?=\d|T\d)(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+(?:\.\d+)?S)?)?\b/;
-  
-  // Split the input string by commas to get individual values
-  let values = [];
-  
-  if (inputString.includes("/")) {
-    values = inputString.split('/');
-  } else {
-    values = inputString.split(',');
-  }
-
-  let parsedValues = values.map(value => {
-      // Trim whitespace
-      value = value.trim();
-      
-      if (dateTimePattern.test(value)) {
-          return { type: "datetime", value };
-      } else if (durationPattern.test(value)) {
-          return { type: "duration", value };
-      } else {
-          return { type: "unknown", value };
-      }
-  });
-
-  if (parsedValues.length === 2 && parsedValues[1].type === 'duration') {
-    const beginDate = new Date(parsedValues[0].value);
-    const endDate = new Date();
-    const duration = parsedValues[1].value;
-
-    let calcDate = beginDate;
-
-    parsedValues = [parsedValues[0].value];
-
-    while (calcDate < endDate) {
-      calcDate = addDurationToDate(calcDate, duration);
-
-      if (calcDate > endDate) {
-        break;
-      } else {
-        parsedValues.push(calcDate.toISOString());
-        //parsedValues.push(isoDateWithoutTimeZone(calcDate));
-      }
-    }
-  } else if (parsedValues.length === 3 && parsedValues[2].type === 'duration') {
-    const beginDate = new Date(parsedValues[0].value);
-    const endDate = new Date(parsedValues[1].value);
-    const duration = parsedValues[2].value;
-    
-    let calcDate = beginDate;
-
-    parsedValues = [parsedValues[0].value];
-
-    while (calcDate < endDate) {
-      calcDate = addDurationToDate(calcDate, duration);
-
-      if (calcDate > endDate) {
-        break;
-      } else {
-        parsedValues.push(calcDate.toISOString());
-        //parsedValues.push(isoDateWithoutTimeZone(calcDate));
-      }
-    }
-  } else {
-    parsedValues = parsedValues.map(v => v.value);
-  }
-  
-  return parsedValues.map(d => d.indexOf(".") > -1  ? d.split('.')[0]+"Z" : d);
-}
-
-function formatDate(val, format) { 
-  let day, month;
-
-  const inputDate = new Date(val);
-
-  day = inputDate.getDate();
-  month = inputDate.getMonth() + 1;
-  const year = inputDate.getFullYear();
-  day = day.toString().padStart(2, '0');
-  month = month.toString().padStart(2, '0');
-
-  const hour = inputDate.getHours().toString().padStart(2, '0');
-  const minute = inputDate.getMinutes().toString().padStart(2, '0');
-  const second = inputDate.getSeconds().toString().padStart(2, '0');
-
-  if (format) {
-    const val = format.replace("{dd}", day).replace("{mm}", month).replace("{yyyy}", year).replace("{h}", hour).replace("{m}", minute).replace("{s}", second);
-    return val;
-  }
-
-  return(inputDate.toISOString());
-}
-
-
-const calculateSelectedDate = (value, defaultValue = new Date()) => {
-  let calculatedDate = defaultValue;
-
-  // With default
-  if (value == 'now') {
-    calculatedDate = new Date();
-  } else if (value == 'today') {
-    calculatedDate = new Date();
-    calculatedDate.setUTCHours(0, 0, 0, 0);
-  } else if (value == 'tomorrow') {
-    const date = new Date();
-    date.setDate(date.getDate() + 1);
-    date.setUTCHours(0, 0, 0, 0);
-    calculatedDate = date;
-  } else if (value == 'yesterday') {
-    const date = new Date();
-    date.setDate(date.getDate() - 1);
-    date.setUTCHours(0, 0, 0, 0);
-    calculatedDate = date;
-  } else if (value) {
-    if (value.startsWith("-")) {
-      calculatedDate = subtractDurationToDate(new Date(), value.substring(value.indexOf("-")));
-    } else {
-      calculatedDate = addDurationToDate(new Date(), value);
-    }
-  }
-
-  return calculatedDate;
-}
-
-
-const calculateDates = (config, data) => {
-
-  let values = [];
-  let defaultPos = 0;
-
-  if (data) {
-    values = parseDateTimeList(data);
-
-    const refDate = formatDate(calculateSelectedDate(config.value));
-
-    if (config?.interval?.length > 1) {
-      const minDate = new Date(config.interval[0]);
-      const maxDate = new Date(config.interval[1]);
-
-      values = values.filter(d => {
-        const dt = new Date(d);
-        return dt >= minDate && dt <= maxDate;
-      });
-      defaultPos = values.findIndex(d => formatDate(d) == refDate);
-    } else {
-      values.forEach((val, idx) => {
-        const dt = formatDate(val);
-        if (refDate == dt) defaultPos = idx;
-      });
-
-      if (config?.steps != null) {
-        // With steps
-        let leftSteps = 0; 
-        let rightSteps = 0;
-        if (Array.isArray(config.steps)) {
-          if (config.steps.length > 1) {
-            leftSteps = defaultPos - config.steps[0];
-            rightSteps = defaultPos + config.steps[1] + 1;
-          }
-        } else if (Number.isInteger(config.steps)) {
-          leftSteps = defaultPos - config.steps;
-          rightSteps = defaultPos + config.steps + 1;
-        }
-        values = values.slice(leftSteps, rightSteps);
-        defaultPos = values.findIndex(d => formatDate(d) == refDate);
-      } else if (config?.delta) {
-        // With delta
-        let minDate = refDate;
-        let maxDate = refDate;
-        if (Array.isArray(config?.delta)) {
-           if (config.delta.length > 1) {
-            minDate = subtractDurationToDate(refDate, config.delta[0]);
-            maxDate = addDurationToDate(refDate, config.delta[1]);
-           }
-        } else {
-          minDate = subtractDurationToDate(refDate, config.delta);
-          maxDate = addDurationToDate(refDate, config.delta);
-        }
-
-        values = values.filter(d => {
-          const dt = new Date(d);
-          return dt.setHours(0, 0, 0, 0) >= minDate.setHours(0, 0, 0, 0) && dt <= maxDate.setHours(0, 0, 0, 0);
-        });
-        defaultPos = values.findIndex(d => {  
-          return formatDate(d) == refDate
-        });
-      }
-    }
-  }
-
-  if (config?.selectedIndex != null) {
-    if (Number.isInteger(config.selectedIndex)) {
-      if (config.selectedIndex > (values.length)) {
-        defaultPos = values.length - 1;
-      } else {
-        defaultPos = config.selectedIndex - 1;
-      }
-    } else {
-      if (config.selectedIndex === "first") {
-        defaultPos = 0
-      } else if (config.selectedIndex === "last") {
-        defaultPos = values.length - 1;
-      }
-    }
-  }
-
-  if (defaultPos < 0) defaultPos = 0;
-  
-  return [values, defaultPos];
-
-}
-
-export default function TimelineConstrol({ core, viewer, mainMap, dispatch, actions, record, utils, Models, theme, dimension, opened }) {
-
-  const { exclusive_mapcontrol, checked } = viewer;
-
-  const [timeData, setTimeData] = useState([]);
-
-  const [frameRate, setFrameRate] = useState(record?.config_json?.speed ? record?.config_json?.speed : 0.5);
-
-  const controlLayer = useRef();
-  
-  const [currentPos, setCurrentPos] = useState(0);
+export default function TimelineControl({ core, viewer, mainMap, actions, record, utils, Models, themes, dimension, dimensions, opened, loading, error }) {
+  const cfg = record.config_json || {};
+  const [current, setCurrent] = useState(null);
   const [playing, setPlaying] = useState(false);
-  const loop = record?.config_json?.loop === true;
-
-  const startPlaying = () => {
-    if (!timeData?.length) return;
-    if (currentPos >= timeData.length - 1) setCurrentPos(0);
-    setPlaying(true);
-  };
-
-  useEffect(() => {
-    if (!playing) return;
-    const lastPos = timeData.length - 1;
-    const id = setInterval(() => {
-      setCurrentPos((val) => (val < lastPos ? val + 1 : (loop ? 0 : val)));
-    }, 1000 / frameRate);
-    return () => clearInterval(id);
-  }, [playing, timeData, frameRate, loop]);
+  const [activeStep, setActiveStep] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const hidden = useRef(new Map());
+  const checked = viewer?.config_json?.checked || [];
+  const anyVisible = themes.some(theme => checked.includes(theme.id));
+  const options = (cfg.stepOptions || []).filter(option => durationSeconds(option.value) > 0);
+  const step = activeStep || options[0]?.value || dimension?.step;
+  const initialKey = JSON.stringify({ value: cfg.value, selectedIndex: cfg.selectedIndex });
+  const layersKey = JSON.stringify((viewer?.config_json?.layers || []).map(layer => [layer.id, layer.children, layer.opacity]));
+  const frameRate = Number(cfg.speed) > 0 && Number.isFinite(Number(cfg.speed)) ? Number(cfg.speed) : 0.5;
 
   useEffect(() => {
-    if (playing && !loop && currentPos >= timeData.length - 1) setPlaying(false);
-  }, [playing, loop, currentPos, timeData]);
+    setCurrent(previous => previous != null && dimension && previous >= dimension.min && previous <= dimension.max
+      ? clampDate(previous, dimension) : initialDate(dimension, JSON.parse(initialKey), step));
+    setPreview(null);
+  }, [dimension, initialKey, step]);
+
+  useEffect(() => { if (!opened || !anyVisible || !dimension) setPlaying(false); }, [opened, anyVisible, dimension]);
 
   useEffect(() => {
-    if (!opened) setPlaying(false);
-  }, [opened]);
+    if (!playing || !dimension) return;
+    const timer = setInterval(() => {
+      setCurrent(previous => {
+        const next = stepDate(previous, dimension, step, 1);
+        if (next === previous) {
+          if (cfg.loop) return dimension.min;
+          return previous;
+        }
+        return next;
+      });
+    }, Math.max(16, 1000 / frameRate));
+    return () => clearInterval(timer);
+  }, [playing, dimension, step, frameRate, cfg.loop]);
 
   useEffect(() => {
-    controlLayer.current = null;
-
-    if (!mainMap) return;
-    if (!theme?.id) return;
-
-    const layerId = theme?.id;
-
-    let layer;
-    
-    if (layerId) layer = utils.findOlLayer(mainMap, layerId);
-    if (layer) controlLayer.current = layer;
-  }, [mainMap, theme]);
+    if (playing && !cfg.loop && current === dimension?.max) setPlaying(false);
+  }, [current, playing, cfg.loop, dimension?.max]);
 
   useEffect(() => {
+    if (!mainMap || current == null) return;
+    function apply() {
+      for (const theme of themes) {
+        const layer = utils.findOlLayer(mainMap, theme.id);
+        if (!layer) continue;
+        const extent = dimensions[theme.id];
+        applyLayerTime(layer, theme, current, extent?.name || theme.dimension_name || cfg.dimension?.name || 'time', hidden.current);
+      }
+    }
+    apply();
+    const timer = setTimeout(apply, 0);
+    return () => clearTimeout(timer);
+  }, [current, mainMap, layersKey, dimensions, themes, utils, cfg.dimension?.name]);
+
+  useEffect(() => {
+    const hiddenLayers = hidden.current;
+    return () => {
+      hiddenLayers.forEach((opacity, layer) => layer.setOpacity(opacity));
+      hiddenLayers.clear();
+    };
+  }, []);
+
+  if (!opened) return null;
+  if (!anyVisible) return <Alert mt="xs" color="informative" p="xs" style={{ width: 258, maxWidth: '100%' }}>
+    {themes.length ? <>
+      <Text size="xs">Ative uma das seguintes camadas:</Text>
+      <div role="region" aria-label="Camadas disponíveis no Controlo Temporal" tabIndex={0}
+        style={{ maxHeight: 96, overflowY: 'auto', overflowWrap: 'anywhere', fontSize: 12 }}>
+        <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+          {themes.map(theme => <li key={theme.id}>{theme.title || theme.name || theme.id}</li>)}
+        </ul>
+      </div>
+    </> : <Text size="xs">Não existem camadas configuradas neste Controlo Temporal.</Text>}
+  </Alert>;
+  const enabled = current != null && !!dimension;
+  const hasTime = step ? durationSeconds(step) < 86400 : !!dimension?.dates.some(value => value % 86400000);
+  const display = preview ?? current;
+  const inputValue = value => value == null ? '' : localInput(value, hasTime).slice(0, hasTime ? 16 : 10);
+  const position = !enabled || dimension.max === dimension.min ? 0 : Math.round(((display - dimension.min) / (dimension.max - dimension.min)) * 1000);
+  function select(value, dateOnly = false) {
     setPlaying(false);
-    if (!mainMap) return;
-    if (!dimension?.values) {
-      setTimeData([]);
-      setCurrentPos(0);
-      return;
-    }
-
-    const [values, defaultPos] = calculateDates(record?.config_json, dimension?.values);;
-
-    setTimeData(values || []);
-    setCurrentPos(defaultPos);
-  }, [mainMap, dimension]);
-
-  useEffect(() => {
-    if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
-      setPlaying(false);
-    }
-  }, [viewer?.config_json?.checked, theme?.id]);
-
-  useEffect(() => {
-    if (!timeData?.length) return;
-
-    if (!controlLayer.current && mainMap && theme?.id) {
-      controlLayer.current = utils.findOlLayer(mainMap, theme.id);
-    }
-
-    const selectedTime = timeData[currentPos];
-    if (selectedTime && controlLayer.current) {
-      controlLayer.current.getSource().updateParams({'TIME': selectedTime});
-    }
-  }, [currentPos, timeData, mainMap, theme]);
-
-  const options = (timeData || []).map((v, idx) => {
-    const format = record?.config_json?.displayFormat;
-    return { value: String(idx), label: formatDate(v, format) }
-  });
-  const hasTimeData = !!timeData?.length;
-
-  if(!opened) return <React.Fragment></React.Fragment>
-
-  if (theme?.id && viewer?.config_json?.checked?.length && !viewer.config_json.checked.includes(theme.id)) {
-    return (
-      <div style={{width: "100%"}}>
-        <Alert color="informative" py="xs" className="mt-2" style={{width: "100%" }}>
-          <Group justify="center" gap="xs" wrap="nowrap">
-            <IconInfoCircle />
-            <span>{`O tema "${theme?.title}" não está visível`}</span>
-          </Group>
-        </Alert>
-      </div>
-    )
+    setCurrent(selectDate(value, dimension, step, dateOnly));
+    setPreview(null);
   }
-
-  const showLegend = theme && record?.config_json?.showLegend === true;
-
-  return (
-    <div style={{padding: "10px 10px"}}>
-      { showLegend && <div className="mb-2"><Legend viewer={viewer} data={theme} core={core} actions={actions} models={Models}/></div> }
-      <div className="text-center mb-3">
-        <Select
-          value={currentPos != null ? String(currentPos) : null}
-          data={options}
-          searchable={options?.length > 20}
-          allowDeselect={false}
-          placeholder="Escolha uma data"
-          disabled={!hasTimeData}
-          onChange={(value) => { if (value != null) setCurrentPos(Number(value)) }}
-        />
-      </div>
-      <Slider
-        className="mb-3"
-        size="sm"
-        label={null}
-        value={currentPos}
-        onChange={(value) => { setCurrentPos(value) }}
-        max={hasTimeData ? timeData.length - 1 : 100}
-        disabled={!hasTimeData}
-      />
-      <Group justify="center" gap={0} wrap="nowrap" className="scalargis-timeline">
-        <MapToolButton.Group>
-          <MapToolButton
-            variant="filled" size="lg"
-            icon={<IconAngleDoubleLeft />}
-            title="Primeira data"
-            onClick={(e) => { setCurrentPos(0); }} disabled={!hasTimeData}
-          />
-          <MapToolButton
-            variant="filled" size="lg"
-            icon={<IconAngleLeft />}
-            title="Data anterior"
-            onClick={(e) => {
-              if (currentPos > 0) setCurrentPos(currentPos - 1);
-            }}
-            disabled={!hasTimeData}
-          />
-          { playing ?
-            <MapToolButton
-              variant="filled" size="lg"
-              icon={<IconPause />}
-              title="Pausar"
-              onClick={(e) => { setPlaying(false); }}
-            /> :
-            <MapToolButton
-              variant="filled" size="lg"
-              icon={<IconPlay />}
-              title="Reproduzir"
-              onClick={(e) => { startPlaying(); }} disabled={!hasTimeData}
-            />
-          }
-          <MapToolButton
-            variant="filled" size="lg"
-            icon={<IconAngleRight />}
-            title="Data seguinte"
-            onClick={(e) => {
-              if (timeData?.length) {
-                if (currentPos + 1 < timeData.length) {
-                  setCurrentPos(currentPos + 1);
-                } else if (loop) {
-                  setCurrentPos(0);
-                }
-              }
-            }}
-            disabled={!hasTimeData}
-          />
-          <MapToolButton
-            variant="filled" size="lg"
-            icon={<IconAngleDoubleRight />}
-            title="Última data"
-            onClick={(e) => { if (timeData?.length) setCurrentPos(timeData.length - 1); }} disabled={!hasTimeData}
-          />
-        </MapToolButton.Group>
-      </Group>
-    </div>
-  )
+  function navigate(direction) {
+    setPlaying(false);
+    setCurrent(cfg.loop && direction > 0 && current === dimension.max
+      ? dimension.min : stepDate(current, dimension, step, direction));
+  }
+  return <div style={{ padding: '6px 4px 2px' }}>
+    {error && <details style={{ fontSize: 12, marginBottom: 6 }}><summary style={{ cursor: 'pointer' }}>Aviso sobre as datas das camadas</summary>{error}</details>}
+    {!dimension && <Text size="sm" role="status">{loading ? 'A carregar datas…' : 'Sem datas disponíveis.'}</Text>}
+    {cfg.showLegend === true && themes.filter(theme => checked.includes(theme.id)).map(theme =>
+      <Legend key={theme.id} viewer={viewer} data={theme} core={core} actions={actions} models={Models} />)}
+    <Group gap={6} wrap="wrap" justify="center" align="center">
+    <DateInput key={hasTime ? 'datetime' : 'date'} size="xs" styles={{ input: { fontSize: 13, paddingInline: 6, height: 28, minHeight: 28 } }} className={`timeline-picker ${hasTime ? 'timeline-picker-time' : 'timeline-picker-date'}`} aria-label={hasTime ? 'Data e hora local' : 'Data local'} title="Hora local do navegador; serviços em UTC" type={hasTime ? 'datetime-local' : 'date'}
+      value={inputValue(display)} min={inputValue(dimension?.min)} max={inputValue(dimension?.max)} step={hasTime ? 60 : 1}
+      disabled={!enabled} onEdit={() => setPlaying(false)} onCommit={text => {
+        const value = parseLocalInput(text, current);
+        if (!Number.isFinite(value)) return null;
+        const next = hasTime ? clampDate(value, dimension) : selectDate(value, dimension, step, true);
+        setPlaying(false); setPreview(null); setCurrent(next);
+        return inputValue(next);
+      }} />
+    {cfg.displayFormat && display != null && <Text size="xs" style={{ fontSize: 11, whiteSpace: 'nowrap' }} title="Hora local">{formatDate(display, cfg.displayFormat)}</Text>}
+    </Group>
+    <Slider mt={8} mb={12} size="xs" thumbSize={12} label={null} aria-label="Posição temporal" value={position} min={0} max={1000}
+      disabled={!enabled || dimension.min === dimension.max}
+      onChange={value => { setPlaying(false); setPreview(dimension.min + value / 1000 * (dimension.max - dimension.min)); }}
+      onChangeEnd={value => select(dimension.min + value / 1000 * (dimension.max - dimension.min))} />
+    {options.length > 0 && <Group justify="center" gap={6} mb={8}>
+      {options.map(option => <Button key={option.value} size="compact-sm" fz={12} h={24} px={8} variant={step === option.value ? 'filled' : 'outline'}
+        aria-pressed={step === option.value} disabled={!enabled} onClick={() => {
+          setPlaying(false); setActiveStep(option.value); setCurrent(clampDate(snapStepPeriod(current, option.value), dimension));
+        }}>{option.label || option.value}</Button>)}
+    </Group>}
+    <Group justify="center" gap={0} wrap="nowrap">
+      <MapToolButton.Group>
+        <MapToolButton size={30} radius="sm" icon={<IconAngleDoubleLeft />} title="Primeira data" disabled={!enabled} onClick={() => { setPlaying(false); setCurrent(dimension.min); }} />
+        <MapToolButton size={30} radius="sm" icon={<IconAngleLeft />} title="Data anterior" disabled={!enabled} onClick={() => navigate(-1)} />
+        <MapToolButton size={30} radius="sm" icon={playing ? <IconPause /> : <IconPlay />} title={playing ? 'Pausar' : 'Reproduzir'} disabled={!enabled || dimension.min === dimension.max}
+          onClick={() => { if (!playing && current === dimension.max) setCurrent(dimension.min); setPlaying(!playing); }} />
+        <MapToolButton size={30} radius="sm" icon={<IconAngleRight />} title="Data seguinte" disabled={!enabled} onClick={() => navigate(1)} />
+        <MapToolButton size={30} radius="sm" icon={<IconAngleDoubleRight />} title="Última data" disabled={!enabled} onClick={() => { setPlaying(false); setCurrent(dimension.max); }} />
+      </MapToolButton.Group>
+    </Group>
+  </div>;
 }

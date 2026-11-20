@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActionIcon, Badge, Box, Button, Group, Paper, Select, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
+import { ActionIcon, Alert, Badge, Box, Button, Group, Paper, Select, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
 import { JsonForm, viewerConfigSchema } from '@scalargis/components';
-import { confirm, IconArrowDown, IconArrowUp, IconFolder, IconPlus, IconTrash } from '@scalargis/ui';
+import { confirm, IconArrowDown, IconArrowUp, IconFolder, IconPlus, IconShare, IconTrash } from '@scalargis/ui';
 
 import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N, control, inlineRefs } from './formViewShared';
 import {
   addNode, layerList, moveInto, moveNode, moveTargets, parentOf, removeNode, renameNode, treeRows, uniqueId
 } from './viewerLayerTree';
+import SharedLayerPicker from './SharedLayerPicker';
 
 const SIMPLE_TYPES = ['string', 'number', 'integer', 'boolean'];
 
@@ -34,7 +35,7 @@ function buildLayerSchema() {
   const layer = inlineRefs(root.definitions.layer, root.definitions);
   const properties = {};
   for (const [key, value] of Object.entries(layer.properties)) {
-    if (key === 'id' || key === 'children') continue;
+    if (key === 'id' || key === 'children' || key === 'shared') continue;
     if (SIMPLE_TYPES.includes(value.type)) properties[key] = value;
   }
   return { type: 'object', properties };
@@ -69,8 +70,12 @@ function nodeFormData(node) {
 }
 
 /** One row of the layer tree. */
-function TreeRow({ node, depth, parentId, selected, onSelect }) {
+function TreeRow({ node, depth, parentId, selected, onSelect, library }) {
   const isGroup = node.type === 'GROUP';
+  const shared = typeof node.shared === 'string' && node.shared ? node.shared : null;
+  const entry = shared ? (library || []).find((r) => r.code === shared) : null;
+  const title = node.title || entry?.title || node.id;
+  const type = node.type || entry?.type;
   return (
     <UnstyledButton
       type="button"
@@ -79,6 +84,7 @@ function TreeRow({ node, depth, parentId, selected, onSelect }) {
       data-layer-id={node.id}
       data-depth={depth}
       data-parent-id={parentId || ''}
+      data-shared={shared || undefined}
       aria-pressed={selected}
       style={{
         display: 'block',
@@ -90,16 +96,17 @@ function TreeRow({ node, depth, parentId, selected, onSelect }) {
     >
       <Group gap={6} wrap="nowrap">
         {isGroup && <IconFolder />}
-        <Text size="sm" truncate style={{ flex: 1, minWidth: 0 }}>{node.title || node.id}</Text>
-        <Text size="xs" c="dimmed" truncate maw={140}>{node.id}</Text>
-        <Badge size="xs" variant="light" color={isGroup ? 'gray' : 'primary'}>{node.type || '?'}</Badge>
+        {shared && <IconShare />}
+        <Text size="sm" truncate style={{ flex: 1, minWidth: 0 }}>{title}</Text>
+        <Text size="xs" c="dimmed" truncate maw={140}>{shared ? `partilhada: ${shared}` : node.id}</Text>
+        <Badge size="xs" variant="light" color={isGroup ? 'gray' : shared && library && !entry ? 'warning' : 'primary'}>{type || '?'}</Badge>
       </Group>
     </UnstyledButton>
   );
 }
 
 /** The Layers section of the viewer form view: the layer tree, its actions, and the fields of the selected node. */
-function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, getLatest }) {
+function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, getLatest, sharedLibrary }) {
   const { rows, orphans } = useMemo(() => treeRows(config), [config]);
   const [selectedId, setSelectedId] = useState(null);
   const nodes = layerList(config);
@@ -146,6 +153,9 @@ function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, ge
     setSelectedId(id);
     return addNode(base, node, parentId, afterId);
   });
+
+  const [pickerOpened, setPickerOpened] = useState(false);
+  const pickerTarget = selected?.type === 'GROUP' ? selected.id : (selected ? parentOf(config, selected.id) : null);
 
   const move = (step) => apply((base) => moveNode(base, selectedId, step));
 
@@ -212,6 +222,10 @@ function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, ge
           onClick={() => addLayer(false)} data-testid="layer-add">Camada WMS</Button>
         <Button type="button" size="xs" variant="light" leftSection={<IconPlus />} disabled={readonly}
           onClick={() => addLayer(true)} data-testid="layer-add-group">Grupo</Button>
+        {sharedLibrary !== undefined &&
+          <Button type="button" size="xs" variant="light" leftSection={<IconPlus />} disabled={readonly || !sharedLibrary}
+            onClick={() => setPickerOpened(true)} data-testid="layer-add-shared">Camada partilhada</Button>
+        }
         <Group gap={4} ml="auto">
           <ActionIcon type="button" variant="subtle" disabled={readonly || !selected} onClick={() => move(-1)}
             aria-label="Subir" title="Subir" data-testid="layer-up"><IconArrowUp /></ActionIcon>
@@ -227,13 +241,13 @@ function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, ge
           <Text size="sm" c="dimmed" p="xs">Sem camadas.</Text>
         }
         {rows.map(({ node, depth, parentId: rowParent }) =>
-          <TreeRow key={node.id} node={node} depth={depth} parentId={rowParent} selected={node.id === selectedId} onSelect={setSelectedId} />
+          <TreeRow key={node.id} node={node} depth={depth} parentId={rowParent} selected={node.id === selectedId} onSelect={setSelectedId} library={sharedLibrary} />
         )}
         {orphans.length > 0 &&
           <>
             <Text size="xs" c="dimmed" px="xs" pt="xs">Fora da árvore (nenhum grupo os tem)</Text>
             {orphans.map((node) =>
-              <TreeRow key={node.id} node={node} depth={0} selected={node.id === selectedId} onSelect={setSelectedId} />
+              <TreeRow key={node.id} node={node} depth={0} selected={node.id === selectedId} onSelect={setSelectedId} library={sharedLibrary} />
             )}
           </>
         }
@@ -247,6 +261,12 @@ function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, ge
             <Button type="button" size="sm" variant="default" disabled={readonly || !!idError || idTrimmed === selectedId}
               onClick={renameId} data-testid="layer-id-apply">Mudar id</Button>
           </Group>
+          {typeof selected.shared === 'string' && selected.shared &&
+            <Alert color="primary" py="xs" data-testid="layer-shared-note">
+              Camada partilhada <b>{selected.shared}</b>. Os campos abaixo são as sobreposições deste visualizador. Um campo vazio
+              usa o valor da biblioteca.
+            </Alert>
+          }
           <Select label="Mover para o grupo" placeholder="Escolha um grupo" data={moveData} value={null}
             onChange={moveTo} disabled={readonly} searchable data-testid="layer-move-into" />
           <Box>
@@ -264,6 +284,17 @@ function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, ge
           </Box>
         </Stack> :
         <Text size="sm" c="dimmed">Escolha um nó da árvore para ver os campos.</Text>
+      }
+
+      {sharedLibrary !== undefined &&
+        <SharedLayerPicker
+          opened={pickerOpened}
+          onClose={() => setPickerOpened(false)}
+          config={config}
+          library={sharedLibrary}
+          defaultTarget={pickerTarget}
+          onAdd={(next, id) => { writeConfig(next); setSelectedId(id); }}
+        />
       }
     </Stack>
   );

@@ -22,6 +22,7 @@ import { v4 as uuidV4 } from 'uuid'
 import xml2js from 'xml2js'
 import { isUrlAppOrigin, findOlLayer } from '../utils';
 import { serializeFeatures, deserializeFeatures } from '../model/MapModel';
+import { withWmtsDimensions } from './wmtsDimensions';
 
 const selectionLayerStyle = new Style({
   image: new Circle({
@@ -1095,8 +1096,9 @@ class FeatureInfoUtils  {
       + '&TileRow=' +  tileRow
       + '&I=' +  tileI
       + '&J=' +  tileJ;
-  
-  
+
+    url = withWmtsDimensions(url, source);
+
     if (!isUrlAppOrigin(url)) {
       url = this.core.MAP_PROXY_URL + encodeURIComponent(url);
     }
@@ -1162,7 +1164,9 @@ class FeatureInfoUtils  {
       + '&TileRow=' +  tileRow
       + '&I=' +  tileI
       + '&J=' +  tileJ;
-  
+
+    url = withWmtsDimensions(url, source);
+
     if (!isUrlAppOrigin(url) && layer.get('get_feature_info_proxy_request') !== false) {
       url = this.core.MAP_PROXY_URL + encodeURIComponent(url);
     }

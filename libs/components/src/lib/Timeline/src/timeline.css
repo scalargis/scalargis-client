@@ -1,0 +1,17 @@
+.timeline-picker {
+  flex: 0 0 auto;
+}
+.timeline-picker-time {
+  width: 164px;
+}
+.timeline-picker-date {
+  width: 124px;
+}
+@supports (-moz-appearance: none) {
+  .timeline-picker-time {
+    width: 190px;
+  }
+  .timeline-picker-date {
+    width: 136px;
+  }
+}

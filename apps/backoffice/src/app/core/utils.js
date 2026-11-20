@@ -88,6 +88,9 @@ export const isAdminOrManager = (auth) => {
   return retVal;
 }
 
+/** Returns true when the user has the Admin role. */
+export const isAdmin = (auth) => (auth?.data?.userroles || []).some((r) => String(r).toLowerCase() === 'admin');
+
 // -----------------------------------------------------------------------------
 
 export const getAppRootPath = () => {

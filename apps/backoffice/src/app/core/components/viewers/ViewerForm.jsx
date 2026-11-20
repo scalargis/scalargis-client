@@ -24,18 +24,20 @@ import {
   TextInput,
 } from '@mantine/core';
 import { findUnknownKeys, validateViewerConfig, describeViewerConfigFault } from '@scalargis/components';
-import { CodeEditor, jsonPointerRange, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory, IconFileEdit } from '@scalargis/ui';
+import { CodeEditor, jsonPointerRange, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory, IconFileEdit, IconPlus } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
 import { useChangeSummary } from '../common/ChangeSummary';
 import { useRecordHistory } from '../common/RecordHistory';
-import { isAdminOrManager } from '../../utils';
+import { isAdmin, isAdminOrManager } from '../../utils';
 
 import PrintGroupChildsEditor from "../common/PrintGroupChildsEditor";
 import PageSection from '../common/PageSection';
 import ViewerFormView from './ViewerFormView';
+import SharedLayerPicker, { unknownSharedCodes, useSharedLibrary } from './SharedLayerPicker';
+import { sharedCodes } from './viewerLayerTree';
 
 // Inactive tabs stay mounted (so editor state and history survive a tab
 // switch) but are hidden off-flow. We deliberately do NOT use display:none:
@@ -189,6 +191,19 @@ function ViewerForm(props) {
   const { core } = useContext(AppContext);
 
   const adminOrManager = isAdminOrManager(props.auth);
+  const admin = isAdmin(props.auth);
+  const sharedLibrary = useSharedLibrary(admin);
+  const [pickerOpened, setPickerOpened] = useState(false);
+
+  const parsedConfig = useMemo(() => {
+    try {
+      const value = JSON.parse(configJson);
+      return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
+    } catch (e) {
+      return null;
+    }
+  }, [configJson]);
+  const badCodes = useMemo(() => unknownSharedCodes(sharedCodes(parsedConfig), sharedLibrary), [parsedConfig, sharedLibrary]);
 
   const API_URL = core.API_URL;
 
@@ -688,8 +703,18 @@ function ViewerForm(props) {
           </PageSection>
 
         <PageSection style={activeTab === 'config' ? undefined : HIDDEN}>
+            {badCodes.length > 0 &&
+              <Alert color="warning" py="xs" mb="xs" icon={<IconAlertTriangle />} data-testid="shared-unknown-codes">
+                {badCodes.length === 1 ? 'Este código de camada partilhada não existe na biblioteca: ' : 'Estes códigos de camada partilhada não existem na biblioteca: '}
+                <b>{badCodes.join(', ')}</b>. O visualizador não mostra estas camadas.
+              </Alert>
+            }
             <Group justify="space-between" gap="xs" wrap="nowrap" mb={4}>
               <Group gap="xs" wrap="nowrap">
+                {admin &&
+                  <Button type="button" size="xs" variant="light" leftSection={<IconPlus />} disabled={!parsedConfig || !sharedLibrary}
+                    onClick={() => setPickerOpened(true)} data-testid="shared-picker-open">Adicionar camada partilhada</Button>
+                }
                 {(schemaLint.warnings > 0 || schemaLint.infos > 0) && <>
                   <Text size="sm" c={schemaLint.warnings ? 'warning' : 'dimmed'} data-testid="schema-lint-count">
                     {schemaCountText(schemaLint)}
@@ -743,6 +768,7 @@ function ViewerForm(props) {
               onConfigTextChange={setConfigJson}
               viewerId={data.id}
               active={activeTab === 'form'}
+              sharedLibrary={admin ? sharedLibrary : undefined}
             />
           </PageSection>
 
@@ -776,6 +802,16 @@ function ViewerForm(props) {
 
         {summary.dialog}
         {history.dialog}
+
+        {admin &&
+          <SharedLayerPicker
+            opened={pickerOpened}
+            onClose={() => setPickerOpened(false)}
+            config={parsedConfig || {}}
+            library={sharedLibrary}
+            onAdd={(next) => setConfigJson(JSON.stringify(next, null, 2))}
+          />
+        }
 
       </form>
 
