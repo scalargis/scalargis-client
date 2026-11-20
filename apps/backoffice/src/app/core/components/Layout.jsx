@@ -21,6 +21,9 @@ import NotificationList from './notifications/NotificationList';
 import ViewerEdit from './viewers/ViewerEdit';
 import ViewerList from './viewers/ViewerList';
 
+import SharedLayerEdit from './shared_layers/SharedLayerEdit';
+import SharedLayerList from './shared_layers/SharedLayerList';
+
 import PrintEdit from './prints/PrintEdit';
 import PrintList from './prints/PrintList';
 import PrintGroupEdit from './prints/PrintGroupEdit';
@@ -143,6 +146,10 @@ function Layout(props) {
                 <Route path="/viewers/create" element={<ViewerEdit />} />
                 <Route path="/viewers/edit/:id" element={<ViewerEdit />} />
                 <Route path="/viewers/list" element={<ViewerList />} />
+
+                <Route path="/shared-layers/create" element={<SharedLayerEdit />} />
+                <Route path="/shared-layers/edit/:id" element={<SharedLayerEdit />} />
+                <Route path="/shared-layers/list" element={<SharedLayerList />} />
 
                 <Route path="/prints/create" element={<PrintEdit />} />
                 <Route path="/prints/edit/:id" element={<PrintEdit />} />
