@@ -77,7 +77,7 @@ export const useViewerLocale = (viewer, location) => {
   useEffect(() => {
     const queryLang = new URLSearchParams(location?.search || '').get('lang');
     const lang = queryLang || (loaded ? resolveViewerLocale(viewer) : null);
-    if (lang && lang !== i18n.language) {
+    if (lang && lang !== i18n.resolvedLanguage) {
       i18n.changeLanguage(lang);
     }
   }, [loaded, viewer?.lang, allowedKey, location?.search]);
