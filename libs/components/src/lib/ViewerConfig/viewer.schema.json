@@ -398,9 +398,15 @@
       "description": "Um tema, um grupo ou uma camada da árvore de camadas.",
       "type": "object",
       "additionalProperties": true,
-      "required": ["id", "type"],
+      "required": ["id"],
       "properties": {
         "id": { "title": "Id", "description": "Id único do nó.", "type": "string" },
+        "shared": {
+          "title": "Camada partilhada",
+          "description": "Código de uma camada da biblioteca de camadas partilhadas. O servidor junta a camada da biblioteca e as chaves deste nó.",
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
         "type": {
           "title": "Tipo",
           "description": "Tipo do nó. Um tipo fora da lista não aparece no mapa.",
@@ -473,6 +479,10 @@
         "style_stroke_width": { "title": "Largura do contorno", "description": "Largura do contorno dos elementos, em píxeis.", "type": "number" }
       },
       "allOf": [
+        {
+          "if": { "not": { "required": ["shared"] } },
+          "then": { "required": ["type"] }
+        },
         {
           "if": {
             "properties": { "type": { "enum": ["WMS", "WFS", "WMTS", "WMTSXYZ", "XYZ", "TileJSON", "VTILE", "GeoJSON", "KML", "ArcGISMap", "COG", "OGCMapTile", "OGCVectorTile", "OGCFeatures", "OGCMap"] } },
