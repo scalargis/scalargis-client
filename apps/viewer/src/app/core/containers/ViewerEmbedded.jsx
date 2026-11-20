@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import { connect, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import Layout from './Layout'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import AppContext from '../../AppContext'
+import { useViewerLocale } from '../i18n/resolveLocale'
 import MainMap from '../components/MainMap'
 import MainMenu from './MainMenu'
 import Layers from '../components/Layers'
@@ -64,9 +64,6 @@ function ViewerEmbedded(props) {
     params
   }
 
-  //Localization
-  const { i18n } = useTranslation();
-
   // Main map
   const mainMapEl = useRef(null);
   
@@ -112,30 +109,7 @@ function ViewerEmbedded(props) {
     return () => window.removeEventListener('message', onMessage);
   }, [preview]);
 
-  useEffect(() => {
-    // Only change language if:
-    // 1. viewer.locale exists AND
-    // 2. There's no user preference in localStorage (OR user preference matches backend default)
-    if (viewer.locale) {
-      const storedLang = localStorage.getItem('i18nextLng');
-
-      // If no stored preference, use backend default
-      // If stored preference matches, no-op (already set by LanguageDetector)
-      // If stored preference differs, respect user's choice (don't override)
-      if (!storedLang) {
-        i18n.changeLanguage(viewer.locale);
-      }
-    }
-  }, [viewer?.locale]);
-
-  useEffect(() => {
-    // Check for lang query param and change language if present, overriding other settings
-    const query =new URLSearchParams(location.search);
-    const lang = query.get("lang");
-    if (lang) {
-      i18n.changeLanguage(lang);
-    }
-  }, [location]);
+  useViewerLocale(viewer, location);
 
 
   let rlayers = ['overlays', 'main', 'background', 'basemaps'];
