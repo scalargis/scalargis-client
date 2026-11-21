@@ -639,9 +639,22 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
   finalUrl = removeAuthToken(finalUrl, options.authToken);
 
   let featureInfoUrl = finalUrl;
-  if (!options.ignore_url) {
-    const gfiUrl = getWMTSFeatureInfoUrl(wmts);
-    if (gfiUrl && gfiUrl.indexOf('localhost') === -1) featureInfoUrl = removeAuthToken(gfiUrl, options.authToken);
+  const gfiUrl = getWMTSFeatureInfoUrl(wmts);
+  if (gfiUrl && gfiUrl.indexOf('localhost') === -1) {
+    if (!options.ignore_url) {
+      featureInfoUrl = removeAuthToken(gfiUrl, options.authToken);
+    } else {
+      try {
+        const origin = new URL(originUrl);
+        const gfi = new URL(gfiUrl);
+        if (gfi.host === origin.host) {
+          gfi.protocol = origin.protocol;
+          featureInfoUrl = removeAuthToken(gfi.toString(), options.authToken);
+        }
+      } catch (e) {
+        featureInfoUrl = finalUrl;
+      }
+    }
   }
 
 
