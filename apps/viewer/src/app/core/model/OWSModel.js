@@ -556,6 +556,37 @@ export const convertWMS2Themes = (wms, originUrl, options) => {
 /**
  * Parse WMTS to Theme
  */
+const WMTS_NS = 'http://www.opengis.net/wmts/1.0';
+const OWS_NS = 'http://www.opengis.net/ows/1.1';
+
+/** Copies the InfoFormat list of each layer from the capabilities XML into the parsed layers, which the OpenLayers parser skips. */
+export const addWMTSInfoFormats = (wmts, xmlText) => {
+  const layers = wmts?.Contents?.Layer;
+  if (!Array.isArray(layers) || !xmlText) return wmts;
+  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+  const formats = {};
+  Array.from(doc.getElementsByTagNameNS(WMTS_NS, 'Layer')).forEach(node => {
+    const children = Array.from(node.children);
+    const id = children.find(c => c.namespaceURI === OWS_NS && c.localName === 'Identifier')?.textContent?.trim();
+    if (!id) return;
+    formats[id] = children
+      .filter(c => c.namespaceURI === WMTS_NS && c.localName === 'InfoFormat')
+      .map(c => c.textContent.trim())
+      .filter(Boolean);
+  });
+  layers.forEach(l => {
+    if (formats[l.Identifier]?.length) l.InfoFormat = formats[l.Identifier];
+  });
+  return wmts;
+}
+
+/** Returns the GetFeatureInfo URL of the WMTS operations metadata, or null. */
+const getWMTSFeatureInfoUrl = (wmts) => {
+  const gets = wmts?.OperationsMetadata?.GetFeatureInfo?.DCP?.HTTP?.Get;
+  if (!Array.isArray(gets)) return null;
+  return gets.find(v => v.href)?.href || null;
+}
+
 export const convertWMTS2Themes = (wmts, originUrl, options) => {
   const result = [];
 
@@ -606,6 +637,12 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
   // Some services publish wrong URL from GetCapabilities
   if (finalUrl.indexOf('localhost') > -1) finalUrl = originUrl; // Wrong on some services
   finalUrl = removeAuthToken(finalUrl, options.authToken);
+
+  let featureInfoUrl = finalUrl;
+  if (!options.ignore_url) {
+    const gfiUrl = getWMTSFeatureInfoUrl(wmts);
+    if (gfiUrl && gfiUrl.indexOf('localhost') === -1) featureInfoUrl = removeAuthToken(gfiUrl, options.authToken);
+  }
 
 
   //// Get formats for GetFeatureInfo request
@@ -665,7 +702,7 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
     }
 
     //Get FeatureInfo Url
-    const get_feature_info_url = finalUrl;
+    const get_feature_info_url = featureInfoUrl;
 
     //Get FeatureInfo formats
     let get_feature_info_format = '';
@@ -673,6 +710,11 @@ export const convertWMTS2Themes = (wmts, originUrl, options) => {
     if (l.ResourceURL && l.ResourceURL.length > 0) {
       get_feature_info_formats = l.ResourceURL.filter((f => f.resourceType === 'FeatureInfo' ))
         .map(e => e.format);
+    }
+    if (Array.isArray(l.InfoFormat)) {
+      l.InfoFormat.forEach(f => {
+        if (!get_feature_info_formats.includes(f)) get_feature_info_formats.push(f);
+      });
     }
     if (get_feature_info_formats.length > 0) {
       get_feature_info_format_preference.forEach(gfif => {
@@ -1298,6 +1340,7 @@ export default {
   convertWFS2Themes,
   convertWMS2Themes,
   convertWMTS2Themes,
+  addWMTSInfoFormats,
   convertArcGISMap2Themes,
   convertKML2Themes,
   convertGeoJSON2Themes,

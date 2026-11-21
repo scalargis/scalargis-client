@@ -70,7 +70,7 @@ export default function WMTS(props) {
       })
       .then((r) => {
         const parser = new WMTSCapabilities();
-        const wmts = parser.read(r);
+        const wmts = Models.OWSModel.addWMTSInfoFormats(parser.read(r), r);
         const dataitems = Models.OWSModel.convertWMTS2Themes(wmts, sourceUrl, options);
         const wmtsTileMatrixSet = (wmts.Contents && wmts.Contents.TileMatrixSet)
           ? wmts.Contents.TileMatrixSet.map(m => ({ Identifier: m.Identifier, SupportedCRS: m.SupportedCRS }))
