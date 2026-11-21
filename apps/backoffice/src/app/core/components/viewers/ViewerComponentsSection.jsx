@@ -5,11 +5,13 @@ import { JsonForm, coreComponentSchemas, viewerConfigSchema } from '@scalargis/c
 import { confirm, IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@scalargis/ui';
 
 import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N } from './formViewShared';
+import { componentSchemas, outsideComponentTypes } from './outsideComponentSchemas';
 import {
   addComponent, componentForm, componentList, moveComponent, removeComponent, renameComponent, uniqueComponentId
 } from './viewerComponents';
 
 const CORE_TYPES = Object.keys(coreComponentSchemas).sort((a, b) => a.localeCompare(b));
+const OUTSIDE_TYPES = outsideComponentTypes;
 const TARGETS = viewerConfigSchema.definitions.component.properties.target.examples || [];
 const NEW_TARGET = 'mainmenu';
 
@@ -23,7 +25,7 @@ function recordTitle(record) {
 
 /** One row of the component list. */
 function ComponentRow({ record, selected, onSelect }) {
-  const known = !!coreComponentSchemas[record.type];
+  const known = !!componentSchemas[record.type];
   return (
     <UnstyledButton
       type="button"
@@ -65,7 +67,7 @@ function ViewerComponentsSection({ config, readonly, dataGeneration, writeConfig
     setTargetDraft(selected?.target || '');
   }, [selectedId, dataGeneration]);
 
-  const known = !!(selected && coreComponentSchemas[selected.type]);
+  const known = !!(selected && componentSchemas[selected.type]);
   const formKey = useRef({ generation: null, id: null, type: null, form: null, data: null });
   if (formKey.current.generation !== dataGeneration || formKey.current.id !== selectedId
     || formKey.current.type !== selected?.type) {
@@ -74,7 +76,7 @@ function ViewerComponentsSection({ config, readonly, dataGeneration, writeConfig
       generation: dataGeneration,
       id: selectedId,
       type: selected?.type,
-      form: known ? componentForm(coreComponentSchemas[selected.type], data) : null,
+      form: known ? componentForm(componentSchemas[selected.type], data) : null,
       data
     };
   }
@@ -150,7 +152,11 @@ function ViewerComponentsSection({ config, readonly, dataGeneration, writeConfig
     });
   };
 
-  const typeOptions = useMemo(() => CORE_TYPES.map((t) => ({ value: t, label: t })), []);
+  const typeOptions = useMemo(() => {
+    const groups = [{ group: 'Núcleo', items: CORE_TYPES }];
+    if (OUTSIDE_TYPES.length) groups.push({ group: 'Externos', items: OUTSIDE_TYPES });
+    return groups;
+  }, []);
   const targetOptions = useMemo(() => [...new Set([...TARGETS, ...records.map((c) => c.target).filter(Boolean)])], [records]);
   const index = selected ? records.indexOf(selected) : -1;
 
