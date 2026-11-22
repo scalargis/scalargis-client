@@ -25,8 +25,8 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
     return 'http://www.opengis.net/def/crs/EPSG/0/' + srid;
   }
 
-  /** Default vector style, aligned with WFSLayer. */
-  function defaultStyle(config) {
+  /** Function to build vector style, aligned with WFSLayer. */
+  function buildStyle(config) {
     const style_color = config.style_color === null ? null : (config.style_color ? `rgba(${config.style_color})` : 'black');
 
     const style_stroke_color = config.style_stroke_color === null ? null : (config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'black');
@@ -140,7 +140,7 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
       attributions: config.attributions || []
     });
 
-    const style = defaultStyle(config);
+    const style = buildStyle(config);
 
     const new_layer = new OlLayerVector({
       ...config,
@@ -201,6 +201,22 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
     layer.current.setProperties(config);
     layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
+
+    let style = config.style_text_value ? (feature, resolution) => {
+        let label = config.style_text_value || '';
+        if (config.style_text_value && feature?.get) {
+          const rf = (label && label.match) ? label.match(/[^{}]+(?=})/g) : null;
+          if (rf) {
+            rf.forEach(fld => {
+              label = label.replace(`{${fld}}`, feature.get(fld) || '');
+            });
+          }
+        }
+        style.getText().setText(label);
+        return style;
+      } : buildStyle(config);
+
+    layer.current.setStyle(style);
     layer.current.changed();
   }, [config]);
 

@@ -37,6 +37,32 @@ const OGCVectorTileLayer = ({ config, source, group, checked }) => {
   const { mainMap } = useContext(AppContext);
   const layer = useRef();
 
+  const MAX_CONCURRENT = 4;
+  const MAX_RETRIES = 3;
+  let active = 0;
+  const queue = [];
+
+  function runNext() {
+    while (active < MAX_CONCURRENT && queue.length) {
+      active++;
+      queue.shift()().finally(() => { active--; runNext(); });
+    }
+  }
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  async function fetchWithRetry(url, attempt = 0) {
+    const res = await fetch(url);
+    if (res.status === 429 && attempt < MAX_RETRIES) {
+      const retryAfter = Number(res.headers.get('Retry-After'));
+      const delay = retryAfter ? retryAfter * 1000 : 500 * 2 ** attempt;
+      await sleep(delay);
+      return fetchWithRetry(url, attempt + 1);
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.arrayBuffer();
+  }
+
   useEffect(() => {
     if (!mainMap) return;
 
@@ -56,11 +82,36 @@ const OGCVectorTileLayer = ({ config, source, group, checked }) => {
     const hasStyle = config.style_color !== undefined
       || config.style_stroke_color !== undefined
       || config.style_stroke_width !== undefined;
+      
 
     layer.current = new OlVectorTileLayer({
       ...config,
+      preload: 0,                    // não pré-carrega níveis de zoom inferiores
+      updateWhileAnimating: false,
+      updateWhileInteracting: false, // só pede tiles quando o movimento termina
       visible: config.active,
-      source: source ? source : new OlSourceOGCVectorTile(options),
+      source: source ? source : new OlSourceOGCVectorTile({
+        ...options,
+        tileLoadFunction: (tile, url) => {
+          tile.setLoader((extent, resolution, projection) => {
+            queue.push(async () => {
+              try {
+                const data = await fetchWithRetry(url);
+                const format = tile.getFormat();
+                tile.setFeatures(
+                  format.readFeatures(data, {
+                    extent,
+                    featureProjection: projection,
+                  })
+                );
+              } catch (e) {
+                tile.setState(3); // TileState.ERROR
+              }
+            });
+            runNext();
+          });
+        }
+      }),
       ...(hasStyle ? { style: buildStyle(config) } : {})
     });
 
@@ -88,8 +139,11 @@ const OGCVectorTileLayer = ({ config, source, group, checked }) => {
 
   // Changed config
   useEffect(() => {
+    layer.current.setProperties(config);
     layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
+    layer.current.setStyle(buildStyle(config))
+    layer.current.changed();
   }, [config]);
 
   return null;

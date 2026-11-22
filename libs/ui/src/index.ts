@@ -106,6 +106,9 @@ export type { ActionToolbarProps, ToolbarAction } from './recipes/ActionToolbar'
 export { useMapResize } from './recipes/useMapResize';
 export type { MapResizeDeps, MapResizeActions } from './recipes/useMapResize';
 
+export { TextInput } from './recipes/TextInput';
+export type { TextInputProps } from './recipes/TextInput';
+
 /* Icon seam — primeicons behind one indirection (see recipes/icons.tsx). */
 export * from './recipes/icons';
 

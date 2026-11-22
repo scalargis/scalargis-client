@@ -246,7 +246,7 @@ class EditNode extends React.Component {
             </Accordion>
           ) : null }
 
-          { ['GeoJSON', 'WFS', 'KML'].includes(edit.type) ? (
+          { ['GeoJSON', 'WFS', 'KML', 'OGCVectorTile', 'OGCFeatures'].includes(edit.type) ? (
             <React.Fragment>
               <div className="field grid">
                 <label className="col-12 md:col-4">{this.props.t("fillColor", "Côr de Preenchimento")}</label>

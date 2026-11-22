@@ -12,7 +12,9 @@ export default function WizardStepConfirm(props) {
 
   const { i18n, t } = useTranslation([I18N_NAMESPACE, "custom"]);
 
+  const { itemRenderer } = props;
   const data = props.wizardData;
+
   return (
     <div>
 
@@ -30,6 +32,7 @@ export default function WizardStepConfirm(props) {
             themes={data.items}
             selected={data.selected}
             readOnly={true}
+            itemRenderer={itemRenderer}
           />
         )
       ) :

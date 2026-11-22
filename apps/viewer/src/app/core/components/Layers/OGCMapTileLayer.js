@@ -39,6 +39,8 @@ const OGCMapTileLayer = ({ config, source, group, checked }) => {
 
   // Changed config
   useEffect(() => {
+    layer.current.setProperties(config);
+    layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
   }, [config]);  
 

@@ -115,6 +115,8 @@ export interface TreeViewProps
    * omitted, the node's own `label` is rendered as today.
    */
   renderLabel?: (node: TreeNodeData) => React.ReactNode;
+  /** Item Renderer */
+  itemRenderer?: (data: any) => React.ReactNode;
 }
 
 export function TreeView({
@@ -124,6 +126,7 @@ export function TreeView({
   bordered = true,
   levelOffset = 'md',
   defaultExpandAll = false,
+  itemRenderer,
   renderLabel,
   onKeyDown,
   ...treeProps
@@ -239,7 +242,7 @@ export function TreeView({
           />
         )}
 
-        <span>{content}</span>
+        { itemRenderer ? itemRenderer({id: node?.value, content}) : <span>{content}</span> }
       </Group>
     );
   };

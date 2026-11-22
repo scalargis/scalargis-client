@@ -12,6 +12,8 @@ import OlSourceImageWMS from 'ol/source/ImageWMS';
 import OlSourceTileArcGISRest from 'ol/source/TileArcGISRest';
 import OlSourceImageArcGISRest from 'ol/source/ImageArcGISRest';
 import OlSourceWMTS from 'ol/source/WMTS';
+import OlSourceImage from "ol/source/Image";
+import OlSourceImageTile from "ol/source/ImageTile";
 import OlSourceVector from "ol/source/Vector";
 import OlWKT from "ol/format/WKT";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
@@ -1299,6 +1301,295 @@ export const getArcGISVisibleLayers = function (map, scale) {
   return vlayers;    
 };
 
+export const getOGCAPIVisibleLayers = function (map, scale) {
+  const vlayers = [];
+
+  const _getLayers = function (layer, list) {
+    if (layer.getVisible()) {
+      if (layer instanceof OlGroup) {
+          const lls = layer.getLayers().getArray();
+          for (let i=0; i<lls.length; i++) {
+              _getLayers(lls[i], list);
+          }
+      } else if (layer.get('type') == 'OGCMap')  {
+        const source = layer.getSource();
+        if (layer.get('print')) {
+          const print = layer.get('print').length ? layer.get('print') : [layer.get('print')];
+
+          print.forEach(pitem => {
+            const type = (pitem.type || '').toLowerCase();
+
+            if (['wms', 'ogcmap'].includes(type)) {
+              const params = {};
+              if (type == 'ogcmap') {
+                params['format'] = pitem.format || 'png';
+              } else {
+                params['FORMAT'] = pitem.format || 'image/png';
+              }
+              if (pitem.layers) params['LAYERS'] = pitem.layers;
+              params['STYLES'] = pitem.styles || '';
+              params['VERSION'] = pitem.version || '1.3.0';
+              if (pitem.cql_filter) params['CQL_FILTER'] = pitem.cql_filter;
+
+              const ldata = {
+                'url': pitem.url,
+                'params': params,
+                'opacity': layer.getOpacity(),
+                'minScale': 0,
+                'maxScale': 0
+              };
+
+              if (layer.getMaxResolution && layer.getMaxResolution() > 0) {
+                ldata['minScale'] = getScaleForResolution(layer.getMaxResolution(), map.getView().getProjection().getUnits());
+              }
+              if (pitem.maxResolution && pitem.maxResolution > 0) {
+                ldata['minScale'] = getScaleForResolution(pitem.maxResolution, map.getView().getProjection().getUnits());
+              }
+              if (pitem.minScale && pitem.minScale > 0) {
+                ldata['minScale'] = pitem.minScale;
+              }
+
+              if (layer.getMinResolution && layer.getMinResolution() > 0) {
+                  ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
+              }
+              if (pitem.minResolution && pitem.minResolution > 0) {
+                ldata['maxScale'] = getScaleForResolution(pitem.minResolution, map.getView().getProjection().getUnits());
+              }
+              if (pitem.maxScale && pitem.maxScale > 0) {
+                ldata['maxScale'] = pitem.maxScale;
+              }
+
+              ldata['attributions'] = getPrintAttribution(layer, pitem);
+
+              list.push(ldata);
+            }
+          });
+        } else if (source instanceof OlSourceImageTile || source instanceof OlSourceImage) {          
+          const url = layer.get('url');
+
+          const params = {
+            format: layer.get('format') || 'png'
+          };
+          /*
+          const p = source.getParams()
+          for (const key in p) {
+              params[key] = p[key];
+          }
+          */
+
+          const ldata = {
+              'url': url,
+              'params': params,
+              'opacity': layer.getOpacity(),
+              'minScale': 0,
+              'maxScale': 0
+          };
+
+          if (layer.getMaxResolution && layer.getMaxResolution() > 0) {
+              ldata['minScale'] = getScaleForResolution(layer.getMaxResolution(), map.getView().getProjection().getUnits());
+          }
+          if (layer.getMinResolution && layer.getMinResolution() > 0) {
+              ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
+          }
+
+          ldata['attributions'] = getPrintAttribution(layer);
+
+          list.push(ldata);
+        }
+      }
+    }
+  }
+
+  const rootLayers = map.getLayers().getArray();
+  for (let i=0; i<rootLayers.length; i++) {
+      _getLayers(rootLayers[i], vlayers);
+  }
+
+  return vlayers;    
+};
+
+export const getPrintableVisibleLayers = function (map, scale) {
+  const vlayers = [];
+
+  const _getLayers = function (layer, list) {
+    if (layer.getVisible()) {
+      if (layer instanceof OlGroup) {
+        const lls = layer.getLayers().getArray();
+        for (let i=0; i<lls.length; i++) {
+            _getLayers(lls[i], list);
+        }
+      } else {
+        const source = layer.getSource();
+
+        if (layer.get('print')) {
+          const print = layer.get('print').length ? layer.get('print') : [layer.get('print')];
+          print.forEach(pitem => {
+            let params;
+            let ldata;
+
+            const type = (pitem.type || '').toLowerCase();
+
+            if (['wms', 'ogcmap'].includes(type)) {
+              params = {};
+              if (type == 'ogcmap') {
+                params['format'] = pitem.format || 'png';
+              } else {
+                params['FORMAT'] = pitem.format || 'image/png';
+              }
+              if (pitem.layers) params['LAYERS'] = pitem.layers;
+              params['STYLES'] = pitem.styles || '';
+              if (type == 'wms') {
+                params['VERSION'] = pitem.version || '1.3.0';
+              }
+              if (pitem.cql_filter) params['CQL_FILTER'] = pitem.cql_filter;
+
+              ldata = {
+                'type': type,
+                'url': pitem.url,
+                'params': params
+              };
+            } else if (type == 'arcgismap') {
+              params = {};
+              params["LAYERS"] = pitem.layers;
+
+              ldata = {
+                'type': type,
+                'url': pitem.url,
+                'params': params
+              };
+            }
+
+            if (ldata) {
+              ldata = {
+                ...ldata,
+                'opacity': layer.getOpacity(),
+                'minScale': 0,
+                'maxScale': 0
+              }
+
+              if (layer.getMaxResolution && layer.getMaxResolution() > 0) {
+                ldata['minScale'] = getScaleForResolution(layer.getMaxResolution(), map.getView().getProjection().getUnits());
+              }
+              if (pitem.maxResolution && pitem.maxResolution > 0) {
+                ldata['minScale'] = getScaleForResolution(pitem.maxResolution, map.getView().getProjection().getUnits());
+              }
+              if (pitem.minScale && pitem.minScale > 0) {
+                ldata['minScale'] = pitem.minScale;
+              }
+
+              if (layer.getMinResolution && layer.getMinResolution() > 0) {
+                  ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
+              }
+              if (pitem.minResolution && pitem.minResolution > 0) {
+                ldata['maxScale'] = getScaleForResolution(pitem.minResolution, map.getView().getProjection().getUnits());
+              }
+              if (pitem.maxScale && pitem.maxScale > 0) {
+                ldata['maxScale'] = pitem.maxScale;
+              }
+
+              ldata['attributions'] = getPrintAttribution(layer, pitem);
+              
+              list.push(ldata);
+            }
+          });
+
+        } else {
+          let ldata;
+
+          const type = (layer.get('type') || '').toLowerCase();
+
+          if (source instanceof OlSourceTileWMS || source instanceof OlSourceImageWMS) {
+            let url = '';
+
+            if (source.getUrl) {
+                url = source.getUrl();
+            } else {
+                url = source.getUrls()[0];
+            }
+
+            const params = {};
+            const p = source.getParams()
+            for (const key in p) {
+                params[key] = p[key];
+            }
+
+            ldata = {
+              'type': 'wms',
+              'url': url,
+              'params': params
+            }
+          } else if (source instanceof OlSourceTileArcGISRest || source instanceof OlSourceImageArcGISRest) {
+            let url = '';
+
+            if (source.getUrl) {
+                url = source.getUrl();
+            } else {
+                url = source.getUrls()[0];
+            }
+
+            const params = {};
+            const p = source.getParams()
+            for (const key in p) {
+                params[key] = p[key];
+            }
+
+            ldata = {
+              'type': 'arcgismap',
+              'url': url,
+              'params': params
+            }
+          } else if ((type == 'ogcmap') && (source instanceof OlSourceImageTile || source instanceof OlSourceImage)) {          
+            const url = layer.get('url');
+
+            const params = {
+              format: layer.get('format') || 'png'
+            };
+            /*
+            const p = source.getParams()
+            for (const key in p) {
+                params[key] = p[key];
+            }
+            */
+
+            ldata = {
+                'type': 'ogcmap',
+                'url': url,
+                'params': params,
+            };
+          }
+
+          if (ldata) {
+            ldata = {
+              ...ldata,
+              'opacity': layer.getOpacity(),
+              'minScale': 0,
+              'maxScale': 0
+            };
+
+            if (layer.getMaxResolution && layer.getMaxResolution() > 0) {
+                ldata['minScale'] = getScaleForResolution(layer.getMaxResolution(), map.getView().getProjection().getUnits());
+            }
+            if (layer.getMinResolution && layer.getMinResolution() > 0) {
+                ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
+            }
+
+            ldata['attributions'] = getPrintAttribution(layer);
+
+            list.push(ldata);
+          }
+        }
+      }
+    }
+  }
+
+  const rootLayers = map.getLayers().getArray();
+  for (let i=0; i<rootLayers.length; i++) {
+      _getLayers(rootLayers[i], vlayers);
+  }
+
+  return vlayers; 
+}
+
 export const buildMultiGeom = function (geoms) {
   let outGeom;
   const type = geoms[0].getType().toUpperCase();
@@ -1426,5 +1717,7 @@ export default {
   getWKTFromGeometry,
   getGeometryFromWKT,
   getWMSVisibleLayers,
-  getArcGISVisibleLayers
+  getArcGISVisibleLayers,
+  getOGCAPIVisibleLayers,
+  getPrintableVisibleLayers
 }

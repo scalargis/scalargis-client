@@ -66,7 +66,7 @@ const sameSet = (a, b) => a.length === b.length && a.every((v) => b.includes(v))
  * (carried over by the up-sync) and are re-seeded when the filter clears —
  * filtering never loses a selection, which is how the Prime Tree behaved.
  */
-export default function ThemesTree({ nodes, selected, setSelected, readOnly, withFilter }) {
+export default function ThemesTree({ nodes, selected, setSelected, readOnly, withFilter, itemRenderer }) {
   const { t } = useTranslation([I18N_NAMESPACE, 'custom']);
   const [filter, setFilter] = useState('');
   const [isSelectAll, setIsSelectAll] = useState(false);
@@ -175,7 +175,7 @@ export default function ThemesTree({ nodes, selected, setSelected, readOnly, wit
         />
       )}
 
-      <TreeView data={filteredData} tree={tree} checkboxes={!readOnly} />
+      <TreeView data={filteredData} tree={tree} checkboxes={!readOnly} itemRenderer={itemRenderer} />
     </React.Fragment>
   );
 }

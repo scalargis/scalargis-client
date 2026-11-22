@@ -1065,7 +1065,7 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
         opacity: 1,
         type: 'OGCFeatures',
         url,
-        limit: 1000,
+        limit: options?.maxFeatures || 1000,
         max_pages: 10,
         style_color: generateRGBA(),
         style_stroke_color: generateRGBA(),
@@ -1085,6 +1085,7 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
         tiled: typeof options.tiled === 'undefined' ? true : options.tiled,
         type: 'OGCMap',
         url,
+        format: coll.format || 'png',
         children: []
       };
     } else {

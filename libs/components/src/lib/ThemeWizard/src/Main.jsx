@@ -50,7 +50,9 @@ const initialData = {
   wmtsVersion: "1.0.0",
   wfsVersion: "2.0.0",
   wfsIgnoreServiceUrl: true,
-  ogcTiled: true
+  ogcTiled: true,
+  maxFeatures: 500,
+  state: {}
 };
 
 
@@ -101,6 +103,7 @@ export default function Main(props) {
   const [loading, setLoading] = useState(false);
   const [types, setTypes] = useState(source_types);
   const loadVersion = useRef(0);
+  const [itemRenderer, setItemRenderer] = useState(null);
 
   /** Starts a load and returns a check that is true while no later load or reset has started. */
   function beginLoad() {
@@ -260,6 +263,7 @@ export default function Main(props) {
             wizardData={wizardData}
             onSave={e => onComplete(wizardData)}
             onCancel={null}
+            itemRenderer={itemRenderer}
           />
         break
       case 1:
@@ -286,6 +290,10 @@ export default function Main(props) {
             }}
             onCancel={null}
             fastFetch={fastFetch}
+            setItemRenderer={(fn) => {
+              setItemRenderer(() => { return fn; });}
+            }
+            itemRenderer={itemRenderer}
           />
         break
       case 0:

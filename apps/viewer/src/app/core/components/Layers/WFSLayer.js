@@ -23,8 +23,8 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
 
   const MAP_PROXY = core.MAP_PROXY_URL;
 
-  // Default style
-  function defaultStyle(config) {
+  /** Function to build vector style */
+  function buildStyle(config) {
     const style_color = config.style_color === null ? null : (config.style_color ? `rgba(${config.style_color})` : 'black');
     
     const style_stroke_color = config.style_stroke_color === null ? null : (config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'black');
@@ -174,7 +174,7 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
       attributions: config.attributions || []
     });
 
-    const style = defaultStyle(config);
+    const style = buildStyle(config);
 
     const new_layer = new OlLayerVector({
       ...config,
@@ -236,6 +236,23 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
     layer.current.setProperties(config);
     layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
+
+    const style = config.style_text_value ? (feature, resolution) => {
+      let label = config.style_text_value || '';
+      if (config.style_text_value && feature?.get) {
+        const rf = (label && label.match) ? label.match(/[^{}]+(?=})/g) : null;
+        if (rf) {
+          rf.forEach(fld => {
+            label = label.replace(`{${fld}}`, feature.get(fld) || '');      
+          });            
+        }
+      }
+      //const label = map.getView().getZoom() > 12 ? feature.get('PAR_ID') + '' : '';
+      style.getText().setText(label);
+        return style;
+      } : buildStyle(config);
+
+    layer.current.setStyle(style);
     layer.current.changed();
   }, [config]);
 

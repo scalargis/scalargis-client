@@ -24,6 +24,7 @@ export default function WizardStepData(props) {
 
   const { Models, fastFetch } = props;
   const { selected, setSelected } = props;
+  const {itemRenderer, setItemRenderer } = props;
   const [filter, setFilter] = useState('');
   const { getWindowSize } = Models.Utils;
   const winSize = getWindowSize();
@@ -41,6 +42,7 @@ export default function WizardStepData(props) {
   }
 
   const data = props.wizardData;
+
 
   function updateData(d) {
     props.onChange(d);
@@ -115,6 +117,7 @@ export default function WizardStepData(props) {
         setData={updateData}
         patchData={patchData}
         setSelected={setSelected}
+        setItemRenderer={setItemRenderer}
         getUrlHistory={getUrlHistory}
         editField={editField}
         winSize={winSize}
@@ -149,6 +152,7 @@ export default function WizardStepData(props) {
           selected={selected}
           setSelected={setSelected}
           filter={filter}
+          itemRenderer={itemRenderer}
         />
       }
 

@@ -124,7 +124,12 @@ const ArcGISMapLayer = ({ config, group, checked, viewer }) => {
     }
     if (t && config.layerName) {
       t.set('layerName', Array.isArray(config.layerName) ? config.layerName : [config.layerName]);
-    }       
+    }
+    
+    //Set print override
+    if (t && config.print) {
+      t.set("print", config.print);
+    }
 
     return t;
   }

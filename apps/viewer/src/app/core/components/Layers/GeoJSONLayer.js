@@ -17,8 +17,8 @@ const GeoJSONLayer = ({ config, group, checked }) => {
 
   const MAP_PROXY = core.MAP_PROXY_URL;
 
-  // Default style
-  function defaultStyle(feature) {
+  /** Function to build vector style */
+  function buildStyle(feature) {
     let style_color = config.style_color ? `rgba(${config.style_color})` : 'black';
     let style_stroke_color = config.style_stroke_color ? `rgba(${config.style_stroke_color})` : 'black';
     let style_stroke_width = typeof config.style_stroke_width === 'undefined' ? 1 : Number(config.style_stroke_width);
@@ -84,7 +84,7 @@ const GeoJSONLayer = ({ config, group, checked }) => {
       ...config,
       visible: config.active,
       source: vectorSource,
-      style: defaultStyle
+      style: buildStyle(config)
     });
   }
   
@@ -110,6 +110,7 @@ const GeoJSONLayer = ({ config, group, checked }) => {
     layer.current.setProperties(config);
     layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
+    layer.current.setStyle(buildStyle(config));
     layer.current.changed();
   }, [config]);
 

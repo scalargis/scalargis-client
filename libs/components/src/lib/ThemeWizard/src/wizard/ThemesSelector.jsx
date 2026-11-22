@@ -3,7 +3,7 @@ import layerNode from './layerNode';
 import ThemesTree from './ThemesTree';
 
 
-const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide }) => {
+const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide, itemRenderer }) => {
   const nodes = useMemo(() => (themes || []).map((l) => layerNode(l)), [themes]);
 
   if (!nodes.length) return null;
@@ -16,6 +16,7 @@ const ThemesSelector = ({ themes, selected, setSelected, readOnly, hide }) => {
       setSelected={setSelected}
       readOnly={readOnly}
       withFilter={!readOnly && nodes.length >= 10}
+      itemRenderer={itemRenderer} 
     />
   );
 }

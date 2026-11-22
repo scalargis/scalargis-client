@@ -11,22 +11,127 @@ import AppContext from "../../../AppContext";
 import { isUrlAppOrigin } from '../../utils';
 import { getProjectionSrid, getResolutionForScale } from '../../model/MapModel';
 
-const OGCMapLayer = ({ config, group, checked }) => {
+const OGCMapLayer = ({ config, group, checked, viewer }) => {
 
   const { core, mainMap } = useContext(AppContext);
   const layer = useRef();
 
   const MAP_PROXY = core.MAP_PROXY_URL;
 
+  const TILE_SIZE = 256;
+  // Grelha XYZ em EPSG:3857
+  const MAP_SRID = mainMap ? getProjectionSrid(mainMap.getView().getProjection()) : 3857;
+  const tileGrid = createXYZ({tileSize: TILE_SIZE});
+
   /** Build the OGC URI for an EPSG code. */
   function crsUri(srid) {
     return 'http://www.opengis.net/def/crs/EPSG/0/' + srid;
   }
 
+  function buildUrl(mapUrl, format, z, x, y) {
+    const [minX, minY, maxX, maxY] = tileGrid.getTileCoordExtent([z, x, y]);
+
+    const p = new URLSearchParams({
+      f: format,
+      bbox: [minX, minY, maxX, maxY].join(','),
+      'bbox-crs': crsUri(MAP_SRID),
+      crs: crsUri(MAP_SRID),
+      width: String(TILE_SIZE),
+      height: String(TILE_SIZE),
+      transparent: 'true',
+    });
+    return `${mapUrl}?${p}`;
+  }
+
+  function createThrottledLoader({
+    maxConcurrent = 4,
+    maxRetries = 4,
+    baseDelayMs = 500,
+    mapUrl,
+    format = 'png'
+  } = {}) {
+    const queue = [];
+    let active = 0;
+
+    const pump = () => {
+      while (active < maxConcurrent && queue.length) {
+        const job = queue.shift();
+        active++;
+        job().finally(() => {
+          active--;
+          pump();
+        });
+      }
+    };
+
+    const enqueue = (task, signal) =>
+      new Promise((resolve, reject) => {
+        queue.push(() => {
+          // tile já cancelado (utilizador fez pan/zoom): não pede ao servidor
+          if (signal?.aborted) {
+            reject(new DOMException('Aborted', 'AbortError'));
+            return Promise.resolve();
+          }
+          return task().then(resolve, reject);
+        });
+        pump();
+      });
+
+    const sleep = (ms, signal) =>
+      new Promise((resolve, reject) => {
+        const t = setTimeout(resolve, ms);
+        signal?.addEventListener('abort', () => {
+          clearTimeout(t);
+          reject(new DOMException('Aborted', 'AbortError'));
+        }, {once: true});
+      });
+
+    async function fetchImage(url, signal) {
+      for (let attempt = 0; ; attempt++) {
+        let retryAfterMs = null;
+        try {
+          const res = await fetch(url, {signal});
+          if (res.ok) {
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            try {
+              const img = new Image();
+              img.src = objectUrl;
+              await img.decode();
+              return img;
+            } finally {
+              URL.revokeObjectURL(objectUrl);
+            }
+          }
+          if (res.status !== 429 && res.status !== 503) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+          const ra = Number(res.headers.get('Retry-After'));
+          if (ra > 0) retryAfterMs = ra * 1000;
+        } catch (e) {
+          if (e.name === 'AbortError') throw e;
+          // TypeError "Failed to fetch": típico de 429 sem CORS, também repete
+          if (!(e instanceof TypeError) && !/HTTP (429|503)/.test(e.message)) {
+            if (attempt >= maxRetries) throw e;
+          }
+        }
+        if (attempt >= maxRetries) throw new Error(`Falhou após ${attempt + 1} tentativas`);
+        const backoff = baseDelayMs * 2 ** attempt + Math.random() * 250;
+        await sleep(retryAfterMs ?? backoff, signal);
+      }
+    }
+
+    return (z, x, y, options) =>
+      enqueue(() => fetchImage(buildUrl(mapUrl, format, z, x, y), options?.signal), options?.signal);
+  }
+
+
+
   function createImageLayer(config) {
     const proj = mainMap.getView().getProjection().getCode();
     const srid = config.crs ? config.crs : getProjectionSrid(proj);
     const uri = crsUri(srid);
+
     const format = config.format ? config.format : 'png';
 
     const source = new OlSourceImage({
@@ -81,19 +186,15 @@ const OGCMapLayer = ({ config, group, checked }) => {
     base = base.replace(/&$/ig, '');
     base = base + (base.indexOf('?') > -1 ? '&' : '?');
 
-    const TILE_SIZE = 256;
-    const CRS_3857 = 'http://www.opengis.net/def/crs/EPSG/0/3857';
-
-    // Grelha XYZ em EPSG:3857, a mesma usada pela source
-    const tileGrid = createXYZ({tileSize: TILE_SIZE});
-
     const format = config.format ? config.format : 'png';
 
     const source = new OLSourceImageTile({
-      projection: 'EPSG:3857',
+      projection: `EPSG:${MAP_SRID}`,
       tileGrid,
       wrapX: false,          // evita pedidos de tiles fora do mundo
       crossOrigin: 'anonymous',
+      loader: createThrottledLoader({mapUrl: base, format: format, maxConcurrent: 4}),
+      /*
       url: (z, x, y) => {
         const [minX, minY, maxX, maxY] = tileGrid.getTileCoordExtent([z, x, y]);
         const params = new URLSearchParams({
@@ -113,21 +214,13 @@ const OGCMapLayer = ({ config, group, checked }) => {
 
         return mapUrl;
       },
+      */
     });
-
-    console.log({...config});
 
     const new_layer = new OLTileLayer({
       visible: config.active,
       source
     });
-    /*
-    const new_layer = new OLTileLayer({
-      ...config,
-      visible: config.active,
-      source
-    });
-    */
 
     return new_layer;
   }

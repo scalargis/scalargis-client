@@ -31,7 +31,7 @@ export default function PrintPanelItem(props) {
   const { core, control, printItem, printLayer, fields, handleFieldChange, standalone, config, actions } = props;
   const { viewer, mainMap, dispatch, Models, auth } = config;
   const { findOLInteraction, isUrlAppHostname } = Models.Utils;
-  const { getScaleForResolution, getWMSVisibleLayers, getArcGISVisibleLayers } = Models.MapModel;
+  const { getScaleForResolution, getPrintableVisibleLayers } = Models.MapModel;
   const { exclusive_mapcontrol } = viewer;
 
   const { selected_menu } = viewer.config_json;
@@ -350,12 +350,11 @@ export default function PrintPanelItem(props) {
       data += '&' + geomWKT.map(wkt => 'geomWKT[]=' + wkt).join('&');
     }
 
-    //Get WMS and ArGIS Layers
-    const wmsLayers = getWMSVisibleLayers(mainMap, undefined) || [];
-    const arcgisLayers = getArcGISVisibleLayers(mainMap) || [];
+    //Get printable layers
+    const printableLayers = getPrintableVisibleLayers(mainMap, undefined) || [];
 
-    const allLayers = [
-      ...wmsLayers.map(l => {
+    const allLayers = printableLayers.map(l => {
+      if (l.type == 'wms') {
         let vals =  'wms' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '') + ';' + (l.params.FORMAT || '');
         //Add user authentication token
         if (isUrlAppHostname(l.url) && auth?.data?.auth_token) {
@@ -365,14 +364,17 @@ export default function PrintPanelItem(props) {
         }
         vals += ';' + (l.params.TIME || l.params.time || '');
         return vals;
-      }),
-      ...arcgisLayers.map(l => 'esri_rest' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '')),
-    ];
+      } else if (l.type == 'arcgismap') {
+        return 'esri_rest' + ';' + l.url + ';' + l.params.LAYERS + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';' + (l.params.STYLES || l.params.STYLE || '');
+      } else if (l.type == 'ogcmap') {
+        return 'ogcapi' + ';' + l.url + ';' + (l.params.LAYERS || '') + ';' + l.opacity + ';' + l.minScale + ';' + l.maxScale + ';' + (l.params.CQL_FILTER || '') + ';'  + (l.params.STYLES || l.params.STYLE || '') + ';' + (l.params.format || '');
+      }
+    });
 
     if (allLayers.length) {
       data += '&' + allLayers.map(l => 'layers[]=' + encodeURIComponent(l)).join('&');
 
-      const layersAttributions = [...wmsLayers, ...arcgisLayers].map(l => l.attributions || null);
+      const layersAttributions = printableLayers.map(l => l.attributions || null);
       data += '&layersAttributions=' + encodeURIComponent(JSON.stringify(layersAttributions));
     }
 
