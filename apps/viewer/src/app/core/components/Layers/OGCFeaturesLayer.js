@@ -202,7 +202,7 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
     layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
 
-    let style = config.style_text_value ? (feature, resolution) => {
+    const style = config.style_text_value ? (feature, resolution) => {
         let label = config.style_text_value || '';
         if (config.style_text_value && feature?.get) {
           const rf = (label && label.match) ? label.match(/[^{}]+(?=})/g) : null;
