@@ -1,6 +1,7 @@
 import React, { useMemo} from 'react';
 import { useTranslation } from "react-i18next";
 import { Menu, UnstyledButton } from '@mantine/core';
+import { i18n as i18nUtils } from '@scalargis/components';
 
 
 const defaultMode = 'dropdown';
@@ -51,7 +52,7 @@ export default function LocaleSelector({ type, core, dispatch,  actions, compone
 
   const handleChange = (val) => {
     if (!val) return;
-    i18n.changeLanguage(val);
+    i18nUtils.setUserLocale(val);
   }
 
 

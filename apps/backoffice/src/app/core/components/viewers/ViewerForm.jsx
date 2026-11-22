@@ -23,10 +23,11 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import { findUnknownKeys, validateViewerConfig, describeViewerConfigFault } from '@scalargis/components';
+import { findUnknownKeys, getViewerConfigSchema, validateViewerConfig, describeViewerConfigFault } from '@scalargis/components';
 import { CodeEditor, jsonPointerRange, DataGrid, notify, IconX, IconAlertTriangle, IconUndo, IconRefresh, IconSearch, IconArrowLeft, IconSave, IconHome, IconCog, IconPrint, IconHistory, IconFileEdit, IconPlus } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
+import { componentSchemas } from './outsideComponentSchemas';
 import dataProvider from '../../../service/DataProvider';
 import { useRecordNavigation } from '../common/useRecord';
 import { useChangeSummary } from '../common/ChangeSummary';
@@ -58,6 +59,8 @@ const HIDDEN = {
   pointerEvents: 'none',
 };
 
+const VIEWER_CONFIG_SCHEMA = getViewerConfigSchema(componentSchemas);
+
 /** Returns the schema diagnostics of the viewer config text, or none when the text is not valid JSON. */
 function viewerConfigDiagnostics(view) {
   let config;
@@ -68,7 +71,7 @@ function viewerConfigDiagnostics(view) {
   }
   const out = [];
   const seen = new Set();
-  for (const fault of validateViewerConfig(config).faults) {
+  for (const fault of validateViewerConfig(config, VIEWER_CONFIG_SCHEMA).faults) {
     const range = jsonPointerRange(view.state, fault.pointer) || { from: 0, to: Math.min(1, view.state.doc.length) };
     const message = describeViewerConfigFault(fault);
     const key = `${range.from}:${message}`;
@@ -76,7 +79,7 @@ function viewerConfigDiagnostics(view) {
     seen.add(key);
     out.push({ from: range.from, to: range.to, severity: 'warning', source: 'Esquema', message });
   }
-  for (const unknown of findUnknownKeys(config)) {
+  for (const unknown of findUnknownKeys(config, componentSchemas)) {
     const range = jsonPointerRange(view.state, unknown.pointer, { key: true });
     if (range) out.push({ from: range.from, to: range.to, severity: 'info', source: 'Esquema', message: `Chave "${unknown.key}" fora do esquema.` });
   }

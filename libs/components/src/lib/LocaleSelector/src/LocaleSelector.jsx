@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Menu, UnstyledButton } from '@mantine/core';
 import { IconGlobe } from '@scalargis/ui';
 
+import { setUserLocale } from '../../utils/i18n';
+
 import './style.css';
 
 const defaultMode = 'dropdown';
@@ -58,7 +60,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
 
   const handleChange = (value) => {
     if (!value) return;
-    i18n.changeLanguage(value); // Save to localStorage
+    setUserLocale(value);
     dispatch(viewer_set_locale(value));
   }
 
@@ -75,7 +77,7 @@ export default function LocaleSelector({ type, config, actions, componentConfig,
             className={i18n.resolvedLanguage === item.value ? 'locale-btn locale-selected' : 'locale-btn'}
             onClick={(e) => {
               e.preventDefault();
-              i18n.changeLanguage(item.value);
+              setUserLocale(item.value);
               dispatch(viewer_set_locale(item.value));
             }}
           >

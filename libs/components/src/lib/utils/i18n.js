@@ -65,3 +65,19 @@ export const translateValue = (value, defaultString=null, lang=i18next.resolvedL
 export const getResolvedLanguage = () => {
   return i18next?.resolvedLanguage;
 }
+
+
+const storeUserLocale = (lang) => {
+  try {
+    window.localStorage.setItem('i18nextLng', lang);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/** Switches the language and stores it as the user's pick. */
+export const setUserLocale = (lang) => {
+  storeUserLocale(lang);
+  return i18next.changeLanguage(lang);
+}

@@ -13,13 +13,13 @@
     },
     "header_registration": {
       "title": "Cabeçalho do registo",
-      "description": "Com valor, a janela de registo usa o texto de header como título.",
+      "description": "Título da janela de registo, em texto ou por idioma. Sem valor, usa Registo de utilizador e o nome curto da entidade.",
       "type": ["string", "object"],
       "additionalProperties": { "type": "string" }
     },
     "header_password": {
       "title": "Cabeçalho da recuperação",
-      "description": "Com valor, a janela de recuperação da password usa o texto de header como título.",
+      "description": "Título da janela de recuperação da password, em texto ou por idioma. Sem valor, usa Redefinir password e o nome curto da entidade.",
       "type": ["string", "object"],
       "additionalProperties": { "type": "string" }
     },

@@ -6,6 +6,7 @@ import { i18n } from '@scalargis/components';
 
 import { getAppDefaultLocale, getAppApiUrl } from './../utils';
 import resources from './translations';
+import { readStoredLocale } from './resolveLocale';
 
 
 export const initTranslations = () => {
@@ -22,20 +23,16 @@ export const initTranslations = () => {
     },
     detection: {
       order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
+      caches: []
     }
   }
 
-  // Read localStorage synchronously to avoid initial render with wrong language
-  const storedLang = localStorage.getItem('i18nextLng');
+  const storedLang = readStoredLocale();
   if (storedLang) {
-    // User has a preference - use it immediately
     options["lng"] = storedLang;
   } else if (defaultLocale) {
-    // No user preference - use backend default
     options["lng"] = defaultLocale;
   }
-  // LanguageDetector will still handle future changes and save to localStorage
 
   i18next
     .use(initReactI18next)

@@ -33,8 +33,8 @@ function Main({ type, region, as, auth, core, config, actions, record }) {
   const isMobileSmall = wsize[0] <= 440;
 
   const loginHeader = record?.config_json?.header ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("login", "Entrar")} - ${appEntityNameAbrev || "ScalarGIS"}`;
-  const registrationHeader = record?.config_json?.header_registration ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("userRegistration", "Registo de utilizador")} - ${appEntityNameAbrev || "ScalarGIS"}`;
-  const passwordHeader = record?.config_json?.header_password ? i18nUtils.translateValue(record.config_json.header, record.config_json.header) : `${i18nUtils.translateValue("passwordReset", "Redefinir password")} - ${appEntityNameAbrev || "ScalarGIS"}`;
+  const registrationHeader = record?.config_json?.header_registration ? i18nUtils.translateValue(record.config_json.header_registration, record.config_json.header_registration) : `${i18nUtils.translateValue("userRegistration", "Registo de utilizador")} - ${appEntityNameAbrev || "ScalarGIS"}`;
+  const passwordHeader = record?.config_json?.header_password ? i18nUtils.translateValue(record.config_json.header_password, record.config_json.header_password) : `${i18nUtils.translateValue("passwordReset", "Redefinir password")} - ${appEntityNameAbrev || "ScalarGIS"}`;
 
   const closable = record?.config_json?.closable === false ? false : true;
 
