@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Accordion, ActionIcon, Alert, Group, Switch, Text, TextInput, Select } from '@mantine/core';
 import { IconInfoCircle, IconSearch } from '@scalargis/ui';
 
-import { ItemCard } from './../ItemCard';
+import { ItemCard, viewableUrl } from './../ItemCard';
 import { findItemById } from './../itemTree';
 import { useServiceAutoLoad } from './../autoLoad';
 import { I18N_NAMESPACE } from './../../i18n/index';
@@ -117,6 +117,7 @@ export default function OGCAPI(props) {
       maxFeatures: data?.maxFeatures || 500,
       pageSize: data?.ogcLimit?.base === data.ogcBase ? data?.ogcLimit?.max : undefined,
       pageSizes: data?.ogcLimit?.base === data.ogcBase ? data?.ogcLimit?.byCollection : undefined,
+      legends: data?.ogcLegends?.base === data.ogcBase ? data?.ogcLegends?.byCollection : undefined,
       mapSrid
     };
 
@@ -135,7 +136,7 @@ export default function OGCAPI(props) {
     });
 
     patchData({ dataitems });
-  }, [ogcAPIType, data?.ogcTiled, data?.ogcLoadAll, data?.ogcBase, data?.maxFeatures, data?.ogcLimit, collections, mapSrid]);
+  }, [ogcAPIType, data?.ogcTiled, data?.ogcLoadAll, data?.ogcBase, data?.maxFeatures, data?.ogcLimit, data?.ogcLegends, collections, mapSrid]);
 
   const limitBase = data?.ogcLimit?.base;
   const ogcBase = data?.ogcBase;
@@ -149,6 +150,33 @@ export default function OGCAPI(props) {
       });
     return () => { cancelled = true; };
   }, [ogcAPIType, ogcBase, limitBase, fetchCtx]);
+
+  const legendsBase = data?.ogcLegends?.base;
+  const OWSModel = props.Models.OWSModel;
+  useEffect(() => {
+    if (ogcAPIType !== 'maps' || !ogcBase || !collections || legendsBase === ogcBase) return;
+    const linkBase = `${ogcBase}/collections`;
+    const mapIds = new Set(filterCollectionsByType(collections, 'maps', ogcBase).map((c) => c.id));
+    const mapCollections = collections.filter((c) => mapIds.has(c.id));
+    const linked = mapCollections
+      .map((c) => [c.id, OWSModel.ogcapiCollectionLegendUrl(c, linkBase)])
+      .filter(([, url]) => url);
+    const linkedIds = new Set(linked.map(([id]) => id));
+    const asks = mapCollections
+      .filter((c) => !linkedIds.has(c.id))
+      .map((c) => ({ id: c.id, defaultStyle: c.defaultStyle, url: OWSModel.ogcapiStylesUrl(c, linkBase) }))
+      .filter((a) => a.url);
+    let cancelled = false;
+    Promise.all(asks.map((a) => getJson(a.url, fetchCtx)
+      .then((json) => [a.id, OWSModel.ogcapiStyleLegendUrl(json, a.url, a.defaultStyle)])
+      .catch(() => [a.id, null])))
+      .then((pairs) => {
+        if (cancelled) return;
+        const byCollection = Object.fromEntries([...linked, ...pairs.filter(([, url]) => url)]);
+        patchRef.current({ ogcLegends: { base: ogcBase, byCollection } });
+      });
+    return () => { cancelled = true; };
+  }, [ogcAPIType, ogcBase, collections, legendsBase, fetchCtx, OWSModel]);
 
   useEffect(() => {
     if (ogcAPIType !== 'features') return;
@@ -172,11 +200,17 @@ export default function OGCAPI(props) {
       const item = findItemById(dataitems, itemData?.id);
 
       if (item) {
-        return <ItemCard title={item.title} description={item.description} />;
+        return (
+          <ItemCard
+            title={item.title}
+            description={item.description}
+            legendUrl={item.legend_url ? viewableUrl(proxied(item.legend_url, fetchCtx), proxyUrl, isUrlAppOrigin) : null}
+          />
+        );
       }
       return <span>{itemData?.content}</span>;
     });
-  }, [data?.dataitems, setItemRenderer]);
+  }, [data?.dataitems, setItemRenderer, fetchCtx, proxyUrl, isUrlAppOrigin]);
 
   /** Loads the collections of the OGC API service. */
   const loadCollections = () => {
@@ -206,6 +240,7 @@ export default function OGCAPI(props) {
           ogcBase: base,
           ogcAPIType: null,
           ogcLimit: null,
+          ogcLegends: null,
         });
         setMatched({});
         asked.current = new Set();

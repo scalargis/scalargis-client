@@ -1007,6 +1007,50 @@ const ogcapiMapUrl = (collection, serviceUrl) => {
   return href.split('?')[0];
 }
 
+/** True when a link has the given relation, as a short name or an OGC relation URI. */
+const ogcapiRelIs = (link, name) => {
+  const rel = (link?.rel || '').toLowerCase();
+  return rel === name || rel.endsWith('/' + name);
+}
+
+/** Resolves an href against a base URL, or returns null. */
+const ogcapiAbsoluteHref = (href, base) => {
+  if (!href) return null;
+  if (/^https?:\/\//i.test(href)) return href;
+  try { return new URL(href, base).toString(); } catch (e) { return null; }
+}
+
+/** Picks the image legend link of a link list, or null. */
+const ogcapiLegendLink = (links) => {
+  const legends = (links || []).filter(l => l?.href && ogcapiRelIs(l, 'legend'));
+  return legends.find(l => /png/i.test(l.type || ''))
+    || legends.find(l => /^image\//i.test(l.type || ''))
+    || legends[0]
+    || null;
+}
+
+/** Returns the legend URL that an OGC API collection links to, or null. */
+export const ogcapiCollectionLegendUrl = (collection, serviceUrl) => {
+  const link = ogcapiLegendLink(collection?.links);
+  return link ? ogcapiAbsoluteHref(link.href, serviceUrl) : null;
+}
+
+/** Returns the JSON styles document URL of an OGC API collection, or null. */
+export const ogcapiStylesUrl = (collection, serviceUrl) => {
+  const styles = (collection?.links || []).filter(l => l?.href && ogcapiRelIs(l, 'styles'));
+  const link = styles.find(l => /json/i.test(l.type || '')) || styles.find(l => !l.type);
+  return link ? ogcapiAbsoluteHref(link.href, serviceUrl) : null;
+}
+
+/** Returns the legend URL of the default style of an OGC API styles document, or null. */
+export const ogcapiStyleLegendUrl = (stylesJson, stylesUrl, defaultStyle) => {
+  const styles = Array.isArray(stylesJson?.styles) ? stylesJson.styles : [];
+  const id = defaultStyle || stylesJson?.default;
+  const style = styles.find(s => s?.id === id) || styles.find(s => s?.id === 'default') || styles[0];
+  const link = ogcapiLegendLink(style?.links);
+  return link ? ogcapiAbsoluteHref(link.href, stylesUrl) : null;
+}
+
 /** Build the vector tileset document URL for one feature collection. */
 const ogcapiVectorTilesUrl = (collection, serviceUrl, tileMatrixSet = 'WebMercatorQuad') => {
   const links = collection?.links || [];
@@ -1094,6 +1138,8 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
         format: coll.format || 'png',
         children: []
       };
+      const legendUrl = ogcapiCollectionLegendUrl(coll, serviceUrl) || options.legends?.[coll.id];
+      if (legendUrl) theme.legend_url = legendUrl;
     } else {
       return;
     }
@@ -1384,5 +1430,8 @@ export default {
   convertCOG2Themes,
   convertOGCAPI2Themes,
   detectOGCAPICollectionType,
+  ogcapiCollectionLegendUrl,
+  ogcapiStylesUrl,
+  ogcapiStyleLegendUrl,
   createGroup
 }

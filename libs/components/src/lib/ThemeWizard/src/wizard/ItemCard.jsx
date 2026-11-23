@@ -2,6 +2,13 @@ import { useRef, useState } from 'react';
 import { ActionIcon, Box, Group, Popover, Text } from '@mantine/core';
 import 'primeicons/primeicons.css';
 
+/** Sends an http URL through the map proxy when the page runs on https. */
+export function viewableUrl(url, proxyUrl, isUrlAppOrigin) {
+  const pageIsHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  if (!url || !pageIsHttps || !/^http:/i.test(url) || !proxyUrl || isUrlAppOrigin?.(url)) return url;
+  return proxyUrl + encodeURIComponent(url);
+}
+
 /** Item title with an optional grey subtitle and a popover that shows the description and the legend. */
 export function ItemCard({ title, subtitle, description, legendUrl }) {
 

@@ -4,7 +4,7 @@ import { WMSCapabilities } from 'ol/format';
 import { Accordion, ActionIcon, Group, Select, Switch, TextInput } from '@mantine/core';
 import { IconSearch } from '@scalargis/ui';
 
-import { ItemCard } from './../ItemCard';
+import { ItemCard, viewableUrl } from './../ItemCard';
 import { findItemById } from './../itemTree';
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -43,12 +43,6 @@ export default function WMS(props) {
 
   useEffect(() => {
     if (!setItemRenderer) return;
-    const pageIsHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
-
-    const viewable = (url) => {
-      if (!url || !pageIsHttps || !/^http:/i.test(url) || !proxyUrl || isUrlAppOrigin?.(url)) return url;
-      return proxyUrl + encodeURIComponent(url);
-    };
 
     setItemRenderer((itemData) => {
       const item = findItemById(dataitems || [], itemData?.id);
@@ -64,7 +58,7 @@ export default function WMS(props) {
           title={title}
           subtitle={subtitle}
           description={item.description}
-          legendUrl={isGroup ? null : viewable(legendUrlOf(item))}
+          legendUrl={isGroup ? null : viewableUrl(legendUrlOf(item), proxyUrl, isUrlAppOrigin)}
         />
       );
     });
