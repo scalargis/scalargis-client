@@ -23,6 +23,14 @@ function proxied(url, ctx) {
   return ctx.useProxy && !ctx.isUrlAppOrigin(url) ? ctx.proxyUrl + encodeURIComponent(url) : url;
 }
 
+/** Returns the GeoJSON items URL of each collection that has one, by collection id. */
+function itemsUrlsOf(collections, base) {
+  return Object.fromEntries(filterCollectionsByType(collections, 'features', base).map((c) => {
+    const link = c.links.find((l) => /geo\+json/i.test(l.type || '')) || c.links[0];
+    return [c.id, link.href.split('?')[0]];
+  }));
+}
+
 /** Fetches a URL as JSON with f=json, or throws. */
 function getJson(url, ctx) {
   const target = /[?&]f=/.test(url) ? url : url + (url.includes('?') ? '&' : '?') + 'f=json';
@@ -118,6 +126,7 @@ export default function OGCAPI(props) {
       pageSize: data?.ogcLimit?.base === data.ogcBase ? data?.ogcLimit?.max : undefined,
       pageSizes: data?.ogcLimit?.base === data.ogcBase ? data?.ogcLimit?.byCollection : undefined,
       legends: data?.ogcLegends?.base === data.ogcBase ? data?.ogcLegends?.byCollection : undefined,
+      items: ogcAPIType === 'maps' ? itemsUrlsOf(collections, data.ogcBase) : undefined,
       mapSrid
     };
 
