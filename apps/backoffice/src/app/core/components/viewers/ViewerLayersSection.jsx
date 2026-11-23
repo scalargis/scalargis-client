@@ -5,7 +5,7 @@ import { confirm, IconArrowDown, IconArrowUp, IconFolder, IconPlus, IconShare, I
 
 import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N, control, inlineRefs } from './formViewShared';
 import {
-  addNode, layerList, moveInto, moveNode, moveTargets, parentOf, removeNode, renameNode, treeRows, uniqueId
+  addNode, layerList, moveInto, moveNode, moveTargets, parentOf, removeNode, renameNode, rootIds, treeRows, uniqueId
 } from './viewerLayerTree';
 import SharedLayerPicker from './SharedLayerPicker';
 
@@ -61,6 +61,13 @@ function layerUiSchema(isGroup) {
 
 const GROUP_UISCHEMA = layerUiSchema(true);
 const LAYER_UISCHEMA = layerUiSchema(false);
+
+/** Returns the id of the first group that the top of the tree reaches, or the first group of the layers, or null. */
+function firstGroupId(config) {
+  const groups = layerList(config).filter((l) => l.type === 'GROUP');
+  const top = rootIds(config).map((id) => groups.find((g) => g.id === id)).find(Boolean);
+  return (top || groups[0])?.id ?? null;
+}
 
 /** Returns the form data of a node: its keys without id and children. */
 function nodeFormData(node) {
@@ -140,18 +147,25 @@ function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, ge
       ? { id, type: 'GROUP', title: 'Novo grupo', children: [] }
       : { id, type: 'WMS', title: 'Nova camada', version: '1.3.0', format: 'image/png', opacity: 1 };
     const current = layerList(base).find((l) => l.id === selectedId);
-    let parentId;
+    let parentId = null;
     let afterId = null;
     if (current?.type === 'GROUP') {
       parentId = current.id;
     } else if (current) {
       parentId = parentOf(base, current.id);
       afterId = current.id;
-    } else {
-      parentId = layerList(base).some((l) => l.id === 'main' && l.type === 'GROUP') ? 'main' : null;
+    }
+    let next = base;
+    if (!parentId && !isGroup) {
+      parentId = firstGroupId(base);
+      if (!parentId) {
+        const group = { id: uniqueId(base, 'grupo'), type: 'GROUP', title: 'Novo grupo', children: [] };
+        next = addNode(base, group, null);
+        parentId = group.id;
+      }
     }
     setSelectedId(id);
-    return addNode(base, node, parentId, afterId);
+    return addNode(next, node, parentId, afterId);
   });
 
   const [pickerOpened, setPickerOpened] = useState(false);
@@ -211,7 +225,7 @@ function ViewerLayersSection({ config, readonly, dataGeneration, writeConfig, ge
   const targets = selected ? moveTargets(config, selected.id) : [];
   const parentId = selected ? parentOf(config, selected.id) : null;
   const moveData = [
-    { value: TOP_LEVEL, label: 'Topo da árvore' },
+    ...(selected?.type === 'GROUP' ? [{ value: TOP_LEVEL, label: 'Topo da árvore' }] : []),
     ...targets.filter((g) => g.id !== parentId).map((g) => ({ value: g.id, label: `${g.title || g.id} (${g.id})` }))
   ];
 
