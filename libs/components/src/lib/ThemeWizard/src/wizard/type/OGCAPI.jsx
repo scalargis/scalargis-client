@@ -215,7 +215,7 @@ export default function OGCAPI(props) {
       {hasService && (
         <Select
           className="pt-2"
-          placeholder={t("ogcType", "Escolha um tipo de API")}
+          placeholder={t("ogcapiType", "Tipo de API")}
           data={ogcTypeList}
           value={ogcAPIType || null}
           allowDeselect={false}
@@ -242,23 +242,16 @@ export default function OGCAPI(props) {
                       checked={data.ogcLoadAll}
                       onChange={() => editField('ogcLoadAll', !data.ogcLoadAll)}
                     />
-                    {/*
-                    <TextInput
-                      placeholder="500"
-                      value={data.maxFeatures || ''}
-                      style={{ flex: 1 }}
-                      onChange={(e) => editField('maxFeatures', e.target.value)}
+                    <div>{t("ogcapiMaxFeatures", "Número máximo de elementos")}</div>
+                    <CustomTextInput
+                      numeric="integer"
+                      allowNegative
+                      value={data.maxFeatures}
+                      onCommit={(text) => {
+                        const n = parseInt(text, 10);
+                        editField('maxFeatures', Number.isFinite(n) && n > 0 ? n : undefined);
+                      }}
                     />
-                    */}
-                  <CustomTextInput
-                    label={t("ogcapiMaxFeatures", "Número máximo de features")}
-                    inputMode="numeric"
-                    value={data.maxFeatures}
-                    onCommit={(text) => {
-                      const n = parseInt(text, 10);
-                      editField('maxFeatures', Number.isFinite(n) && n > 0 ? n : undefined);
-                    }}
-                  />
                   </React.Fragment>
                 )}
 
@@ -278,7 +271,7 @@ export default function OGCAPI(props) {
 
       {hasService && ogcAPIType && (
         <Alert color="informative" py="xs" mt="sm" icon={<IconInfoCircle />}>
-          {t("ogcapiTypeCollections", `${data?.dataitems?.length || 0} de ${collections.length || 0} coleções`)}
+          {t("ogcapiCountTypeCollections", "{{count}} de {{total}} coleções", {count: data?.dataitems?.length || 0, total: collections?.length || 0})}
         </Alert>
       )}
 

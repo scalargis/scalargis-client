@@ -75,6 +75,10 @@
   "useProxy": "Use server proxy",
   "ogcapiLoadAll": "Load whole collection (no bbox)",
   "ogcapiAsTiles": "Data collections as vector tiles (fast render)",
-  "ogcapiUnsupportedCollections": "{{count}} record collections are not supported yet."
+  "ogcapiUnsupportedCollections": "{{count}} record collections are not supported yet.",
+  "ogcapiSelectType": "Select an API type",
+  "ogcapiType": "API type",
+  "ogcapiCountTypeCollections": "{{count}} of {{total}} collections",
 
+  "filter": "Filter"
 }

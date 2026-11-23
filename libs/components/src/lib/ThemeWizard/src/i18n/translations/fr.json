@@ -75,6 +75,10 @@
   "useProxy": "Utiliser le proxy du serveur",
   "ogcapiLoadAll": "Charger toute la collection (sans bbox)",
   "ogcapiAsTiles": "Collections de données comme tuiles vectorielles (rendu rapide)",
-  "ogcapiUnsupportedCollections": "{{count}} collections d'enregistrement ne sont pas encore prises en charge."
+  "ogcapiUnsupportedCollections": "{{count}} collections d'enregistrement ne sont pas encore prises en charge.",
+  "ogcapiSelectType": "Sélectionnez un type d'API",
+  "ogcapiType": "Type d'API",
+  "ogcapiCountTypeCollections": "{{count}} sur {{total}} collections",
 
+  "filter": "Filtre"
 }
