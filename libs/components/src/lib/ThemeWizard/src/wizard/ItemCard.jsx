@@ -23,7 +23,7 @@ export function ItemCard({ title, subtitle, description, legendUrl }) {
   const hasDetails = !!description || showLegend;
 
   return (
-    <Box data-item-card>
+    <Box data-item-card style={{ flex: 1, minWidth: 0 }}>
       <Group gap="xs" justify="space-between" align="center" wrap="nowrap">
         <Text fz={14} lineClamp={2} style={{ flex: 1, minWidth: 0 }}>
           {title}
