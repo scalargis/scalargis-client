@@ -4,6 +4,7 @@ import { Accordion, ActionIcon, Alert, Group, Switch, Text, TextInput, Select } 
 import { IconInfoCircle, IconSearch } from '@scalargis/ui';
 
 import { ItemCard } from './../ItemCard';
+import { findItemById } from './../itemTree';
 import { useServiceAutoLoad } from './../autoLoad';
 import { I18N_NAMESPACE } from './../../i18n/index';
 
@@ -103,11 +104,6 @@ export default function OGCAPI(props) {
     { value: 'features', label: t("ogcapiFeatures", "OGC API - Features") },
   ], [t]);
 
-  const typeLabel = useMemo(
-    () => ogcTypeList.find((o) => o.value === ogcAPIType)?.label,
-    [ogcTypeList, ogcAPIType]
-  );
-
   useEffect(() => {
     if (!ogcAPIType || !collections || !data?.ogcBase) return;
 
@@ -173,20 +169,14 @@ export default function OGCAPI(props) {
     const dataitems = data?.dataitems || [];
 
     setItemRenderer((itemData) => {
-      const item = itemData?.id ? dataitems.find((i) => i.id === itemData.id) : null;
+      const item = findItemById(dataitems, itemData?.id);
 
       if (item) {
-        return (
-          <ItemCard
-            title={item.title}
-            badges={typeLabel ? [{ label: typeLabel, color: 'teal' }] : []}
-            description={item.description}
-          />
-        );
+        return <ItemCard title={item.title} description={item.description} />;
       }
       return <span>{itemData?.content}</span>;
     });
-  }, [data?.dataitems, typeLabel]);
+  }, [data?.dataitems, setItemRenderer]);
 
   /** Loads the collections of the OGC API service. */
   const loadCollections = () => {

@@ -132,6 +132,7 @@ export default function WizardStepData(props) {
           selected={selected}
           setSelected={setSelected}
           filter={filter}
+          itemRenderer={itemRenderer}
         />,
         wmts: <WMTSThemesSelector
           core={props.core}

@@ -4,7 +4,26 @@ import { WMSCapabilities } from 'ol/format';
 import { Accordion, ActionIcon, Group, Select, Switch, TextInput } from '@mantine/core';
 import { IconSearch } from '@scalargis/ui';
 
+import { ItemCard } from './../ItemCard';
+import { findItemById } from './../itemTree';
 import { I18N_NAMESPACE } from './../../i18n/index';
+
+
+/** True when a WMS title reads as a code, so the layer name goes next to it. */
+function isCodeTitle(title, name) {
+  if (!title || title === name) return true;
+  return !/\s/.test(title) && /[_:]/.test(title);
+}
+
+/** Builds the legend URL of a WMS item: its LegendURL, else a GetLegendGraphic request. */
+function legendUrlOf(item) {
+  if (item.legend_url) return item.legend_url;
+  if (!item.url || !item.layers) return '';
+  const sep = !item.url.includes('?') ? '?' : (/[?&]$/.test(item.url) ? '' : '&');
+  const style = item.wms_style ? '&STYLE=' + encodeURIComponent(item.wms_style) : '';
+  return item.url + sep + 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&FORMAT=image%2Fpng&LAYER=' +
+    encodeURIComponent(item.layers) + style;
+}
 
 
 export default function WMS(props) {
@@ -16,6 +35,40 @@ export default function WMS(props) {
       loadWMSCapabilities();
     }
   }, [props?.data?.dataType]);
+
+  const { setItemRenderer } = props;
+  const dataitems = props?.data?.dataitems;
+  const proxyUrl = props.core?.MAP_PROXY_URL;
+  const isUrlAppOrigin = props.Models?.Utils?.isUrlAppOrigin;
+
+  useEffect(() => {
+    if (!setItemRenderer) return;
+    const pageIsHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+
+    const viewable = (url) => {
+      if (!url || !pageIsHttps || !/^http:/i.test(url) || !proxyUrl || isUrlAppOrigin?.(url)) return url;
+      return proxyUrl + encodeURIComponent(url);
+    };
+
+    setItemRenderer((itemData) => {
+      const item = findItemById(dataitems || [], itemData?.id);
+      if (!item) return <span>{itemData?.content}</span>;
+
+      const name = item.layers || '';
+      const title = item.title || name;
+      const subtitle = name && name !== title && isCodeTitle(item.title, name) ? name : null;
+      const isGroup = !!item.children?.length;
+
+      return (
+        <ItemCard
+          title={title}
+          subtitle={subtitle}
+          description={item.description}
+          legendUrl={isGroup ? null : viewable(legendUrlOf(item))}
+        />
+      );
+    });
+  }, [dataitems, setItemRenderer, proxyUrl, isUrlAppOrigin]);
 
 
   /**

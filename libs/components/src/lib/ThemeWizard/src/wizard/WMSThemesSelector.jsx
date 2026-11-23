@@ -3,7 +3,7 @@ import layerNode from './layerNode';
 import ThemesTree from './ThemesTree';
 
 
-const WMSThemesSelector = ({ themes, selected, setSelected, readOnly }) => {
+const WMSThemesSelector = ({ themes, selected, setSelected, readOnly, itemRenderer }) => {
   const nodes = useMemo(() => (themes || []).map((l) => layerNode(l)), [themes]);
 
   if (!nodes.length) return null;
@@ -15,6 +15,7 @@ const WMSThemesSelector = ({ themes, selected, setSelected, readOnly }) => {
       setSelected={setSelected}
       readOnly={readOnly}
       withFilter={!readOnly}
+      itemRenderer={itemRenderer}
     />
   );
 }

@@ -26,6 +26,7 @@ export default function WizardStepConfirm(props) {
             themes={data.items}
             selected={data.selected}
             readOnly={true}
+            itemRenderer={itemRenderer}
           />
         ) : (
           <ThemesSelector

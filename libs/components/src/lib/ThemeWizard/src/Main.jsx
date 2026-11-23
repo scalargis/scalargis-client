@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from "react-i18next";
 import { Stepper } from '@mantine/core';
 import { CollapsiblePanel, IconPlusCircle } from '@scalargis/ui';
@@ -104,6 +104,7 @@ export default function Main(props) {
   const [types, setTypes] = useState(source_types);
   const loadVersion = useRef(0);
   const [itemRenderer, setItemRenderer] = useState(null);
+  const setItemRendererFn = useCallback((fn) => setItemRenderer(() => fn), []);
 
   /** Starts a load and returns a check that is true while no later load or reset has started. */
   function beginLoad() {
@@ -142,6 +143,7 @@ export default function Main(props) {
   /** Opens step 1 with a type and a URL, and lets the type step load the service. */
   function startServiceLoad(type, url) {
     cancelLoads();
+    setItemRenderer(null);
     setActiveIndex(1);
     setSelected({});
     setWizardData({
@@ -163,6 +165,7 @@ export default function Main(props) {
 
   function reset() {
     cancelLoads();
+    setItemRenderer(null);
     setSelected({});
     setWizardData({...initialData, dataitems: [], items:[]});
   }
@@ -292,9 +295,7 @@ export default function Main(props) {
             }}
             onCancel={null}
             fastFetch={fastFetch}
-            setItemRenderer={(fn) => {
-              setItemRenderer(() => { return fn; });}
-            }
+            setItemRenderer={setItemRendererFn}
             itemRenderer={itemRenderer}
           />
         break
@@ -312,6 +313,7 @@ export default function Main(props) {
             wizardData={wizardData}
             onChange={type => {
               cancelLoads();
+              setItemRenderer(null);
               setSelected({});
               setWizardData({...initialData, dataitems: [], items:[], type})
             }}
