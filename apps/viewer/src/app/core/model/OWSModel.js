@@ -4,7 +4,7 @@ import OlFormatKML from "ol/format/KML";
 import OlFormatGML2 from "ol/format/GML2";
 import OlFormatGeoJSON from "ol/format/GeoJSON";
 import * as OlExtent from 'ol/extent';
-import { generateRGBA, removeUrlParam, addUrlParam } from '../utils';
+import { generateRGBA, removeUrlParam, addUrlParam, removeAuthToken } from '../utils';
 import FileSaver from 'file-saver';
 import proj4 from 'proj4';
 
@@ -20,12 +20,6 @@ const getCRSCode = (val) => {
   }
 
   return retVal;
-}
-
-/** Removes the integrated authentication token that the capabilities request carried. */
-const removeAuthToken = (url, authToken) => {
-  if (!url || !authToken?.token) return url;
-  return url.replace(new RegExp(`([?&])${authToken.param}=${authToken.token}(&|$)`, 'i'), (match, start, end) => end ? start : '');
 }
 
 // Get loaded coordinate systems from server

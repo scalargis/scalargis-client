@@ -24,7 +24,7 @@ export default function KML(props) {
   }
 
   const loadFromUserURL = () => {
-    const { core, data, setSelected, setError, cookies, setLoading, patchData, beginLoad, Models } = props;
+    const { core, data, setSelected, setError, setLoading, patchData, beginLoad, Models } = props;
     const { isUrlAppOrigin, rememberUrl } = Models.Utils;
     const sourceUrl = data.url || '';
     const crs = data.crs;
@@ -51,7 +51,7 @@ export default function KML(props) {
       .then(dataitems => {
         if (!isCurrent()) return;
         patchData({ dataitems });
-        if (cookies) rememberUrl(cookies, 'kml', sourceUrl);
+        rememberUrl('kml', sourceUrl);
       })
       .catch(error => {
         if (!isCurrent()) return;
@@ -102,6 +102,7 @@ export default function KML(props) {
                 <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
                   <TextInput placeholder='https://...'
                     value={data.url}
+                    list={`urlhistory-${data.type}`}
                     onChange={e => changeURL(e.target.value)}
                     style={{ flex: 1 }}
                   />
@@ -118,6 +119,9 @@ export default function KML(props) {
                     <IconSearch />
                   </ActionIcon>
                 </Group>
+                <datalist id={`urlhistory-${data.type}`}>
+                  {props.getUrlHistory().map((i) => <option key={i} value={i} />)}
+                </datalist>
 
               </div>
             </Tabs.Panel>

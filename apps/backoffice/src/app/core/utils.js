@@ -22,12 +22,36 @@ const _getAppDefaultLocale = () => {
   }
 }
 
-export function rememberUrl(cookies, type, url) {
-  const prefix = import.meta.env.VITE_APP_COOKIE_PREFIX || 'scalargis_';
-  const cookieName = prefix + type;
-  const urlhistory = cookies.get(cookieName) || [];
-  if (urlhistory.indexOf(url) === -1) urlhistory.push(url);
-  cookies.set(cookieName, urlhistory);
+/** Removes the integrated authentication token from a URL. */
+export const removeAuthToken = (url, authToken) => {
+  if (!url || !authToken?.token) return url;
+  return url.replace(new RegExp(`([?&])${authToken.param}=${authToken.token}(&|$)`, 'i'), (match, start, end) => end ? start : '');
+}
+
+const URL_HISTORY_SIZE = 10;
+const urlHistoryKey = (type) => `scalargis_urlhistory_${type}`;
+
+/** Returns the saved service URLs of a wizard type, the last one first. */
+export function getUrlHistory(type) {
+  try {
+    const items = JSON.parse(window.localStorage.getItem(urlHistoryKey(type)) || '[]');
+    return Array.isArray(items) ? items.filter(i => typeof i === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Saves a service URL first in the history of its wizard type. */
+export function rememberUrl(type, url, authToken) {
+  const clean = removeAuthToken((url || '').trim(), authToken);
+  if (!clean) return false;
+  try {
+    const items = [clean, ...getUrlHistory(type).filter(i => i !== clean)].slice(0, URL_HISTORY_SIZE);
+    window.localStorage.setItem(urlHistoryKey(type), JSON.stringify(items));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export const  generateRGBA = () => {

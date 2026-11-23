@@ -11,7 +11,7 @@ import { I18N_NAMESPACE } from './../../i18n/index';
 
 export default function COG(props) {
 
-  const { core, auth, mainMap, viewer, data, loading, setLoading, setData, patchData, beginLoad, setError, editField, cookies, Models } = props;
+  const { core, auth, mainMap, viewer, data, loading, setLoading, setData, patchData, beginLoad, setError, editField, Models } = props;
   const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
   const { hasProjection, addProjections } = Models.MapModel;
   const { getCOGImageProjCode } = Models.OWSModel;
@@ -107,8 +107,7 @@ export default function COG(props) {
       if (!isCurrent()) return;
       patchData({ options, dataitems });
 
-      // Add to cookies history
-      if (cookies) rememberUrl(cookies, 'cog', sourceUrl);
+      rememberUrl('cog', sourceUrl);
       
     }).catch((error) => {
       if (!isCurrent()) return;
@@ -217,7 +216,7 @@ export default function COG(props) {
         <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
           <TextInput placeholder='https://...'
             value={data.url}
-            list='urlhistory'
+            list={`urlhistory-${data.type}`}
             style={{ flex: 1 }}
             onChange={e => editField('url', e.target.value.trim())}
           />
@@ -234,11 +233,9 @@ export default function COG(props) {
             <IconSearch />
           </ActionIcon>
         </Group>
-        {/*
-        <datalist id='urlhistory'>
-          { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
+        <datalist id={`urlhistory-${data.type}`}>
+          { props.getUrlHistory().map((i) => <option key={i} value={i} />)}
         </datalist>
-          */}
 
         <Accordion className="pt-2">
           <Accordion.Item value="advanced">

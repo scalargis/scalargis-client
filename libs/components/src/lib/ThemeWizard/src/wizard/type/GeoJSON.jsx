@@ -18,7 +18,7 @@ export default function GeoJSON (props) {
   }
 
   const loadFromUserURL = () => {
-    const { core, data, setSelected, setError, cookies, setLoading, patchData, beginLoad, Models } = props;
+    const { core, data, setSelected, setError, setLoading, patchData, beginLoad, Models } = props;
     const { isUrlAppOrigin, rememberUrl } = Models.Utils;
     const name = 'GeoJSON';
     const sourceUrl = data.url || '';
@@ -40,7 +40,7 @@ export default function GeoJSON (props) {
         if (!dataitems || !dataitems.length) throw new Error(invalidResponse);
         if (!isCurrent()) return;
         patchData({ dataitems });
-        if (cookies) rememberUrl(cookies, 'geojson', sourceUrl);
+        rememberUrl('geojson', sourceUrl);
       })
       .catch(error => {
         if (!isCurrent()) return;
@@ -101,6 +101,7 @@ export default function GeoJSON (props) {
                 <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
                   <TextInput placeholder='https://...'
                     value={data.url}
+                    list={`urlhistory-${data.type}`}
                     onChange={e => changeURL(e.target.value)}
                     style={{ flex: 1 }}
                   />
@@ -117,6 +118,9 @@ export default function GeoJSON (props) {
                     <IconSearch />
                   </ActionIcon>
                 </Group>
+                <datalist id={`urlhistory-${data.type}`}>
+                  {props.getUrlHistory().map((i) => <option key={i} value={i} />)}
+                </datalist>
 
               </div>
             </Tabs.Panel>

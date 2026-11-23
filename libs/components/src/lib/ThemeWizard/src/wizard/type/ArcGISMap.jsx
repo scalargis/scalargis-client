@@ -21,7 +21,7 @@ export default function ArcGISMap(props) {
    * Event handler for load ArcGIS Map Service capabilities
    */
   const loadArcGISMapCapabilities = () => {
-    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, cookies, Models } = props;
+    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -63,7 +63,7 @@ export default function ArcGISMap(props) {
       const dataitems = Models.OWSModel.convertArcGISMap2Themes(capabilities, sourceUrl, options);
       if (!isCurrent()) return;
       patchData({ dataitems });
-      if (cookies) rememberUrl(cookies, 'arcgismap', sourceUrl);
+      rememberUrl('arcgismap', sourceUrl);
     }).catch((error) => {
       if (!isCurrent()) return;
       patchData({ dataitems: [] });
@@ -84,7 +84,7 @@ export default function ArcGISMap(props) {
         <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
           <TextInput placeholder='https://...'
             value={data.url}
-            list='urlhistory'
+            list={`urlhistory-${data.type}`}
             style={{ flex: 1 }}
             onChange={e => editField('url', e.target.value.trim())}
           />
@@ -101,7 +101,7 @@ export default function ArcGISMap(props) {
             <IconSearch />
           </ActionIcon>
         </Group>
-        <datalist id='urlhistory'>
+        <datalist id={`urlhistory-${data.type}`}>
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 

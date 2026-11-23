@@ -24,7 +24,7 @@ export default function WMS(props) {
    * @param {Object} e The click handler
    */
   const loadWMSCapabilities = () => {
-    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, cookies, Models } = props;
+    const { core, auth, mainMap, viewer, data, setLoading, patchData, beginLoad, setError, Models } = props;
     const { isUrlAppOrigin, isUrlAppHostname, rememberUrl, removeUrlParam } = Models.Utils;
     if (!data.url) return;
 
@@ -76,7 +76,7 @@ export default function WMS(props) {
         const dataitems = Models.OWSModel.convertWMS2Themes(wms, sourceUrl, options);
         if (!isCurrent()) return;
         patchData({ dataType: undefined, dataitems });
-        if (cookies) rememberUrl(cookies, 'wms', sourceUrl);
+        rememberUrl('wms', sourceUrl, options.authToken);
       }).catch((error) => {
         if (!isCurrent()) return;
         patchData({ dataType: undefined, dataitems: [] });
@@ -113,7 +113,7 @@ export default function WMS(props) {
         <Group className="ads-input-group" gap={0} wrap="nowrap" align="stretch">
           <TextInput placeholder='https://...'
             value={data.url}
-            list='urlhistory'
+            list={`urlhistory-${data.type}`}
             style={{ flex: 1 }}
             onChange={e => editField('url', e.target.value.trim())}
           />
@@ -130,7 +130,7 @@ export default function WMS(props) {
             <IconSearch />
           </ActionIcon>
         </Group>
-        <datalist id='urlhistory'>
+        <datalist id={`urlhistory-${data.type}`}>
           { getUrlHistory().map((i, k) => <option key={k} value={i} />)}
         </datalist>
 

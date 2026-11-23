@@ -57,8 +57,7 @@ export default function WizardStepData(props) {
   }
 
   function getUrlHistory() {
-    const items = props.cookies || [];
-    return items;
+    return props.Models?.Utils?.getUrlHistory?.(data.type) || [];
   }
 
   function setError(message) {

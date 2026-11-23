@@ -189,7 +189,7 @@ export default function OGCAPI(props) {
 
   /** Loads the collections of the OGC API service. */
   const loadCollections = () => {
-    const { setLoading, beginLoad, setSelected, setError, cookies, Models } = props;
+    const { setLoading, beginLoad, setSelected, setError, Models } = props;
     const { rememberUrl } = Models.Utils;
 
     const base = serviceBase(data.url);
@@ -219,7 +219,7 @@ export default function OGCAPI(props) {
         setMatched({});
         asked.current = new Set();
         setSelected({});
-        if (cookies) rememberUrl(cookies, 'ogcapi', sourceUrl);
+        rememberUrl('ogcapi', sourceUrl);
       })
       .catch((error) => {
         if (!isCurrent()) return;
@@ -255,7 +255,7 @@ export default function OGCAPI(props) {
         <TextInput
           placeholder="https://..."
           value={data.url || ''}
-          list="urlhistory"
+          list={`urlhistory-${data.type}`}
           style={{ flex: 1 }}
           onChange={(e) => editField('url', e.target.value)}
           onKeyDown={(e) => {
@@ -281,7 +281,7 @@ export default function OGCAPI(props) {
         </ActionIcon>
       </Group>
 
-      <datalist id="urlhistory">
+      <datalist id={`urlhistory-${data.type}`}>
         {getUrlHistory().map((i) => <option key={i} value={i} />)}
       </datalist>
 
