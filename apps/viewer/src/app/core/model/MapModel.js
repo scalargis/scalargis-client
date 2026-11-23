@@ -1301,113 +1301,6 @@ export const getArcGISVisibleLayers = function (map, scale) {
   return vlayers;    
 };
 
-export const getOGCAPIVisibleLayers = function (map, scale) {
-  const vlayers = [];
-
-  const _getLayers = function (layer, list) {
-    if (layer.getVisible()) {
-      if (layer instanceof OlGroup) {
-          const lls = layer.getLayers().getArray();
-          for (let i=0; i<lls.length; i++) {
-              _getLayers(lls[i], list);
-          }
-      } else if (layer.get('type') == 'OGCMap')  {
-        const source = layer.getSource();
-        if (layer.get('print')) {
-          const print = layer.get('print').length ? layer.get('print') : [layer.get('print')];
-
-          print.forEach(pitem => {
-            const type = (pitem.type || '').toLowerCase();
-
-            if (['wms', 'ogcmap'].includes(type)) {
-              const params = {};
-              if (type == 'ogcmap') {
-                params['format'] = pitem.format || 'png';
-              } else {
-                params['FORMAT'] = pitem.format || 'image/png';
-              }
-              if (pitem.layers) params['LAYERS'] = pitem.layers;
-              params['STYLES'] = pitem.styles || '';
-              params['VERSION'] = pitem.version || '1.3.0';
-              if (pitem.cql_filter) params['CQL_FILTER'] = pitem.cql_filter;
-
-              const ldata = {
-                'url': pitem.url,
-                'params': params,
-                'opacity': layer.getOpacity(),
-                'minScale': 0,
-                'maxScale': 0
-              };
-
-              if (layer.getMaxResolution && layer.getMaxResolution() > 0) {
-                ldata['minScale'] = getScaleForResolution(layer.getMaxResolution(), map.getView().getProjection().getUnits());
-              }
-              if (pitem.maxResolution && pitem.maxResolution > 0) {
-                ldata['minScale'] = getScaleForResolution(pitem.maxResolution, map.getView().getProjection().getUnits());
-              }
-              if (pitem.minScale && pitem.minScale > 0) {
-                ldata['minScale'] = pitem.minScale;
-              }
-
-              if (layer.getMinResolution && layer.getMinResolution() > 0) {
-                  ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
-              }
-              if (pitem.minResolution && pitem.minResolution > 0) {
-                ldata['maxScale'] = getScaleForResolution(pitem.minResolution, map.getView().getProjection().getUnits());
-              }
-              if (pitem.maxScale && pitem.maxScale > 0) {
-                ldata['maxScale'] = pitem.maxScale;
-              }
-
-              ldata['attributions'] = getPrintAttribution(layer, pitem);
-
-              list.push(ldata);
-            }
-          });
-        } else if (source instanceof OlSourceImageTile || source instanceof OlSourceImage) {          
-          const url = layer.get('url');
-
-          const params = {
-            format: layer.get('format') || 'png'
-          };
-          /*
-          const p = source.getParams()
-          for (const key in p) {
-              params[key] = p[key];
-          }
-          */
-
-          const ldata = {
-              'url': url,
-              'params': params,
-              'opacity': layer.getOpacity(),
-              'minScale': 0,
-              'maxScale': 0
-          };
-
-          if (layer.getMaxResolution && layer.getMaxResolution() > 0) {
-              ldata['minScale'] = getScaleForResolution(layer.getMaxResolution(), map.getView().getProjection().getUnits());
-          }
-          if (layer.getMinResolution && layer.getMinResolution() > 0) {
-              ldata['maxScale'] = getScaleForResolution(layer.getMinResolution(), map.getView().getProjection().getUnits());
-          }
-
-          ldata['attributions'] = getPrintAttribution(layer);
-
-          list.push(ldata);
-        }
-      }
-    }
-  }
-
-  const rootLayers = map.getLayers().getArray();
-  for (let i=0; i<rootLayers.length; i++) {
-      _getLayers(rootLayers[i], vlayers);
-  }
-
-  return vlayers;    
-};
-
 export const getPrintableVisibleLayers = function (map, scale) {
   const vlayers = [];
 
@@ -1718,6 +1611,5 @@ export default {
   getGeometryFromWKT,
   getWMSVisibleLayers,
   getArcGISVisibleLayers,
-  getOGCAPIVisibleLayers,
   getPrintableVisibleLayers
 }

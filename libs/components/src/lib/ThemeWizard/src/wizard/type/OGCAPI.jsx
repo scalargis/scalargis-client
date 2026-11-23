@@ -11,7 +11,6 @@ import { TextInput as CustomTextInput} from '@scalargis/ui';
 import {
   filterCollectionsByType,
   serviceBase,
-  countRecordCollections,
 } from './../ogcapiUtils';
 
 
@@ -52,16 +51,6 @@ export default function OGCAPI(props) {
     [ogcTypeList, ogcAPIType]
   );
 
-  // Coleções de registos (Records) ainda não suportadas
-  /*
-  const skippedCount = useMemo(() => countRecordCollections(collections), [collections]);
-  const skippedCount = useMemo(
-    () => (collections || []).filter((c) => c.itemType === 'record').length,
-    [collections]
-  );
-  */
-
-  // Converte as coleções filtradas em dataitems sempre que algo relevante muda
   useEffect(() => {
     if (!ogcAPIType || !collections || !data?.ogcBase) return;
 
@@ -86,7 +75,6 @@ export default function OGCAPI(props) {
     patchData({ dataitems });
   }, [ogcAPIType, data?.ogcTiled, data?.ogcLoadAll, data?.ogcBase, data?.maxFeatures, collections]);
 
-  // Renderer dos itens da lista
   useEffect(() => {
     if (!setItemRenderer) return;
     const dataitems = data?.dataitems || [];
@@ -107,7 +95,7 @@ export default function OGCAPI(props) {
     });
   }, [data?.dataitems, typeLabel]);
 
-  /** Carrega as coleções do serviço OGC API */
+  /** Loads the collections of the OGC API service. */
   const loadCollections = () => {
     const { core, setLoading, patchData, beginLoad, setSelected, setError, cookies, Models } = props;
     const { isUrlAppOrigin, rememberUrl } = Models.Utils;
@@ -195,16 +183,6 @@ export default function OGCAPI(props) {
       <datalist id="urlhistory">
         {getUrlHistory().map((i) => <option key={i} value={i} />)}
       </datalist>
-
-      {/*skippedCount > 0 && (
-        <Alert color="informative" py="xs" mt="sm" icon={<IconInfoCircle />}>
-          {t(
-            "ogcapiUnsupportedCollections",
-            "{{count}} coleções de registo ainda não são suportadas.",
-            { count: skippedCount }
-          )}
-        </Alert>
-      )*/}
 
       {hasService && !ogcAPIType && (
         <Alert color="informative" py="xs" mt="sm" icon={<IconInfoCircle />}>

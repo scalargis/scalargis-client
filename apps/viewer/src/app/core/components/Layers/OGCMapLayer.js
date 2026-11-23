@@ -3,7 +3,7 @@ import OLImageLayer from "ol/layer/Image";
 import OLTileLayer from 'ol/layer/Tile.js';
 import OlSourceImage from "ol/source/Image";
 import OLSourceImageTile from 'ol/source/ImageTile.js';
-import {createXYZ} from 'ol/tilegrid.js';
+import { createXYZ, createForProjection } from 'ol/tilegrid.js';
 import { load as loadImage } from "ol/Image";
 import { getWidth, getHeight } from "ol/extent";
 
@@ -19,28 +19,33 @@ const OGCMapLayer = ({ config, group, checked, viewer }) => {
   const MAP_PROXY = core.MAP_PROXY_URL;
 
   const TILE_SIZE = 256;
-  // Grelha XYZ em EPSG:3857
-  const MAP_SRID = mainMap ? getProjectionSrid(mainMap.getView().getProjection()) : 3857;
-  const tileGrid = createXYZ({tileSize: TILE_SIZE});
 
   /** Build the OGC URI for an EPSG code. */
   function crsUri(srid) {
     return 'http://www.opengis.net/def/crs/EPSG/0/' + srid;
   }
 
-  function buildUrl(mapUrl, format, z, x, y) {
+  /** Tile grid in the map projection. */
+  function mapTileGrid(projection) {
+    if (getProjectionSrid(projection) === 3857) return createXYZ({ tileSize: TILE_SIZE });
+    return createForProjection(projection, undefined, TILE_SIZE);
+  }
+
+  function buildUrl(mapUrl, tileGrid, srid, format, z, x, y, useProxy) {
     const [minX, minY, maxX, maxY] = tileGrid.getTileCoordExtent([z, x, y]);
 
     const p = new URLSearchParams({
       f: format,
       bbox: [minX, minY, maxX, maxY].join(','),
-      'bbox-crs': crsUri(MAP_SRID),
-      crs: crsUri(MAP_SRID),
+      'bbox-crs': crsUri(srid),
+      crs: crsUri(srid),
       width: String(TILE_SIZE),
       height: String(TILE_SIZE),
       transparent: 'true',
     });
-    return `${mapUrl}?${p}`;
+    const url = `${mapUrl}${p}`;
+    if (useProxy && !isUrlAppOrigin(url)) return MAP_PROXY + encodeURIComponent(url);
+    return url;
   }
 
   function createThrottledLoader({
@@ -48,6 +53,9 @@ const OGCMapLayer = ({ config, group, checked, viewer }) => {
     maxRetries = 4,
     baseDelayMs = 500,
     mapUrl,
+    tileGrid,
+    srid,
+    useProxy = false,
     format = 'png'
   } = {}) {
     const queue = [];
@@ -67,7 +75,6 @@ const OGCMapLayer = ({ config, group, checked, viewer }) => {
     const enqueue = (task, signal) =>
       new Promise((resolve, reject) => {
         queue.push(() => {
-          // tile já cancelado (utilizador fez pan/zoom): não pede ao servidor
           if (signal?.aborted) {
             reject(new DOMException('Aborted', 'AbortError'));
             return Promise.resolve();
@@ -110,22 +117,19 @@ const OGCMapLayer = ({ config, group, checked, viewer }) => {
           if (ra > 0) retryAfterMs = ra * 1000;
         } catch (e) {
           if (e.name === 'AbortError') throw e;
-          // TypeError "Failed to fetch": típico de 429 sem CORS, também repete
           if (!(e instanceof TypeError) && !/HTTP (429|503)/.test(e.message)) {
             if (attempt >= maxRetries) throw e;
           }
         }
-        if (attempt >= maxRetries) throw new Error(`Falhou após ${attempt + 1} tentativas`);
+        if (attempt >= maxRetries) throw new Error(`Failed after ${attempt + 1} attempts`);
         const backoff = baseDelayMs * 2 ** attempt + Math.random() * 250;
         await sleep(retryAfterMs ?? backoff, signal);
       }
     }
 
     return (z, x, y, options) =>
-      enqueue(() => fetchImage(buildUrl(mapUrl, format, z, x, y), options?.signal), options?.signal);
+      enqueue(() => fetchImage(buildUrl(mapUrl, tileGrid, srid, format, z, x, y, useProxy), options?.signal), options?.signal);
   }
-
-
 
   function createImageLayer(config) {
     const proj = mainMap.getView().getProjection().getCode();
@@ -188,33 +192,23 @@ const OGCMapLayer = ({ config, group, checked, viewer }) => {
 
     const format = config.format ? config.format : 'png';
 
+    const projection = mainMap.getView().getProjection();
+    const srid = getProjectionSrid(projection);
+    const tileGrid = mapTileGrid(projection);
+
     const source = new OLSourceImageTile({
-      projection: `EPSG:${MAP_SRID}`,
+      projection: `EPSG:${srid}`,
       tileGrid,
-      wrapX: false,          // evita pedidos de tiles fora do mundo
+      wrapX: false,
       crossOrigin: 'anonymous',
-      loader: createThrottledLoader({mapUrl: base, format: format, maxConcurrent: 4}),
-      /*
-      url: (z, x, y) => {
-        const [minX, minY, maxX, maxY] = tileGrid.getTileCoordExtent([z, x, y]);
-        const params = new URLSearchParams({
-          f: format,                                // ou image/png, conforme o servidor
-          bbox: [minX, minY, maxX, maxY].join(','),
-          'bbox-crs': CRS_3857,
-          crs: CRS_3857,                           // CRS da imagem devolvida
-          width: String(TILE_SIZE),
-          height: String(TILE_SIZE),
-          transparent: 'true'
-        });
-
-        let mapUrl = `${base}${params}`;
-        if (config.use_proxy && !isUrlAppOrigin(mapUrl)) {
-          mapUrl = MAP_PROXY + encodeURIComponent(mapUrl);
-        }
-
-        return mapUrl;
-      },
-      */
+      loader: createThrottledLoader({
+        mapUrl: base,
+        tileGrid,
+        srid,
+        useProxy: !!config.use_proxy,
+        format,
+        maxConcurrent: 4
+      })
     });
 
     const new_layer = new OLTileLayer({
@@ -233,19 +227,19 @@ const OGCMapLayer = ({ config, group, checked, viewer }) => {
       layer.current = createImageLayer(config);
     }
 
-    if (layer && config.min_resolution) {
-      layer.setMinResolution(config.min_resolution);
+    if (config.min_resolution) {
+      layer.current.setMinResolution(config.min_resolution);
     }
-    if (layer && config.max_resolution) {
-      layer.setMaxResolution(config.max_resolution);
+    if (config.max_resolution) {
+      layer.current.setMaxResolution(config.max_resolution);
     }
-    if (layer && config.min_scale) {
+    if (config.min_scale) {
       const res = getResolutionForScale(config.min_scale, mainMap.getView().getProjection().getUnits());
-      layer.setMinResolution(res);
+      layer.current.setMinResolution(res);
     }
-    if (layer && config.max_scale) {
+    if (config.max_scale) {
       const res = getResolutionForScale(config.max_scale, mainMap.getView().getProjection().getUnits());
-      layer.setMaxResolution(res);
+      layer.current.setMaxResolution(res);
     }
 
     group.getLayers().push(layer.current);

@@ -3,6 +3,7 @@ import OlFormatMVT from 'ol/format/MVT';
 import OlFormatGeoJSON from 'ol/format/GeoJSON';
 import OlVectorTileLayer from 'ol/layer/VectorTile';
 import OlSourceOGCVectorTile from 'ol/source/OGCVectorTile.js';
+import TileState from 'ol/TileState';
 import OlStyleStyle from "ol/style/Style";
 import OlStyleStroke from "ol/style/Stroke";
 import OlStyleFill from "ol/style/Fill";
@@ -30,6 +31,13 @@ function buildStyle(config) {
     style_objs['stroke'] = new OlStyleStroke({ color: style_stroke_color, width: style_stroke_width });
   }
   return new OlStyleStyle(style_objs);
+}
+
+/** True when the config sets a style field. */
+function hasStyle(config) {
+  return config.style_color !== undefined
+    || config.style_stroke_color !== undefined
+    || config.style_stroke_width !== undefined;
 }
 
 const OGCVectorTileLayer = ({ config, source, group, checked }) => {
@@ -79,16 +87,11 @@ const OGCVectorTileLayer = ({ config, source, group, checked }) => {
     if (config.mediaType) options.mediaType = config.mediaType;
     if (config.attributions) options.attributions = config.attributions;
 
-    const hasStyle = config.style_color !== undefined
-      || config.style_stroke_color !== undefined
-      || config.style_stroke_width !== undefined;
-      
-
     layer.current = new OlVectorTileLayer({
       ...config,
-      preload: 0,                    // não pré-carrega níveis de zoom inferiores
+      preload: 0,
       updateWhileAnimating: false,
-      updateWhileInteracting: false, // só pede tiles quando o movimento termina
+      updateWhileInteracting: false,
       visible: config.active,
       source: source ? source : new OlSourceOGCVectorTile({
         ...options,
@@ -104,15 +107,15 @@ const OGCVectorTileLayer = ({ config, source, group, checked }) => {
                     featureProjection: projection,
                   })
                 );
-              } catch (e) {
-                tile.setState(3); // TileState.ERROR
+              } catch {
+                tile.setState(TileState.ERROR);
               }
             });
             runNext();
           });
         }
       }),
-      ...(hasStyle ? { style: buildStyle(config) } : {})
+      ...(hasStyle(config) ? { style: buildStyle(config) } : {})
     });
 
     if (config.min_resolution) layer.current.setMinResolution(config.min_resolution);
@@ -142,7 +145,7 @@ const OGCVectorTileLayer = ({ config, source, group, checked }) => {
     layer.current.setProperties(config);
     layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
-    layer.current.setStyle(buildStyle(config))
+    if (hasStyle(config)) layer.current.setStyle(buildStyle(config));
     layer.current.changed();
   }, [config]);
 

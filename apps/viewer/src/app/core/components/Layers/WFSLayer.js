@@ -71,6 +71,23 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
     );
   }
 
+  /** Builds the layer style, with a label function when the config has a label. */
+  function layerStyle(config) {
+    const base = buildStyle(config);
+    if (!config.style_text_value) return base;
+    return (feature) => {
+      let label = config.style_text_value || '';
+      const rf = (label && label.match) ? label.match(/[^{}]+(?=})/g) : null;
+      if (rf && feature?.get) {
+        rf.forEach(fld => {
+          label = label.replace(`{${fld}}`, feature.get(fld) || '');
+        });
+      }
+      base.getText().setText(label);
+      return base;
+    };
+  }
+
   function createLayer(config) {
     const crs = mainMap.getView().getProjection().getCode();
     let wfsFormatOptions = {
@@ -174,26 +191,11 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
       attributions: config.attributions || []
     });
 
-    const style = buildStyle(config);
-
     const new_layer = new OlLayerVector({
       ...config,
       visible: config.active,
       source: vectorSource,
-      style: config.style_text_value ? (feature, resolution) => {
-        let label = config.style_text_value || '';
-        if (config.style_text_value && feature?.get) {
-          const rf = (label && label.match) ? label.match(/[^{}]+(?=})/g) : null;
-          if (rf) {
-            rf.forEach(fld => {
-              label = label.replace(`{${fld}}`, feature.get(fld) || '');      
-            });            
-          }
-        }
-        //const label = map.getView().getZoom() > 12 ? feature.get('PAR_ID') + '' : '';
-        style.getText().setText(label);
-          return style;
-        } : style
+      style: layerStyle(config)
     });
 
     if (new_layer && config.min_resolution) {
@@ -237,22 +239,7 @@ const WFSLayer = ({ config, group, checked, viewer }) => {
     layer.current.set('selectable', config.selectable);
     layer.current.setOpacity(config.opacity);
 
-    const style = config.style_text_value ? (feature, resolution) => {
-      let label = config.style_text_value || '';
-      if (config.style_text_value && feature?.get) {
-        const rf = (label && label.match) ? label.match(/[^{}]+(?=})/g) : null;
-        if (rf) {
-          rf.forEach(fld => {
-            label = label.replace(`{${fld}}`, feature.get(fld) || '');      
-          });            
-        }
-      }
-      //const label = map.getView().getZoom() > 12 ? feature.get('PAR_ID') + '' : '';
-      style.getText().setText(label);
-        return style;
-      } : buildStyle(config);
-
-    layer.current.setStyle(style);
+    layer.current.setStyle(layerStyle(config));
     layer.current.changed();
   }, [config]);
 

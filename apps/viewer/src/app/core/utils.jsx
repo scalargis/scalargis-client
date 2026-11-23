@@ -202,8 +202,6 @@ export const getAppUploadUrl = () => {
   let url = '';
   if (import.meta.env.VITE_APP_UPLOAD_URL) {
     url = root_path + import.meta.env.VITE_APP_UPLOAD_URL;
-  } else {
-    url =  root_path + '/spatial_toolbox/convert2geojson';
   }
   if (url.startsWith('//')) {
     url = window.location.protocol + url;

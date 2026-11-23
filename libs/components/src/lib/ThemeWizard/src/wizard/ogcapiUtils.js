@@ -1,8 +1,3 @@
-/**
- * Utilitários puros para trabalhar com serviços OGC API.
- * Sem dependências de React, o que facilita os testes unitários.
- */
-
 export const REL = {
   maps: ['http://www.opengis.net/def/rel/ogc/1.0/map'],
   mapTiles: ['http://www.opengis.net/def/rel/ogc/1.0/tilesets-map'],
@@ -10,7 +5,7 @@ export const REL = {
   features: ['items'],
 };
 
-/** Reduz o URL colado à base do serviço (sem /collections, query ou hash). */
+/** Reduces a pasted URL to the service base, with no /collections, query, or hash. */
 export function serviceBase(raw) {
   let u = (raw || '').trim();
   if (!u) return '';
@@ -20,7 +15,7 @@ export function serviceBase(raw) {
   return u;
 }
 
-/** Resolve um href (absoluto ou relativo) contra um URL base. Devolve null se for inválido. */
+/** Resolves an absolute or relative href against a base URL, or returns null. */
 export function resolveHref(href, baseUrl) {
   try {
     return new URL(href, baseUrl).href;
@@ -29,14 +24,12 @@ export function resolveHref(href, baseUrl) {
   }
 }
 
-/** Indica se um link de uma coleção corresponde ao tipo de API pedido. */
+/** True when a collection link matches the requested API type. */
 export function matchesType(link, rels, type, collection) {
   if (!link?.rel || !link?.href || !rels.includes(link.rel)) return false;
 
   if (type === 'features') {
-    // Exclui coleções de outros tipos que também usam rel="items" (ex.: Records)
     if (collection?.itemType && collection.itemType !== 'feature') return false;
-    // Se o link declarar type, tem de ser GeoJSON/JSON
     if (link.type && !/json/i.test(link.type)) return false;
   }
 
@@ -47,7 +40,7 @@ export function matchesType(link, rels, type, collection) {
   return true;
 }
 
-/** Devolve apenas as coleções com links do tipo pedido, com hrefs absolutos. */
+/** Returns only the collections with links of the requested type, with absolute hrefs. */
 export function filterCollectionsByType(collections, type, base) {
   const rels = REL[type] || [];
   const resolveBase = `${base}/collections`;
@@ -63,9 +56,4 @@ export function filterCollectionsByType(collections, type, base) {
   }
 
   return result;
-}
-
-/** Conta as coleções de registos (Records), ainda não suportadas. */
-export function countRecordCollections(collections) {
-  return (collections || []).filter((c) => c.itemType === 'record').length;
 }

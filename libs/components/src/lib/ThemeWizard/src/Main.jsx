@@ -188,9 +188,6 @@ export default function Main(props) {
       }
 
       const addLayerItems = function (items, parent) {
-
-        console.log('addLayerItems', items, parent);
-
         items.forEach(item => {
           allIds.push(item.id);
           
