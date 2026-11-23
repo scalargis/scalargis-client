@@ -5,6 +5,7 @@ import { FileUpload, notify, IconSearch } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 import { uploadVectorFile } from '../upload';
+import { useServiceAutoLoad } from '../autoLoad';
 
 
 export default function GeoJSON (props) {
@@ -39,12 +40,12 @@ export default function GeoJSON (props) {
         const dataitems = Models.OWSModel.convertGeoJSON2Themes(res, sourceUrl, name, crs);
         if (!dataitems || !dataitems.length) throw new Error(invalidResponse);
         if (!isCurrent()) return;
-        patchData({ dataitems });
+        patchData({ dataType: undefined, dataitems });
         rememberUrl('geojson', sourceUrl);
       })
       .catch(error => {
         if (!isCurrent()) return;
-        patchData({ dataitems: [] });
+        patchData({ dataType: undefined, dataitems: [] });
         setSelected({});
         setError(''+error);
       })
@@ -52,6 +53,8 @@ export default function GeoJSON (props) {
         if (isCurrent()) setLoading(false);
       });
   }
+
+  useServiceAutoLoad(props.data, 'geojson', loadFromUserURL);
 
   /**
    * Render GeoJSON wizard
@@ -71,7 +74,7 @@ export default function GeoJSON (props) {
             />
           </div>
 
-          <Tabs defaultValue="file">
+          <Tabs defaultValue={props.data?.url ? "url" : "file"}>
             <Tabs.List>
               <Tabs.Tab value="file">{t("file", "Ficheiro")}</Tabs.Tab>
               <Tabs.Tab value="url">URL</Tabs.Tab>

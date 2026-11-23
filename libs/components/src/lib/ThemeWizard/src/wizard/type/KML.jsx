@@ -6,6 +6,7 @@ import {parseString} from 'xml2js';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
 import { uploadVectorFile } from '../upload';
+import { useServiceAutoLoad } from '../autoLoad';
 
 
 export default function KML(props) {
@@ -50,12 +51,12 @@ export default function KML(props) {
       }))
       .then(dataitems => {
         if (!isCurrent()) return;
-        patchData({ dataitems });
+        patchData({ dataType: undefined, dataitems });
         rememberUrl('kml', sourceUrl);
       })
       .catch(error => {
         if (!isCurrent()) return;
-        patchData({ dataitems: [] });
+        patchData({ dataType: undefined, dataitems: [] });
         setSelected({});
         setError(''+error);
       })
@@ -63,6 +64,8 @@ export default function KML(props) {
         if (isCurrent()) setLoading(false);
       });
   }
+
+  useServiceAutoLoad(props.data, 'kml', loadFromUserURL);
 
   /**
    * Render KML wizard
@@ -72,7 +75,7 @@ export default function KML(props) {
     return (
       <div>
 
-          <Tabs defaultValue="file">
+          <Tabs defaultValue={props.data?.url ? "url" : "file"}>
             <Tabs.List>
               <Tabs.Tab value="file">{t("file", "Ficheiro")}</Tabs.Tab>
               <Tabs.Tab value="url">URL</Tabs.Tab>

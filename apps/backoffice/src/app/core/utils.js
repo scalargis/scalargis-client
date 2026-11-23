@@ -29,29 +29,66 @@ export const removeAuthToken = (url, authToken) => {
 }
 
 const URL_HISTORY_SIZE = 10;
-const urlHistoryKey = (type) => `scalargis_urlhistory_${type}`;
+const RECENT_SEARCHES_SIZE = 8;
+const URL_HISTORY_PREFIX = 'scalargis_urlhistory_';
+const urlHistoryKey = (type) => `${URL_HISTORY_PREFIX}${type}`;
 
-/** Returns the saved service URLs of a wizard type, the last one first. */
-export function getUrlHistory(type) {
+/** Returns the saved entries of a wizard type as {url, date}, the last one first. */
+function readUrlEntries(type) {
   try {
     const items = JSON.parse(window.localStorage.getItem(urlHistoryKey(type)) || '[]');
-    return Array.isArray(items) ? items.filter(i => typeof i === 'string') : [];
+    if (!Array.isArray(items)) return [];
+    return items
+      .map(i => typeof i === 'string' ? { url: i, date: 0 } : i)
+      .filter(i => i && typeof i.url === 'string' && i.url);
   } catch {
     return [];
   }
 }
 
-/** Saves a service URL first in the history of its wizard type. */
-export function rememberUrl(type, url, authToken) {
-  const clean = removeAuthToken((url || '').trim(), authToken);
-  if (!clean) return false;
+/** Writes the entries of a wizard type, or returns false when the storage refuses them. */
+function writeUrlEntries(type, entries) {
   try {
-    const items = [clean, ...getUrlHistory(type).filter(i => i !== clean)].slice(0, URL_HISTORY_SIZE);
-    window.localStorage.setItem(urlHistoryKey(type), JSON.stringify(items));
+    if (entries.length) window.localStorage.setItem(urlHistoryKey(type), JSON.stringify(entries));
+    else window.localStorage.removeItem(urlHistoryKey(type));
     return true;
   } catch {
     return false;
   }
+}
+
+/** Returns the saved service URLs of a wizard type, the last one first. */
+export function getUrlHistory(type) {
+  return readUrlEntries(type).map(i => i.url);
+}
+
+/** Saves a service URL first in the history of its wizard type, with the date of the save. */
+export function rememberUrl(type, url, authToken) {
+  const clean = removeAuthToken((url || '').trim(), authToken);
+  if (!clean) return false;
+  const entries = [{ url: clean, date: Date.now() }, ...readUrlEntries(type).filter(i => i.url !== clean)];
+  return writeUrlEntries(type, entries.slice(0, URL_HISTORY_SIZE));
+}
+
+/** Removes a service URL from the history of its wizard type. */
+export function forgetUrl(type, url) {
+  return writeUrlEntries(type, readUrlEntries(type).filter(i => i.url !== url));
+}
+
+/** Returns the recent searches of all wizard types as {type, url, date}, the newest first. */
+export function getRecentSearches(types, size = RECENT_SEARCHES_SIZE) {
+  let keys = [];
+  try {
+    keys = Object.keys(window.localStorage).filter(k => k.startsWith(URL_HISTORY_PREFIX));
+  } catch {
+    return [];
+  }
+  return keys
+    .map(k => k.slice(URL_HISTORY_PREFIX.length))
+    .filter(type => !types || types.includes(type))
+    .flatMap(type => readUrlEntries(type).map(i => ({ type, url: i.url, date: i.date || 0 })))
+    .sort((a, b) => b.date - a.date)
+    .slice(0, size);
 }
 
 export const  generateRGBA = () => {

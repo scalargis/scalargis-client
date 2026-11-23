@@ -139,7 +139,8 @@ export default function Main(props) {
     });
   }, [translation?.i18n?.resolvedLanguage]);
 
-  function externalLoad(data) {
+  /** Opens step 1 with a type and a URL, and lets the type step load the service. */
+  function startServiceLoad(type, url) {
     cancelLoads();
     setActiveIndex(1);
     setSelected({});
@@ -148,10 +149,14 @@ export default function Main(props) {
       dataitems: [],
       items: [],
       key: String(uuidV4()),
-      type: data.type ? data.type.toLowerCase() : '',
-      url: data.url || '',
-      dataType: data.type ? data.type.toLowerCase() : ''
+      type,
+      url,
+      dataType: type
     });
+  }
+
+  function externalLoad(data) {
+    startServiceLoad(data.type ? data.type.toLowerCase() : '', data.url || '');
     props.config.dispatch(props.actions.viewer_set_selectedmenu(props.record.id));
     if (data.callback) data.callback();
   }
@@ -300,7 +305,9 @@ export default function Main(props) {
             core={props.core}
             auth={props.config.auth}
             record={props.record}
+            Models={props.config.Models}
             types={types}
+            onRecent={({ type, url }) => startServiceLoad(type, url)}
             initialData={{...initialData, dataitems: [], items:[]}}
             wizardData={wizardData}
             onChange={type => {

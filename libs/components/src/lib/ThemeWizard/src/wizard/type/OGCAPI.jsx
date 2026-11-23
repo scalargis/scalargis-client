@@ -4,6 +4,7 @@ import { Accordion, ActionIcon, Alert, Group, Switch, Text, TextInput, Select } 
 import { IconInfoCircle, IconSearch } from '@scalargis/ui';
 
 import { ItemCard } from './../ItemCard';
+import { useServiceAutoLoad } from './../autoLoad';
 import { I18N_NAMESPACE } from './../../i18n/index';
 
 import { TextInput as CustomTextInput} from '@scalargis/ui';
@@ -210,7 +211,7 @@ export default function OGCAPI(props) {
         if (!isCurrent()) return;
         patchData({
           state: { jsonService: json },
-          dataType: 'ogcapi',
+          dataType: undefined,
           dataitems: [],
           ogcBase: base,
           ogcAPIType: null,
@@ -225,6 +226,7 @@ export default function OGCAPI(props) {
         if (!isCurrent()) return;
         patchData({
           state: { jsonService: null },
+          dataType: undefined,
           dataitems: [],
           ogcBase: null,
           ogcAPIType: null,
@@ -236,6 +238,8 @@ export default function OGCAPI(props) {
         if (isCurrent()) setLoading(false);
       });
   };
+
+  useServiceAutoLoad(data, 'ogcapi', loadCollections);
 
   const hasService = jsonService != null;
   const showAdvanced = ['maps', 'features'].includes(ogcAPIType);

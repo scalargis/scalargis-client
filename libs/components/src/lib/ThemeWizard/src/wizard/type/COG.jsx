@@ -7,6 +7,7 @@ import { Accordion, ActionIcon, Fieldset, Group, NumberInput, Select, Switch, Te
 import { IconSearch } from '@scalargis/ui';
 
 import { I18N_NAMESPACE } from './../../i18n/index';
+import { useServiceAutoLoad } from './../autoLoad';
 
 
 export default function COG(props) {
@@ -105,19 +106,21 @@ export default function COG(props) {
 
       const dataitems = Models.OWSModel.convertCOG2Themes(image, sourceUrl, filename, proxyRequests, options);
       if (!isCurrent()) return;
-      patchData({ options, dataitems });
+      patchData({ dataType: undefined, options, dataitems });
 
       rememberUrl('cog', sourceUrl);
       
     }).catch((error) => {
       if (!isCurrent()) return;
       console.log(error);
-      patchData({ dataitems: [] });
+      patchData({ dataType: undefined, dataitems: [] });
       setError('' + error);
     }).finally(()=>{
       if (isCurrent()) setLoading(false);
     });
   }
+
+  useServiceAutoLoad(data, 'cog', loadCOGMetadata);
 
   const onChangeBand = (index, value) => {
     const bands = [...selectedBands];
