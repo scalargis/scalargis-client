@@ -28,7 +28,7 @@ export function ItemCard({ title, subtitle, description, legendUrl }) {
         <Text fz={14} lineClamp={2} style={{ flex: 1, minWidth: 0 }}>
           {title}
           {subtitle ? (
-            <Text span c="dimmed" fz={12} ml={6} data-item-subtitle>{subtitle}</Text>
+            <Text span c="dimmed" fz={12} ml={6} data-item-subtitle style={{ display: 'inline-block', maxWidth: '100%' }}>{subtitle}</Text>
           ) : null}
         </Text>
 
