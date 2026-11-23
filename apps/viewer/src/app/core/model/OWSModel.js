@@ -1107,7 +1107,8 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
     if (options.use_proxy) theme.use_proxy = true;
     if (theme.type === 'OGCFeatures') {
       if (options.strategy === 'all') theme.strategy = 'all';
-      if (Number(options.pageSize) > 0) theme.page_size = Number(options.pageSize);
+      const pageSize = Number(options.pageSizes?.[coll.id]?.max) || Number(options.pageSize);
+      if (pageSize > 0) theme.page_size = pageSize;
     }
 
     const bbox = coll?.extent?.spatial?.bbox?.[0];

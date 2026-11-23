@@ -58,7 +58,7 @@ export function filterCollectionsByType(collections, type, base) {
   return result;
 }
 
-/** Returns the maximum and default of the limit parameter of the items path of an OpenAPI document. */
+/** Returns the limit maximum and default of the items paths of an OpenAPI document, for each collection and for the path template. */
 export function itemsLimitOf(doc) {
   const resolve = (p) => {
     if (!p?.$ref) return p;
@@ -74,12 +74,22 @@ export function itemsLimitOf(doc) {
     }
     return undefined;
   };
-  const path = Object.keys(doc?.paths || {}).find((p) => /\/collections\/[^/]+\/items$/.test(p));
-  if (!path) return {};
-  const entry = doc.paths[path];
-  const params = [...(entry.parameters || []), ...(entry.get?.parameters || [])].map(resolve);
-  const limit = params.find((p) => p?.name === 'limit' && p?.in === 'query');
-  if (!limit) return {};
-  const schema = resolve(limit.schema);
-  return { max: numberIn(schema, 'maximum'), def: numberIn(schema, 'default') };
+  const result = { max: undefined, def: undefined, byCollection: {} };
+  Object.keys(doc?.paths || {}).forEach((path) => {
+    const m = path.match(/\/collections\/([^/]+)\/items$/);
+    if (!m) return;
+    const entry = doc.paths[path];
+    const params = [...(entry.parameters || []), ...(entry.get?.parameters || [])].map(resolve);
+    const limit = params.find((p) => p?.name === 'limit' && p?.in === 'query');
+    if (!limit) return;
+    const schema = resolve(limit.schema);
+    const facts = { max: numberIn(schema, 'maximum'), def: numberIn(schema, 'default') };
+    if (/^\{.*\}$/.test(m[1])) {
+      result.max = facts.max;
+      result.def = facts.def;
+    } else {
+      result.byCollection[decodeURIComponent(m[1])] = facts;
+    }
+  });
+  return result;
 }

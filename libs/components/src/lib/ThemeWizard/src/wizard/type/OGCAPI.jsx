@@ -119,6 +119,7 @@ export default function OGCAPI(props) {
       tiled: !!data.ogcTiled,
       maxFeatures: data?.maxFeatures || 500,
       pageSize: data?.ogcLimit?.base === data.ogcBase ? data?.ogcLimit?.max : undefined,
+      pageSizes: data?.ogcLimit?.base === data.ogcBase ? data?.ogcLimit?.byCollection : undefined,
       mapSrid
     };
 
@@ -238,10 +239,13 @@ export default function OGCAPI(props) {
 
   const hasService = jsonService != null;
   const showAdvanced = ['maps', 'features'].includes(ogcAPIType);
-  const serverMax = data?.ogcLimit?.base === data?.ogcBase ? data?.ogcLimit?.max : null;
+  const ticked = (data?.dataitems || []).filter((i) => selected?.[i.id]?.checked);
+  const serverMax = ogcAPIType === 'features' && data?.ogcLimit?.base === data?.ogcBase
+    ? [...new Set((ticked.length ? ticked.map((i) => i.page_size) : [data?.ogcLimit?.max]).filter(Boolean))].sort((a, b) => a - b).join(', ')
+    : null;
   const large = ogcAPIType === 'features'
-    ? (data?.dataitems || [])
-      .filter((i) => selected?.[i.id]?.checked && matched[i.url] > LARGE_COLLECTION)
+    ? ticked
+      .filter((i) => matched[i.url] > LARGE_COLLECTION)
       .map((i) => ({ title: i.title, count: matched[i.url] }))
     : [];
 
