@@ -1140,6 +1140,9 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
       };
       const legendUrl = ogcapiCollectionLegendUrl(coll, serviceUrl) || options.legends?.[coll.id];
       if (legendUrl) theme.legend_url = legendUrl;
+      if ((coll.links || []).some(l => l.rel === 'items')) {
+        theme.get_feature_info_url = ogcapiItemsUrl(coll, serviceUrl);
+      }
     } else {
       return;
     }

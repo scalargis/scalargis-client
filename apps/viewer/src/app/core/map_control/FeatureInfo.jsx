@@ -381,6 +381,38 @@ export default function FeatureInfo({ core, config, actions }) {
       }
     });
 
+    const ogcmaplrs = utils.findActiveOGCMapLayer(mainMap.getLayers());
+    ogcmaplrs.forEach(l => {
+      if (l.get('selectable') === false) return;
+      const itemsUrl = l.get('get_feature_info_url');
+      if (!itemsUrl) return;
+
+      const half = viewResolution * 2.5;
+      const bbox = transformExtent(
+        [coordinate[0] - half, coordinate[1] - half, coordinate[0] + half, coordinate[1] + half],
+        mapCRS, 'EPSG:4326'
+      );
+
+      const done = track();
+      utils.getOGCAPIItemsInExtent(itemsUrl, bbox, 10, !!l.get('use_proxy'))
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(json => {
+          const parser = new OlFormatGeoJSON();
+          const found = parser.readFeatures(json, { dataProjection: 'EPSG:4326', featureProjection: mapCRS });
+          found.forEach(feat => {
+            const geom = feat.getGeometry();
+            if (geom && /Polygon/i.test(geom.getType()) && !geom.intersectsCoordinate(coordinate)) return;
+            acc.push(displayFeature(feat, l));
+          });
+          publish();
+        })
+        .catch(err => console.log(err))
+        .finally(done);
+    });
+
     // Find features from ArcGIS layers strategy
     const aglrs = utils.findActiveArcGISMapLayer(mainMap.getLayers());;
     aglrs.forEach(l => {
@@ -1023,6 +1055,31 @@ class FeatureInfoUtils  {
       }
     });
     return result;
+  }
+
+  /** Returns the visible OGC API Maps layers. */
+  findActiveOGCMapLayer(layers) {
+    const result = [];
+    layers.forEach(l => {
+      if (l.getVisible() && l.get('type') === 'OGCMap') {
+        result.push(l);
+      }
+      if ((l instanceof OlGroup) && l.getVisible()) {
+        const temp = this.findActiveOGCMapLayer(l.getLayers());
+        temp.forEach(t => result.push(t));
+      }
+    });
+    return result;
+  }
+
+  /** Fetches the OGC API Features items inside a CRS84 extent. */
+  getOGCAPIItemsInExtent(itemsUrl, bbox, limit, useProxy) {
+    const params = new URLSearchParams({ f: 'json', bbox: bbox.join(','), limit: String(limit) });
+    let url = itemsUrl + (itemsUrl.indexOf('?') < 0 ? '?' : '&') + params.toString();
+    if (useProxy && !isUrlAppOrigin(url)) {
+      url = this.core.MAP_PROXY_URL + encodeURIComponent(url);
+    }
+    return fetch(url, { headers: { Accept: 'application/geo+json, application/json' } });
   }
 
   buildFeatureInfoWMSUrl(map, layer, viewResolution, coordinate, crs, format) {
