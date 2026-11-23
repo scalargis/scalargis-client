@@ -116,7 +116,9 @@ const PrintLayoutsEditor = props => {
 
   const onLayoutFormSave = (formData) => {
     const layout = pickLayout(formData);
-    props.onChange(editing ? data.map((l) => (l === editing ? layout : l)) : [...data, layout]);
+    const next = editing ? data.map((l) => (l === editing ? layout : l)) : [...data, layout];
+    props.onChange(next);
+    if (props.onSave) props.onSave(next);
     setSelectedRecords([]);
     setEditing(undefined);
   }

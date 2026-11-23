@@ -144,11 +144,11 @@ function PrintForm(props) {
 
   const { goBack, openCreated } = useRecordNavigation('/prints');
 
-  const buildData = (formData, geometry) => {
+  const buildData = (formData, geometry, nextLayouts = layouts) => {
     let new_data = {
       ...formData,
       form_fields: formFields ? {...formFields}  : {},
-      layouts: layouts ? [...layouts]: []
+      layouts: nextLayouts ? [...nextLayouts]: []
     }
 
     if (geometry) {
@@ -208,8 +208,8 @@ function PrintForm(props) {
     }
   });
 
-  const onSubmit = (formData) => {
-    const new_data = buildData(formData, geometryFilter);
+  const onSubmit = (formData, nextLayouts) => {
+    const new_data = buildData(formData, geometryFilter, nextLayouts);
 
     if (data.id) {
       summary.submit(new_data);
@@ -588,6 +588,7 @@ function PrintForm(props) {
                 onChange={(data) => {
                   setLayouts(data);
                 }}
+                onSave={(data) => handleSubmit((formData) => onSubmit(formData, data))()}
               />
           </PageSection>
         </TabPanel>
