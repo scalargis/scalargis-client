@@ -963,6 +963,18 @@ export const detectOGCAPICollectionType = (collection) => {
   return 'unknown';
 }
 
+/** Returns the EPSG codes that an OGC API collection serves, from its crs list or the global one. */
+const ogcapiCollectionSrids = (collection, collectionsJson) => {
+  let list = Array.isArray(collection?.crs) ? collection.crs : [];
+  if (list.includes('#/crs')) list = list.filter(c => c !== '#/crs').concat(collectionsJson?.crs || []);
+  const srids = [];
+  list.forEach(uri => {
+    const m = String(uri).match(/EPSG\/0\/(\d+)$/i) || String(uri).match(/^EPSG:(\d+)$/i);
+    if (m && !srids.includes(Number(m[1]))) srids.push(Number(m[1]));
+  });
+  return srids;
+}
+
 /** Build the items endpoint base URL for one feature collection (query stripped). */
 const ogcapiItemsUrl = (collection, serviceUrl) => {
   const links = collection?.links || [];
@@ -1066,7 +1078,7 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
         type: 'OGCFeatures',
         url,
         limit: options?.maxFeatures || 1000,
-        max_pages: 10,
+        supported_crs: ogcapiCollectionSrids(coll, collectionsJson),
         style_color: generateRGBA(),
         style_stroke_color: generateRGBA(),
         style_stroke_width: 1,
@@ -1093,7 +1105,21 @@ export const convertOGCAPI2Themes = (collectionsJson, serviceUrl, options = {}) 
     }
 
     if (options.use_proxy) theme.use_proxy = true;
-    if (options.strategy === 'all' && theme.type === 'OGCFeatures') theme.strategy = 'all';
+    if (theme.type === 'OGCFeatures') {
+      if (options.strategy === 'all') theme.strategy = 'all';
+      if (Number(options.pageSize) > 0) theme.page_size = Number(options.pageSize);
+    }
+
+    const bbox = coll?.extent?.spatial?.bbox?.[0];
+    if (theme.type !== 'OGCMap' && options.mapSrid && Array.isArray(bbox) && bbox.length >= 4) {
+      const wgs = bbox.length === 6 ? [bbox[0], bbox[1], bbox[3], bbox[4]] : bbox.slice(0, 4);
+      try {
+        theme.bbox = OlProj.transformExtent(wgs, 'EPSG:4326', 'EPSG:' + options.mapSrid).join(' ');
+        theme.crs = Number(options.mapSrid);
+      } catch {
+        delete theme.bbox;
+      }
+    }
 
     result.push(theme);
   });

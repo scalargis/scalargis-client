@@ -79,6 +79,9 @@
   "ogcapiSelectType": "Sélectionnez un type d'API",
   "ogcapiType": "Type d'API",
   "ogcapiCountTypeCollections": "{{count}} sur {{total}} collections",
+  "ogcapiTotalFeatures": "Nombre total d'éléments à charger",
+  "ogcapiServerMax": "Max. du serveur : {{max}} par requête",
+  "ogcapiLargeCollection": "{{title}} : {{count}} éléments. Charger toute la collection peut être lent.",
 
   "filter": "Filtre"
 }

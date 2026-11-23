@@ -474,6 +474,11 @@
         "include_components": { "title": "Componentes incluídos", "description": "Tipos de componente que as ferramentas da camada mostram sempre.", "$ref": "#/definitions/stringList" },
         "proxy_http_image_requests": { "title": "Proxy para imagens HTTP", "description": "Com true, os pedidos de imagem por HTTP da camada passam pelo proxy.", "type": "boolean" },
         "use_proxy": { "title": "Usar proxy", "description": "Com true, os pedidos da camada passam pelo proxy.", "type": "boolean" },
+        "limit": { "title": "Total de elementos", "description": "OGC API Features: total de elementos que a camada carrega por extensão. Por omissão, 1000.", "type": "integer", "minimum": 1 },
+        "page_size": { "title": "Elementos por pedido", "description": "OGC API Features: máximo de elementos por pedido que o servidor aceita. A camada pede o menor valor entre este e o total.", "type": "integer", "minimum": 1 },
+        "max_pages": { "title": "Máximo de páginas", "description": "OGC API Features: número máximo de páginas por extensão. Por omissão, o maior valor entre 10 e o total a dividir pelos elementos por pedido.", "type": "integer", "minimum": 1 },
+        "supported_crs": { "title": "Sistemas da coleção", "description": "OGC API Features: códigos EPSG que a coleção aceita. Quando o sistema do mapa não está na lista, a camada pede e lê em CRS84.", "type": "array", "items": { "type": "integer" } },
+        "strategy": { "title": "Estratégia de carga", "description": "Com bbox, a camada pede os elementos da extensão visível. Com all, pede a coleção toda uma vez.", "type": "string" },
         "style_color": { "title": "Cor de preenchimento", "description": "Cor de preenchimento dos elementos.", "type": ["string", "null"] },
         "style_stroke_color": { "title": "Cor do contorno", "description": "Cor do contorno dos elementos.", "type": ["string", "null"] },
         "style_stroke_width": { "title": "Largura do contorno", "description": "Largura do contorno dos elementos, em píxeis.", "type": "number" }

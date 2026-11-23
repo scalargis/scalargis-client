@@ -116,6 +116,7 @@ export default function WizardStepData(props) {
         setError={setError}
         setData={updateData}
         patchData={patchData}
+        selected={selected}
         setSelected={setSelected}
         setItemRenderer={setItemRenderer}
         getUrlHistory={getUrlHistory}

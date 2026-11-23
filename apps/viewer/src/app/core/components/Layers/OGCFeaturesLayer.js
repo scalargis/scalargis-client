@@ -8,10 +8,25 @@ import OlStyleFill from "ol/style/Fill";
 import OlStyleCircle from "ol/style/Circle";
 import OlStyleText from 'ol/style/Text';
 import { all as allStrategy, bbox as bboxStrategy } from 'ol/loadingstrategy';
+import { transformExtent } from 'ol/proj';
 
 import AppContext from "../../../AppContext";
 import { isUrlAppOrigin } from '../../utils';
 import { getProjectionSrid, getResolutionForScale } from '../../model/MapModel';
+
+/** Returns the page size, the total, the page cap, and the request SRID (null for CRS84) of an OGC API Features layer. */
+function requestPlan(config, mapProjection) {
+  const total = Number(config.limit) > 0 ? Number(config.limit) : 1000;
+  const serverMax = Number(config.page_size) > 0 ? Number(config.page_size) : null;
+  const pageSize = serverMax ? Math.min(total, serverMax) : total;
+  const maxPages = typeof config.max_pages === 'undefined' || config.max_pages === null
+    ? Math.max(10, Math.ceil(total / pageSize))
+    : Number(config.max_pages);
+  const wanted = Number(config.crs ? config.crs : getProjectionSrid(mapProjection));
+  const supported = Array.isArray(config.supported_crs) ? config.supported_crs.map(Number) : null;
+  const srid = !supported || supported.includes(wanted) ? wanted : null;
+  return { total, pageSize, maxPages, srid };
+}
 
 const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
 
@@ -90,14 +105,12 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
 
   function createLayer(config) {
     const proj = mainMap.getView().getProjection().getCode();
-    const srid = config.crs ? config.crs : getProjectionSrid(proj);
-    const uri = crsUri(srid);
-    const limit = config.limit ? config.limit : 1000;
-    const max_pages = typeof config.max_pages === 'undefined' ? 10 : Number(config.max_pages);
     const format = new OlFormatGeoJSON();
+    const retry = { delay: 0 };
 
     const vectorSource = new OlSourceVector({
       loader: (extent, resolution, projection, success, failure) => {
+        const plan = requestPlan(config, proj);
         let base = (config.url || '');
         if (!base.toLowerCase().startsWith('http')) {
           base = window.location.origin + base;
@@ -105,16 +118,13 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
         base = base.replace(/&$/ig, '');
         base = base + (base.indexOf('?') > -1 ? '&' : '?');
 
-        const params = [];
-        params.push('f=json');
-        params.push('limit=' + limit);
-        params.push('crs=' + encodeURIComponent(uri));
+        const params = ['f=json', 'limit=' + plan.pageSize];
+        if (plan.srid) params.push('crs=' + encodeURIComponent(crsUri(plan.srid)));
         if (config.strategy !== 'all') {
-          params.push('bbox-crs=' + encodeURIComponent(uri));
-          params.push('bbox=' + extent.join(','));
+          const box = transformExtent(extent, proj, plan.srid ? 'EPSG:' + plan.srid : 'EPSG:4326');
+          if (plan.srid) params.push('bbox-crs=' + encodeURIComponent(crsUri(plan.srid)));
+          params.push('bbox=' + box.join(','));
         }
-
-        const url = base + params.join('&');
 
         const collected = [];
 
@@ -124,33 +134,51 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
             target = MAP_PROXY + encodeURIComponent(target);
           }
           return fetch(target)
-            .then(res => res.json())
+            .then(res => {
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              return res.json();
+            })
             .then(json => {
               const features = format.readFeatures(json, {
-                dataProjection: 'EPSG:' + srid,
+                dataProjection: plan.srid ? 'EPSG:' + plan.srid : 'EPSG:4326',
                 featureProjection: proj
               });
-              features.forEach(f => f.ollayer = layer.current);
-              collected.push(...features);
+              features.forEach((f, i) => {
+                f.ollayer = layer.current;
+                const assets = json.features?.[i]?.assets;
+                if (assets && typeof assets === 'object') {
+                  Object.keys(assets).forEach(k => {
+                    if (assets[k]?.href && f.get('asset_' + k) === undefined) f.set('asset_' + k, assets[k].href);
+                  });
+                }
+              });
+              const pageFeatures = features.slice(0, Math.max(0, plan.total - collected.length));
+              collected.push(...pageFeatures);
+              layer.current?.getSource().addFeatures(pageFeatures);
 
               const next = (json.links || []).find(l => l.rel === 'next');
-              const numReturned = typeof json.numberReturned === 'number' ? json.numberReturned : features.length;
-              if (next && next.href && numReturned >= limit && page < max_pages) {
+              if (next && next.href && features.length && collected.length < plan.total && page < plan.maxPages) {
                 return fetchPage(next.href, page + 1);
               }
               return collected;
             });
         };
 
-        fetchPage(url, 1)
+        fetchPage(base + params.join('&'), 1)
           .then(features => {
-            layer.current.getSource().addFeatures(features);
+            retry.delay = 0;
             if (success) success(features);
           })
           .catch(error => {
             console.log(error);
-            layer.current.getSource().removeLoadedExtent(extent);
+            retry.delay = Math.min(retry.delay ? retry.delay * 2 : 2000, 30000);
             if (failure) failure();
+            setTimeout(() => {
+              const source = layer.current?.getSource();
+              if (!source) return;
+              source.removeLoadedExtent(extent);
+              source.changed();
+            }, retry.delay);
           });
       },
       strategy: config?.strategy === 'all' ? allStrategy : bboxStrategy,

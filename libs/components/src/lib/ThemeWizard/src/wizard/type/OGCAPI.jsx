@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from "react-i18next";
-import { Accordion, ActionIcon, Alert, Group, Switch, TextInput, Select } from '@mantine/core';
+import { Accordion, ActionIcon, Alert, Group, Switch, Text, TextInput, Select } from '@mantine/core';
 import { IconInfoCircle, IconSearch } from '@scalargis/ui';
 
 import { ItemCard } from './../ItemCard';
@@ -10,8 +10,46 @@ import { TextInput as CustomTextInput} from '@scalargis/ui';
 
 import {
   filterCollectionsByType,
+  itemsLimitOf,
   serviceBase,
 } from './../ogcapiUtils';
+
+const LARGE_COLLECTION = 10000;
+
+/** Sends a URL through the map proxy when the context asks for it. */
+function proxied(url, ctx) {
+  return ctx.useProxy && !ctx.isUrlAppOrigin(url) ? ctx.proxyUrl + encodeURIComponent(url) : url;
+}
+
+/** Fetches a URL as JSON with f=json, or throws. */
+function getJson(url, ctx) {
+  const target = /[?&]f=/.test(url) ? url : url + (url.includes('?') ? '&' : '?') + 'f=json';
+  return fetch(proxied(target, ctx)).then((res) => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  });
+}
+
+/** Returns the first OpenAPI document that one of the URLs gives, or null. */
+function firstOpenApi(urls, ctx) {
+  if (!urls.length) return Promise.resolve(null);
+  return getJson(urls[0], ctx)
+    .then((json) => (json?.paths ? json : firstOpenApi(urls.slice(1), ctx)))
+    .catch(() => firstOpenApi(urls.slice(1), ctx));
+}
+
+/** Returns the limit facts of the items path of an OGC API service, from its OpenAPI document. */
+function readItemsLimit(base, ctx) {
+  return getJson(`${base}/`, ctx)
+    .then((json) => json?.links || [])
+    .catch(() => [])
+    .then((links) => {
+      const desc = links.find((l) => l.rel === 'service-desc' && /json/i.test(l.type || ''))?.href
+        || links.find((l) => l.rel === 'service-desc')?.href;
+      return firstOpenApi([...new Set([desc, `${base}/openapi`, `${base}/api`].filter(Boolean))], ctx);
+    })
+    .then((doc) => (doc ? itemsLimitOf(doc) : {}));
+}
 
 
 function SwitchRow({ label, checked, onChange, labelCols = 8 }) {
@@ -31,9 +69,27 @@ function SwitchRow({ label, checked, onChange, labelCols = 8 }) {
 }
 
 export default function OGCAPI(props) {
-  const { setItemRenderer, data, loading, editField, getUrlHistory } = props;
+  const { setItemRenderer, data, loading, editField, getUrlHistory, selected, patchData } = props;
 
-  const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
+  const { t, i18n } = useTranslation([I18N_NAMESPACE, "custom"]);
+  const lang = i18n?.resolvedLanguage || i18n?.language;
+  const [matched, setMatched] = useState({});
+  const asked = useRef(new Set());
+  const patchRef = useRef(patchData);
+  patchRef.current = patchData;
+  const itemsRef = useRef(data?.dataitems);
+  itemsRef.current = data?.dataitems;
+
+  const isUrlAppOrigin = props.Models.Utils.isUrlAppOrigin;
+  const proxyUrl = props.core?.MAP_PROXY_URL;
+  const useProxy = !!data?.ogcUseProxy;
+  const fetchCtx = useMemo(() => ({ useProxy, proxyUrl, isUrlAppOrigin }), [useProxy, proxyUrl, isUrlAppOrigin]);
+
+  const mapCode = props.mainMap?.getView?.().getProjection?.().getCode?.();
+  const mapSrid = useMemo(() => {
+    const n = mapCode ? parseInt(String(mapCode).split(':')[1], 10) : NaN;
+    return Number.isFinite(n) ? n : null;
+  }, [mapCode]);
 
   const jsonService = data?.state?.jsonService;
   const collections = jsonService?.collections;
@@ -54,14 +110,16 @@ export default function OGCAPI(props) {
   useEffect(() => {
     if (!ogcAPIType || !collections || !data?.ogcBase) return;
 
-    const { patchData, Models } = props;
+    const { Models } = props;
 
     const options = {
       use_proxy: false,
       strategy: data.ogcLoadAll ? 'all' : 'bbox',
       featureRender: ogcAPIType === 'vectorTiles' ? 'tiles' : 'features',
       tiled: !!data.ogcTiled,
-      maxFeatures: data?.maxFeatures || 500
+      maxFeatures: data?.maxFeatures || 500,
+      pageSize: data?.ogcLimit?.base === data.ogcBase ? data?.ogcLimit?.max : undefined,
+      mapSrid
     };
 
     const filtered = filterCollectionsByType(collections, ogcAPIType, data.ogcBase);
@@ -72,8 +130,41 @@ export default function OGCAPI(props) {
       options
     );
 
+    const ids = new Map((itemsRef.current || []).map((i) => [`${i.type}|${i.url}`, i.id]));
+    dataitems.forEach((i) => {
+      const id = ids.get(`${i.type}|${i.url}`);
+      if (id) i.id = id;
+    });
+
     patchData({ dataitems });
-  }, [ogcAPIType, data?.ogcTiled, data?.ogcLoadAll, data?.ogcBase, data?.maxFeatures, collections]);
+  }, [ogcAPIType, data?.ogcTiled, data?.ogcLoadAll, data?.ogcBase, data?.maxFeatures, data?.ogcLimit, collections, mapSrid]);
+
+  const limitBase = data?.ogcLimit?.base;
+  const ogcBase = data?.ogcBase;
+  useEffect(() => {
+    if (ogcAPIType !== 'features' || !ogcBase || limitBase === ogcBase) return;
+    let cancelled = false;
+    readItemsLimit(ogcBase, fetchCtx)
+      .catch(() => ({}))
+      .then((limit) => {
+        if (!cancelled) patchRef.current({ ogcLimit: { base: ogcBase, ...limit } });
+      });
+    return () => { cancelled = true; };
+  }, [ogcAPIType, ogcBase, limitBase, fetchCtx]);
+
+  useEffect(() => {
+    if (ogcAPIType !== 'features') return;
+    const items = (data?.dataitems || []).filter((i) => selected?.[i.id]?.checked && i.url && !asked.current.has(i.url));
+    items.forEach((item) => {
+      asked.current.add(item.url);
+      getJson(`${item.url}?f=json&limit=1`, fetchCtx)
+        .then((json) => {
+          const n = typeof json?.numberMatched === 'number' ? json.numberMatched : null;
+          setMatched((m) => ({ ...m, [item.url]: n }));
+        })
+        .catch(() => setMatched((m) => ({ ...m, [item.url]: null })));
+    });
+  }, [selected, data?.dataitems, ogcAPIType, fetchCtx]);
 
   useEffect(() => {
     if (!setItemRenderer) return;
@@ -97,16 +188,13 @@ export default function OGCAPI(props) {
 
   /** Loads the collections of the OGC API service. */
   const loadCollections = () => {
-    const { core, setLoading, patchData, beginLoad, setSelected, setError, cookies, Models } = props;
-    const { isUrlAppOrigin, rememberUrl } = Models.Utils;
+    const { setLoading, beginLoad, setSelected, setError, cookies, Models } = props;
+    const { rememberUrl } = Models.Utils;
 
     const base = serviceBase(data.url);
     if (!base) return;
 
-    let url = `${base}/collections?f=json`;
-    if (data.ogcUseProxy && !isUrlAppOrigin(url)) {
-      url = core.MAP_PROXY_URL + encodeURIComponent(url);
-    }
+    const url = proxied(`${base}/collections?f=json` + (lang ? `&lang=${encodeURIComponent(lang)}` : ''), fetchCtx);
 
     const sourceUrl = data.url;
     const isCurrent = beginLoad();
@@ -125,7 +213,10 @@ export default function OGCAPI(props) {
           dataitems: [],
           ogcBase: base,
           ogcAPIType: null,
+          ogcLimit: null,
         });
+        setMatched({});
+        asked.current = new Set();
         setSelected({});
         if (cookies) rememberUrl(cookies, 'ogcapi', sourceUrl);
       })
@@ -147,6 +238,12 @@ export default function OGCAPI(props) {
 
   const hasService = jsonService != null;
   const showAdvanced = ['maps', 'features'].includes(ogcAPIType);
+  const serverMax = data?.ogcLimit?.base === data?.ogcBase ? data?.ogcLimit?.max : null;
+  const large = ogcAPIType === 'features'
+    ? (data?.dataitems || [])
+      .filter((i) => selected?.[i.id]?.checked && matched[i.url] > LARGE_COLLECTION)
+      .map((i) => ({ title: i.title, count: matched[i.url] }))
+    : [];
 
   return (
     <React.Fragment>
@@ -220,7 +317,15 @@ export default function OGCAPI(props) {
                       checked={data.ogcLoadAll}
                       onChange={() => editField('ogcLoadAll', !data.ogcLoadAll)}
                     />
-                    <div>{t("ogcapiMaxFeatures", "Número máximo de elementos")}</div>
+                    {large.map((l) => (
+                      <Alert key={l.title} color="warning" py="xs" mb="xs" icon={<IconInfoCircle />}>
+                        {t("ogcapiLargeCollection", "{{title}}: {{count}} elementos. Carregar toda a coleção pode ser lento.", {
+                          title: l.title,
+                          count: l.count.toLocaleString(lang)
+                        })}
+                      </Alert>
+                    ))}
+                    <div>{t("ogcapiTotalFeatures", "Total de elementos a carregar")}</div>
                     <CustomTextInput
                       numeric="integer"
                       allowNegative={false}
@@ -230,6 +335,11 @@ export default function OGCAPI(props) {
                         editField('maxFeatures', Number.isFinite(n) && n > 0 ? n : undefined);
                       }}
                     />
+                    {serverMax ? (
+                      <Text size="xs" c="dimmed" mt={4}>
+                        {t("ogcapiServerMax", "Máx. do servidor: {{max}} por pedido", { max: serverMax })}
+                      </Text>
+                    ) : null}
                   </React.Fragment>
                 )}
 
