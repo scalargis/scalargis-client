@@ -245,7 +245,7 @@ export default function OGCAPI(props) {
                     <div>{t("ogcapiMaxFeatures", "Número máximo de elementos")}</div>
                     <CustomTextInput
                       numeric="integer"
-                      allowNegative
+                      allowNegative={false}
                       value={data.maxFeatures}
                       onCommit={(text) => {
                         const n = parseInt(text, 10);
