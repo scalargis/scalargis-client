@@ -130,9 +130,13 @@ export default function OGCAPI(props) {
     );
 
     const ids = new Map((itemsRef.current || []).map((i) => [`${i.type}|${i.url}`, i.id]));
+    const used = new Set();
     dataitems.forEach((i) => {
       const id = ids.get(`${i.type}|${i.url}`);
-      if (id) i.id = id;
+      if (id && !used.has(id)) {
+        i.id = id;
+        used.add(id);
+      }
     });
 
     patchData({ dataitems });
