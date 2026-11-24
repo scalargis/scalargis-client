@@ -233,7 +233,7 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
       const view = mainMap.getView().calculateExtent(mainMap.getSize());
       if (extentEquals(view, last)) return;
       capped.current = { extent: null, gen: capped.current.gen + 1 };
-      layer.current.getSource().clear();
+      layer.current.getSource().refresh();
     });
 
     return () => {
