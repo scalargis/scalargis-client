@@ -208,6 +208,13 @@ function PrintForm(props) {
     }
   });
 
+  const onInvalid = () => {
+    setActiveTab('base');
+    notify.error(data.id ? 'Editar Registo' : 'Criar Registo', 'Preencha os campos obrigatórios em Dados Base');
+  };
+
+  const save = (nextLayouts) => handleSubmit((formData) => onSubmit(formData, nextLayouts), onInvalid);
+
   const onSubmit = (formData, nextLayouts) => {
     const new_data = buildData(formData, geometryFilter, nextLayouts);
 
@@ -259,7 +266,7 @@ function PrintForm(props) {
         </Tabs.List>
       </Tabs>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={save()}>
 
         {history.notice}
 
@@ -588,7 +595,7 @@ function PrintForm(props) {
                 onChange={(data) => {
                   setLayouts(data);
                 }}
-                onSave={(data) => handleSubmit((formData) => onSubmit(formData, data))()}
+                onSave={(data) => save(data)()}
               />
           </PageSection>
         </TabPanel>
