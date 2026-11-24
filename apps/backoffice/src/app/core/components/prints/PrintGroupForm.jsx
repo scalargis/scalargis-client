@@ -15,7 +15,7 @@ import {
   Tabs,
   TextInput,
 } from '@mantine/core';
-import { CollapsiblePanel, notify, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog, IconHistory } from '@scalargis/ui';
+import { CollapsiblePanel, notify, TabPanel, IconEllipsisV, IconArrowLeft, IconSave, IconHome, IconCog, IconHistory } from '@scalargis/ui';
 
 import GeometryFilterEditor from "./GeometryFilterEditor";
 import PrintLayoutsEditor from "./PrintLayoutsEditor";
@@ -143,12 +143,12 @@ function PrintGroupForm(props) {
 
   const { goBack, openCreated } = useRecordNavigation('/prints/groups');
 
-  const buildData = (formData, geometry) => {
+  const buildData = (formData, geometry, nextLayouts = layouts) => {
 
     let new_data = {
       ...formData,
       form_fields: formFields ? {...formFields}  : {},
-      layouts: layouts ? [...layouts] : [],
+      layouts: nextLayouts ? [...nextLayouts] : [],
       prints: groupChilds?.prints ? groupChilds.prints : [],
       groups: groupChilds?.groups ? groupChilds.groups : []
     }
@@ -213,8 +213,15 @@ function PrintGroupForm(props) {
     }
   });
 
-  const onSubmit = (formData) => {
-    const new_data = buildData(formData, geometryFilter);
+  const onInvalid = () => {
+    setActiveTab('base');
+    notify.error(data.id ? 'Editar Registo' : 'Criar Registo', 'Preencha os campos obrigatórios em Dados Base');
+  };
+
+  const save = (nextLayouts) => handleSubmit((formData) => onSubmit(formData, nextLayouts), onInvalid);
+
+  const onSubmit = (formData, nextLayouts) => {
+    const new_data = buildData(formData, geometryFilter, nextLayouts);
 
     if (data.id) {
       summary.submit(new_data);
@@ -264,11 +271,11 @@ function PrintGroupForm(props) {
         </Tabs.List>
       </Tabs>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={save()}>
 
         {history.notice}
 
-        {activeTab === 'base' ?
+        <TabPanel active={activeTab === 'base'} mount="eager">
 
           <PageSection>
 
@@ -504,7 +511,7 @@ function PrintGroupForm(props) {
 
           </PageSection>
 
-        : null}
+        </TabPanel>
 
         {activeTab === 'form' ?
 
@@ -528,6 +535,7 @@ function PrintGroupForm(props) {
                 onChange={(data) => {
                   setLayouts(data);
                 }}
+                onSave={(data) => save(data)()}
               />
             </Grid>
 
