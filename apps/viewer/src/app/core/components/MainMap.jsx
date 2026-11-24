@@ -5,6 +5,7 @@ import 'ol/ol.css'
 import './mainmap.css'
 import { connect } from 'react-redux'
 import  { addProjections, transformExtent } from '../model/MapModel'
+import LayerTooltip from './LayerTooltip'
 
 
 /** Returns the View options for the zoom and extent limits of a viewer, or null if it has none. */
@@ -145,6 +146,7 @@ function MainMap(props) {
   return (
     <div id="map" ref={mainMapEl} style={{...map_style}} className={viewer?.className}>
         { props.children }
+        <LayerTooltip olMap={olMap} />
       </div>
   )
 }

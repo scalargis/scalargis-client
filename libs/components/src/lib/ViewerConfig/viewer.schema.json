@@ -479,6 +479,15 @@
         "max_pages": { "title": "Máximo de páginas", "description": "OGC API Features: número máximo de páginas por extensão. Por omissão, o maior valor entre 10 e o total a dividir pelos elementos por pedido.", "type": "integer", "minimum": 1 },
         "supported_crs": { "title": "Sistemas da coleção", "description": "OGC API Features: códigos EPSG que a coleção aceita. Quando o sistema do mapa não está na lista, a camada pede e lê em CRS84.", "type": "array", "items": { "type": "integer" } },
         "strategy": { "title": "Estratégia de carga", "description": "Com bbox, a camada pede os elementos da extensão visível. Com all, pede a coleção toda uma vez.", "type": "string" },
+        "tooltip": {
+          "title": "Etiqueta ao passar o rato",
+          "description": "Camadas de elementos (GeoJSON, WFS, KML, OGC API Features): mostra o valor do campo junto ao cursor. Uma camada WMS não tem etiqueta.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "field": { "title": "Campo", "description": "Nome do atributo do elemento que a etiqueta mostra.", "type": "string" }
+          }
+        },
         "style_color": { "title": "Cor de preenchimento", "description": "Cor de preenchimento dos elementos.", "type": ["string", "null"] },
         "style_stroke_color": { "title": "Cor do contorno", "description": "Cor do contorno dos elementos.", "type": ["string", "null"] },
         "style_stroke_width": { "title": "Largura do contorno", "description": "Largura do contorno dos elementos, em píxeis.", "type": "number" }
