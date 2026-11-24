@@ -430,8 +430,10 @@ export default function PrintPanelItem(props) {
     //Set restricted scales
     const scales = [];
     if (printItem.restrict_scales_list) {
-      printItem.restrict_scales_list.split(',').forEach((s) => {
-        scales.push({ value: parseInt(s), label: '1:' + s });
+      String(printItem.restrict_scales_list).split(',').forEach((s) => {
+        const value = parseInt(s, 10);
+        if (Number.isNaN(value) || scales.some(e => e.value === value)) return;
+        scales.push({ value, label: '1:' + value });
       })
     }
     setRestrictScales(scales);
