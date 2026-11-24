@@ -9,7 +9,7 @@ import OlStyleCircle from "ol/style/Circle";
 import OlStyleText from 'ol/style/Text';
 import { all as allStrategy, bbox as bboxStrategy } from 'ol/loadingstrategy';
 import { transformExtent } from 'ol/proj';
-import { equals as extentEquals } from 'ol/extent';
+import { containsExtent } from 'ol/extent';
 import { unByKey } from 'ol/Observable';
 
 import AppContext from "../../../AppContext";
@@ -30,11 +30,22 @@ function requestPlan(config, mapProjection) {
   return { total, pageSize, maxPages, srid };
 }
 
+/** Returns the most features one layer keeps in memory, from the device memory in GB. */
+function heldFeatureCap(total) {
+  const gb = Number(navigator.deviceMemory) > 0 ? Number(navigator.deviceMemory) : 4;
+  return Math.max(2 * total, 2500 * gb);
+}
+
+/** Tells if two resolutions are the same zoom. */
+function sameResolution(a, b) {
+  return Math.abs(a - b) <= b * 0.01;
+}
+
 const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
 
   const { core, mainMap } = useContext(AppContext);
   const layer = useRef();
-  const capped = useRef({ extent: null, gen: 0 });
+  const capped = useRef({ loads: [], gen: 0 });
 
   const MAP_PROXY = core.MAP_PROXY_URL;
 
@@ -129,9 +140,15 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
           params.push('bbox=' + box.join(','));
         }
 
+        const kept = capped.current.loads.find(r => sameResolution(resolution, r.resolution) && containsExtent(r.extent, extent));
+        if (kept) {
+          kept.inTree = true;
+          if (success) success([]);
+          return;
+        }
+
         const collected = [];
         const gen = capped.current.gen;
-        const viewExtent = mainMap.getView().calculateExtent(mainMap.getSize());
         let truncated = false;
 
         const fetchPage = (pageUrl, page) => {
@@ -175,8 +192,15 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
         fetchPage(base + params.join('&'), 1)
           .then(features => {
             retry.delay = 0;
-            if (gen === capped.current.gen && config.strategy !== 'all') {
-              capped.current.extent = truncated ? viewExtent : null;
+            const source = layer.current?.getSource();
+            if (gen === capped.current.gen && source) {
+              if (truncated && config.strategy !== 'all') {
+                capped.current.loads.push({ extent: extent.slice(), resolution, inTree: true });
+              }
+              if (source.getFeatures().length > heldFeatureCap(plan.total)) {
+                capped.current = { loads: [], gen: capped.current.gen + 1 };
+                source.refresh();
+              }
             }
             if (success) success(features);
           })
@@ -228,12 +252,18 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
     group.getLayers().push(layer.current);
 
     const moveKey = mainMap.on('moveend', () => {
-      const last = capped.current.extent;
-      if (!last || !layer.current) return;
-      const view = mainMap.getView().calculateExtent(mainMap.getSize());
-      if (extentEquals(view, last)) return;
-      capped.current = { extent: null, gen: capped.current.gen + 1 };
-      layer.current.getSource().refresh();
+      const source = layer.current?.getSource();
+      if (!source) return;
+      const resolution = mainMap.getView().getResolution();
+      let removed = false;
+      capped.current.loads.forEach(r => {
+        if (r.inTree && !sameResolution(resolution, r.resolution)) {
+          source.removeLoadedExtent(r.extent);
+          r.inTree = false;
+          removed = true;
+        }
+      });
+      if (removed) source.changed();
     });
 
     return () => {
