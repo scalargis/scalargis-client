@@ -82,7 +82,7 @@
   "ogcapiType": "Tipo de API",
   "ogcapiCountTypeCollections": "{{count}} de {{total}} coleções",
   "ogcapiTotalFeatures": "Total de elementos a carregar",
-  "ogcapiServerMax": "Máx. do servidor: {{max}} por pedido",
+  "ogcapiServerMax": "O servidor envia até {{max}} por pedido; a camada junta vários pedidos. Aproxime o mapa da zona de interesse: a camada carrega os elementos da vista atual.",
   "ogcapiLargeCollection": "{{title}}: {{count}} elementos. Carregar toda a coleção pode ser lento.",
 
   "filter": "Filtro"

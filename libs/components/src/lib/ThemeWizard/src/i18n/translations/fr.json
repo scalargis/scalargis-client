@@ -82,7 +82,7 @@
   "ogcapiType": "Type d'API",
   "ogcapiCountTypeCollections": "{{count}} sur {{total}} collections",
   "ogcapiTotalFeatures": "Nombre total d'éléments à charger",
-  "ogcapiServerMax": "Max. du serveur : {{max}} par requête",
+  "ogcapiServerMax": "Le serveur envoie jusqu'à {{max}} par requête ; la couche regroupe plusieurs requêtes. Zoomez sur votre zone : la couche charge les éléments de la vue actuelle.",
   "ogcapiLargeCollection": "{{title}} : {{count}} éléments. Charger toute la collection peut être lent.",
 
   "filter": "Filtre"

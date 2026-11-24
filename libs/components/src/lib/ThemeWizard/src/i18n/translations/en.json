@@ -82,7 +82,7 @@
   "ogcapiType": "API type",
   "ogcapiCountTypeCollections": "{{count}} of {{total}} collections",
   "ogcapiTotalFeatures": "Total features to load",
-  "ogcapiServerMax": "Server max: {{max}} per request",
+  "ogcapiServerMax": "The server sends up to {{max}} per request; the layer joins several requests. Zoom the map to your area: the layer loads the features of the current view.",
   "ogcapiLargeCollection": "{{title}}: {{count}} features. Loading the whole collection can be slow.",
 
   "filter": "Filter"

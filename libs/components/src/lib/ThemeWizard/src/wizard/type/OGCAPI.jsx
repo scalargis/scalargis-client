@@ -383,7 +383,7 @@ export default function OGCAPI(props) {
                     />
                     {serverMax ? (
                       <Text size="xs" c="dimmed" mt={4}>
-                        {t("ogcapiServerMax", "Máx. do servidor: {{max}} por pedido", { max: serverMax })}
+                        {t("ogcapiServerMax", "O servidor envia até {{max}} por pedido; a camada junta vários pedidos. Aproxime o mapa da zona de interesse: a camada carrega os elementos da vista atual.", { max: serverMax })}
                       </Text>
                     ) : null}
                   </React.Fragment>

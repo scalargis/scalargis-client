@@ -9,6 +9,8 @@ import OlStyleCircle from "ol/style/Circle";
 import OlStyleText from 'ol/style/Text';
 import { all as allStrategy, bbox as bboxStrategy } from 'ol/loadingstrategy';
 import { transformExtent } from 'ol/proj';
+import { equals as extentEquals } from 'ol/extent';
+import { unByKey } from 'ol/Observable';
 
 import AppContext from "../../../AppContext";
 import { isUrlAppOrigin } from '../../utils';
@@ -32,6 +34,7 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
 
   const { core, mainMap } = useContext(AppContext);
   const layer = useRef();
+  const capped = useRef({ extent: null, gen: 0 });
 
   const MAP_PROXY = core.MAP_PROXY_URL;
 
@@ -127,6 +130,9 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
         }
 
         const collected = [];
+        const gen = capped.current.gen;
+        const viewExtent = mainMap.getView().calculateExtent(mainMap.getSize());
+        let truncated = false;
 
         const fetchPage = (pageUrl, page) => {
           let target = pageUrl;
@@ -139,6 +145,7 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
               return res.json();
             })
             .then(json => {
+              if (gen !== capped.current.gen) return collected;
               const features = format.readFeatures(json, {
                 dataProjection: plan.srid ? 'EPSG:' + plan.srid : 'EPSG:4326',
                 featureProjection: proj
@@ -160,6 +167,7 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
               if (next && next.href && features.length && collected.length < plan.total && page < plan.maxPages) {
                 return fetchPage(next.href, page + 1);
               }
+              truncated = !!(next && next.href && features.length);
               return collected;
             });
         };
@@ -167,6 +175,9 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
         fetchPage(base + params.join('&'), 1)
           .then(features => {
             retry.delay = 0;
+            if (gen === capped.current.gen && config.strategy !== 'all') {
+              capped.current.extent = truncated ? viewExtent : null;
+            }
             if (success) success(features);
           })
           .catch(error => {
@@ -216,7 +227,17 @@ const OGCFeaturesLayer = ({ config, group, checked, viewer }) => {
     layer.current = createLayer(config);
     group.getLayers().push(layer.current);
 
+    const moveKey = mainMap.on('moveend', () => {
+      const last = capped.current.extent;
+      if (!last || !layer.current) return;
+      const view = mainMap.getView().calculateExtent(mainMap.getSize());
+      if (extentEquals(view, last)) return;
+      capped.current = { extent: null, gen: capped.current.gen + 1 };
+      layer.current.getSource().clear();
+    });
+
     return () => {
+      unByKey(moveKey);
       group.getLayers().remove(layer.current);
     };
 
