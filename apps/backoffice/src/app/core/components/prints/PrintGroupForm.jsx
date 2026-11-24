@@ -529,7 +529,6 @@ function PrintGroupForm(props) {
 
           <PageSection>
 
-            <Grid gap="sm">
               <PrintLayoutsEditor data={layouts}
                 pageFormatList={pageFormatList} pageOrientationList={pageOrientationList}
                 onChange={(data) => {
@@ -537,7 +536,6 @@ function PrintGroupForm(props) {
                 }}
                 onSave={(data) => save(data)()}
               />
-            </Grid>
 
           </PageSection>
 
