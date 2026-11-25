@@ -19,6 +19,12 @@ const ARRAY_TEXTS = {
   deleteDialogDecline: 'Não'
 };
 
+const ENUM_TEXTS = {
+  'enum.none': 'Nenhum',
+  'enum.placeholder': 'Escolha uma opção',
+  'oneofenum.placeholder': 'Escolha uma ou mais opções'
+};
+
 export const FORM_I18N = {
   locale: 'pt',
   translate: (key, defaultMessage, values) => {
@@ -26,7 +32,10 @@ export const FORM_I18N = {
     if (error?.keyword) {
       return describeViewerConfigFault({ pointer: error.instancePath, keyword: error.keyword, message: error.message, params: error.params });
     }
-    const last = String(key || '').split('.').pop();
+    const name = String(key || '');
+    const enumKey = Object.keys(ENUM_TEXTS).find((k) => name === k || name.endsWith(`.${k}`));
+    if (enumKey) return ENUM_TEXTS[enumKey];
+    const last = name.split('.').pop();
     return ARRAY_TEXTS[last] ?? defaultMessage;
   }
 };
