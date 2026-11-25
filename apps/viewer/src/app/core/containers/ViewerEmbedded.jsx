@@ -100,6 +100,13 @@ function ViewerEmbedded(props) {
     const onMessage = (event) => {
       if (event.source !== window.parent || !previewOrigins().includes(event.origin)) return;
       const message = event.data;
+      if (message?.type === 'sg-preview-view-request') {
+        const view = mainMap.getView();
+        const size = mainMap.getSize();
+        if (!view || !size) return;
+        postToParent({ type: 'sg-preview-view', center: view.getCenter(), extent: view.calculateExtent(size) });
+        return;
+      }
       if (!message || message.type !== 'sg-preview-config') return;
       const config = message.config_json;
       if (!config || typeof config !== 'object' || Array.isArray(config) || !previewRecord.current) return;

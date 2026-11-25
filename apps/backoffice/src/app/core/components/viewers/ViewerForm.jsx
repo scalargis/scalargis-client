@@ -772,6 +772,7 @@ function ViewerForm(props) {
               viewerId={data.id}
               active={activeTab === 'form'}
               sharedLibrary={admin ? sharedLibrary : undefined}
+              savedConfig={data.config_json}
             />
           </PageSection>
 

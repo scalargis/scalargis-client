@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Accordion, ActionIcon, Alert, Box, Grid, Group, Paper, Text } from '@mantine/core';
-import { isEqual } from 'lodash';
+import { Accordion, ActionIcon, Alert, Box, Button, Grid, Group, Paper, Stack, Text } from '@mantine/core';
+import { cloneDeep, isEqual } from 'lodash';
 import { JsonForm, viewerConfigSchema } from '@scalargis/components';
-import { IconAlertTriangle, IconRefresh } from '@scalargis/ui';
+import { IconAlertTriangle, IconRefresh, confirm, notify } from '@scalargis/ui';
 
 import AppContext from '../../../AppContext';
 import { AJV_OPTIONS, FORM_CONFIG, FORM_I18N, control, inlineRefs, pick } from './formViewShared';
@@ -11,6 +11,7 @@ import ViewerHeaderSection from './ViewerHeaderSection';
 import ViewerLayersSection from './ViewerLayersSection';
 
 const PREVIEW_DELAY_MS = 800;
+const VIEW_REPLY_TIMEOUT_MS = 2000;
 
 const MAP_KEYS = ['center', 'extent', 'full_extent', 'restricted_extent', 'constrained_extent',
   'display_crs', 'crs_list', 'map_controls', 'exclude_map_controls'];
@@ -50,6 +51,12 @@ function parseConfig(text) {
   }
 }
 
+/** Returns the numbers of a view reply rounded to whole metres, or null when the value is not a list of that many finite numbers. */
+function roundedNumbers(value, length) {
+  if (!Array.isArray(value) || value.length !== length || !value.every(Number.isFinite)) return null;
+  return value.map((n) => Math.round(n));
+}
+
 /** Returns the base URL of the viewer app that the preview frame opens. */
 function previewBaseUrl(core) {
   const fromEnv = import.meta.env.VITE_APP_PREVIEW_VIEWER_URL;
@@ -58,7 +65,7 @@ function previewBaseUrl(core) {
 }
 
 /** The beta form view of the viewer config: sections on the left, a preview of the unsaved config on the right. */
-function ViewerFormView({ configText, onConfigTextChange, viewerId, active, sharedLibrary }) {
+function ViewerFormView({ configText, onConfigTextChange, viewerId, active, sharedLibrary, savedConfig }) {
   const { core } = useContext(AppContext);
 
   const parsed = useMemo(() => parseConfig(configText), [configText]);
@@ -102,6 +109,31 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active, shar
     writeConfig(next);
   };
 
+  const changedMapKeys = viewerId && parsed && savedConfig ?
+    MAP_KEYS.filter((key) => !isEqual(parsed[key], savedConfig[key])) : [];
+
+  const revertMap = () => {
+    if (!changedMapKeys.length) return;
+    confirm({
+      header: 'Repor gravado',
+      message: `Repor os valores gravados de: ${changedMapKeys.join(', ')}. As outras secções ficam como estão.`,
+      severity: 'warning',
+      acceptLabel: 'Repor',
+      rejectLabel: 'Cancelar',
+      accept: () => {
+        const base = latest.current;
+        if (!base || !savedConfig) return;
+        const next = { ...base };
+        for (const key of MAP_KEYS) {
+          if (savedConfig[key] === undefined) delete next[key];
+          else next[key] = cloneDeep(savedConfig[key]);
+        }
+        if (isEqual(pick(next, MAP_KEYS), pick(base, MAP_KEYS))) return;
+        writeConfig(next);
+      }
+    });
+  };
+
   const [openSections, setOpenSections] = useState(['map', 'layers']);
   const [componentId, setComponentId] = useState(null);
   const openComponent = (id) => {
@@ -121,8 +153,45 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active, shar
   const ready = useRef(false);
   const lastSent = useRef(null);
   const [frameKey, setFrameKey] = useState(0);
+  const [frameReady, setFrameReady] = useState(false);
+  const viewTimer = useRef(null);
+
+  const stopViewRequest = () => {
+    clearTimeout(viewTimer.current);
+    viewTimer.current = null;
+  };
+
+  const onViewReply = useRef(null);
+  onViewReply.current = (message) => {
+    if (!viewTimer.current) return;
+    stopViewRequest();
+    const center = roundedNumbers(message.center, 2);
+    const extent = roundedNumbers(message.extent, 4);
+    const base = latest.current;
+    if (!center || !extent || !base) {
+      notify.error('Usar a vista atual', 'A pré-visualização não devolveu uma vista válida.');
+      return;
+    }
+    if (isEqual(base.center, center) && isEqual(base.extent, extent)) return;
+    writeConfig({ ...base, center, extent });
+  };
+
+  const requestView = () => {
+    const target = frame.current?.contentWindow;
+    if (!target || !ready.current || !previewOrigin) return;
+    stopViewRequest();
+    viewTimer.current = setTimeout(() => {
+      viewTimer.current = null;
+      notify.error('Usar a vista atual', 'A pré-visualização não respondeu. Recarregue a pré-visualização e tente de novo.');
+    }, VIEW_REPLY_TIMEOUT_MS);
+    target.postMessage({ type: 'sg-preview-view-request' }, previewOrigin);
+  };
+
+  useEffect(() => stopViewRequest, []);
 
   const reloadPreview = () => {
+    stopViewRequest();
+    setFrameReady(false);
     ready.current = false;
     lastSent.current = null;
     setFrameKey((k) => k + 1);
@@ -141,8 +210,13 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active, shar
     if (!frameOpened || !previewOrigin) return undefined;
     const onMessage = (event) => {
       if (event.source !== frame.current?.contentWindow || event.origin !== previewOrigin) return;
+      if (event.data?.type === 'sg-preview-view') {
+        onViewReply.current(event.data);
+        return;
+      }
       if (event.data?.type !== 'sg-preview-ready') return;
       ready.current = true;
+      setFrameReady(true);
       lastSent.current = null;
       send(latest.current);
     };
@@ -168,6 +242,19 @@ function ViewerFormView({ configText, onConfigTextChange, viewerId, active, shar
           <Accordion.Item value="map">
             <Accordion.Control>Mapa</Accordion.Control>
             <Accordion.Panel>
+              <Group justify="flex-end" align="flex-start" gap="xs" mb="sm" data-testid="form-view-map-tools">
+                <Button type="button" variant="default" size="xs" onClick={revertMap}
+                  disabled={!changedMapKeys.length} data-testid="form-view-map-revert">
+                  Repor gravado
+                </Button>
+                <Stack gap={2} align="flex-end">
+                  <Button type="button" variant="default" size="xs" onClick={requestView}
+                    disabled={!parsed || !frameOpened || !frameReady} data-testid="form-view-map-use-view">
+                    Usar a vista atual
+                  </Button>
+                  <Text size="xs" c="dimmed">A extensão segue a largura da pré-visualização.</Text>
+                </Stack>
+              </Group>
               <Box data-testid="form-view-map">
                 <JsonForm
                   schema={MAP_SCHEMA}
