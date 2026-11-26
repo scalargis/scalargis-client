@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import { Alert, Anchor, Box, Button, Flex, Group, PasswordInput, TextInput } from '@mantine/core';
+import { Alert, Box, Button, Flex, Group, PasswordInput, TextInput } from '@mantine/core';
 import { IconCheck, IconXCircle } from '@scalargis/ui';
 
 import AppContext from '../../AppContext';
@@ -14,23 +14,7 @@ function LoginWidget({ auth, history, redirect }) {
   // Enable redux actions
   const dispatch = useDispatch();
   const { core } = useContext(AppContext);
-  const { login_post, logout } = core.actions;
-
-  // Render user
-  if (auth?.data?.token) {
-    const { username } = auth.data;
-    return (
-      <div>
-        <p>Olá { username }.</p>
-        <p>
-          Clique para{' '}
-          <Anchor component="button" type="button" onClick={e => dispatch(logout())}>
-            terminar sessão
-          </Anchor>.
-        </p>
-      </div>
-    )
-  }
+  const { login_post } = core.actions;
 
   function submit(e) {
     e.preventDefault();

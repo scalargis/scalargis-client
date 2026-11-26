@@ -110,8 +110,7 @@ export function login_post(post, history, redirect) {
         if (res.authenticated) {
           writeAuthCookie(res);
           dispatch(login(res));
-          if (redirect) window.location.assign(getBackofficeBaseUrl() + redirect.replace(/^\//, ''));
-          else window.location.reload();
+          window.location.replace(getBackofficeBaseUrl() + (redirect || '/').replace(/^\//, ''));
         } else {
           dispatch(login_http_error({ kind: 'rejected', status: 401 }));
         }

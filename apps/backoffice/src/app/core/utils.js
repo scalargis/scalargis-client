@@ -180,6 +180,23 @@ export const getBackofficeBaseUrl = () => {
   return url;
 }
 
+/** Returns the safe backoffice route of the redirect query value of the login page, else '/'. */
+export const getLoginRedirect = (search) => {
+  const found = /redirect=(.*)/i.exec(search || '');
+  if (!found) return '/';
+  let target;
+  try {
+    target = decodeURIComponent(found[1]);
+  } catch (e) {
+    return '/';
+  }
+  const baseUrl = getBackofficeBaseUrl();
+  if ((target + '/').startsWith(baseUrl)) target = '/' + target.slice(baseUrl.length);
+  if (!target.startsWith('/') || target.startsWith('//') || target.includes('\\')) return '/';
+  if (/^\/login(?:[/?#]|$)/i.test(target)) return '/';
+  return target;
+}
+
 export const getAppClientUrl = () => {
   const root_path = _getAppRootPath();
   //let url = root_path + '/static/backoffice/';
