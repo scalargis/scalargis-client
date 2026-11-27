@@ -95,7 +95,11 @@ function schemaCountText({ warnings, infos }) {
 }
 
 const VIEWER_FORM_KEYS = ['name', 'title', 'description', 'slug', 'keywords', 'is_active', 'show_help', 'show_credits',
-  'show_contact', 'on_homepage', 'img_icon', 'img_logo', 'img_logo_alt'];
+  'show_contact', 'on_homepage', 'img_icon', 'img_logo', 'img_logo_alt', 'send_email_notifications_admin',
+  'email_notifications_admin'];
+
+/** Splits the comma list of the viewer notification emails. */
+const splitEmails = (value) => (value ? value.split(',').map((e) => e.trim()).filter(Boolean) : []);
 
 const sortRolesArray = (data) => {
   if (!data) return data;
@@ -326,6 +330,8 @@ function ViewerForm(props) {
       show_credits: formData.show_credits,
       show_contact: formData.show_contact,
       on_homepage: formData.on_homepage,
+      send_email_notifications_admin: formData.send_email_notifications_admin !== false,
+      email_notifications_admin: splitEmails(formData.email_notifications_admin).join(',') || null,
       img_icon: formData.img_icon ? formData.img_icon : null,
       img_logo: formData.img_logo ? formData.img_logo : null,
       img_logo_alt: formData.img_logo_alt ? formData.img_logo_alt : null,
@@ -362,6 +368,8 @@ function ViewerForm(props) {
       show_credits: s.show_credits,
       show_contact: s.show_contact,
       on_homepage: s.on_homepage,
+      send_email_notifications_admin: s.send_email_notifications_admin !== false,
+      email_notifications_admin: s.email_notifications_admin || null,
       img_icon: s.img_icon || null,
       img_logo: s.img_logo || null,
       img_logo_alt: s.img_logo_alt || null,
@@ -578,6 +586,19 @@ function ViewerForm(props) {
               <Grid.Col span={{ base: 12, md: 6 }}>
                 <Controller name="keywords" control={control} render={({ field }) => (
                   <TagsInput id="keywords" label="Tags" value={field.value || []} onChange={field.onChange} />
+                )} />
+              </Grid.Col>
+
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller name="email_notifications_admin" control={control} render={({ field }) => (
+                  <TagsInput id="email_notifications_admin" label="Emails das mensagens de contacto"
+                    description="Recebem as mensagens do formulário de contacto. Vazio: a lista da configuração do servidor."
+                    value={splitEmails(field.value)} onChange={(v) => field.onChange(v.join(','))} />
+                )} />
+                <Controller name="send_email_notifications_admin" control={control} render={({ field }) => (
+                  <Switch size="md" mt="xs" label="Enviar email das mensagens de contacto"
+                    checked={field.value !== false}
+                    onChange={(e) => field.onChange(e.currentTarget.checked)} />
                 )} />
               </Grid.Col>
 
