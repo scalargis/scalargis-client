@@ -73,3 +73,22 @@ export const findAllChildren = (layers, ids, seen = new Set()) => {
   }
   return result;
 }
+
+/** Descendants to check when a group is checked, without the items of exclusive groups or of subgroups with activate_children false. */
+export const findChildrenToActivate = (layers, id) => {
+  const result = [];
+  const seen = new Set();
+  const visit = (groupId, isRoot) => {
+    if (seen.has(groupId)) return;
+    seen.add(groupId);
+    const group = layers.find(l => l.id === groupId);
+    if (!group || !Array.isArray(group.children) || group.exclusive) return;
+    if (!isRoot && group.activate_children === false) return;
+    group.children.forEach(childId => {
+      if (!result.includes(childId)) result.push(childId);
+      visit(childId, false);
+    });
+  };
+  visit(id, true);
+  return result;
+}

@@ -23,6 +23,12 @@
       "type": "boolean",
       "default": false
     },
+    "activate_children": {
+      "title": "Ligar os filhos",
+      "description": "Com true, ligar um grupo liga as camadas e os grupos dentro dele. Um grupo exclusivo fica ligado sem mudar os seus itens. activate_children da camada tem prioridade.",
+      "type": "boolean",
+      "default": false
+    },
     "deactivate_children": {
       "title": "Desligar os filhos",
       "description": "Com true, desligar um grupo desliga as camadas dentro dele. deactivate_children da camada tem prioridade.",

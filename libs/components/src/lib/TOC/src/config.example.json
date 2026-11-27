@@ -5,6 +5,7 @@
   "config_json": {
       "show_filter": false,
       "activate_parents": true,
+      "activate_children": true,
       "deactivate_children": true,
       "open_children": true,
       "draggable": false,

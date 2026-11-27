@@ -8,7 +8,7 @@ import * as i18n from '../../utils/i18n';
 import { MainMenuButton } from '../../components';
 import { foldDiacritics } from '../../utils/common';
 import Tree from './TOC/Tree';
-import { traverseTree, findAllParents, findAllChildren } from './TOC/Model';
+import { traverseTree, findAllParents, findAllChildren, findChildrenToActivate } from './TOC/Model';
 
 import './TOC/style.css';
 export { default as configSchema } from './config.schema.json';
@@ -83,7 +83,7 @@ class Main extends React.Component {
   }
 
   toggle(id, layer_data, items) {
-    const { activate_parents, deactivate_children, open_children, viewer } = this.props.config;
+    const { activate_parents, activate_children, deactivate_children, open_children, viewer } = this.props.config;
     const { layers } = viewer.config_json;
     const checked = Object.assign([], viewer.config_json.checked);
 
@@ -107,6 +107,13 @@ class Main extends React.Component {
       parents.forEach(p => {
         const index = checked.indexOf(p);
         if (index === -1) checked.push(p);
+      });
+    }
+
+    if (index === -1 && layer_data?.type === 'GROUP' && ((activate_children && layer_data?.activate_children !== false)
+      || layer_data?.activate_children === true)) {
+      findChildrenToActivate(layers, id).forEach(c => {
+        if (!checked.includes(c)) checked.push(c);
       });
     }
 
