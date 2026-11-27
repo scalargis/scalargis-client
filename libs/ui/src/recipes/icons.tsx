@@ -95,6 +95,7 @@ export const IconSpinner = piIcon('pi pi-spinner');
 // Search / view
 export const IconSearch = piIcon('pi pi-search');
 export const IconSearchPlus = piIcon('pi pi-search-plus');
+export const IconArrowsToCenter = piIcon('pi pi-arrow-down-left-and-arrow-up-right-to-center');
 export const IconEye = piIcon('pi pi-eye');
 export const IconList = piIcon('pi pi-list');
 export const IconListCheck = piIcon('pi pi-list-check');

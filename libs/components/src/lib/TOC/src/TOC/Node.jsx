@@ -2,7 +2,7 @@ import React from "react";
 import { withTranslation } from "react-i18next";
 import Tree from "./Tree";
 import { ActionIcon, Checkbox, Radio } from '@mantine/core';
-import { IconChevronDown, IconChevronRight, IconSquare, IconCog, IconSearch } from '@scalargis/ui';
+import { IconChevronDown, IconChevronRight, IconSquare, IconCog, IconArrowsToCenter } from '@scalargis/ui';
 import DraggableItem from './DraggableItem';
 import Legend from "./Legend";
 
@@ -176,7 +176,7 @@ class Node extends React.Component {
                             aria-label={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
                             onClick={e => this.onClickZoom(e, data)}
                           >
-                            <IconSearch />
+                            <IconArrowsToCenter />
                           </ActionIcon>
                         ) : null}
                       </div>
