@@ -49,6 +49,8 @@ function Layout(props) {
   const showEntityInfo = viewer?.config_json?.entity_info_show === false ? false : true;
   const showLogoMobile = viewer?.config_json?.mobile_show_logo === false ? false : true;
   const showLogoEmbedded = viewer?.config_json?.embedded_show_logo === true ? true : false;
+  const size = utils.getWindowSize();
+  const showSidebarLogo = viewer.mobileMenuActive && showLogoMobile && size[0] <= 768;
 
   let wrapperClass = classNames('layout-wrapper', {
     'layout-overlay': viewer.layoutMode === 'overlay',
@@ -56,7 +58,7 @@ function Layout(props) {
     'layout-static-sidebar-inactive': viewer.staticMenuInactive && viewer.layoutMode === 'static',
     'layout-overlay-sidebar-active': viewer.overlayMenuActive && viewer.layoutMode === 'overlay',
     'layout-mobile-sidebar-active': viewer.mobileMenuActive,
-    'layout-mobile-sidebar-no-logo': viewer.mobileMenuActive && !showLogoMobile,
+    'layout-mobile-sidebar-no-logo': viewer.mobileMenuActive && !showSidebarLogo,
     'layout-embedded-sidebar-no-logo': mode === 'embedded' && !showLogoEmbedded
   }, config?.config_json?.layout_class || config?.layout_class);
 
@@ -76,9 +78,6 @@ function Layout(props) {
     'layout-sidebar-dark': viewer.layoutColorMode === 'dark',
     'layout-sidebar-light': viewer.layoutColorMode === 'light'
   });
-
-  // Use window width for sidebar in mobile
-  const size = utils.getWindowSize();
 
   let logo = viewer.layoutColorMode === 'dark' ?
     utils.buildRelativeUrlPath('assets/images/logo-light.png') :
@@ -148,7 +147,7 @@ function Layout(props) {
           onClick={onSidebarClick}
           style={{ width: viewer.mobileMenuActive && size[0] <= 768 ? size[0] : null }}
           >
-            { viewer.mobileMenuActive && showLogoMobile &&
+            { showSidebarLogo &&
             <div className="layout-logo">
                 { title_logo ?
                   <div dangerouslySetInnerHTML={{__html: title_logo }}></div> : null

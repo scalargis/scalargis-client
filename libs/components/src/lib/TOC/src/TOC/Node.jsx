@@ -166,7 +166,7 @@ class Node extends React.Component {
                           <Button
                             size="small" text
                             title={this.props.t("zoomTheme", "Enquadrar extensão do tema")}
-                            icon="pi pi-search"
+                            icon="pi pi-arrow-down-left-and-arrow-up-right-to-center"
                             onClick={e => this.onClickZoom(e, data)}
                           />
                         ) : null}
