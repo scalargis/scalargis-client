@@ -1,0 +1,18 @@
+{
+  "name": "Nom",
+  "email": "E-mail",
+  "description": "Description",
+  "send": "Envoyer",
+  "attachments": "Pièces jointes",
+  "select": "Sélectionner",
+  "clear": "Effacer",
+  "dropFiles": "Déposez ici les fichiers à envoyer.",
+  "fileTooLarge": "Le fichier dépasse la taille autorisée ({0}).",
+  "maxFileSize": "Taille maximale du fichier : {{size}} Mo",
+  "requiredField": "Champ obligatoire",
+  "requiredFields": "Champs obligatoires non remplis",
+  "emailInvalid": "Format d'e-mail incorrect",
+  "minFiles": "Vous devez joindre au moins {{n}} fichier(s).",
+  "maxFiles": "Vous pouvez joindre jusqu'à {{n}} fichier(s).",
+  "error": "Une erreur s'est produite."
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Nome",
+  "email": "Email",
+  "description": "Descrição",
+  "send": "Enviar",
+  "attachments": "Anexos",
+  "select": "Selecionar",
+  "clear": "Limpar",
+  "dropFiles": "Arraste para aqui os ficheiros a enviar.",
+  "fileTooLarge": "Ficheiro com dimensão superior ao permitido ({0}).",
+  "maxFileSize": "Tamanho máximo do ficheiro: {{size}} MB",
+  "requiredField": "Campo de preenchimento obrigatório",
+  "requiredFields": "Campos obrigatórios não preenchidos",
+  "emailInvalid": "Formato de email incorreto",
+  "minFiles": "Tem de anexar pelo menos {{n}} ficheiro(s).",
+  "maxFiles": "Apenas pode anexar até {{n}} ficheiro(s).",
+  "error": "Ocorreu um erro."
+}

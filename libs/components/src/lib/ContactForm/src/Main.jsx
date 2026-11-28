@@ -8,9 +8,15 @@ import { i18n, MainMenuButton } from '../../components';
 
 import ContactForm from './ContactForm';
 import ContactInfo from './ContactInfo';
+import { loadTranslations } from './i18n/index';
 
 import './index.css';
 export { default as configSchema } from './config.schema.json';
+
+/** Component translations. */
+export const translations = {
+  load: loadTranslations
+};
 
 // As regiões do rodapé do viewer (`FooterLeft.jsx` / `FooterRight.jsx`). O
 // `Core.renderComponents` já as monta como qualquer outra região - o que não

@@ -1,0 +1,18 @@
+{
+  "name": "Name",
+  "email": "Email",
+  "description": "Description",
+  "send": "Send",
+  "attachments": "Attachments",
+  "select": "Select",
+  "clear": "Clear",
+  "dropFiles": "Drag the files to send here.",
+  "fileTooLarge": "The file is larger than allowed ({0}).",
+  "maxFileSize": "Maximum file size: {{size}} MB",
+  "requiredField": "Required field",
+  "requiredFields": "Required fields are empty",
+  "emailInvalid": "Incorrect email format",
+  "minFiles": "Attach at least {{n}} file(s).",
+  "maxFiles": "You can attach up to {{n}} file(s).",
+  "error": "An error occurred."
+}

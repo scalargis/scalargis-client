@@ -3,7 +3,10 @@ import { useForm } from 'react-hook-form';
 import { Alert, Button, Group, Textarea, TextInput } from '@mantine/core';
 import { Field, FileUpload, notify, IconCheck, IconAlertTriangle } from '@scalargis/ui';
 
+import { useTranslation } from 'react-i18next';
+
 import ContactInfo from './ContactInfo';
+import { I18N_NAMESPACE } from './i18n/index';
 
 
 const validateEmail = (email) => {
@@ -64,6 +67,8 @@ export default function ContactFrom(props) {
 
   const { core, viewer, config, Utils } = props;
 
+  const { t } = useTranslation([I18N_NAMESPACE, "custom"]);
+
   const upload_cfg = config.upload || {};
 
   const showCaptcha = (!viewer?.user_info?.name && viewer.captcha_key) ? true : false;
@@ -122,7 +127,7 @@ export default function ContactFrom(props) {
   function onInvalid() {
     setInfoMessage({
       type: 'error',
-      message: 'Campos obrigatórios não preenchidos'
+      message: t('requiredFields', 'Campos obrigatórios não preenchidos')
     });
   }
 
@@ -134,19 +139,19 @@ export default function ContactFrom(props) {
     if (!validateEmail(email)) {
       setInfoMessage({
         type: 'error',
-        message: 'Formato de email incorreto'
+        message: t('emailInvalid', 'Formato de email incorreto')
       });
       return false;
     } else if (upload_cfg?.minFiles != null && (upload_cfg.minFiles  > final_files.length)) {
       setInfoMessage({
         type: 'error',
-        message: `Tem de anexar pelo menos ${upload_cfg.minFiles} ficheiro(s).`
+        message: t("minFiles", "Tem de anexar pelo menos {{n}} ficheiro(s).", { n: upload_cfg.minFiles })
       });
       return false;
     } else if (upload_cfg?.maxFiles !=null && upload_cfg?.maxFiles < final_files.length) {
       setInfoMessage({
         type: 'error',
-        message: `Apenas pode anexar até ${upload_cfg.maxFiles} ficheiro(s).`
+        message: t("maxFiles", "Apenas pode anexar até {{n}} ficheiro(s).", { n: upload_cfg.maxFiles })
       });
       return false;
     } else {
@@ -207,7 +212,7 @@ export default function ContactFrom(props) {
         setSending(false);
         setInfoMessage({
           type: 'error',
-          message: 'Ocorreu um erro.'
+          message: t('error', 'Ocorreu um erro.')
         });
         setIsComplete(false);
       });
@@ -218,25 +223,25 @@ export default function ContactFrom(props) {
       <div>
         <TextInput
           id="contact_name"
-          label="Nome"
+          label={t("name", "Nome")}
           value={submittedValues?.name || ''}
-          placeholder="Nome"
+          placeholder={t("name", "Nome")}
           disabled
           mb="sm"
         />
         <TextInput
           id="contact_email"
-          label="Email"
+          label={t("email", "Email")}
           value={submittedValues?.email || ''}
-          placeholder="Email"
+          placeholder={t("email", "Email")}
           disabled
           mb="sm"
         />
         <Textarea rows={3}
           id="contact_description"
-          label="Descrição"
+          label={t("description", "Descrição")}
           value={submittedValues?.description || ''}
-          placeholder="Descrição"
+          placeholder={t("description", "Descrição")}
           disabled
           mb="sm"
         />
@@ -249,16 +254,16 @@ export default function ContactFrom(props) {
     )
   }
 
-  const requiredMessage = config.requiredFieldMessage || 'Campo de preenchimento obrigatório';
+  const requiredMessage = config.requiredFieldMessage || t('requiredField', 'Campo de preenchimento obrigatório');
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
 
-        <Field name="name" control={control} label="Nome" required rules={{ required: requiredMessage }}>
+        <Field name="name" control={control} label={t("name", "Nome")} required rules={{ required: requiredMessage }}>
           {(field, fieldState) => (
             <TextInput
               {...field}
-              placeholder="Nome"
+              placeholder={t("name", "Nome")}
               disabled={!!viewer?.user_info?.name}
               error={fieldState.error?.message}
               onChange={e => { field.onChange(e); setInfoMessage(null); }}
@@ -266,11 +271,11 @@ export default function ContactFrom(props) {
             />
           )}
         </Field>
-        <Field name="email" control={control} label="Email" required rules={{ required: requiredMessage }}>
+        <Field name="email" control={control} label={t("email", "Email")} required rules={{ required: requiredMessage }}>
           {(field, fieldState) => (
             <TextInput
               {...field}
-              placeholder="Email"
+              placeholder={t("email", "Email")}
               disabled={!!viewer?.user_info?.email}
               error={fieldState.error?.message}
               onChange={e => { field.onChange(e); setInfoMessage(null); }}
@@ -278,11 +283,11 @@ export default function ContactFrom(props) {
             />
           )}
         </Field>
-        <Field name="description" control={control} label="Descrição" required rules={{ required: requiredMessage }}>
+        <Field name="description" control={control} label={t("description", "Descrição")} required rules={{ required: requiredMessage }}>
           {(field, fieldState) => (
             <Textarea rows={3}
               {...field}
-              placeholder="Descrição"
+              placeholder={t("description", "Descrição")}
               error={fieldState.error?.message}
               onChange={e => { field.onChange(e); setInfoMessage(null); }}
               mb="sm"
@@ -292,26 +297,26 @@ export default function ContactFrom(props) {
 
         { upload_cfg.enabled &&
         <div className="field">
-          <label>Anexos</label>
+          <label>{t("attachments", "Anexos")}</label>
 
           <FileUpload
             className="contact-form-upload-file"
-            chooseLabel={ upload_cfg.chooseLabel || "Selecionar" }
-            cancelLabel={ upload_cfg.cancelLabel || "Limpar" }
+            chooseLabel={ upload_cfg.chooseLabel || t("select", "Selecionar") }
+            cancelLabel={ upload_cfg.cancelLabel || t("clear", "Limpar") }
             onFilesChange={onFilesChange}
             multiple
             disabled={isProcessingFiles}
             accept={ (upload_cfg.accept || "image/*, application/pdf").split(',').map(s => s.trim()) }
             maxSize={ upload_cfg.maxFileSize || 1000000}
-            placeholder={ upload_cfg.emptyMessage || "Arraste para aqui os ficheiros a enviar." }
+            placeholder={ upload_cfg.emptyMessage || t("dropFiles", "Arraste para aqui os ficheiros a enviar.") }
             onReject={(rejections) => {
-              const maxSizeMsg = (upload_cfg.invalidFileSizeMessageDetail || "Ficheiro com dimensão superior ao permitido ({0}).")
+              const maxSizeMsg = (upload_cfg.invalidFileSizeMessageDetail || t("fileTooLarge", "Ficheiro com dimensão superior ao permitido ({0})."))
                 .replace('{0}', `${(((upload_cfg.maxFileSize || 1000000)) / 1048576).toFixed(2)} MB`);
               rejections.forEach(r => notify.error(r.file.name, maxSizeMsg));
             }}
           />
 
-            { (upload_cfg.maxFileSize) && <small className="block">Tamanho máximo do ficheiro: {(upload_cfg.maxFileSize / 1048576).toFixed(2)} MB</small> }
+            { (upload_cfg.maxFileSize) && <small className="block">{t("maxFileSize", "Tamanho máximo do ficheiro: {{size}} MB", { size: (upload_cfg.maxFileSize / 1048576).toFixed(2) })}</small> }
 
         </div> }
 
@@ -345,7 +350,7 @@ export default function ContactFrom(props) {
             loading={sending}
             disabled={!enableSubmit || sending}
           >
-            Enviar
+            {t("send", "Enviar")}
           </Button>
         </Group>
       </form>
