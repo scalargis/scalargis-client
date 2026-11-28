@@ -7,13 +7,15 @@
   "properties": {
     "header": {
       "title": "Cabeçalho",
-      "description": "Título da janela ou do painel. Sem valor, usa o título do componente e depois \"Formulário de Contacto\".",
-      "type": "string"
+      "description": "Título da janela ou do painel, em texto ou por idioma. Sem valor, usa o título do componente e depois \"Formulário de Contacto\".",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" }
     },
     "closeLabel": {
       "title": "Texto do botão fechar",
-      "description": "Texto do botão que fecha a janela.",
-      "type": "string",
+      "description": "Texto do botão que fecha a janela, em texto ou por idioma.",
+      "type": ["string", "object"],
+      "additionalProperties": { "type": "string" },
       "default": "Fechar"
     },
     "footerLabel": {

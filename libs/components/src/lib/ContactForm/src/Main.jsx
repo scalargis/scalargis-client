@@ -4,7 +4,7 @@ import { Button, Group, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { CollapsiblePanel, Dialog, IconQuestionCircle, IconEnvelope } from '@scalargis/ui';
 
-import { MainMenuButton } from '../../components';
+import { i18n, MainMenuButton } from '../../components';
 
 import ContactForm from './ContactForm';
 import ContactInfo from './ContactInfo';
@@ -30,8 +30,10 @@ export function MainMenu({ className, core, config, actions, record }) {
   const [showPopup, { open, close }] = useDisclosure(false);
 
   const component_cfg = record.config_json || {};
-  const title = record.title || '';
-  const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
+  const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("contact", "Contacto");
+  const header = component_cfg.header
+    ? i18n.translateValue(component_cfg.header, component_cfg.header)
+    : (record.title ? title : i18n.translateValue("contactForm", "Formulário de Contacto"));
 
   function renderContent() {
     return (
@@ -55,7 +57,7 @@ export function MainMenu({ className, core, config, actions, record }) {
   }
 
   if (record.as === 'popup') {
-    const closeLabel = component_cfg.closeLabel || t("close", "Fechar");
+    const closeLabel = component_cfg.closeLabel ? i18n.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18n.translateValue("close", "Fechar");
     return (
       <React.Fragment>
 
@@ -100,10 +102,12 @@ export default function Main({ region, as, core, config, actions, record }) {
   const [showForm, { open, close }] = useDisclosure(false);
 
   const component_cfg = record.config_json || {};
-  const title = record.title || '';
-  const header = component_cfg.header || title || t("contactForm", "Formulário de Contacto");
+  const title = record.title ? i18n.translateValue(record.title, record.title) : i18n.translateValue("contact", "Contacto");
+  const header = component_cfg.header
+    ? i18n.translateValue(component_cfg.header, component_cfg.header)
+    : (record.title ? title : i18n.translateValue("contactForm", "Formulário de Contacto"));
 
-  const closeLabel = component_cfg.closeLabel || t("close", "Fechar");
+  const closeLabel = component_cfg.closeLabel ? i18n.translateValue(component_cfg.closeLabel, component_cfg.closeLabel) : i18n.translateValue("close", "Fechar");
 
   function renderContent() {
     return  (
